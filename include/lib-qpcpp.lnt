@@ -1,0 +1,353 @@
+//////////////////////////////////////////////////////////////////////////////
+// Product: PC-Lint 9.x option file for linting QP/C++ applications
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 09, 2012
+//
+//                    Q u a n t u m     L e a P s
+//                    ---------------------------
+//                    innovating embedded systems
+//
+// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+//
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// Alternatively, this program may be distributed and modified under the
+// terms of Quantum Leaps commercial licenses, which expressly supersede
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Contact information:
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
+// e-mail:                  info@quantum-leaps.com
+//////////////////////////////////////////////////////////////////////////////
+
+// general (evt.h)
+-estring(1960,                // 11-0-1(req) non-private data member
+ sig,
+ poolId_,
+ refCtr_)
+-estring(1927,                // 8-5-1(req) not in the ctor initializer
+ *QEvt::poolId_,
+ *QEvt::refCtr_)
+-estring(1923,                // 16-2-2(req) could become const variable
+ Q_USE_NAMESPACE,
+ Q_EVT_CTOR,
+ Q_SIGNAL_SIZE,
+ QP_VERSION)
+-emacro(923, Q_UINT2PTR_CAST) // 5-2-7, 5-2-8 cast from int to pointer
+-emacro(930, QEVT_INITIALIZER)// 5-2-7, 5-2-8 cast from enum to unsigned
+-estring(1960,                // 16-0-4(req) function-like macro
+ Q_DIM,
+ Q_UINT2PTR_CAST,
+ QEVT_INITIALIZER)
+-esym(1790,                   // Base class has no virtual functions
+ *QEvt)
+-estring(1712, QEvt)          // default constructor not defined
+-estring(1401,                // member not initialized in the ctor
+ *QEvt::poolId_,
+ *QEvt::refCtr_)
+-emacro(866, Q_DIM)           // Unusual use of 'SYM' in argument to sizeof
+-estring(970,bool)            // Use of 'bool' outside of a typedef
+
+
+// Assertions
+-estring(1960,                // 16-0-4 function-like macro
+ Q_ASSERT,
+ Q_ASSERT_ID,
+ Q_ALLEGE,
+ Q_ALLEGE_ID,
+ Q_ERROR,
+ Q_ERROR_ID,
+ Q_REQUIRE,
+ Q_REQUIRE_ID,
+ Q_ENSURE,
+ Q_ENSURE_ID,
+ Q_INVARIANT,
+ Q_INVARIANT_ID,
+ Q_ASSERT_COMPILE,
+ Q_DEFINE_THIS_MODULE)
+-emacro(1924,                 // 5-2-4 C-style cast
+ Q_ASSERT,
+ Q_ALLEGE,
+ Q_ERROR)
+-emacro(522,                  // Highest operation lacks side-effects 
+ Q_ASSERT,
+ Q_ALLEGE,
+ Q_ERROR)
+-function(exit, Q_onAssert)   // give Q_onAssert() the semantics of "exit"
+
+
+// QEP
+-emacro(929,                  // 5-2-7(req) cast pointer to pointer
+ Q_STATE_CAST,
+ Q_EVT_CAST)
+-emacro(1939,                 // 5-2-2, Down cast detected
+ Q_EVT_CAST,
+ Q_NEW)
+-esym(1960,                   // 16-0-4 function-like macro
+ Q_ROM_BYTE,
+ Q_TRAN,
+ Q_SUPER,
+ Q_STATE_CAST,
+ Q_EVT_CAST)
+-esym(1712,                   // default constructor not defined
+ QFsm,
+ QHsm)
+
+
+// QF
+-emacro(929, Q_NEW)           // 5-2-7 cast from pointer to pointer
+-esym(1927,                   // 8-5-1 Symbol not in the ctor initializer list
+ *QActive::m_prio,
+ *QActive::m_eQueue,
+ *QActive::m_osObject,
+ *QActive::m_thread)
+-estring(1923,                // 16-2-2 could become const variable
+ QF_MAX_ACTIVE,
+ QF_MAX_EPOOL,
+ QF_EVENT_SIZ_SIZE,
+ QF_EQUEUE_CTR_SIZE,
+ QF_MPOOL_SIZ_SIZE,
+ QF_MPOOL_CTR_SIZE,
+ QF_TIMEEVT_CTR_SIZE)
+-estring(1923,                // 16-2-2 could become const variable
+ QF_INT_DISABLE,
+ QF_INT_ENABLE,
+ QF_CRIT_ENTRY,
+ QF_CRIT_EXIT,
+ QF_QS_CRIT_ENTRY,
+ QF_QS_CRIT_EXIT,
+ QF_QS_ISR_ENTRY,
+ QF_QS_ISR_EXIT,
+ QF_QS_ACTION)
+-esym(1960,                   // 16-0-2, '#define' used within a block
+ QF_EVENT_SIZ_SIZE,
+ QF_TIMEEVT_CTR_SIZE,
+ QF_ACTIVE_SUPER_,
+ QF_ACTIVE_STATE_)
+-esym(1960,                   // 16-0-4 function-like macro
+ QF_INT_DISABLE,
+ QF_INT_ENABLE,
+ QF_CRIT_ENTRY,
+ QF_CRIT_EXIT,
+ QF_TICK,
+ Q_NEW,
+ PUBLISH,
+ POST,
+ TICK)
+-esym(1960,                   // 16-0-4 function-like macro
+ QF_QS_CRIT_EXIT,
+ QF_QS_CRIT_ENTRY,
+ QF_QS_CRIT_EXIT,
+ QF_QS_ISR_ENTRY,
+ QF_QS_ISR_EXIT,
+ QF_QS_ACTION,
+ QF_MPOOL_EL)
+-esym(1960,                   // 16-0-4 function-like macro
+ QACTIVE_EQUEUE_WAIT_,
+ QACTIVE_EQUEUE_SIGNAL_,
+ QACTIVE_EQUEUE_ONEMPTY_,
+ QF_EPOOL_INIT_,
+ QF_EPOOL_EVENT_SIZE_,
+ QF_EPOOL_GET_,
+ QF_EPOOL_PUT_)
+-estring(1963, Q_NEW)         // 16-3-2(adv) '#/##' used in macro
+-esym(1790,                   // Base class has no virtual functions
+ *QHsm,
+ *QFsm,
+ *QActive)
+-esym(1401,                   // member not initialized by constructor
+ *QActive::m_prio,
+ *QActive::m_eQueue,
+ *QActive::m_osObject,
+ *QActive::m_thread)
+-esym(1712,                   // default constructor not defined for class
+ *QActive,
+ *QTimeEvt)
+-esym(641, *Signals)          // Converting enum '*Signals' to 'int'
+-esym(754, sto_)              // local structure member 'sto' not referenced
+-efunc(1960, *QPSet*::isEmpty)    // incorrect reporting int->bool
+-efunc(1960, *QPSet*::notEmpty)   // incorrect reporting int->bool
+-efunc(1960, *QPSet*::hasElement) // incorrect reporting int->bool
+
+
+// QK
+-esym(1960,                   // 16-0-4 function-like macro
+ QK_ISR_ENTRY,
+ QK_ISR_EXIT,
+ QK_EXT_SAVE,
+ QK_EXT_RESTORE,
+ QK_TLS)
+
+
+// QS
+-emacro(506, QS_*)            // 0-1-1 constant value boolean
+-emacro(774, QS_*)            // 0-1-1 'if' always True
+-emacro(930, QS_*)            // 5-2-7 cast from enum to unsigned char
+-emacro(923,                  // 5-2-7, 5-2-8 cast from pointer to int
+ QS_OBJ_,
+ QS_FUN_)
+-estring(1923,                // 16-2-2 macro could become const variable
+ QS_RESET,
+ QS_TIME_SIZE,
+ QS_OBJ_PTR_SIZE,
+ QS_FUN_PTR_SIZE,
+ QS_OBJ_,
+ QS_FUN_)
+-esym(1960,                   // 16-0-4 function-like macro
+ QS_INIT,
+ QS_EXIT,
+ QS_DUMP,
+ QS_RESET,
+ QS_FILTER_ON,
+ QS_FILTER_OFF,
+ QS_FILTER_SM_OBJ,
+ QS_FILTER_AO_OBJ,
+ QS_FILTER_MP_OBJ,
+ QS_FILTER_EQ_OBJ,
+ QS_FILTER_TE_OBJ,
+ QS_FILTER_AP_OBJ,
+ QS_GET_BYTE,
+ QS_GET_BLOCK,
+ QS_BEGIN,
+ QS_END,
+ QS_BEGIN_NOCRIT,
+ QS_END_NOCRIT)
+-esym(1960,                   // 16-0-4 function-like macro
+ QS_I8,
+ QS_U8,
+ QS_I16,
+ QS_U16,
+ QS_I32,
+ QS_I64,
+ QS_U32,
+ QS_F32,
+ QS_F64,
+ QS_U64,
+ QS_U32_HEX,
+ QS_STR,
+ QS_OBJ,
+ QS_FUN,
+ QS_SIG_DICTIONARY,
+ QS_OBJ_DICTIONARY,
+ QS_FUN_DICTIONARY,
+ QS_USR_DICTIONARY,
+ QS_ASSERTION,
+ QS_FLUSH,
+ QS_STR_ROM,
+ QS_MEM,
+ QS_SIG)
+-esym(1960,                   // 16-0-4 function-like macro
+ QS_CRIT_ENTRY_,
+ QS_CRIT_EXIT_,
+ QS_BEGIN_,
+ QS_END_,
+ QS_GLB_FILTER_,
+ QS_BEGIN_NOCRIT_,
+ QS_END_NOCRIT_,
+ QS_U8_,
+ QS_U16_,
+ QS_U32_,
+ QS_U64_,
+ QS_STR_,
+ QS_STR_ROM_,
+ QS_TIME_,
+ QS_SIG_,
+ QS_EVS_,
+ QS_OBJ_,
+ QS_FUN_,
+ QS_EQC_,
+ QS_MPC_,
+ QS_MPS_,
+ QS_TEC_)
+-esym(1923,                   // 16-2-2 could become const variable
+ QS_INIT,
+ QS_EXIT,
+ QS_DUMP,
+ QS_FILTER_ON,
+ QS_FILTER_OFF,
+ QS_FILTER_SM_OBJ,
+ QS_FILTER_AO_OBJ,
+ QS_FILTER_MP_OBJ,
+ QS_FILTER_EQ_OBJ,
+ QS_FILTER_TE_OBJ,
+ QS_FILTER_AP_OBJ,
+ QS_GET_BYTE,
+ QS_GET_BLOCK,
+ QS_BEGIN,
+ QS_END,
+ QS_BEGIN_NOCRIT,
+ QS_END_NOCRIT)
+-esym(1923,                   // 16-2-2 could become const variable
+ QS_I8,
+ QS_U8,
+ QS_I16,
+ QS_U16,
+ QS_I32,
+ QS_I64,
+ QS_U32,
+ QS_F32,
+ QS_F64,
+ QS_U64,
+ QS_U32_HEX,
+ QS_STR,
+ QS_OBJ,
+ QS_FUN,
+ QS_SIG_DICTIONARY,
+ QS_OBJ_DICTIONARY,
+ QS_FUN_DICTIONARY,
+ QS_USR_DICTIONARY,
+ QS_ASSERTION,
+ QS_FLUSH,
+ QS_STR_ROM,
+ QS_MEM,
+ QS_SIG)
+-esym(1923,                   // 16-2-2 could become const variable
+ QS_CRIT_ENTRY_,
+ QS_CRIT_EXIT_,
+ QS_BEGIN_,
+ QS_END_,
+ QS_BEGIN_NOCRIT_,
+ QS_END_NOCRIT_,
+ QS_U8_,
+ QS_U16_,
+ QS_U32_,
+ QS_U64_,
+ QS_STR_,
+ QS_STR_ROM_,
+ QS_TIME_,
+ QS_SIG_,
+ QS_EVS_,
+ QS_OBJ_,
+ QS_FUN_,
+ QS_EQC_,
+ QS_MPC_,
+ QS_MPS_,
+ QS_TEC_)
+-esym(1963,                   // 16-3-2, '#/##' operator used in macro
+ QS_SIG_DICTIONARY,
+ QS_OBJ_DICTIONARY,
+ QS_FUN_DICTIONARY,
+ QS_USR_DICTIONARY)
+-emacro(717, QS_*)            // do ... while(0);
+-emacro(725, QS_END*)         // Expected positive indentation
+-esym(641, *QSType)           // Converting enum '*QSType' to 'int'
+
+
+// Miscallaneous
+-estring(793,6)   // ANSI/ISO limit of 6 significant chars exceeded
+-e546             // Suspicious use of &
+
+

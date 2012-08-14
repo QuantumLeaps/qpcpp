@@ -1,0 +1,2079 @@
+
+--- Module:   ..\bsp.cpp
+            _
+static void interrupt (*l_dosTmrISR)(...);
+..\bsp.cpp  37  Note 950: Non-ANSI reserved word or construct: 'interrupt'
+    [Misra Rule 1]
+            _
+static void interrupt (*l_dosKbdISR)(...);
+..\bsp.cpp  38  Note 950: Non-ANSI reserved word or construct: 'interrupt'
+    [Misra Rule 1]
+            _
+static void interrupt (*l_dosSpareISR)(...);
+..\bsp.cpp  39  Note 950: Non-ANSI reserved word or construct: 'interrupt'
+    [Misra Rule 1]
+                        _
+#define TMR_VECTOR      0x08
+..\bsp.cpp  48  Note 1923: macro 'TMR_VECTOR' could become const variable --
+    Effective C++ #1
+                        _
+#define KBD_VECTOR      0x09
+..\bsp.cpp  49  Note 1923: macro 'KBD_VECTOR' could become const variable --
+    Effective C++ #1
+                        _
+#define SPARE_VECTOR    0x81
+..\bsp.cpp  50  Note 1923: macro 'SPARE_VECTOR' could become const variable --
+    Effective C++ #1
+            _
+static void interrupt ISR_tmr(...) {
+..\bsp.cpp  53  Note 950: Non-ANSI reserved word or construct: 'interrupt'
+    [Misra Rule 1]
+                       _
+#...     __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                                 // unlock interrupts
+..\bsp.cpp  55  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                                 // unlock interrupts
+..\bsp.cpp  55  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                                 // unlock interrupts
+..\bsp.cpp  55  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                       _
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                                 // unlock interrupts
+..\bsp.cpp  55  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+                                                 _
+    static QEvent const tickEvt = { TIME_TICK_SIG, 0 };
+..\bsp.cpp  58  Warning 641: Converting enum 'GameSignals' to int
+                     _
+#...   __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);                               // lock interrupts again
+..\bsp.cpp  65  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);                               // lock interrupts again
+..\bsp.cpp  65  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);                               // lock interrupts again
+..\bsp.cpp  65  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                     _
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);                               // lock interrupts again
+..\bsp.cpp  65  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+                       _
+    outportb(0x20, 0x20);                       // write EOI to the master PIC
+..\bsp.cpp  66  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+            _
+static void interrupt ISR_kbd(...) {
+..\bsp.cpp  69  Note 950: Non-ANSI reserved word or construct: 'interrupt'
+    [Misra Rule 1]
+                       _
+#...     __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                                 // unlock interrupts
+..\bsp.cpp  74  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                                 // unlock interrupts
+..\bsp.cpp  74  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                                 // unlock interrupts
+..\bsp.cpp  74  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                       _
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                                 // unlock interrupts
+..\bsp.cpp  74  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+                      _
+    key = inport(0x60);              // key scan code from 8042 kbd controller
+..\bsp.cpp  76  Info 734: Loss of precision (assignment) (31 bits to 8 bits)
+                      _
+    kcr = inport(0x61);                       // get keyboard control register
+..\bsp.cpp  77  Info 734: Loss of precision (assignment) (31 bits to 8 bits)
+                                                                        _
+            ObjectPosEvt *ope = Q_NEW(ObjectPosEvt, PLAYER_SHIP_MOVE_SIG);
+..\bsp.cpp  84  Warning 641: Converting enum 'GameSignals' to int
+..\bsp.cpp  84  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+            _
+            ope->x = (uint8_t)GAME_SHIP_X;              // x-position is fixed
+..\bsp.cpp  92  Note 961: Violates MISRA Advisory Rule 60, no 'else' at end of
+    'if ... else if' chain
+                                      _
+            ope->y = (uint8_t)ship_pos;
+..\bsp.cpp  93  Note 961: Violates MISRA Advisory Rule 44, redundant explicit
+    casting
+                                _
+            Video::printNumAt(24, 24, Video::FGND_YELLOW, ship_pos);
+..\bsp.cpp  96  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  96  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  96  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  96  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  96  Note 917: Prototype coercion (arg. no. 4) unsigned char to
+    unsigned long [MISRA Rule 77]
+                                                              _
+            static QEvent const fireEvt = { PLAYER_TRIGGER_SIG, 0 };
+..\bsp.cpp  101  Warning 641: Converting enum 'GameSignals' to int
+                                _
+            Video::printNumAt(47, 24, Video::FGND_YELLOW, ++ntrig);
+..\bsp.cpp  104  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  104  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  104  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  104  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  104  Note 917: Prototype coercion (arg. no. 4) unsigned int to
+    unsigned long [MISRA Rule 77]
+                                                           _
+            static QEvent const quitEvt = { PLAYER_QUIT_SIG, 0 };
+..\bsp.cpp  108  Warning 641: Converting enum 'GameSignals' to int
+    _
+    }
+..\bsp.cpp  112  Info 744: switch statement has no default [MISRA Rule 62]
+                     _
+#...   __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);                               // lock interrupts again
+..\bsp.cpp  114  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);                               // lock interrupts again
+..\bsp.cpp  114  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);                               // lock interrupts again
+..\bsp.cpp  114  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                     _
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);                               // lock interrupts again
+..\bsp.cpp  114  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+                       _
+    outportb(0x20, 0x20);                       // write EOI to the master PIC
+..\bsp.cpp  115  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+              _
+void BSP_init(int argc, char *argv[]) {
+..\bsp.cpp  118  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\bsp.cpp  118  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\bsp.cpp  118  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\bsp.cpp  118  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+    _
+    char const *com = "COM1";
+..\bsp.cpp  119  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\bsp.cpp  119  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                    _
+    if (!QS_INIT(com)) {                                      // initialize QS
+..\bsp.cpp  126  Warning 506: Constant value Boolean [MISRA Rule 52]
+..\bsp.cpp  126  Warning 506: Constant value Boolean [MISRA Rule 52]
+..\bsp.cpp  126  Info 774: Boolean within 'if' always evaluates to False
+    [Reference: file ..\bsp.cpp: line 126]
+..\bsp.cpp  126  Info 831: Reference cited in prior message
+                                             _
+    Video::clearScreen(Video::BGND_LIGHT_GRAY);
+..\bsp.cpp  130  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  130  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+                       _
+    Video::clearRect( 0,  0, 80,   1, Video::BGND_RED | Video::BGND_BLINK);
+..\bsp.cpp  131  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  131  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  131  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  131  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  131  Warning 655: bit-wise operation uses (compatible) enum's
+..\bsp.cpp  131  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  131  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                       _
+    Video::clearRect( 0,  8, 80,  24, Video::BGND_BLACK | Video::FGND_WHITE);
+..\bsp.cpp  132  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  132  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  132  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  132  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  132  Warning 655: bit-wise operation uses (compatible) enum's
+..\bsp.cpp  132  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  132  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                       _
+    Video::clearRect( 0,  7, 80,   8, Video::BGND_BLUE);
+..\bsp.cpp  133  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  133  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  133  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  133  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  133  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  133  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                       _
+    Video::clearRect( 0, 24, 80,  25, Video::BGND_BLUE);
+..\bsp.cpp  134  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  134  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  134  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  134  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  134  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  134  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                       _
+    Video::clearRect(24, 24, 28,  25, Video::BGND_RED | Video::BGND_BLINK);
+..\bsp.cpp  136  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  136  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  136  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  136  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  136  Warning 655: bit-wise operation uses (compatible) enum's
+..\bsp.cpp  136  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  136  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                       _
+    Video::clearRect(24, 24, 28,  25, Video::BGND_RED | Video::BGND_BLINK);
+..\bsp.cpp  137  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  137  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  137  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  137  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  137  Warning 655: bit-wise operation uses (compatible) enum's
+..\bsp.cpp  137  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  137  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt(35,  0, Video::FGND_WHITE, "FLY 'n' SHOOT");
+..\bsp.cpp  139  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  139  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  139  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  139  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt(15,  2, Video::FGND_BLACK,
+..\bsp.cpp  140  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  140  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  140  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  140  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt(15,  3, Video::FGND_BLACK,
+..\bsp.cpp  142  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  142  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  142  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  142  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt(15,  4, Video::FGND_BLACK,
+..\bsp.cpp  144  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  144  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  144  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  144  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt(15,  5, Video::FGND_BLACK,
+..\bsp.cpp  146  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  146  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  146  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  146  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt( 8, 24, Video::FGND_WHITE, "Ship Position:");
+..\bsp.cpp  148  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  148  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  148  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  148  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt(37, 24, Video::FGND_WHITE, "Triggers:");
+..\bsp.cpp  149  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  149  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  149  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  149  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt(61, 24, Video::FGND_WHITE, "Score:");
+..\bsp.cpp  150  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  150  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  150  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  150  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                       _
+    Video::clearRect(24, 24, 28,  25, Video::BGND_RED);
+..\bsp.cpp  152  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  152  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  152  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  152  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  152  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  152  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                       _
+    Video::clearRect(47, 24, 51,  25, Video::BGND_RED);
+..\bsp.cpp  153  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  153  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  153  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  153  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  153  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  153  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                       _
+    Video::clearRect(68, 24, 72,  25, Video::BGND_RED);
+..\bsp.cpp  154  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  154  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  154  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  154  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  154  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  154  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printNumAt(24, 24, Video::FGND_YELLOW, 0);
+..\bsp.cpp  155  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  155  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  155  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  155  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  155  Note 917: Prototype coercion (arg. no. 4) int to unsigned long
+    [MISRA Rule 77]
+                        _
+    Video::printNumAt(47, 24, Video::FGND_YELLOW, 0);
+..\bsp.cpp  156  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  156  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  156  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  156  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  156  Note 917: Prototype coercion (arg. no. 4) int to unsigned long
+    [MISRA Rule 77]
+                        _
+    Video::printNumAt(68, 24, Video::FGND_YELLOW, 0);
+..\bsp.cpp  157  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  157  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  157  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  157  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  157  Note 917: Prototype coercion (arg. no. 4) int to unsigned long
+    [MISRA Rule 77]
+_
+}
+..\bsp.cpp  158  Info 818: Pointer parameter 'argv' (line 118) could be
+    declared as pointing to const [MISRA Rule 81]
+..\bsp.cpp  118  Info 830: Location cited in prior message
+                         _
+    Video::drawBitmapAt(0, 8, bitmap, width, height);
+..\bsp.cpp  161  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  161  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+                                           _
+void BSP_drawNString(uint8_t x, uint8_t y, char const *str) {
+..\bsp.cpp  164  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\bsp.cpp  164  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                                 _
+    Video::drawStringAt(x, 8 + y*8, str);
+..\bsp.cpp  165  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '+' and '*'
+..\bsp.cpp  165  Info 734: Loss of precision (arg. no. 2) (11 bits to 8 bits)
+..\bsp.cpp  165  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+                  _
+    if (score == 0) {
+..\bsp.cpp  169  Note 912: Implicit binary conversion from int to unsigned int
+                           _
+        Video::clearRect(68, 24, 72,  25, Video::BGND_RED);
+..\bsp.cpp  170  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  170  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  170  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  170  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  170  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  170  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printNumAt(68, 24, Video::FGND_YELLOW, score);
+..\bsp.cpp  172  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  172  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  172  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  172  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  172  Note 917: Prototype coercion (arg. no. 4) unsigned int to
+    unsigned long [MISRA Rule 77]
+                           _
+    l_dosTmrISR   = getvect(TMR_VECTOR);
+..\bsp.cpp  178  Error 1055: Symbol 'getvect' undeclared, assumed to return int
+..\bsp.cpp  178  Info 746: call to function 'getvect()' not made in the
+    presence of a prototype [Misra Rules 20 and 71]
+..\bsp.cpp  178  Error 64: Type mismatch (assignment) (void (interrupt *)(...)
+    = int) [MISRA Rule 29]
+                                       _
+    l_dosKbdISR   = getvect(KBD_VECTOR);
+..\bsp.cpp  179  Error 64: Type mismatch (assignment) (void (interrupt *)(...)
+    = int) [MISRA Rule 29]
+                                         _
+    l_dosSpareISR = getvect(SPARE_VECTOR);
+..\bsp.cpp  180  Error 64: Type mismatch (assignment) (void (interrupt *)(...)
+    = int) [MISRA Rule 29]
+                     _
+#...   __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  182  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  182  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  182  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                     _
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  182  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+                                                            _
+    count = (uint16_t)(((1193180 * 2) / BSP_TICKS_PER_SEC + 1) >> 1);
+..\bsp.cpp  184  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '/' and '+'
+                       _
+    outportb(0x43, 0x36);                // use mode-3 for timer 0 in the 8254
+..\bsp.cpp  185  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+                               _
+    outportb(0x40, count & 0xFF);                 // load low  byte of timer 0
+..\bsp.cpp  186  Note 912: Implicit binary conversion from int to unsigned int
+..\bsp.cpp  186  Note 917: Prototype coercion (arg. no. 2) unsigned int to
+    unsigned char [MISRA Rule 77]
+                                      _
+    outportb(0x40, (count >> 8) & 0xFF);          // load high byte of timer 0
+..\bsp.cpp  187  Note 912: Implicit binary conversion from int to unsigned int
+..\bsp.cpp  187  Note 917: Prototype coercion (arg. no. 2) unsigned int to
+    unsigned char [MISRA Rule 77]
+           _
+    setvect(TMR_VECTOR, &ISR_tmr);
+..\bsp.cpp  189  Error 1055: Symbol 'setvect' undeclared, assumed to return int
+..\bsp.cpp  189  Info 746: call to function 'setvect()' not made in the
+    presence of a prototype [Misra Rules 20 and 71]
+..\bsp.cpp  189  Warning 534: Ignoring return value of function 'setvect()'
+    (compare with line 189)
+..\bsp.cpp  189  Info 830: Location cited in prior message
+                                 _
+    setvect(KBD_VECTOR, &ISR_kbd);
+..\bsp.cpp  190  Warning 534: Ignoring return value of function 'setvect()'
+    (compare with line 189)
+..\bsp.cpp  189  Info 830: Location cited in prior message
+                                      _
+    setvect(SPARE_VECTOR, l_dosTmrISR);
+..\bsp.cpp  191  Warning 534: Ignoring return value of function 'setvect()'
+    (compare with line 189)
+..\bsp.cpp  189  Info 830: Location cited in prior message
+                       _
+#...     __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);
+..\bsp.cpp  192  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);
+..\bsp.cpp  192  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);
+..\bsp.cpp  192  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                       _
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);
+..\bsp.cpp  192  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+                     _
+#...   __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  197  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  197  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  197  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                     _
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  197  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+                       _
+    outportb(0x43, 0x36);                // use mode-3 for timer 0 in the 8254
+..\bsp.cpp  198  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+                    _
+    outportb(0x40, 0);                            // load low  byte of timer 0
+..\bsp.cpp  199  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+                    _
+    outportb(0x40, 0);                            // load high byte of timer 0
+..\bsp.cpp  200  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+                                    _
+    setvect(TMR_VECTOR, l_dosTmrISR);
+..\bsp.cpp  202  Warning 534: Ignoring return value of function 'setvect()'
+    (compare with line 189)
+..\bsp.cpp  189  Info 830: Location cited in prior message
+                                    _
+    setvect(KBD_VECTOR, l_dosKbdISR);
+..\bsp.cpp  203  Warning 534: Ignoring return value of function 'setvect()'
+    (compare with line 189)
+..\bsp.cpp  189  Info 830: Location cited in prior message
+                                        _
+    setvect(SPARE_VECTOR, l_dosSpareISR);
+..\bsp.cpp  204  Warning 534: Ignoring return value of function 'setvect()'
+    (compare with line 189)
+..\bsp.cpp  189  Info 830: Location cited in prior message
+                       _
+#...     __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);
+..\bsp.cpp  205  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);
+..\bsp.cpp  205  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);
+..\bsp.cpp  205  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                       _
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);
+..\bsp.cpp  205  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+         _
+    _exit(0);                                                   // exit to DOS
+..\bsp.cpp  208  Error 1055: Symbol '_exit' undeclared, assumed to return int
+..\bsp.cpp  208  Info 746: call to function '_exit()' not made in the presence
+    of a prototype [Misra Rules 20 and 71]
+..\bsp.cpp  208  Warning 534: Ignoring return value of function '_exit()'
+    (compare with line 208)
+..\bsp.cpp  208  Info 830: Location cited in prior message
+                       _
+#...     __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                          // always unlock interrutps
+..\bsp.cpp  212  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                          // always unlock interrutps
+..\bsp.cpp  212  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                       _
+#...    __emit__( (char)(0xfb) )
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                          // always unlock interrutps
+..\bsp.cpp  212  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                       _
+#... e  -e717 */enable() /*lint -restore */
+    QF_INT_UNLOCK(dummy);                          // always unlock interrutps
+..\bsp.cpp  212  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+                _
+void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
+..\bsp.cpp  227  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\bsp.cpp  227  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\bsp.cpp  227  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+..\bsp.cpp  227  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...   __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  228  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  228  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+                     _
+#...  __emit__( (char)(0xfa) )
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  228  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                     _
+#... -e717 */disable() /*lint -restore */
+    QF_INT_LOCK(dummy);
+..\bsp.cpp  228  Error 119: Too many arguments (1) for prototype
+    '__emit__(void)' [MISRA Rule 78]
+                        _
+    Video::clearRect ( 0, 24, 80, 25, Video::BGND_RED);
+..\bsp.cpp  230  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  230  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  230  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  230  Note 917: Prototype coercion (arg. no. 4) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  230  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  230  Note 917: Prototype coercion (arg. no. 5) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt( 0, 24, Video::FGND_WHITE, "ASSERTION FAILED in file:");
+..\bsp.cpp  231  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  231  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  231  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  231  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt(26, 24, Video::FGND_YELLOW, file);
+..\bsp.cpp  232  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  232  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  232  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  232  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printStrAt(57, 24, Video::FGND_WHITE, "line:");
+..\bsp.cpp  233  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  233  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  233  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  233  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+                        _
+    Video::printNumAt(62, 24, Video::FGND_YELLOW, line);
+..\bsp.cpp  234  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  234  Note 917: Prototype coercion (arg. no. 2) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  234  Warning 641: Converting enum 'VideoColor' to int
+..\bsp.cpp  234  Note 917: Prototype coercion (arg. no. 3) int to unsigned char
+    [MISRA Rule 77]
+..\bsp.cpp  234  Info 732: Loss of sign (arg. no. 4) (int to unsigned long)
+..\bsp.cpp  234  Note 917: Prototype coercion (arg. no. 4) int to unsigned long
+    [MISRA Rule 77]
+
+    --- Wrap-up for Module: ..\bsp.cpp
+
+Info 766: Header file 'c:\tools\tcpp101\INCLUDE\stdlib.h' not used in module
+    '..\bsp.cpp'
+
+--- Module:   ..\main.cpp
+          _
+void main(int argc, char *argv[]) {
+..\main.cpp  41  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\main.cpp  41  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\main.cpp  41  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\main.cpp  41  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+                                                   _
+    QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
+..\main.cpp  48  Note 917: Prototype coercion (arg. no. 2) unsigned int to
+    unsigned long [MISRA Rule 77]
+                                                   _
+    QF::poolInit(l_medPoolSto, sizeof(l_medPoolSto), sizeof(l_medPoolSto[0]));
+..\main.cpp  49  Note 917: Prototype coercion (arg. no. 2) unsigned int to
+    unsigned long [MISRA Rule 77]
+                                             _
+    QF::psInit(l_subscrSto, Q_DIM(l_subscrSto));     // init publish-subscribe
+..\main.cpp  51  Note 917: Prototype coercion (arg. no. 2) unsigned int to
+    unsigned char [MISRA Rule 77]
+                       _
+    AO_Missile->start(1,                                           // priority
+..\main.cpp  113  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                                                _
+                      l_missileQueueSto, Q_DIM(l_missileQueueSto),// evt queue
+..\main.cpp  114  Note 917: Prototype coercion (arg. no. 3) unsigned int to
+    unsigned long [MISRA Rule 77]
+                                  _
+                      (void *)0, 0,                     // no per-thread stack
+..\main.cpp  115  Note 917: Prototype coercion (arg. no. 5) int to unsigned
+    long [MISRA Rule 77]
+                       _
+    AO_Ship   ->start(2,                                           // priority
+..\main.cpp  117  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                                          _
+                      l_shipQueueSto, Q_DIM(l_shipQueueSto),      // evt queue
+..\main.cpp  118  Note 917: Prototype coercion (arg. no. 3) unsigned int to
+    unsigned long [MISRA Rule 77]
+                                  _
+                      (void *)0, 0,                     // no per-thread stack
+..\main.cpp  119  Note 917: Prototype coercion (arg. no. 5) int to unsigned
+    long [MISRA Rule 77]
+                       _
+    AO_Tunnel ->start(3,                                           // priority
+..\main.cpp  121  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                                              _
+                      l_tunnelQueueSto, Q_DIM(l_tunnelQueueSto),  // evt queue
+..\main.cpp  122  Note 917: Prototype coercion (arg. no. 3) unsigned int to
+    unsigned long [MISRA Rule 77]
+                                  _
+                      (void *)0, 0,                     // no per-thread stack
+..\main.cpp  123  Note 917: Prototype coercion (arg. no. 5) int to unsigned
+    long [MISRA Rule 77]
+
+--- Module:   ..\mine1.cpp
+                          _
+class Mine1 : public QHsm {                           // extend the QHsm class
+..\mine1.cpp  35  Note 1932: Base class 'QHsm' is not abstract -- More
+    Effective C++ #33
+                                                       _
+    Mine1(void) : QHsm((QStateHandler)&Mine1::initial) {}
+..\mine1.cpp  41  Note 1927: Symbol 'Mine1::m_x' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\mine1.cpp  41  Note 1927: Symbol 'Mine1::m_y' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\mine1.cpp  41  Note 1927: Symbol 'Mine1::m_exp_ctr' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\mine1.cpp  41  Warning 1401: member 'Mine1::m_x' (line 36) not initialized
+    by constructor
+..\mine1.cpp  36  Info 830: Location cited in prior message
+                                                        _
+    Mine1(void) : QHsm((QStateHandler)&Mine1::initial) {}
+..\mine1.cpp  41  Warning 1401: member 'Mine1::m_y' (line 37) not initialized
+    by constructor
+..\mine1.cpp  37  Info 830: Location cited in prior message
+                                                        _
+    Mine1(void) : QHsm((QStateHandler)&Mine1::initial) {}
+..\mine1.cpp  41  Warning 1401: member 'Mine1::m_exp_ctr' (line 38) not
+    initialized by constructor
+..\mine1.cpp  38  Info 830: Location cited in prior message
+                  _
+    if (!dict_sent) {
+..\mine1.cpp  64  Info 727: Symbol 'dict_sent' (line 63) not explicitly
+    initialized
+..\mine1.cpp  63  Info 830: Location cited in prior message
+    _
+    }
+..\mine1.cpp  96  Info 744: switch statement has no default [MISRA Rule 62]
+                                                           _
+            MineEvt *mev = Q_NEW(MineEvt, MINE_DISABLED_SIG);
+..\mine1.cpp  104  Warning 641: Converting enum 'GameSignals' to int
+..\mine1.cpp  104  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                _
+            mev->id = MINE_ID(me);
+..\mine1.cpp  105  Note 946: Relational or subtract operator applied to
+    pointers [MISRA Rule 103]
+..\mine1.cpp  105  Info 734: Loss of precision (assignment) (31 bits to 8 bits)
+    _
+    }
+..\mine1.cpp  112  Info 744: switch statement has no default [MISRA Rule 62]
+                                                        _
+                oie = Q_NEW(ObjectImageEvt, MINE_IMG_SIG);
+..\mine1.cpp  129  Warning 641: Converting enum 'GameSignals' to int
+..\mine1.cpp  129  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                  _
+                oie->y   = me->m_y;
+..\mine1.cpp  131  Info 713: Loss of precision (assignment) (unsigned char to
+    signed char)
+                                    _
+                oie->bmp = MINE1_BMP;
+..\mine1.cpp  132  Warning 641: Converting enum 'GameBitmapIds' to int
+                                            _
+            if (do_bitmaps_overlap(MINE1_BMP, me->m_x, me->m_y, bmp, x, y)) {
+..\mine1.cpp  146  Warning 641: Converting enum 'GameBitmapIds' to int
+..\mine1.cpp  146  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                                           _
+                static MineEvt const mine1_hit(HIT_MINE_SIG, 1);
+..\mine1.cpp  148  Warning 641: Converting enum 'GameSignals' to int
+..\mine1.cpp  148  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+..\mine1.cpp  148  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                            _
+            if (do_bitmaps_overlap(MINE1_BMP, me->m_x, me->m_y, bmp, x, y)) {
+..\mine1.cpp  162  Warning 641: Converting enum 'GameBitmapIds' to int
+..\mine1.cpp  162  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                                                        _
+                static ScoreEvt const mine1_destroyed(DESTROYED_MINE_SIG, 25);
+..\mine1.cpp  164  Warning 641: Converting enum 'GameSignals' to int
+..\mine1.cpp  164  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+..\mine1.cpp  164  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    int [MISRA Rule 77]
+    _
+    }
+..\mine1.cpp  170  Info 744: switch statement has no default [MISRA Rule 62]
+                                                         _
+                oie = Q_NEW(ObjectImageEvt, EXPLOSION_SIG);
+..\mine1.cpp  188  Warning 641: Converting enum 'GameSignals' to int
+..\mine1.cpp  188  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                     _
+                oie->y   = (int8_t)((int)me->m_y - 4 + 2);   // y of explosion
+..\mine1.cpp  190  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\mine1.cpp  190  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\mine1.cpp  190  Info 834: Operator '-' followed by operator '+' is
+    confusing.  Use parentheses. [Misra Rule 47]
+..\mine1.cpp  190  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '-' and '+'
+                                                                _
+                oie->bmp = EXPLOSION0_BMP + (me->m_exp_ctr >> 2);
+..\mine1.cpp  191  Warning 641: Converting enum 'GameBitmapIds' to int
+    _
+    }
+..\mine1.cpp  199  Info 744: switch statement has no default [MISRA Rule 62]
+
+    --- Wrap-up for Module: ..\mine1.cpp
+
+Info 766: Header file '..\bsp.h' not used in module '..\mine1.cpp'
+
+--- Module:   ..\mine2.cpp
+                          _
+class Mine2 : public QHsm {                           // extend the QHsm class
+..\mine2.cpp  35  Note 1932: Base class 'QHsm' is not abstract -- More
+    Effective C++ #33
+                                                       _
+    Mine2(void) : QHsm((QStateHandler)&Mine2::initial) {}
+..\mine2.cpp  41  Note 1927: Symbol 'Mine2::m_x' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\mine2.cpp  41  Note 1927: Symbol 'Mine2::m_y' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\mine2.cpp  41  Note 1927: Symbol 'Mine2::m_exp_ctr' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\mine2.cpp  41  Warning 1401: member 'Mine2::m_x' (line 36) not initialized
+    by constructor
+..\mine2.cpp  36  Info 830: Location cited in prior message
+                                                        _
+    Mine2(void) : QHsm((QStateHandler)&Mine2::initial) {}
+..\mine2.cpp  41  Warning 1401: member 'Mine2::m_y' (line 37) not initialized
+    by constructor
+..\mine2.cpp  37  Info 830: Location cited in prior message
+                                                        _
+    Mine2(void) : QHsm((QStateHandler)&Mine2::initial) {}
+..\mine2.cpp  41  Warning 1401: member 'Mine2::m_exp_ctr' (line 38) not
+    initialized by constructor
+..\mine2.cpp  38  Info 830: Location cited in prior message
+                                        _
+#define MINE_ID(me_)    ((me_) - l_mine2)
+..\mine2.cpp  55  Info 767: macro 'MINE_ID' was defined differently in another
+    module (line 54, file ..\mine1.cpp)
+..\mine1.cpp  54  Info 830: Location cited in prior message
+                  _
+    if (!dict_sent) {
+..\mine2.cpp  65  Info 727: Symbol 'dict_sent' (line 64) not explicitly
+    initialized
+..\mine2.cpp  64  Info 830: Location cited in prior message
+    _
+    }
+..\mine2.cpp  97  Info 744: switch statement has no default [MISRA Rule 62]
+                                                           _
+            MineEvt *mev = Q_NEW(MineEvt, MINE_DISABLED_SIG);
+..\mine2.cpp  105  Warning 641: Converting enum 'GameSignals' to int
+..\mine2.cpp  105  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                _
+            mev->id = MINE_ID(me);
+..\mine2.cpp  106  Note 946: Relational or subtract operator applied to
+    pointers [MISRA Rule 103]
+..\mine2.cpp  106  Info 734: Loss of precision (assignment) (31 bits to 8 bits)
+    _
+    }
+..\mine2.cpp  113  Info 744: switch statement has no default [MISRA Rule 62]
+                                                        _
+                oie = Q_NEW(ObjectImageEvt, MINE_IMG_SIG);
+..\mine2.cpp  130  Warning 641: Converting enum 'GameSignals' to int
+..\mine2.cpp  130  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                  _
+                oie->y   = me->m_y;
+..\mine2.cpp  132  Info 713: Loss of precision (assignment) (unsigned char to
+    signed char)
+                                    _
+                oie->bmp = MINE2_BMP;
+..\mine2.cpp  133  Warning 641: Converting enum 'GameBitmapIds' to int
+                                            _
+            if (do_bitmaps_overlap(MINE2_BMP, me->m_x, me->m_y, bmp, x, y)) {
+..\mine2.cpp  147  Warning 641: Converting enum 'GameBitmapIds' to int
+..\mine2.cpp  147  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                                           _
+                static MineEvt const mine2_hit(HIT_MINE_SIG, 2);
+..\mine2.cpp  149  Warning 641: Converting enum 'GameSignals' to int
+..\mine2.cpp  149  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+..\mine2.cpp  149  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                                    _
+            if (do_bitmaps_overlap(MINE2_MISSILE_BMP,
+..\mine2.cpp  168  Warning 641: Converting enum 'GameBitmapIds' to int
+..\mine2.cpp  168  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                                                        _
+                static ScoreEvt const mine2_destroyed(DESTROYED_MINE_SIG, 45);
+..\mine2.cpp  172  Warning 641: Converting enum 'GameSignals' to int
+..\mine2.cpp  172  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+..\mine2.cpp  172  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    int [MISRA Rule 77]
+    _
+    }
+..\mine2.cpp  178  Info 744: switch statement has no default [MISRA Rule 62]
+                                                         _
+                oie = Q_NEW(ObjectImageEvt, EXPLOSION_SIG);
+..\mine2.cpp  196  Warning 641: Converting enum 'GameSignals' to int
+..\mine2.cpp  196  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                     _
+                oie->y   = (int8_t)((int)me->m_y - 4 + 2);   // y of explosion
+..\mine2.cpp  198  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\mine2.cpp  198  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\mine2.cpp  198  Info 834: Operator '-' followed by operator '+' is
+    confusing.  Use parentheses. [Misra Rule 47]
+..\mine2.cpp  198  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '-' and '+'
+                                                                _
+                oie->bmp = EXPLOSION0_BMP + (me->m_exp_ctr >> 2);
+..\mine2.cpp  199  Warning 641: Converting enum 'GameBitmapIds' to int
+    _
+    }
+..\mine2.cpp  207  Info 744: switch statement has no default [MISRA Rule 62]
+
+    --- Wrap-up for Module: ..\mine2.cpp
+
+Info 766: Header file '..\bsp.h' not used in module '..\mine2.cpp'
+
+--- Module:   ..\missile.cpp
+                               _
+class Missile : public QActive {                   // extend the QActive class
+..\missile.cpp  35  Note 1932: Base class 'QActive' is not abstract -- More
+    Effective C++ #33
+                                                              _
+    Missile(void) : QActive((QStateHandler)&Missile::initial) {}
+..\missile.cpp  41  Note 1927: Symbol 'Missile::m_x' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\missile.cpp  41  Note 1927: Symbol 'Missile::m_y' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\missile.cpp  41  Note 1927: Symbol 'Missile::m_exp_ctr' did not appear in
+    the constructor initializer list -- Effective C++ #12
+..\missile.cpp  41  Warning 1401: member 'Missile::m_x' (line 36) not
+    initialized by constructor
+..\missile.cpp  36  Info 830: Location cited in prior message
+                                                               _
+    Missile(void) : QActive((QStateHandler)&Missile::initial) {}
+..\missile.cpp  41  Warning 1401: member 'Missile::m_y' (line 37) not
+    initialized by constructor
+..\missile.cpp  37  Info 830: Location cited in prior message
+                                                               _
+    Missile(void) : QActive((QStateHandler)&Missile::initial) {}
+..\missile.cpp  41  Warning 1401: member 'Missile::m_exp_ctr' (line 38) not
+    initialized by constructor
+..\missile.cpp  38  Info 830: Location cited in prior message
+                               _
+    me->subscribe(TIME_TICK_SIG);
+..\missile.cpp  59  Warning 641: Converting enum 'GameSignals' to int
+..\missile.cpp  59  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+    _
+    }
+..\missile.cpp  83  Info 744: switch statement has no default [MISRA Rule 62]
+                                                 _
+#...                              BSP_SCREEN_WIDTH
+            if (me->m_x + GAME_MISSILE_SPEED_X < GAME_SCREEN_WIDTH) {
+..\missile.cpp  91  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '+' and '<'
+                                                           _
+                oie = Q_NEW(ObjectImageEvt, MISSILE_IMG_SIG);
+..\missile.cpp  94  Warning 641: Converting enum 'GameSignals' to int
+..\missile.cpp  94  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                  _
+                oie->y   = me->m_y;
+..\missile.cpp  96  Info 713: Loss of precision (assignment) (unsigned char to
+    signed char)
+                                      _
+                oie->bmp = MISSILE_BMP;
+..\missile.cpp  97  Warning 641: Converting enum 'GameBitmapIds' to int
+    _
+    }
+..\missile.cpp  115  Info 744: switch statement has no default [MISRA Rule 62]
+                                                         _
+                oie = Q_NEW(ObjectImageEvt, EXPLOSION_SIG);
+..\missile.cpp  133  Warning 641: Converting enum 'GameSignals' to int
+..\missile.cpp  133  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                     _
+                oie->y   = (int8_t)((int)me->m_y - 4);                // y-pos
+..\missile.cpp  135  Note 970: Use of modifier or type 'int' outside of a
+    typedef [MISRA Rule 13]
+..\missile.cpp  135  Note 970: Use of modifier or type 'int' outside of a
+    typedef [MISRA Rule 13]
+                                                                _
+                oie->bmp = EXPLOSION0_BMP + (me->m_exp_ctr >> 2);
+..\missile.cpp  136  Warning 641: Converting enum 'GameBitmapIds' to int
+    _
+    }
+..\missile.cpp  144  Info 744: switch statement has no default [MISRA Rule 62]
+
+--- Module:   ..\ship.cpp
+                    _
+#define SHIP_WIDTH  5
+..\ship.cpp  34  Note 1923: macro 'SHIP_WIDTH' could become const variable --
+    Effective C++ #1
+                    _
+#define SHIP_HEIGHT 3
+..\ship.cpp  35  Note 1923: macro 'SHIP_HEIGHT' could become const variable --
+    Effective C++ #1
+                            _
+class Ship : public QActive {                      // extend the QActive class
+..\ship.cpp  38  Note 1932: Base class 'QActive' is not abstract -- More
+    Effective C++ #33
+                                                    _
+                 m_x(GAME_SHIP_X), m_y(GAME_SHIP_Y) {}
+..\ship.cpp  46  Note 1927: Symbol 'Ship::m_exp_ctr' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\ship.cpp  46  Note 1927: Symbol 'Ship::m_score' did not appear in the
+    constructor initializer list -- Effective C++ #12
+..\ship.cpp  46  Warning 1401: member 'Ship::m_exp_ctr' (line 41) not
+    initialized by constructor
+..\ship.cpp  41  Info 830: Location cited in prior message
+                                                     _
+                 m_x(GAME_SHIP_X), m_y(GAME_SHIP_Y) {}
+..\ship.cpp  46  Warning 1401: member 'Ship::m_score' (line 42) not initialized
+    by constructor
+..\ship.cpp  42  Info 830: Location cited in prior message
+                               _
+    me->subscribe(TIME_TICK_SIG);
+..\ship.cpp  64  Warning 641: Converting enum 'GameSignals' to int
+..\ship.cpp  64  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+                                    _
+    me->subscribe(PLAYER_TRIGGER_SIG);
+..\ship.cpp  65  Warning 641: Converting enum 'GameSignals' to int
+..\ship.cpp  65  Note 917: Prototype coercion (arg. no. 1) int to unsigned char
+    [MISRA Rule 77]
+    _
+    }
+..\ship.cpp  95  Info 744: switch statement has no default [MISRA Rule 62]
+    _
+    }
+..\ship.cpp  104  Info 744: switch statement has no default [MISRA Rule 62]
+                                           _
+            sev = Q_NEW(ScoreEvt, SCORE_SIG);
+..\ship.cpp  114  Warning 641: Converting enum 'GameSignals' to int
+..\ship.cpp  114  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                                                    _
+            ObjectImageEvt *oie = Q_NEW(ObjectImageEvt, SHIP_IMG_SIG);
+..\ship.cpp  121  Warning 641: Converting enum 'GameSignals' to int
+..\ship.cpp  121  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                              _
+            oie->y   = me->m_y;
+..\ship.cpp  123  Info 713: Loss of precision (assignment) (unsigned char to
+    signed char)
+                               _
+            oie->bmp = SHIP_BMP;
+..\ship.cpp  124  Warning 641: Converting enum 'GameBitmapIds' to int
+                                 _
+            if ((me->m_score % 10) == 0) {            // is the score "round"?
+..\ship.cpp  129  Note 912: Implicit binary conversion from int to unsigned int
+..\ship.cpp  129  Note 912: Implicit binary conversion from int to unsigned int
+                                                         _
+                ScoreEvt *sev = Q_NEW(ScoreEvt, SCORE_SIG);
+..\ship.cpp  130  Warning 641: Converting enum 'GameSignals' to int
+..\ship.cpp  130  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                                                    _
+            ObjectPosEvt *ope = Q_NEW(ObjectPosEvt, MISSILE_FIRE_SIG);
+..\ship.cpp  138  Warning 641: Converting enum 'GameSignals' to int
+..\ship.cpp  138  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                             _
+            ope->y = me->m_y + SHIP_HEIGHT - 1;
+..\ship.cpp  140  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '+' and '-'
+    _
+    }
+..\ship.cpp  153  Info 744: switch statement has no default [MISRA Rule 62]
+                                                         _
+                oie = Q_NEW(ObjectImageEvt, EXPLOSION_SIG);
+..\ship.cpp  170  Warning 641: Converting enum 'GameSignals' to int
+..\ship.cpp  170  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                                                _
+                oie->bmp = EXPLOSION0_BMP + (me->m_exp_ctr >> 2);
+..\ship.cpp  171  Warning 641: Converting enum 'GameBitmapIds' to int
+                                     _
+                oie->y   = (int8_t)((int)me->m_y - 4 + SHIP_HEIGHT);
+..\ship.cpp  173  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\ship.cpp  173  Note 970: Use of modifier or type 'int' outside of a typedef
+    [MISRA Rule 13]
+..\ship.cpp  173  Info 834: Operator '-' followed by operator '+' is confusing. 
+    Use parentheses. [Misra Rule 47]
+..\ship.cpp  173  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '-' and '+'
+                                                                  _
+                ScoreEvt *gameOver = Q_NEW(ScoreEvt, GAME_OVER_SIG);
+..\ship.cpp  177  Warning 641: Converting enum 'GameSignals' to int
+..\ship.cpp  177  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+    _
+    }
+..\ship.cpp  184  Info 744: switch statement has no default [MISRA Rule 62]
+
+    --- Wrap-up for Module: ..\ship.cpp
+
+Info 750: local macro 'SHIP_WIDTH' (line 34, file ..\ship.cpp) not referenced
+..\ship.cpp  34  Info 830: Location cited in prior message
+
+--- Module:   ..\tunnel.cpp
+                              _
+class Tunnel : public QActive {                    // extend the QActive class
+..\tunnel.cpp  37  Note 1932: Base class 'QActive' is not abstract -- More
+    Effective C++ #33
+_
+private: // Helper functions
+..\tunnel.cpp  69  Info 1736: Redundant access specifier (private)
+                                                              _
+static uint8_t l_walls[GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8];
+..\tunnel.cpp  87  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '*' and '/'
+                                                              _
+static uint8_t l_frame[GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8];
+..\tunnel.cpp  88  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '*' and '/'
+                                                   _
+                   m_blinkTimeEvt(BLINK_TIMEOUT_SIG),
+..\tunnel.cpp  93  Warning 641: Converting enum 'GameSignals' to int
+..\tunnel.cpp  93  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                                     _
+                   m_screenTimeEvt(SCREEN_TIMEOUT_SIG),
+..\tunnel.cpp  94  Warning 641: Converting enum 'GameSignals' to int
+..\tunnel.cpp  94  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+_
+{
+..\tunnel.cpp  97  Note 1927: Symbol 'Tunnel::m_blink_ctr' did not appear in
+    the constructor initializer list -- Effective C++ #12
+..\tunnel.cpp  97  Note 1927: Symbol 'Tunnel::m_wall_thickness_top' did not
+    appear in the constructor initializer list -- Effective C++ #12
+..\tunnel.cpp  97  Note 1927: Symbol 'Tunnel::m_wall_thickness_bottom' did not
+    appear in the constructor initializer list -- Effective C++ #12
+..\tunnel.cpp  97  Note 1927: Symbol 'Tunnel::m_minimal_gap' did not appear in
+    the constructor initializer list -- Effective C++ #12
+_
+}
+..\tunnel.cpp  103  Warning 1401: member 'Tunnel::m_blink_ctr' (line 46) not
+    initialized by constructor
+..\tunnel.cpp  46  Info 830: Location cited in prior message
+_
+}
+..\tunnel.cpp  103  Warning 1401: member 'Tunnel::m_wall_thickness_top' (line
+    51) not initialized by constructor
+..\tunnel.cpp  51  Info 830: Location cited in prior message
+_
+}
+..\tunnel.cpp  103  Warning 1401: member 'Tunnel::m_wall_thickness_bottom'
+    (line 52) not initialized by constructor
+..\tunnel.cpp  52  Info 830: Location cited in prior message
+_
+}
+..\tunnel.cpp  103  Warning 1401: member 'Tunnel::m_minimal_gap' (line 53) not
+    initialized by constructor
+..\tunnel.cpp  53  Info 830: Location cited in prior message
+                   _
+    randomSeed(1234);                      // seed the pseudo-random generator
+..\tunnel.cpp  113  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    long [MISRA Rule 77]
+                               _
+    me->subscribe(TIME_TICK_SIG);
+..\tunnel.cpp  115  Warning 641: Converting enum 'GameSignals' to int
+..\tunnel.cpp  115  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                    _
+    me->subscribe(PLAYER_TRIGGER_SIG);
+..\tunnel.cpp  116  Warning 641: Converting enum 'GameSignals' to int
+..\tunnel.cpp  116  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                 _
+    me->subscribe(PLAYER_QUIT_SIG);
+..\tunnel.cpp  117  Warning 641: Converting enum 'GameSignals' to int
+..\tunnel.cpp  117  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                      _
+            memset(l_frame, (uint8_t)0,
+..\tunnel.cpp  149  Note 917: Prototype coercion (arg. no. 2) unsigned char to
+    int [MISRA Rule 77]
+                                                           _
+                   (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8));
+..\tunnel.cpp  150  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  150  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    int [MISRA Rule 77]
+                                    _
+            BSP_drawBitmap(l_frame, GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+..\tunnel.cpp  151  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  151  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    char [MISRA Rule 77]
+    _
+    }
+..\tunnel.cpp  155  Info 744: switch statement has no default [MISRA Rule 62]
+    _
+    }
+..\tunnel.cpp  170  Info 744: switch statement has no default [MISRA Rule 62]
+                                      _
+            memset(l_walls, (uint8_t)0,
+..\tunnel.cpp  185  Note 917: Prototype coercion (arg. no. 2) unsigned char to
+    int [MISRA Rule 77]
+                                                           _
+                   (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8));
+..\tunnel.cpp  186  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  186  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    int [MISRA Rule 77]
+                                                                _
+            me->m_blinkTimeEvt.postEvery(me, BSP_TICKS_PER_SEC/2);  // 1/2 sec
+..\tunnel.cpp  189  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    int [MISRA Rule 77]
+                                                               _
+            me->m_screenTimeEvt.postIn(me, BSP_TICKS_PER_SEC*20);    // 20 sec
+..\tunnel.cpp  191  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    int [MISRA Rule 77]
+                                       _
+            me->m_blinkTimeEvt.disarm();
+..\tunnel.cpp  197  Warning 534: Ignoring return value of function
+    'QTimeEvt::disarm(void)' (compare with line 533, file ..\..\..\..\..\..\..\include\qf.h,
+    module ..\bsp.cpp)
+..\..\..\..\..\..\..\include\qf.h  533  Info 830: Location cited in prior
+    message
+                                        _
+            me->m_screenTimeEvt.disarm();
+..\tunnel.cpp  198  Warning 534: Ignoring return value of function
+    'QTimeEvt::disarm(void)' (compare with line 533, file ..\..\..\..\..\..\..\include\qf.h,
+    module ..\bsp.cpp)
+..\..\..\..\..\..\..\include\qf.h  533  Info 830: Location cited in prior
+    message
+                                               _
+                me->addImageAt(PRESS_BUTTON_BMP,
+..\tunnel.cpp  212  Warning 641: Converting enum 'GameBitmapIds' to int
+..\tunnel.cpp  212  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+                                                         _
+                               (GAME_SCREEN_WIDTH - 55)/2,
+..\tunnel.cpp  213  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                                         _
+                               (GAME_SCREEN_HEIGHT - 8)/2);
+..\tunnel.cpp  214  Note 917: Prototype coercion (arg. no. 3) int to signed
+    char [MISRA Rule 77]
+                                    _
+            BSP_drawBitmap(l_frame, GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+..\tunnel.cpp  216  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  216  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    char [MISRA Rule 77]
+    _
+    }
+..\tunnel.cpp  222  Info 744: switch statement has no default [MISRA Rule 62]
+                                                                _
+            me->m_blinkTimeEvt.postEvery(me, BSP_TICKS_PER_SEC/2);  // 1/2 sec
+..\tunnel.cpp  229  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    int [MISRA Rule 77]
+                                                          _
+                                       BSP_TICKS_PER_SEC*5);          // 5 sec
+..\tunnel.cpp  231  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    int [MISRA Rule 77]
+                                                   _
+            BSP_drawNString((GAME_SCREEN_WIDTH - 6*9)/2, 0, "Game Over");
+..\tunnel.cpp  233  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '*'
+..\tunnel.cpp  233  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  233  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                       _
+            me->m_blinkTimeEvt.disarm();
+..\tunnel.cpp  237  Warning 534: Ignoring return value of function
+    'QTimeEvt::disarm(void)' (compare with line 533, file ..\..\..\..\..\..\..\include\qf.h,
+    module ..\bsp.cpp)
+..\..\..\..\..\..\..\include\qf.h  533  Info 830: Location cited in prior
+    message
+                                        _
+            me->m_screenTimeEvt.disarm();
+..\tunnel.cpp  238  Warning 534: Ignoring return value of function
+    'QTimeEvt::disarm(void)' (compare with line 533, file ..\..\..\..\..\..\..\include\qf.h,
+    module ..\bsp.cpp)
+..\..\..\..\..\..\..\include\qf.h  533  Info 830: Location cited in prior
+    message
+                             _
+            BSP_updateScore(0);             // update the score on the display
+..\tunnel.cpp  239  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    int [MISRA Rule 77]
+                                                   _
+            BSP_drawNString((GAME_SCREEN_WIDTH - 6*9)/2, 0,
+..\tunnel.cpp  244  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '*'
+..\tunnel.cpp  244  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  244  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+    _
+    }
+..\tunnel.cpp  253  Info 744: switch statement has no default [MISRA Rule 62]
+                                      _
+            memset(l_walls, (uint8_t)0,
+..\tunnel.cpp  267  Note 917: Prototype coercion (arg. no. 2) unsigned char to
+    int [MISRA Rule 77]
+                                                           _
+                   (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8));
+..\tunnel.cpp  268  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  268  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    int [MISRA Rule 77]
+                                                        _
+            static QEvent const takeoff = { TAKE_OFF_SIG, 0 };
+..\tunnel.cpp  270  Warning 641: Converting enum 'GameSignals' to int
+                                          _
+            recycle.sig = MINE_RECYCLE_SIG;
+..\tunnel.cpp  276  Warning 641: Converting enum 'GameSignals' to int
+                                    _
+            BSP_drawBitmap(l_frame, GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+..\tunnel.cpp  282  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  282  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    char [MISRA Rule 77]
+                                       _
+            if (me->isWallHit(bmp, x, y)) {
+..\tunnel.cpp  297  Info 732: Loss of sign (arg. no. 3) (signed char to
+    unsigned char)
+..\tunnel.cpp  297  Note 917: Prototype coercion (arg. no. 3) signed char to
+    unsigned char [MISRA Rule 77]
+                                                 _
+                QEvent const hit = { HIT_WALL_SIG, 0};
+..\tunnel.cpp  298  Warning 641: Converting enum 'GameSignals' to int
+                                          _
+                if (e->sig == SHIP_IMG_SIG) {
+..\tunnel.cpp  299  Warning 641: Converting enum 'GameSignals' to int
+                              _
+                              - ((ScoreEvt const *)e)->score/2000;
+..\tunnel.cpp  325  Info 834: Operator '-' followed by operator '-' is
+    confusing.  Use parentheses. [Misra Rule 47]
+..\tunnel.cpp  325  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '-'
+..\tunnel.cpp  325  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '/'
+..\tunnel.cpp  325  Note 912: Implicit binary conversion from int to unsigned
+    int
+..\tunnel.cpp  325  Note 912: Implicit binary conversion from int to unsigned
+    int
+..\tunnel.cpp  325  Info 734: Loss of precision (assignment) (32 bits to 8
+    bits)
+            _
+            char str[5];
+..\tunnel.cpp  330  Note 970: Use of modifier or type 'char' outside of a
+    typedef [MISRA Rule 13]
+..\tunnel.cpp  330  Note 971: Use of 'char' without 'signed' or 'unsigned'
+    [MISRA Rule 14]
+                                      _
+            memset(l_frame, (uint8_t)0,
+..\tunnel.cpp  335  Note 917: Prototype coercion (arg. no. 2) unsigned char to
+    int [MISRA Rule 77]
+                                                           _
+                   (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8));
+..\tunnel.cpp  336  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  336  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    int [MISRA Rule 77]
+                                    _
+            BSP_drawBitmap(l_frame, GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+..\tunnel.cpp  337  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  337  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    char [MISRA Rule 77]
+                                                   _
+            BSP_drawNString((GAME_SCREEN_WIDTH - 6*10)/2, 1, "Score:");
+..\tunnel.cpp  340  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '*'
+..\tunnel.cpp  340  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  340  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+                                      _
+            str[3] = '0' + (score % 10); score /= 10;
+..\tunnel.cpp  342  Note 912: Implicit binary conversion from int to unsigned
+    int
+..\tunnel.cpp  342  Note 912: Implicit binary conversion from int to unsigned
+    int
+..\tunnel.cpp  342  Note 912: Implicit binary conversion from int to unsigned
+    int
+                                      _
+            str[2] = '0' + (score % 10); score /= 10;
+..\tunnel.cpp  343  Note 912: Implicit binary conversion from int to unsigned
+    int
+..\tunnel.cpp  343  Note 912: Implicit binary conversion from int to unsigned
+    int
+..\tunnel.cpp  343  Note 912: Implicit binary conversion from int to unsigned
+    int
+                                      _
+            str[1] = '0' + (score % 10); score /= 10;
+..\tunnel.cpp  344  Note 912: Implicit binary conversion from int to unsigned
+    int
+..\tunnel.cpp  344  Note 912: Implicit binary conversion from int to unsigned
+    int
+..\tunnel.cpp  344  Note 912: Implicit binary conversion from int to unsigned
+    int
+                                      _
+            str[0] = '0' + (score % 10);
+..\tunnel.cpp  345  Note 912: Implicit binary conversion from int to unsigned
+    int
+..\tunnel.cpp  345  Note 912: Implicit binary conversion from int to unsigned
+    int
+                                                   _
+            BSP_drawNString((GAME_SCREEN_WIDTH - 6*10)/2 + 6*6, 1, str);
+..\tunnel.cpp  346  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '*'
+..\tunnel.cpp  346  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '/' and '+'
+..\tunnel.cpp  346  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '+' and '*'
+..\tunnel.cpp  346  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  346  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+    _
+    }
+..\tunnel.cpp  350  Info 744: switch statement has no default [MISRA Rule 62]
+    _
+    }
+..\tunnel.cpp  363  Info 744: switch statement has no default [MISRA Rule 62]
+                                                               _
+            me->m_screenTimeEvt.postIn(me, BSP_TICKS_PER_SEC*60);    // 60 sec
+..\tunnel.cpp  370  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    int [MISRA Rule 77]
+                                      _
+            memset(l_frame, (uint8_t)0,
+..\tunnel.cpp  372  Note 917: Prototype coercion (arg. no. 2) unsigned char to
+    int [MISRA Rule 77]
+                                                           _
+                   (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8));
+..\tunnel.cpp  373  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  373  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    int [MISRA Rule 77]
+                                        _
+            me->m_screenTimeEvt.disarm();
+..\tunnel.cpp  377  Warning 534: Ignoring return value of function
+    'QTimeEvt::disarm(void)' (compare with line 533, file ..\..\..\..\..\..\..\include\qf.h,
+    module ..\bsp.cpp)
+..\..\..\..\..\..\..\include\qf.h  533  Info 830: Location cited in prior
+    message
+                                                                      _
+                l_frame[rnd % (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8)]
+..\tunnel.cpp  387  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  387  Note 912: Implicit binary conversion from int to unsigned
+    long
+                                                      _
+                    = (uint8_t)(1 << ((rnd >> 8) & 0x7));
+..\tunnel.cpp  388  Note 912: Implicit binary conversion from int to unsigned
+    long
+                                    _
+            BSP_drawBitmap(l_frame, GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+..\tunnel.cpp  390  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  390  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    char [MISRA Rule 77]
+    _
+    }
+..\tunnel.cpp  393  Info 744: switch statement has no default [MISRA Rule 62]
+                                      _
+            memset(l_frame, (uint8_t)0,
+..\tunnel.cpp  401  Note 917: Prototype coercion (arg. no. 2) unsigned char to
+    int [MISRA Rule 77]
+                                                           _
+                   (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8));
+..\tunnel.cpp  402  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  402  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    int [MISRA Rule 77]
+                                                            _
+                                         BSP_TICKS_PER_SEC/5);      // 1/5 sec
+..\tunnel.cpp  405  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    int [MISRA Rule 77]
+                                       _
+            me->m_blinkTimeEvt.disarm();
+..\tunnel.cpp  409  Warning 534: Ignoring return value of function
+    'QTimeEvt::disarm(void)' (compare with line 533, file ..\..\..\..\..\..\..\include\qf.h,
+    module ..\bsp.cpp)
+..\..\..\..\..\..\..\include\qf.h  533  Info 830: Location cited in prior
+    message
+                                                                          _
+            me->m_blink_ctr = rnd % (GAME_SCREEN_WIDTH*GAME_SCREEN_HEIGHT/8);
+..\tunnel.cpp  418  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  418  Note 912: Implicit binary conversion from int to unsigned
+    long
+                                                                       _
+            l_frame[me->m_blink_ctr] = (uint8_t)(1 << ((rnd >> 8) & 0x7));
+..\tunnel.cpp  419  Note 912: Implicit binary conversion from int to unsigned
+    long
+                                    _
+            BSP_drawBitmap(l_frame, GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+..\tunnel.cpp  421  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+..\tunnel.cpp  421  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    char [MISRA Rule 77]
+    _
+    }
+..\tunnel.cpp  424  Info 744: switch statement has no default [MISRA Rule 62]
+                                  _
+    l_rnd = l_rnd * (3*7*11*13*23);
+..\tunnel.cpp  581  Note 912: Implicit binary conversion from int to unsigned
+    long
+                          _
+    rnd = (random() & 0xFF);
+..\tunnel.cpp  593  Note 912: Implicit binary conversion from int to unsigned
+    long
+                 _
+    if ((rnd < 48) && (m_wall_thickness_top > 0)) {
+..\tunnel.cpp  596  Note 912: Implicit binary conversion from int to unsigned
+    long
+                  _
+    if ((rnd > 208) && (m_wall_thickness_bottom > 0)) {
+..\tunnel.cpp  601  Note 912: Implicit binary conversion from int to unsigned
+    long
+                          _
+    rnd = (random() & 0xFF);
+..\tunnel.cpp  605  Note 912: Implicit binary conversion from int to unsigned
+    long
+                 _
+    if ((rnd < 48)
+..\tunnel.cpp  608  Note 912: Implicit binary conversion from int to unsigned
+    long
+             _
+             - m_wall_thickness_bottom) > m_minimal_gap)
+..\tunnel.cpp  611  Info 834: Operator '-' followed by operator '-' is
+    confusing.  Use parentheses. [Misra Rule 47]
+..\tunnel.cpp  611  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '-'
+                  _
+    if ((rnd > 208)
+..\tunnel.cpp  619  Note 912: Implicit binary conversion from int to unsigned
+    long
+             _
+             - m_wall_thickness_bottom) > m_minimal_gap)
+..\tunnel.cpp  622  Info 834: Operator '-' followed by operator '-' is
+    confusing.  Use parentheses. [Misra Rule 47]
+..\tunnel.cpp  622  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '-'
+                  _
+                < (GAME_SCREEN_HEIGHT - m_wall_thickness_bottom))))
+..\tunnel.cpp  625  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '+' and '<'
+                                                    _
+            (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8) - GAME_SPEED_X);
+..\tunnel.cpp  632  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  632  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    int [MISRA Rule 77]
+                                        _
+    bmp1 = (~(~0 << m_wall_thickness_top))
+..\tunnel.cpp  634  Info 701: Shift left of signed quantity (int) [MISRA Rule
+    37]
+..\tunnel.cpp  634  Warning 502: Expected unsigned type
+                                                  _
+                        - m_wall_thickness_bottom));
+..\tunnel.cpp  636  Info 701: Shift left of signed quantity (int) [MISRA Rule
+    37]
+                                                    _
+    l_walls[GAME_SCREEN_WIDTH + GAME_SCREEN_WIDTH - 1]
+..\tunnel.cpp  639  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '+' and '-'
+                                                                     _
+    memcpy(l_frame, l_walls, (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8));
+..\tunnel.cpp  643  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '*' and '/'
+..\tunnel.cpp  643  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    int [MISRA Rule 77]
+                                   _
+    uint32_t rnd = (random() & 0xFF);
+..\tunnel.cpp  647  Note 912: Implicit binary conversion from int to unsigned
+    long
+                                               _
+#...                            BSP_SCREEN_WIDTH
+    if ((m_last_mine_x + GAME_MINES_DIST_MIN < GAME_SCREEN_WIDTH)
+..\tunnel.cpp  653  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '+' and '<'
+                   _
+        && (rnd < 8))                   // place the mines only 5% of the time
+..\tunnel.cpp  654  Note 912: Implicit binary conversion from int to unsigned
+    long
+                                     _
+        for (n = 0; n < Q_DIM(m_mines); ++n) {      // look for disabled mines
+..\tunnel.cpp  657  Note 912: Implicit binary conversion from int to unsigned
+    int
+                             _
+        if (n < Q_DIM(m_mines)) {                    // a disabled Mine found?
+..\tunnel.cpp  662  Note 912: Implicit binary conversion from int to unsigned
+    int
+                                    _
+            rnd = (random() & 0xFFFF);
+..\tunnel.cpp  665  Note 912: Implicit binary conversion from int to unsigned
+    long
+                        _
+            if ((rnd & 1) == 0) {               // choose the type of the mine
+..\tunnel.cpp  667  Note 912: Implicit binary conversion from int to unsigned
+    long
+..\tunnel.cpp  667  Note 912: Implicit binary conversion from int to unsigned
+    long
+                    _
+                    - m_wall_thickness_bottom - 4);
+..\tunnel.cpp  680  Info 834: Operator '-' followed by operator '-' is
+    confusing.  Use parentheses. [Misra Rule 47]
+..\tunnel.cpp  680  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '-'
+..\tunnel.cpp  680  Info 834: Operator '-' followed by operator '-' is
+    confusing.  Use parentheses. [Misra Rule 47]
+..\tunnel.cpp  680  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '-' and '-'
+..\tunnel.cpp  680  Note 912: Implicit binary conversion from int to unsigned
+    long
+..\tunnel.cpp  680  Warning 573: Signed-unsigned mix with divide
+..\tunnel.cpp  680  Warning 414: Possible division by 0 [Reference: file
+    ..\tunnel.cpp: lines 96, 596, 597, 613, 615, 624, 625, 627, 678, 680]
+..\tunnel.cpp  96  Info 831: Reference cited in prior message
+..\tunnel.cpp  596  Info 831: Reference cited in prior message
+..\tunnel.cpp  597  Info 831: Reference cited in prior message
+..\tunnel.cpp  613  Info 831: Reference cited in prior message
+..\tunnel.cpp  615  Info 831: Reference cited in prior message
+..\tunnel.cpp  624  Info 831: Reference cited in prior message
+..\tunnel.cpp  625  Info 831: Reference cited in prior message
+..\tunnel.cpp  627  Info 831: Reference cited in prior message
+..\tunnel.cpp  678  Info 831: Reference cited in prior message
+..\tunnel.cpp  680  Info 831: Reference cited in prior message
+                                                          _
+            m_last_mine_y = m_wall_thickness_top + 2 + rnd;
+..\tunnel.cpp  681  Note 912: Implicit binary conversion from int to unsigned
+    long
+..\tunnel.cpp  681  Info 734: Loss of precision (assignment) (32 bits to 8
+    bits)
+                                    _
+            ope.sig = MINE_PLANT_SIG;
+..\tunnel.cpp  683  Warning 641: Converting enum 'GameSignals' to int
+
+During Specific Walk:
+  File ..\tunnel.cpp line 285: plantMine()
+..\tunnel.cpp  680  Warning 414: Possible division by 0 [Reference: file
+    ..\tunnel.cpp: lines 96, 596, 597, 613, 615, 624, 625, 627, 678, 680]
+..\tunnel.cpp  96  Info 831: Reference cited in prior message
+..\tunnel.cpp  596  Info 831: Reference cited in prior message
+..\tunnel.cpp  597  Info 831: Reference cited in prior message
+..\tunnel.cpp  613  Info 831: Reference cited in prior message
+..\tunnel.cpp  615  Info 831: Reference cited in prior message
+..\tunnel.cpp  624  Info 831: Reference cited in prior message
+..\tunnel.cpp  625  Info 831: Reference cited in prior message
+..\tunnel.cpp  627  Info 831: Reference cited in prior message
+..\tunnel.cpp  678  Info 831: Reference cited in prior message
+..\tunnel.cpp  680  Info 831: Reference cited in prior message
+_
+}
+..\tunnel.cpp  698  Info 1762: Member function 'Tunnel::dispatchToAllMines(const
+    struct QEvent *)' could be made const
+                                   _
+#... bitmap) / sizeof(l_bitmap[0]))) { } else (Q_onAssert(l_this_file, __LINE__
+#... bitmap) / sizeof(l_bitmap[0])))
+    Q_REQUIRE(bmp < Q_DIM(l_bitmap));
+..\tunnel.cpp  704  Note 912: Implicit binary conversion from int to unsigned
+    int
+                                _
+    if (w > GAME_SCREEN_WIDTH - x_pos) {
+..\tunnel.cpp  707  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '>' and '-'
+                                                              _
+            bmp1 = (l_bitmap[bmp].bits[x] >> (uint8_t)(-y_pos));
+..\tunnel.cpp  716  Warning 504: Unusual shift operation (unusually formed
+    right argument)
+_
+}
+..\tunnel.cpp  721  Info 1762: Member function 'Tunnel::addImageAt(unsigned
+    char, unsigned char, signed char)' could be made const
+                                   _
+#... bitmap) / sizeof(l_bitmap[0]))) { } else (Q_onAssert(l_this_file, __LINE__
+#... bitmap) / sizeof(l_bitmap[0])))
+    Q_REQUIRE(bmp < Q_DIM(l_bitmap));
+..\tunnel.cpp  727  Note 912: Implicit binary conversion from int to unsigned
+    int
+                                _
+    if (w > GAME_SCREEN_WIDTH - x_pos) {
+..\tunnel.cpp  730  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '>' and '-'
+_
+}
+..\tunnel.cpp  743  Info 1762: Member function 'Tunnel::isWallHit(unsigned
+    char, unsigned char, unsigned char)' could be made const
+                                                                        _
+#... ve  -e960 */if ((bmp_id1 < (sizeof(l_bitmap) / sizeof(l_bitmap[0]))) && (b
+#... itmap[0]))) && (bmp_id2 < (sizeof(l_bitmap) / sizeof(l_bitmap[0]))))
+    Q_REQUIRE((bmp_id1 < Q_DIM(l_bitmap)) && (bmp_id2 < Q_DIM(l_bitmap)));
+..\tunnel.cpp  756  Note 912: Implicit binary conversion from int to unsigned
+    int
+                                                                        _
+#... bitmap[0]))) && (bmp_id2 < (sizeof(l_bitmap) / sizeof(l_bitmap[0])))) { } 
+#... itmap[0]))) && (bmp_id2 < (sizeof(l_bitmap) / sizeof(l_bitmap[0]))))
+    Q_REQUIRE((bmp_id1 < Q_DIM(l_bitmap)) && (bmp_id2 < Q_DIM(l_bitmap)));
+..\tunnel.cpp  756  Note 912: Implicit binary conversion from int to unsigned
+    int
+                                          _
+    if ((x1 <= x2) && (x1 + bmp2->width > x2)) {
+..\tunnel.cpp  762  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '+' and '>'
+                                _
+        w  = x1 + bmp2->width - x2;
+..\tunnel.cpp  764  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '+' and '-'
+                                    _
+            if ((bits1 & bits2) != 0) {                // do the bits overlap?
+..\tunnel.cpp  771  Note 912: Implicit binary conversion from int to unsigned
+    long
+                                             _
+        if ((x1 > x2) && (x2 + bmp1->width > x1)) {
+..\tunnel.cpp  777  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '+' and '>'
+                                    _
+            w  = x2 + bmp1->width - x1;
+..\tunnel.cpp  779  Note 961: Violates MISRA Advisory Rule 47, dependence
+    placed on C's operator precedence; operators: '+' and '-'
+                                        _
+                if ((bits1 & bits2) != 0) {            // do the bits overlap?
+..\tunnel.cpp  786  Note 912: Implicit binary conversion from int to unsigned
+    long
+
+--- Module:   ..\video.cpp
+         _
+#include <dos.h>
+..\video.cpp  32  Warning 537: Repeated include file 'c:\tools\tcpp101\INCLUDE\dos.h'
+                     _
+#define VIDEO_BASE   0xB800
+..\video.cpp  34  Note 1923: macro 'VIDEO_BASE' could become const variable --
+    Effective C++ #1
+                     _
+#define VIDEO_WIDTH  80
+..\video.cpp  35  Note 1923: macro 'VIDEO_WIDTH' could become const variable --
+    Effective C++ #1
+                     _
+#define VIDEO_HEIGHT 25
+..\video.cpp  36  Note 1923: macro 'VIDEO_HEIGHT' could become const variable
+    -- Effective C++ #1
+               _
+    clearRect(0,  0, VIDEO_WIDTH, VIDEO_HEIGHT, bgColor);
+..\video.cpp  41  Note 917: Prototype coercion (arg. no. 1) int to unsigned
+    char [MISRA Rule 77]
+..\video.cpp  41  Note 917: Prototype coercion (arg. no. 2) int to unsigned
+    char [MISRA Rule 77]
+..\video.cpp  41  Note 917: Prototype coercion (arg. no. 3) int to unsigned
+    char [MISRA Rule 77]
+..\video.cpp  41  Note 917: Prototype coercion (arg. no. 4) int to unsigned
+    char [MISRA Rule 77]
+                _
+        uint8_t far *pscr = (uint8_t far *)MK_FP(VIDEO_BASE,
+..\video.cpp  49  Note 950: Non-ANSI reserved word or construct: 'far' [Misra
+    Rule 1]
+..\video.cpp  49  Note 950: Non-ANSI reserved word or construct: 'far' [Misra
+    Rule 1]
+                                                _
+        uint8_t far *pscr = (uint8_t far *)MK_FP(VIDEO_BASE,
+..\video.cpp  49  Error 1055: Symbol 'MK_FP' undeclared, assumed to return int
+..\video.cpp  49  Info 746: call to function 'MK_FP()' not made in the presence
+    of a prototype [Misra Rules 20 and 71]
+                                                                             _
+                                   (uint16_t)(((y1 * VIDEO_WIDTH) + x1) * 2));
+..\video.cpp  50  Note 923: cast from int to pointer [MISRA Rule 45]
+                       _
+                       char const *str)
+..\video.cpp  60  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  60  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+            _
+    uint8_t far *pscr = (uint8_t far *)MK_FP(VIDEO_BASE,
+..\video.cpp  63  Note 950: Non-ANSI reserved word or construct: 'far' [Misra
+    Rule 1]
+..\video.cpp  63  Note 950: Non-ANSI reserved word or construct: 'far' [Misra
+    Rule 1]
+                                                                             _
+                                     (uint16_t)(((y * VIDEO_WIDTH) + x) * 2));
+..\video.cpp  64  Note 923: cast from int to pointer [MISRA Rule 45]
+                        _
+        pscr[0] = *str++;                        // Put character in video RAM
+..\video.cpp  66  Info 732: Loss of sign (assignment) (char to unsigned char)
+    _
+    char buf[4];
+..\video.cpp  74  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  74  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+              _
+    buf[3] = (char)0;
+..\video.cpp  75  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  75  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  75  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+              _
+    buf[2] = (char)('0' + num % 10);
+..\video.cpp  76  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  76  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  76  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+..\video.cpp  76  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '+' and '%'
+..\video.cpp  76  Note 912: Implicit binary conversion from int to unsigned
+    long
+..\video.cpp  76  Note 912: Implicit binary conversion from int to unsigned
+    long
+             _
+    num /= 10;
+..\video.cpp  77  Note 912: Implicit binary conversion from int to unsigned
+    long
+              _
+    buf[1] = (char)('0' + num % 10);
+..\video.cpp  78  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  78  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  78  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+..\video.cpp  78  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '+' and '%'
+..\video.cpp  78  Note 912: Implicit binary conversion from int to unsigned
+    long
+..\video.cpp  78  Note 912: Implicit binary conversion from int to unsigned
+    long
+             _
+    num /= 10;
+..\video.cpp  79  Note 912: Implicit binary conversion from int to unsigned
+    long
+              _
+    buf[0] = (char)('0' + num % 10);
+..\video.cpp  80  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  80  Note 970: Use of modifier or type 'char' outside of a typedef
+    [MISRA Rule 13]
+..\video.cpp  80  Note 971: Use of 'char' without 'signed' or 'unsigned' [MISRA
+    Rule 14]
+..\video.cpp  80  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '+' and '%'
+..\video.cpp  80  Note 912: Implicit binary conversion from int to unsigned
+    long
+..\video.cpp  80  Note 912: Implicit binary conversion from int to unsigned
+    long
+            _
+    uint8_t far *pscrX = (uint8_t far *)MK_FP(VIDEO_BASE,
+..\video.cpp  90  Note 950: Non-ANSI reserved word or construct: 'far' [Misra
+    Rule 1]
+..\video.cpp  90  Note 950: Non-ANSI reserved word or construct: 'far' [Misra
+    Rule 1]
+                                                                             _
+                                    (uint16_t)(((y * VIDEO_WIDTH) + x) << 1));
+..\video.cpp  91  Note 923: cast from int to pointer [MISRA Rule 45]
+                          _
+    if (w > VIDEO_WIDTH - x) {
+..\video.cpp  103  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '>' and '-'
+                           _
+    if (h > VIDEO_HEIGHT - y) {
+..\video.cpp  106  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '>' and '-'
+                                        _
+    for (ix = 0; ix < w; ++ix, pscrX += 2) {                    // loop over x
+..\video.cpp  110  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: ',' and '+='
+                _
+        uint8_t far *pscrXY = pscrX;
+..\video.cpp  111  Note 950: Non-ANSI reserved word or construct: 'far' [Misra
+    Rule 1]
+                                             _
+        for (iy = 0; iy < h; ++iy, pscrXY += 2*VIDEO_WIDTH) {
+..\video.cpp  112  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: ',' and '+='
+                                                 _
+            uint8_t byte = bitmap[ix + (iy >> 3)*width];
+..\video.cpp  114  Note 961: Violates MISRA Advisory Rule 47, dependence placed
+    on C's operator precedence; operators: '+' and '*'
+                                               _
+void Video::drawStringAt(uint8_t x, uint8_t y, char const *str) {
+..\video.cpp  120  Note 970: Use of modifier or type 'char' outside of a
+    typedef [MISRA Rule 13]
+..\video.cpp  120  Note 971: Use of 'char' without 'signed' or 'unsigned'
+    [MISRA Rule 14]
+                                                                             _
+        { 0x02, 0x04, 0x08, 0x10, 0x20 },                                 // \
+..\video.cpp  182  Warning 427: // comment terminates in \
+    _
+    };
+..\video.cpp  217  Info 785: Too few initializers for aggregate 'font5x7' of
+    type 'const unsigned char [95][5]'
+                                                 _
+        drawBitmapAt(x, y, font5x7[*str - ' '], 5, 8);
+..\video.cpp  220  Note 917: Prototype coercion (arg. no. 4) int to unsigned
+    char [MISRA Rule 77]
+..\video.cpp  220  Note 917: Prototype coercion (arg. no. 5) int to unsigned
+    char [MISRA Rule 77]
+
+--- Global Wrap-up
+
+Warning 526: Symbol 'setvect()' (line 189, file ..\bsp.cpp) not defined
+..\bsp.cpp  189  Info 830: Location cited in prior message
+Warning 628: no argument information provided for function 'setvect()' (line
+    189, file ..\bsp.cpp)
+..\bsp.cpp  189  Info 830: Location cited in prior message
+Warning 526: Symbol '_exit()' (line 208, file ..\bsp.cpp) not defined
+..\bsp.cpp  208  Info 830: Location cited in prior message
+Warning 628: no argument information provided for function '_exit()' (line 208,
+    file ..\bsp.cpp)
+..\bsp.cpp  208  Info 830: Location cited in prior message
+Warning 526: Symbol 'getvect()' (line 178, file ..\bsp.cpp) not defined
+..\bsp.cpp  178  Info 830: Location cited in prior message
+Warning 628: no argument information provided for function 'getvect()' (line
+    178, file ..\bsp.cpp)
+..\bsp.cpp  178  Info 830: Location cited in prior message
+Warning 526: Symbol 'MK_FP()' (line 49, file ..\video.cpp) not defined
+..\video.cpp  49  Info 830: Location cited in prior message
+Warning 628: no argument information provided for function 'MK_FP()' (line 49,
+    file ..\video.cpp)
+..\video.cpp  49  Info 830: Location cited in prior message

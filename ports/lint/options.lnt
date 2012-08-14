@@ -1,0 +1,166 @@
+//////////////////////////////////////////////////////////////////////////////
+// Product: PC-Lint 9.x option file for linting QP/C++
+// Last Updated for Version: 4.5.00
+// Date of the Last Update:  May 20, 2012
+//
+//                    Q u a n t u m     L e a P s
+//                    ---------------------------
+//                    innovating embedded systems
+//
+// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+//
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// Alternatively, this program may be distributed and modified under the
+// terms of Quantum Leaps commercial licenses, which expressly supersede
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Contact information:
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
+// e-mail:                  info@quantum-leaps.com
+//////////////////////////////////////////////////////////////////////////////
+
+// library headers
++libclass()       // lint all header files, including "foreign"
++libh(new)        // treat header file new as library file
+//-vf             // print names of all source files
+
++fdi              // start #include search in directory of the including file
+-i.               // QP/C port includes
+-i../../include   // QP/C includes
+
+-si4              // sizeof(int) 
+-ss2              // sizeof(short)
+-spD4             // sizeof(void *)
+-spP4             // sizeof(function pointer)
+-sbo4             // sizeof(bool)
+
+
+au-misra-cpp.lnt  // MISRA-C++:2008 options
+au-ds.lnt         // Dan Saks recommendations
+lib-qpcpp.lnt     // QP/C++ options
+-strong(AXJ)      // Strong type checking
+
+
+// QEP
+-esym(1960,                 // 16-0-4 function-like macro
+ QEP_TRIG_,
+ QEP_ENTER_,
+ QEP_EXIT_)
+-efunc(639, *getVersion)    // Strong type mismatch in binary operation
+-efunc(778, *getVersion)    // Constant expression evaluates to 0
+-efunc(835, *getVersion)    // 0 as left argument to operator '+'
+-emacro(717,                // do ... while(0);
+ QEP_ENTER_,
+ QEP_EXIT_)
+-esym(613,                  // Possible use of null pointer
+ *m_state,
+ *m_temp)
+
+// QF
+-emacro(1960, QF_EVT_CONST_CAST_) // 5-2-5 attempt to cast away const
+-emacro(929, QF_EVT_CONST_CAST_)  // 5-2-7 cast from pointer to pointer
+-emacro(925, QF_EPOOL_GET_)       // 5-2-8 5-2-9 cast from pointer to pointer
+-estring(522,               // function lacks side-effects
+ *QF_EVT_REF_CTR_INC_,
+ *QF_EVT_REF_CTR_DEC_)
+-emacro(1960, QF_PTR_AT_)   // 5-0-15 pointer arithmetic
+-efunc(925,                 // 5-2-8, 5-2-9 cast from pointer to pointer
+ *QMPool::init,
+ *QMPool::get,
+ *QMPool::put)
+-emacro(946, QF_PTR_RANGE_) // 5-0-15, 5-0-17, 5-0-18
+                            // Relation or subtraction applied to pointers
+-esym(1960,                 // 16-0-4 function-like macro
+ QF_EVT_CONST_CAST_,
+ QF_EVT_POOL_ID_,
+ QF_EVT_REF_CTR_,
+ QF_PTR_AT_,
+ QF_CRIT_ENTRY_,
+ QF_CRIT_EXIT_,
+ QF_PTR_RANGE_)
+-efunc(818,                 // 7-1-2 'stkSto' could be const
+ *QActive::start,
+ *QActive::stop)
+-efunc(1762,                // 9-3-3 function could be made const
+ *QActive::stop)
+-emacro(717, QACTIVE_EQUEUE_SIGNAL_) // do ... while(0);
+-efunc(529, *QF::tick)      // Symbol 'dummy' not accessed
+-efunc(438, *QF::tick)      // Value assigned to 'dummy' not used
+
+
+// QK
+-emacro(929,                // 5-2-7 cast from pointer to pointer
+ QK_EXT_SAVE,
+ QK_EXT_RESTORE)
+-emacro(740,                // 5-2-6 pointer cast, incompatible indirect types
+ QK_EXT_SAVE,
+ QK_EXT_RESTORE)
+-emacro(925,                // 5-2-8, 5-2-9 cast from pointer to pointer
+ QK_EXT_SAVE,
+ QK_EXT_RESTORE,
+ QK_TLS)
+
+ 
+// QS -- the following options are needed only when Q_SPY is defined
+-emacro(1960,               // 5-0-15, pointer arithmetic
+ QS_PTR_AT_,
+ QS_PTR_INC_)
+-efunc(1960,                // 9-5-1 declaration of union
+ *QS::f32,
+ *QS::f64)
+-estring(1960,              // 16-0-4 function-like macro
+ QS_INSERT_BYTE,
+ QS_INSERT_ESC_BYTE,
+ QS_INSERT_CHKSUM_BYTE,
+ QS_PTR_AT_,
+ QS_PTR_INC_)
+-emacro(944,                // Operator ... always evaluates to True
+ QS_BEGIN_,
+ QS_BEGIN_NOCRIT_)
+-emacro(948,                // Operator ... always evaluates to True
+ QS_BEGIN_,
+ QS_BEGIN_NOCRIT_)
+-emacro(923,                // 5-2-7, 5-2-8 cast from pointer to long
+ QS_OBJ_,
+ QS_FUN_)
+-efunc(930,                 // 5-2-7 cast from enum to unsigned char
+ *QS::mem,
+ *QS::str,
+ *QS::str_ROM)
+-emacro(930,                // 5-2-7 cast from enum to unsigned char
+ QS_BEGIN_,
+ QS_BEGIN_NOCRIT_)
+-emacro(572,                // 5-8-1 excessive shift value
+ QS_BEGIN_,
+ QS_BEGIN_NOCRIT_)
+-emacro(1963, QS_TEC_)      // 5-2-10, increment combined with operator
+-emacro(778,                // expression evaluates to 0 in operation '>>'
+ QS_BEGIN_,
+ QS_BEGIN_NOCRIT_)
+-emacro(845,                // The right argument of '<<' is zero
+ QS_BEGIN_,
+ QS_BEGIN_NOCRIT_)
+-emacro(725,                // Expected positive indentation
+ QS_END_,
+ QS_END_NOCRIT_)
+
+// Warning 537 "Repeated include file" is generated only in the Q_SPY
+// configuration. This warning is redundant, because all QP header files
+// are protected by #ifndef xxx_h ... #endif preprocessor
+// checks.
+-e537                       // Repeated include file (checked by 451)
+

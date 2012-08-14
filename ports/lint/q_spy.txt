@@ -1,0 +1,7 @@
+/// \brief This macro, if defined, activates the QS software tracing
+/// instrumentation.
+///
+/// \note Typically, you define this macro to the compiler in the Spy
+/// build configuration (usually via the -DQ_SPY option).
+///
+#define Q_SPY

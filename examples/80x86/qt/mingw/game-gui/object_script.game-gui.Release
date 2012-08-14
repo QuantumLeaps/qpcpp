@@ -1,0 +1,12 @@
+INPUT(
+./release\main.o
+./release\gui.o
+./release\bsp.o
+./release\missile.o
+./release\mine2.o
+./release\mine1.o
+./release\tunnel.o
+./release\ship.o
+./release\moc_gui.o
+./release\qrc_gui.o
+);

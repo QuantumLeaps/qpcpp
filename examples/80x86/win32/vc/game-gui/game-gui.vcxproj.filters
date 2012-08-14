@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{408ce8d3-7fe8-4d7c-9936-3693d0cec16f}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{98b2af90-e163-43eb-86d9-5944aef7cdc5}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{26b2e92e-c899-4651-9da5-73559d739dc5}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bsp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mine1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mine2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="missile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ship.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tunnel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\qtools\qspy\source\qspy.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bsp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dpp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Res\BTN_DWN.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\BTN_UP.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\EK-LM3S811.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\LCD.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\led_off.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\led_on.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\qp.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg0.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg1.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg3.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg4.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg5.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg6.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg7.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg8.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Res\seg9.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="game-gui.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
