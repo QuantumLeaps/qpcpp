@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example, QK version
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -34,6 +34,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef dpp_h
 #define dpp_h
+
+using namespace QP;
 
 enum DPPSignals {
    EAT_SIG = Q_USER_SIG,        // published by Table to let a philosopher eat

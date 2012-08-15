@@ -89,7 +89,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
      </state_glyph>
     </state>
     <state name="eating">
-     <entry>me-&gt;m_timeEvt.postIn(me, think_time());</entry>
+     <entry>me-&gt;m_timeEvt.postIn(me, eat_time());</entry>
      <exit>TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
 pe-&gt;philoNum = PHILO_ID(me);
 QP::QF::PUBLISH(pe, me);

@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: Product: "Fly'n'Shoot" game
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -34,6 +34,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef game_h
 #define game_h
+
+using namespace QP;
 
 enum GameSignals {                                 // signals used in the game
     TIME_TICK_SIG = Q_USER_SIG,                     // published from tick ISR

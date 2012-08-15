@@ -122,7 +122,7 @@ CFLAGS = -c -Wall -O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -Wall -O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
-LINKFLAGS = -s -L$(QP_PORT_DIR)\$(BIN_DIR) -mwindows 
+LINKFLAGS = -s -L$(QP_PORT_DIR)\$(BIN_DIR) -mwindows
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
@@ -136,7 +136,7 @@ CFLAGS = -c -g $(INCLUDES) $(DEFINES) -DQ_SPY
 
 CPPFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES) -DQ_SPY
 
-LINKFLAGS = -s -L$(QP_PORT_DIR)\$(BIN_DIR) -mwindows 
+LINKFLAGS = -s -L$(QP_PORT_DIR)\$(BIN_DIR) -mwindows
 
 else                     # default Debug configuration .......................
 
@@ -148,7 +148,7 @@ CFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES)
 
 CPPFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES)
 
-LINKFLAGS = -s -L$(QP_PORT_DIR)\$(BIN_DIR) -mwindows 
+LINKFLAGS = -s -L$(QP_PORT_DIR)\$(BIN_DIR) -mwindows
 
 endif
 

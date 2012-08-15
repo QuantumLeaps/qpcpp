@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -92,6 +92,7 @@ QState Table::initial(Table *me, QEvt const *) {
 //............................................................................
 QState Table::serving(Table *me, QEvt const *e) {
     uint8_t n, m;
+    TableEvt *te;
     switch (e->sig) {
         case HUNGRY_SIG: {
             BSP_busyDelay();
@@ -103,7 +104,9 @@ QState Table::serving(Table *me, QEvt const *e) {
             m = LEFT(n);
             if ((me->m_fork[m] == FREE) && (me->m_fork[n] == FREE)) {
                 me->m_fork[m] = me->m_fork[n] = USED;
-                QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, n), me);
+                te = Q_NEW(TableEvt, EAT_SIG);
+                te->philoNum = n;
+                QF::PUBLISH(te, me);
                 BSP_displyPhilStat(n, "eating  ");
             }
             else {
@@ -127,7 +130,9 @@ QState Table::serving(Table *me, QEvt const *e) {
             if (me->m_isHungry[m] && (me->m_fork[m] == FREE)) {
                 me->m_fork[n] = me->m_fork[m] = USED;
                 me->m_isHungry[m] = 0;
-                QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, m), me);
+                te = Q_NEW(TableEvt, EAT_SIG);
+                te->philoNum = m;
+                QF::PUBLISH(te, me);
                 BSP_displyPhilStat(m, "eating  ");
             }
             m = LEFT(n);                            // check the left neighbor
@@ -135,7 +140,9 @@ QState Table::serving(Table *me, QEvt const *e) {
             if (me->m_isHungry[m] && (me->m_fork[n] == FREE)) {
                 me->m_fork[m] = me->m_fork[n] = USED;
                 me->m_isHungry[m] = 0;
-                QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, m), me);
+                te = Q_NEW(TableEvt, EAT_SIG);
+                te->philoNum = m;
+                QF::PUBLISH(te, me);
                 BSP_displyPhilStat(m, "eating  ");
             }
             return Q_HANDLED();

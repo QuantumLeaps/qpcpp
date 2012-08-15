@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QF/C++ port to x86, uC/OS-II, Open Watcom, Large model
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------

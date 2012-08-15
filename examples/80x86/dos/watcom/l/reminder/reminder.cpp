@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: Reminder state pattern example
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -39,6 +39,8 @@
 #include <stdio.h>
 
 Q_DEFINE_THIS_FILE
+
+using namespace QP;
 
 //............................................................................
 enum SensorSignals {

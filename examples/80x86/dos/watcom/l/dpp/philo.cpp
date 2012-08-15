@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -132,7 +132,9 @@ QState Philo::thinking(Philo *me, QEvt const *e) {
 QState Philo::hungry(Philo *me, QEvt const *e) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            AO_Table->POST(Q_NEW(TableEvt, HUNGRY_SIG, PHILO_ID(me)), me);
+            TableEvt *te = Q_NEW(TableEvt, HUNGRY_SIG);
+            te->philoNum = PHILO_ID(me);
+            AO_Table->POST(te, me);
             return Q_HANDLED();
         }
         case EAT_SIG: {
@@ -158,7 +160,9 @@ QState Philo::eating(Philo *me, QEvt const *e) {
             return Q_HANDLED();
         }
         case Q_EXIT_SIG: {
-            QF::PUBLISH(Q_NEW(TableEvt, DONE_SIG, PHILO_ID(me)), me);
+            TableEvt *te = Q_NEW(TableEvt, DONE_SIG);
+            te->philoNum = PHILO_ID(me);
+            QF::PUBLISH(te, me);
             return Q_HANDLED();
         }
         case TIMEOUT_SIG: {

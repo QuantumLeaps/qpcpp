@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: UI with State-Local Storage Example
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 24, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -34,6 +34,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef ui_h
 #define ui_h
+
+using namespace QP;
 
 enum UserSignals {
     QUIT_SIG = Q_USER_SIG,

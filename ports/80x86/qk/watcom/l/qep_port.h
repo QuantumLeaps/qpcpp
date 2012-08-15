@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QEP/C++  port to 80x86, Open Watcom
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  Jul 01, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -34,10 +34,9 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef qep_port_h
 #define qep_port_h
-                                                // do NOT use the QP namespace
-#define Q_NNAMESPACE   1
 
 #include <stdint.h>                      // standard exact-width integer types
+
 #include "qep.h"                  // QEP platform-independent public interface
 
 #endif                                                           // qep_port_h

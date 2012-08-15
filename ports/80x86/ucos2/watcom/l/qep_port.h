@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QEP/C++  port to uC/OS-II/80x86, Open Watcom compiler
 // Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jul 01, 2012
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -36,9 +36,6 @@
 #define qep_port_h
 
 #include "ucos_ii.h"                                  // uC/OS-II include file
-
-                                                // do NOT use the QP namespace
-#define Q_NNAMESPACE   1
 
                           // Exact-width integer types, as defined in uC/OS-II
 typedef INT8S    int8_t;

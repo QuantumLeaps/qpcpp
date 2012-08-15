@@ -21,7 +21,7 @@ INSTALL_FILE  = $(COPY_FILE)
 INSTALL_PROGRAM = $(COPY_FILE)
 INSTALL_DIR   = $(COPY_DIR)
 DEL_FILE      = del
-SYMLINK       = 
+SYMLINK       =
 DEL_DIR       = rmdir
 MOVE          = move
 CHK_DIR_EXISTS= if not exist
@@ -33,7 +33,7 @@ SUBTARGETS    =  \
 debug: $(MAKEFILE).Debug FORCE
 	$(MAKE) -f $(MAKEFILE).Debug
 debug-make_default: $(MAKEFILE).Debug FORCE
-	$(MAKE) -f $(MAKEFILE).Debug 
+	$(MAKE) -f $(MAKEFILE).Debug
 debug-make_first: $(MAKEFILE).Debug FORCE
 	$(MAKE) -f $(MAKEFILE).Debug first
 debug-all: $(MAKEFILE).Debug FORCE
@@ -49,7 +49,7 @@ debug-uninstall: $(MAKEFILE).Debug FORCE
 release: $(MAKEFILE).Release FORCE
 	$(MAKE) -f $(MAKEFILE).Release
 release-make_default: $(MAKEFILE).Release FORCE
-	$(MAKE) -f $(MAKEFILE).Release 
+	$(MAKE) -f $(MAKEFILE).Release
 release-make_first: $(MAKEFILE).Release FORCE
 	$(MAKE) -f $(MAKEFILE).Release first
 release-all: $(MAKEFILE).Release FORCE

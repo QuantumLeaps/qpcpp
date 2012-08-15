@@ -182,7 +182,7 @@ QP::QState Philo::eating(Philo * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // @(/2/0/2/3)
         case Q_ENTRY_SIG: {
-            me->m_timeEvt.postIn(me, think_time());
+            me->m_timeEvt.postIn(me, eat_time());
             status = Q_HANDLED();
             break;
         }

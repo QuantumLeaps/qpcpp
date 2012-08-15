@@ -53,11 +53,16 @@
 //////////////////////////////////////////////////////////////////////////////
 // interface used only inside QF, but not in applications
 //
+
+QP_BEGIN_
+
 class UCosMemPart {                     // uC/OS-II memory pool and block-size
     OS_MEM *m_pool;                                    // uC/OS-II memory pool
     QEvtSize m_block_size;                       // the block size of the pool
     friend class QF;
 };
+
+QP_END_
                                              // uC/OS-II event pool operations
 #define QF_EPOOL_TYPE_              UCosMemPart
 #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) do { \

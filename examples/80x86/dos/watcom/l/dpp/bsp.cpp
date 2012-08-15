@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Aug 15, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -84,7 +84,7 @@ void interrupt ISR_kbd() {
     outp(0x61, (uint8_t)(kcr | 0x80));          // toggle acknowledge bit high
     outp(0x61, kcr);                             // toggle acknowledge bit low
     if (key == (uint8_t)129) {                             // ESC key pressed?
-        static QEvt term(TERMINATE_SIG);                       // static event
+        static QEvt const term = QEVT_INITIALIZER(TERMINATE_SIG);//const event
         QF::PUBLISH(&term, &l_kbd);           // publish to all interested AOs
     }
 
