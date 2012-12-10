@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QF/C++  port to ARM7/ARM9
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Nov 09, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,28 +35,27 @@
 #ifndef qf_port_h
 #define qf_port_h
 
-                    // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE               63
-
+        // The maximum number of active objects in the application, see NOTE01
+#define QF_MAX_ACTIVE               32
                        // The maximum number of event pools in the application
 #define QF_MAX_EPOOL                6
 
-              // fast unconditional interrupt disabling/enabling for ARM state
+      // fast unconditional interrupt disabling/enabling for ARM state, NOTE02
 #define QF_INT_DISABLE()   \
-    __asm volatile ("MSR cpsr_c,#(0x1F | 0x80 | 0x40)" ::: "cc")
+    __asm volatile ("MSR cpsr_c,#(0x1F | 0x80)" ::: "cc")
 
 #define QF_INT_ENABLE() \
     __asm volatile ("MSR cpsr_c,#(0x1F)" ::: "cc")
 
                                              // QF critical section entry/exit
 #ifdef __thumb__                                                // THUMB mode?
-                                             // QF interrupt locking/unlocking
+                                           // QF interrupt disabling/enabling
     #define QF_CRIT_STAT_TYPE         unsigned int
-    #define QF_CRIT_ENTRY(stat_)      ((stat_) = QF_int_lock_SYS())
-    #define QF_CRIT_EXIT(stat_)       QF_int_unlock_SYS(stat_)
+    #define QF_CRIT_ENTRY(stat_)      ((stat_) = QF_int_disable_SYS())
+    #define QF_CRIT_EXIT(stat_)       QF_int_enable_SYS(stat_)
 
-    extern "C" QF_CRIT_STAT_TYPE QF_int_lock_SYS(void);
-    extern "C" void QF_int_unlock_SYS(QF_CRIT_STAT_TYPE stat);
+    extern "C" QF_CRIT_STAT_TYPE QF_int_disable_SYS(void);
+    extern "C" void QF_int_enable_SYS(QF_CRIT_STAT_TYPE stat);
 
 #elif (defined __arm__)                                           // ARM mode?
 
@@ -82,14 +81,30 @@ extern "C" {
     void QF_dAbort(void);
     void QF_reserved(void);
     void QF_irq(void);
-    void QF_fiq(void);
+    void QF_fiq_dummy(void);                                     // see NOTE03
 
     void BSP_irq(void);
-    void BSP_fiq(void);
 }
 
 #include "qep_port.h"                                              // QEP port
 #include "qvanilla.h"                          // "Vanilla" cooperative kernel
 #include "qf.h"                    // QF platform-independent public interface
+
+//////////////////////////////////////////////////////////////////////////////
+// NOTE01:
+// The maximum number of active objects QF_MAX_ACTIVE can be increased
+// up to 63, if necessary. Here it is set to a lower level to save some RAM.
+//
+// NOTE02:
+// The QF critical section does NOT disable the FIQ, which means that FIQ
+// is effectively a Non-Maskable Interrupt (NMI) from the kernel perspective.
+// This means that FIQ has "zero latency", but it also means that FIQ *cannot*
+// call any QF/QK services. Specifically FIQ cannot post or publish events.
+//
+// NOTE03:
+// The FIQ needs to be implemented in assembly at the application level, if it
+// is ever used. The dummy FIQ implementation provided at the port level causes
+// an exception if it is ever called.
+//
 
 #endif                                                            // qf_port_h

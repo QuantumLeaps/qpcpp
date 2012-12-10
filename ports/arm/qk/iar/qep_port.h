@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: QP/C++  port to ARM Cortex-M3
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Product: QP/C++  port to ARM7/ARM9
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 08, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -36,7 +36,6 @@
 #define qep_port_h
 
 #include <stdint.h>  // exact-width integers, WG14/N843 C99 Standard, 7.18.1.1
-
 #include "qep.h"                  // QEP platform-independent public interface
 
 #endif                                                           // qep_port_h

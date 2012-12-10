@@ -1,8 +1,8 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for MSP430, QK port, TI CCS MSP430 compiler
-:: Last Updated for Version: 4.4.00
-:: Date of the Last Update:  Apr 19, 2012
+:: Last Updated for Version: 4.5.02
+:: Date of the Last Update:  Oct 09, 2012
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -67,10 +67,9 @@ if "%1"=="spy" (
     set CCFLAGS=-vmsp --abi=eabi -g --include_path="%CCS_DIR%\tools\compiler\msp430\include" --include_path="%CCS_DIR%\ccs_base\msp430" --define=Q_SPY
 )
 
+mkdir %BINDIR%
 set LIBDIR=%BINDIR%
 set LIBFLAGS=a
-mkdir %BINDIR%
-
 erase %BINDIR%\qp.lib
 
 :: QEP ----------------------------------------------------------------------
@@ -88,6 +87,7 @@ set CCINC=--include_path=%QP_PRTDIR% --include_path=%QP_INCDIR% --include_path=%
 
 %LIB% %LIBFLAGS% %LIBDIR%\qp.lib %BINDIR%\qep.obj %BINDIR%\qfsm_ini.obj %BINDIR%\qfsm_dis.obj %BINDIR%\qhsm_ini.obj %BINDIR%\qhsm_dis.obj %BINDIR%\qhsm_top.obj %BINDIR%\qhsm_in.obj
 @echo off
+erase %BINDIR%\*.obj
 
 :: QF -----------------------------------------------------------------------
 set SRCDIR=..\..\..\..\qf\source
@@ -123,8 +123,9 @@ set CCINC=--include_path=%QP_PRTDIR% --include_path=%QP_INCDIR% --include_path=%
 %CC% %CCFLAGS% %CCINC% --obj_directory="%QP_PRTDIR%\%BINDIR%" %SRCDIR%\qte_rarm.cpp
 %CC% %CCFLAGS% %CCINC% --obj_directory="%QP_PRTDIR%\%BINDIR%" %SRCDIR%\qte_ctr.cpp
 
-%LIB% %LIBFLAGS% %LIBDIR%\qp.lib %BINDIR%\qep.obj %BINDIR%\qfsm_ini.obj %BINDIR%\qfsm_dis.obj %BINDIR%\qhsm_ini.obj %BINDIR%\qhsm_dis.obj %BINDIR%\qhsm_top.obj %BINDIR%\qhsm_in.obj %BINDIR%\qa_defer.obj %BINDIR%\qa_fifo.obj %BINDIR%\qa_lifo.obj %BINDIR%\qa_get_.obj %BINDIR%\qa_sub.obj %BINDIR%\qa_usub.obj %BINDIR%\qa_usuba.obj %BINDIR%\qeq_fifo.obj %BINDIR%\qeq_get.obj %BINDIR%\qeq_init.obj %BINDIR%\qeq_lifo.obj %BINDIR%\qf_act.obj %BINDIR%\qf_gc.obj %BINDIR%\qf_log2.obj %BINDIR%\qf_new.obj %BINDIR%\qf_pool.obj %BINDIR%\qf_psini.obj %BINDIR%\qf_pspub.obj %BINDIR%\qf_pwr2.obj %BINDIR%\qf_tick.obj %BINDIR%\qmp_get.obj %BINDIR%\qmp_init.obj %BINDIR%\qmp_put.obj %BINDIR%\qte_ctor.obj %BINDIR%\qte_arm.obj %BINDIR%\qte_darm.obj %BINDIR%\qte_rarm.obj %BINDIR%\qte_ctr.obj
+%LIB% %LIBFLAGS% %LIBDIR%\qp.lib %BINDIR%\qa_defer.obj %BINDIR%\qa_fifo.obj %BINDIR%\qa_lifo.obj %BINDIR%\qa_get_.obj %BINDIR%\qa_sub.obj %BINDIR%\qa_usub.obj %BINDIR%\qa_usuba.obj %BINDIR%\qeq_fifo.obj %BINDIR%\qeq_get.obj %BINDIR%\qeq_init.obj %BINDIR%\qeq_lifo.obj %BINDIR%\qf_act.obj %BINDIR%\qf_gc.obj %BINDIR%\qf_log2.obj %BINDIR%\qf_new.obj %BINDIR%\qf_pool.obj %BINDIR%\qf_psini.obj %BINDIR%\qf_pspub.obj %BINDIR%\qf_pwr2.obj %BINDIR%\qf_tick.obj %BINDIR%\qmp_get.obj %BINDIR%\qmp_init.obj %BINDIR%\qmp_put.obj %BINDIR%\qte_ctor.obj %BINDIR%\qte_arm.obj %BINDIR%\qte_darm.obj %BINDIR%\qte_rarm.obj %BINDIR%\qte_ctr.obj
 @echo off
+erase %BINDIR%\*.obj
 
 :: QK -----------------------------------------------------------------------
 set SRCDIR=..\..\..\..\qk\source
@@ -138,6 +139,7 @@ set CCINC=--include_path=%QP_PRTDIR% --include_path=%QP_INCDIR% --include_path=%
 
 %LIB% %LIBFLAGS% %LIBDIR%\qp.lib %BINDIR%\qk.obj %BINDIR%\qk_sched.obj %BINDIR%\qk_mutex.obj %BINDIR%\qk_port.obj
 @echo off
+erase %BINDIR%\*.obj
 
 :: QS -----------------------------------------------------------------------
 if not "%1"=="spy" goto clean
@@ -157,12 +159,11 @@ set CCINC=--include_path=%QP_PRTDIR% --include_path=%QP_INCDIR% --include_path=%
 
 %LIB% %LIBFLAGS% %LIBDIR%\qp.lib %BINDIR%\qs.obj %BINDIR%\qs_.obj %BINDIR%\qs_blk.obj %BINDIR%\qs_byte.obj %BINDIR%\qs_f32.obj %BINDIR%\qs_f64.obj %BINDIR%\qs_mem.obj %BINDIR%\qs_str.obj
 @echo off
+erase %BINDIR%\*.obj
 
 :: --------------------------------------------------------------------------
 
 :clean
 @echo off
-
-erase %BINDIR%\*.obj
 
 endlocal

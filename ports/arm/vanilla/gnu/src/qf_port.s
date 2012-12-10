@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product:  QF/Vanilla port to ARM, GNU ARM Assembler
-* Last Updated for Version: 4.4.00
-* Date of the Last Update:  Apr 19, 2012
+* Last Updated for Version: 4.5.02
+* Date of the Last Update:  Nov 09, 2012
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -33,9 +33,8 @@
 * e-mail:                  info@quantum-leaps.com
 *****************************************************************************/
 
-    .equ    NO_INT,      0xC0   /* mask to disable interrupts (FIQ and IRQ) */
-    .equ    NO_IRQ,      0x80   /* mask to disable interrupts (FIQ and IRQ) */
-    .equ    NO_FIQ,      0x40   /* mask to disable interrupts (FIQ and IRQ) */
+    .equ    NO_IRQ,      0x80   /* mask to disable interrupts (IRQ) */
+    .equ    NO_FIQ,      0x40   /* mask to disable interrupts (FIQ) */
     .equ    FIQ_MODE,    0x11
     .equ    IRQ_MODE,    0x12
     .equ    SYS_MODE,    0x1F
@@ -49,29 +48,29 @@
     .section .text.fastcode
 
 /*****************************************************************************
-* QF_INT_KEY_TYPE QF_int_lock_SYS(void);
+* unsigned int QF_int_disable_SYS(void);
 */
-    .global QF_int_lock_SYS
-    .func   QF_int_lock_SYS
-QF_int_lock_SYS:
-    MRS     r0,cpsr             /* get the original CPSR in r0 to return */
-    MSR     cpsr_c,#(SYS_MODE | NO_INT) /* disable both IRQ/FIQ */
-    BX      lr
+    .global QF_int_disable_SYS
+    .func   QF_int_disable_SYS
+QF_int_disable_SYS:
+    MRS     r0,cpsr             /* get the original CPSR in r0 to return  */
+    MSR     cpsr_c,#(SYS_MODE | NO_IRQ) /* disable IRQ only, FIQ enabled! */
+    BX      lr                  /* return the original CPSR in r0         */
 
-    .size   QF_int_lock_SYS, . - QF_int_lock_SYS
+    .size   QF_int_disable_SYS, . - QF_int_disable_SYS
     .endfunc
 
 
 /*****************************************************************************
-* void QF_int_unlock_SYS(QF_INT_KEY_TYPE key);
+* void QF_int_enable_SYS(unsigned int key);
 */
-    .global QF_int_unlock_SYS
-    .func   QF_int_unlock_SYS
-QF_int_unlock_SYS:
+    .global QF_int_enable_SYS
+    .func   QF_int_enable_SYS
+QF_int_enable_SYS:
     MSR     cpsr_c,r0           /* restore the original CPSR from r0 */
-    BX      lr
+    BX      lr                  /* return to ARM or THUMB */
 
-    .size   QF_int_unlock_SYS, . - QF_int_unlock_SYS
+    .size   QF_int_enable_SYS, . - QF_int_enable_SYS
     .endfunc
 
 
@@ -109,11 +108,11 @@ QF_irq:
 
 
 /* IRQ exit {{{ */
-    MSR     cpsr_c,#(SYS_MODE | NO_INT) /* make sure IRQ/FIQ are disabled */
+    MSR     cpsr_c,#(SYS_MODE | NO_IRQ) /* make sure IRQ are disabled */
     MOV     r0,sp               /* make sp_SYS visible to IRQ mode */
     ADD     sp,sp,#(8*4)        /* fake unstacking 8 registers from sp_SYS */
 
-    MSR     cpsr_c,#(IRQ_MODE | NO_INT) /* IRQ mode, both IRQ/FIQ disabled */
+    MSR     cpsr_c,#(IRQ_MODE | NO_IRQ) /* IRQ mode, IRQ disabled */
     MOV     sp,r0               /* copy sp_SYS to sp_IRQ */
     LDR     r0,[sp,#(7*4)]      /* load the saved SPSR from the stack */
     MSR     spsr_cxsf,r0        /* copy it into spsr_IRQ */
@@ -125,61 +124,6 @@ QF_irq:
 /* IRQ exit }}} */
 
     .size   QF_irq, . - QF_irq
-    .endfunc
-
-
-/*****************************************************************************
-* void QF_fiq(void);
-*/
-    .global QF_fiq
-    .func   QF_fiq
-    .align  3
-QF_fiq:
-/* FIQ entry {{{ */
-    MOV     r13,r0              /* save r0 in r13_FIQ */
-    SUB     r0,lr,#4            /* put return address in r0_SYS */
-    MOV     lr,r1               /* save r1 in r14_FIQ (lr) */
-    MRS     r1,spsr             /* put the SPSR in r1_SYS */
-
-    MSR     cpsr_c,#(SYS_MODE | NO_INT) /* SYSTEM mode, IRQ/FIQ disabled */
-    STMFD   sp!,{r0,r1}         /* save SPSR and PC on SYS stack */
-    STMFD   sp!,{r2-r3,r12,lr}  /* save APCS-clobbered regs on SYS stack */
-    MOV     r0,sp               /* make the sp_SYS visible to FIQ mode */
-    SUB     sp,sp,#(2*4)        /* make room for stacking (r0_SYS, SPSR) */
-
-    MSR     cpsr_c,#(FIQ_MODE | NO_INT) /* FIQ mode, IRQ/FIQ disabled */
-    STMFD   r0!,{r13,r14}       /* finish saving the context (r0_SYS,r1_SYS)*/
-
-    MSR     cpsr_c,#(SYS_MODE | NO_INT) /* SYSTEM mode, IRQ/FIQ disabled */
-/* FIQ entry }}} */
-
-
-    /* NOTE:
-    * Because FIQ is typically NOT prioritized by the interrupt controller
-    * BSP_fiq must not enable IRQ/FIQ to avoid priority inversions!
-    */
-    LDR     r12,=BSP_fiq
-    MOV     lr,pc               /* store the return address */
-    BX      r12                 /* call the C FIQ-handler (ARM/THUMB)
-
-
-/* FIQ exit {{{ */              /* both IRQ/FIQ disabled (see NOTE above) */
-    MSR     cpsr_c,#(SYS_MODE | NO_INT) /* make sure IRQ/FIQ are disabled */
-    MOV     r0,sp               /* make sp_SYS visible to FIQ mode */
-    ADD     sp,sp,#(8*4)        /* fake unstacking 8 registers from sp_SYS */
-
-    MSR     cpsr_c,#(FIQ_MODE | NO_INT) /* FIQ mode, IRQ/FIQ disabled */
-    MOV     sp,r0               /* copy sp_SYS to sp_FIQ */
-    LDR     r0,[sp,#(7*4)]      /* load the saved SPSR from the stack */
-    MSR     spsr_cxsf,r0        /* copy it into spsr_FIQ */
-
-    LDMFD   sp,{r0-r3,r12,lr}^  /* unstack all saved USER/SYSTEM registers */
-    NOP                         /* can't access banked reg immediately */
-    LDR     lr,[sp,#(6*4)]      /* load return address from the SYS stack */
-    MOVS    pc,lr               /* return restoring CPSR from SPSR */
-/* FIQ exit }}} */
-
-    .size   QF_fiq, . - QF_fiq
     .endfunc
 
 
@@ -256,6 +200,18 @@ QF_reserved:
     .endfunc
 
 /*****************************************************************************
+* void QF_fiq_dummy(void);
+*/
+    .global QF_fiq_dummy
+    .func   QF_fiq_dummy
+    .align  3
+QF_fiq_dummy:
+    LDR     r0,=Csting_fiq
+    B       QF_except
+    .size   QF_fiq_dummy, . - QF_fiq_dummy
+    .endfunc
+
+/*****************************************************************************
 * void QF_except(void);
 */
     .global QF_except
@@ -264,7 +220,7 @@ QF_reserved:
 QF_except:
     /* r0 is set to the string with the exception name */
     SUB     r1,lr,#4            /* set line number to the exception address */
-    MSR     cpsr_c,#(SYS_MODE | NO_INT) /* SYSTEM mode, IRQ/FIQ disabled */
+    MSR     cpsr_c,#(SYS_MODE | NO_IRQ | NO_FIQ) /* SYSTEM,IRQ/FIQ disabled */
     LDR     r12,=Q_onAssert
     MOV     lr,pc               /* store the return address */
     BX      r12                 /* call the assertion-handler (ARM/THUMB) */
@@ -279,6 +235,7 @@ Csting_swi:         .string  "Software Int"
 Csting_pAbort:      .string  "Prefetch Abort"
 Csting_dAbort:      .string  "Data Abort"
 Csting_reserved:    .string  "Reserved"
+Csting_fiq:         .string  "FIQ dummy"
 
     .size   QF_except, . - QF_except
     .endfunc

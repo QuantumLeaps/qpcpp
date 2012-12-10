@@ -1,28 +1,35 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: BSP for DPP application with lwIP on EV-LM3S9665 board
-// Last Updated for Version: 4.3.00
-// Date of the Last Update:  Nov 13, 2011
+// Product: BSP for DPP application with lwIP on EV-LM3S9665 board, Vanilla
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 06, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2011 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"                                    // QP port header file
@@ -35,11 +42,13 @@ extern "C" {
 
 Q_DEFINE_THIS_FILE
 
-#define USER_LED           (1 << 0)
-#define USER_BTN           (1 << 1)
+#define USER_LED           (1U << 0)
+#define USER_BTN           (1U << 1)
 
-#define ETH0_LED           (1 << 3)
-#define ETH1_LED           (1 << 2)
+#define ETH0_LED           (1U << 3)
+#define ETH1_LED           (1U << 2)
+
+static uint32_t l_nTicks;
 
 enum ISR_Priorities {      // ISR priorities starting from the highest urgency
     SYSTICK_PRIO,
@@ -47,25 +56,23 @@ enum ISR_Priorities {      // ISR priorities starting from the highest urgency
     // ...
 };
 
-static uint32_t l_nTicks;
-
 #ifdef Q_SPY
 
     QSTimeCtr QS_tickTime_;
     QSTimeCtr QS_tickPeriod_;
     static uint8_t l_SysTick_Handler;
 
-    #define UART_BAUD_RATE      115200
-    #define UART_TXFIFO_DEPTH   16
-    #define UART_FR_TXFE        (1 << 7)
+    #define UART_BAUD_RATE      115200U
+    #define UART_TXFIFO_DEPTH   16U
+    #define UART_FR_TXFE        (1U << 7)
 
 #endif
 
 //............................................................................
 extern "C" void SysTick_Handler(void) __attribute__((__interrupt__));
 extern "C" void SysTick_Handler(void) {
-    static uint32_t btn_debounced  = 0;
-    static uint8_t  debounce_state = 0;
+    static uint32_t btn_debounced  = 0U;
+    static uint8_t  debounce_state = 0U;
     uint32_t volatile tmp;
 
     ++l_nTicks;                             // count the number of clock ticks
@@ -104,11 +111,11 @@ extern "C" void SysTick_Handler(void) {
             if (tmp != btn_debounced) {
                 btn_debounced = tmp;        // save the debounced button value
                 if (tmp == 0) {                    // is the button depressed?
-                    static QEvent const bd = { BTN_DOWN_SIG, 0 };
+                    static QEvt const bd = { BTN_DOWN_SIG, 0 };
                     QF::PUBLISH(&bd, &l_SysTick_Handler);
                 }
                 else {
-                    static QEvent const bu = { BTN_UP_SIG, 0 };
+                    static QEvt const bu = { BTN_UP_SIG, 0 };
                     QF::PUBLISH(&bu, &l_SysTick_Handler);
                 }
             }
@@ -151,7 +158,7 @@ void BSP_init(void) {
     GPIOF->DEN   |=  USER_BTN;
     GPIOF->AMSEL &= ~USER_BTN;
 
-    if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
+    if (!QS_INIT((void *)0)) {           // initialize the QS software tracing
         Q_ERROR();
     }
 
@@ -172,19 +179,22 @@ void QF::onStartup(void) {
 void QF::onCleanup(void) {
 }
 //............................................................................
-void QF::onIdle(void) {          // entered with interrupts LOCKED, see NOTE01
+void QF::onIdle(void) {        // entered with interrupts DISABLED; see NOTE01
 
     // toggle the User LED on and then off, see NOTE02
     GPIOF->DATA_Bits[USER_LED] = USER_LED;            // turn the User LED on
     GPIOF->DATA_Bits[USER_LED] = 0;                   // turn the User LED off
 
 #ifdef Q_SPY
+
     QF_INT_ENABLE();
+
     if ((UART0->FR & UART_FR_TXFE) != 0) {                         // TX done?
         uint16_t fifo = UART_TXFIFO_DEPTH;          // max bytes we can accept
+        uint8_t const *block;
 
         QF_INT_DISABLE();
-        uint8_t const *block = QS::getBlock(&fifo);   // try to get next block
+        block = QS::getBlock(&fifo);      // try to get next block to transmit
         QF_INT_ENABLE();
 
         while (fifo-- != 0) {                       // any bytes in the block?
@@ -225,7 +235,7 @@ extern "C" uint32_t sys_now(void) {
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 //............................................................................
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[6*256];                     // buffer for Quantum Spy
     uint32_t tmp;
     initBuf(qsBuf, sizeof(qsBuf));
@@ -304,7 +314,7 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
     QS_FILTER_OFF(QS_QF_ISR_EXIT);
 
-    return (uint8_t)1;                                       // return success
+    return true;                                             // return success
 }
 //............................................................................
 void QS::onCleanup(void) {

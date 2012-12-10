@@ -10,25 +10,31 @@
 #ifndef dpp_h
 #define dpp_h
 
-enum DPPSignals {
-   EAT_SIG = Q_USER_SIG,  // published by Table to let a philosopher eat
-   DONE_SIG,              // published by Philosopher when done eating
-   TERMINATE_SIG,         // published by BSP to terminate the application
-   MAX_PUB_SIG,           // the last published signal
+namespace DPP {
 
-   HUNGRY_SIG,            // posted direclty to Table from hungry Philosopher
-   MAX_SIG                // the last signal
+enum DPPSignals {
+    EAT_SIG = QP::Q_USER_SIG, // published by Table to let a philosopher eat
+    DONE_SIG,                 // published by Philosopher when done eating
+    PAUSE_SIG,                // published by BSP to pause the application
+    TERMINATE_SIG,            // published by BSP to terminate the application
+    MAX_PUB_SIG,              // the last published signal
+
+    HUNGRY_SIG,               // posted direclty to Table from hungry Philo
+    MAX_SIG                   // the last signal
 };
 
 // @(/1/0) ...................................................................
-class TableEvt : public QEvent {
+class TableEvt : public QP::QEvt {
 public:
     uint8_t philoNum;
 };
 
-enum { N_PHILO = 5 };     // number of philosophers
+// number of philosophers
+#define N_PHILO ((uint8_t)5)
 
-extern QActive * const AO_Philo[N_PHILO];
-extern QActive * const AO_Table;
+extern QP::QActive * const AO_Philo[N_PHILO];
+extern QP::QActive * const AO_Table;
 
-#endif // dpp_h
+}                             // namespace DPP
+
+#endif                        // dpp_h

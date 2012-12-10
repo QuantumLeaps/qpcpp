@@ -975,7 +975,6 @@ QP_END_
     /// vital information for software tracing and avoids any overhead when
     /// the tracing is disabled.
     ///
-    ///
     /// This macro takes the last argument \a sender_, which is a pointer to
     /// the sender object. This argument is actually only used when QS
     /// tracing is enabled (macro #Q_SPY is defined). When QS software
@@ -996,13 +995,12 @@ QP_END_
     /// provides the vital information for software tracing and avoids any
     /// overhead when the tracing is disabled.
     ///
-    ///
     /// This macro takes the last argument \a sender_, which is a pointer to
     /// the sender object. This argument is actually only used when QS
     /// tracing is disabled (macro #Q_SPY is defined). When QS software
-    /// tracing is not enabled, the macro calls QF_publish() without the
-    /// \a sender_ argument, so the overhead of passing this extra argument
-    /// is entirely avoided.
+    /// tracing is not enabled, the macro calls QActive::postFIFO() without
+    /// the \a sender_ argument, so the overhead of passing this extra
+    /// argument is entirely avoided.
     ///
     /// \note the pointer to the sender object is not necessarily a poiner
     /// to an active object. In fact, if ao->POST() is called from an

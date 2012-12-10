@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: Dummy heap management to reduce the codesize
-// Last Updated for Version: 4.0.00
-// Date of the Last Update:  May 28, 2008
+// Product: Dummy heap management to reduce the codesize, GCC 4.3.3
+// Last Updated for Version: 4.1.02
+// Date of the Last Update:  Feb 14, 2010
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2008 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2010 Quantum Leaps, LLC. All rights reserved.
 //
 // This software may be distributed and modified under the terms of the GNU
 // General Public License version 2 (GPL) as published by the Free Software
@@ -32,16 +32,16 @@
 Q_DEFINE_THIS_FILE
 
 //............................................................................
-extern "C" void *malloc(size_t) {
+void *malloc(size_t) {
     Q_ERROR();
     return (void *)0;
 }
 //............................................................................
-extern "C" void free(void *) {
+void free(void *) {
     Q_ERROR();
 }
 //............................................................................
-extern "C" void *calloc(size_t, size_t) {
+void *calloc(size_t, size_t) {
     Q_ERROR();
     return (void *)0;
 }

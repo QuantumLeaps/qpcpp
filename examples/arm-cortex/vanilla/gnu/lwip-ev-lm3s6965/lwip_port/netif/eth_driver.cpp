@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // lwIP Ethernet CMSIS-compliant driver for Stellaris MCUs
-// Copyright (c) 2011 Quantum Leaps, LLC, www.state-machine.com
+// Copyright (c) 2012 Quantum Leaps, LLC, www.state-machine.com
 //
 
 //
@@ -58,9 +58,8 @@
 #include "netif/etharp.h"
 #include "netif/eth_driver.h"
 
-extern "C" {
-    #include "lm3s_cmsis.h"
-}
+#include "lm3s_cmsis.h"
+
 #include <string.h>                                         /* for memcpy() */
 
 /**
@@ -155,17 +154,17 @@ extern "C" void Ethernet_IRQHandler(void) {
     eth_stat &= ETH->IM;                   /* mask only the enabled sources */
 
     if ((eth_stat & ETH_INT_RX) != 0) {
-        static QEvent const evt_eth_rx = { LWIP_RX_READY_SIG, 0 };
+        static QEvt const evt_eth_rx = { LWIP_RX_READY_SIG, 0 };
         l_active->POST(&evt_eth_rx, &l_Ethernet_IRQHandler);
         ETH->IM &= ~ETH_INT_RX;                       /* disable further RX */
     }
     if ((eth_stat & ETH_INT_TX) != 0) {
-        static QEvent const evt_eth_tx = { LWIP_TX_READY_SIG, 0 };
+        static QEvt const evt_eth_tx = { LWIP_TX_READY_SIG, 0 };
         l_active->POST(&evt_eth_tx, &l_Ethernet_IRQHandler);
     }
 #if LINK_STATS
     if ((eth_stat & ETH_INT_RXOF) != 0) {
-        static QEvent const evt_eth_er = { LWIP_RX_OVERRUN_SIG, 0 };
+        static QEvt const evt_eth_er = { LWIP_RX_OVERRUN_SIG, 0 };
         l_active->POST(&evt_eth_er, &l_Ethernet_IRQHandler);
     }
 #endif

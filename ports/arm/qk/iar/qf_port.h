@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product:  QF/C++, ARM7/ARM9, QK port, IAR compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 08, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,9 +35,8 @@
 #ifndef qf_port_h
 #define qf_port_h
 
-                    // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE               63
-
+        // The maximum number of active objects in the application, see NOTE01
+#define QF_MAX_ACTIVE               32
                        // The maximum number of event pools in the application
 #define QF_MAX_EPOOL                6
 
@@ -83,5 +82,11 @@ extern "C" {
 #include "qep_port.h"                                              // QEP port
 #include "qk_port.h"                                                // QK port
 #include "qf.h"                    // QF platform-independent public interface
+
+//////////////////////////////////////////////////////////////////////////////
+// NOTE01:
+// The maximum number of active objects QF_MAX_ACTIVE can be increased
+// up to 63, if necessary. Here it is set to a lower level to save some RAM.
+//
 
 #endif                                                            // qf_port_h

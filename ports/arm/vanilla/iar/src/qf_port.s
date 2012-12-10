@@ -1,7 +1,7 @@
 ;-----------------------------------------------------------------------------
-; Product:  QF/Vanilla port to ARM, IAR ARM Assembler 5.11
-; Last Updated for Version: 4.4.00
-; Date of the Last Update:  Apr 19, 2012
+; Product:  QF/Vanilla port to ARM, IAR ARM Assembler
+; Last Updated for Version: 4.5.02
+; Date of the Last Update:  Oct 09, 2012
 ;
 ;                    Q u a n t u m     L e a P s
 ;                    ---------------------------

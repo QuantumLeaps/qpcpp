@@ -54,7 +54,7 @@
 "D:\qp\qpcpp\include\qs_dummy.h" 82 1 Info 755: global macro 'QS_OBJ' (line 82, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 86 1 Info 755: global macro 'QS_OBJ_DICTIONARY' (line 86, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 105 1 Info 755: global macro 'QS_OBJ_' (line 105, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qf.h" 1018 1 Info 755: global macro 'PUBLISH' (line 1018, file D:\qp\qpcpp\include\qf.h) not referenced
+"D:\qp\qpcpp\include\qf.h" 1016 1 Info 755: global macro 'PUBLISH' (line 1016, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\include\qmpool.h" 206 1 Info 755: global macro 'QF_MPOOL_EL' (line 206, file D:\qp\qpcpp\include\qmpool.h) not referenced
 "D:\qp\qpcpp\include\qf.h" 946 1 Info 755: global macro 'Q_NEW' (line 946, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\include\qassert.h" 195 1 Info 755: global macro 'Q_ENSURE' (line 195, file D:\qp\qpcpp\include\qassert.h) not referenced
@@ -68,7 +68,7 @@
 "D:\qp\qpcpp\include\qs_dummy.h" 63 1 Info 755: global macro 'QS_BEGIN' (line 63, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 94 1 Info 755: global macro 'QS_BEGIN_' (line 94, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 65 1 Info 755: global macro 'QS_BEGIN_NOCRIT' (line 65, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qf.h" 1019 1 Info 755: global macro 'POST' (line 1019, file D:\qp\qpcpp\include\qf.h) not referenced
+"D:\qp\qpcpp\include\qf.h" 1017 1 Info 755: global macro 'POST' (line 1017, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\include\qep.h" 52 1 Info 755: global macro 'Q_TRAN' (line 52, file D:\qp\qpcpp\include\qep.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 93 1 Info 755: global macro 'QS_CRIT_STAT_' (line 93, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 81 1 Info 755: global macro 'QS_SIG' (line 81, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
@@ -130,7 +130,7 @@
 "D:\qp\qpcpp\include\qk.h" 158 1 Info 755: global macro 'QF_EPOOL_INIT_' (line 158, file D:\qp\qpcpp\include\qk.h) not referenced
 "D:\qp\qpcpp\include\qk.h" 183 1 Info 755: global macro 'QF_EPOOL_PUT_' (line 183, file D:\qp\qpcpp\include\qk.h) not referenced
 "D:\qp\qpcpp\include\qep.h" 75 1 Info 755: global macro 'Q_EVT_CAST' (line 75, file D:\qp\qpcpp\include\qep.h) not referenced
-"D:\qp\qpcpp\include\qf.h" 1017 1 Info 755: global macro 'TICK' (line 1017, file D:\qp\qpcpp\include\qf.h) not referenced
+"D:\qp\qpcpp\include\qf.h" 1015 1 Info 755: global macro 'TICK' (line 1015, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 47 1 Info 755: global macro 'QS_INIT' (line 47, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 68 1 Info 755: global macro 'QS_I8' (line 68, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 70 1 Info 755: global macro 'QS_I16' (line 70, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
@@ -177,7 +177,6 @@
 "D:\qp\qpcpp\ports\lint\qk_port.h" 104 1 Info 768: global struct member 'FPU_context::align' (line 104, file D:\qp\qpcpp\ports\lint\qk_port.h) not referenced
 "D:\qp\qpcpp\ports\lint\qk_port.h" 105 1 Info 768: global struct member 'FPU_context::fpu' (line 105, file D:\qp\qpcpp\ports\lint\qk_port.h) not referenced
 "D:\qp\qpcpp\ports\lint\qk_port.h" 126 1 Info 768: global struct member 'reent::foo' (line 126, file D:\qp\qpcpp\ports\lint\qk_port.h) not referenced
-"D:\qp\qpcpp\include\qequeue.h" 132 1 Info 768: global struct member 'QP::QEQueue::m_frontEvt' (line 132, file D:\qp\qpcpp\include\qequeue.h) not referenced
 "D:\qp\qpcpp\include\qequeue.h" 135 1 Info 768: global struct member 'QP::QEQueue::m_ring' (line 135, file D:\qp\qpcpp\include\qequeue.h) not referenced
 "D:\qp\qpcpp\include\qequeue.h" 139 1 Info 768: global struct member 'QP::QEQueue::m_end' (line 139, file D:\qp\qpcpp\include\qequeue.h) not referenced
 "D:\qp\qpcpp\include\qequeue.h" 142 1 Info 768: global struct member 'QP::QEQueue::m_head' (line 142, file D:\qp\qpcpp\include\qequeue.h) not referenced
@@ -191,6 +190,7 @@
 "D:\qp\qpcpp\include\qequeue.h" 202 1 Info 1714: Member function 'QP::QEQueue::get(void)' (line 202, file D:\qp\qpcpp\include\qequeue.h) not referenced [MISRA C++ Rule 0-1-10]
 "D:\qp\qpcpp\include\qequeue.h" 202 1 Warning 1526: Member function 'QP::QEQueue::get(void)' (line 202, file D:\qp\qpcpp\include\qequeue.h) not defined
 "D:\qp\qpcpp\include\qequeue.h" 214 1 Info 1714: Member function 'QP::QEQueue::getNFree(void) const' (line 214, file D:\qp\qpcpp\include\qequeue.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qequeue.h" 228 1 Info 1714: Member function 'QP::QEQueue::isEmpty(void) const' (line 228, file D:\qp\qpcpp\include\qequeue.h) not referenced [MISRA C++ Rule 0-1-10]
 "D:\qp\qpcpp\include\qmpool.h" 109 1 Info 768: global struct member 'QP::QMPool::m_start' (line 109, file D:\qp\qpcpp\include\qmpool.h) not referenced
 "D:\qp\qpcpp\include\qmpool.h" 112 1 Info 768: global struct member 'QP::QMPool::m_end' (line 112, file D:\qp\qpcpp\include\qmpool.h) not referenced
 "D:\qp\qpcpp\include\qmpool.h" 115 1 Info 768: global struct member 'QP::QMPool::m_free' (line 115, file D:\qp\qpcpp\include\qmpool.h) not referenced
@@ -302,9 +302,9 @@ Count   Type    Number  Text
 5       Info    758     global ___ '___' (___) not referenced
 2       Info    759     header declaration for symbol '___' defined at (___) could be moved from header to module
 2       Info    765     external '___' (___) could be made static
-22      Info    768     global struct member '___' (___) not referenced
+21      Info    768     global struct member '___' (___) not referenced
 5       Info    769     global enumeration constant '___' (___) not referenced
 1       Info    843     Variable '___' (___) could be declared as const
-67      Info    1714    Member function '___' (___) not referenced
+68      Info    1714    Member function '___' (___) not referenced
 1       Note    974     Worst case function for stack usage: ___ See +stack for a full report.
 2       Note    1960    Violates MISRA C++ 2008 Required Rule ___, ___

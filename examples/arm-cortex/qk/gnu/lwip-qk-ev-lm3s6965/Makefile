@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP-lwIP, EK-LM36965, QK, GNU/Sourcery G++
-# Last Updated for Version: 4.4.00
-# Date of the Last Update:  Apr 19, 2012
+# Last Updated for Version: lwIP-1.4.0/QP-4.5.02
+# Date of the Last Update:  Oct 03, 2012
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -90,12 +90,14 @@ INCLUDES  = -I$(QPCPP)/include	\
 	-I$(CMSIS_DIR) \
 	-Ilwip_port \
 	-Iwebserver \
-	-I ../../../../../../lwip-1.4.0/src/include \
-	-I ../../../../../../lwip-1.4.0/src/include/ipv4 \
-	-I ../../../../../../lwip-1.4.0/src
+	-I $(LWIP)/src/include \
+	-I $(LWIP)/src/include/ipv4 \
+	-I $(LWIP)/src
 
 # defines
 DEFINES =
+
+ARM_CORE = cortex-m3
 
 #-----------------------------------------------------------------------------
 # files
@@ -115,8 +117,8 @@ C_SRCS := $(wildcard *.c) \
 # C++ source files
 CPP_SRCS := $(wildcard *.cpp)
 
-
 LD_SCRIPT := lm3s6965.ld
+LIBS    := -lqp_$(ARM_CORE)_cs
 
 #-----------------------------------------------------------------------------
 # build options for various configurations
@@ -127,7 +129,6 @@ ARM_CORE = cortex-m3
 ifeq (rel, $(CONF))       # Release configuration ............................
 
 BIN_DIR := rel
-LIBS    := -lqk_$(ARM_CORE)_cs -lqf_$(ARM_CORE)_cs -lqep_$(ARM_CORE)_cs
 
 ASFLAGS = -mcpu=$(ARM_CORE)
 
@@ -145,7 +146,6 @@ LINKFLAGS = -T$(LD_SCRIPT) -mcpu=$(ARM_CORE) -mthumb -nostdlib -Xlinker \
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
 BIN_DIR := spy
-LIBS    := -lqk_$(ARM_CORE)_cs -lqf_$(ARM_CORE)_cs -lqep_$(ARM_CORE)_cs -lqs_$(ARM_CORE)_cs
 
 ASFLAGS = -g -mcpu=$(ARM_CORE)
 
@@ -163,7 +163,6 @@ LINKFLAGS = -T$(LD_SCRIPT) -mcpu=$(ARM_CORE) -mthumb -nostdlib -Xlinker \
 else                     # default Debug configuration .......................
 
 BIN_DIR := dbg
-LIBS    := -lqk_$(ARM_CORE)_cs -lqf_$(ARM_CORE)_cs -lqep_$(ARM_CORE)_cs
 
 ASFLAGS = -g -mcpu=$(ARM_CORE)
 
@@ -202,7 +201,7 @@ all: $(BIN_DIR) $(TARGET_BIN)
 
 $(BIN_DIR):
 	@echo
-	mkdir -p $@
+	mkdir $@
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O ihex $< $@

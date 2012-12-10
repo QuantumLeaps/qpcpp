@@ -36,7 +36,7 @@ MEMORY {                                          /* memory map of LM3S6965 */
 }
 
 /* The size of the stack used by the application. NOTE: you need to adjust  */
-STACK_SIZE = 1500;
+STACK_SIZE = 2000;
 
 /* The size of the heap used by the application. NOTE: you need to adjust   */
 HEAP_SIZE = 0;

@@ -1,35 +1,48 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QDK/C_ARM-GNU_AT91SAM7S-EK with QK
-// Last Updated for Version: 4.3.00
-// Date of the Last Update:  Nov 08, 2011
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Nov 09, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2011 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
 
+#include <AT91SAM7S64.H>                           // AT91SAMT7S64 definitions
+
 typedef void (*IntVector)(void);              // IntVector pointer-to-function
+
+#ifdef Q_SPY
+    static uint8_t const l_ISR_tick = 0;
+#endif
 
 //............................................................................
 __attribute__ ((section (".text.fastcode")))
@@ -45,21 +58,17 @@ void BSP_irq(void) {
 }
 //............................................................................
 __attribute__ ((section (".text.fastcode")))
-void BSP_fiq(void) {
-    // TBD: implement the FIQ handler directly right here, see NOTE01
-    // NOTE: Do NOT enable interrupts throughout the whole FIQ processing.
-    // NOTE: Do NOT write EOI to the AIC
-}
-//............................................................................
-__attribute__ ((section (".text.fastcode")))
 static void tickIRQ(void) {
     uint32_t tmp = AT91C_BASE_PITC->PITC_PIVR;       // clear interrupt source
-    QF::TICK(&QS_tickIRQ);
+    QP::QF::TICK(&l_ISR_tick);
 }
 //............................................................................
 static void spurIRQ(void) {
 }
+
 //............................................................................
+namespace QP {
+
 void QF::onStartup(void) {
                                // hook the exception handlers from the QF port
     *(uint32_t volatile *)0x24 = (uint32_t)&QF_undef;
@@ -69,7 +78,7 @@ void QF::onStartup(void) {
     *(uint32_t volatile *)0x34 = (uint32_t)&QF_reserved;
 
     *(uint32_t volatile *)0x38 = (uint32_t)&QK_irq;
-    *(uint32_t volatile *)0x3C = (uint32_t)&QK_fiq;
+    *(uint32_t volatile *)0x3C = (uint32_t)&QF_fiq_dummy;    // unimplemented!
 
     AT91C_BASE_AIC->AIC_SVR[AT91C_ID_SYS] = (uint32_t)&tickIRQ;
     AT91C_BASE_AIC->AIC_SPU = (uint32_t)&spurIRQ;              // spurious IRQ
@@ -78,16 +87,11 @@ void QF::onStartup(void) {
         (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | AT91C_AIC_PRIOR_LOWEST);
     AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_SYS);
     AT91C_BASE_AIC->AIC_IECR = (1 << AT91C_ID_SYS);
+
+    QS_OBJ_DICTIONARY(&l_ISR_tick);
 }
 //............................................................................
 void QF::onCleanup(void) {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// NOTE01:
-// The QK FIQ assembly "wrapper" QF_fiq() calls the FIQ handler BSP_fiq()
-// with interrupts locked at the ARM core level. In contrast to the IRQ line,
-// the FIQ line is NOT prioritized by the AIC. Therefore, you must NOT enable
-// interrupts while processing FIQ. All FIQs should be the highest-priority
-// in the system. All FIQs run at the same (highest) priority level.
-//
+}                                                              // namespace QP

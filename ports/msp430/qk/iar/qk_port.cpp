@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: QK/C port, MSP430, QK, IAR-compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Product: QK/C++ port, MSP430, QK, CCS MSP430 GNU-compiler
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 09, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -34,6 +34,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "qk_pkg.h"
 
-//............................................................................
+/*..........................................................................*/
 void QK_init(void) {
+    // nothing to do for the MSP430 processor
 }

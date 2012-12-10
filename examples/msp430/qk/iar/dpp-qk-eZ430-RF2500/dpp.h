@@ -10,6 +10,8 @@
 #ifndef dpp_h
 #define dpp_h
 
+using namespace QP;
+
 enum DPPSignals {
    EAT_SIG = Q_USER_SIG,  // published by Table to let a philosopher eat
    DONE_SIG,              // published by Philosopher when done eating
@@ -20,8 +22,8 @@ enum DPPSignals {
    MAX_SIG                // the last signal
 };
 
-// $(Events::TableEvt) .......................................................
-class TableEvt : public QEvent {
+// @(/1/0) ...................................................................
+class TableEvt : public QP::QEvt {
 public:
     uint8_t philoNum;
 };

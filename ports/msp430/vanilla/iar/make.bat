@@ -1,8 +1,8 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for MSP430, Vanilla port, IAR compiler
-:: Last Updated for Version: 4.4.00
-:: Date of the Last Update:  Apr 19, 2012
+:: Last Updated for Version: 4.5.02
+:: Date of the Last Update:  Oct 09, 2012
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -26,7 +26,7 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http:::www.gnu.org/licenses/>.
+:: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
 :: Quantum Leaps Web sites: http://www.quantum-leaps.com
@@ -67,9 +67,10 @@ if "%1"=="spy" (
     set CCFLAGS=-I%IAR_430%\430\inc -I%IAR_430%\430\inc\dlib -Ohz --eec++ --debug -e --double=32 --reduce_stack_usage --dlib_config %IAR_430%\430\lib\dlib\dl430fn.h --diag_suppress Pa050 -DQ_SPY
 )
 
+mkdir %BINDIR%
 set LIBDIR=%BINDIR%
 set LIBFLAGS=
-mkdir %BINDIR%
+erase %LIBDIR%\libqp.r43
 
 :: QEP ----------------------------------------------------------------------
 set SRCDIR=..\..\..\..\qep\source
@@ -137,7 +138,6 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 
 :no_spy
 %LIB% %LIBFLAGS% %LIBDIR%\libqp.lib %BINDIR%\qep.r43 %BINDIR%\qfsm_ini.r43 %BINDIR%\qfsm_dis.r43 %BINDIR%\qhsm_ini.r43 %BINDIR%\qhsm_dis.r43 %BINDIR%\qhsm_top.r43 %BINDIR%\qhsm_in.r43 %BINDIR%\qa_defer.r43 %BINDIR%\qa_fifo.r43 %BINDIR%\qa_lifo.r43 %BINDIR%\qa_get_.r43 %BINDIR%\qa_sub.r43 %BINDIR%\qa_usub.r43 %BINDIR%\qa_usuba.r43 %BINDIR%\qeq_fifo.r43 %BINDIR%\qeq_get.r43 %BINDIR%\qeq_init.r43 %BINDIR%\qeq_lifo.r43 %BINDIR%\qf_act.r43 %BINDIR%\qf_gc.r43 %BINDIR%\qf_log2.r43 %BINDIR%\qf_new.r43 %BINDIR%\qf_pool.r43 %BINDIR%\qf_psini.r43 %BINDIR%\qf_pspub.r43 %BINDIR%\qf_pwr2.r43 %BINDIR%\qf_tick.r43 %BINDIR%\qmp_get.r43 %BINDIR%\qmp_init.r43 %BINDIR%\qmp_put.r43 %BINDIR%\qte_ctor.r43 %BINDIR%\qte_arm.r43 %BINDIR%\qte_darm.r43 %BINDIR%\qte_rarm.r43 %BINDIR%\qte_ctr.r43 %BINDIR%\qvanilla.r43
-
 
 :clean
 @echo off

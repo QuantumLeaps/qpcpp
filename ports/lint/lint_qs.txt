@@ -67,7 +67,7 @@
 "D:\qp\qpcpp\include\qs.h" 909 1 Info 755: global macro 'QS_OBJ' (line 909, file D:\qp\qpcpp\include\qs.h) not referenced
 "D:\qp\qpcpp\include\qs.h" 796 1 Info 755: global macro 'QS_OBJ_' (line 796, file D:\qp\qpcpp\include\qs.h) not referenced
 "D:\qp\qpcpp\include\qs.h" 1025 1 Info 755: global macro 'QS_OBJ_DICTIONARY' (line 1025, file D:\qp\qpcpp\include\qs.h) not referenced
-"D:\qp\qpcpp\include\qf.h" 992 1 Info 755: global macro 'PUBLISH' (line 992, file D:\qp\qpcpp\include\qf.h) not referenced
+"D:\qp\qpcpp\include\qf.h" 991 1 Info 755: global macro 'PUBLISH' (line 991, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\include\qmpool.h" 206 1 Info 755: global macro 'QF_MPOOL_EL' (line 206, file D:\qp\qpcpp\include\qmpool.h) not referenced
 "D:\qp\qpcpp\include\qf.h" 946 1 Info 755: global macro 'Q_NEW' (line 946, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\ports\lint\qk_port.h" 81 1 Info 755: global macro 'QK_ISR_ENTRY' (line 81, file D:\qp\qpcpp\ports\lint\qk_port.h) not referenced
@@ -78,7 +78,7 @@
 "D:\qp\qpcpp\include\qs.h" 655 1 Info 755: global macro 'QS_BEGIN_NOCRIT' (line 655, file D:\qp\qpcpp\include\qs.h) not referenced
 "D:\qp\qpcpp\include\qs.h" 760 1 Info 755: global macro 'QS_BEGIN_NOCRIT_' (line 760, file D:\qp\qpcpp\include\qs.h) not referenced
 "D:\qp\qpcpp\include\qs.h" 945 1 Info 755: global macro 'QS_RESET' (line 945, file D:\qp\qpcpp\include\qs.h) not referenced
-"D:\qp\qpcpp\include\qf.h" 1013 1 Info 755: global macro 'POST' (line 1013, file D:\qp\qpcpp\include\qf.h) not referenced
+"D:\qp\qpcpp\include\qf.h" 1011 1 Info 755: global macro 'POST' (line 1011, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\include\qep.h" 52 1 Info 755: global macro 'Q_TRAN' (line 52, file D:\qp\qpcpp\include\qep.h) not referenced
 "D:\qp\qpcpp\include\qs.h" 699 1 Info 755: global macro 'QS_CRIT_ENTRY_' (line 699, file D:\qp\qpcpp\include\qs.h) not referenced
 "D:\qp\qpcpp\include\qs.h" 700 1 Info 755: global macro 'QS_CRIT_EXIT_' (line 700, file D:\qp\qpcpp\include\qs.h) not referenced
@@ -189,7 +189,6 @@
 "D:\qp\qpcpp\ports\lint\qk_port.h" 104 1 Info 768: global struct member 'FPU_context::align' (line 104, file D:\qp\qpcpp\ports\lint\qk_port.h) not referenced
 "D:\qp\qpcpp\ports\lint\qk_port.h" 105 1 Info 768: global struct member 'FPU_context::fpu' (line 105, file D:\qp\qpcpp\ports\lint\qk_port.h) not referenced
 "D:\qp\qpcpp\ports\lint\qk_port.h" 126 1 Info 768: global struct member 'reent::foo' (line 126, file D:\qp\qpcpp\ports\lint\qk_port.h) not referenced
-"D:\qp\qpcpp\include\qequeue.h" 132 1 Info 768: global struct member 'QP::QEQueue::m_frontEvt' (line 132, file D:\qp\qpcpp\include\qequeue.h) not referenced
 "D:\qp\qpcpp\include\qequeue.h" 135 1 Info 768: global struct member 'QP::QEQueue::m_ring' (line 135, file D:\qp\qpcpp\include\qequeue.h) not referenced
 "D:\qp\qpcpp\include\qequeue.h" 139 1 Info 768: global struct member 'QP::QEQueue::m_end' (line 139, file D:\qp\qpcpp\include\qequeue.h) not referenced
 "D:\qp\qpcpp\include\qequeue.h" 142 1 Info 768: global struct member 'QP::QEQueue::m_head' (line 142, file D:\qp\qpcpp\include\qequeue.h) not referenced
@@ -204,6 +203,7 @@
 "D:\qp\qpcpp\include\qequeue.h" 202 1 Info 1714: Member function 'QP::QEQueue::get(void)' (line 202, file D:\qp\qpcpp\include\qequeue.h) not referenced [MISRA C++ Rule 0-1-10]
 "D:\qp\qpcpp\include\qequeue.h" 202 1 Warning 1526: Member function 'QP::QEQueue::get(void)' (line 202, file D:\qp\qpcpp\include\qequeue.h) not defined
 "D:\qp\qpcpp\include\qequeue.h" 214 1 Info 1714: Member function 'QP::QEQueue::getNFree(void) const' (line 214, file D:\qp\qpcpp\include\qequeue.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qequeue.h" 228 1 Info 1714: Member function 'QP::QEQueue::isEmpty(void) const' (line 228, file D:\qp\qpcpp\include\qequeue.h) not referenced [MISRA C++ Rule 0-1-10]
 "D:\qp\qpcpp\include\qmpool.h" 109 1 Info 768: global struct member 'QP::QMPool::m_start' (line 109, file D:\qp\qpcpp\include\qmpool.h) not referenced
 "D:\qp\qpcpp\include\qmpool.h" 112 1 Info 768: global struct member 'QP::QMPool::m_end' (line 112, file D:\qp\qpcpp\include\qmpool.h) not referenced
 "D:\qp\qpcpp\include\qmpool.h" 115 1 Info 768: global struct member 'QP::QMPool::m_free' (line 115, file D:\qp\qpcpp\include\qmpool.h) not referenced
@@ -457,9 +457,9 @@ Count   Type    Number  Text
 2       Info    756     global typedef '___' (___) not referenced
 15      Info    757     global declarator '___' (___) not referenced
 7       Info    758     global ___ '___' (___) not referenced
-27      Info    768     global struct member '___' (___) not referenced
+26      Info    768     global struct member '___' (___) not referenced
 90      Info    769     global enumeration constant '___' (___) not referenced
-101     Info    1714    Member function '___' (___) not referenced
+102     Info    1714    Member function '___' (___) not referenced
 8       Info    1715    static member '___' (___) not referenced
 1       Note    974     Worst case function for stack usage: ___ See +stack for a full report.
 2       Note    1960    Violates MISRA C++ 2008 Required Rule ___, ___

@@ -1,7 +1,7 @@
 ;-----------------------------------------------------------------------------
 ; Product:  QK port to ARM, IAR ARM Assembler 5.11
-; Last Updated for Version: 4.4.00
-; Date of the Last Update:  Apr 19, 2012
+; Last Updated for Version: 4.5.02
+; Date of the Last Update:  Oct 07, 2012
 ;
 ;                    Q u a n t u m     L e a P s
 ;                    ---------------------------
@@ -41,11 +41,11 @@ IRQ_MODE    DEFINE     0x12
 SYS_MODE    DEFINE     0x1F
 
 ;-----------------------------------------------------------------------------
-; Interrupt locking/unlocking
+; Interrupt locking/unlocking and QK initialization
 ;-----------------------------------------------------------------------------
 
     SECTION .textrw:DATA:NOROOT(2)
-    PUBLIC  QF_int_lock_SYS, QF_int_unlock_SYS
+    PUBLIC  QF_int_lock_SYS, QF_int_unlock_SYS, QK_init
     CODE32
 
 QF_int_lock_SYS:
@@ -56,6 +56,10 @@ QF_int_lock_SYS:
 
 QF_int_unlock_SYS:
     MSR     cpsr_c,r0           ; restore the original CPSR from r0
+    BX      lr                  ; return to ARM or THUMB
+
+
+QK_init:
     BX      lr                  ; return to ARM or THUMB
 
 

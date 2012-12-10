@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QP/C++ buld script for ARM, QK port, IAR compiler
-:: Last Updated for Version: 4.4.00
-:: Date of the Last Update:  Apr 19, 2012
+:: Last Updated for Version: 4.5.02
+:: Date of the Last Update:  Sep 18, 2012
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -60,19 +60,20 @@ set QP_PRTDIR=.
 if "%1"=="" (
     @echo default selected
     set BINDIR=dbg
-    set CCFLAGS=--cpu=%TARGET_MCU% --eeprom_size=%EEPROM_SIZE% -ms --initializers_in_flash -Om -e --ec++ --no_inline --no_cross_call --no_tbaa --debug -I%IAR_AVR%\avr\inc -I%IAR_AVR%\avr\inc\dlib --dlib_config %IAR_AVR%\avr\lib\dlib\dlAVR-3s-ec_mul-sf-n.h --diag_suppress Pa050
+    set CCFLAGS=--cpu=%TARGET_MCU% --eeprom_size=%EEPROM_SIZE% -ms --initializers_in_flash -Om -e --eec++ --no_inline --no_cross_call --no_tbaa --debug -I%IAR_AVR%\avr\inc -I%IAR_AVR%\avr\inc\dlib --dlib_config %IAR_AVR%\avr\lib\dlib\dlAVR-3s-ec_mul-sf-n.h --diag_suppress Pa050
 )
 if "%1"=="rel" (
     @echo rel selected
     set BINDIR=rel
-    set CCFLAGS=--cpu=%TARGET_MCU% --eeprom_size=%EEPROM_SIZE% -ms -y --initializers_in_flash -Ohz -e --ec++ --diag_suppress Pa050 -I%IAR_AVR%\avr\inc -I%IAR_AVR%\avr\inc\dlib --dlib_config %IAR_AVR%\avr\lib\dlib\dlAVR-3s-ec_mul-sf-n.h -DNDEBUG
+    set CCFLAGS=--cpu=%TARGET_MCU% --eeprom_size=%EEPROM_SIZE% -ms -y --initializers_in_flash -Ohz -e --eec++ --diag_suppress Pa050 -I%IAR_AVR%\avr\inc -I%IAR_AVR%\avr\inc\dlib --dlib_config %IAR_AVR%\avr\lib\dlib\dlAVR-3s-ec_mul-sf-n.h -DNDEBUG
 )
 if "%1"=="spy" (
     @echo spy selected
     set BINDIR=spy
-    set CCFLAGS=--cpu=%TARGET_MCU% --eeprom_size=%EEPROM_SIZE% -ms --initializers_in_flash -Om -e --ec++ --no_inline --no_cross_call --no_tbaa --debug --diag_suppress Pa050 -I%IAR_AVR%\avr\inc -I%IAR_AVR%\avr\inc\dlib --dlib_config %IAR_AVR%\avr\lib\dlib\dlAVR-3s-ec_mul-sf-n.h -DQ_SPY
+    set CCFLAGS=--cpu=%TARGET_MCU% --eeprom_size=%EEPROM_SIZE% -ms --initializers_in_flash -Om -e --eec++ --no_inline --no_cross_call --no_tbaa --debug --diag_suppress Pa050 -I%IAR_AVR%\avr\inc -I%IAR_AVR%\avr\inc\dlib --dlib_config %IAR_AVR%\avr\lib\dlib\dlAVR-3s-ec_mul-sf-n.h -DQ_SPY
 )
 
+mkdir %BINDIR%
 set LIBDIR=%BINDIR%
 set LIBFLAGS=
 mkdir %BINDIR%

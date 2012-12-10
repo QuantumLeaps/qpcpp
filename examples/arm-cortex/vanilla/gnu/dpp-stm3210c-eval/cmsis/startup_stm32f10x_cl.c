@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Purpose: CMSIS-compliant startup code for STM32F10x connectivity line
-* Last Updated for Version: 4.1.01
-* Date of the Last Update:  Jan 18, 2010
+* Last Updated for Version: 4.4.00
+* Date of the Last Update:  Mar 04, 2012
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -297,7 +297,7 @@ VectorTableEntry const g_pfnVectors[] = {
 void assert_failed(char const *file, int line);
 
 /*..........................................................................*/
-void Reset_Handler(void) __attribute__((__interrupt__));
+void Reset_Handler(void)    __attribute__((__interrupt__));
 void Reset_Handler(void) {
     extern int main(void);
     extern int __libc_init_array(void);
@@ -340,5 +340,8 @@ void Spurious_Handler(void) {
     */
     for (;;) {
     }
+}
+/*..........................................................................*/
+void _init() {
 }
 

@@ -36,49 +36,46 @@
 #include "dpp.h"
 #include "bsp.h"
 
-// Local-scope objects -------------------------------------------------------
-static QEvt const *l_tableQueueSto[N_PHILO];
-static QEvt const *l_philoQueueSto[N_PHILO][N_PHILO];
-static QSubscrList   l_subscrSto[MAX_PUB_SIG];
-
-static union SmallEvents {
-    void   *e0;                                          // minimum event size
-    uint8_t e1[sizeof(TableEvt)];
-    // ... other event types to go into this pool
-} l_smlPoolSto[2*N_PHILO];                 // storage for the small event pool
+namespace DPP {
 
 //............................................................................
-int main() {
+extern "C" int_t main(void) {
+    static QP::QEvt const *tableQueueSto[N_PHILO];
+    static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
+    static QP::QSubscrList   subscrSto[MAX_PUB_SIG];
+    static QF_MPOOL_EL(TableEvt) smlPoolSto[2U*N_PHILO];         // small pool
 
     BSP_init();                                          // initialize the BSP
 
-    QF::init();       // initialize the framework and the underlying RT kernel
+    QP::QF::init();   // initialize the framework and the underlying RT kernel
 
                                                      // object dictionaries...
-    QS_OBJ_DICTIONARY(l_smlPoolSto);
-    QS_OBJ_DICTIONARY(l_tableQueueSto);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[0]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[1]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[2]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[3]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[4]);
+    QS_OBJ_DICTIONARY(smlPoolSto);
+    QS_OBJ_DICTIONARY(tableQueueSto);
+    QS_OBJ_DICTIONARY(philoQueueSto[0]);
+    QS_OBJ_DICTIONARY(philoQueueSto[1]);
+    QS_OBJ_DICTIONARY(philoQueueSto[2]);
+    QS_OBJ_DICTIONARY(philoQueueSto[3]);
+    QS_OBJ_DICTIONARY(philoQueueSto[4]);
 
-    QF::psInit(l_subscrSto, Q_DIM(l_subscrSto));     // init publish-subscribe
+    QP::QF::psInit(&subscrSto[0], Q_DIM(subscrSto)); // init publish-subscribe
 
                                                   // initialize event pools...
-    QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
+    QP::QF::poolInit(&smlPoolSto[0], sizeof(smlPoolSto),
+                                     sizeof(smlPoolSto[0]));
 
                                                 // start the active objects...
-    uint8_t n;
-    for (n = 0; n < N_PHILO; ++n) {
-        AO_Philo[n]->start((uint8_t)(n + 1),
-                           l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
-                           (void *)0, 0, (QEvt *)0);
+    for (uint8_t n = 0U; n < N_PHILO; ++n) {
+        AO_Philo[n]->start(static_cast<uint8_t>(n + 1U),
+                           &philoQueueSto[n][0], Q_DIM(philoQueueSto[n]),
+                           static_cast<void *>(0), 0U);
     }
-    AO_Table->start((uint8_t)(N_PHILO + 1),
-                    l_tableQueueSto, Q_DIM(l_tableQueueSto),
-                    (void *)0, 0, (QEvt *)0);
+    AO_Table->start(static_cast<uint8_t>(N_PHILO + 1U),
+                    &tableQueueSto[0], Q_DIM(tableQueueSto),
+                    static_cast<void *>(0), 0U);
 
-    return QF::run();                                // run the QF application
+
+    return QP::QF::run();                            // run the QF application
 }
 
+}                                                             // namespace DPP

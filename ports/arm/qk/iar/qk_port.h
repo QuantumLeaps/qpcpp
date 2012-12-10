@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product:  QF/C++, ARM7/ARM9, QK port, IAR compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 08, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------

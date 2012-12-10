@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QEP/C++ port, Renesas RX, GNU-RX (KPIT) compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 18, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -34,7 +34,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef qep_port_h
 #define qep_port_h
-
                               // exact-width integers, WG14/N843 C99, 7.18.1.1
 typedef unsigned char  uint8_t;
 typedef signed   char  int8_t;

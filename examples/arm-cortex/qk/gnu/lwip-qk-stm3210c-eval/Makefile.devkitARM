@@ -210,7 +210,7 @@ all: $(BIN_DIR) $(TARGET_BIN)
 
 $(BIN_DIR):
 	@echo
-	mkdir -p $@
+	mkdir $@
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O ihex $< $@

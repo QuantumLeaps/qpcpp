@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QEP/C++ port, AVR, GNU compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Sep 17, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------

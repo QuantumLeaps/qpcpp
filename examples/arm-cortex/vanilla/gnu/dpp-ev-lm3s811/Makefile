@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP application, Vanilla, GNU/Sourcery G++
-# Last Updated for Version: 4.4.00
-# Date of the Last Update:  Apr 19, 2012
+# Last Updated for Version: 4.5.03
+# Date of the Last Update:  Nov 29, 2012
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -96,6 +96,8 @@ INCLUDES  = -I$(QPCPP)/include	\
 # defines
 DEFINES =
 
+ARM_CORE = cortex-m3
+
 #-----------------------------------------------------------------------------
 # files
 #
@@ -112,17 +114,15 @@ C_SRCS := $(wildcard *.c) \
 CPP_SRCS := $(wildcard *.cpp)
 
 LD_SCRIPT := lm3s811.ld
+LIBS    := -lqp_$(ARM_CORE)_cs
 
 #-----------------------------------------------------------------------------
 # build options for various configurations
 #
 
-ARM_CORE = cortex-m3
-
 ifeq (rel, $(CONF))       # Release configuration ............................
 
 BIN_DIR := rel
-LIBS    := -lqf_$(ARM_CORE)_cs -lqep_$(ARM_CORE)_cs
 
 ASFLAGS = -mcpu=$(ARM_CORE)
 
@@ -140,7 +140,6 @@ LINKFLAGS = -T$(LD_SCRIPT) -mcpu=$(ARM_CORE) -mthumb -nostdlib -Xlinker \
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
 BIN_DIR := spy
-LIBS    := -lqf_$(ARM_CORE)_cs -lqep_$(ARM_CORE)_cs -lqs_$(ARM_CORE)_cs
 
 ASFLAGS = -g -mcpu=$(ARM_CORE)
 
@@ -158,7 +157,6 @@ LINKFLAGS = -T$(LD_SCRIPT) -mcpu=$(ARM_CORE) -mthumb -nostdlib -Xlinker \
 else                     # default Debug configuration .......................
 
 BIN_DIR := dbg
-LIBS    := -lqf_$(ARM_CORE)_cs -lqep_$(ARM_CORE)_cs
 
 ASFLAGS = -g -mcpu=$(ARM_CORE)
 
@@ -198,7 +196,7 @@ all: $(BIN_DIR) $(TARGET_ELF)
 
 $(BIN_DIR):
 	@echo
-	mkdir -p $@
+	mkdir $@
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@

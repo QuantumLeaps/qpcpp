@@ -1,33 +1,46 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: DPP example, Board Support Package for STK600-ATMEGA2560
-// Last Updated for Version: 4.3.00
-// Date of the Last Update:  Dec 10, 2011
+// Product: DPP example, Board Support Package for STK600-ATMEGA2560, QK
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Sep 17, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2011 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
+
+#define F_CPU                8000000UL
+#include <avr\io.h>                                                 // AVR I/O
+
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
 
 Q_DEFINE_THIS_FILE
 
@@ -37,15 +50,17 @@ Q_DEFINE_THIS_FILE
 #define LED_OFF_ALL()      (PORTD = 0xFF)
 
 // Local objects -------------------------------------------------------------
-#ifdef Q_SPY
-    #define QS_BUF_SIZE        (256)
-    #define BAUD_RATE          38400
+static uint32_t l_rnd;                                          // random seed
 
-    static QTimeEvtCtr l_tickTime;
-    static uint8_t const l_TIMER2_COMPA = 0;
+#ifdef Q_SPY
+    #define QS_BUF_SIZE        256U
+    #define BAUD_RATE          38400U
+
+    static QP::QTimeEvtCtr l_tickTime;
+    static uint8_t const l_TIMER2_COMPA = 0U;
 
     enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
+        PHILO_STAT = QP::QS_USER
     };
 #endif
 
@@ -54,30 +69,80 @@ Q_DEFINE_THIS_FILE
 ISR(TIMER2_COMPA_vect) {
     // No need to clear the interrupt source since the Timer0 compare
     // interrupt is automatically cleared in hardware when the ISR runs.
-    //
 
     QK_ISR_ENTRY();                        // inform QK kernel about ISR entry
 
 #ifdef Q_SPY
-    l_tickTime += (F_CPU / BSP_TICKS_PER_SEC / 1024);
+    l_tickTime += (F_CPU / BSP_TICKS_PER_SEC / 1024U);
 #endif
 
-    QF::TICK(&l_TIMER2_COMPA);
+    QP::QF::TICK(&l_TIMER2_COMPA);
 
     QK_ISR_EXIT();                          // inform QK kernel about ISR exit
 }
 
 //............................................................................
 void BSP_init(void) {
-    DDRD  = 0xFF;                       // All PORTD pins are outputs for LEDs
+    DDRD  = 0xFFU;                      // All PORTD pins are outputs for LEDs
     LED_OFF_ALL();                                        // turn off all LEDs
+
+    BSP_randomSeed(1234U);
 
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
-
+    QS_RESET();
     QS_OBJ_DICTIONARY(&l_TIMER2_COMPA);
 }
+//............................................................................
+void BSP_terminate(int16_t const result) {
+    (void)result;
+}
+//............................................................................
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
+    if (stat[0] == (uint8_t)'e') {              // is this Philosopher eating?
+        LED_ON(n);
+    }
+    else {                                   // this Philosopher is not eating
+        LED_OFF(n);
+    }
+
+    QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin
+        QS_U8(1, n);                                     // Philosopher number
+        QS_STR(stat);                                    // Philosopher status
+    QS_END()
+}
+//............................................................................
+void BSP_displayPaused(uint8_t const paused) {
+    (void)paused;
+}
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP_randomSeed(uint32_t const seed) {
+    l_rnd = seed;
+}
+//............................................................................
+extern "C" void Q_onAssert(char_t const Q_ROM * const Q_ROM_VAR file,
+                           int_t line)
+{
+    QF_INT_DISABLE();                                // disable all interrupts
+    LED_ON_ALL();                                               // all LEDs on
+    for (;;) {                               // hang here in the for-ever loop
+    }
+}
+
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
+namespace QP {
+
 //............................................................................
 void QF::onStartup(void) {
           // set Timer2 in CTC mode, 1/1024 prescaler, start the timer ticking
@@ -86,7 +151,7 @@ void QF::onStartup(void) {
     ASSR  &= ~(1 << AS2);
     TIMSK2 = (1 << OCIE2A);                 // enable TIMER2 compare Interrupt
     TCNT2 = 0;
-    OCR2A = ((F_CPU / BSP_TICKS_PER_SEC / 1024) - 1);             // keep last
+    OCR2A = ((F_CPU / DPP::BSP_TICKS_PER_SEC / 1024U) - 1U);      // keep last
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -121,38 +186,10 @@ void QK::onIdle() {
 
 #endif
 }
-//............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
-    if (stat[0] == (uint8_t)'e') {              // is this Philosopher eating?
-        LED_ON(n);
-    }
-    else {                                   // this Philosopher is not eating
-        LED_OFF(n);
-    }
-
-    QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin
-        QS_U8(1, n);                                     // Philosopher number
-        QS_STR(stat);                                    // Philosopher status
-    QS_END()
-}
-//............................................................................
-void BSP_busyDelay(void) {
-}
-//............................................................................
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
-    cli();                                              // lock all interrupts
-    LED_ON_ALL();                                               // all LEDs on
-    for (;;) {                               // hang here in the for-ever loop
-    }
-}
-//............................................................................
-void operator delete(void *) {
-    Q_ERROR();                // this operator should never be actually called
-}
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[QS_BUF_SIZE];               // buffer for Quantum Spy
     uint16_t n;
 
@@ -219,7 +256,7 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
     QS_FILTER_OFF(QS_QF_ISR_EXIT);
 
-    return (uint8_t)1;               // indicate successfull QS initialization
+    return true;                      // indicate successful QS initialization
 }
 //............................................................................
 void QS::onCleanup(void) {
@@ -234,18 +271,25 @@ void QS::onFlush(void) {
     }
 }
 //............................................................................
-// NOTE: invoked within a critical section (inetrrupts disabled)
+// NOTE: invoked within a critical section (interrupts disabled)
 QSTimeCtr QS::onGetTime(void) {
     if ((TIFR0 & (1 << OCF0A)) == 0) {         // output compare flag NOT set?
-        return l_tickTime + (QSTimeCtr)TCNT0;
+        return DPP::l_tickTime + (QSTimeCtr)TCNT0;
     }
     else {          // the output compare occured, but the ISR did not run yet
-        return l_tickTime + (F_CPU / BSP_TICKS_PER_SEC / 1024)
+        return DPP::l_tickTime + (F_CPU / DPP::BSP_TICKS_PER_SEC / 1024U)
                + (QSTimeCtr)TCNT0;
     }
 }
 #endif                                                                // Q_SPY
 //----------------------------------------------------------------------------
+
+}                                                              // namespace QP
+
+//............................................................................
+void operator delete(void *) {             // dummy definition for C++ runtime
+    // should never be actually used
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:

@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QEP/C++ port, AVR, GNU compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Sep 17, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -42,7 +42,7 @@
 #define Q_ROM_BYTE(rom_var_)    pgm_read_byte_near(&(rom_var_))
 
 #include <stdint.h>                       // C99-standard exact-width integers
-#include <avr\pgmspace.h>    // accessing data in the program memory (PROGMEM)
+#include <avr/pgmspace.h>    // accessing data in the program memory (PROGMEM)
 
 #include "qep.h"                  // QEP platform-independent public interface
 

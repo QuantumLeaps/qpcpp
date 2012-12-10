@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: BSP for YRDKRX63N board, QK kernel, Renesas RX Standard Toolchain
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 18, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -40,6 +40,75 @@
 #include "iodefine.h"
 #include "yrdkrx63n.h"
 
+// Q-Spy ---------------------------------------------------------------------
+#ifdef Q_SPY
+
+    QP::QSTimeCtr QS_tickTime_;
+    QP::QSTimeCtr QS_tickPeriod_;
+
+    uint8_t const QS_CMT0_isr  = 0U;          // identifies event source
+    uint8_t const QS_IRQ8_isr  = 0U;          // identifies event source
+    uint8_t const QS_IRQ9_isr  = 0U;          // identifies event source
+    uint8_t const QS_IRQ12_isr = 0U;          // identifies event source
+
+    #define UART_BAUD_RATE      115200U
+
+    enum AppRecords {                    // application-specific trace records
+        PHILO_STAT = QP::QS_USER
+    };
+
+#endif
+
+//............................................................................
+extern "C" {
+#pragma interrupt (CMT0_isr (vect = VECT(CMT0, CMI0)))
+void CMT0_isr(void) {
+    QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
+
+#ifdef Q_SPY
+    QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
+#endif
+    QP::QF::TICK(& QS_CMT0_isr);              // process all armed time events
+
+    QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
+}
+//............................................................................
+#pragma interrupt (IRQ8_isr (vect = VECT(ICU, IRQ8)))
+void IRQ8_isr(void) {
+    QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
+
+    DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::PAUSE_SIG),
+                 &QS_IRQ8_isr);
+    QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
+}
+//............................................................................
+#pragma interrupt (IRQ9_isr (vect = VECT(ICU, IRQ9)))
+void IRQ9_isr(void) {
+    QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
+
+    DPP::AO_Philo[0]->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),// for testing...
+                 &QS_IRQ9_isr);
+    QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
+}
+//............................................................................
+#pragma interrupt (IRQ12_isr (vect = VECT(ICU, IRQ12)))
+void IRQ12_isr(void) {
+    QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
+
+    DPP::AO_Philo[0]->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),// for testing...
+                 &QS_IRQ12_isr);
+    QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
+}
+//............................................................................
+void abort(void) {
+    Q_onAssert("abort", 0);
+}
+
+}                                                                // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
+
 Q_DEFINE_THIS_FILE
 
                     // interrupt priorities (higher number is higher priority)
@@ -54,66 +123,10 @@ enum InterruptPriorities {
 
 // clock configuration -------------------------------------------------------
 #define PCLK_FREQ         48000000U
-#define TICK_COUNT_VAL    (PCLK_FREQ / 128U / BSP_TICKS_PER_SEC)
+#define TICK_COUNT_VAL    (PCLK_FREQ / 128U / DPP::BSP_TICKS_PER_SEC)
 
-// Q-Spy ---------------------------------------------------------------------
-#ifdef Q_SPY
-
-    QSTimeCtr QS_tickTime_;
-    QSTimeCtr QS_tickPeriod_;
-
-    uint8_t const QS_CMT0_isr  = 0U;          // identifies event source
-    uint8_t const QS_IRQ8_isr  = 0U;          // identifies event source
-    uint8_t const QS_IRQ9_isr  = 0U;          // identifies event source
-    uint8_t const QS_IRQ12_isr = 0U;          // identifies event source
-
-    #define UART_BAUD_RATE      115200U
-
-    enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
-    };
-
-#endif
-
-//............................................................................
-#pragma interrupt (CMT0_isr (vect = VECT(CMT0, CMI0)))
-extern "C" static void CMT0_isr(void) {
-    QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
-
-#ifdef Q_SPY
-    QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
-#endif
-    QF::TICK(& QS_CMT0_isr);                  // process all armed time events
-
-    QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
-}
-//............................................................................
-#pragma interrupt (IRQ8_isr (vect = VECT(ICU, IRQ8)))
-extern "C" void IRQ8_isr(void) {
-    QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
-
-    AO_Philo[0]->POST(Q_NEW(QEvt, MAX_PUB_SIG),            // for testing...
-                 &QS_IRQ8_isr);
-    QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
-}
-//............................................................................
-#pragma interrupt (IRQ9_isr (vect = VECT(ICU, IRQ9)))
-extern "C" void IRQ9_isr(void) {
-    QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
-
-    AO_Table->POST(Q_NEW(QEvt, MAX_PUB_SIG),               // for testing...
-                 &QS_IRQ9_isr);
-    QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
-}
-//............................................................................
-#pragma interrupt (IRQ12_isr (vect = VECT(ICU, IRQ12)))
-extern "C" void IRQ12_isr(void) {
-    QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
-
-    AO_Table->POST(Q_NEW(QEvt, MAX_PUB_SIG),               // for testing...
-                 &QS_IRQ12_isr);
-    QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
-}
+// Local-scope objects -------------------------------------------------------
+static uint32_t l_rnd;                                          // random seed
 
 //............................................................................
 void BSP_init(void) {
@@ -146,26 +159,23 @@ void BSP_init(void) {
     MPC.P41PFS.BYTE = 0x40U;       // P41 is used as IRQ pin
     MPC.P44PFS.BYTE = 0x40U;       // P44 is used as IRQ pin
 
+    BSP_randomSeed(1234);
 
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
-
+    QS_RESET();
     QS_OBJ_DICTIONARY(&QS_CMT0_isr);
     QS_OBJ_DICTIONARY(&QS_IRQ8_isr);
     QS_OBJ_DICTIONARY(&QS_IRQ9_isr);
     QS_OBJ_DICTIONARY(&QS_IRQ12_isr);
 }
 //............................................................................
-void BSP_busyDelay(void) {
-    // limit for the loop counter in busyDelay()
-    static uint32_t l_delay = 0UL;
-    uint32_t volatile i = l_delay;
-    while (i-- > 0UL) {                                      // busy-wait loop
-    }
+void BSP_terminate(int16_t const result) {
+    (void)result;
 }
 //............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
                             // turn LED on when eating and off when not eating
     uint8_t on_off = (stat[0] == 'e' ? LED_ON : LED_OFF);
     switch (n) {
@@ -183,6 +193,28 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
+void BSP_displayPaused(uint8_t const paused) {
+    LED11 = (paused != 0U) ? LED_ON : LED_OFF;
+}
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP_randomSeed(uint32_t const seed) {
+    l_rnd = seed;
+}
+
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
+namespace QP {
+
+//............................................................................
 void QF::onStartup(void) {
 
     SYSTEM.PRCR.WORD = 0xA50B;                                  // Protect off
@@ -190,22 +222,22 @@ void QF::onStartup(void) {
     SYSTEM.PRCR.WORD = 0xA500;                                  // Protect on
 
     // set the interrupt priorities, (manual 11.2.3)
-    IPR(CMT0,)     = TICK_INT_PRIORITY;
-    IPR(ICU,IRQ8)  = SW1_INT_PRIORITY;
-    IPR(ICU,IRQ9)  = SW2_INT_PRIORITY;
-    IPR(ICU,IRQ12) = SW3_INT_PRIORITY;
+    IPR(CMT0,)     = DPP::TICK_INT_PRIORITY;
+    IPR(ICU,IRQ8)  = DPP::SW1_INT_PRIORITY;
+    IPR(ICU,IRQ9)  = DPP::SW2_INT_PRIORITY;
+    IPR(ICU,IRQ12) = DPP::SW3_INT_PRIORITY;
 
     // setup the system clock tick interrupt as CMT0...
     CMT.CMSTR0.BIT.STR0 = 0;
     CMT0.CMCR.WORD  = 0x0042;        // CMIE:1(CMin enabled), CKS:2,(PCLK/128)
     CMT0.CMCOR      = TICK_COUNT_VAL;
-    IPR(CMT0, CMI0) = TICK_INT_PRIORITY;      // Set interrupt priority in ICU
+    IPR(CMT0, CMI0) = DPP::TICK_INT_PRIORITY; // Set interrupt priority in ICU
     IEN(CMT0, CMI0) = 1U;                   // Enable the interrupt in the ICU
     CMT.CMSTR0.BIT.STR0 = 1U;                       // Start the clock running
 
 
     // setup the Switch interrupts...
-    ICU.IRQCR[ 8].BIT.IRQMD = 0x01U;            // set IRQ type (falling edge)
+    ICU.IRQCR[ 8].BIT.IRQMD = 0x03U;     // IRQ type: raising and falling edge
     ICU.IRQCR[ 9].BIT.IRQMD = 0x01U;
     ICU.IRQCR[12].BIT.IRQMD = 0x01U;
 
@@ -216,14 +248,6 @@ void QF::onStartup(void) {
     IEN(ICU, IRQ8 ) = 1U;                             // enable the interrupts
     IEN(ICU, IRQ9 ) = 1U;
     IEN(ICU, IRQ12) = 1U;
-}
-//............................................................................
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
-    (void)file;                                      // avoid compiler warning
-    (void)line;                                      // avoid compiler warning
-    QF_INT_DISABLE();            // make sure that all interrupts are disabled
-    for (;;) {          // NOTE: replace the loop with reset for final version
-    }
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -267,14 +291,18 @@ void QK::onIdle(void) {
 #endif
 }
 //............................................................................
-extern "C" void abort(void) {
-    Q_ERROR();
+extern "C" void Q_onAssert(char const * const file, int line) {
+    (void)file;                                      // avoid compiler warning
+    (void)line;                                      // avoid compiler warning
+    QF_INT_DISABLE();            // make sure that all interrupts are disabled
+    for (;;) {          // NOTE: replace the loop with reset for final version
+    }
 }
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 //............................................................................
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[6*256];                     // buffer for Quantum Spy
     (void) arg;               // get rid of compiler warning (unused argument)
     initBuf(qsBuf, sizeof(qsBuf));
@@ -362,9 +390,7 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
     QS_FILTER_OFF(QS_QF_ISR_EXIT);
 
-    QS_FILTER_AO_OBJ(AO_Table);
-
-    return (uint8_t)1;                                       // return success
+    return true;                                             // return success
 }
 //............................................................................
 void QS::onCleanup(void) {
@@ -391,6 +417,8 @@ void QS::onFlush(void) {
     }
 }
 #endif                                                                // Q_SPY
+
+}                                                              // namespace QP
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:

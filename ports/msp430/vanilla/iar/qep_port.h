@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: QP/C++  port
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Product: QEP/C++ port
+// Last Updated for Version: 4.4.02
+// Date of the Last Update:  Oct 09, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,11 +35,7 @@
 #ifndef qep_port_h
 #define qep_port_h
 
-                                          // 1-byte signal space (255 signals)
-#define QP_SIGNAL_SIZE      1
-
 #include <stdint.h>  // exact-width integers, WG14/N843 C99 Standard, 7.18.1.1
-
 #include "qep.h"                  // QEP platform-independent public interface
 
 #endif                                                           // qep_port_h

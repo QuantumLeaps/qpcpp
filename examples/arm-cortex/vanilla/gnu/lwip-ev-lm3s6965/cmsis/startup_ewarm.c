@@ -1,6 +1,6 @@
 //*****************************************************************************
-// Added STACK_SIZE macro
-// Quantum Leaps on Feb-17-2010
+// Added STACK_SIZE macro and calls to Q_onAssert()
+// Quantum Leaps on 25-Jan-2012
 // www.state-machine.com
 //*****************************************************************************
 
@@ -202,17 +202,15 @@ __root const uVectorEntry __vector_table[] @ ".intvec" =
     Hibernate_IRQHandler                    // Hibernate
 };
 
+/* function prototypes -----------------------------------------------------*/
+void Q_onAssert(char const *file, int line);
 
-//*****************************************************************************
-//
-// This is the code that gets called when the processor receives a NMI.  This
-// simply enters an infinite loop, preserving the system state for examination
-// by a debugger.
-//
-//*****************************************************************************
+
+/****************************************************************************/
 void
 NMI_Handler(void)
 {
+    Q_onAssert("NMI_Handler", __LINE__);
     //
     // Enter an infinite loop.
     //
@@ -221,21 +219,15 @@ NMI_Handler(void)
     }
 }
 
-//*****************************************************************************
-//
-// This is the code that gets called when the processor receives a fault
-// interrupt.  This simply enters an infinite loop, preserving the system state
-// for examination by a debugger.
-//
-//*****************************************************************************
+/****************************************************************************/
 void
 HardFault_Handler(void)
 {
-    int volatile wait = 1;
+    Q_onAssert("HardFault_Handler", __LINE__);
     //
     // Enter an infinite loop.
     //
-    while(wait)
+    while(1)
     {
     }
 }

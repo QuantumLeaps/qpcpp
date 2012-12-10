@@ -1,0 +1,22 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "dpp-qk_uc3a3xplained", "dpp-qk_uc3a3xplained.cppproj", "{2CFF3109-404A-4202-8D01-7D6939FA04A3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+		Spy|AVR = Spy|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2CFF3109-404A-4202-8D01-7D6939FA04A3}.Debug|AVR.ActiveCfg = Debug|AVR
+		{2CFF3109-404A-4202-8D01-7D6939FA04A3}.Debug|AVR.Build.0 = Debug|AVR
+		{2CFF3109-404A-4202-8D01-7D6939FA04A3}.Release|AVR.ActiveCfg = Release|AVR
+		{2CFF3109-404A-4202-8D01-7D6939FA04A3}.Release|AVR.Build.0 = Release|AVR
+		{2CFF3109-404A-4202-8D01-7D6939FA04A3}.Spy|AVR.ActiveCfg = Spy|AVR
+		{2CFF3109-404A-4202-8D01-7D6939FA04A3}.Spy|AVR.Build.0 = Spy|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

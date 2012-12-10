@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: BSP for DPP application on eZ430-RF2500, TI CCS MSP430 compiler
-// Last Updated for Version: 4.3.00
-// Date of the Last Update:  Feb 19, 2012
+// Product: BSP for DPP on eZ430-RF2500, Vanilla kernel, TI CCS MSP430 compiler
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 09, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -9,27 +9,42 @@
 //
 // Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
 
+#include <msp430x22x4.h>                                // MSP430 variant used
+
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
+
 Q_DEFINE_THIS_FILE
+
+// Local-scope objects -------------------------------------------------------
+static uint32_t l_rnd;                                          // random seed
 
 #define BSP_MCK       8000000U
 #define BSP_SMCLK     8000000U
@@ -37,16 +52,17 @@ Q_DEFINE_THIS_FILE
 
 #define LED0_on()     (P1OUT |= (uint8_t)BIT0)
 #define LED0_off()    (P1OUT &= (uint8_t)~BIT0)
+#define LED0_toggle() (P1OUT ^= (uint8_t)BIT0)
 
 #define LED1_on()     (P1OUT |= (uint8_t)BIT1)
 #define LED1_off()    (P1OUT &= (uint8_t)~BIT1)
 
 #ifdef Q_SPY
-    QSTimeCtr QS_tickTime_;
+    QP::QSTimeCtr QS_tickTime_;
     static uint8_t const l_timerA_ISR = 0;
 
     enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
+        PHILO_STAT = QP::QS_USER
     };
 #endif
 
@@ -63,36 +79,105 @@ __interrupt void timerA_ISR(void) {
        (((BSP_SMCLK / 8) + BSP_TICKS_PER_SEC/2) / BSP_TICKS_PER_SEC) + 1;
 #endif
 
-    QF::TICK(&l_timerA_ISR);
+    QP::QF::TICK(&l_timerA_ISR);
+}
+//............................................................................
+#pragma vector = PORT1_VECTOR
+__interrupt void port1_ISR(void) {                              // for testing
+    static const QP::QEvt tstEvt = { MAX_SIG, 0U, 0U };
+
+#ifdef NDEBUG
+    __low_power_mode_off_on_exit();
+#endif
+
+    P1IFG &= ~BIT2;                                  // clear interrupt source
+
+    AO_Table->POST(&tstEvt, (void *)0);
 }
 //............................................................................
 void BSP_init(void) {
     WDTCTL   = (WDTPW | WDTHOLD);                                  // Stop WDT
 
        // configure the Basic Clock Module */
-    DCOCTL   = CALDCO_8MHZ;                                 // Set DCO to 8MHz
-    BCSCTL1  = CALBC1_8MHZ;
+    DCOCTL  = CALDCO_8MHZ;                                  // Set DCO to 8MHz
+    BCSCTL1 = CALBC1_8MHZ;
 
-    TACTL    = (ID_3 | TASSEL_2 | MC_1);          // SMCLK, /8 divider, upmode
-    TACCR0   = (((BSP_SMCLK / 8) + BSP_TICKS_PER_SEC/2) / BSP_TICKS_PER_SEC);
+    TACTL   = (ID_3 | TASSEL_2 | MC_1);           // SMCLK, /8 divider, upmode
+    TACCR0  = (((BSP_SMCLK / 8) + BSP_TICKS_PER_SEC/2) / BSP_TICKS_PER_SEC);
 
-    P1DIR   |= (BIT0 | BIT1);                  // P1.0 and P1.1 outputs (LEDs)
+    P1DIR  |= (BIT0 | BIT1);                   // P1.0 and P1.1 outputs (LEDs)
+
+    P1DIR  &= ~BIT2;                                // P1.2 input (Switch TS1)
+    P1REN  |=  BIT2;                        // enable pull-up resistor on P1.2
+    P1SEL  &= ~BIT2;                            // enable I/O function on P1.2
+    P1IES  |=  BIT2;                        // interrupt edge select high->low
+    P1IFG  &= ~BIT2;                                 // clear interrupt source
+
+    BSP_randomSeed(1234U);
 
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
-
+    QS_RESET();
     QS_OBJ_DICTIONARY(&l_timerA_ISR);
 }
 //............................................................................
+void BSP_terminate(int16_t const result) {
+    (void)result;
+}
+//............................................................................
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
+    (void)n;
+    (void)stat;
+    LED0_toggle();
+
+    QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin
+        QS_U8(1, n);                                     // Philosopher number
+        QS_STR(stat);                                    // Philosopher status
+    QS_END()
+}
+//............................................................................
+void BSP_displayPaused(uint8_t const paused) {
+    (void)paused;
+}
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP_randomSeed(uint32_t const seed) {
+    l_rnd = seed;
+}
+
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
+//............................................................................
+void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
+    (void)file;                                      // avoid compiler warning
+    (void)line;                                      // avoid compiler warning
+    QF_INT_DISABLE();                // make sure that interrupts are disabled
+    for (;;) {
+    }
+}
+
+namespace QP {
+
+//............................................................................
 void QF::onStartup(void) {
     TACCTL0 = CCIE;                          // Timer_A CCR0 interrupt enabled
+
+    P1IE   |= BIT2;                      // P1.2 interrupt enable (Switch TS1)
 }
 //............................................................................
 void QF::onCleanup(void) {
 }
 //............................................................................
-void QF::onIdle(void) {
+void QF::onIdle(void) {                    // invoked with interrupts DISABLED
 
     LED1_on();                                       // switch LED1 on and off
     LED1_off();
@@ -110,40 +195,16 @@ void QF::onIdle(void) {
         QF_INT_ENABLE();
     }
 #elif defined NDEBUG
-    __low_power_mode_1();               // Enter LPM1; also UNLOCKS interrupts
+    __low_power_mode_1();       // Enter LPM1 and ENABLE interrupts atomically
 #else
     QF_INT_ENABLE();
 #endif
-}
-//............................................................................
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
-    (void)file;                                      // avoid compiler warning
-    (void)line;                                      // avoid compiler warning
-    QF_INT_DISABLE();                // make sure that interrupts are disabled
-    for (;;) {
-    }
-}
-//............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
-    if (n == 0) {                                              // for Philo[0]
-        if (stat[0] == 'e') {                       // ON when Philo[0] eating
-            LED0_on();
-        }
-        else {
-            LED0_off();
-        }
-    }
-
-    QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin
-        QS_U8(1, n);                                     // Philosopher number
-        QS_STR(stat);                                    // Philosopher status
-    QS_END()
 }
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 //............................................................................
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[256];                       // buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
@@ -199,7 +260,7 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
     QS_FILTER_OFF(QS_QF_ISR_EXIT);
 
-    return (uint8_t)1;                                       // return success
+    return true;                                             // return success
 }
 //............................................................................
 void QS::onCleanup(void) {
@@ -207,11 +268,12 @@ void QS::onCleanup(void) {
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {            // invoked with interrupts disabled
     if ((TACTL & TAIFG) == 0) {                      // interrupt not pending?
-        return QS_tickTime_ + TAR;
+        return DPP::QS_tickTime_ + TAR;
     }
     else {         // the rollover occured, but the timerA_ISR did not run yet
-        return QS_tickTime_
-           + (((BSP_SMCLK / 8) + BSP_TICKS_PER_SEC/2) / BSP_TICKS_PER_SEC) + 1
+        return DPP::QS_tickTime_
+           + (((BSP_SMCLK / 8) + DPP::BSP_TICKS_PER_SEC/2)
+               / DPP::BSP_TICKS_PER_SEC) + 1
            + TAR;
     }
 }
@@ -226,3 +288,13 @@ void QS::onFlush(void) {
 }
 #endif                                                                // Q_SPY
 //----------------------------------------------------------------------------
+
+}                                                              // namespace QP
+
+//////////////////////////////////////////////////////////////////////////////
+// NOTE01:
+// The User LED is used to visualize the idle loop activity. The brightness
+// of the LED is proportional to the frequency of invcations of the idle loop.
+// Please note that the LED is toggled with interrupts locked, so no interrupt
+// execution time contributes to the brightness of the User LED.
+//

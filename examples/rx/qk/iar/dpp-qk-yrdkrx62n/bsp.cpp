@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: "Dining Philosophers Problem" example, QK kernel
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Product: BSP for YRDKRX63N board, QK kernel, Renesas RX Standard Toolchain
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 18, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -39,21 +39,6 @@
 #include "iorx62n.h"
 #include "yfuns.h"                                             // for __exit()
 
-Q_DEFINE_THIS_FILE
-
-                    // interrupt priorities (higher number is higher priority)
-enum InterruptPriorities {
-    // lowest urgency
-    SW1_INT_PRIORITY  = 3,
-    TICK_INT_PRIORITY = 4,
-    SW2_INT_PRIORITY  = 5,
-    SW3_INT_PRIORITY  = 6
-    // highest urgency
-};
-
-                              // Number of timer ticks for each OS kernel tick
-#define TICK_COUNT_VAL ((TICK_TIMER_FREQ) / (BSP_TICKS_PER_SEC))
-
 // On board LEDs -------------------------------------------------------------
 #define  LED04                  (PORTD.DR.BIT.B5)
 #define  LED05                  (PORTE.DR.BIT.B3)
@@ -78,12 +63,10 @@ enum InterruptPriorities {
 #define  BSP_LED_IDLE_OFF()     (LED12 = LED_OFF)
 
 // On board Buttonss ---------------------------------------------------------
-enum GPIOIntTriggerType {           // GPIO interrupt triggers (manual 11.2.8)
-    IT_LOW_LEVEL           = 0,
-    IT_FALLING_EDGE        = 1,
-    IT_RISING_EDGE         = 2,
-    IT_RISING_FALLING_EDGE = 3
-};
+#define IT_LOW_LEVEL            0
+#define IT_FALLING_EDGE         1
+#define IT_RISING_EDGE          2
+#define IT_RISING_FALLING_EDGE  3
 
 #define  BSP_BUTTON_PRESSED(button_) \
     ((PORT4.PORT.BYTE & (1 << Button)) == 0);
@@ -95,41 +78,38 @@ enum GPIOIntTriggerType {           // GPIO interrupt triggers (manual 11.2.8)
 #define BSP_CLKDIV            512U                        // See manual 21.2.3
 #define TICK_TIMER_FREQ       (PCLK_FREQ / BSP_CLKDIV)
 
-// QS facilities -------------------------------------------------------------
+                              // Number of timer ticks for each OS kernel tick
+#define TICK_COUNT_VAL (TICK_TIMER_FREQ / DPP::BSP_TICKS_PER_SEC)
+
+// Q-Spy ---------------------------------------------------------------------
 #ifdef Q_SPY
 
-    static QSTimeCtr l_tickTime_;
-    static QSTimeCtr l_tickPeriod_;
+    QP::QSTimeCtr QS_tickTime_;
+    QP::QSTimeCtr QS_tickPeriod_;
 
-    static uint8_t const l_tickISR = 0;      // identifies event source for QS
-    static uint8_t const l_sw1ISR  = 0;      // identifies event source for QS
-    static uint8_t const l_sw2ISR  = 0;      // identifies event source for QS
-    static uint8_t const l_sw3ISR  = 0;      // identifies event source for QS
+    uint8_t const QS_CMT0_isr  = 0U;          // identifies event source
+    uint8_t const QS_IRQ8_isr  = 0U;          // identifies event source
+    uint8_t const QS_IRQ9_isr  = 0U;          // identifies event source
+    uint8_t const QS_IRQ12_isr = 0U;          // identifies event source
 
-    #define UART_BAUD_RATE    115200U
+    #define UART_BAUD_RATE      115200U
 
     enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
+        PHILO_STAT = QP::QS_USER
     };
 
 #endif
 
 //............................................................................
 extern "C" {
-
-//............................................................................
-void __exit(int) {
-    Q_ERROR();
-}
-//............................................................................
 #pragma vector=28
 static __interrupt void tickISR(void) {
     QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
 
 #ifdef Q_SPY
-    l_tickTime_ += l_tickPeriod_;            // account for the clock rollover
+    QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
 #endif
-    QF::TICK(&l_tickISR);                     // process all armed time events
+    QP::QF::TICK(& QS_CMT0_isr);              // process all armed time events
 
     QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
 }
@@ -138,8 +118,8 @@ static __interrupt void tickISR(void) {
 static __interrupt void sw1ISR(void) {
     QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
 
-    AO_Philo[0]->POST(Q_NEW(QEvt, MAX_PUB_SIG), &l_sw1ISR);   // for testing
-
+    DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::PAUSE_SIG),
+                 &QS_IRQ8_isr);
     QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
 }
 //............................................................................
@@ -147,8 +127,8 @@ static __interrupt void sw1ISR(void) {
 static __interrupt void sw2ISR(void) {
     QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
 
-    AO_Philo[1]->POST(Q_NEW(QEvt, MAX_PUB_SIG), &l_sw2ISR);   // for testing
-
+    DPP::AO_Philo[0]->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),// for testing...
+                 &QS_IRQ9_isr);
     QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
 }
 //............................................................................
@@ -156,12 +136,34 @@ static __interrupt void sw2ISR(void) {
 static __interrupt void sw3ISR(void) {
     QK_ISR_ENTRY();             // inform the QK kernel about entering the ISR
 
-    AO_Philo[2]->POST(Q_NEW(QEvt, MAX_PUB_SIG), &l_sw3ISR);   // for testing
-
+    DPP::AO_Philo[0]->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),// for testing...
+                 &QS_IRQ12_isr);
     QK_ISR_EXIT();               // inform the QK kernel about exiting the ISR
+}
+//............................................................................
+void abort(void) {
+    Q_onAssert("abort", 0);
 }
 
 }                                                                // extern "C"
+
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
+
+Q_DEFINE_THIS_FILE
+
+                    // interrupt priorities (higher number is higher priority)
+enum InterruptPriorities {
+    // lowest urgency
+    SW1_INT_PRIORITY  = 3,
+    TICK_INT_PRIORITY = 4,
+    SW2_INT_PRIORITY  = 5,
+    SW3_INT_PRIORITY  = 6
+    // highest urgency
+};
+
+// Local-scope objects -------------------------------------------------------
+static uint32_t l_rnd;                                          // random seed
 
 //............................................................................
 void BSP_init(void) {
@@ -185,25 +187,23 @@ void BSP_init(void) {
     //
     PORT4.DDR.BYTE = 0;
 
+    BSP_randomSeed(1234);
+
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
-
-    QS_OBJ_DICTIONARY(&l_tickISR);
-    QS_OBJ_DICTIONARY(&l_sw1ISR);
-    QS_OBJ_DICTIONARY(&l_sw2ISR);
-    QS_OBJ_DICTIONARY(&l_sw3ISR);
+    QS_RESET();
+    QS_OBJ_DICTIONARY(&QS_CMT0_isr);
+    QS_OBJ_DICTIONARY(&QS_IRQ8_isr);
+    QS_OBJ_DICTIONARY(&QS_IRQ9_isr);
+    QS_OBJ_DICTIONARY(&QS_IRQ12_isr);
 }
 //............................................................................
-void BSP_busyDelay(void) {
-       // limit for the loop counter in busyDelay()
-    static uint32_t l_delay = 0UL;
-    uint32_t volatile i = l_delay;
-    while (i-- > 0UL) {                                      // busy-wait loop
-    }
+void BSP_terminate(int16_t const result) {
+    (void)result;
 }
 //............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
                             // turn LED on when eating and off when not eating
     uint8_t on_off = (stat[0] == 'e' ? LED_ON : LED_OFF);
     switch (n) {
@@ -212,7 +212,7 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
         case 2: LED06 = on_off; break;
         case 3: LED07 = on_off; break;
         case 4: LED08 = on_off; break;
-        default: Q_ERROR();     break;
+        default: Q_ERROR();    break;
     }
 
     QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin
@@ -221,30 +221,52 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void QF::onStartup(void) {
-       // set the interrupt priorities, (manual 11.2.3)
-    IPR(CMT0,)     = TICK_INT_PRIORITY;
-    IPR(ICU,IRQ8)  = SW1_INT_PRIORITY;
-    IPR(ICU,IRQ9)  = SW2_INT_PRIORITY;
-    IPR(ICU,IRQ10) = SW3_INT_PRIORITY;
+void BSP_displayPaused(uint8_t const paused) {
+    LED11 = (paused != 0U) ? LED_ON : LED_OFF;
+}
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP_randomSeed(uint32_t const seed) {
+    l_rnd = seed;
+}
 
-       // enable GPIO interrupts ...*/
-       // configure interrupts for SW1 (IRQ8)
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
+namespace QP {
+
+//............................................................................
+void QF::onStartup(void) {
+    // set the interrupt priorities, (manual 11.2.3)
+    IPR(CMT0,)     = DPP::TICK_INT_PRIORITY;
+    IPR(ICU,IRQ8)  = DPP::SW1_INT_PRIORITY;
+    IPR(ICU,IRQ9)  = DPP::SW2_INT_PRIORITY;
+    IPR(ICU,IRQ10) = DPP::SW3_INT_PRIORITY;
+
+    // enable GPIO interrupts ...
+    // configure interrupts for SW1 (IRQ8)
     PORT4.ICR.BIT.B0 = 1 ;                     // enable input buffer for P4.0
-    ICU.IRQCR[8].BIT.IRQMD = IT_FALLING_EDGE;         // falling edge (11.2.8)
+    ICU.IRQCR[8].BIT.IRQMD = IT_RISING_FALLING_EDGE; //rising&falling (11.2.8)
     IEN(ICU, IRQ8) = 1;                    // enable interrupt source (11.2.2)
 
-       // configure interrupts for SW2 (IRQ9)
+    // configure interrupts for SW2 (IRQ9)
     PORT4.ICR.BIT.B1 = 1 ;                     // enable input buffer for P4.1
     ICU.IRQCR[9].BIT.IRQMD = IT_FALLING_EDGE;         // falling edge (11.2.8)
     IEN(ICU, IRQ9) = 1;                    // enable interrupt source (11.2.2)
 
-       // configure interrupts for SW3 (IRQ10)
+    // configure interrupts for SW3 (IRQ10)
     PORT4.ICR.BIT.B2 = 1 ;                     // enable input buffer for P4.2
     ICU.IRQCR[10].BIT.IRQMD = IT_FALLING_EDGE;        // falling edge (11.2.8)
     IEN(ICU, IRQ10) = 1;                   // enable interrupt source (11.2.2)
 
-       // configure & start tick timer. Enable CMT0 module. (see manual 9.2.2)
+    // configure & start tick timer. Enable CMT0 module. (see manual 9.2.2)
     MSTP(CMT0) = 0;
     CMT.CMSTR0.BIT.STR0 = 0;         // Stop CMT0 (channel 0)  (manual 21.2.1)
     CMT0.CMCR.BIT.CKS   = CMT_PCLK_DIV_512;     // peripheral divider (21.2.3)
@@ -257,27 +279,20 @@ void QF::onStartup(void) {
     CMT.CMSTR0.BIT.STR0 = 1;     // start tick timer (CMT0 channel 0) (21.2.1)
 }
 //............................................................................
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
-    (void)file;                                      // avoid compiler warning
-    (void)line;                                      // avoid compiler warning
-    QF_INT_DISABLE();            // make sure that all interrupts are disabled
-    for (;;) {          // NOTE: replace the loop with reset for final version
-    }
-}
-//............................................................................
 void QF::onCleanup(void) {
 }
 //............................................................................
 void QK::onIdle(void) {
 
     QF_INT_DISABLE();
-    BSP_LED_IDLE_ON();      // toggle the User LED on and then off, see NOTE01
-    BSP_LED_IDLE_OFF();
+    LED12 = LED_ON;         // toggle the User LED on and then off, see NOTE01
+    LED12 = LED_OFF;
     QF_INT_ENABLE();
 
 #ifdef Q_SPY
+
     // RX62N has no TX FIFO, just a Transmit Data Register (TDR)
-    if (SMCI2.SSR.BIT.TDRE) {                           // Is SMC's TDR Empty?
+    if (SCI2.SSR.BIT.TEND) {                           // Is SMC's TDR Empty?
         uint16_t b;
 
         QF_INT_DISABLE();
@@ -285,7 +300,7 @@ void QK::onIdle(void) {
         QF_INT_ENABLE();
 
         if (b != QS_EOD) {
-            SMCI2.TDR = (uint8_t)b;                   // send byte to UART TDR
+            SCI2.TDR = (uint8_t)b;                   // send byte to UART TDR
         }
     }
 #elif defined NDEBUG
@@ -295,18 +310,31 @@ void QK::onIdle(void) {
     //
     // Sleep mode for RX CPU:
     // Use compiler intrinsic function to put CPU to sleep.
-    //
-    __wait_for_interrupt();
+    // Note that we execute this instruction with interrupts disabled,
+    // i.e., PSW[I] = 0.
+    // HOWEVER, executing the WAIT instruction sets PSW[I] = 1,
+    // therefore we do not need to unlock (enable) interrupts upon wakeup,
+    // since they will already be enabled.
+
+    wait();
 #endif
+}
+//............................................................................
+extern "C" void Q_onAssert(char const * const file, int line) {
+    (void)file;                                      // avoid compiler warning
+    (void)line;                                      // avoid compiler warning
+    QF_INT_DISABLE();            // make sure that all interrupts are disabled
+    for (;;) {          // NOTE: replace the loop with reset for final version
+    }
 }
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 //............................................................................
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[6*256];                     // buffer for Quantum Spy
     (void) arg;               // get rid of compiler warning (unused argument)
-    QS::initBuf(qsBuf, sizeof(qsBuf));
+    initBuf(qsBuf, sizeof(qsBuf));
 
     // Configure & enable the serial interface used by QS
     // See Figure 28.7 "SCI Initialization Flowchart (Async Mode)"
@@ -333,11 +361,11 @@ uint8_t QS::onStartup(void const *arg) {
     IPR(SCI2,TXI2) = 10;                         // irq level 11 (pretty high)
     IEN(SCI2,TXI2) = 0;         // disable TXI2 interrupt (just poll RXI flag)
 
-    SCI2.SCR.BYTE |= 0x30 ;                 // enable RX & TX at the same time
+    SCI2.SCR.BYTE |= 0x30;                  // enable RX & TX at the same time
 
     // Initialize QS timing variables
-    l_tickPeriod_ = TICK_COUNT_VAL;
-    l_tickTime_   = 0;                        // count up timer starts at zero
+    QS_tickPeriod_ = TICK_COUNT_VAL;
+    QS_tickTime_   = 0;                       // count up timer starts at zero
 
                                                     // setup the QS filters...
     QS_FILTER_ON(QS_ALL_RECORDS);
@@ -383,39 +411,39 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
     QS_FILTER_OFF(QS_QF_ISR_EXIT);
 
-    //QS_FILTER_AO_OBJ(AO_Table);
-
-    return (uint8_t)1;                                       // return success
+    return true;                                             // return success
 }
 //............................................................................
 void QS::onCleanup(void) {
 }
 //............................................................................
-QSTimeCtr QS::onGetTime(void) {            // invoked with interrupts disabled
+QSTimeCtr QS::onGetTime(void) {              // invoked with interrupts locked
     if (IR(CMT0, CMI0)) {                              // is tick ISR pending?
-        return l_tickTime_ + CMT0.CMCNT + l_tickPeriod_ ;
+        return QS_tickTime_ + CMT0.CMCNT + QS_tickPeriod_;
     }
     else {                                              // no rollover occured
-        return l_tickTime_ + CMT0.CMCNT;
+        return QS_tickTime_ + CMT0.CMCNT;
     }
 }
 //............................................................................
 void QS::onFlush(void) {
     uint16_t b;
-    b = QS::getByte();
-    while (b != QS_EOD) {                     // next QS trace byte available?
-        while (SMCI2.SSR.BIT.TDRE == 0) {                     // TX not ready?
+    b = getByte();
+    while (b != QS_EOD) {    // next QS trace byte available?
+        while (SCI2.SSR.BIT.TEND == 0) {                      // TX not ready?
         }
-        SMCI2.TDR = (uint8_t)b;                       // send byte to UART TDR
-        // Try to get next byte
-        b = QS::getByte();
+        SCI2.TDR = (uint8_t)b;                        // send byte to UART TDR
+
+        b = getByte();                                 // try to get next byte
     }
 }
 #endif                                                                // Q_SPY
 
+}                                                              // namespace QP
+
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:
-// The User LED is used to visualize the idle loop activity. The brightness
+// The LED12 is used to visualize the idle loop activity. The brightness
 // of the LED is proportional to the frequency of invcations of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt
 // execution time contributes to the brightness of the User LED.

@@ -41,11 +41,7 @@ static QEvt const *l_tableQueueSto[N_PHILO];
 static QEvt const *l_philoQueueSto[N_PHILO][N_PHILO];
 //static QSubscrList   l_subscrSto[MAX_PUB_SIG];
 
-static union SmallEvents {
-    void   *e0;                                          // minimum event size
-    uint8_t e1[sizeof(TableEvt)];
-    // ... other event types to go into this pool
-} l_smlPoolSto[2*N_PHILO];                 // storage for the small event pool
+static QF_MPOOL_EL(TableEvt) l_smlPoolSto[2U*N_PHILO];           // small pool
 
 //............................................................................
 int main(void) {

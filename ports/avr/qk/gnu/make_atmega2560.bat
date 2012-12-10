@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QP/C++ buld script for AVR, QK port, GNU compiler
-:: Last Updated for Version: 4.4.00
-:: Date of the Last Update:  Apr 19, 2012
+:: Last Updated for Version: 4.5.02
+:: Date of the Last Update:  Sep 16, 2012
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -26,7 +26,7 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http:::www.gnu.org/licenses/>.
+:: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
 :: Quantum Leaps Web sites: http://www.quantum-leaps.com
@@ -38,7 +38,7 @@ setlocal
 :: adjust the following path to the location where you've installed
 :: the WinAVR toolset...
 ::
-if "%GNU_AVR%"=="" set GNU_AVR=C:\tools\Atmel\AVR_Studio_5.0\AVR Toolchain
+if "%GNU_AVR%"=="" set GNU_AVR=C:\tools\Atmel\Studio_6.0\extensions\Atmel\AVRGCC\3.4.0.65\AVRToolchain
 
 set PATH=%GNU_AVR%\bin;%PATH%
 
@@ -52,7 +52,6 @@ set QP_PRTDIR=.
 :: Adjust the Target MCU to your project
 :: 
 set TARGET_MCU=atmega2560
-
 
 if "%1"=="" (
     @echo default selected
@@ -70,6 +69,7 @@ if "%1"=="spy" (
     set CCFLAGS=-c -DQ_SPY -g3 -O1 -fdata-sections -ffunction-sections -fshort-enums -mmcu=%TARGET_MCU% -fno-threadsafe-statics -Wall
 )
 
+mkdir %BINDIR%
 set LIBDIR=%BINDIR%
 set LIBFLAGS=rs
 mkdir %BINDIR%

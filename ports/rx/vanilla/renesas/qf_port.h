@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QP/C++  port to Renesas RX, Renesas RX compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 18, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,22 +35,22 @@
 #ifndef qf_port_h
 #define qf_port_h
 
-                    // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE               63
+        // The maximum number of active objects in the application, see NOTE01
+#define QF_MAX_ACTIVE           32
                        // The maximum number of event pools in the application
-#define QF_MAX_EPOOL                6
+#define QF_MAX_EPOOL            6
                                             // QF interrupt disabling/enabling
-#define QF_INT_DISABLE()            clr_psw_i()
-#define QF_INT_ENABLE()             set_psw_i()
+#define QF_INT_DISABLE()        clr_psw_i()
+#define QF_INT_ENABLE()         set_psw_i()
 
                                              // QF critical section entry/exit
-   // QF_CRIT_STAT_TYPE not defined: unconditional interrupt unlocking, NOTE01
-#define QF_CRIT_ENTRY(dummy)        QF_INT_DISABLE()
-#define QF_CRIT_EXIT(dummy)         QF_INT_ENABLE()
+   // QF_CRIT_STAT_TYPE not defined: unconditional interrupt unlocking, NOTE02
+#define QF_CRIT_ENTRY(dummy)    QF_INT_DISABLE()
+#define QF_CRIT_EXIT(dummy)     QF_INT_ENABLE()
 
                                          // QF ISR entry/exit, also see NOTE01
-#define QF_ISR_ENTRY()              QF_INT_ENABLE()
-#define QF_ISR_EXIT()               QF_INT_DISABLE()
+#define QF_ISR_ENTRY()          QF_INT_ENABLE()
+#define QF_ISR_EXIT()           QF_INT_DISABLE()
 
                                                          // inline definitions
 #pragma inline_asm clr_psw_i
@@ -67,6 +67,10 @@ extern "C" static void set_psw_i(void) { SETPSW I }
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:
+// The maximum number of active objects QF_MAX_ACTIVE can be increased
+// up to 63, if necessary. Here it is set to a lower level to save some RAM.
+//
+// NOTE02:
 // This policy does not allow to nest critical sections. Therefore interrupts
 // must be enabled in ISRs before calling any QP service. This should be no
 // problem, because if interrupts nesting is not desired, the interrupts can

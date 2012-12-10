@@ -5,7 +5,7 @@
 *  1. added definitions of the ISRs used in the DPP application.
 *  2. added Q_ERROR() assertions to exception handlers.
 *
-*  DATE: May 20, 2012
+*  DATE: Oct 19, 2012
 ***********************************************************************/
 #include "qp_port.h"
 #include "bsp.h"
@@ -98,9 +98,9 @@ void  INT_Excep_CMTU0_CMI0(void) {
     QF_ISR_ENTRY();     // inform the QF Vanilla kernel about entering the ISR
 
 #ifdef Q_SPY
-    QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
+    DPP::QS_tickTime_ += DPP::QS_tickPeriod_;// account for the clock rollover
 #endif
-    QF::TICK(&QS_Excep_CMTU0_CMT0);           // process all armed time events
+    QP::QF::TICK(&DPP::QS_Excep_CMTU0_CMT0);  // process all armed time events
 
     QF_ISR_EXIT();       // inform the QF Vanilla kernel about exiting the ISR
 }
@@ -194,24 +194,24 @@ void  INT_Excep_IRQ7(void){ }
 void  INT_Excep_IRQ8(void) {
     QF_ISR_ENTRY();     // inform the QF Vanilla kernel about entering the ISR
 
-    AO_Philo[0]->POST(Q_NEW(QEvt, MAX_PUB_SIG),            // for testing...
-                     &QS_Excep_IRQ8);
+    DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::PAUSE_SIG),
+                     &DPP::QS_Excep_IRQ8);
     QF_ISR_EXIT();       // inform the QF Vanilla kernel about exiting the ISR
 }
 //;0x0124 IRQ9
 void  INT_Excep_IRQ9(void) {
     QF_ISR_ENTRY();     // inform the QF Vanilla kernel about entering the ISR
 
-    AO_Table->POST(Q_NEW(QEvt, MAX_PUB_SIG),               // for testing...
-                   &QS_Excep_IRQ9);
+    DPP::AO_Philo[0]->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),// for testing...
+                   &DPP::QS_Excep_IRQ9);
     QF_ISR_EXIT();       // inform the QF Vanilla kernel about exiting the ISR
 }
 //;0x0128 IRQ10
 void  INT_Excep_IRQ10(void) {
     QF_ISR_ENTRY();     // inform the QF Vanilla kernel about entering the ISR
 
-    AO_Table->POST(Q_NEW(QEvt, MAX_PUB_SIG),               // for testing...
-                   &QS_Excep_IRQ10);
+    DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),   // for testing...
+                   &DPP::QS_Excep_IRQ10);
     QF_ISR_EXIT();       // inform the QF Vanilla kernel about exiting the ISR
 }
 //;0x012C IRQ11

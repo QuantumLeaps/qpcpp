@@ -29,7 +29,7 @@
         </option>
         <option>
           <name>Variant</name>
-          <version>19</version>
+          <version>20</version>
           <state>14</state>
         </option>
         <option>
@@ -87,7 +87,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>6.30.1.53141</state>
+          <state>6.40.4.54214</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -99,7 +99,7 @@
         </option>
         <option>
           <name>OGChipSelectEditMenu</name>
-          <state>STR912F	ST STR912F</state>
+          <state>STR912Fx44	ST STR912Fx44</state>
         </option>
         <option>
           <name>GenLowLevelInterface</name>
@@ -137,12 +137,12 @@
         </option>
         <option>
           <name>GFPUCoreSlave</name>
-          <version>19</version>
+          <version>20</version>
           <state>14</state>
         </option>
         <option>
           <name>GBECoreSlave</name>
-          <version>19</version>
+          <version>20</version>
           <state>14</state>
         </option>
         <option>
@@ -162,6 +162,10 @@
         <version>28</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>1</debug>
+        <option>
+          <name>CCOptimizationNoSizeConstraints</name>
+          <state>0</state>
+        </option>
         <option>
           <name>CCDefines</name>
           <state></state>
@@ -608,7 +612,7 @@
       <name>ILINK</name>
       <archiveVersion>0</archiveVersion>
       <data>
-        <version>14</version>
+        <version>15</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>1</debug>
         <option>
@@ -737,8 +741,7 @@
         </option>
         <option>
           <name>IlinkAdditionalLibs</name>
-          <state>$_QPCPP_$\ports\arm\vanilla\iar\dbg\qep_ARM966E-S.a</state>
-          <state>$_QPCPP_$\ports\arm\vanilla\iar\dbg\qf_ARM966E-S.a</state>
+          <state>$_QPCPP_$\ports\arm\vanilla\iar\dbg\libqp_ARM966E-S.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
@@ -775,10 +778,6 @@
         </option>
         <option>
           <name>CrcAlign</name>
-          <state>1</state>
-        </option>
-        <option>
-          <name>CrcAlgo</name>
           <state>1</state>
         </option>
         <option>
@@ -883,6 +882,16 @@
           <name>IlinkStackCallGraphFile</name>
           <state></state>
         </option>
+        <option>
+          <name>CrcAlgorithm</name>
+          <version>0</version>
+          <state>1</state>
+        </option>
+        <option>
+          <name>CrcUnitSize</name>
+          <version>0</version>
+          <state>0</state>
+        </option>
       </data>
     </settings>
     <settings>
@@ -939,7 +948,7 @@
         </option>
         <option>
           <name>Variant</name>
-          <version>19</version>
+          <version>20</version>
           <state>14</state>
         </option>
         <option>
@@ -997,7 +1006,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>6.30.1.53141</state>
+          <state>6.40.4.54214</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -1009,7 +1018,7 @@
         </option>
         <option>
           <name>OGChipSelectEditMenu</name>
-          <state>STR912F	ST STR912F</state>
+          <state>STR912Fx44	ST STR912Fx44</state>
         </option>
         <option>
           <name>GenLowLevelInterface</name>
@@ -1047,12 +1056,12 @@
         </option>
         <option>
           <name>GFPUCoreSlave</name>
-          <version>19</version>
+          <version>20</version>
           <state>14</state>
         </option>
         <option>
           <name>GBECoreSlave</name>
-          <version>19</version>
+          <version>20</version>
           <state>14</state>
         </option>
         <option>
@@ -1072,6 +1081,10 @@
         <version>28</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>0</debug>
+        <option>
+          <name>CCOptimizationNoSizeConstraints</name>
+          <state>0</state>
+        </option>
         <option>
           <name>CCDefines</name>
           <state>NDEBUG</state>
@@ -1518,7 +1531,7 @@
       <name>ILINK</name>
       <archiveVersion>0</archiveVersion>
       <data>
-        <version>14</version>
+        <version>15</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>0</debug>
         <option>
@@ -1647,8 +1660,7 @@
         </option>
         <option>
           <name>IlinkAdditionalLibs</name>
-          <state>$_QPCPP_$\ports\arm\vanilla\iar\rel\qep_ARM966E-S.a</state>
-          <state>$_QPCPP_$\ports\arm\vanilla\iar\rel\qf_ARM966E-S.a</state>
+          <state>$_QPCPP_$\ports\arm\vanilla\iar\rel\libqp_ARM966E-S.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
@@ -1685,10 +1697,6 @@
         </option>
         <option>
           <name>CrcAlign</name>
-          <state>1</state>
-        </option>
-        <option>
-          <name>CrcAlgo</name>
           <state>1</state>
         </option>
         <option>
@@ -1793,6 +1801,16 @@
           <name>IlinkStackCallGraphFile</name>
           <state></state>
         </option>
+        <option>
+          <name>CrcAlgorithm</name>
+          <version>0</version>
+          <state>1</state>
+        </option>
+        <option>
+          <name>CrcUnitSize</name>
+          <version>0</version>
+          <state>0</state>
+        </option>
       </data>
     </settings>
     <settings>
@@ -1849,7 +1867,7 @@
         </option>
         <option>
           <name>Variant</name>
-          <version>19</version>
+          <version>20</version>
           <state>14</state>
         </option>
         <option>
@@ -1907,7 +1925,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>6.30.1.53141</state>
+          <state>6.40.4.54214</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -1919,7 +1937,7 @@
         </option>
         <option>
           <name>OGChipSelectEditMenu</name>
-          <state>STR912F	ST STR912F</state>
+          <state>STR912Fx44	ST STR912Fx44</state>
         </option>
         <option>
           <name>GenLowLevelInterface</name>
@@ -1957,12 +1975,12 @@
         </option>
         <option>
           <name>GFPUCoreSlave</name>
-          <version>19</version>
+          <version>20</version>
           <state>14</state>
         </option>
         <option>
           <name>GBECoreSlave</name>
-          <version>19</version>
+          <version>20</version>
           <state>14</state>
         </option>
         <option>
@@ -1982,6 +2000,10 @@
         <version>28</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>1</debug>
+        <option>
+          <name>CCOptimizationNoSizeConstraints</name>
+          <state>0</state>
+        </option>
         <option>
           <name>CCDefines</name>
           <state>Q_SPY</state>
@@ -2428,7 +2450,7 @@
       <name>ILINK</name>
       <archiveVersion>0</archiveVersion>
       <data>
-        <version>14</version>
+        <version>15</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>1</debug>
         <option>
@@ -2557,9 +2579,7 @@
         </option>
         <option>
           <name>IlinkAdditionalLibs</name>
-          <state>$_QPCPP_$\ports\arm\vanilla\iar\spy\qep_ARM966E-S.a</state>
-          <state>$_QPCPP_$\ports\arm\vanilla\iar\spy\qf_ARM966E-S.a</state>
-          <state>$_QPCPP_$\ports\arm\vanilla\iar\spy\qs_ARM966E-S.a</state>
+          <state>$_QPCPP_$\ports\arm\vanilla\iar\spy\libqp_ARM966E-S.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
@@ -2596,10 +2616,6 @@
         </option>
         <option>
           <name>CrcAlign</name>
-          <state>1</state>
-        </option>
-        <option>
-          <name>CrcAlgo</name>
           <state>1</state>
         </option>
         <option>
@@ -2704,6 +2720,16 @@
           <name>IlinkStackCallGraphFile</name>
           <state></state>
         </option>
+        <option>
+          <name>CrcAlgorithm</name>
+          <version>0</version>
+          <state>1</state>
+        </option>
+        <option>
+          <name>CrcUnitSize</name>
+          <version>0</version>
+          <state>0</state>
+        </option>
       </data>
     </settings>
     <settings>
@@ -2752,6 +2778,10 @@
           <version>28</version>
           <wantNonLocal>0</wantNonLocal>
           <debug>1</debug>
+          <option>
+            <name>CCOptimizationNoSizeConstraints</name>
+            <state>0</state>
+          </option>
           <option>
             <name>CCDefines</name>
             <state></state>
@@ -2991,6 +3021,10 @@
           <wantNonLocal>0</wantNonLocal>
           <debug>0</debug>
           <option>
+            <name>CCOptimizationNoSizeConstraints</name>
+            <state>0</state>
+          </option>
+          <option>
             <name>CCDefines</name>
             <state>NDEBUG</state>
           </option>
@@ -3228,6 +3262,10 @@
           <version>28</version>
           <wantNonLocal>0</wantNonLocal>
           <debug>1</debug>
+          <option>
+            <name>CCOptimizationNoSizeConstraints</name>
+            <state>0</state>
+          </option>
           <option>
             <name>CCDefines</name>
             <state>Q_SPY</state>
@@ -3482,6 +3520,732 @@
     <file>
       <name>$PROJ_DIR$\main.cpp</name>
     </file>
+    <configuration>
+      <name>Debug</name>
+      <settings>
+        <name>ICCARM</name>
+        <data>
+          <version>28</version>
+          <wantNonLocal>0</wantNonLocal>
+          <debug>1</debug>
+          <option>
+            <name>CCOptimizationNoSizeConstraints</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCDefines</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCPreprocFile</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPreprocComments</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPreprocLine</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListCFile</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListCMnemonics</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListCMessages</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListAssFile</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListAssSource</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCEnableRemarks</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCDiagSuppress</name>
+            <state>Pa050</state>
+          </option>
+          <option>
+            <name>CCDiagRemark</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCDiagWarning</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCDiagError</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCObjPrefix</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>CCAllowList</name>
+            <version>1</version>
+            <state>1001000</state>
+          </option>
+          <option>
+            <name>CCDebugInfo</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IEndianMode</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IProcessor</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IExtraOptionsCheck</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IExtraOptions</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCLangConformance</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCSignedPlainChar</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>CCRequirePrototypes</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCMultibyteSupport</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCDiagWarnAreErr</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCCompilerRuntimeInfo</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IFpuProcessor</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>OutputFile</name>
+            <state>$FILE_BNAME$.o</state>
+          </option>
+          <option>
+            <name>CCLibConfigHeader</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>PreInclude</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CompilerMisraOverride</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCIncludePath2</name>
+            <state>$PROJ_DIR$\.</state>
+            <state>$_QPCPP_$\include</state>
+            <state>$_QPCPP_$\ports\arm\vanilla\iar</state>
+            <state>$PROJ_DIR$\STR91xlibrary\include</state>
+          </option>
+          <option>
+            <name>CCStdIncCheck</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCCodeSection</name>
+            <state>.text</state>
+          </option>
+          <option>
+            <name>IInterwork2</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IProcessorMode2</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCOptLevel</name>
+            <state>2</state>
+          </option>
+          <option>
+            <name>CCOptStrategy</name>
+            <version>0</version>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCOptLevelSlave</name>
+            <state>2</state>
+          </option>
+          <option>
+            <name>CompilerMisraRules98</name>
+            <version>0</version>
+            <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+          </option>
+          <option>
+            <name>CompilerMisraRules04</name>
+            <version>0</version>
+            <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+          </option>
+          <option>
+            <name>CCPosIndRopi</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPosIndRwpi</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPosIndNoDynInit</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IccLang</name>
+            <state>2</state>
+          </option>
+          <option>
+            <name>IccCDialect</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccAllowVLA</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IccCppDialect</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccExceptions</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccRTTI</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccStaticDestr</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccCppInlineSemantics</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccCmsis</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccFloatSemantics</name>
+            <state>0</state>
+          </option>
+        </data>
+      </settings>
+    </configuration>
+    <configuration>
+      <name>Release</name>
+      <settings>
+        <name>ICCARM</name>
+        <data>
+          <version>28</version>
+          <wantNonLocal>0</wantNonLocal>
+          <debug>0</debug>
+          <option>
+            <name>CCOptimizationNoSizeConstraints</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCDefines</name>
+            <state>NDEBUG</state>
+          </option>
+          <option>
+            <name>CCPreprocFile</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPreprocComments</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPreprocLine</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListCFile</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListCMnemonics</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListCMessages</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListAssFile</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListAssSource</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCEnableRemarks</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCDiagSuppress</name>
+            <state>Pa050</state>
+          </option>
+          <option>
+            <name>CCDiagRemark</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCDiagWarning</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCDiagError</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCObjPrefix</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>CCAllowList</name>
+            <version>1</version>
+            <state>1111111</state>
+          </option>
+          <option>
+            <name>CCDebugInfo</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IEndianMode</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IProcessor</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IExtraOptionsCheck</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IExtraOptions</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCLangConformance</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCSignedPlainChar</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>CCRequirePrototypes</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCMultibyteSupport</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCDiagWarnAreErr</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCCompilerRuntimeInfo</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IFpuProcessor</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>OutputFile</name>
+            <state>$FILE_BNAME$.o</state>
+          </option>
+          <option>
+            <name>CCLibConfigHeader</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>PreInclude</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CompilerMisraOverride</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCIncludePath2</name>
+            <state>$PROJ_DIR$\.</state>
+            <state>$_QPCPP_$\include</state>
+            <state>$_QPCPP_$\ports\arm\vanilla\iar</state>
+            <state>$PROJ_DIR$\STR91xlibrary\include</state>
+          </option>
+          <option>
+            <name>CCStdIncCheck</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCCodeSection</name>
+            <state>.text</state>
+          </option>
+          <option>
+            <name>IInterwork2</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IProcessorMode2</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCOptLevel</name>
+            <state>3</state>
+          </option>
+          <option>
+            <name>CCOptStrategy</name>
+            <version>0</version>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCOptLevelSlave</name>
+            <state>3</state>
+          </option>
+          <option>
+            <name>CompilerMisraRules98</name>
+            <version>0</version>
+            <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+          </option>
+          <option>
+            <name>CompilerMisraRules04</name>
+            <version>0</version>
+            <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+          </option>
+          <option>
+            <name>CCPosIndRopi</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPosIndRwpi</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPosIndNoDynInit</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IccLang</name>
+            <state>2</state>
+          </option>
+          <option>
+            <name>IccCDialect</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccAllowVLA</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IccCppDialect</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccExceptions</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccRTTI</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccStaticDestr</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccCppInlineSemantics</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccCmsis</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccFloatSemantics</name>
+            <state>0</state>
+          </option>
+        </data>
+      </settings>
+    </configuration>
+    <configuration>
+      <name>Spy</name>
+      <settings>
+        <name>ICCARM</name>
+        <data>
+          <version>28</version>
+          <wantNonLocal>0</wantNonLocal>
+          <debug>1</debug>
+          <option>
+            <name>CCOptimizationNoSizeConstraints</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCDefines</name>
+            <state>Q_SPY</state>
+          </option>
+          <option>
+            <name>CCPreprocFile</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPreprocComments</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPreprocLine</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListCFile</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListCMnemonics</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListCMessages</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListAssFile</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCListAssSource</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCEnableRemarks</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCDiagSuppress</name>
+            <state>Pa050</state>
+          </option>
+          <option>
+            <name>CCDiagRemark</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCDiagWarning</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCDiagError</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCObjPrefix</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>CCAllowList</name>
+            <version>1</version>
+            <state>1001000</state>
+          </option>
+          <option>
+            <name>CCDebugInfo</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IEndianMode</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IProcessor</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IExtraOptionsCheck</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IExtraOptions</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CCLangConformance</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCSignedPlainChar</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>CCRequirePrototypes</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCMultibyteSupport</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCDiagWarnAreErr</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCCompilerRuntimeInfo</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IFpuProcessor</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>OutputFile</name>
+            <state>$FILE_BNAME$.o</state>
+          </option>
+          <option>
+            <name>CCLibConfigHeader</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>PreInclude</name>
+            <state></state>
+          </option>
+          <option>
+            <name>CompilerMisraOverride</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCIncludePath2</name>
+            <state>$PROJ_DIR$\.</state>
+            <state>$_QPCPP_$\include</state>
+            <state>$_QPCPP_$\ports\arm\vanilla\iar</state>
+            <state>$PROJ_DIR$\STR91xlibrary\include</state>
+          </option>
+          <option>
+            <name>CCStdIncCheck</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCCodeSection</name>
+            <state>.text</state>
+          </option>
+          <option>
+            <name>IInterwork2</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IProcessorMode2</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCOptLevel</name>
+            <state>2</state>
+          </option>
+          <option>
+            <name>CCOptStrategy</name>
+            <version>0</version>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCOptLevelSlave</name>
+            <state>2</state>
+          </option>
+          <option>
+            <name>CompilerMisraRules98</name>
+            <version>0</version>
+            <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+          </option>
+          <option>
+            <name>CompilerMisraRules04</name>
+            <version>0</version>
+            <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+          </option>
+          <option>
+            <name>CCPosIndRopi</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPosIndRwpi</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>CCPosIndNoDynInit</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IccLang</name>
+            <state>2</state>
+          </option>
+          <option>
+            <name>IccCDialect</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccAllowVLA</name>
+            <state>0</state>
+          </option>
+          <option>
+            <name>IccCppDialect</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccExceptions</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccRTTI</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccStaticDestr</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccCppInlineSemantics</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccCmsis</name>
+            <state>1</state>
+          </option>
+          <option>
+            <name>IccFloatSemantics</name>
+            <state>0</state>
+          </option>
+        </data>
+      </settings>
+    </configuration>
   </group>
   <group>
     <name>STR91xlibrary</name>

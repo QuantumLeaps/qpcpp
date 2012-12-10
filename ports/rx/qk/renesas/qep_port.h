@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: QP/C++  port to Renesas RX
+// Product: QP/C++ port to Renesas RX
 // Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jul 02, 2012
+// Date of the Last Update:  Oct 18, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -34,8 +34,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef qep_port_h
 #define qep_port_h
-                                                // do NOT use the QP namespace
-#define Q_NO_NAMESPACE   1
 
 #include <stdint.h>  // exact-width integers, WG14/N843 C99 Standard, 7.18.1.1
 

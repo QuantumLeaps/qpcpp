@@ -11,57 +11,76 @@
 #include "dpp.h"
 #include "bsp.h"
 
+namespace DPP {
+
 Q_DEFINE_THIS_FILE
 
-/* Active object class -----------------------------------------------------*/
+// Active object class -------------------------------------------------------
 // @(/2/0) ...................................................................
-class Philo : public QActive {
+class Philo : public QP::QActive {
 private:
-    QTimeEvt m_timeEvt;
+    QP::QTimeEvt m_timeEvt;
 
 public:
     Philo();
 
 protected:
-    static QState initial(Philo *me, QEvent const *e);
-    static QState thinking(Philo *me, QEvent const *e);
-    static QState hungry(Philo *me, QEvent const *e);
-    static QState eating(Philo *me, QEvent const *e);
+    static QP::QState initial(Philo * const me, QP::QEvt const * const e);
+    static QP::QState thinking(Philo * const me, QP::QEvt const * const e);
+    static QP::QState hungry(Philo * const me, QP::QEvt const * const e);
+    static QP::QState eating(Philo * const me, QP::QEvt const * const e);
 };
 
-/* Local objects -----------------------------------------------------------*/
-static Philo l_philo[N_PHILO];                    /* storage for all Philos */
+// Local objects -------------------------------------------------------------
+static Philo l_philo[N_PHILO];   // storage for all Philos
 
-#define THINK_TIME  ((BSP_TICKS_PER_SEC) / 2)
-#define EAT_TIME    ((BSP_TICKS_PER_SEC) / 5)
+// helper function to provide a randomized think time for Philos
+inline QP::QTimeEvtCtr think_time() {
+    return static_cast<QP::QTimeEvtCtr>((BSP_random() % BSP_TICKS_PER_SEC)
+                                        + (BSP_TICKS_PER_SEC/2U));
+}
 
-                           /* helper macro to provide the ID of Philo "me_" */
-#define PHILO_ID(me_)    ((uint8_t)((me_) - l_philo))
+// helper function to provide a randomized eat time for Philos
+inline QP::QTimeEvtCtr eat_time() {
+    return static_cast<QP::QTimeEvtCtr>((BSP_random() % BSP_TICKS_PER_SEC)
+                                        + BSP_TICKS_PER_SEC);
+}
 
-enum InternalSignals {                                  /* internal signals */
+// helper function to provide the ID of Philo "me"
+inline uint8_t PHILO_ID(Philo const * const me) {
+    return static_cast<uint8_t>(me - l_philo);
+}
+
+enum InternalSignals {           // internal signals
     TIMEOUT_SIG = MAX_SIG
 };
 
-/* Global objects ----------------------------------------------------------*/
-QActive * const AO_Philo[N_PHILO] = {      /* "opaque" pointers to Philo AO */
-    (QActive *)&l_philo[0],
-    (QActive *)&l_philo[1],
-    (QActive *)&l_philo[2],
-    (QActive *)&l_philo[3],
-    (QActive *)&l_philo[4]
+// Global objects ------------------------------------------------------------
+QP::QActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AO
+    &l_philo[0],
+    &l_philo[1],
+    &l_philo[2],
+    &l_philo[3],
+    &l_philo[4]
 };
 
-/* Philo definition --------------------------------------------------------*/
+// Philo definition ----------------------------------------------------------
 // @(/2/0) ...................................................................
 // @(/2/0/1) .................................................................
-Philo::Philo() : QActive((QStateHandler)&Philo::initial), m_timeEvt(TIMEOUT_SIG) {
+Philo::Philo() 
+  : QActive(Q_STATE_CAST(&Philo::initial)),
+    m_timeEvt(TIMEOUT_SIG)
+{
 }
+
 // @(/2/0/2) .................................................................
 // @(/2/0/2/0)
-QState Philo::initial(Philo *me, QEvent const *e) {
-    static uint8_t registered; // starts off with 0, per C-standard
+QP::QState Philo::initial(Philo * const me, QP::QEvt const * const e) {
+    static bool registered = false; // starts off with 0, per C-standard
     (void)e; // suppress the compiler warning about unused parameter
     if (!registered) {
+        registered = true;
+
         QS_OBJ_DICTIONARY(&l_philo[0]);
         QS_OBJ_DICTIONARY(&l_philo[0].m_timeEvt);
         QS_OBJ_DICTIONARY(&l_philo[1]);
@@ -77,8 +96,6 @@ QState Philo::initial(Philo *me, QEvent const *e) {
         QS_FUN_DICTIONARY(&Philo::thinking);
         QS_FUN_DICTIONARY(&Philo::hungry);
         QS_FUN_DICTIONARY(&Philo::eating);
-
-        registered = (uint8_t)1;
     }
     QS_SIG_DICTIONARY(HUNGRY_SIG, me);  // signal for each Philos
     QS_SIG_DICTIONARY(TIMEOUT_SIG, me); // signal for each Philos
@@ -87,93 +104,117 @@ QState Philo::initial(Philo *me, QEvent const *e) {
     return Q_TRAN(&Philo::thinking);
 }
 // @(/2/0/2/1) ...............................................................
-QState Philo::thinking(Philo *me, QEvent const *e) {
+QP::QState Philo::thinking(Philo * const me, QP::QEvt const * const e) {
+    QP::QState status;
     switch (e->sig) {
         // @(/2/0/2/1)
         case Q_ENTRY_SIG: {
-            me->m_timeEvt.postIn(me, THINK_TIME);
-            return Q_HANDLED();
+            me->m_timeEvt.postIn(me, think_time());
+            status = Q_HANDLED();
+            break;
+        }
+        // @(/2/0/2/1)
+        case Q_EXIT_SIG: {
+            (void)me->m_timeEvt.disarm();
+            status = Q_HANDLED();
+            break;
         }
         // @(/2/0/2/1/0)
         case TIMEOUT_SIG: {
-            BSP_busyDelay();
-            return Q_TRAN(&Philo::hungry);
+            status = Q_TRAN(&Philo::hungry);
+            break;
         }
         // @(/2/0/2/1/1)
-        case TERMINATE_SIG: // intentionally fall through
+        case EAT_SIG: // intentionally fall through
         case DONE_SIG: {
-            Q_ERROR();
-            return Q_HANDLED();
+            /* EAT or DONE must be for other Philos than this one */
+            Q_ASSERT(Q_EVT_CAST(TableEvt)->philoNum != PHILO_ID(me));
+            status = Q_HANDLED();
+            break;
         }
-        // @(/2/0/2/1/2)
-        case EAT_SIG: {
-            Q_ASSERT(((TableEvt const *)e)->philoNum != PHILO_ID(me));
-            return Q_HANDLED();
+        default: {
+            status = Q_SUPER(&QHsm::top);
+            break;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }
 // @(/2/0/2/2) ...............................................................
-QState Philo::hungry(Philo *me, QEvent const *e) {
+QP::QState Philo::hungry(Philo * const me, QP::QEvt const * const e) {
+    QP::QState status;
     switch (e->sig) {
         // @(/2/0/2/2)
         case Q_ENTRY_SIG: {
             TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
             pe->philoNum = PHILO_ID(me);
             AO_Table->POST(pe, me);
-            return Q_HANDLED();
+            status = Q_HANDLED();
+            break;
         }
         // @(/2/0/2/2/0)
         case EAT_SIG: {
             // @(/2/0/2/2/0/0)
-            if (((TableEvt const *)e)->philoNum == PHILO_ID(me)) {
-                BSP_busyDelay();
-                return Q_TRAN(&Philo::eating);
+            if (Q_EVT_CAST(TableEvt)->philoNum == PHILO_ID(me)) {
+                status = Q_TRAN(&Philo::eating);
+            }
+            else {
+                status = Q_UNHANDLED();
             }
             break;
         }
         // @(/2/0/2/2/1)
-        case TERMINATE_SIG: // intentionally fall through
         case DONE_SIG: {
-            Q_ERROR();
-            return Q_HANDLED();
+            /* DONE must be for other Philos than this one */
+            Q_ASSERT(Q_EVT_CAST(TableEvt)->philoNum != PHILO_ID(me));
+            status = Q_HANDLED();
+            break;
+        }
+        default: {
+            status = Q_SUPER(&QHsm::top);
+            break;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }
 // @(/2/0/2/3) ...............................................................
-QState Philo::eating(Philo *me, QEvent const *e) {
+QP::QState Philo::eating(Philo * const me, QP::QEvt const * const e) {
+    QP::QState status;
     switch (e->sig) {
         // @(/2/0/2/3)
         case Q_ENTRY_SIG: {
-            me->m_timeEvt.postIn(me, EAT_TIME);
-            return Q_HANDLED();
+            me->m_timeEvt.postIn(me, eat_time());
+            status = Q_HANDLED();
+            break;
         }
         // @(/2/0/2/3)
         case Q_EXIT_SIG: {
             TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
             pe->philoNum = PHILO_ID(me);
-            QF::PUBLISH(pe, me);
-            return Q_HANDLED();
+            QP::QF::PUBLISH(pe, me);
+            (void)me->m_timeEvt.disarm();
+            status = Q_HANDLED();
+            break;
         }
         // @(/2/0/2/3/0)
         case TIMEOUT_SIG: {
-            BSP_busyDelay();
-            return Q_TRAN(&Philo::thinking);
+            status = Q_TRAN(&Philo::thinking);
+            break;
         }
         // @(/2/0/2/3/1)
-        case TERMINATE_SIG: // intentionally fall through
+        case EAT_SIG: // intentionally fall through
         case DONE_SIG: {
-            Q_ERROR();
-            return Q_HANDLED();
+            /* EAT or DONE must be for other Philos than this one */
+            Q_ASSERT(Q_EVT_CAST(TableEvt)->philoNum != PHILO_ID(me));
+            status = Q_HANDLED();
+            break;
         }
-        // @(/2/0/2/3/2)
-        case EAT_SIG: {
-            Q_ASSERT(((TableEvt const *)e)->philoNum != PHILO_ID(me));
-            return Q_HANDLED();
+        default: {
+            status = Q_SUPER(&QHsm::top);
+            break;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }
 
 
+}                                                             // namespace DPP

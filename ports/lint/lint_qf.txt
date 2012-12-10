@@ -166,7 +166,7 @@
 "D:\qp\qpcpp\include\qevt.h" 250 1 Info 755: global macro 'QEvent' (line 250, file D:\qp\qpcpp\include\qevt.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 82 1 Info 755: global macro 'QS_OBJ' (line 82, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 86 1 Info 755: global macro 'QS_OBJ_DICTIONARY' (line 86, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qf.h" 1018 1 Info 755: global macro 'PUBLISH' (line 1018, file D:\qp\qpcpp\include\qf.h) not referenced
+"D:\qp\qpcpp\include\qf.h" 1016 1 Info 755: global macro 'PUBLISH' (line 1016, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\include\qmpool.h" 206 1 Info 755: global macro 'QF_MPOOL_EL' (line 206, file D:\qp\qpcpp\include\qmpool.h) not referenced
 "D:\qp\qpcpp\include\qf.h" 946 1 Info 755: global macro 'Q_NEW' (line 946, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\include\qassert.h" 195 1 Info 755: global macro 'Q_ENSURE' (line 195, file D:\qp\qpcpp\include\qassert.h) not referenced
@@ -226,7 +226,7 @@
 "D:\qp\qpcpp\include\qs_dummy.h" 60 1 Info 755: global macro 'QS_GET_BYTE' (line 60, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 61 1 Info 755: global macro 'QS_GET_BLOCK' (line 61, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qep.h" 75 1 Info 755: global macro 'Q_EVT_CAST' (line 75, file D:\qp\qpcpp\include\qep.h) not referenced
-"D:\qp\qpcpp\include\qf.h" 1017 1 Info 755: global macro 'TICK' (line 1017, file D:\qp\qpcpp\include\qf.h) not referenced
+"D:\qp\qpcpp\include\qf.h" 1015 1 Info 755: global macro 'TICK' (line 1015, file D:\qp\qpcpp\include\qf.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 47 1 Info 755: global macro 'QS_INIT' (line 47, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 68 1 Info 755: global macro 'QS_I8' (line 68, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 70 1 Info 755: global macro 'QS_I16' (line 70, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
@@ -271,6 +271,7 @@
 "D:\qp\qpcpp\ports\lint\qk_port.h" 126 1 Info 768: global struct member 'reent::foo' (line 126, file D:\qp\qpcpp\ports\lint\qk_port.h) not referenced
 "D:\qp\qpcpp\qf\source\qeq_lifo.cpp" 47 1 Info 1714: Member function 'QP::QEQueue::postLIFO(const struct QP::QEvt *)' (line 47, file D:\qp\qpcpp\qf\source\qeq_lifo.cpp) not referenced [MISRA C++ Rule 0-1-10]
 "D:\qp\qpcpp\include\qequeue.h" 214 1 Info 1714: Member function 'QP::QEQueue::getNFree(void) const' (line 214, file D:\qp\qpcpp\include\qequeue.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qequeue.h" 228 1 Info 1714: Member function 'QP::QEQueue::isEmpty(void) const' (line 228, file D:\qp\qpcpp\include\qequeue.h) not referenced [MISRA C++ Rule 0-1-10]
 "D:\qp\qpcpp\include\qpset.h" 99 1 Info 1714: Member function 'QP::QPSet8::isEmpty(void) const' (line 99, file D:\qp\qpcpp\include\qpset.h) not referenced [MISRA C++ Rule 0-1-10]
 "D:\qp\qpcpp\include\qpset.h" 105 1 Info 1714: Member function 'QP::QPSet8::notEmpty(void) const' (line 105, file D:\qp\qpcpp\include\qpset.h) not referenced [MISRA C++ Rule 0-1-10]
 "D:\qp\qpcpp\include\qpset.h" 111 1 Info 1714: Member function 'QP::QPSet8::hasElement(uint8_t) const' (line 111, file D:\qp\qpcpp\include\qpset.h) not referenced [MISRA C++ Rule 0-1-10]
@@ -341,6 +342,6 @@ Count   Type    Number  Text
 5       Info    768     global struct member '___' (___) not referenced
 5       Info    769     global enumeration constant '___' (___) not referenced
 1       Info    843     Variable '___' (___) could be declared as const
-56      Info    1714    Member function '___' (___) not referenced
+57      Info    1714    Member function '___' (___) not referenced
 1       Note    974     Worst case function for stack usage: ___ See +stack for a full report.
 5       Note    1960    Violates MISRA C++ 2008 Required Rule ___, ___

@@ -9,7 +9,7 @@ if "%1"=="rel" (
    set CONF=dbg
 )
 @echo on
-arm-eabi-insight -x jlink.gdb %CONF%\dpp-qk.elf
+arm-eabi-insight -x jlink.gdb %CONF%\dpp.elf
 
 @echo off
 endlocal

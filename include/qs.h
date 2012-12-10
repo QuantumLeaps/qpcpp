@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QP/C++
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jul 08, 2012
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Oct 10, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -771,7 +771,7 @@ QP_END_
     /// \brief Internal QS macro to output an unformatted event signal
     /// data element
     /// \note the size of the pointer depends on the macro #Q_SIGNAL_SIZE.
-    #define QS_SIG_(sig_)    (QP_ QS::u8_(static_cast<uint8_t>(sig_))))
+    #define QS_SIG_(sig_)    (QP_ QS::u8_(static_cast<uint8_t>(sig_)))
 #elif (Q_SIGNAL_SIZE == 2)
     #define QS_SIG_(sig_)    (QP_ QS::u16_(static_cast<uint16_t>(sig_)))
 #elif (Q_SIGNAL_SIZE == 4)
@@ -866,7 +866,7 @@ QP_END_
 
 /// \brief Output formatted 32-bit floating point number to the QS record
 #define QS_F32(width_, data_) \
-    QP_ QS::f32(static_cast<uint8_t>((static_cast<uint8_t>((width_) << 4)) \
+    (QP_ QS::f32(static_cast<uint8_t>((static_cast<uint8_t>((width_) << 4)) \
         | static_cast<uint8_t>(QP_ QS_F32_T)), (data_)))
 
 /// \brief Output formatted 64-bit floating point number to the QS record

@@ -1,8 +1,8 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for MSP430, QK port, IAR compiler
-:: Last Updated for Version: 4.4.00
-:: Date of the Last Update:  Apr 19, 2012
+:: Last Updated for Version: 4.5.02
+:: Date of the Last Update:  Oct 09, 2012
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -26,7 +26,7 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http:::www.gnu.org/licenses/>.
+:: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
 :: Quantum Leaps Web sites: http://www.quantum-leaps.com
@@ -67,9 +67,10 @@ if "%1"=="spy" (
     set CCFLAGS=-I%IAR_430%\430\inc -I%IAR_430%\430\inc\dlib -Ohz --eec++ --debug -e --double=32 --reduce_stack_usage --dlib_config %IAR_430%\430\lib\dlib\dl430fn.h --diag_suppress Pa050 -DQ_SPY
 )
 
+mkdir %BINDIR%
 set LIBDIR=%BINDIR%
 set LIBFLAGS=
-mkdir %BINDIR%
+erase %LIBDIR%\libqp.r43
 
 :: QEP ----------------------------------------------------------------------
 set SRCDIR=..\..\..\..\qep\source

@@ -14,8 +14,8 @@
 //Q_DEFINE_THIS_FILE
 
 /* Active object class -----------------------------------------------------*/
-// $(AOs::Philo) .............................................................
-class Philo : public QActive {
+// @(/2/0) ...................................................................
+class Philo : public QP::QActive {
 private:
     QTimeEvt m_timeEvt;
 
@@ -23,10 +23,10 @@ public:
     Philo();
 
 protected:
-    static QState initial(Philo *me, QEvent const *e);
-    static QState thinking(Philo *me, QEvent const *e);
-    static QState hungry(Philo *me, QEvent const *e);
-    static QState eating(Philo *me, QEvent const *e);
+    static QP::QState initial(Philo * const me, QP::QEvt const * const e);
+    static QP::QState thinking(Philo * const me, QP::QEvt const * const e);
+    static QP::QState hungry(Philo * const me, QP::QEvt const * const e);
+    static QP::QState eating(Philo * const me, QP::QEvt const * const e);
 };
 
 /* Local objects -----------------------------------------------------------*/
@@ -52,13 +52,17 @@ QActive * const AO_Philo[N_PHILO] = {      /* "opaque" pointers to Philo AO */
 };
 
 /* Philo definition --------------------------------------------------------*/
-// $(AOs::Philo) .............................................................
-// $(AOs::Philo::Philo) ......................................................
-Philo::Philo() : QActive((QStateHandler)&Philo::initial), m_timeEvt(TIMEOUT_SIG) {
+// @(/2/0) ...................................................................
+// @(/2/0/1) .................................................................
+Philo::Philo() 
+  : QActive((QStateHandler)&Philo::initial),
+    m_timeEvt(TIMEOUT_SIG)
+{
 }
-// $(AOs::Philo::Statechart) .................................................
+
+// @(/2/0/2) .................................................................
 // @(/2/0/2/0)
-QState Philo::initial(Philo *me, QEvent const *e) {
+QP::QState Philo::initial(Philo * const me, QP::QEvt const * const e) {
     static uint8_t registered; // starts off with 0, per C-standard
     (void)e; // suppress the compiler warning about unused parameter
     if (!registered) {
@@ -86,66 +90,90 @@ QState Philo::initial(Philo *me, QEvent const *e) {
     //me->subscribe(EAT_SIG);
     return Q_TRAN(&Philo::thinking);
 }
-// $(AOs::Philo::Statechart::thinking) .......................................
-QState Philo::thinking(Philo *me, QEvent const *e) {
+// @(/2/0/2/1) ...............................................................
+QP::QState Philo::thinking(Philo * const me, QP::QEvt const * const e) {
+    QP::QState status;
     switch (e->sig) {
         // @(/2/0/2/1)
         case Q_ENTRY_SIG: {
             me->m_timeEvt.postIn(me, THINK_TIME);
-            return Q_HANDLED();
+            status = Q_HANDLED();
+            break;
         }
         // @(/2/0/2/1/0)
         case TIMEOUT_SIG: {
             BSP_busyDelay();
-            return Q_TRAN(&Philo::hungry);
+            status = Q_TRAN(&Philo::hungry);
+            break;
+        }
+        default: {
+            status = Q_SUPER(&QHsm::top);
+            break;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }
-// $(AOs::Philo::Statechart::hungry) .........................................
-QState Philo::hungry(Philo *me, QEvent const *e) {
+// @(/2/0/2/2) ...............................................................
+QP::QState Philo::hungry(Philo * const me, QP::QEvt const * const e) {
+    QP::QState status;
     switch (e->sig) {
         // @(/2/0/2/2)
         case Q_ENTRY_SIG: {
             TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
             pe->philoNum = PHILO_ID(me);
             AO_Table->POST(pe, me);
-            return Q_HANDLED();
+            status = Q_HANDLED();
+            break;
         }
         // @(/2/0/2/2/0)
         case EAT_SIG: {
             // @(/2/0/2/2/0/0)
             if (((TableEvt const *)e)->philoNum == PHILO_ID(me)) {
                 BSP_busyDelay();
-                return Q_TRAN(&Philo::eating);
+                status = Q_TRAN(&Philo::eating);
+            }
+            else {
+                status = Q_UNHANDLED();
             }
             break;
         }
+        default: {
+            status = Q_SUPER(&QHsm::top);
+            break;
+        }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }
-// $(AOs::Philo::Statechart::eating) .........................................
-QState Philo::eating(Philo *me, QEvent const *e) {
+// @(/2/0/2/3) ...............................................................
+QP::QState Philo::eating(Philo * const me, QP::QEvt const * const e) {
+    QP::QState status;
     switch (e->sig) {
         // @(/2/0/2/3)
         case Q_ENTRY_SIG: {
             me->m_timeEvt.postIn(me, EAT_TIME);
-            return Q_HANDLED();
+            status = Q_HANDLED();
+            break;
         }
         // @(/2/0/2/3)
         case Q_EXIT_SIG: {
             TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
             pe->philoNum = PHILO_ID(me);
             AO_Table->POST(pe, me);
-            return Q_HANDLED();
+            status = Q_HANDLED();
+            break;
         }
         // @(/2/0/2/3/0)
         case TIMEOUT_SIG: {
             BSP_busyDelay();
-            return Q_TRAN(&Philo::thinking);
+            status = Q_TRAN(&Philo::thinking);
+            break;
+        }
+        default: {
+            status = Q_SUPER(&QHsm::top);
+            break;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }
 
 

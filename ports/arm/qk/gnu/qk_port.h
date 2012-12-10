@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QK/C++, ARM, ARM port, GNU toolset
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Nov 09, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -37,14 +37,8 @@
 
 extern "C" {
     void QK_irq(void);
-    void QK_fiq(void);
-
     void BSP_irq(void);
-    void BSP_fiq(void);
 }
-
-                                  // allow using the QK priority ceiling mutex
-#define QK_MUTEX  1
 
 #include "qk.h"                    // QK platform-independent public interface
 

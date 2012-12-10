@@ -35,6 +35,6 @@ void __cxa_guard_acquire() {
 void __cxa_guard_release() {
 }
 //............................................................................
-//void *__dso_handle = 0;
+void *__dso_handle = 0;
 
 }                                                                // extern "C"

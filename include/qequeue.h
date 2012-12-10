@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QP/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Sep 26, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -213,6 +213,20 @@ public:
     /// \sa QActive::defer(), QActive::recall()
     QEQueueCtr getNFree(void) const {
         return m_nFree;
+    }
+
+    /// \brief "raw" thread-safe QF event queue operation to find out
+    /// if the queue is empty
+    ///
+    /// \note This operation needs to be used with caution because the
+    /// queue status can change unexpectedly. The main intent for using
+    /// this operation is in conjunction with event deferral. In this
+    /// case the queue is accessed only from a single thread (by a single AO),
+    /// so no other entitiy can post events to the queue.
+    ///
+    /// \sa QActive::defer(), QActive::recall()
+    bool isEmpty(void) const {
+        return m_frontEvt == static_cast<QEvt const *>(0);
     }
 
 private:

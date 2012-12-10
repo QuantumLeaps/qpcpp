@@ -354,7 +354,7 @@
         </option>
         <option>
           <name>IccCppDialect</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IccRequirePrototypes2</name>
@@ -748,9 +748,7 @@
         </option>
         <option>
           <name>IlinkAdditionalLibs</name>
-          <state>$_QPCPP_$\ports\rx\qk\iar\dbg\libqep_RX600.a</state>
-          <state>$_QPCPP_$\ports\rx\qk\iar\dbg\libqf_RX600.a</state>
-          <state>$_QPCPP_$\ports\rx\qk\iar\dbg\libqk_RX600.a</state>
+          <state>$_QPCPP_$\ports\rx\qk\iar\dbg\libqp_RX600.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
@@ -1248,7 +1246,7 @@
         </option>
         <option>
           <name>IccCppDialect</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IccRequirePrototypes2</name>
@@ -1642,9 +1640,7 @@
         </option>
         <option>
           <name>IlinkAdditionalLibs</name>
-          <state>$_QPCPP_$\ports\rx\qk\iar\dbg\libqep_RX600.a</state>
-          <state>$_QPCPP_$\ports\rx\qk\iar\dbg\libqf_RX600.a</state>
-          <state>$_QPCPP_$\ports\rx\qk\iar\dbg\libqk_RX600.a</state>
+          <state>$_QPCPP_$\ports\rx\qk\iar\dbg\libqp_RX600.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
@@ -2142,7 +2138,7 @@
         </option>
         <option>
           <name>IccCppDialect</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IccRequirePrototypes2</name>
@@ -2536,10 +2532,7 @@
         </option>
         <option>
           <name>IlinkAdditionalLibs</name>
-          <state>$_QPCPP_$\ports\rx\qk\iar\spy\libqep_RX600.a</state>
-          <state>$_QPCPP_$\ports\rx\qk\iar\spy\libqf_RX600.a</state>
-          <state>$_QPCPP_$\ports\rx\qk\iar\spy\libqk_RX600.a</state>
-          <state>$_QPCPP_$\ports\rx\qk\iar\spy\libqs_RX600.a</state>
+          <state>$_QPCPP_$\ports\rx\qk\iar\spy\libqp_RX600.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>

@@ -1,7 +1,7 @@
 /*****************************************************************************
-* Product: QDK/C++_ARM-GNU_AT91SAM7S-EK, QK-port
+* Product: QDK/C++_ARM-GNU_AT91SAM7S-EK
 * Last Updated for Version: 4.1.02
-* Date of the Last Update:  Jan 13, 2010
+* Date of the Last Update:  Jan 12, 2010
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -62,7 +62,6 @@ SECTIONS {
         *(.text.fastcode)   /* all functions explicitly placed in .fastcode */
         *(.text._ZN2QF4tickEv)                                /* QF::tick() */
         *(.text._ZN2QF3runEv)                                  /* QF::run() */
-        *(.text.QK_schedule_)
         /* add other modules here ... */
 
         . = ALIGN (4);

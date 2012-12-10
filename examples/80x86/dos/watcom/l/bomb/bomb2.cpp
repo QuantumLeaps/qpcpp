@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product:  Time Bomb Example with "State Table"
-// Last Updated for Version: 4.1.01
-// Date of the Last Update:  Nov 04, 2009
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Nov 22, 2009
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -52,7 +52,7 @@ class Bomb2 : public StateTable {                              // the Bomb FSM
 public:
     Bomb2(uint8_t defuse);                                      // public ctor
 
-    static void initial     (Bomb2 *me);             // the initial transition
+    static void initial     (Bomb2 *me, Event const *e); // initial transition
 
     static void setting_UP  (Bomb2 *me, Event const *e);   // transition func.
     static void setting_DOWN(Bomb2 *me, Event const *e);   // transition func.
@@ -87,7 +87,7 @@ Bomb2::Bomb2(uint8_t defuse)
       m_defuse(defuse)
 {}
 //............................................................................
-void Bomb2::initial(Bomb2 *me) {
+void Bomb2::initial(Bomb2 *me, Event const *) {
     me->m_timeout = INIT_TIMEOUT;
     TRAN(SETTING_STATE);
 }

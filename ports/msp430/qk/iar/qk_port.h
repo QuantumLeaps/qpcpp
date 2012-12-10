@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: QK/C++ port, MSP430, QK port, IAR-compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Product: QK/C++ port, MSP430
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 09, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -34,7 +34,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef qk_port_h
 #define qk_port_h
-
                                                 // QK interrupt entry and exit
 #define QK_ISR_ENTRY()    (++QK_intNest_)
 
@@ -45,6 +44,9 @@
         if (p != (uint8_t)0) { \
             QK_sched_(p); \
         } \
+    } \
+    else { \
+        Q_ERROR(); \
     } \
 } while (0)
 

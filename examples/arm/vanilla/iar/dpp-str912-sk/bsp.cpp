@@ -1,63 +1,79 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: Board Support Package for the STR912-SK Evaluaiton Board
-// Last Updated for Version: 4.3.00
-// Date of the Last Update:  Nov 08, 2011
+// Product: Board Support Package for the STR912-SK board, Vanilla kernel
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 12, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2011 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
 
+extern "C" {
+    #include "91x_lib.h"                                       // ST ST91x MCU
+}
+
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
+
 Q_DEFINE_THIS_FILE
 
 // Local objects -------------------------------------------------------------
+static uint32_t l_rnd;
+
 static u8 const l_gpioPin[] = {
-    0,               // unused */
+    0,               // unused
 
-    GPIO_Pin_0,      // LED  1 */
-    GPIO_Pin_1,      // LED  2 */
-    GPIO_Pin_2,      // LED  3 */
-    GPIO_Pin_3,      // LED  4 */
-    GPIO_Pin_4,      // LED  5 */
-    GPIO_Pin_5,      // LED  6 */
-    GPIO_Pin_6,      // LED  7 */
-    GPIO_Pin_7,      // LED  8 */
+    GPIO_Pin_0,      // LED  1
+    GPIO_Pin_1,      // LED  2
+    GPIO_Pin_2,      // LED  3
+    GPIO_Pin_3,      // LED  4
+    GPIO_Pin_4,      // LED  5
+    GPIO_Pin_5,      // LED  6
+    GPIO_Pin_6,      // LED  7
+    GPIO_Pin_7,      // LED  8
 
-    GPIO_Pin_0,      // LED  9 */
-    GPIO_Pin_1,      // LED 10 */
-    GPIO_Pin_2,      // LED 11 */
-    GPIO_Pin_3,      // LED 12 */
-    GPIO_Pin_4,      // LED 13 */
-    GPIO_Pin_5,      // LED 14 */
-    GPIO_Pin_6,      // LED 15 */
-    GPIO_Pin_7       // LED 16 */
+    GPIO_Pin_0,      // LED  9
+    GPIO_Pin_1,      // LED 10
+    GPIO_Pin_2,      // LED 11
+    GPIO_Pin_3,      // LED 12
+    GPIO_Pin_4,      // LED 13
+    GPIO_Pin_5,      // LED 14
+    GPIO_Pin_6,      // LED 15
+    GPIO_Pin_7       // LED 16
 };
 
-#define LED_ON(num_)       GPIO_WriteBit(GPIO6, l_gpioPin[num_], Bit_RESET)
-#define LED_OFF(num_)      GPIO_WriteBit(GPIO6, l_gpioPin[num_], Bit_SET)
-#define LED_ON_ALL()       GPIO_WriteBit(GPIO6, GPIO_Pin_All,    Bit_RESET)
-#define LED_OFF_ALL()      GPIO_WriteBit(GPIO6, GPIO_Pin_All,    Bit_SET)
+#define LED_ON(num_)     GPIO_WriteBit(GPIO6, DPP::l_gpioPin[num_], Bit_RESET)
+#define LED_OFF(num_)    GPIO_WriteBit(GPIO6, DPP::l_gpioPin[num_], Bit_SET)
+#define LED_ON_ALL()     GPIO_WriteBit(GPIO6, GPIO_Pin_All,    Bit_RESET)
+#define LED_OFF_ALL()    GPIO_WriteBit(GPIO6, GPIO_Pin_All,    Bit_SET)
 
 typedef void (*IntVector)(void);              // IntVector pointer-to-function
 
@@ -73,19 +89,19 @@ typedef void (*IntVector)(void);              // IntVector pointer-to-function
 
 
 #define BSP_TIM3_PERIOD    \
-    (BSP_CPU_PERIPH_HZ / BSP_TIM3_PRESCALER / BSP_TICKS_PER_SEC)
+    (BSP_CPU_PERIPH_HZ / BSP_TIM3_PRESCALER / DPP::BSP_TICKS_PER_SEC)
 
 #ifdef Q_SPY
     static uint32_t l_currTime32;
     static uint16_t l_prevTime16;
     static uint8_t const l_TIM3_IRQHandler = 0;
     enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
+        PHILO_STAT = QP::QS_USER
     };
 #endif
 
 //............................................................................
-__arm void BSP_irq(void) {
+extern "C" __arm void BSP_irq(void) {
     IntVector vect = (IntVector)VIC0->VAR;           // read the VAR from VIC0
     IntVector vect1 = (IntVector)VIC1->VAR;          // read the VAR from VIC1
 
@@ -97,13 +113,13 @@ __arm void BSP_irq(void) {
     VIC1->VAR = 0;                            // send End-Of-Interrupt to VIC1
 }
 //............................................................................
-__arm void BSP_fiq(void) {
+extern "C" __arm void BSP_fiq(void) {
     // TBD: implement the FIQ handler directly right here, see NOTE02
     // NOTE: Do NOT enable interrupts throughout the whole FIQ processing.
-    // NOTE: Do NOT write EOI to the AIC
+    // NOTE: Do NOT write EOI to the VIC
 }
 // ISRs ----------------------------------------------------------------------
-__arm void TIM3_IRQHandler(void) {
+extern "C" __arm void TIM3_IRQHandler(void) {
     TIM3->OC1R += BSP_TIM3_PERIOD - 1;      // set the output compare register
     TIM3->SR &= ~TIM_IT_OC1;                // clear interrupt source (Timer3)
 
@@ -115,76 +131,11 @@ __arm void TIM3_IRQHandler(void) {
     }
 #endif
 
-    QF::TICK(&l_TIM3_IRQHandler);      // process all arm time events (timers)
+    QP::QF::TICK(&l_TIM3_IRQHandler);  // process all arm time events (timers)
 }
 //............................................................................
-static __arm void ISR_spur(void) {
+extern "C" __arm void ISR_spur(void) {
 }
-//............................................................................
-__arm void QF::onStartup(void) {
-    TIM_InitTypeDef TIM_InitStruct;
-
-    SCU_APBPeriphClockConfig(__TIM23, ENABLE);
-    TIM_DeInit(TIM3);
-
-    TIM_StructInit(&TIM_InitStruct);
-    TIM_InitStruct.TIM_Mode           = TIM_OCM_CHANNEL_1;
-    TIM_InitStruct.TIM_OC1_Modes      = TIM_TIMING;
-    TIM_InitStruct.TIM_Clock_Source   = TIM_CLK_APB;
-    TIM_InitStruct.TIM_Clock_Edge     = TIM_CLK_EDGE_RISING;
-    TIM_InitStruct.TIM_Prescaler      = BSP_TIM3_PRESCALER - 1;
-    TIM_InitStruct.TIM_Pulse_Level_1  = TIM_HIGH;
-    TIM_InitStruct.TIM_Pulse_Length_1 = BSP_TIM3_PERIOD - 1;
-    TIM_Init(TIM3, &TIM_InitStruct);
-
-                                   // configure the VIC for the TIM2 interrupt
-    VIC_Config(TIM3_ITLine, VIC_IRQ, BSP_TICK_PRIO);
-    VIC_ITCmd(TIM3_ITLine, ENABLE);
-
-    TIM_ITConfig(TIM3, TIM_IT_OC1, ENABLE);
-    TIM_CounterCmd(TIM3, TIM_CLEAR);
-    TIM_CounterCmd(TIM3, TIM_START);
-}
-//............................................................................
-void QF::onCleanup(void) {
-}
-//............................................................................
-__arm void QF::onIdle(void) {         // NOTE: called with interrupts DISABLED
-
-    LED_ON(16);
-    LED_OFF(16);
-
-#ifdef Q_SPY                        // use the idle cycles for QS transmission
-
-    QF_INT_ENABLE();
-    if ((UART0->FR & 0x80) != 0) {                           // TX FIFO empty?
-        uint16_t nBytes = BSP_UART_TX_FIFO;         // capacity of the TX FIFO
-        uint8_t const *block;
-
-        QF_INT_DISABLE();
-        block = QS::getBlock(&nBytes);       // get the data block to transfer
-        QF_INT_ENABLE();
-
-        while (nBytes-- != 0) {
-            UART0->DR = *block++;             // stick the byte to the TX FIFO
-        }
-    }
-
-#elif defined NDEBUG    // only if not debugging (idle mode hinders debugging)
-    // shut down unused peripherals to save power ...
-//    SCU_EnterIdleMode();            // Power-Management: disable the CPU clock
-// NOTE: idle or sleep mode hangs the J-TAG, it's difficult to
-// get control of the MCU again!!!
-    // NOTE: an interrupt starts the CPU clock again
-    QF_INT_ENABLE();          // enable interrupts as soon as CPU clock starts
-
-#else
-
-    QF_INT_ENABLE();
-
-#endif
-}
-
 //............................................................................
 void BSP_init(void) {
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -215,16 +166,20 @@ void BSP_init(void) {
     GPIO_InitStruct.GPIO_Alternate   = GPIO_OutputAlt1;
     GPIO_Init(GPIO6, &GPIO_InitStruct);
 
+    BSP_randomSeed(1234);
+
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
+    QS_RESET();
+    QS_OBJ_DICTIONARY(&l_TIM3_IRQHandler);
 }
 //............................................................................
-void BSP_busyDelay(void) {
+void BSP_terminate(int16_t const result) {
+    (void)result;
 }
-
 //............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == (uint8_t)'e') {              // is this Philosopher eating?
         LED_ON(9 + n);
     }
@@ -238,6 +193,26 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
+void BSP_displayPaused(uint8_t const paused) {
+    (void)paused;
+}
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP_randomSeed(uint32_t const seed) {
+    l_rnd = seed;
+}
+
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
+//............................................................................
 __arm void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
     QF_INT_DISABLE();            // make sure that all interrupts are disabled
     LED_ON_ALL();                                         // light up all LEDs
@@ -245,11 +220,76 @@ __arm void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
     }
 }
 
+
+namespace QP {
+
+//............................................................................
+__arm void QF::onStartup(void) {
+    TIM_InitTypeDef TIM_InitStruct;
+
+    SCU_APBPeriphClockConfig(__TIM23, ENABLE);
+    TIM_DeInit(TIM3);
+
+    TIM_StructInit(&TIM_InitStruct);
+    TIM_InitStruct.TIM_Mode           = TIM_OCM_CHANNEL_1;
+    TIM_InitStruct.TIM_OC1_Modes      = TIM_TIMING;
+    TIM_InitStruct.TIM_Clock_Source   = TIM_CLK_APB;
+    TIM_InitStruct.TIM_Clock_Edge     = TIM_CLK_EDGE_RISING;
+    TIM_InitStruct.TIM_Prescaler      = BSP_TIM3_PRESCALER - 1;
+    TIM_InitStruct.TIM_Pulse_Level_1  = TIM_HIGH;
+    TIM_InitStruct.TIM_Pulse_Length_1 = BSP_TIM3_PERIOD - 1;
+    TIM_Init(TIM3, &TIM_InitStruct);
+
+                                   // configure the VIC for the TIM2 interrupt
+    VIC_Config(TIM3_ITLine, VIC_IRQ, BSP_TICK_PRIO);
+    VIC_ITCmd(TIM3_ITLine, ENABLE);
+
+    TIM_ITConfig(TIM3, TIM_IT_OC1, ENABLE);
+    TIM_CounterCmd(TIM3, TIM_CLEAR);
+    TIM_CounterCmd(TIM3, TIM_START);
+}
+//............................................................................
+void QF::onCleanup(void) {
+}
+//............................................................................
+void QF::onIdle(void) {                     // called with interrupts disabled
+
+    LED_ON(16);
+    LED_OFF(16);
+
+#ifdef Q_SPY                        // use the idle cycles for QS transmission
+    QF_INT_ENABLE();
+
+    if ((UART0->FR & 0x80) != 0) {                           // TX FIFO empty?
+        uint16_t nBytes = BSP_UART_TX_FIFO;         // capacity of the TX FIFO
+        uint8_t const *block;
+
+        QF_INT_DISABLE();
+        block = QS::getBlock(&nBytes);       // get the data block to transfer
+        QF_INT_ENABLE();
+
+        while (nBytes-- != 0) {
+            UART0->DR = *block++;             // stick the byte to the TX FIFO
+        }
+    }
+
+#elif defined NDEBUG    // only if not debugging (idle mode hinders debugging)
+    // shut down unused peripherals to save power ...*/
+//    SCU_EnterIdleMode();            // Power-Management: disable the CPU clock
+// NOTE: idle or sleep mode hangs the J-TAG, it's difficult to
+// get control of the MCU again!!!
+    // NOTE: an interrupt starts the CPU clock again */
+    QF_INT_ENABLE();
+#else
+    QF_INT_ENABLE();
+#endif
+}
+
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 uint32_t l_timeOverflow;
 
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[BSP_QS_BUF_SIZE];           // buffer for Quantum Spy
     GPIO_InitTypeDef GPIO_InitStruct;
     UART_InitTypeDef UART_InitStruct;
@@ -330,7 +370,7 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
     QS_FILTER_OFF(QS_QF_ISR_EXIT);
 
-    return (uint8_t)1;               // indicate successfull QS initialization
+    return true;                     // indicate successfull QS initialization
 }
 //............................................................................
 void QS::onCleanup(void) {
@@ -349,12 +389,15 @@ void QS::onFlush(void) {
     }
 }
 //............................................................................
-   // NOTE: getTime is invoked within a critical section (inetrrupts disabled)
+// NOTE: getTime is invoked within a critical section (inetrrupts disabled)
 uint32_t QS::onGetTime(void) {
     uint16_t currTime16 = (uint16_t)TIM3->CNTR;
-    l_currTime32 += (currTime16 - l_prevTime16) & 0xFFFF;
-    l_prevTime16 = currTime16;
-    return l_currTime32;
+    DPP::l_currTime32 += (currTime16 - DPP::l_prevTime16) & 0xFFFF;
+    DPP::l_prevTime16 = currTime16;
+    return DPP::l_currTime32;
 }
 #endif                                                                // Q_SPY
 //----------------------------------------------------------------------------
+
+}                                                              // namespace QP
+

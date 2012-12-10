@@ -14,8 +14,8 @@
 Q_DEFINE_THIS_FILE
 
 /* Active object class -----------------------------------------------------*/
-// $(AOs::Table) .............................................................
-class Table : public QActive {
+// @(/2/1) ...................................................................
+class Table : public QP::QActive {
 private:
     uint8_t m_fork[N_PHILO];
     uint8_t m_isHungry[N_PHILO];
@@ -24,8 +24,8 @@ public:
     Table();
 
 protected:
-    static QState initial(Table *me, QEvent const *e);
-    static QState serving(Table *me, QEvent const *e);
+    static QP::QState initial(Table * const me, QP::QEvt const * const e);
+    static QP::QState serving(Table * const me, QP::QEvt const * const e);
 };
 
 #define RIGHT(n_) ((uint8_t)(((n_) + (N_PHILO - 1)) % N_PHILO))
@@ -39,17 +39,20 @@ static Table l_table;     /* the single instance of the Table active object */
 QActive * const AO_Table = (QActive *)&l_table;      /* "opaque" AO pointer */
 
 /*..........................................................................*/
-// $(AOs::Table) .............................................................
-// $(AOs::Table::Table) ......................................................
-Table::Table() : QActive((QStateHandler)&Table::initial) {
+// @(/2/1) ...................................................................
+// @(/2/1/2) .................................................................
+Table::Table() 
+  : QActive((QStateHandler)&Table::initial)
+{
     for (uint8_t n = 0; n < N_PHILO; ++n) {
         m_fork[n] = FREE;
         m_isHungry[n] = 0;
     }
 }
-// $(AOs::Table::Statechart) .................................................
+
+// @(/2/1/3) .................................................................
 // @(/2/1/3/0)
-QState Table::initial(Table *me, QEvent const *e) {
+QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
     (void)e; // suppress the compiler warning about unused parameter
 
     QS_OBJ_DICTIONARY(&l_table);
@@ -67,8 +70,9 @@ QState Table::initial(Table *me, QEvent const *e) {
     //me->subscribe(TERMINATE_SIG);
     return Q_TRAN(&Table::serving);
 }
-// $(AOs::Table::Statechart::serving) ........................................
-QState Table::serving(Table *me, QEvent const *e) {
+// @(/2/1/3/1) ...............................................................
+QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
+    QP::QState status;
     switch (e->sig) {
         // @(/2/1/3/1/0)
         case HUNGRY_SIG: {
@@ -77,7 +81,7 @@ QState Table::serving(Table *me, QEvent const *e) {
             // phil ID must be in range and he must be not hungry
             Q_ASSERT((n < N_PHILO) && (!me->m_isHungry[n]));
 
-            BSP_displyPhilStat(n, "hungry  ");
+            BSP_displayPhilStat(n, "hungry  ");
             uint8_t m = LEFT(n);
             // @(/2/1/3/1/0/0)
             if ((me->m_fork[m] == FREE) && (me->m_fork[n] == FREE)) {
@@ -85,14 +89,15 @@ QState Table::serving(Table *me, QEvent const *e) {
                 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = n;
                 AO_Philo[n]->POST(pe, me);
-                BSP_displyPhilStat(n, "eating  ");
-                return Q_HANDLED();
+                BSP_displayPhilStat(n, "eating  ");
+                status = Q_HANDLED();
             }
             // @(/2/1/3/1/0/1)
             else {
                 me->m_isHungry[n] = 1;
-                return Q_HANDLED();
+                status = Q_HANDLED();
             }
+            break;
         }
         // @(/2/1/3/1/1)
         case DONE_SIG: {
@@ -104,7 +109,7 @@ QState Table::serving(Table *me, QEvent const *e) {
             // phil ID must be in range and he must be not hungry
             Q_ASSERT((n < N_PHILO) && (!me->m_isHungry[n]));
 
-            BSP_displyPhilStat(n, "thinking");
+            BSP_displayPhilStat(n, "thinking");
             m = LEFT(n);
             // both forks of Phil[n] must be used
             Q_ASSERT((me->m_fork[n] == USED) && (me->m_fork[m] == USED));
@@ -118,7 +123,7 @@ QState Table::serving(Table *me, QEvent const *e) {
                 pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
                 AO_Philo[m]->POST(pe, me);
-                BSP_displyPhilStat(m, "eating  ");
+                BSP_displayPhilStat(m, "eating  ");
             }
             m = LEFT(n); // check the left neighbor
             n = LEFT(m); // left fork of the left neighbor
@@ -128,11 +133,16 @@ QState Table::serving(Table *me, QEvent const *e) {
                 pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
                 AO_Philo[m]->POST(pe, me);
-                BSP_displyPhilStat(m, "eating  ");
+                BSP_displayPhilStat(m, "eating  ");
             }
-            return Q_HANDLED();
+            status = Q_HANDLED();
+            break;
+        }
+        default: {
+            status = Q_SUPER(&QHsm::top);
+            break;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }
 

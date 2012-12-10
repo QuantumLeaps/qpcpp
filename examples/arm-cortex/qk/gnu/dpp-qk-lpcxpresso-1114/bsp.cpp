@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example, LPCXpresso-1114 board, QK kernel
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 05, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -36,36 +36,39 @@
 #include "dpp.h"
 #include "bsp.h"
 
-Q_DEFINE_THIS_FILE
-
 extern "C" {
     #include "LPC11xx.h"                                // LPC11xx definitions
     #include "timer16.h"
     #include "clkconfig.h"
     #include "gpio.h"
+#ifdef Q_SPY
+    #include "uart.h"
+#endif
 }
+
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
+
+Q_DEFINE_THIS_FILE
 
 #define LED_PORT    0
 #define LED_BIT     7
 #define LED_ON      1
 #define LED_OFF     0
 
-enum ISR_Priorities {   /* ISR priorities starting from the highest urgency */
+enum ISR_Priorities {      // ISR priorities starting from the highest urgency
     PIOINT0_PRIO,
     SYSTICK_PRIO,
     // ...
 };
 
-static uint32_t l_delay = 0UL;    // limit for the loop counter in busyDelay()
+//............................................................................
+static unsigned  l_rnd;                                         // random seed
 
 #ifdef Q_SPY
 
-    extern "C" {
-        #include "uart.h"
-    }
-
-    QSTimeCtr QS_tickTime_;
-    QSTimeCtr QS_tickPeriod_;
+    QP::QSTimeCtr QS_tickTime_;
+    QP::QSTimeCtr QS_tickPeriod_;
     static uint8_t l_SysTick_Handler;
     static uint8_t l_GPIOPortA_IRQHandler;
 
@@ -73,7 +76,7 @@ static uint32_t l_delay = 0UL;    // limit for the loop counter in busyDelay()
     #define QS_BAUD_RATE  115200
 
     enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
+        PHILO_STAT = QP::QS_USER
     };
 #endif
 
@@ -86,7 +89,7 @@ extern "C" void SysTick_Handler(void) {
     QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
 #endif
 
-    QF::TICK(&l_SysTick_Handler);             // process all armed time events
+    QP::QF::TICK(&l_SysTick_Handler);         // process all armed time events
 
     QK_ISR_EXIT();                            // inform QK-nano about ISR exit
 }
@@ -95,7 +98,7 @@ extern "C" void PIOINT0_IRQHandler(void) __attribute__((__interrupt__));
 extern "C" void PIOINT0_IRQHandler(void) {
     QK_ISR_ENTRY();                          // inform QK-nano about ISR entry
 
-    AO_Table->POST(Q_NEW(QEvt, MAX_PUB_SIG),                  // for testing
+    AO_Table->POST(Q_NEW(QP::QEvt, MAX_PUB_SIG),                // for testing
                    &l_GPIOPortA_IRQHandler);
 
     QK_ISR_EXIT();                            // inform QK-nano about ISR exit
@@ -111,24 +114,78 @@ void BSP_init(void) {
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
-
+    QS_RESET();
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_GPIOPortA_IRQHandler);
 }
+//............................................................................
+void BSP_terminate(int16_t result) {
+    (void)result;
+}
+//............................................................................
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
+    if (stat[0] == 'e') {
+        GPIOSetValue(LED_PORT, LED_BIT, LED_ON);                     // LED on
+    }
+    else {
+        GPIOSetValue(LED_PORT, LED_BIT, LED_OFF);                   // LED off
+    }
+
+    QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin
+        QS_U8(1, n);                                     // Philosopher number
+        QS_STR(stat);                                    // Philosopher status
+    QS_END()
+}
+//............................................................................
+void BSP_displayPaused(uint8_t paused) {
+    (void)paused;
+}
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3*7*11*13*23);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP_randomSeed(uint32_t seed) {
+    l_rnd = seed;
+}
+
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
+//............................................................................
+extern "C" void Q_onAssert(char const * const file, int line) {
+    (void)file;                                      // avoid compiler warning
+    (void)line;                                      // avoid compiler warning
+    QF_INT_DISABLE();            // make sure that all interrupts are disabled
+    for (;;) {          // NOTE: replace the loop with reset for final version
+    }
+}
+//............................................................................
+// error routine that is called if the STM32 library encounters an error
+extern "C" void assert_failed(char const *file, int line) {
+    Q_onAssert(file, line);
+}
+
+namespace QP {
+
 //............................................................................
 void QF::onStartup(void) {
     // Set up and enable the SysTick timer. It will be used as a reference
     // for delay loops in the interrupt handlers. The SysTick timer period
     // will be set up for BSP_TICKS_PER_SEC.
     //
-    SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
+    SysTick_Config(SystemCoreClock / DPP::BSP_TICKS_PER_SEC);
 
               // enable EINT0 interrupt, which is used for testing preemptions
     NVIC_EnableIRQ(EINT0_IRQn);
 
                           // set priorities of all interrupts in the system...
-    NVIC_SetPriority(SysTick_IRQn, SYSTICK_PRIO);
-    NVIC_SetPriority(EINT0_IRQn,   PIOINT0_PRIO);
+    NVIC_SetPriority(SysTick_IRQn, DPP::SYSTICK_PRIO);
+    NVIC_SetPriority(EINT0_IRQn,   DPP::PIOINT0_PRIO);
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -159,44 +216,11 @@ void QK::onIdle(void) {
     __WFI();                   // stop clocking the CPU and wait for interrupt
 #endif
 }
-//............................................................................
-// error routine that is called if the STM32 library encounters an error
-extern "C" void assert_failed(char const *file, int line) {
-    Q_onAssert(file, line);
-}
-//............................................................................
-extern "C" void Q_onAssert(char const * const file, int line) {
-    (void)file;                                      // avoid compiler warning
-    (void)line;                                      // avoid compiler warning
-    QF_INT_DISABLE();            // make sure that all interrupts are disabled
-    for (;;) {          // NOTE: replace the loop with reset for final version
-    }
-}
-//............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
-    if (stat[0] == 'e') {
-        GPIOSetValue(LED_PORT, LED_BIT, LED_ON);                     // LED on
-    }
-    else {
-        GPIOSetValue(LED_PORT, LED_BIT, LED_OFF);                   // LED off
-    }
-
-    QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin
-        QS_U8(1, n);                                     // Philosopher number
-        QS_STR(stat);                                    // Philosopher status
-    QS_END()
-}
-//............................................................................
-void BSP_busyDelay(void) {
-    uint32_t volatile i = l_delay;
-    while (i-- > 0UL) {                                      // busy-wait loop
-    }
-}
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 //............................................................................
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[QS_BUF_SIZE];               // buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
@@ -204,10 +228,10 @@ uint8_t QS::onStartup(void const *arg) {
     NVIC_DisableIRQ(UART_IRQn); // do not use the interrupts (QS uses polling)
     LPC_UART->IER = 0;
 
-    QS_tickPeriod_ = (QSTimeCtr)(SystemCoreClock / BSP_TICKS_PER_SEC);
-    QS_tickTime_ = QS_tickPeriod_;           // to start the timestamp at zero
+    DPP::QS_tickPeriod_ = (QSTimeCtr)(SystemCoreClock/DPP::BSP_TICKS_PER_SEC);
+    DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
-                                                 /* setup the QS filters... */
+                                                    // setup the QS filters...
     QS_FILTER_ON(QS_ALL_RECORDS);
 
 //    QS_FILTER_OFF(QS_QEP_STATE_EMPTY);
@@ -255,18 +279,19 @@ uint8_t QS::onStartup(void const *arg) {
 //    QS_FILTER_OFF(QS_QK_MUTEX_UNLOCK);
     QS_FILTER_OFF(QS_QK_SCHEDULE);
 
-    return (uint8_t)1;                                       // return success
+    return true;                                             // return success
 }
 //............................................................................
 void QS::onCleanup(void) {
 }
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {              // invoked with interrupts locked
-    if ((SysTick->CTRL & 0x00010000) == 0) {                  // COUNT no set?
-        return QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
+    if ((SysTick->CTRL & 0x00010000U) == 0U) {                // COUNT no set?
+        return DPP::QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
     }
     else {        // the rollover occured, but the SysTick_ISR did not run yet
-        return QS_tickTime_ + QS_tickPeriod_ - (QSTimeCtr)SysTick->VAL;
+        return DPP::QS_tickTime_ - (QSTimeCtr)SysTick->VAL
+               + DPP::QS_tickPeriod_;
     }
 }
 //............................................................................
@@ -280,6 +305,8 @@ void QS::onFlush(void) {
 }
 #endif                                                                // Q_SPY
 //----------------------------------------------------------------------------
+
+}                                                              // namespace QP
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:

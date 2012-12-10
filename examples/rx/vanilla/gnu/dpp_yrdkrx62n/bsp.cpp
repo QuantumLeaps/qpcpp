@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: BSP for YRDKRX62N board, Vanilla, GNU-RX compiler
-// Last Updated for Version: 4.3.00
-// Date of the Last Update:  Mar 10, 2012
+// Product: BSP for YRDKRX62N board, Vanilla, GNU-RX compiler (KPIT)
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Oct 19, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -9,20 +9,27 @@
 //
 // Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
@@ -30,21 +37,6 @@
 #include "dpp.h"
 
 #include "iodefine.h"
-
-Q_DEFINE_THIS_FILE
-
-                    // interrupt priorities (higher number is higher priority)
-enum InterruptPriorities {
-    // lowest urgency
-    SW1_INT_PRIORITY  = 3,
-    TICK_INT_PRIORITY = 4,
-    SW2_INT_PRIORITY  = 5,
-    SW3_INT_PRIORITY  = 6,
-    // highest urgency
-};
-
-                              // Number of timer ticks for each OS kernel tick
-#define TICK_COUNT_VAL ((TICK_TIMER_FREQ) / (BSP_TICKS_PER_SEC))
 
 // On board LEDs -------------------------------------------------------------
 #define  LED04                  (PORTD.DR.BIT.B5)
@@ -86,28 +78,53 @@ enum GPIOIntTriggerType {           // GPIO interrupt triggers (manual 11.2.8)
 #define CMT_PCLK_DIV_512        3U              // See manual 21.2.3, CMCR.CKS
 #define BSP_CLKDIV              512U                      // See manual 21.2.3
 #define TICK_TIMER_FREQ         (PCLK_FREQ / BSP_CLKDIV)
+                              // Number of timer ticks for each OS kernel tick
+#define TICK_COUNT_VAL (TICK_TIMER_FREQ / DPP::BSP_TICKS_PER_SEC)
 
+//............................................................................
+extern "C" void abort(void) {
+    Q_onAssert("abort", 0);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
+
+Q_DEFINE_THIS_FILE
+
+                    // interrupt priorities (higher number is higher priority)
+enum InterruptPriorities {
+    // lowest urgency
+    SW1_INT_PRIORITY  = 3,
+    TICK_INT_PRIORITY = 4,
+    SW2_INT_PRIORITY  = 5,
+    SW3_INT_PRIORITY  = 6,
+    // highest urgency
+};
+
+// Local-scope objects -------------------------------------------------------
+static uint32_t l_rnd;                                          // random seed
+
+// Q-Spy ---------------------------------------------------------------------
 #ifdef Q_SPY
 
-    QSTimeCtr QS_tickTime_;
-    QSTimeCtr QS_tickPeriod_;
+    QP::QSTimeCtr QS_tickTime_;
+    QP::QSTimeCtr QS_tickPeriod_;
 
     uint8_t const QS_Excep_CMTU0_CMT0 = 0U;         // identifies event source
     uint8_t const QS_Excep_IRQ8       = 0U;         // identifies event source
     uint8_t const QS_Excep_IRQ9       = 0U;         // identifies event source
     uint8_t const QS_Excep_IRQ10      = 0U;         // identifies event source
 
-    #define UART_BAUD_RATE      (115200)
+    #define UART_BAUD_RATE      115200U
 
     enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
+        PHILO_STAT = QP::QS_USER
     };
 
 #endif
 
 //............................................................................
 void BSP_init(void) {
-
     // Set up system clocks, see manual 8.2.1
     // 12MHz clock
     // I Clk   = 96 MHz
@@ -116,7 +133,7 @@ void BSP_init(void) {
     //
     SYSTEM.SCKCR.LONG = ((0UL << 24) | (2UL << 16) | (1UL << 8));
 
-       // init LEDs (GPIOs and LED states to OFF)
+    // init LEDs (GPIOs and LED states to OFF)
     PORTD.DDR.BYTE  = 0xFF;
     PORTE.DDR.BYTE |= 0x0F;
     PORTD.DR.BYTE   = 0xFF;                // initialize all LEDs to OFF state
@@ -125,28 +142,26 @@ void BSP_init(void) {
     // Init buttons as GPIO inputs
     // Config GPIO Port 4 as input for reading buttons
     // Not needed after POR because this is the default value...
-
+    //
     PORT4.DDR.BYTE = 0;
+
+    BSP_randomSeed(1234);
 
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
-
+    QS_RESET();
     QS_OBJ_DICTIONARY(&QS_Excep_CMTU0_CMT0);
     QS_OBJ_DICTIONARY(&QS_Excep_IRQ8);
     QS_OBJ_DICTIONARY(&QS_Excep_IRQ9);
     QS_OBJ_DICTIONARY(&QS_Excep_IRQ10);
 }
 //............................................................................
-void BSP_busyDelay(void) {
-    // limit for the loop counter in busyDelay()
-    static uint32_t l_delay = 0UL;
-    uint32_t volatile i = l_delay;
-    while (i-- > 0UL) {                                      // busy-wait loop
-    }
+void BSP_terminate(int16_t const result) {
+    (void)result;
 }
 //............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
                             // turn LED on when eating and off when not eating
     uint8_t on_off = (stat[0] == 'e' ? LED_ON : LED_OFF);
     switch (n) {
@@ -155,7 +170,7 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
         case 2: LED06 = on_off; break;
         case 3: LED07 = on_off; break;
         case 4: LED08 = on_off; break;
-        default: Q_ERROR();    break;
+        default: Q_ERROR();     break;
     }
 
     QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin
@@ -164,17 +179,39 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
+void BSP_displayPaused(uint8_t const paused) {
+    LED11 = (paused != 0U) ? LED_ON : LED_OFF;
+}
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP_randomSeed(uint32_t const seed) {
+    l_rnd = seed;
+}
+
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
+namespace QP {
+
+//............................................................................
 void QF::onStartup(void) {
     // set the interrupt priorities, (manual 11.2.3)
-    IPR(CMT0,)     = TICK_INT_PRIORITY;
-    IPR(ICU,IRQ8)  = SW1_INT_PRIORITY;
-    IPR(ICU,IRQ9)  = SW2_INT_PRIORITY;
-    IPR(ICU,IRQ10) = SW3_INT_PRIORITY;
+    IPR(CMT0,)     = DPP::TICK_INT_PRIORITY;
+    IPR(ICU,IRQ8)  = DPP::SW1_INT_PRIORITY;
+    IPR(ICU,IRQ9)  = DPP::SW2_INT_PRIORITY;
+    IPR(ICU,IRQ10) = DPP::SW3_INT_PRIORITY;
 
-    // enable GPIO interrupts ...*/
+    // enable GPIO interrupts ...
     // configure interrupts for SW1 (IRQ8)
     PORT4.ICR.BIT.B0 = 1 ;                     // enable input buffer for P4.0
-    ICU.IRQCR[8].BIT.IRQMD = IT_FALLING_EDGE;         // falling edge (11.2.8)
+    ICU.IRQCR[8].BIT.IRQMD = IT_RISING_FALLING_EDGE;               // (11.2.8)
     IEN(ICU, IRQ8) = 1;                    // enable interrupt source (11.2.2)
 
     // configure interrupts for SW2 (IRQ9)
@@ -198,14 +235,6 @@ void QF::onStartup(void) {
     IEN(CMT0, CMI0)     = 1;               // enable interrupt source (11.2.2)
     CMT0.CMCR.BIT.CMIE  = 1;               // enable timer interrupt  (21.2.3)
     CMT.CMSTR0.BIT.STR0 = 1;     // start tick timer (CMT0 channel 0) (21.2.1)
-}
-//............................................................................
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
-    (void)file;                                      // avoid compiler warning
-    (void)line;                                      // avoid compiler warning
-    QF_INT_DISABLE();            // make sure that all interrupts are disabled
-    for (;;) {          // NOTE: replace the loop with reset for final version
-    }
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -250,11 +279,20 @@ void QF::onIdle(void) {              // entered with interrupts DISABLED NOTE01
 #endif
 }
 
+//............................................................................
+extern "C" void Q_onAssert(char const * const file, int line) {
+    (void)file;                                      // avoid compiler warning
+    (void)line;                                      // avoid compiler warning
+    QF_INT_DISABLE();            // make sure that all interrupts are disabled
+    for (;;) {          // NOTE: replace the loop with reset for final version
+    }
+}
+
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 //............................................................................
-uint8_t qsBuf[4*256];                     // buffer for Quantum Spy
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
+    static uint8_t qsBuf[6*256];                     // buffer for Quantum Spy
     (void) arg;               // get rid of compiler warning (unused argument)
     initBuf(qsBuf, sizeof(qsBuf));
 
@@ -270,7 +308,7 @@ uint8_t QS::onStartup(void const *arg) {
     // RXD2 pin = input (set Port 5.2 Input Buffer Control Register)
     PORT5.ICR.BIT.B2 = 1;
 
-    SCI2.SCR.BIT.CKE = 0;                       // On-chip baud rate generator
+    SCI2.SCR.BIT.CKE = 0;                      // On-chip baud rate generator
     SCI2.SMR.BYTE = 0;                // PCLK input; asynchronous; mode: 8,N,1
 
     // RX interrupt stuff
@@ -286,8 +324,8 @@ uint8_t QS::onStartup(void const *arg) {
     SCI2.SCR.BYTE |= 0x30 ;                 // enable RX & TX at the same time
 
     // Initialize QS timing variables
-    QS_tickPeriod_ = TICK_COUNT_VAL;
-    QS_tickTime_   = 0;                       // count up timer starts at zero
+    DPP::QS_tickPeriod_ = TICK_COUNT_VAL;
+    DPP::QS_tickTime_   = 0U;                 // count up timer starts at zero
 
                                                     // setup the QS filters...
     QS_FILTER_ON(QS_ALL_RECORDS);
@@ -333,20 +371,18 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
     QS_FILTER_OFF(QS_QF_ISR_EXIT);
 
-    QS_FILTER_AO_OBJ(AO_Table);
-
-    return (uint8_t)1;                                       // return success
+    return true;                                             // return success
 }
 //............................................................................
 void QS::onCleanup(void) {
 }
 //............................................................................
-QSTimeCtr QS::onGetTime(void) {            // invoked with interrupts disabled
+QSTimeCtr QS::onGetTime(void) {              // invoked with interrupts locked
     if (IR(CMT0, CMI0)) {                              // is tick ISR pending?
-        return QS_tickTime_ + CMT0.CMCNT + QS_tickPeriod_;
+        return DPP::QS_tickTime_ + CMT0.CMCNT + DPP::QS_tickPeriod_;
     }
-    else {        // no rollover occured
-        return QS_tickTime_ + CMT0.CMCNT;
+    else {                                              // no rollover occured
+        return DPP::QS_tickTime_ + CMT0.CMCNT;
     }
 }
 //............................................................................
@@ -354,14 +390,16 @@ void QS::onFlush(void) {
     uint16_t b;
     b = getByte();
     while (b != QS_EOD) {    // next QS trace byte available?
-        while (SCI2.SSR.BIT.TEND == 0) {                     // TX not ready?
+        while (SCI2.SSR.BIT.TEND == 0) {                      // TX not ready?
         }
-        SCI2.TDR = (uint8_t)b;                       // send byte to UART TDR
+        SCI2.TDR = (uint8_t)b;                        // send byte to UART TDR
 
-        b = getByte();                                // try to get next byte
+        b = getByte();                                 // try to get next byte
     }
 }
 #endif                                                                // Q_SPY
+
+}                                                              // namespace QP
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:

@@ -468,7 +468,7 @@
         </option>
         <option>
           <name>IccCppDialect</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IccAllowVLA</name>
@@ -1466,7 +1466,7 @@
         </option>
         <option>
           <name>IccCppDialect</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IccAllowVLA</name>
@@ -2465,7 +2465,7 @@
         </option>
         <option>
           <name>IccCppDialect</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IccAllowVLA</name>

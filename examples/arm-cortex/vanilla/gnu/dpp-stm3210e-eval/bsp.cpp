@@ -1,71 +1,96 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example, STM3210C-EVAL board, Vanilla kernel
-// Last Updated for Version: 4.3.00
-// Date of the Last Update:  Nov 03, 2011
+// Last Updated for Version: 4.5.05
+// Date of the Last Update:  Oct 06, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2011 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
 
-Q_DEFINE_THIS_FILE
-
 extern "C" {
     #include "stm32f10x.h"
     #include "stm32_eval.h"
-//    #include "stm3210e_eval_lcd.h"
+    #include "stm3210c_eval_lcd.h"
 }
 
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
+
+Q_DEFINE_THIS_FILE
+
 enum ISR_Priorities {      // ISR priorities starting from the highest urgency
+    EXTI0_PRIO,                                            // highest priority
     SYSTICK_PRIO,
     // ...
 };
 
-static uint32_t l_delay = 0UL;    // limit for the loop counter in busyDelay()
+//............................................................................
+static unsigned  l_rnd;                                         // random seed
 
 #ifdef Q_SPY
-    QSTimeCtr QS_tickTime_;
-    QSTimeCtr QS_tickPeriod_;
+    QP::QSTimeCtr QS_tickTime_;
+    QP::QSTimeCtr QS_tickPeriod_;
     static uint8_t l_SysTick_Handler;
 
     #define QS_BUF_SIZE   (2*1024)
     #define QS_BAUD_RATE  115200
 
     enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
+        PHILO_STAT = QP::QS_USER
     };
 #endif
 
 //............................................................................
 extern "C" void SysTick_Handler(void) __attribute__((__interrupt__));
 extern "C" void SysTick_Handler(void) {
+    QK_ISR_ENTRY();                          // inform QK-nano about ISR entry
 #ifdef Q_SPY
     uint32_t dummy = SysTick->CTRL;           // clear NVIC_ST_CTRL_COUNT flag
     QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
 #endif
 
-    QF::TICK(&l_SysTick_Handler);             // process all armed time events
+    QP::QF::TICK(&l_SysTick_Handler);         // process all armed time events
+
+    QK_ISR_EXIT();                            // inform QK-nano about ISR exit
+}
+//............................................................................
+extern "C" void EXTI0_IRQHandler(void) __attribute__((__interrupt__));
+extern "C" void EXTI0_IRQHandler(void) {
+    QK_ISR_ENTRY();                          // inform QK-nano about ISR entry
+    EXTI->PR = 0x1;      // set the EXTI->PR[0] to clear the EXTI_SWIER[0] bit
+
+    AO_Table->POST(Q_NEW(QP::QEvt, MAX_PUB_SIG), (void *)0);    // for testing
+
+    QK_ISR_EXIT();                            // inform QK-nano about ISR exit
 }
 
 //............................................................................
@@ -78,15 +103,23 @@ void BSP_init(void) {
     STM_EVAL_LEDInit(LED2);
     STM_EVAL_LEDInit(LED3);
     STM_EVAL_LEDInit(LED4);
-/*
+
+                       // initialize the EXTI Line0 interrupt used for testing
+    EXTI_InitTypeDef exti_init;
+    exti_init.EXTI_Mode    = EXTI_Mode_Interrupt;
+    exti_init.EXTI_Trigger = EXTI_Trigger_Rising;
+    exti_init.EXTI_Line    = EXTI_Line0;
+    exti_init.EXTI_LineCmd = ENABLE;
+    EXTI_Init(&exti_init);
+
     STM3210C_LCD_Init();                                 // initialize the LCD
     LCD_Clear(White);                                         // clear the LCD
     LCD_SetBackColor(Grey);
     LCD_SetTextColor(Black);
     LCD_DisplayString(Line0, 0, "   Quantum Leaps    ");
     LCD_DisplayString(Line1, 0, "     DPP example    ");
-    LCD_DisplayString(Line2, 0, "QP/C++Vanilla       ");
-    LCD_DisplayString(Line2, 14*16, QF::getVersion());
+    LCD_DisplayString(Line2, 0, " QP/C++ (QK)        ");
+    LCD_DisplayString(Line2, 14*16, QP::QF::getVersion());
     LCD_SetBackColor(White);
     LCD_DisplayString(Line5, 0, "DPP:");
     LCD_SetBackColor(Black);
@@ -95,53 +128,12 @@ void BSP_init(void) {
     LCD_SetBackColor(Blue);
     LCD_SetTextColor(White);
     LCD_DisplayString(Line5, 4*16, "0 ,1 ,2 ,3 ,4    ");
-*/
+
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
-
+    QS_RESET();
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
-}
-//............................................................................
-void QF::onStartup(void) {
-    // Set up and enable the SysTick timer.  It will be used as a reference
-    // for delay loops in the interrupt handlers.  The SysTick timer period
-    // will be set up for BSP_TICKS_PER_SEC.
-    //
-    SysTick_Config(SystemFrequency_SysClk / BSP_TICKS_PER_SEC);
-
-                          // set priorities of all interrupts in the system...
-    NVIC_SetPriority(SysTick_IRQn, SYSTICK_PRIO);
-    // ...
-}
-//............................................................................
-void QF::onCleanup(void) {
-}
-//............................................................................
-void QF::onIdle(void) {          // entered with interrupts LOCKED, see NOTE01
-
-    // toggle the User LED on and then off, see NOTE02
-    STM_EVAL_LEDOn (LED4);                                     // blue LED on
-    STM_EVAL_LEDOff(LED4);                                     // blue LED off
-
-#ifdef Q_SPY
-    QF_INT_ENABLE();
-    if ((USART2->SR & USART_FLAG_TXE) != 0) {                 // is TXE empty?
-
-        QF_INT_DISABLE();
-        uint16_t b = QS::getByte();
-        QF_INT_ENABLE();
-
-        if (b != QS_EOD) {                                 // not End-Of-Data?
-           USART2->DR = (b & 0xFF);                // put into the DR register
-        }
-    }
-#elif defined NDEBUG
-    __WFI();                                             // wait for interrupt
-    QF_INT_ENABLE();
-#else
-    QF_INT_ENABLE();
-#endif
 }
 //............................................................................
 // error routine that is called if the STM32 library encounters an error
@@ -157,9 +149,13 @@ extern "C" void Q_onAssert(char const * const file, int line) {
     }
 }
 //............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
+void BSP_terminate(int16_t result) {
+    (void)result;
+}
+//............................................................................
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
 
-    //LCD_DisplayChar(Line5, (3*16*n + 5*16), stat[0]);
+    LCD_DisplayChar(Line5, (3*16*n + 5*16), stat[0]);
 
     QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin
         QS_U8(1, n);                                     // Philosopher number
@@ -167,16 +163,88 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_busyDelay(void) {
-    uint32_t volatile i = l_delay;
-    while (i-- > 0UL) {                                      // busy-wait loop
+void BSP_displayPaused(uint8_t paused) {
+    (void)paused;
+}
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3*7*11*13*23);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP_randomSeed(uint32_t seed) {
+    l_rnd = seed;
+}
+
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
+namespace QP {
+
+//............................................................................
+void QF::onStartup(void) {
+
+    // Set up and enable the SysTick timer.  It will be used as a reference
+    // for delay loops in the interrupt handlers.  The SysTick timer period
+    // will be set up for BSP_TICKS_PER_SEC.
+    //
+    SysTick_Config(SystemFrequency_SysClk / DPP::BSP_TICKS_PER_SEC);
+
+    // Enable the EXTI0 Interrupt used for testing preemptions
+    NVIC_InitTypeDef nvic_init;
+    nvic_init.NVIC_IRQChannel                   = EXTI0_IRQn;
+    nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic_init.NVIC_IRQChannelSubPriority        = 0;
+    nvic_init.NVIC_IRQChannelCmd                = ENABLE;
+    NVIC_Init(&nvic_init);   // enables the device and sets interrupt priority
+
+                          // set priorities of all interrupts in the system...
+    NVIC_SetPriority(SysTick_IRQn, DPP::SYSTICK_PRIO);
+    NVIC_SetPriority(EXTI0_IRQn,   DPP::EXTI0_PRIO);
+    // ...
+}
+//............................................................................
+void QF::onCleanup(void) {
+}
+//............................................................................
+void QF::onIdle(void) {        // entered with interrupts DISABLED, see NOTE01
+                            // toggle the blue LED on and then off, see NOTE02
+    STM_EVAL_LEDOn (LED4);                                     // blue LED on
+    STM_EVAL_LEDOff(LED4);                                     // blue LED off
+
+#ifdef Q_SPY
+
+    QF_INT_ENABLE();
+
+    if ((USART2->SR & USART_FLAG_TXE) != 0) {                 // is TXE empty?
+
+        QF_INT_DISABLE();
+        uint16_t b = QS::getByte();
+        QF_INT_ENABLE();
+
+        if (b != QS_EOD) {                                 // not End-Of-Data?
+           USART2->DR = (b & 0xFF);                // put into the DR register
+        }
     }
+
+#elif defined NDEBUG
+    // put the CPU and peripherals to the low-power mode
+    // you might need to customize the clock management for your application,
+    // see the datasheet for your particular Cortex-M3 MCU.
+    __WFI();                                             // wait for interrupt
+    QF_INT_ENABLE();
+#else
+    QF_INT_ENABLE();
+#endif
 }
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 //............................................................................
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[QS_BUF_SIZE];               // buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
@@ -215,8 +283,9 @@ uint8_t QS::onStartup(void const *arg) {
 
     USART_Cmd(USART2, ENABLE);                                // enable USART2
 
-    QS_tickPeriod_ = (QSTimeCtr)(SystemFrequency_SysClk / BSP_TICKS_PER_SEC);
-    QS_tickTime_ = QS_tickPeriod_;           // to start the timestamp at zero
+    DPP::QS_tickPeriod_ =
+        (QSTimeCtr)(SystemFrequency_SysClk / DPP::BSP_TICKS_PER_SEC);
+    DPP::QS_tickTime_ = DPP::QS_tickPeriod_;           // to start the timestamp at zero
 
                                                  /* setup the QS filters... */
     QS_FILTER_ON(QS_ALL_RECORDS);
@@ -266,18 +335,19 @@ uint8_t QS::onStartup(void const *arg) {
 //    QS_FILTER_OFF(QS_QK_MUTEX_UNLOCK);
     QS_FILTER_OFF(QS_QK_SCHEDULE);
 
-    return (uint8_t)1;                                       // return success
+    return true;                                             // return success
 }
 //............................................................................
 void QS::onCleanup(void) {
 }
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {              // invoked with interrupts locked
-    if ((SysTick->CTRL & 0x00010000) == 0) {                  // COUNT no set?
-        return QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
+    if ((SysTick->CTRL & 0x00010000U) == 0U) {                // COUNT no set?
+        return DPP::QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
     }
     else {        // the rollover occured, but the SysTick_ISR did not run yet
-        return QS_tickTime_ + QS_tickPeriod_ - (QSTimeCtr)SysTick->VAL;
+        return DPP::QS_tickTime_ - (QSTimeCtr)SysTick->VAL
+               + DPP::QS_tickPeriod_;
     }
 }
 //............................................................................
@@ -292,9 +362,11 @@ void QS::onFlush(void) {
 #endif                                                                // Q_SPY
 //----------------------------------------------------------------------------
 
+}                                                              // namespace QP
+
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:
-// The QF::onIdle() callback is called with interrupts locked, because the
+// The QF_onIdle() callback is called with interrupts locked, because the
 // determination of the idle condition might change by any interrupt posting
 // an event. QF::onIdle() must internally unlock interrupts, ideally
 // atomically with putting the CPU to the power-saving mode.
