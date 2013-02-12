@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QP/C++
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Sep 26, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Jan 16, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -222,7 +222,7 @@ public:
     /// queue status can change unexpectedly. The main intent for using
     /// this operation is in conjunction with event deferral. In this
     /// case the queue is accessed only from a single thread (by a single AO),
-    /// so no other entitiy can post events to the queue.
+    /// so no other entity can post events to the queue.
     ///
     /// \sa QActive::defer(), QActive::recall()
     bool isEmpty(void) const {

@@ -1,14 +1,14 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++, ARM Cortex-M0, QK, GNU/CodeRed compiler
-:: Last Updated for Version: 4.5.02
-:: Date of the Last Update:  Jul 25, 2012
+:: Last Updated for Version: 4.5.04
+:: Date of the Last Update:  Feb 10, 2013
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
 ::                    innovating embedded systems
 ::
-:: Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -52,19 +52,19 @@ set ARM_CORE=cortex-m0
 if "%1"=="" (
     echo default selected
     set BINDIR=%QP_PRTDIR%\dbg
-    set CCFLAGS=-g -c -mcpu=%ARM_CORE% -mthumb -Wall -O -fno-rtti -fno-exceptions -D__REDLIB__
+    set CCFLAGS=-g -c -mcpu=%ARM_CORE% -mthumb -Wall -O -DARM_ARCH_V6M -fno-rtti -fno-exceptions -D__REDLIB__
     set ASMFLAGS=-g -mcpu=%ARM_CORE%
 )
 if "%1"=="rel" (
     echo rel selected
     set BINDIR=%QP_PRTDIR%\rel
-    set CCFLAGS=-c -mcpu=%ARM_CORE% -mthumb -Wall -Os -fno-rtti -fno-exceptions -D__REDLIB__ -DNDEBUG
+    set CCFLAGS=-c -mcpu=%ARM_CORE% -mthumb -Wall -Os -DARM_ARCH_V6M -fno-rtti -fno-exceptions -D__REDLIB__ -DNDEBUG
     set ASMFLAGS=-mcpu=%ARM_CORE%
 )
 if "%1"=="spy" (
     echo spy selected
     set BINDIR=%QP_PRTDIR%\spy
-    set CCFLAGS=-g -c -mcpu=%ARM_CORE% -mthumb -Wall -O -fno-rtti -fno-exceptions -D__REDLIB__ -DQ_SPY
+    set CCFLAGS=-g -c -mcpu=%ARM_CORE% -mthumb -Wall -O -DARM_ARCH_V6M -fno-rtti -fno-exceptions -D__REDLIB__ -DQ_SPY
     set ASMFLAGS=-g -mcpu=%ARM_CORE%
 )
 
@@ -122,9 +122,9 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qte_arm.cpp  -o%BINDIR%\qte_arm.o 
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qte_darm.cpp -o%BINDIR%\qte_darm.o
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qte_rarm.cpp -o%BINDIR%\qte_rarm.o
-%ASM% src\qk_port.s -o %BINDIR%\qk_port.o %ASMFLAGS%
+%CC% %CCFLAGS% %CCINC% %SRCDIR%\qte_ctr.cpp  -o%BINDIR%\qte_ctr.o
 
-%LIB% %LIBFLAGS% %LIBDIR%\libqp_%ARM_CORE%_cr.a %BINDIR%\qa_defer.o %BINDIR%\qa_fifo.o %BINDIR%\qa_lifo.o %BINDIR%\qa_get_.o %BINDIR%\qa_sub.o %BINDIR%\qa_usub.o %BINDIR%\qa_usuba.o %BINDIR%\qeq_fifo.o %BINDIR%\qeq_get.o %BINDIR%\qeq_init.o %BINDIR%\qeq_lifo.o %BINDIR%\qf_act.o %BINDIR%\qf_gc.o %BINDIR%\qf_log2.o %BINDIR%\qf_new.o %BINDIR%\qf_pool.o %BINDIR%\qf_psini.o %BINDIR%\qf_pspub.o %BINDIR%\qf_pwr2.o %BINDIR%\qf_tick.o %BINDIR%\qmp_get.o %BINDIR%\qmp_init.o %BINDIR%\qmp_put.o %BINDIR%\qte_ctor.o %BINDIR%\qte_arm.o %BINDIR%\qte_darm.o %BINDIR%\qte_rarm.o %BINDIR%\qk_port.o
+%LIB% %LIBFLAGS% %LIBDIR%\libqp_%ARM_CORE%_cr.a %BINDIR%\qa_defer.o %BINDIR%\qa_fifo.o %BINDIR%\qa_lifo.o %BINDIR%\qa_get_.o %BINDIR%\qa_sub.o %BINDIR%\qa_usub.o %BINDIR%\qa_usuba.o %BINDIR%\qeq_fifo.o %BINDIR%\qeq_get.o %BINDIR%\qeq_init.o %BINDIR%\qeq_lifo.o %BINDIR%\qf_act.o %BINDIR%\qf_gc.o %BINDIR%\qf_log2.o %BINDIR%\qf_new.o %BINDIR%\qf_pool.o %BINDIR%\qf_psini.o %BINDIR%\qf_pspub.o %BINDIR%\qf_pwr2.o %BINDIR%\qf_tick.o %BINDIR%\qmp_get.o %BINDIR%\qmp_init.o %BINDIR%\qmp_put.o %BINDIR%\qte_ctor.o %BINDIR%\qte_arm.o %BINDIR%\qte_darm.o %BINDIR%\qte_rarm.o %BINDIR%\qte_ctr.o
 @echo off
 erase %BINDIR%\*.o
 
@@ -136,7 +136,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qk.cpp       -o%BINDIR%\qk.o
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qk_sched.cpp -o%BINDIR%\qk_sched.o
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qk_mutex.cpp -o%BINDIR%\qk_mutex.o
-%ASM% src\qk_port.s -o %BINDIR%\qk_port.o %ASMFLAGS%
+%ASM% qk_port.s -o %BINDIR%\qk_port.o %ASMFLAGS%
 
 %LIB% %LIBFLAGS% %LIBDIR%\libqp_%ARM_CORE%_cr.a %BINDIR%\qk.o %BINDIR%\qk_sched.o %BINDIR%\qk_mutex.o %BINDIR%\qk_port.o
 @echo off

@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 09, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -55,9 +55,9 @@ QP_BEGIN_
     /// status type.
     ///
     /// The purpose of this macro is to enable writing the same code for the
-    /// case when critical sectgion status type is defined and when it is not.
+    /// case when critical section status type is defined and when it is not.
     /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
-    /// provides the definition of the critical section status varaible.
+    /// provides the definition of the critical section status variable.
     /// Otherwise this macro is empty.
     /// \sa #QF_CRIT_STAT_TYPE
     ///
@@ -66,7 +66,7 @@ QP_BEGIN_
     /// \brief This is an internal macro for entering a critical section.
     ///
     /// The purpose of this macro is to enable writing the same code for the
-    /// case when critical sectgion status type is defined and when it is not.
+    /// case when critical section status type is defined and when it is not.
     /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
     /// invokes #QF_CRIT_ENTRY passing the key variable as the parameter.
     /// Otherwise #QF_CRIT_ENTRY is invoked with a dummy parameter.
@@ -74,10 +74,10 @@ QP_BEGIN_
     ///
     #define QF_CRIT_ENTRY_()    QF_CRIT_ENTRY(dummy)
 
-    /// \brief This is an internal macro for exiting a cricial section.
+    /// \brief This is an internal macro for exiting a critical section.
     ///
     /// The purpose of this macro is to enable writing the same code for the
-    /// case when critical sectgion status type is defined and when it is not.
+    /// case when critical section status type is defined and when it is not.
     /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
     /// invokes #QF_CRIT_EXIT passing the key variable as the parameter.
     /// Otherwise #QF_CRIT_EXIT is invoked with a dummy parameter.

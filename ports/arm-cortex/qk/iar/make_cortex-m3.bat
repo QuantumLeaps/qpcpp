@@ -1,14 +1,14 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for ARM Cortex-M3, QK port, IAR compiler
-:: Last Updated for Version: 4.5.02
-:: Date of the Last Update:  Jul 26, 2012
+:: Last Updated for Version: 4.5.04
+:: Date of the Last Update:  Feb 10, 2013
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
 ::                    innovating embedded systems
 ::
-:: Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -39,7 +39,7 @@ setlocal
 :: where you've installed the IAR toolset or adjust the following 
 :: set instruction 
 ::if "%IAR_ARM%"=="" set IAR_ARM="C:\Program Files\IAR Systems\Embedded Workbench 6.30"
-if "%IAR_ARM%"=="" set IAR_ARM="C:\tools\IAR\ARM_KS_6.40"
+if "%IAR_ARM%"=="" set IAR_ARM="C:\tools\IAR\ARM_6.5"
 
 set PATH=%IAR_ARM%\arm\bin;%IAR_ARM%\common\bin;%PATH%
 
@@ -51,24 +51,25 @@ set QP_INCDIR=..\..\..\..\include
 set QP_PRTDIR=.
 
 set ARM_CORE=cortex-m3
+set ARM_FPU=None
 
 if "%1"=="" (
     echo default selected
     set BINDIR=%QP_PRTDIR%\dbg
-    set CCFLAGS=-D DEBUG --debug --endian little --cpu %ARM_CORE% --eec++ -e --fpu None --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 -Ohz
-    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu None -I%IAR_ARM%\ARM\INC\ 
+    set CCFLAGS=-D DEBUG --debug --endian little --cpu=%ARM_CORE% --fpu %ARM_FPU% --eec++ -e --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ohz
+    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu %ARM_FPU% -I%IAR_ARM%\ARM\INC\ 
 )
 if "%1"=="rel" (
     echo rel selected
     set BINDIR=%QP_PRTDIR%\rel
-    set CCFLAGS=-D NDEBUG --endian little --cpu %ARM_CORE% --eec++ -e --fpu None --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 -Ohz
-    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu None -I%IAR_ARM%\ARM\INC\ 
+    set CCFLAGS=-D NDEBUG --endian little --cpu %ARM_CORE% --eec++ -e --fpu %ARM_FPU% --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ohs --no_size_constraints
+    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu %ARM_FPU% -I%IAR_ARM%\ARM\INC\ 
 )
 if "%1"=="spy" (
     echo spy selected
     set BINDIR=%QP_PRTDIR%\spy
-    set CCFLAGS=-D Q_SPY -D DEBUG --debug --endian little --cpu %ARM_CORE% --eec++ -e --fpu None --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 -Ohz
-    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu None -I%IAR_ARM%\ARM\INC\ 
+    set CCFLAGS=-D Q_SPY -D DEBUG --debug --endian little --cpu %ARM_CORE% --fpu %ARM_FPU% --eec++ -e --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ohz
+    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu %ARM_FPU% -I%IAR_ARM%\ARM\INC\ 
 )
 
 mkdir %BINDIR% 
@@ -137,7 +138,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 %CC% %CCFLAGS% %CCINC% -o%BINDIR%\ %SRCDIR%\qk.cpp
 %CC% %CCFLAGS% %CCINC% -o%BINDIR%\ %SRCDIR%\qk_sched.cpp
 %CC% %CCFLAGS% %CCINC% -o%BINDIR%\ %SRCDIR%\qk_mutex.cpp
-%ASM% %ASMFLAGS%  -o %BINDIR%\qk_port.o src\qk_port.s
+%ASM% %ASMFLAGS%  -o %BINDIR%\qk_port.o qk_port.s
 
 %LIB% %LIBFLAGS% %LIBDIR%\libqp_%ARM_CORE%.a %BINDIR%\qk.o %BINDIR%\qk_sched.o %BINDIR%\qk_mutex.o %BINDIR%\qk_port.o
 @echo off

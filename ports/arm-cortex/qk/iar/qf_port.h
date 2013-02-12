@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product:  QF/C++, Cortex-M3, QK port, IAR compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 04, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -46,6 +46,10 @@
 // QF_CRIT_STAT_TYPE not defined: "unconditional interrupt unlocking" policy
 #define QF_CRIT_ENTRY(dummy)        __disable_interrupt()
 #define QF_CRIT_EXIT(dummy)         __enable_interrupt()
+
+#if (__CORE__ != __ARM6M__)                          // not Cortex-M0/M0+/M1 ?
+    #define QF_LOG2(n_) ((uint8_t)32 - __CLZ(n_))
+#endif
 
 #include <intrinsics.h>                             // IAR intrinsic functions
 

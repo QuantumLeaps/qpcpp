@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QF/C++ port TMS320C55x, TI-C5500 compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Jan 17, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -38,6 +38,7 @@
         // The maximum number of active objects in the application, see NOTE01
 #define QF_MAX_ACTIVE               8
 
+#define QF_MAX_EPOOL                3
 #define QF_EVENT_SIZ_SIZE           2
 #define QF_EQUEUE_CTR_SIZE          2
 #define QF_MPOOL_SIZ_SIZE           2
@@ -57,8 +58,10 @@
 #include "qvanilla.h"                          // "Vanilla" cooperative kernel
 #include "qf.h"                    // QF platform-independent public interface
 
-void QF_zero(void);                              // zero the .bss QF variables
-void bzero(uint8_t *ptr, uint16_t len);       // helper to clear other objects
+namespace QP {
+    void QF_zero(void);                          // zero the .bss QF variables
+    void bzero(uint8_t *ptr, uint16_t len);   // helper to clear other objects
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:
@@ -68,7 +71,7 @@ void bzero(uint8_t *ptr, uint16_t len);       // helper to clear other objects
 // NOTE02: (TMS320C55x Optimizing C/C++ Compiler User’s Guide, Section 6.6.4)
 // On some versions of the hardware there is a latency between setting the
 // INTM bit and when interrupts are actually disabled, therefore it is NOT
-// advisible to use inline assembly for setting/clearing the INTM mask.
+// advisable to use inline assembly for setting/clearing the INTM mask.
 // Using the intrinsics not only allows you to enable and disable the
 // interrupts with C code but guarantees that any necessary timing issues
 // are handled automatically.

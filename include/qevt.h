@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QP/C++
-// Last Updated for Version: 4.5.03
-// Date of the Last Update:  Nov 26, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 10, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -48,13 +48,13 @@
 /// \return version of the QP as a hex constant constant 0xXYZZ, where X is
 /// a 1-digit major version number, Y is a 1-digit minor version number, and
 /// ZZ is a 2-digit release number.
-#define QP_VERSION      0x4503U
+#define QP_VERSION      0x4504U
 
 #ifndef Q_ROM
     /// \brief Macro to specify compiler-specific directive for placing a
     /// constant object in ROM.
     ///
-    /// Many compilers for Harvard-architecture MCUs provide non-stanard
+    /// Many compilers for Harvard-architecture MCUs provide non-standard
     /// extensions to support placement of objects in different memories.
     /// In order to conserve the precious RAM, QP uses the Q_ROM macro for
     /// all constant objects that can be allocated in ROM.

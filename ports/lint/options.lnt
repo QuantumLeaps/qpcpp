@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 09, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -100,6 +100,8 @@ lib-qpcpp.lnt     // QP/C++ options
 -emacro(717, QACTIVE_EQUEUE_SIGNAL_) // do ... while(0);
 -efunc(529, *QF::tick)      // Symbol 'dummy' not accessed
 -efunc(438, *QF::tick)      // Value assigned to 'dummy' not used
+-esym(1960, QP::QF_*)       // 3-2-3, object/function previously declared
+                            // reported incorrectly for qf_pkg.h
 
 
 // QK
@@ -157,6 +159,8 @@ lib-qpcpp.lnt     // QP/C++ options
 -emacro(725,                // Expected positive indentation
  QS_END_,
  QS_END_NOCRIT_)
+-esym(1960, QP::QS_*)       // 3-2-3, object/function previously declared
+                            // reported incorrectly for qs_pkg.h
 
 // Warning 537 "Repeated include file" is generated only in the Q_SPY
 // configuration. This warning is redundant, because all QP header files

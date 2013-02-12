@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QP/C++
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 09, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 04, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -47,16 +47,29 @@ QP_BEGIN_
 //////////////////////////////////////////////////////////////////////////////
 // useful lookup tables
 
-/// \brief Lookup table for (log2(n) + 1), where n is the index
-/// into the table.
-///
-/// This lookup delivers the 1-based number of the most significant 1-bit
-/// of a byte.
-///
-/// \note Index range n = 0..255. The first index (n == 0) should never
-/// be used.
-///
-extern uint8_t const Q_ROM Q_ROM_VAR QF_log2Lkup[256];
+#ifndef QF_LOG2
+
+    /// \brief Macro to return (log2(n_) + 1), where \a n_ = 0..255.
+    ///
+    /// This macro delivers the 1-based number of the most significant 1-bit
+    /// of a byte. This macro can be re-implemented in the QP-nano ports,
+    /// if the processor supports special instructions, such as CLZ (count
+    /// leading zeros).
+    ///
+    /// If the macro is not defined in the port, the default implementation
+    /// uses a lookup table.
+    ///
+    #define QF_LOG2(n_) (Q_ROM_BYTE(QF_log2Lkup[(n_)]))
+
+    /// \brief Lookup table for (log2(n) + 1), where n is the index
+    /// into the table.
+    ///
+    /// This lookup delivers the 1-based number of the most significant 1-bit
+    /// of a byte.
+    ///
+    extern uint8_t const Q_ROM Q_ROM_VAR QF_log2Lkup[256];
+
+#endif                                                              // QF_LOG2
 
 /// \brief Lookup table for (1 << ((n-1) % 8)), where n is the index
 /// into the table.
@@ -77,7 +90,6 @@ extern uint8_t const Q_ROM Q_ROM_VAR QF_invPwr2Lkup[65];
 /// \note Index range n = 0..64. The first index (n == 0) should never
 /// be used.
 extern uint8_t const Q_ROM Q_ROM_VAR QF_div8Lkup[65];
-
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Priority Set of up to 8 elements for building various schedulers,
@@ -126,7 +138,7 @@ public:
     /// \brief find the maximum element in the set,
     /// \note returns zero if the set is empty
     uint8_t findMax(void) const {
-        return Q_ROM_BYTE(QF_log2Lkup[m_bits]);
+        return QF_LOG2(m_bits);
     }
 
     friend class QPSet64;
@@ -144,7 +156,7 @@ public:
 /// to manage up to 64 tasks. It is also used in the Quantum Kernel (QK)
 /// preemptive scheduler.
 ///
-/// The inherited 8-bit set is used as the 8-elemtn set of of 8-bit subsets
+/// The inherited 8-bit set is used as the 8-element set of of 8-bit subsets
 /// Each bit in the super.bits set represents a subset (8-elements)
 /// as follows: \n
 /// bit 0 in this->m_bits is 1 when subset[0] is not empty \n
@@ -216,11 +228,10 @@ public:
     uint8_t findMax(void) const {
         uint8_t n;
         if (m_bytes != static_cast<uint8_t>(0)) {
-            n = static_cast<uint8_t>(Q_ROM_BYTE(QF_log2Lkup[m_bytes])
+            n = static_cast<uint8_t>(QF_LOG2(m_bytes)
                                      - static_cast<uint8_t>(1));
-            n = static_cast<uint8_t>(
-                    Q_ROM_BYTE(QF_log2Lkup[m_bits[n]])
-                               + static_cast<uint8_t>(n << 3));
+            n = static_cast<uint8_t>(QF_LOG2(m_bits[n])
+                                     + static_cast<uint8_t>(n << 3));
         }
         else {
             n = static_cast<uint8_t>(0);

@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QP/C++ buld script for TMS320C55x, QK, C5500-compiler, large mem
-:: Last Updated for Version: 4.4.00
-:: Date of the Last Update:  Apr 19, 2012
+:: Last Updated for Version: 4.5.03
+:: Date of the Last Update:  Jan 16, 2013
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -26,7 +26,7 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http:::www.gnu.org/licenses/>.
+:: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
 :: Quantum Leaps Web sites: http://www.quantum-leaps.com
@@ -38,7 +38,7 @@ setlocal
 :: adjust the following path to the location where you've installed
 :: the TI CodeComposer/C5500 toolset...
 ::
-set TI_C5500=C:\tools\TI\ccsv5\tools\compiler\c5500
+set TI_C5500=C:\tools\TI\ccsv5\ccsv5\tools\compiler\c5500_4.4.1
 
 
 :: Typically, you don't need to modify this file past this line -------------

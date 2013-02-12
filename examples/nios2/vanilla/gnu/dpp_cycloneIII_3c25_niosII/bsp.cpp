@@ -1,28 +1,35 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example
-// Last Updated for Version: 4.1.02
-// Date of the Last Update:  Feb 10, 2010
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Feb 01, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2010 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
@@ -63,25 +70,25 @@ uint8_t l_led;
 //............................................................................
 void BSP_init(void) {
 
-       // low-level hadware initialization already performed in the Altera HAL
+    // low-level hardware initialization already done in the Altera HAL
 
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
 }
 //............................................................................
-void QF::onIdle(alt_irq_context intCtx) {
+void QF::onIdle(void) {
 #ifdef Q_SPY                        // use the idle cycles for QS transmission
-    QF_INT_UNLOCK(intCtx);
+    QF_INT_ENABLE();
 
     //while ((IORD_ALTERA_AVALON_UART_STATUS(UART1_BASE) // uncomment for UART
     //        & ALTERA_AVALON_UART_STATUS_TRDY_MSK) != 0)
     while((IORD_ALTERA_AVALON_JTAG_UART_CONTROL(JTAG_UART_BASE) // JTAG UART
          & ALTERA_AVALON_JTAG_UART_CONTROL_WSPACE_MSK ) != 0 )
     {
-        QF_INT_LOCK(intCtx);
+        QF_INT_DISABLE();
         uint16_t b = QS::getByte();
-        QF_INT_UNLOCK(intCtx);
+        QF_INT_ENABLE();
         if (b != QS_EOD) {                   /* is the QS buffer NOT empty? */
             //IOWR_ALTERA_AVALON_UART_TXDATA(UART1_BASE, (uint8_t)b);
             IOWR_ALTERA_AVALON_JTAG_UART_DATA(JTAG_UART_BASE, (uint8_t)b);
@@ -92,7 +99,7 @@ void QF::onIdle(alt_irq_context intCtx) {
     }
 
 #else
-    QF_INT_UNLOCK(intCtx);
+    QF_INT_ENABLE();
 
 #endif                                                                // Q_SPY
 }
@@ -115,14 +122,14 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
 //............................................................................
 void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
     LED_ON(7);
-    (void)alt_irq_disable_all();                        // lock all interrupts
+    QF_INT_DISABLE();                                // disable all interrupts
     for (;;) {      // NOTE: replace this endless loop in the production code!
     }
 }
 
 #ifdef Q_SPY
 //----------------------------------------------------------------------------
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[QS_BUF_SIZE];               // buffer for Quantum Spy
 
     initBuf(qsBuf, sizeof(qsBuf));
@@ -149,7 +156,7 @@ uint8_t QS::onStartup(void const *arg) {
 //    QS_FILTER_OFF(QS_QEP_INIT_TRAN);
 //    QS_FILTER_OFF(QS_QEP_INTERN_TRAN);
 //    QS_FILTER_OFF(QS_QEP_TRAN);
-//    QS_FILTER_OFF(QS_QEP_dummyD);
+//    QS_FILTER_OFF(QS_QEP_IGNORED);
 
     QS_FILTER_OFF(QS_QF_ACTIVE_ADD);
     QS_FILTER_OFF(QS_QF_ACTIVE_REMOVE);
@@ -178,12 +185,12 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM);
     QS_FILTER_OFF(QS_QF_TIMEEVT_REARM);
     QS_FILTER_OFF(QS_QF_TIMEEVT_POST);
-    QS_FILTER_OFF(QS_QF_INT_LOCK);
-    QS_FILTER_OFF(QS_QF_INT_UNLOCK);
+    QS_FILTER_OFF(QS_QF_CRIT_ENTRY);
+    QS_FILTER_OFF(QS_QF_CRIT_EXIT);
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
     QS_FILTER_OFF(QS_QF_ISR_EXIT);
 
-    return (uint8_t)1;               // indicate successfull QS initialization
+    return true;                      // indicate successful QS initialization
 }
 //............................................................................
 void QS::onCleanup(void) {
@@ -216,10 +223,9 @@ QSTimeCtr QS::onGetTime(void) {
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:
-// The QF_onIdle() callback is called with interrupts locked, because the
+// The QF_onIdle() callback is called with interrupts disabled, because the
 // determination of the idle condition might change by any interrupt posting
-// an event. QF_onIdle() must internally unlock interrupts, ideally
+// an event. QF_onIdle() must internally enable interrupts, ideally
 // atomically with putting the CPU to the power-saving mode.
-//
 //
 

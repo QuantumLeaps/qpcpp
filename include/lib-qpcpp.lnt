@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 09, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 09, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -34,6 +34,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // general (evt.h)
+-esym(1960,                   // Rule 7-3-1, Global declaration of symbol
+ char_t,
+ int_t,
+ enum_t,
+ float32_t,
+ float64_t)
 -estring(1960,                // 11-0-1(req) non-private data member
  sig,
  poolId_,
@@ -63,6 +69,7 @@
 
 
 // Assertions
+-esym(1960, Q_onAssert)       // Rule 7-3-1, Global declaration of symbol
 -estring(1960,                // 16-0-4 function-like macro
  Q_ASSERT,
  Q_ASSERT_ID,
@@ -154,7 +161,8 @@
  QF_QS_ISR_ENTRY,
  QF_QS_ISR_EXIT,
  QF_QS_ACTION,
- QF_MPOOL_EL)
+ QF_MPOOL_EL,
+ QF_LOG2)
 -esym(1960,                   // 16-0-4 function-like macro
  QACTIVE_EQUEUE_WAIT_,
  QACTIVE_EQUEUE_SIGNAL_,
@@ -164,6 +172,7 @@
  QF_EPOOL_GET_,
  QF_EPOOL_PUT_)
 -estring(1963, Q_NEW)         // 16-3-2(adv) '#/##' used in macro
+-esym(1960, remove)           // 17-0-2, Re-use of C++ identifier
 -esym(1790,                   // Base class has no virtual functions
  *QHsm,
  *QFsm,
@@ -190,6 +199,15 @@
  QK_EXT_SAVE,
  QK_EXT_RESTORE,
  QK_TLS)
+-esym(1960,                   // 7-3-1, Global declaration of symbol
+ QK_readySet_,
+ QK_currPrio_,
+ QK_intNest_,
+ QK_init,
+ QK_sched_,
+ QK_schedExt_,
+ QK_schedPrio_,
+ QK_ceilingPrio_)
 
 
 // QS

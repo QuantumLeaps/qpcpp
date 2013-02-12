@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QP/C++
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jun 25, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 04, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -86,7 +86,7 @@
     /// completely customized class that has nothing to do with QHsm or QFsm.
     /// The QF_ACTIVE_SUPER_ class must provide member functions init() and
     /// dispatch(), consistent with the signatures of QHsm and QFsm. But
-    /// the implementatin of these functions is completely open.
+    /// the implementation of these functions is completely open.
     #define QF_ACTIVE_SUPER_  QHsm
 
     /// \brief The argument of the base class' constructor.
@@ -226,12 +226,12 @@ public:
                void * const stkSto, uint32_t const stkSize,
                QEvt const * const ie = static_cast<QEvt *>(0));
 
-    /// \brief Posts an event \a e directly to the event queue of the acitve
+    /// \brief Posts an event \a e directly to the event queue of the active
     /// object \a me using the First-In-First-Out (FIFO) policy.
     ///
     /// Direct event posting is the simplest asynchronous communication method
     /// available in QF. The following example illustrates how the Philosopher
-    /// active obejct posts directly the HUNGRY event to the Table active
+    /// active object posts directly the HUNGRY event to the Table active
     /// object. \include qf_post.cpp
     ///
     /// \note The producer of the event (Philosopher in this case) must only
@@ -732,7 +732,7 @@ public:
     /// QF_onIdle() MUST enable the interrupts internally, but not before
     /// putting the CPU into the low-power mode. (Ideally, enabling interrupts
     /// and low-power mode should happen atomically). At the very least, the
-    /// function MUST enable interrupts, otherwise interrups will remain
+    /// function MUST enable interrupts, otherwise interrupts will remain
     /// disabled permanently.
     ///
     /// \note QF::onIdle() is only used by the non-preemptive "Vanilla"
@@ -740,7 +740,7 @@ public:
     /// QF ports. When QF is combined with QK, the QK idle loop calls a
     /// different function QK::onIdle(), with different semantics than
     /// QF::onIdle(). When QF is combined with a 3rd-party RTOS or kernel, the
-    /// idle processing mechanism of the RTOS or kernal is used instead of
+    /// idle processing mechanism of the RTOS or kernel is used instead of
     /// QF::onIdle().
     ///
     static void onIdle(void);
@@ -773,8 +773,8 @@ public:
     ///
     /// In the general case, event publishing requires multi-casting the
     /// event to multiple subscribers. This happens in the caller's thread
-    /// with the scheduler locked to prevent preemptions during the multi-
-    /// casting process. (Please note that the interrupts are not locked.)
+    /// with the scheduler locked to prevent preemption during the
+    /// multicasting process. (Please note that the interrupts are enabled.)
 #ifndef Q_SPY
     static void publish(QEvt const *e);
 #else
@@ -962,10 +962,11 @@ QP_END_
     /// arguments, so the overhead of passing this extra argument is
     /// entirely avoided.
     ///
-    /// \note the pointer to the sender object is not necessarily a poiner
-    /// to an active object. In fact, typically QF::TICK() will be called from
-    /// an interrupt, in which case you would create a unique object just to
-    /// unambiguously identify the ISR as the sender of the time events.
+    /// \note the pointer to the sender object is not necessarily a pointer
+    /// to an active object. In fact, typically QF::TICK() will be called
+    /// from an interrupt, in which case you would create a unique object
+    /// just to unambiguously identify the ISR as the sender of the time
+    /// events.
     ///
     /// \sa QF::tick()
     #define TICK(sender_)                  tick(sender_)
@@ -1002,7 +1003,7 @@ QP_END_
     /// the \a sender_ argument, so the overhead of passing this extra
     /// argument is entirely avoided.
     ///
-    /// \note the pointer to the sender object is not necessarily a poiner
+    /// \note the pointer to the sender object is not necessarily a pointer
     /// to an active object. In fact, if ao->POST() is called from an
     /// interrupt or other context, you can create a unique object just to
     /// unambiguously identify the publisher of the event.

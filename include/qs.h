@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QP/C++
-// Last Updated for Version: 4.5.03
-// Date of the Last Update:  Oct 10, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Jan 16, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -82,7 +82,7 @@ enum QSpyRecords {
     // QEP records
     QS_QEP_STATE_ENTRY,                               ///< a state was entered
     QS_QEP_STATE_EXIT,                                 ///< a state was exited
-    QS_QEP_STATE_INIT,          ///< an intial transition was taken in a state
+    QS_QEP_STATE_INIT,         ///< an initial transition was taken in a state
     QS_QEP_INIT_TRAN,           ///< the top-most initial transition was taken
     QS_QEP_INTERN_TRAN,                  ///< an internal transition was taken
     QS_QEP_TRAN,                           ///< a regular transition was taken
@@ -115,7 +115,7 @@ enum QSpyRecords {
     QS_QF_TICK,                                     ///< QF::tick() was called
     QS_QF_TIMEEVT_ARM,                             ///< a time event was armed
     QS_QF_TIMEEVT_AUTO_DISARM,      ///< a time event expired and was disarmed
-    QS_QF_TIMEEVT_DISARM_ATTEMPT,///< an attempt to disarmed a disarmed tevent
+    QS_QF_TIMEEVT_DISARM_ATTEMPT,///< an attempt to disarm a disarmed QTimeEvt
     QS_QF_TIMEEVT_DISARM,           ///< true disarming of an armed time event
     QS_QF_TIMEEVT_REARM,                         ///< rearming of a time event
     QS_QF_TIMEEVT_POST,      ///< a time event posted itself directly to an AO
@@ -218,7 +218,7 @@ public:
     /// \note If the data output rate cannot keep up with the production rate,
     /// QS will start overwriting the older data with newer data. This is
     /// consistent with the "last-is-best" QS policy. The record sequence
-    ///  counters and checksums on each record allow to easily detect data
+    /// counters and check sums on each record allow to easily detect data
     /// loss.
     static void initBuf(uint8_t sto[], uint32_t const stoSize);
 
@@ -664,7 +664,7 @@ QP_END_
     /// status type.
     ///
     /// The purpose of this macro is to enable writing the same code for the
-    /// case when critical sectgion status type is defined and when it is not.
+    /// case when critical section status type is defined and when it is not.
     /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
     /// provides the definition of the critical section status variable.
     /// Otherwise this macro is empty.
@@ -675,7 +675,7 @@ QP_END_
     /// \brief This is an internal macro for entering a critical section.
     ///
     /// The purpose of this macro is to enable writing the same code for the
-    /// case when critical sectgion status type is defined and when it is not.
+    /// case when critical section status type is defined and when it is not.
     /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
     /// invokes #QF_CRIT_ENTRY passing the key variable as the parameter.
     /// Otherwise #QF_CRIT_ENTRY is invoked with a dummy parameter.
@@ -683,10 +683,10 @@ QP_END_
     ///
     #define QS_CRIT_ENTRY_()    QF_CRIT_ENTRY(dummy)
 
-    /// \brief This is an internal macro for exiting a cricial section.
+    /// \brief This is an internal macro for exiting a critical section.
     ///
     /// The purpose of this macro is to enable writing the same code for the
-    /// case when critical sectgion status type is defined and when it is not.
+    /// case when critical section status type is defined and when it is not.
     /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
     /// invokes #QF_CRIT_EXIT passing the key variable as the parameter.
     /// Otherwise #QF_CRIT_EXIT is invoked with a dummy parameter.
@@ -1049,7 +1049,7 @@ QP_END_
     } \
 } while (false)
 
-/// \brief Output user QS rectord dictionary record
+/// \brief Output user QS record dictionary record
 ///
 /// A user QS record dictionary record associates the numerical value of a
 /// user record with the human-readable identifier.

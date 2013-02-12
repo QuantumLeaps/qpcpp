@@ -121,14 +121,14 @@ SECTIONS
                          RUN_START(_ramfuncs_runstart),
                          PAGE = 0
    {
-      qf2800_ml.lib<qf_tick.obj> (.text)
+      qp2800_ml.lib<qf_tick.obj> (.text)
 /*
-      qf2800_ml.lib<qa_fifo.obj> (.text)
-      qf2800_ml.lib<qa_get_.obj> (.text)
-      qf2800_ml.lib<qf_new.obj>  (.text)
-      qf2800_ml.lib<qf_gc.obj>   (.text)
+      qp2800_ml.lib<qa_fifo.obj> (.text)
+      qp2800_ml.lib<qa_get_.obj> (.text)
+      qp2800_ml.lib<qf_new.obj>  (.text)
+      qp2800_ml.lib<qf_gc.obj>   (.text)
 */
-      qf2800_ml.lib<qvanilla.obj>(.text)
+      qp2800_ml.lib<qvanilla.obj>(.text)
    }
 
    ramconsts           : LOAD = FLASH,
@@ -138,9 +138,9 @@ SECTIONS
                          RUN_START(_ramconsts_runstart)
                          PAGE = 0
    {
-      qf2800_ml.lib<qf_log2.obj> (.econst)
+      qp2800_ml.lib<qf_log2.obj> (.econst)
 /*
-      qf2800_ml.lib<qf_pwr2.obj> (.econst)
+      qp2800_ml.lib<qf_pwr2.obj> (.econst)
 */
    }
 

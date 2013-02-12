@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QP/C++ buld script for TMS320C28x, vanilla port, C2000-compiler
-:: Last Updated for Version: 4.4.00
-:: Date of the Last Update:  Apr 19, 2012
+:: Last Updated for Version: 4.5.03
+:: Date of the Last Update:  Jan 18, 2013
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -26,7 +26,7 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http:::www.gnu.org/licenses/>.
+:: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
 :: Quantum Leaps Web sites: http://www.quantum-leaps.com
@@ -36,9 +36,9 @@
 setlocal
 
 :: adjust the following path to the location where you've installed
-:: the IAR toolset...
+:: the TI CodeComposer/C2000 toolset...
 ::
-set TI_C2000=C:\tools\TI\CCStudio_v3.3\C2000\cgtools
+set TI_C2000=C:\tools\TI\ccsv5\ccsv5\tools\compiler\c2000_6.1.0
 
 
 :: Typically, you don't need to modify this file past this line -------------
@@ -78,6 +78,8 @@ set LIBDIR=%BINDIR%
 set LIBFLAGS=a
 mkdir %BINDIR%
 
+erase %BINDIR%\qp%TMS320_VER%00_m%MEM_MODEL%.lib
+
 :: QEP ----------------------------------------------------------------------
 set SRCDIR=..\..\..\..\qep\source
 set CCINC=-i%QP_PRTDIR% -i%QP_INCDIR% -i%SRCDIR%
@@ -91,8 +93,7 @@ set CCINC=-i%QP_PRTDIR% -i%QP_INCDIR% -i%SRCDIR%
 %CC% %CCFLAGS% %CCINC% -fr"%QP_PRTDIR%\%BINDIR%" %SRCDIR%\qhsm_top.cpp
 %CC% %CCFLAGS% %CCINC% -fr"%QP_PRTDIR%\%BINDIR%" %SRCDIR%\qhsm_in.cpp 
 
-erase %BINDIR%\qep%TMS320_VER%00_m%MEM_MODEL%.lib
-%LIB% %LIBFLAGS% %LIBDIR%\qep%TMS320_VER%00_m%MEM_MODEL%.lib %BINDIR%\qep.obj %BINDIR%\qfsm_ini.obj %BINDIR%\qfsm_dis.obj %BINDIR%\qhsm_ini.obj %BINDIR%\qhsm_dis.obj %BINDIR%\qhsm_top.obj %BINDIR%\qhsm_in.obj
+%LIB% %LIBFLAGS% %LIBDIR%\qp%TMS320_VER%00_m%MEM_MODEL%.lib %BINDIR%\qep.obj %BINDIR%\qfsm_ini.obj %BINDIR%\qfsm_dis.obj %BINDIR%\qhsm_ini.obj %BINDIR%\qhsm_dis.obj %BINDIR%\qhsm_top.obj %BINDIR%\qhsm_in.obj
 @echo off
 
 :: QF -----------------------------------------------------------------------
@@ -130,8 +131,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 %CC% %CCFLAGS% %CCINC% -fr"%QP_PRTDIR%\%BINDIR%" %SRCDIR%\qvanilla.cpp
 %CC% %CCFLAGS% %CCINC% -fr"%QP_PRTDIR%\%BINDIR%" src\qf_port.cpp
 
-erase %BINDIR%\qf%TMS320_VER%00_m%MEM_MODEL%.lib
-%LIB% %LIBFLAGS% %LIBDIR%\qf%TMS320_VER%00_m%MEM_MODEL%.lib %BINDIR%\qa_defer.obj %BINDIR%\qa_fifo.obj %BINDIR%\qa_lifo.obj %BINDIR%\qa_get_.obj %BINDIR%\qa_sub.obj %BINDIR%\qa_usub.obj %BINDIR%\qa_usuba.obj %BINDIR%\qeq_fifo.obj %BINDIR%\qeq_get.obj %BINDIR%\qeq_init.obj %BINDIR%\qeq_lifo.obj %BINDIR%\qf_act.obj %BINDIR%\qf_gc.obj %BINDIR%\qf_log2.obj %BINDIR%\qf_new.obj %BINDIR%\qf_pool.obj %BINDIR%\qf_pspub.obj %BINDIR%\qf_pwr2.obj %BINDIR%\qf_tick.obj %BINDIR%\qmp_get.obj %BINDIR%\qmp_init.obj %BINDIR%\qmp_put.obj %BINDIR%\qte_ctor.obj %BINDIR%\qte_arm.obj %BINDIR%\qte_darm.obj %BINDIR%\qte_rarm.obj %BINDIR%\qvanilla.obj %BINDIR%\qf_port.obj
+%LIB% %LIBFLAGS% %LIBDIR%\qp%TMS320_VER%00_m%MEM_MODEL%.lib %BINDIR%\qa_defer.obj %BINDIR%\qa_fifo.obj %BINDIR%\qa_lifo.obj %BINDIR%\qa_get_.obj %BINDIR%\qa_sub.obj %BINDIR%\qa_usub.obj %BINDIR%\qa_usuba.obj %BINDIR%\qeq_fifo.obj %BINDIR%\qeq_get.obj %BINDIR%\qeq_init.obj %BINDIR%\qeq_lifo.obj %BINDIR%\qf_act.obj %BINDIR%\qf_gc.obj %BINDIR%\qf_log2.obj %BINDIR%\qf_new.obj %BINDIR%\qf_pool.obj %BINDIR%\qf_pspub.obj %BINDIR%\qf_pwr2.obj %BINDIR%\qf_tick.obj %BINDIR%\qmp_get.obj %BINDIR%\qmp_init.obj %BINDIR%\qmp_put.obj %BINDIR%\qte_ctor.obj %BINDIR%\qte_arm.obj %BINDIR%\qte_darm.obj %BINDIR%\qte_rarm.obj %BINDIR%\qvanilla.obj %BINDIR%\qf_port.obj
 @echo off
 
 :: QS -----------------------------------------------------------------------
@@ -151,8 +151,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 ::%CC% %CCFLAGS% %CCINC% -fr"%QP_PRTDIR%\%BINDIR%" %SRCDIR%\qs_str.cpp
 %CC% %CCFLAGS% %CCINC% -fr"%QP_PRTDIR%\%BINDIR%" src\qs_port.cpp
 
-erase %BINDIR%\qs%TMS320_VER%00_m%MEM_MODEL%.lib
-%LIB% %LIBFLAGS% %LIBDIR%\qs%TMS320_VER%00_m%MEM_MODEL%.lib %BINDIR%\qs_port.obj
+%LIB% %LIBFLAGS% %LIBDIR%\qp%TMS320_VER%00_m%MEM_MODEL%.lib %BINDIR%\qs_port.obj
 @echo off
 
 :: --------------------------------------------------------------------------

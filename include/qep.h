@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QEP/C++ platform-independent public interface
-// Last Updated for Version: 4.5.01
-// Date of the Last Update:  Jun 13, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Jan 16, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -265,7 +265,7 @@ public:
     void dispatch(QEvt const * const e);
 
     /// \brief Tests if a given state is part of the current active state
-    /// configuratioin
+    /// configuration
     ///
     /// \param state is a pointer to the state handler function, e.g.,
     /// &QCalc::on.

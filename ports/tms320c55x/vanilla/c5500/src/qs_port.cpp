@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: QS/C++ port TMS32055x, TI-C5500 compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Product: QS/C++ port TMS320C55x, TI-C5500 compiler
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Jan 17, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -35,17 +35,10 @@
 #include "qs_pkg.h"
 #include "qassert.h"
 
-//Q_DEFINE_THIS_MODULE(qs_port)
-
 
 #undef  QS_INSERT_BYTE
 #define QS_INSERT_BYTE(b_) \
-    if ((QS_head_ & 1U) == 0U) { \
-        QS_ring_[QS_head_ >> 1] = (b_) << 8; \
-    } \
-    else { \
-        QS_ring_[QS_head_ >> 1] |= (b_) & 0xFFU; \
-    } \
+    QS_ring_[QS_head_] = (b_) & 0xFFU; \
     if (++QS_head_ == QS_end_) { \
         QS_head_ = (QSCtr)0; \
     } \
@@ -59,6 +52,10 @@
         (b_) ^= QS_ESC_XOR; \
     } \
     QS_INSERT_BYTE(b_)
+
+QP_BEGIN_
+
+//Q_DEFINE_THIS_MODULE("qs_port")
 
 
 // from qs.cpp ===============================================================
@@ -75,32 +72,38 @@ uint8_t QS_chksum_;                      // the checksum of the current record
 uint8_t QS_full_;                       // the ring buffer is temporarily full
 
 //............................................................................
-//lint -e970 -e971               ignore MISRA rules 13 and 14 in this function
-char const Q_ROM * Q_ROM_VAR QS_getVersion(void) {
-    static char const Q_ROM Q_ROM_VAR version[] = "4.0.03";
-    return version;
-}
-//............................................................................
 void QS::initBuf(uint8_t sto[], uint32_t stoSize) {
-    QS_ring_   = &sto[0];
-    QS_end_    = (QSCtr)(stoSize * 2);                // number of 8-bit bytes
+    QS_ring_ = &sto[0];
+    QS_end_  = (QSCtr)stoSize;
+}
 
-    QS_head_   = (uint16_t)0;
-    QS_tail_   = (uint16_t)0;
-    QS_used_   = (uint16_t)0;
+//............................................................................
+void QS_zero(void) {                                             // see NOTE01
+    QS_head_   = (QSCtr)0;
+    QS_tail_   = (QSCtr)0;
+    QS_used_   = (QSCtr)0;
     QS_seq_    = (uint8_t)0;
     QS_chksum_ = (uint8_t)0;
     QS_full_   = (uint8_t)0;
 
-    smObj_     = (void *)0;
-    aoObj_     = (void *)0;
-    mpObj_     = (void *)0;
-    eqObj_     = (void *)0;
-    teObj_     = (void *)0;
-    apObj_     = (void *)0;
+    QS::smObj_ = (void *)0;
+    QS::aoObj_ = (void *)0;
+    QS::mpObj_ = (void *)0;
+    QS::eqObj_ = (void *)0;
+    QS::teObj_ = (void *)0;
+    QS::apObj_ = (void *)0;
 
-    bzero(glbFilter_, sizeof(glbFilter_));
+    bzero(QS::glbFilter_, sizeof(QS::glbFilter_));
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// NOTE01:
+// The standard TI startup code (c_int00) does NOT zero the uninitialized
+// variables, as required by the C-standard. Since QF relies on the clearing
+// of the static uninitialized variables, the critical QF objects are cleared
+// explicitly in this port.
+//
+
 //............................................................................
 void QS::filterOn(uint8_t rec) {
     uint8_t i;
@@ -110,7 +113,7 @@ void QS::filterOn(uint8_t rec) {
         }
     }
     else {
-        glbFilter_[rec >> 3] |= (uint8_t)(1U << (rec & 0x07));
+        glbFilter_[rec >> 3] |= (uint8_t)(1U << (rec & 0x07U));
     }
 }
 //............................................................................
@@ -122,7 +125,7 @@ void QS::filterOff(uint8_t rec) {
         }
     }
     else {
-        glbFilter_[rec >> 3] &= (uint8_t)(~(1U << (rec & 0x07)));
+        glbFilter_[rec >> 3] &= (uint8_t)(~(1U << (rec & 0x07U)));
     }
 }
 //............................................................................
@@ -136,7 +139,7 @@ void QS::begin(uint8_t rec) {
 }
 //............................................................................
 void QS::end(void) {
-    QS_chksum_ = (uint8_t)(~QS_chksum_ & 0xFFU);
+    QS_chksum_ = ~QS_chksum_ & 0xFFU;
     if ((QS_chksum_ == QS_FRAME) || (QS_chksum_ == QS_ESC)) {
         QS_INSERT_BYTE(QS_ESC)
         QS_chksum_ ^= QS_ESC_XOR;
@@ -187,7 +190,7 @@ void const *QS::eqObj_;                           // local raw queue QF filter
 void const *QS::teObj_;                          // local time event QF filter
 void const *QS::apObj_;                     // local object Application filter
 
-QSTimeCtr volatile QS::tickCtr_;     // tick counter for the QS_QF_TICK record
+QSTimeCtr QS::tickCtr_;              // tick counter for the QS_QF_TICK record
 
 //............................................................................
 void QS::u8_(uint8_t d) {
@@ -247,12 +250,7 @@ uint16_t QS::getByte(void) {
     if (QS_used_ == (QSCtr)0) {
         return QS_EOD;                                   // return End-Of-Data
     }
-    if ((QS_tail_ & 1U) == 0U) {
-        byte = QS_ring_[QS_tail_ >> 1] >> 8;
-    }
-    else { \
-        byte = QS_ring_[QS_tail_ >> 1] & 0xFFU;
-    }
+    byte = QS_ring_[QS_tail_] & 0xFFU;               // set the byte to return
     ++QS_tail_;                                            // advance the tail
     if (QS_tail_ == QS_end_) {                            // tail wrap around?
         QS_tail_ = (QSCtr)0;
@@ -365,3 +363,5 @@ void QS::str_ROM(char const Q_ROM * Q_ROM_VAR s) {
     }
     QS_INSERT_BYTE((uint8_t)0)
 }
+
+QP_END_

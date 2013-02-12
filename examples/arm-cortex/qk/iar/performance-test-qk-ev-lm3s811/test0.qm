@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="2.2.03">
+ <documentation>Performance test0:
+
+This performance test uses one state machine Test0, which processes PING events. Upon receiving each PING event, the Test0 state machine increments an internal counter m_counter.
+
+Also, the PING events drive transitions between the &quot;on&quot; and &quot;off&quot; states, which turn an LED on and off, respectively.
+
+The test runs on the EV-LM3S811 ARM Cortex-M3 board, with CPU clock configured for 20MHz.
+
+The SysTick interrupt, which is driven from the CPU clock, is set for 10 million cycles (1/2 second).
+
+The test is indended to be run in a debugger, with a breakpoint inside the SysTick ISR. The l_test.m_counter variable should be watched. The count difference between successive SysTicks represents the number of processed PING events over the 10 million cycles.
+
+Processing of each event tests the performance of the following QP elements:
+
+1. event dispatching to the Test state machine
+2. event processing inside the state machine</documentation>
+ <framework name="qpcpp"/>
+ <package name="AOs" stereotype="0x02" namespace="TEST::">
+  <class name="Test0" superclass="qpcpp::QHsm">
+   <attribute name="m_counter" type="uint32_t" visibility="0x00" properties="0x00">
+    <documentation>ping counter</documentation>
+   </attribute>
+   <operation name="Test0" type="QHsm(Q_STATE_CAST(&amp;Test0::initial))" visibility="0x00" properties="0x00"/>
+   <statechart>
+    <initial target="../1">
+     <action>(void)e; // suppress the compiler warning about unused parameter
+me-&gt;m_counter = 0U;</action>
+     <initial_glyph conn="2,3,5,1,20,5,-4">
+      <action box="0,-2,6,2"/>
+     </initial_glyph>
+    </initial>
+    <state name="on">
+     <entry>BSP_ledOn();</entry>
+     <tran trig="PING" target="../../2">
+      <action>++me-&gt;m_counter;</action>
+      <tran_glyph conn="18,16,1,3,18">
+       <action box="0,-2,14,4"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,6,16,13">
+      <entry box="1,2,12,5"/>
+     </state_glyph>
+    </state>
+    <state name="off">
+     <entry>BSP_ledOff();</entry>
+     <tran trig="PING" target="../../1">
+      <action>++me-&gt;m_counter;</action>
+      <tran_glyph conn="36,12,3,1,-18">
+       <action box="-13,-2,14,4"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="36,6,16,13">
+      <entry box="1,2,12,4"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="55,21"/>
+   </statechart>
+  </class>
+ </package>
+ <directory name=".">
+  <file name="test0.cpp">
+   <text>/*
+Performance test0:
+
+This performance test uses one state machine Test0, which processes PING events.
+Upon receiving each PING event, the Test0 state machine increments an internal
+counter m_counter.
+
+Also, the PING events drive transitions between the &quot;on&quot; and &quot;off&quot; states, which
+turn an LED on and off, respectively.
+
+The test runs on the EV-LM3S811 ARM Cortex-M3 board, with CPU clock configured
+for 20MHz.
+
+The SysTick interrupt, which is driven from the CPU clock, is set for 10 million
+cycles (1/2 second).
+
+The test is indended to be run in a debugger, with a breakpoint inside the
+SysTick ISR. The l_test.m_counter variable should be watched. The m_count
+difference between successive SysTicks represents the number of processed
+PING events over the 10 million cycles.
+
+Processing of each event tests the performance of the following QP elements:
+
+1. event dispatching to the Test state machine
+2. event processing inside the state machine
+*/
+
+#include &quot;qp_port.h&quot;
+#include &quot;lm3s_cmsis.h&quot;
+
+// set ticking rate to 2 times per second, which is every 10million
+// CPU cycles at 20 MHz
+#define BSP_TICKS_PER_SEC  2U
+
+#define USER_LED           (1U &lt;&lt; 5)
+
+namespace TEST {
+
+//Q_DEFINE_THIS_FILE
+
+void BSP_init(void);
+void BSP_ledOn(void);
+void BSP_ledOff(void);
+
+//............................................................................
+extern &quot;C&quot; void SysTick_Handler(void) {
+}
+
+//............................................................................
+void BSP_init(void) {
+    // set the system clock as specified in lm3s_config.h (20MHz from PLL)
+    SystemInit();
+
+    // enable clock to the peripherals used by the application
+    SYSCTL-&gt;RCGC2 |= (1U &lt;&lt; 2);              // enable clock to C
+    __NOP();                                 // wait after enabling clocks
+
+    // configure the LED
+    GPIOC-&gt;DIR |= USER_LED;                  // set direction: output
+    GPIOC-&gt;DEN |= USER_LED;                  // digital enable
+    GPIOC-&gt;DATA_Bits[USER_LED] = 0U;         // turn the User LED off
+
+    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
+    (void)SysTick_Config(SystemFrequency / BSP_TICKS_PER_SEC);
+}
+//............................................................................
+void BSP_ledOn(void) {
+    GPIOC-&gt;DATA_Bits[USER_LED] = USER_LED;
+}
+//............................................................................
+void BSP_ledOff(void) {
+    GPIOC-&gt;DATA_Bits[USER_LED] = 0U;
+}
+//............................................................................
+extern &quot;C&quot; void Q_onAssert(char_t const * const, int_t const) {
+    QF_INT_DISABLE(); // make sure that all interrupts are disabled
+    for (;;) {        // NOTE: replace the loop with reset for final version
+    }
+}
+
+// Active object class -------------------------------------------------------
+enum TestSignals {
+    PING_SIG = QP::Q_USER_SIG,
+    MAX_PUB_SIG,  // the last published signal
+    MAX_SIG       // the last signal
+};
+
+// Test active object --------------------------------------------------------
+$declare(AOs::Test0)
+$define(AOs::Test0)
+
+static Test0 l_test0;   // storage for the Test0 HSM
+
+extern &quot;C&quot; void main(void) {
+
+    BSP_init(); // initialize the BSP
+
+    l_test0.init(); // take the top-most initial transition
+
+    static QP::QEvt const pingEvt = { PING_SIG, 0U, 0U };
+    while (1) {
+        l_test0.dispatch(&amp;pingEvt);
+    }
+}
+
+} // namespace TEST
+</text>
+  </file>
+ </directory>
+</model>

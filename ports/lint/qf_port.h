@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QF/C++ port to Lint, Generic C++ compiler
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 09, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -34,6 +34,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef qf_port_h
 #define qf_port_h
+
+/*lint -save -e1960    MISRA-C++:2008 Rule 7-3-1, Global declaration */
 
 /// \file
 /// \ingroup qf qk
@@ -178,7 +180,7 @@
 /// QF_ACTIVE_BASE.
 ///
 /// Clients might choose, for example, to define QF_ACTIVE_BASE as QFsm
-/// to avoide the 1-2KB overhead of the hierarchical event processor.
+/// to avoid the 1-2KB overhead of the hierarchical event processor.
 ///
 /// Clients might also choose to define QF_ACTIVE_BASE as their own
 /// completely customized class that has nothing to do with QHsm or QFsm.
@@ -219,7 +221,7 @@ extern "C" void intEnable(void);
 /// \brief Define the type of the critical section status.
 ///
 /// Defining this macro configures the "saving and restoring critical section
-/// status" policy. Coversely, if this macro is not defined, the simple
+/// status" policy. Conversely, if this macro is not defined, the simple
 /// "unconditional critical section exit" is used.
 ///
 #define QF_CRIT_STAT_TYPE           crit_stat_t
@@ -256,6 +258,9 @@ extern "C" void intEnable(void);
 typedef unsigned int crit_stat_t;
 extern "C" QF_CRIT_STAT_TYPE critEntry(void);
 extern "C" void critExit(QF_CRIT_STAT_TYPE stat);
+
+/*lint -restore */
+
 
 #include "qep_port.h"                                              // QEP port
 #include "qk_port.h"                                                // QK port

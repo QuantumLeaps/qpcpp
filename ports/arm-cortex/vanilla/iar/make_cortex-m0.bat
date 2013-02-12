@@ -1,8 +1,8 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for ARM Cortex-M0, Vanilla port, IAR IAR compiler
-:: Last Updated for Version: 4.5.02
-:: Date of the Last Update:  Jul 26, 2012
+:: Last Updated for Version: 4.5.04
+:: Date of the Last Update:  Feb 10, 2013
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -38,8 +38,8 @@ setlocal
 :: define the IAR_ARM environment variable to point to the location 
 :: where you've installed the IAR toolset or adjust the following 
 :: set instruction 
-::if "%IAR_ARM%"=="" set IAR_ARM="C:\Program Files\IAR Systems\Embedded Workbench 6.30"
-if "%IAR_ARM%"=="" set IAR_ARM="C:\tools\IAR\ARM_KS_6.40"
+::if "%IAR_ARM%"=="" set IAR_ARM="C:\Program Files\IAR Systems\Embedded Workbench 6.50"
+if "%IAR_ARM%"=="" set IAR_ARM="C:\tools\IAR\ARM_6.5"
 
 set PATH=%IAR_ARM%\arm\bin;%IAR_ARM%\common\bin;%PATH%
 
@@ -51,24 +51,25 @@ set QP_INCDIR=..\..\..\..\include
 set QP_PRTDIR=.
 
 set ARM_CORE=cortex-m0
+set ARM_FPU=None
 
 if "%1"=="" (
     echo default selected
     set BINDIR=%QP_PRTDIR%\dbg
-    set CCFLAGS=-D DEBUG --debug --endian little --cpu %ARM_CORE% --eec++ -e --fpu None --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 -Ohz
-    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu None -I%IAR_ARM%\ARM\INC\ 
+    set CCFLAGS=-D DEBUG --debug --endian little --cpu=%ARM_CORE% --fpu %ARM_FPU% --eec++ -e --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ohz
+    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu %ARM_FPU% -I%IAR_ARM%\ARM\INC\ 
 )
 if "%1"=="rel" (
     echo rel selected
     set BINDIR=%QP_PRTDIR%\rel
-    set CCFLAGS=-D NDEBUG --endian little --cpu %ARM_CORE% --eec++ -e --fpu None --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 -Ohz
-    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu None -I%IAR_ARM%\ARM\INC\ 
+    set CCFLAGS=-D NDEBUG --endian little --cpu %ARM_CORE% --eec++ -e --fpu %ARM_FPU% --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ohs --no_size_constraints
+    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu %ARM_FPU% -I%IAR_ARM%\ARM\INC\ 
 )
 if "%1"=="spy" (
     echo spy selected
     set BINDIR=%QP_PRTDIR%\spy
-    set CCFLAGS=-D Q_SPY -D DEBUG --debug --endian little --cpu %ARM_CORE% --eec++ -e --fpu None --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 -Ohz
-    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu None -I%IAR_ARM%\ARM\INC\ 
+    set CCFLAGS=-D Q_SPY -D DEBUG --debug --endian little --cpu %ARM_CORE% --fpu %ARM_FPU% --eec++ -e --dlib_config %IAR_ARM%\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ohz
+    set ASMFLAGS=-s+ -w+ -r --cpu %ARM_CORE% --fpu %ARM_FPU% -I%IAR_ARM%\ARM\INC\ 
 )
 
 mkdir %BINDIR%
@@ -91,6 +92,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 
 %LIB% --create %LIBDIR%\libqp_%ARM_CORE%.a %BINDIR%\qep.o %BINDIR%\qfsm_ini.o %BINDIR%\qfsm_dis.o %BINDIR%\qhsm_ini.o %BINDIR%\qhsm_dis.o %BINDIR%\qhsm_top.o %BINDIR%\qhsm_in.o
 @echo off
+erase %BINDIR%\*.o
 
 :: QF -----------------------------------------------------------------------
 set SRCDIR=..\..\..\..\qf\source
@@ -129,6 +131,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 
 %LIB% %LIBFLAGS% %LIBDIR%\libqp_%ARM_CORE%.a %BINDIR%\qa_defer.o %BINDIR%\qa_fifo.o %BINDIR%\qa_lifo.o %BINDIR%\qa_get_.o %BINDIR%\qa_sub.o %BINDIR%\qa_usub.o %BINDIR%\qa_usuba.o %BINDIR%\qeq_fifo.o %BINDIR%\qeq_get.o %BINDIR%\qeq_init.o %BINDIR%\qeq_lifo.o %BINDIR%\qf_act.o %BINDIR%\qf_gc.o %BINDIR%\qf_log2.o %BINDIR%\qf_new.o %BINDIR%\qf_pool.o %BINDIR%\qf_psini.o %BINDIR%\qf_pspub.o %BINDIR%\qf_pwr2.o %BINDIR%\qf_tick.o %BINDIR%\qmp_get.o %BINDIR%\qmp_init.o %BINDIR%\qmp_put.o %BINDIR%\qte_ctor.o %BINDIR%\qte_ctr.o %BINDIR%\qte_arm.o %BINDIR%\qte_darm.o %BINDIR%\qte_rarm.o %BINDIR%\qvanilla.o 
 @echo off
+erase %BINDIR%\*.o
 
 :: QS -----------------------------------------------------------------------
 if not "%1"=="spy" goto clean
@@ -148,9 +151,12 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 
 %LIB% %LIBFLAGS% %LIBDIR%\libqp_%ARM_CORE%.a %BINDIR%\qs.o %BINDIR%\qs_.o %BINDIR%\qs_blk.o %BINDIR%\qs_byte.o %BINDIR%\qs_f32.o %BINDIR%\qs_f64.o %BINDIR%\qs_mem.o %BINDIR%\qs_str.o
 @echo off
+erase %BINDIR%\*.o
+
+:: --------------------------------------------------------------------------
 
 :clean
 @echo off
-erase %BINDIR%\*.o
+erase %BINDIR%\tmp*.*
 
 endlocal

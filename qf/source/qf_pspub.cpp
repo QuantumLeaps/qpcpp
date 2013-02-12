@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 04, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -71,7 +71,7 @@ void QF::publish(QEvt const * const e, void const * const sender) {
 #if (QF_MAX_ACTIVE <= 8)
     uint8_t tmp = QF_PTR_AT_(QF_subscrList_, e->sig).m_bits[0];
     while (tmp != u8_0) {
-        uint8_t p = Q_ROM_BYTE(QF_log2Lkup[tmp]);
+        uint8_t p = QF_LOG2(tmp);
         tmp &= Q_ROM_BYTE(QF_invPwr2Lkup[p]);      // clear the subscriber bit
         Q_ASSERT(active_[p] != static_cast<QActive *>(0));//must be registered
 
@@ -85,7 +85,7 @@ void QF::publish(QEvt const * const e, void const * const sender) {
         --i;
         uint8_t tmp = QF_PTR_AT_(QF_subscrList_, e->sig).m_bits[i];
         while (tmp != u8_0) {
-            uint8_t p = Q_ROM_BYTE(QF_log2Lkup[tmp]);
+            uint8_t p = QF_LOG2(tmp);
             tmp &= Q_ROM_BYTE(QF_invPwr2Lkup[p]);  // clear the subscriber bit
                                                         // adjust the priority
             p = static_cast<uint8_t>(p + static_cast<uint8_t>(i << 3));

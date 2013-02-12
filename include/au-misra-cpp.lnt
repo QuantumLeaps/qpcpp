@@ -1,6 +1,12 @@
-/* Date Stamp */ -d"_lint_au_misra_cpp_lnt=au-misra-cpp.lnt modified 6-Jan-2012"
+/* Date Stamp */ -d"_lint_au_misra_cpp_lnt=au-misra-cpp.lnt modified 9-Aug-2012"
 /* To document usage use: -message( "Using " _lint_au_misra_cpp_lnt ) */
-
+// ---------------------------------------------------------------------
+// This file is provided by Gimpel Software (www.gimpel.com) for use with
+// its products PC-lint and FlexeLint.
+//
+// Redistribution and use of this file, with or without modification, is
+// permitted provided that any such redistribution retains this notice.
+// ---------------------------------------------------------------------
 // au-misra-cpp.lnt -- Author options - MISRA C++
 
 /*
@@ -390,7 +396,7 @@
     +e31       /* redefinition */
     +elib(31)
     -append(31,[MISRA C++ Rule 3-2-2])
-    
+
 /* Rule 3-2-3    (req) *********************************/
 
     /* we generate note 1960 as follows
@@ -439,6 +445,9 @@
     +elib(970)
     -esym(970,wchar_t)
     -append(970,[MISRA C++ Rule 3-9-2])
+    //  For the duration, we are presuming MISRA does not want
+    //  diagnostics for the bool type.
+    -esym(970,bool)
 
 /* Rule 3-9-3    (req) *********************************/
 
@@ -451,7 +460,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 4-5-1,
-       Boolean expression used with non-permitted operator 
+       Boolean expression used with non-permitted operator
      */
 
 /* Rule 4-5-2    (req) *********************************/
@@ -473,6 +482,7 @@
 
     +e910       /* conversion from 0 to pointer */
     +elib(910)
+    -emacro((910), NULL)    /*  explicit exception  */
     -append(910,[MISRA C++ Rule 4-10-2])
 
 /* Rule 5-0-1    (req) *********************************/
@@ -633,7 +643,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-0-19,
-       More than two pointer indirection levels used       
+       More than two pointer indirection levels used
      */
 
 /* Rule 5-0-20  (req) *********************************/
@@ -641,17 +651,17 @@
     /* not currently supported */
 
 /* Rule 5-0-21  (req) *********************************/
-    
+
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-0-21,
-       Bitwise operator applied to signed underlying type  
+       Bitwise operator applied to signed underlying type
      */
 
 /* Rule 5-2-1  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-2-1,
-       Non-postfix expression used with logical operator 
+       Non-postfix expression used with logical operator
      */
 
 /* Rule 5-2-2  (req) *********************************/
@@ -680,7 +690,7 @@
     -append(1773,[MISRA C++ Rule 5-2-5])
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-2-5,
-       Attempt to cast away const/volatile from a pointer or reference 
+       Attempt to cast away const/volatile from a pointer or reference
      */
 
 /* Rule 5-2-6  (req) *********************************/
@@ -759,7 +769,7 @@
     +elib(564)
     /* we generate note 1963 as follows
        Note 1963: Violates MISRA C++ Advisory Rule 5-2-10,
-       Increment or decrement combined with another operator 
+       Increment or decrement combined with another operator
      */
 
 /* Rule 5-2-11  (req) *********************************/
@@ -772,7 +782,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-2-12,
-       Array type passed to function expecting a pointer 
+       Array type passed to function expecting a pointer
      */
 
 /* Rule 5-3-1  (req) *********************************/
@@ -782,7 +792,7 @@
     -append(909,[MISRA C++ Rule 5-3-1])
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-3-1,
-       Boolean expression required for operator 
+       Boolean expression required for operator
      */
 
 /* Rule 5-3-2  (req) *********************************/
@@ -792,25 +802,25 @@
     -append(501,[MISRA C++ Rule 5-3-2])
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-3-2,
-       Prohibited operator applied to unsigned underlying type: - 
+       Prohibited operator applied to unsigned underlying type: -
      */
 
 /* Rule 5-3-3  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-3-3,
-       Unary operator & overloaded 
+       Unary operator & overloaded
      */
 
 /* Rule 5-3-4    (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-3-4,
-       'sizeof' used on expressions with side effect 
+       'sizeof' used on expressions with side effect
      */
 
 /* Rule 5-8-1  (req) *********************************/
-    
+
     +e572                        /* excessive shift value */
     +elib(572)
     -append(572,[MISRA C++ Rule 5-8-1])
@@ -819,7 +829,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-14-1,
-       side effects on right hand side of logical operator 
+       side effects on right hand side of logical operator
      */
 
 /* Rule 5-17-1  (req) *********************************/
@@ -830,7 +840,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 5-18-1,
-       comma operator used 
+       comma operator used
      */
 
 /* Rule 5-19-1  (adv) *********************************/
@@ -858,28 +868,28 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 6-2-3,
-       null statement not in line by itself 
+       null statement not in line by itself
      */
 
 /* Rule 6-3-1  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 6-3-1,
-       left brace expected for switch, while, do...while, and for 
+       left brace expected for switch, while, do...while, and for
      */
 
 /* Rule 6-4-1  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 6-4-1,
-       left brace expected for if and else 
+       left brace expected for if and else
      */
 
 /* Rule 6-4-2  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 6-4-2,
-       no 'else' at end of 'if ... else if' chain 
+       no 'else' at end of 'if ... else if' chain
      */
 
 /* Rule 6-4-3  (req) *********************************/
@@ -914,7 +924,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 6-4-7,
-       boolean value in switch statement 
+       boolean value in switch statement
      */
 
 /* Rule 6-4-8  (req) *********************************/
@@ -922,7 +932,7 @@
     +e764       /* no case */
     +elib(764)
     -append(764,[MISRA C++ Rule 6-4-8])
-    
+
 /* Rule 6-5-1  (req) *********************************/
 
     /* not currently supported */
@@ -960,21 +970,21 @@
     -append(107,[MISRA C++ Rule 6-6-2])
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 6-6-2,
-       Goto jumps to an earlier point in the code 
+       Goto jumps to an earlier point in the code
      */
 
 /* Rule 6-6-3  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 6-6-3,
-       continue statement detected 
+       continue statement detected
      */
 
 /* Rule 6-6-4  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 6-6-4,
-       more than one 'break' terminates loop 
+       more than one 'break' terminates loop
      */
 
 /* Rule 6-6-5  (req) *********************************/
@@ -1003,28 +1013,28 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 7-3-1,
-       Global declaration 
+       Global declaration
      */
 
 /* Rule 7-3-2  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 7-3-2,
-       Non-global function, main, declared 
+       Non-global function, main, declared
      */
 
 /* Rule 7-3-3  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 7-3-3,
-       Unnamed namespace in header 
+       Unnamed namespace in header
      */
 
 /* Rule 7-3-4  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 7-3-4,
-       Using-directive used 
+       Using-directive used
      */
 
 /* Rule 7-3-5  (req) *********************************/
@@ -1035,7 +1045,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 7-3-6,
-       Using-directive/declaration in header file 
+       Using-directive/declaration in header file
      */
 
 /* Rule 7-4-1  (doc) *********************************/
@@ -1085,6 +1095,7 @@
 /* Rule 7-5-4  (req) *********************************/
 
     +stack()
+    -e974
     +estring(974,*recursive*)   /* worst case stack usage */
     -append(974,[MISRA C++ Rule 7-5-4])
 
@@ -1092,7 +1103,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 8-0-1,
-       Multiple declarators in a declaration 
+       Multiple declarators in a declaration
      */
 
 /* Rule 8-3-1  (req) *********************************/
@@ -1102,20 +1113,20 @@
     -append(1735,[Potentially Violates MISRA C++ Rule 8-3-1])
 
 /* Rule 8-4-1  (req) *********************************/
-    
+
     +e1916  /* ellipsis */
     +elib(1916)
     -append(1916,[MISRA C++ Rule 8-4-1])
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 8-4-1,
-       Function has variable number of arguments 
+       Function has variable number of arguments
      */
 
 /* Rule 8-4-2  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 8-4-2,
-       Function parameter list differs 
+       Function parameter list differs
      */
 
 /* Rule 8-4-3  (req) *********************************/
@@ -1140,9 +1151,9 @@
     +e1744  /* possibly not initialized */
     +elib(1744)
     -append(1744,[MISRA C++ Rule 8-5-1])
-    +e1927  /* member not initialized */
-    +elib(1927)
-    -append(1927,[MISRA C++ Rule 8-5-1])
+    +e1401  /* member not initialized */
+    +elib(1401)
+    -append(1401,[MISRA C++ Rule 8-5-1])
 
 /* Rule 8-5-2  (req) *********************************/
 
@@ -1154,7 +1165,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 8-5-3,
-       should initialize either all enum members or only the first 
+       should initialize either all enum members or only the first
      */
 
 /* Rule 9-3-1  (req) *********************************/
@@ -1185,7 +1196,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 9-5-1,
-       unions shall not be used 
+       unions shall not be used
      */
 
 /* Rule 9-6-1  (doc) *********************************/
@@ -1215,7 +1226,7 @@
     +e1749  /* base class need not be virtual */
     +elib(1749)
     -append(1749,[MISRA C++ Rule 10-1-1])
-    
+
 /* Rule 10-1-2  (req) *********************************/
 
     /* not currently supported */
@@ -1225,7 +1236,7 @@
     +e1748  /* multiple inclusion of non-virtual base class */
     +elib(1748)
     -append(1748,[MISRA C++ Rule 10-1-3])
-    
+
 /* Rule 10-2-1  (adv) *********************************/
 
     /* not currently supported */
@@ -1239,7 +1250,7 @@
     +e1909  /* 'virtual' assumed */
     +elib(1909)
     -append(1909,[MISRA C++ Rule 10-3-2])
-    
+
 /* Rule 10-3-3  (req) *********************************/
 
     /* not currently supported */
@@ -1256,13 +1267,13 @@
     +e1506  /* virtual function called inside constructor */
     +elib(1506)
     -append(1506,[MISRA C++ Rule 12-1-1])
-    
+
 /* Rule 12-1-2  (adv) *********************************/
 
     +e1928  /* symbol not in constructor initializer list */
     +elib(1928)
     -append(1928,[MISRA C++ Rule 12-1-2])
-    
+
 /* Rule 12-1-3  (req) *********************************/
 
     /* not currently supported */
@@ -1277,7 +1288,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 12-8-2,
-       Public copy constructor in abstract class 
+       Public copy constructor in abstract class
      */
 
 /* Rule 14-5-1  (req) *********************************/
@@ -1337,16 +1348,16 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 14-8-1,
-       Explicit specialization of overloaded function templates 
+       Explicit specialization of overloaded function templates
      */
 
 /* Rule 14-8-2  (adv) *********************************/
 
     /* we generate note 1963 as follows
        Note 1963: Violates MISRA C++ Advisory Rule 14-8-2,
-       Viable set contains both function and template 
+       Viable set contains both function and template
      */
-    
+
 
 /* Rule 15-0-1  (doc) *********************************/
 
@@ -1356,7 +1367,7 @@
 
     /* we generate note 1963 as follows
        Note 1963: Violates MISRA C++ Advisory Rule 15-0-2,
-       Pointer expression thrown 
+       Pointer expression thrown
      */
 
 /* Rule 15-0-3  (req) *********************************/
@@ -1379,7 +1390,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 15-1-3,
-       Empty throw outside of a catch block 
+       Empty throw outside of a catch block
      */
 
 /* Rule 15-3-1  (req) *********************************/
@@ -1416,7 +1427,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 15-3-7,
-       Catch handler after catch(...) 
+       Catch handler after catch(...)
      */
 
 /* Rule 15-4-1  (req) *********************************/
@@ -1456,28 +1467,28 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 16-0-1,
-       only preprocessor statements and comments before '#include' 
+       only preprocessor statements and comments before '#include'
      */
 
 /* Rule 16-0-2  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 16-0-2,
-       '#undef'/'#define' used within a block 
+       '#undef'/'#define' used within a block
      */
 
 /* Rule 16-0-3  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 16-0-3,
-       '#undef' is discouraged 
+       '#undef' is discouraged
      */
 
 /* Rule 16-0-4  (req) *********************************/
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 16-0-4,
-       function-like macro defined 
+       function-like macro defined
      */
 
 /* Rule 16-0-5  (req) *********************************/
@@ -1511,7 +1522,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 16-1-1,
-       Non-standard use of 'defined' preprocessor statement 
+       Non-standard use of 'defined' preprocessor statement
      */
 
 /* Rule 16-1-2  (req) *********************************/
@@ -1540,15 +1551,19 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 16-2-4,
-       header file name with non-standard character 
+       header file name with non-standard character
      */
 
 /* Rule 16-2-5  (adv) *********************************/
 
     /* we generate note 1963 as follows
        Note 1963: Violates MISRA C++ Advisory Rule 16-2-5,
-       header file name with non-standard character 
+       header file name with non-standard character
      */
+    /*  Note: If your system requires the '\' be used as a directory
+        separator, uncomment the following option.
+     */
+    //  -estring(1963,\)
 
 /* Rule 16-2-6  (req) *********************************/
 
@@ -1560,14 +1575,14 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 16-3-1,
-       Multiple use of '#/##' operators in macro definition 
+       Multiple use of '#/##' operators in macro definition
      */
 
 /* Rule 16-3-2  (adv) *********************************/
 
     /* we generate note 1963 as follows
        Note 1963: Violates MISRA C++ Advisory Rule 16-3-2,
-       '#/##' operator used 
+       '#/##' operator used
      */
 
 /* Rule 16-6-1  (doc) *********************************/
@@ -1584,7 +1599,7 @@
 
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 17-0-2,
-       Re-use of reserved identifier 
+       Re-use of reserved identifier
      */
 
 /* Rule 17-0-3  (req) *********************************/

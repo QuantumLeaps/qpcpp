@@ -40,10 +40,10 @@
 #define QS_FUN_PTR_SIZE         4
 
 //////////////////////////////////////////////////////////////////////////////
-// NOTE: QS might be used with or without other QP components, in which
-// case the separate definitions of the macros Q_ROM, Q_ROM_VAR,
+// NOTE: QS might be used with or without other QP components, in which case
+// the separate definitions of the macros Q_ROM, Q_ROM_VAR,
 // QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY, and QF_CRIT_EXIT are needed. In this
-// port QS is configured to be used with the other QP component, by
+// port QS is configured to be used with the QF framework component, by
 // simply including "qf_port.h" *before* "qs.h".
 //
 #include "qf_port.h"                                         // use QS with QF

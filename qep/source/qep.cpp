@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QEP/C++
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jun 25, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 09, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -41,7 +41,7 @@
 QP_BEGIN_
 
 // Package-scope objects -----------------------------------------------------
-QEvt const QEP_reservedEvt_[] = {
+QEvt const QEP_reservedEvt_[4] = {
 #ifdef Q_EVT_CTOR                         // Is the QEvt constructor provided?
     static_cast<QSignal>(0),
     static_cast<QSignal>(1),

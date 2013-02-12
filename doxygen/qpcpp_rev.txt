@@ -1,6 +1,45 @@
 /**
 \page rev_page QP/C++ Revision History
 
+\section qpcpp_4_5_04 Version 4.5.04 (Product) Release date: Feb 10, 2013
+
+The main purpose of this release is adding support for the ARM Cortex-M4F
+processors with the hardware Floating-Point Unit (FPU). The QP/C ports
+to Cortex-M4F take full advantage of the "lazy stacking" feature of the
+FPU registers, and by doing so offer the most efficient preemptive
+multitasking on this processor.
+
+Changes in detail:
+
+1. Added ports and examples for ARM Cortex-M4F with the EK-LM4F120XL
+board (Stellaris Launchpad).
+
+2. Added the macro QF_LOG2(), which can be re-implemented in the QP ports,
+if the CPU supports special instructions, such as CLZ (count leading zeros
+in Cortex-M3/M4). If the macro is not defined in the QP port, the default
+implementation uses a lookup table.
+
+3. Updated all ARM Cortex-M ports and examples to the latest IAR EWARM
+6.50 and Sourcery CodeBench 2012.09-85.
+
+4. Updated App Notes "QP and ARM Cortex-M with IAR" and "QP and ARM
+Cortex-M with GNU".
+
+5. Updated the PC-Lint support files (include\lib-qpcpp.lnt, au-misra2.lnt)
+to the latest PC-Lint 9.00j.
+
+6. Updated the Application Note: "QP/C++ MISRA-C:2004 Compliance Matrix".
+
+7. Spell-checked the comments in all QP/C++ source files and removed
+several typos.
+
+8. Removed the Qt ports and examples from the QP/C++ Baseline Code and
+moved them to the separate QDK/C++-Qt.
+
+\note QP/C++ Version 4.5.04 preserves full compatibility with QM 2.2.03
+and all existing QDKs for QP/C++ 4.5.xx.
+
+
 \section qpcpp_4_5_03 Version 4.5.03 (Product) Release date: Nov 29, 2012
 
 This release changes the directory structure of QP ports to various

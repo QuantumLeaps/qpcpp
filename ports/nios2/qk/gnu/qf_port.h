@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QF/C++ port to Altera Nios II, QK preemptive kernel
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Jan 10, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -35,17 +35,31 @@
 #ifndef qf_port_h
 #define qf_port_h
 
-                    // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE               63
-                                                        // QF critical section
-#define QF_INT_KEY_TYPE             alt_irq_context
-#define QF_INT_LOCK(key_)           ((key_) = alt_irq_disable_all())
-#define QF_INT_UNLOCK(key_)         alt_irq_enable_all(key_)
+        // The maximum number of active objects in the application, see NOTE01
+#define QF_MAX_ACTIVE               32
+                       // The maximum number of event pools in the application
+#define QF_MAX_EPOOL                6
+
+                                                // QF interrupt disable/enable
+#define QF_INT_DISABLE()            ((void)alt_irq_disable_all())
+#define QF_INT_ENABLE()             alt_irq_enable_all(0xFFFFFFFFUL)
+
+                                             // QF critical section entry/exit
+#define QF_CRIT_STAT_TYPE           alt_irq_context
+#define QF_CRIT_ENTRY(stat_)        ((stat_) = alt_irq_disable_all())
+#define QF_CRIT_EXIT(stat_)         alt_irq_enable_all(stat_)
+
 
 #include "sys/alt_irq.h"     // for alt_irq_disable_all()/alt_irq_enable_all()
 
 #include "qep_port.h"                                              // QEP port
 #include "qk_port.h"                                                // QK port
 #include "qf.h"                    // QF platform-independent public interface
+
+//////////////////////////////////////////////////////////////////////////////
+// NOTE01:
+// The maximum number of active objects QF_MAX_ACTIVE can be increased
+// up to 63, if necessary. Here it is set to a lower level to save some RAM.
+//
 
 #endif                                                            // qf_port_h

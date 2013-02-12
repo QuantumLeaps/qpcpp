@@ -1,37 +1,57 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: BSP for DPP example, TMS320C2802x PICCOLO controlSTICK, QK
-// Last Updated for Version: 4.0.03
-// Date of the Last Update:  Jan 15, 2009
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Jan 18, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2009 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
 
-#include "DSP2802x_Device.h"                      // defines the C28027 device
-#include "DSP2802x_SWPrioritizedIsrLevels.h"        //interrupt prioritization
-#include <string.h>                                            // for memcpy()
+extern "C" {
+    #include "DSP2802x_Device.h"                  // defines the C28027 device
+    #include "DSP2802x_SWPrioritizedIsrLevels.h"    //interrupt prioritization
+    #include <string.h>                                        // for memcpy()
+}
+
+static void PieInit(void);
+static void PLLset(Uint16 val);
+static void InitFlash(void);
+static void CopyFlash(void);
+
+// running from Flash
+#define FLASH 1
+
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
 
 Q_DEFINE_THIS_FILE
 
@@ -53,11 +73,12 @@ Q_DEFINE_THIS_FILE
 
 #ifdef Q_SPY
 
-    #define SCI_TXFIFO_DEPTH 8
-    #define SCI_BAUD_RATE    38400
+    #define SCI_TXFIFO_DEPTH 8U
+    #define SCI_BAUD_RATE    38400U
+    uint8_t const l_cpu_timer0_isr = 0U;
 
     enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
+        PHILO_STAT = QP::QS_USER
     };
 #endif
 
@@ -65,32 +86,21 @@ Q_DEFINE_THIS_FILE
 #define LD2_ON()   (GpioDataRegs.GPBCLEAR.bit.GPIO34 = 1)
 #define LD2_OFF()  (GpioDataRegs.GPBSET.bit.GPIO34   = 1)
 
-static void PieInit(void);
-static void PLLset(Uint16 val);
-static void InitFlash(void);
+static uint32_t l_rnd;                                          // random seed
 
 //............................................................................
 // CPU Timer0 ISR is used for system clock tick (Group 1 interrupt 7)
 #pragma CODE_SECTION("ramfuncs");                    // place in RAM for speed
-static interrupt void cpu_timer0_isr(void) {
-#ifndef QF_ISR_NEST
+extern "C" interrupt void cpu_timer0_isr(void) {
     QK_ISR_ENTRY();                         // inform QK about entering an ISR
-#else
-    uint16_t volatile tempPIEIER;
-    QK_ISR_ENTRY(tempPIEIER, 1, 7);              // perform ISR prioritization
-#endif
 
-    QF::tick();                              // handle the QF-nano time events
+    QP::QF::TICK(&l_cpu_timer0_isr);              // handle the QF time events
 
-#ifndef QF_ISR_NEST
     QK_ISR_EXIT();                           // inform QK about exiting an ISR
-#else
-    QK_ISR_EXIT(tempPIEIER, 1);              // inform QK about exiting an ISR
-#endif
 }
 //............................................................................
 // Illegal operation TRAP
-static interrupt void illegal_isr(void) {
+extern "C" interrupt void illegal_isr(void) {
     Q_ERROR();                                              // assert an error
 }
 
@@ -145,25 +155,10 @@ void BSP_init(void) {
     // Only used if running from FLASH
     // Note that the macro FLASH is defined by the compiler (-d FLASH)
 #ifdef FLASH
-{
-    extern uint8_t ramfuncs_loadstart, ramfuncs_loadend, ramfuncs_runstart;
-    extern uint8_t ramconsts_loadstart, ramconsts_loadend, ramconsts_runstart;
+    CopyFlash();
+#endif
 
-    // Copy time critical code and Flash setup code to RAM
-    memcpy(&ramfuncs_runstart, &ramfuncs_loadstart,
-           (&ramfuncs_loadend - &ramfuncs_loadstart));
-
-    // Call Flash Initialization to setup flash waitstates
-    // This function must reside in RAM
-    InitFlash();    // Call the flash wrapper init function
-
-    // Copy RAM constants from Flash to RAM
-    memcpy(&ramconsts_runstart, &ramconsts_loadstart,
-           (&ramconsts_loadend - &ramconsts_loadstart));
-}
-#endif //(FLASH)
-
-    QF_zero();                                                   // see NOTE01
+    QP::QF_zero();                                               // see NOTE01
 
     // Initialise interrupt controller and Vector Table to defaults for now.
     // Application ISR mapping done later.
@@ -205,7 +200,6 @@ void BSP_init(void) {
     SysCtrlRegs.PCLKCR0.bit.TBCLKSYNC   = 0; // Enable TBCLK
     EDIS;
 
-
     EALLOW;                                                  // GPIO config...
     //  GPIO-34 - PIN FUNCTION = LED for F28027 USB dongle
     GpioCtrlRegs.GPBMUX1.bit.GPIO34 = 0;    // 0=GPIO,1=COMP2OUT,2=EMU1,3=Resv
@@ -223,54 +217,19 @@ void BSP_init(void) {
     CpuTimer0Regs.TCR.bit.FREE = 0;   // 0 = Timer Free Run Disabled
     CpuTimer0Regs.TCR.bit.TIE  = 1;   // 1 = Enable Timer Interrupt
 
+    BSP_randomSeed(1234U);
 
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
+    QS_OBJ_DICTIONARY(&l_cpu_timer0_isr);
 }
 //............................................................................
-void QF::onStartup(void) {
-    CpuTimer0Regs.TCR.bit.TSS = 0;        // start the system clock tick timer
-
-    // Enable CPU INT1, which is connected to CPU-Timer 0:
-    IER |= M_INT1;
-
-    // Enable PIE: Group 1 interrupt 7 which is connected to CPU-Timer 0:
-    PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
-
-    // Enable higher priority real-time debug events:
-    ERTM;   // Enable Global realtime interrupt DBGM
-
-    QF_INT_UNLOCK(dummy);                 // set the interrupt flag in PRIMASK
+void BSP_terminate(int16_t const result) {
+    (void)result;
 }
 //............................................................................
-void QF::onCleanup(void) {                                  // nothing to clear
-}
-//............................................................................
-#pragma CODE_SECTION("ramfuncs");                    // place in RAM for speed
-void QK::onIdle(void) {
-
-#ifdef Q_SPY
-
-    if (SciaRegs.SCICTL2.bit.TXRDY != 0) {                        // TX ready?
-        QF_INT_LOCK(dummy);
-        uint16_t b = QS::getByte();
-        QF_INT_UNLOCK(dummy);
-        if (b != QS_EOD) {                                 // not End-Of-Data?
-            SciaRegs.SCITXBUF = b;                     // put into the TX FIFO
-        }
-    }
-
-#elif defined NDEBUG
-    // Put the CPU and peripherals to the low-power mode.
-    // you might need to customize the clock management for your application,
-    // see the datasheet for your particular TMS320C2000 device.
-    //
-    asm(" IDLE");                    // go to IDLE mode with interrupts LOCKED
-#endif
-}
-//............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
     if ((n == 0) && (stat[0] == 'e')) {
         LD2_ON();
     }
@@ -284,9 +243,25 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_busyDelay(void) {
-       // implement some busy-waiting dealy to stress-test the DPP application
+void BSP_displayPaused(uint8_t const paused) {
+    (void)paused;
 }
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP_randomSeed(uint32_t const seed) {
+    l_rnd = seed;
+}
+
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
 //----------------------------------------------------------------------------
 void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
     // Next two lines for debug only to halt the processor here.
@@ -297,6 +272,48 @@ void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
     }
 }
 
+
+namespace QP {
+
+//............................................................................
+void QF::onStartup(void) {
+    CpuTimer0Regs.TCR.bit.TSS = 0;        // start the system clock tick timer
+
+    // Enable CPU INT1, which is connected to CPU-Timer 0:
+    IER |= M_INT1;
+
+    // Enable PIE: Group 1 interrupt 7 which is connected to CPU-Timer 0:
+    PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
+
+    // Enable higher priority real-time debug events:
+    ERTM;   // Enable Global realtime interrupt DBGM
+}
+//............................................................................
+void QF::onCleanup(void) {                                  // nothing to clear
+}
+//............................................................................
+#pragma CODE_SECTION("ramfuncs");                    // place in RAM for speed
+void QK::onIdle(void) {
+
+#ifdef Q_SPY
+
+    if (SciaRegs.SCICTL2.bit.TXRDY != 0) {                        // TX ready?
+        QF_INT_DISABLE();
+        uint16_t b = QS::getByte();
+        QF_INT_ENABLE();
+        if (b != QS_EOD) {                                 // not End-Of-Data?
+            SciaRegs.SCITXBUF = b;                     // put into the TX FIFO
+        }
+    }
+
+#elif defined NDEBUG
+    // Put the CPU and peripherals to the low-power mode.
+    // you might need to customize the clock management for your application,
+    // see the datasheet for your particular TMS320C2000 device.
+    //
+    asm(" IDLE");                    // go to IDLE mode with interrupts LOCKED
+#endif
+}
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 
@@ -304,7 +321,7 @@ void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
 static uint8_t qsBuf[2*256];                         // buffer for Quantum Spy
 
 //............................................................................
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
 
     initBuf(qsBuf, sizeof(qsBuf));
 
@@ -372,11 +389,10 @@ uint8_t QS::onStartup(void const *arg) {
     CpuTimer1Regs.TCR.bit.TSS  = 0;                  // 0 = Start timer
 
                                                     // setup the QS filters...
-    QS_FILTER_ON(QS_SIG_DICTIONARY);
-    QS_FILTER_ON(QS_OBJ_DICTIONARY);
-    QS_FILTER_ON(QS_FUN_DICTIONARY);
+    QS_FILTER_ON(QS_SIG_DIC);
+    QS_FILTER_ON(QS_OBJ_DIC);
+    QS_FILTER_ON(QS_FUN_DIC);
 
-    QS_FILTER_ON(QS_QEP_STATE_EMPTY);
     QS_FILTER_ON(QS_QEP_STATE_ENTRY);
     QS_FILTER_ON(QS_QEP_STATE_EXIT);
     QS_FILTER_ON(QS_QEP_STATE_INIT);
@@ -384,6 +400,8 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_ON(QS_QEP_INTERN_TRAN);
     QS_FILTER_ON(QS_QEP_TRAN);
     QS_FILTER_ON(QS_QEP_IGNORED);
+    QS_FILTER_ON(QS_QEP_DISPATCH);
+    QS_FILTER_ON(QS_QEP_UNHANDLED);
 
 //    QS_FILTER_ON(QS_QF_ACTIVE_ADD);
 //    QS_FILTER_ON(QS_QF_ACTIVE_REMOVE);
@@ -417,7 +435,7 @@ uint8_t QS::onStartup(void const *arg) {
 //    QS_FILTER_ON(QS_QF_ISR_ENTRY);
 //    QS_FILTER_ON(QS_QF_ISR_EXIT);
 
-    return (uint8_t)1;                                       // return success
+    return true;                                           // return success
 }
 //............................................................................
 void QS::onCleanup(void) {
@@ -437,6 +455,8 @@ void QS::onFlush(void) {
 }
 #endif                                                                // Q_SPY
 
+}                                                              // namespace QP
+
 //============================================================================
 // NOTE:
 // IN MOST APPLICATIONS THE FUNCTIONS AFTER THIS POINT CAN BE LEFT UNCHANGED
@@ -446,33 +466,32 @@ void QS::onFlush(void) {
 //............................................................................
 // This function initializes the PLLCR register.
 //void InitPll(Uint16 val, Uint16 clkindiv)
-void PLLset(Uint16 val) {
-   volatile Uint16 iVol;
+static void PLLset(Uint16 val) {
+    Uint16 volatile iVol;
 
-   // Make sure the PLL is not running in limp mode
-   if (SysCtrlRegs.PLLSTS.bit.MCLKSTS != 0) {
-      EALLOW;
-      // OSCCLKSRC1 failure detected. PLL running in limp mode.
-      // Re-enable missing clock logic.
-      SysCtrlRegs.PLLSTS.bit.MCLKCLR = 1;
-      EDIS;
-      // Replace this line with a call to an appropriate
-      // SystemShutdown(); function.
-      asm("   ESTOP0");     // Uncomment for debugging purposes
-   }
+    // Make sure the PLL is not running in limp mode
+    if (SysCtrlRegs.PLLSTS.bit.MCLKSTS != 0) {
+        EALLOW;
+        // OSCCLKSRC1 failure detected. PLL running in limp mode.
+        // Re-enable missing clock logic.
+        SysCtrlRegs.PLLSTS.bit.MCLKCLR = 1;
+        EDIS;
+        // Replace this line with a call to an appropriate
+        // SystemShutdown(); function.
+        asm("   ESTOP0");     // Uncomment for debugging purposes
+    }
 
-   // DIVSEL MUST be 0 before PLLCR can be changed from
-   // 0x0000. It is set to 0 by an external reset XRSn
-   // This puts us in 1/4
-   if (SysCtrlRegs.PLLSTS.bit.DIVSEL != 0) {
-       EALLOW;
-       SysCtrlRegs.PLLSTS.bit.DIVSEL = 0;
-       EDIS;
-   }
+    // DIVSEL MUST be 0 before PLLCR can be changed from
+    // 0x0000. It is set to 0 by an external reset XRSn
+    // This puts us in 1/4
+    if (SysCtrlRegs.PLLSTS.bit.DIVSEL != 0) {
+        EALLOW;
+        SysCtrlRegs.PLLSTS.bit.DIVSEL = 0;
+        EDIS;
+    }
 
-   // Change the PLLCR
-   if (SysCtrlRegs.PLLCR.bit.DIV != val) {
-
+    // Change the PLLCR
+    if (SysCtrlRegs.PLLCR.bit.DIV != val) {
         EALLOW;
         // Before setting PLLCR turn off missing clock detect logic
         SysCtrlRegs.PLLSTS.bit.MCLKOFF = 1;
@@ -511,7 +530,7 @@ void PLLset(Uint16 val) {
 //............................................................................
 // This function initializes the PIE control registers to a known state.
 //
-void PieInit(void) {
+static void PieInit(void) {
     int16  i;
     Uint32 *dest = (Uint32 *)&PieVectTable;
 
@@ -547,17 +566,19 @@ void PieInit(void) {
 
     EALLOW;
     for (i = 0; i < 128; ++i) {
-        *dest++ = (Uint32)&illegal_isr;
+        *dest++ = (Uint32)&DPP::illegal_isr;
     }
     EDIS;
 
     PieCtrlRegs.PIECTRL.bit.ENPIE = 1;
 }
+
+#ifdef FLASH
 //............................................................................
 // This function initializes the Flash Control registers
 // CAUTION: This function MUST be executed out of RAM!!!
 // Executing it out of OTP/Flash will yield unpredictable results
-#pragma CODE_SECTION("ramfuncs");
+#pragma CODE_SECTION("ramfuncs")
 void InitFlash(void) {
     EALLOW;
     // Enable Flash Pipeline mode to improve performance of code
@@ -589,29 +610,24 @@ void InitFlash(void) {
     asm(" RPT #7 || NOP");
 }
 //............................................................................
-// This function will copy the specified memory contents from
-// one location to another.
-//
-//    Uint16 *SourceAddr        Pointer to the first word to be moved
-//                          SourceAddr < SourceEndAddr
-//    Uint16* SourceEndAddr     Pointer to the last word to be moved
-//    Uint16* DestAddr          Pointer to the first destination word
-//
-// No checks are made for invalid memory locations or that the
-// end address is > then the first start address.
-//
-void MemCopy(Uint16 *SourceAddr, Uint16* SourceEndAddr, Uint16 *DestAddr) {
-    while (SourceAddr < SourceEndAddr) {
-       *DestAddr++ = *SourceAddr++;
-    }
-}
+void CopyFlash() {
+    extern uint8_t ramfuncs_loadstart, ramfuncs_loadend, ramfuncs_runstart;
+    extern uint8_t ramconsts_loadstart, ramconsts_loadend, ramconsts_runstart;
 
+    // Copy time critical code and Flash setup code to RAM
+    memcpy(&ramfuncs_runstart, &ramfuncs_loadstart,
+           (&ramfuncs_loadend - &ramfuncs_loadstart));
 
-void bzero(char *ptr, int len) {
-    while (len-- != 0) {
-        *ptr++ = (char)0;
-    }
+    // Call Flash Initialization to setup flash waitstates
+    // This function must reside in RAM
+    InitFlash();    // Call the flash wrapper init function
+
+    // Copy RAM constants from Flash to RAM
+    memcpy(&ramconsts_runstart, &ramconsts_loadstart,
+           (&ramconsts_loadend - &ramconsts_loadstart));
 }
+#endif                                                               // FLASH
+
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:

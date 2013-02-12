@@ -1,13 +1,13 @@
 /*****************************************************************************
 * Product: Exact-width integer types for Lint. NOTE: Adjust for you project!
-* Last Updated for Version: 4.4.00
-* Date of the Last Update:  Apr 19, 2012
+* Last Updated for Version: 4.5.04
+* Date of the Last Update:  Feb 09, 2013
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -35,6 +35,8 @@
 #ifndef stdint_h
 #define stdint_h
 
+/*lint -save -e1960    MISRA-C++:2008 Rule 17-0-2, Re-use of C++ identifier */
+
 /* Exact-width types. WG14/N843 C99 Standard, Section 7.18.1.1 */
 typedef signed   char  int8_t;       /**< C99 exact-width  8-bit signed int */
 typedef signed   short int16_t;      /**< C99 exact-width 16-bit signed int */
@@ -43,6 +45,8 @@ typedef signed   long  int32_t;      /**< C99 exact-width 32-bit signed int */
 typedef unsigned char  uint8_t;    /**< C99 exact-width  8-bit unsigned int */
 typedef unsigned short uint16_t;   /**< C99 exact-width 16-bit unsigned int */
 typedef unsigned long  uint32_t;   /**< C99 exact-width 32-bit unsigned int */
+
+/*lint -restore */
 
 #endif                                                          /* stdint_h */
 

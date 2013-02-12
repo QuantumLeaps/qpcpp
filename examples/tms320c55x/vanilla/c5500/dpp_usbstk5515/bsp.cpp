@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: BSP for DPP example, Vainlla, TMS320C5515 eZdsp USB stick
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Product: BSP for DPP example, Vanilla, TMS320C5515 eZdsp USB stick
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Jan 17, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -37,12 +37,15 @@
 #include "bsp.h"
 
 extern "C" {
-#include "csl_intc.h"
-#include "csl_pll.h"
-#include "csl_gpio.h"
-#include "cslr_tim.h"
-#include "cslr_sysctrl.h"
+    #include "csl_intc.h"
+    #include "csl_pll.h"
+    #include "csl_gpio.h"
+    #include "cslr_tim.h"
+    #include "cslr_sysctrl.h"
 }
+
+//////////////////////////////////////////////////////////////////////////////
+namespace DPP {
 
 Q_DEFINE_THIS_FILE
 
@@ -58,6 +61,8 @@ static uint16_t const l_userLED[] = {
 #define ULED(n_)           ((CSL_GpioPinNum)l_userLED[n_])
 #define ULED_ON            0U
 #define ULED_OFF           1U
+
+static uint32_t l_rnd;                                          // random seed
 
 static CSL_GpioObj l_gpioObj;
 
@@ -76,14 +81,13 @@ extern "C" void VECSTART(void);
 #ifdef Q_SPY
     #include "csl_uart.h"
 
-    #define UART_BAUD_RATE   115200U
-    #define UART_FIFO_DEPTH  16U
+    uint32_t const UART_BAUD_RATE = (uint32_t)115200U;
 
     static CSL_UartObj l_uartObj;
     uint8_t const l_TINT_isr = 0U;
 
     enum AppRecords {                    // application-specific trace records
-        PHILO_STAT = QS_USER
+        PHILO_STAT = QP::QS_USER
     };
 #endif
 
@@ -91,11 +95,11 @@ extern "C" void VECSTART(void);
 extern "C" interrupt void TINT_isr(void) {
     CSL_SYSCTRL_REGS->TIAFR |= 0x0001U;                    // clear Timer0 bit
 
-    QF::TICK(&l_TINT_isr);                        // handle the QF time events
+    QP::QF::TICK(&l_TINT_isr);                    // handle the QF time events
 }
 //............................................................................
 extern "C" interrupt void RTC_isr(void) {
-    static QEvt const testEvt = { MAX_SIG, 0U, 0U };
+    static QP::QEvt const testEvt = { MAX_SIG, 0U, 0U };
 
     //CSL_RTC_REGS->RTCINTFL = 0x01U;            // clear the interrupt source
 
@@ -119,8 +123,6 @@ void BSP_init(void) {
     PLL_reset(&pllObj);
     PLL_config(&pllObj, &pllCfg_100MHz);
 
-    QF_zero();                           // clear the QF variables, see NOTE01
-
     CSL_SYSCTRL_REGS->PCGCR1 = 0U;          // enable clocks to all peripherals
     CSL_SYSCTRL_REGS->PCGCR2 = 0U;
     CSL_SYSCTRL_REGS->EBSR   = 0x1800U;     // configure I/O muxing
@@ -134,7 +136,7 @@ void BSP_init(void) {
     IRQ_clearAll();                         // clear any pending interrupts
     IRQ_setVecs((uint32_t)&VECSTART);       // set the vector table
     for (i = 1U; i < 32U; ++i) {            // pre-fill the Vector table
-        IRQ_plug(i, &illegal_isr);          // with illegal ISR
+        IRQ_plug(i, &illegal_isr);           // with illegal ISR
     }
 
     // plug in all ISRs into the vector table...
@@ -142,73 +144,19 @@ void BSP_init(void) {
     IRQ_plug(RTC_EVENT,  &RTC_isr);
     // ...
 
+    QP::QF_zero();                       // clear the QF variables, see NOTE01
+
     if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_TINT_isr);
 }
 //............................................................................
-void QF::onStartup(void) {
-                        // configuration of Timer0 as the system clock tick...
-    CSL_TIM_0_REGS->TCR = 0x802EU;     // autoReload | prescaler = 4096 (1011)
-    CSL_TIM_0_REGS->TIMPRD1 = (CPU_CLOCK_HZ / 4096U) / BSP_TICKS_PER_SEC;
-    CSL_TIM_0_REGS->TIMPRD2 = 0U;
-    CSL_TIM_0_REGS->TIMCNT1 = 0U;
-    CSL_TIM_0_REGS->TIMCNT2 = 0U;
-    CSL_SYSCTRL_REGS->TIAFR = 0x0007U;         // clear timer aggregation reg.
-    CSL_TIM_0_REGS->TCR    |= 0x0001U;                         // start Timer0
-    IRQ_enable(TINT_EVENT);                       // enable the TINT interrupt
-
-    // setup the RTC interrupt for testing
-    CSL_RTC_REGS->RTCINTEN  = 1U;                     // enable RTC interrupts
-    CSL_RTC_REGS->RTCINTREG = 1U;     // enable millisecond periodic interrupt
-    IRQ_enable(RTC_EVENT);
+void BSP_terminate(int16_t const result) {
+    (void)result;
 }
 //............................................................................
-void QF::onCleanup(void) {
-    GPIO_close(&l_gpioObj);
-}
-//............................................................................
-void QF::onIdle(void) {
-
-    SLED_ON();                             // switch the System LED on and off
-    asm(" nop");
-    asm(" nop");
-    asm(" nop");
-    asm(" nop");
-    SLED_OFF();
-
-#ifdef Q_SPY
-
-    QF_INT_ENABLE();
-
-    if (CSL_FEXT(l_uartObj.uartRegs->LSR, UART_LSR_THRE)) {
-
-        QF_INT_DISABLE();
-        uint16_t b = QS::getByte();
-        QF_INT_ENABLE();
-
-        if (b != QS_EOD) {                                 // not End-Of-Data?
-            CSL_FSET(l_uartObj.uartRegs->THR, 7U, 0U, b);
-        }
-    }
-
-#elif defined NDEBUG
-    // Put the CPU and peripherals to the low-power mode.
-    // you might need to customize the clock management for your application,
-    // see the datasheet for your particular TMS320C5500 device.
-    //
-    asm(" IDLE");
-    QF_INT_ENABLE();
-
-#else
-
-    QF_INT_ENABLE();
-
-#endif
-}
-//............................................................................
-void BSP_displyPhilStat(uint8_t n, char const *stat) {
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
     if (n < Q_DIM(l_userLED)) {
         ULED_set(n, (stat[0] == 'e') ? ULED_ON : ULED_OFF);
     }
@@ -219,18 +167,22 @@ void BSP_displyPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_busyDelay(void) {
-       // implement some busy-waiting dealy to stress-test the DPP application
+void BSP_displayPaused(uint8_t const paused) {
+    (void)paused;
 }
-//----------------------------------------------------------------------------
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
-    // Next two lines are for debug only to halt the processor here.
-    // YOU need to change this policy for the production release!
+//............................................................................
+uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
-    QF_INT_DISABLE();
-    for(;;) {
-    }
+    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    return l_rnd >> 8;
 }
+//............................................................................
+void BSP_randomSeed(uint32_t const seed) {
+    l_rnd = seed;
+}
+
 //............................................................................
 static void ULED_init(void) {
     CSL_Status status;
@@ -261,18 +213,94 @@ static void ULED_init(void) {
     GPIO_write(&l_gpioObj, (CSL_GpioPinNum)l_userLED[3], ULED_OFF);
 }
 
+}                                                             // namespace DPP
+//////////////////////////////////////////////////////////////////////////////
+
+//----------------------------------------------------------------------------
+void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
+    // Next two lines are for debug only to halt the processor here.
+    // YOU need to change this policy for the production release!
+    //
+    QF_INT_DISABLE();
+    for(;;) {
+    }
+}
+
+namespace QP {
+
+//............................................................................
+void QF::onStartup(void) {
+                        // configuration of Timer0 as the system clock tick...
+    CSL_TIM_0_REGS->TCR = 0x802EU;     // autoReload | prescaler = 4096 (1011)
+    CSL_TIM_0_REGS->TIMPRD1 = (CPU_CLOCK_HZ / 4096U) / DPP::BSP_TICKS_PER_SEC;
+    CSL_TIM_0_REGS->TIMPRD2 = 0U;
+    CSL_TIM_0_REGS->TIMCNT1 = 0U;
+    CSL_TIM_0_REGS->TIMCNT2 = 0U;
+    CSL_SYSCTRL_REGS->TIAFR = 0x0007U;         // clear timer aggregation reg.
+    CSL_TIM_0_REGS->TCR    |= 0x0001U;                         // start Timer0
+    IRQ_enable(TINT_EVENT);                       // enable the TINT interrupt
+
+    // setup the RTC interrupt for testing
+    CSL_RTC_REGS->RTCINTEN  = 1U;                     // enable RTC interrupts
+    CSL_RTC_REGS->RTCINTREG = 1U;     // enable millisecond periodic interrupt
+    IRQ_enable(RTC_EVENT);
+}
+//............................................................................
+void QF::onCleanup(void) {
+    GPIO_close(&DPP::l_gpioObj);
+}
+//............................................................................
+void QF::onIdle(void) {
+
+    SLED_ON();                             // switch the System LED on and off
+    asm(" nop");
+    asm(" nop");
+    asm(" nop");
+    asm(" nop");
+    SLED_OFF();
+
+#ifdef Q_SPY
+
+    QF_INT_ENABLE();
+
+    if (CSL_FEXT(DPP::l_uartObj.uartRegs->LSR, UART_LSR_THRE)) {
+
+        QF_INT_DISABLE();
+        uint16_t b = QS::getByte();
+        QF_INT_ENABLE();
+
+        if (b != QS_EOD) {                                 // not End-Of-Data?
+            CSL_FSET(DPP::l_uartObj.uartRegs->THR, 7U, 0U, b);
+        }
+    }
+
+#elif defined NDEBUG
+    // Put the CPU and peripherals to the low-power mode.
+    // you might need to customize the clock management for your application,
+    // see the datasheet for your particular TMS320C5500 device.
+    //
+    asm(" IDLE");
+    QF_INT_ENABLE();
+
+#else
+
+    QF_INT_ENABLE();
+
+#endif
+}
+
 //---------------------------------------------------------------------------
 #ifdef Q_SPY
 
 //............................................................................
-uint8_t QS::onStartup(void const *arg) {
+bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[2*256];                    // buffer for Quantum Spy
-    CSL_UartSetup uartSetup;
+    DPP::CSL_UartSetup uartSetup;
 
     initBuf(qsBuf, sizeof(qsBuf));
 
     uartSetup.clkInput = CPU_CLOCK_HZ;               // input clock freq in Hz
-    uartSetup.baud = UART_BAUD_RATE;                              // baud rate
+    uartSetup.baud = DPP::UART_BAUD_RATE;                         // baud rate
     uartSetup.wordLength = CSL_UART_WORD8;                 // word length of 8
     uartSetup.stopBits = 0;                          // to generate 1 stop bit
     uartSetup.parity = CSL_UART_DISABLE_PARITY;              // disable parity
@@ -281,9 +309,9 @@ uint8_t QS::onStartup(void const *arg) {
     uartSetup.afeEnable = CSL_UART_NO_AFE;             // no auto flow control
     uartSetup.rtsEnable = CSL_UART_NO_RTS;                           // no RTS
 
-    UART_init(&l_uartObj, CSL_UART_INST_0, UART_POLLED);   // init. UART oject
+    UART_init(&DPP::l_uartObj, DPP::CSL_UART_INST_0, DPP::UART_POLLED);// init. UART oject
     CSL_SYSCTRL_REGS->EBSR = 0x1800U;               // re-configure I/O muxing
-    UART_setup(&l_uartObj, &uartSetup);            // configure UART registers
+    UART_setup(&DPP::l_uartObj, &uartSetup);        // configure UART registers
 
     // initialize the CPU Timer 1 used for QS timestamp
     CSL_TIM_1_REGS->TCR = 0U;                                   // stop Timer1
@@ -294,11 +322,10 @@ uint8_t QS::onStartup(void const *arg) {
     CSL_TIM_1_REGS->TCR     = 0x801BU;         // autoReload | prescaler = 128
 
                                                     // setup the QS filters...
-    QS_FILTER_ON(QS_SIG_DICTIONARY);
-    QS_FILTER_ON(QS_OBJ_DICTIONARY);
-    QS_FILTER_ON(QS_FUN_DICTIONARY);
+    QS_FILTER_ON(QS_SIG_DIC);
+    QS_FILTER_ON(QS_OBJ_DIC);
+    QS_FILTER_ON(QS_FUN_DIC);
 
-    QS_FILTER_ON(QS_QEP_STATE_EMPTY);
     QS_FILTER_ON(QS_QEP_STATE_ENTRY);
     QS_FILTER_ON(QS_QEP_STATE_EXIT);
     QS_FILTER_ON(QS_QEP_STATE_INIT);
@@ -306,6 +333,8 @@ uint8_t QS::onStartup(void const *arg) {
     QS_FILTER_ON(QS_QEP_INTERN_TRAN);
     QS_FILTER_ON(QS_QEP_TRAN);
     QS_FILTER_ON(QS_QEP_IGNORED);
+    QS_FILTER_ON(QS_QEP_DISPATCH);
+    QS_FILTER_ON(QS_QEP_UNHANDLED);
 
 //    QS_FILTER_ON(QS_QF_ACTIVE_ADD);
 //    QS_FILTER_ON(QS_QF_ACTIVE_REMOVE);
@@ -339,15 +368,15 @@ uint8_t QS::onStartup(void const *arg) {
 //    QS_FILTER_ON(QS_QF_ISR_ENTRY);
 //    QS_FILTER_ON(QS_QF_ISR_EXIT);
 
-    QS_FILTER_ON(PHILO_STAT);
+    QS_FILTER_ON(DPP::PHILO_STAT);
 
-    return (uint8_t)1;                                       // return success
+    return true;                                           // return success
 }
 //............................................................................
 void QS::onCleanup(void) {
 }
 //............................................................................
-QSTimeCtr QS::onGetTime(void) {            // invoked with interrupts disabled
+QSTimeCtr QS::onGetTime(void) {          // invoked with interrupts disabled
     uint32_t tmr32;
 
     tmr32  = (uint32_t)CSL_TIM_1_REGS->TIMCNT2 << 16;
@@ -359,12 +388,14 @@ QSTimeCtr QS::onGetTime(void) {            // invoked with interrupts disabled
 void QS::onFlush(void) {
     uint16_t b;
     while ((b = getByte()) != QS_EOD) {            // while not End-Of-Data...
-        while (!CSL_FEXT(l_uartObj.uartRegs->LSR, UART_LSR_THRE)) {
+        while (!CSL_FEXT(DPP::l_uartObj.uartRegs->LSR, UART_LSR_THRE)) {
         }
-        CSL_FSET(l_uartObj.uartRegs->THR, 7U, 0U, b);       // output the byte
+        CSL_FSET(DPP::l_uartObj.uartRegs->THR, 7U, 0U, b);  // output the byte
     }
 }
 #endif                                                                // Q_SPY
+
+}                                                              // namespace QP
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:
@@ -373,11 +404,3 @@ void QS::onFlush(void) {
 // of the static uninitialized variables, the critical QP objects are cleared
 // explicitly in this BSP.
 //
-
-
-
-
-
-
-
-

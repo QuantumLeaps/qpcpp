@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QP/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 26, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Jan 16, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -63,7 +63,7 @@
     /// the native QF event queue when the queue is empty
     ///
     /// In QK, the OS object is used to hold the per-thread flags, which might
-    /// be used, for example, to rembember the thread attributes (e.g.,
+    /// be used, for example, to remember the thread attributes (e.g.,
     /// if the thread uses a floating point co-processor). The OS object value
     /// is set on per-thread basis in QActive::start(). Later, the extended
     /// context switch macros (QK_EXT_SAVE() and QK_EXT_RESTORE()) might use
@@ -275,7 +275,7 @@ void QK_sched_(uint8_t p);
 
 /// \brief The QK extended scheduler for interrupt context
 ///
-/// \note The QK extended exscheduler must be always called with the
+/// \note The QK extended scheduler must be always called with the
 /// interrupts disabled and enables interrupts internally.
 ///
 /// \sa QK_schedPrio_()

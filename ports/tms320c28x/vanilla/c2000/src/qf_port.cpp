@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: QF/C++ port TMS320C28x, TI-C2000 compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Product: QF/C++ port to TMS320C28x, TI C2000 compiler
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Jan 18, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -35,11 +35,20 @@
 #include "qf_pkg.h"
 #include "qassert.h"
 
-//Q_DEFINE_THIS_MODULE(qf_port)
+QP_BEGIN_
+
+//Q_DEFINE_THIS_MODULE("qf_port")
 
 // Global objects ------------------------------------------------------------
-QSignal      QF_maxSignal_;
+enum_t       QF_maxSignal_;
 QSubscrList *QF_subscrList_;
+
+//............................................................................
+void QF::psInit(QSubscrList * const subscrSto, uint32_t const maxSignal) {
+    QF_subscrList_ = subscrSto;
+    QF_maxSignal_  = maxSignal;
+    bzero((uint8_t *)subscrSto, maxSignal*sizeof(QSubscrList));
+}
 
 //............................................................................
 void bzero(uint8_t *ptr, uint16_t len) {
@@ -54,15 +63,11 @@ void QF_zero(void) {                                             // see NOTE01
     QF_intLockNest_     = (uint8_t)0;
     QF_maxPool_         = (uint8_t)0;
     QF_timeEvtListHead_ = (QTimeEvt *)0;
-    bzero((uint8_t *)QF::active_,    sizeof(QActive*)*(QF_MAX_ACTIVE + 1));
-    bzero((uint8_t *)&QF_readySet_, sizeof(QF_readySet_));
+    bzero((uint8_t *)QF::active_,
+          sizeof(QActive *) * (QF_MAX_ACTIVE + 1));
 }
-//............................................................................
-void QF::psInit(QSubscrList *subscrSto, QSignal maxSignal) {     // see NOTE01
-    QF_subscrList_ = subscrSto;
-    QF_maxSignal_  = maxSignal;
-    bzero((uint8_t *)subscrSto, maxSignal*sizeof(QSubscrList));
-}
+
+QP_END_
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:
@@ -70,4 +75,4 @@ void QF::psInit(QSubscrList *subscrSto, QSignal maxSignal) {     // see NOTE01
 // variables, as required by the C-standard. Since QF relies on the clearing
 // of the static uninitialized variables, the critical QF objects are cleared
 // explicitly in this port.
-
+//

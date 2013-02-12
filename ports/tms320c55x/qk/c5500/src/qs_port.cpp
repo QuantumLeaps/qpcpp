@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QS/C++ port TMS320C55x, TI-C5500 compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Jan 17, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -35,8 +35,6 @@
 #include "qs_pkg.h"
 #include "qassert.h"
 
-//Q_DEFINE_THIS_MODULE(qs_port)
-
 
 #undef  QS_INSERT_BYTE
 #define QS_INSERT_BYTE(b_) \
@@ -55,6 +53,9 @@
     } \
     QS_INSERT_BYTE(b_)
 
+QP_BEGIN_
+
+//Q_DEFINE_THIS_MODULE("qs_port")
 
 
 // from qs.cpp ===============================================================
@@ -189,7 +190,7 @@ void const *QS::eqObj_;                           // local raw queue QF filter
 void const *QS::teObj_;                          // local time event QF filter
 void const *QS::apObj_;                     // local object Application filter
 
-QSTimeCtr volatile QS::tickCtr_;     // tick counter for the QS_QF_TICK record
+QSTimeCtr QS::tickCtr_;              // tick counter for the QS_QF_TICK record
 
 //............................................................................
 void QS::u8_(uint8_t d) {
@@ -362,3 +363,5 @@ void QS::str_ROM(char const Q_ROM * Q_ROM_VAR s) {
     }
     QS_INSERT_BYTE((uint8_t)0)
 }
+
+QP_END_

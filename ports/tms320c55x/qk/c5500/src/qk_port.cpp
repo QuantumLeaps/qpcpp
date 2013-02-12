@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QK/C++ port TMS320C55x, TI-C5500 compiler
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Apr 19, 2012
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Jan 17, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -35,10 +35,10 @@
 #include "qk_pkg.h"
 
 //............................................................................
-void QK_init(void) {    // explicitly clear uninitialized QF variables, NOTE01
+extern "C" void QK_init(void) {  // explicitly initialize QK variables, NOTE01
     QK_intNest_  = (uint8_t)0;
     QK_currPrio_ = (uint8_t)(QF_MAX_ACTIVE + 1);
-    bzero((uint8_t *)&QK_readySet_, sizeof(QK_readySet_));
+    QP::bzero((uint8_t *)&QK_readySet_, sizeof(QK_readySet_));
 
 #ifndef QK_NO_MUTEX
     QK_ceilingPrio_ = (uint8_t)0;
