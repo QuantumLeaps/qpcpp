@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: "Dining Philosophers Problem" example, cooperative Vanilla kernel
+// Product: "Dining Philosophers Problem" example, preemptive QK kernel
 // Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 15, 2013
+// Date of the Last Update:  Feb 10, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -83,6 +83,8 @@ static uint32_t l_rnd;                                          // random seed
 //............................................................................
 extern "C" void SysTick_Handler(void) {
 
+    QK_ISR_ENTRY();                         // infrom QK about entering an ISR
+
 #ifdef Q_SPY
     {
         uint32_t dummy = SysTick->CTRL;        // clear SysTick_CTRL_COUNTFLAG
@@ -138,11 +140,16 @@ extern "C" void SysTick_Handler(void) {
             Q_ERROR();
             break;
     }
+    QK_ISR_EXIT();                           // inform QK about exiting an ISR
 }
 //............................................................................
 extern "C" void GPIOPortA_IRQHandler(void) {
+    QK_ISR_ENTRY();                         // infrom QK about entering an ISR
+
     DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),      // for testing
                    &l_GPIOPortA_IRQHandler);
+
+    QK_ISR_EXIT();                           // infrom QK about exiting an ISR
 }
 
 //............................................................................
@@ -256,14 +263,15 @@ void QF::onStartup(void) {
 void QF::onCleanup(void) {
 }
 //............................................................................
-void QF::onIdle(void) {         // called with interrupts disabled, see NOTE01
+void QK::onIdle(void) {
 
-    // toggle the User LED on and then off, see NOTE02
+    // toggle the User LED on and then off, see NOTE01
+    QF_INT_DISABLE();
     GPIOF->DATA_Bits[LED_GREEN] = LED_GREEN;         // turn the Green LED on
     GPIOF->DATA_Bits[LED_GREEN] = 0;                 // turn the Green LED off
+    QF_INT_ENABLE();
 
 #ifdef Q_SPY
-    QF_INT_ENABLE();
     if ((UART0->FR & DPP::UART_FR_TXFE) != 0U) {                   // TX done?
         uint16_t fifo = DPP::UART_TXFIFO_DEPTH;     // max bytes we can accept
 
@@ -280,9 +288,6 @@ void QF::onIdle(void) {         // called with interrupts disabled, see NOTE01
     // you might need to customize the clock management for your application,
     // see the datasheet for your particular Cortex-M3 MCU.
     asm(" WFI");                                         // Wait-For-Interrupt
-    QF_INT_ENABLE();
-#else
-    QF_INT_ENABLE();
 #endif
 }
 
@@ -402,12 +407,6 @@ void QS::onFlush(void) {
 
 //////////////////////////////////////////////////////////////////////////////
 // NOTE01:
-// The QF_onIdle() callback is called with interrupts disabled, because the
-// determination of the idle condition might change by any interrupt posting
-// an event. QF::onIdle() must internally enable interrupts, ideally
-// atomically with putting the CPU to the power-saving mode.
-//
-// NOTE02:
 // The User LED is used to visualize the idle loop activity. The brightness
 // of the LED is proportional to the frequency of invcations of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt

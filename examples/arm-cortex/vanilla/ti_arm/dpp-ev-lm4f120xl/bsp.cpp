@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: "Dining Philosophers Problem" example, cooperative Vanilla kernel
 // Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 15, 2013
+// Date of the Last Update:  Feb 16, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -280,10 +280,9 @@ void QF::onIdle(void) {         // called with interrupts disabled, see NOTE01
     // you might need to customize the clock management for your application,
     // see the datasheet for your particular Cortex-M3 MCU.
     asm(" WFI");                                         // Wait-For-Interrupt
-    QF_INT_ENABLE();
-#else
-    QF_INT_ENABLE();
 #endif
+
+    QF_INT_ENABLE();                            /* always enable interrupts */
 }
 
 //----------------------------------------------------------------------------
