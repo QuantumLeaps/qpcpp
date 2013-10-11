@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QEP/C++  port to lint, generic C++ compiler
 // Last Updated for Version: 4.5.04
 // Date of the Last Update:  Feb 09, 2013
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qep_port_h
 #define qep_port_h
 
@@ -40,9 +40,9 @@
 /// \brief QEP/C++ port to QK for a "generic" C++ compiler.
 ///
 /// \note This is just an example of a QEP port used for "linting" the QEP.
-/// Ports of QEP are located in the directory %QPCPP%\ports.
+/// Ports of QEP are located in the directory %QPCPP%\\ports.
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 
                 // Exact-width types. WG14/N843 C99 Standard, Section 7.18.1.1
 #include <stdint.h>

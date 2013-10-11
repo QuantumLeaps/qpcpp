@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: DPP example
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 14, 2012
+// Last Updated for Version: 4.5.05
+// Date of the Last Update:  Mar 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
@@ -54,12 +54,6 @@ extern "C" int_t main(void) {
 
                                                      // object dictionaries...
     QS_OBJ_DICTIONARY(l_smlPoolSto);
-    QS_OBJ_DICTIONARY(l_tableQueueSto);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[0]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[1]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[2]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[3]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[4]);
 
     QP::QF::psInit(l_subscrSto, Q_DIM(l_subscrSto)); // init publish-subscribe
 

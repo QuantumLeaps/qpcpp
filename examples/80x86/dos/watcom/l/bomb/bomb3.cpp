@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product:  Time Bomb Example with the State design pattern (GoF)
 // Last Updated for Version: 4.1.01
 // Date of the Last Update:  Nov 04, 2009
@@ -24,7 +24,7 @@
 // Contact information:
 // Quantum Leaps Web site:  http://www.quantum-leaps.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "bsp.h"
 
 class Bomb3;

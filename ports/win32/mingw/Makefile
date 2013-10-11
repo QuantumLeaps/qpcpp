@@ -1,13 +1,13 @@
 ##############################################################################
 # Product:  QP/C++, Win32 build, GNU compiler
-# Last Updated for Version: 4.5.03
-# Date of the Last Update:  Nov 25, 2012
+# Last Updated for Version: 5.1.0
+# Date of the Last Update:  Sep 29, 2013
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -96,6 +96,7 @@ QS_OBJS = \
 	$(BINDIR)\qs_.o \
 	$(BINDIR)\qs_blk.o \
 	$(BINDIR)\qs_byte.o \
+	$(BINDIR)\qs_dict.o \
 	$(BINDIR)\qs_f32.o \
 	$(BINDIR)\qs_f64.o \
 	$(BINDIR)\qs_mem.o \
@@ -120,6 +121,8 @@ VPATH = $(QEP_SRCDIR) $(QF_SRCDIR) $(QS_SRCDIR)
 # the objects to build =======================================================
 QEP_OBJS = \
 	$(BINDIR)\qep.o \
+	$(BINDIR)\qmsm_ini.o \
+	$(BINDIR)\qmsm_dis.o \
 	$(BINDIR)\qfsm_ini.o \
 	$(BINDIR)\qfsm_dis.o \
 	$(BINDIR)\qhsm_ini.o \
@@ -176,6 +179,12 @@ $(BINDIR)\libqp.a: 	$(QEP_OBJS) $(QF_OBJS) $(QS_OBJS)
 
 # QEP -----------------------------------------
 $(BINDIR)\qep.o: $(QEP_SRCDIR)\qep.cpp
+	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
+
+$(BINDIR)\qmsm_ini.o: $(QEP_SRCDIR)\qmsm_ini.cpp
+	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
+
+$(BINDIR)\qmsm_dis.o: $(QEP_SRCDIR)\qmsm_dis.cpp
 	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
 
 $(BINDIR)\qfsm_ini.o: $(QEP_SRCDIR)\qfsm_ini.cpp
@@ -299,6 +308,9 @@ $(BINDIR)\qs_blk.o: $(QS_SRCDIR)\qs_blk.cpp
 	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QS_SRCDIR) $<
 
 $(BINDIR)\qs_byte.o: $(QS_SRCDIR)\qs_byte.cpp
+	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QS_SRCDIR) $<
+
+$(BINDIR)\qs_dict.o: $(QS_SRCDIR)\qs_dict.cpp
 	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QS_SRCDIR) $<
 
 $(BINDIR)\qs_f32.o: $(QS_SRCDIR)\qs_f32.cpp

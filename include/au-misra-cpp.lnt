@@ -1,4 +1,4 @@
-/* Date Stamp */ -d"_lint_au_misra_cpp_lnt=au-misra-cpp.lnt modified 9-Aug-2012"
+/* Date Stamp */ -d"_lint_au_misra_cpp_lnt=au-misra-cpp.lnt modified 2-Oct-2013"
 /* To document usage use: -message( "Using " _lint_au_misra_cpp_lnt ) */
 // ---------------------------------------------------------------------
 // This file is provided by Gimpel Software (www.gimpel.com) for use with
@@ -225,10 +225,6 @@
 
     /* not statically checkable */
 
-/* Rule 0-4-4    (doc) *********************************/
-
-    /* not statically checkable */
-
 /* Rule 1-0-1    (req) *********************************/
 
     -A(C++2003) /* ensure ISO C++ 2003 compliance */
@@ -306,15 +302,24 @@
 
 /* Rule 2-10-3   (req) *********************************/
 
-    /* not currently supported */
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 2-10-3,
+       Typedef is not a unique declarator
+     */
 
 /* Rule 2-10-4   (req) *********************************/
 
-    /* not currently supported */
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 2-10-4,
+       Tag is not a unique declarator
+     */
 
 /* Rule 2-10-5   (adv) *********************************/
 
-    /* not currently supported */
+    /* we generate note 1963 as follows
+       Note 1963: Violates MISRA C++ Advisory Rule 2-10-5,
+       Identifier with static storage is reused
+     */
 
 /* Rule 2-10-6   (req) *********************************/
 
@@ -378,6 +383,10 @@
     +e85       /* zero-dimensioned array */
     +elib(85)
     -append(85,[MISRA C++ Rule 3-1-3])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 3-1-3.
+       extern array declared without size or initializer
+     */
 
 /* Rule 3-2-1    (req) *********************************/
 
@@ -704,6 +713,9 @@
 
 /* Rule 5-2-7  (req) *********************************/
 
+    +e740   /* unusual cast */
+    +elib(740)
+    -append(740,[MISRA C++ Rule 5-2-7])
     +e916   /* pointer assignment conversion */
     +elib(916)
     -append(916,[MISRA C++ Rule 5-2-7])
@@ -728,9 +740,6 @@
     +e929   /* pointer cast */
     +elib(929)
     -append(929,[MISRA C++ Rule 5-2-7])
-    +e930   /* cast */
-    +elib(930)
-    -append(930,[MISRA C++ Rule 5-2-7])
 
 /* Rule 5-2-8  (adv) *********************************/
 
@@ -824,6 +833,10 @@
     +e572                        /* excessive shift value */
     +elib(572)
     -append(572,[MISRA C++ Rule 5-8-1])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 5-8-1,
+       out of bounds value for right hand side of shift operator
+     */
 
 /* Rule 5-14-1   (req) *********************************/
 
@@ -857,12 +870,20 @@
     +e820       /* boolean test of parenthesized assignment */
     +elib(820)
     -append(820,[MISRA C++ Rule 6-2-1])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 6-2-1,
+       assignment operator used in sub-expression
+     */
 
 /* Rule 6-2-2  (req) *********************************/
 
     +e777       /* testing floats for equality */
     +elib(777)
     -append(777,[MISRA C++ Rule 6-2-2])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 6-2-2,
+       floating point test for equality or inequality
+     */
 
 /* Rule 6-2-3  (req) *********************************/
 
@@ -894,11 +915,18 @@
 
 /* Rule 6-4-3  (req) *********************************/
 
-    /* not currently supported */
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 6-4-3,
+       departure from MISRA switch syntax
+     */
 
 /* Rule 6-4-4  (req) *********************************/
 
-    /* not currently supported */
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 6-4-4,
+       most closely enclosing compound statement of a case/default is
+       not of a switch
+     */
 
 /* Rule 6-4-5  (req) *********************************/
 
@@ -908,6 +936,10 @@
     +e825       /* control flows into case/default without -fallthrough */
     +elib(825)
     -append(825,[MISRA C++ Rule 6-4-5])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 6-4-5,
+       missing unconditional break from switch case
+     */
 
 /* Rule 6-4-6  (req) *********************************/
 
@@ -943,9 +975,9 @@
 
 /* Rule 6-5-3  (req) *********************************/
 
-    +e446       /* loop variable modified */
-    +elib(446)
-    -append(446,[MISRA C++ Rule 6-5-3])
+    +e850       /* loop variable modified in body */
+    +elib(850)
+    -append(850,[MISRA C++ Rule 6-5-3])
 
 /* Rule 6-5-4  (req) *********************************/
 
@@ -1208,6 +1240,10 @@
     +e46    /* bit field should be int */
     +elib(46)
     -append(46,[MISRA C++ Rules 9-6-2])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 9-6-2,
+       Bit field must be explicitly signed int, unsigned int, or bool
+     */
 
 /* Rule 9-6-3  (req) *********************************/
 
@@ -1220,6 +1256,10 @@
     +e806   /* signed small bit field */
     +elib(806)
     -append(806,[MISRA C++ Rule 9-6-4])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 9-6-4,
+       Signed bit field is too small
+     */
 
 /* Rule 10-1-1  (adv) *********************************/
 
@@ -1358,7 +1398,6 @@
        Viable set contains both function and template
      */
 
-
 /* Rule 15-0-1  (doc) *********************************/
 
     /* not statically checkable */
@@ -1367,7 +1406,7 @@
 
     /* we generate note 1963 as follows
        Note 1963: Violates MISRA C++ Advisory Rule 15-0-2,
-       Pointer expression thrown
+       dependence placed on C's operator precedence
      */
 
 /* Rule 15-0-3  (req) *********************************/
@@ -1502,6 +1541,10 @@
     +e665   /* unparenthesized macro parameter */
     +elib(665)
     -append(665,[MISRA C++ Rule 16-0-6])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 16-0-6,
+       unparenthesized macro parameter in definition of macro
+     */
 
 /* Rule 16-0-7  (req) *********************************/
 
@@ -1517,6 +1560,10 @@
     +e544       /* endif or else not followed by EOL */
     +elib(544)
     -append(544,[MISRA C++ Rule 16-0-8])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 16-0-8,
+       all preprocessing directives must be valid
+     */
 
 /* Rule 16-1-1  (req) *********************************/
 

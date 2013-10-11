@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
-// Product: BSP for PELICAN crossing example
-// Last Updated for Version: 4.5.01
-// Date of the Last Update:  Jun 14, 2012
+//****************************************************************************
+// Product: BSP for PELICAN crossing example for Qt5
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Oct 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,10 +31,9 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
-#include <QtGui>
+//****************************************************************************
+#include <QtWidgets>
 #include "gui.h"
-#include "qp_app.h"
 //-----------------
 #include "qp_port.h"
 #include "pelican.h"
@@ -46,8 +45,8 @@ Q_DEFINE_THIS_FILE
 static uint8_t const l_time_tick = 0U;                               // for QS
 
 //............................................................................
-void QPApp::onClockTick(void) {                                        // slot
-    QP::QF::TICK(&l_time_tick);
+void QP::QF_onClockTick(void) {
+    QP::QF::TICK_X(0U, &l_time_tick);
 }
 //............................................................................
 void QP::QF::onStartup(void) {
@@ -122,7 +121,7 @@ void BSP_signalPeds(enum BSP_PedsSignal sig) {
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifdef Q_SPY
 
 #include "qspy.h"
@@ -153,7 +152,7 @@ bool QP::QS::onStartup(void const *arg) {
     static uint8_t qsBuf[4*1024];                 // 4K buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
-    QSPY_config((QP_VERSION >> 8),  // version
+    QSPY_config(QP_VERSION,         // version
                 QS_OBJ_PTR_SIZE,    // objPtrSize
                 QS_FUN_PTR_SIZE,    // funPtrSize
                 QS_TIME_SIZE,       // tstampSize
@@ -225,9 +224,7 @@ void QP::QS::onCleanup(void) {
 void QP::QS::onFlush(void) {
     uint16_t nBytes = 1024;
     uint8_t const *block;
-    QF_CRIT_ENTRY(dummy);
     while ((block = getBlock(&nBytes)) != (uint8_t *)0) {
-        QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
         nBytes = 1024;
     }
@@ -242,9 +239,12 @@ void QP::QS_onEvent(void) {
     uint16_t nBytes = 1024;
     uint8_t const *block;
     QF_CRIT_ENTRY(dummy);
-    if ((block = QP::QS::getBlock(&nBytes)) != (uint8_t *)0) {
+    if ((block = QS::getBlock(&nBytes)) != (uint8_t *)0) {
         QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
+    }
+    else {
+        QF_CRIT_EXIT(dummy);
     }
 }
 //............................................................................

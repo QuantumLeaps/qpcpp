@@ -8,6 +8,6 @@ INPUT(
 ./debug\tunnel.o
 ./debug\ship.o
 ./debug\qspy.o
-./debug\moc_gui.o
 ./debug\qrc_gui.o
+./debug\moc_gui.o
 );

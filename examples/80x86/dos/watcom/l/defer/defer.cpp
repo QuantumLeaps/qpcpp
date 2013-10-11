@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: Deferred Event state pattern example
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 15, 2012
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 08, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qp_port.h"
 #include "bsp.h"
 
@@ -124,9 +124,7 @@ QState TServer::idle(TServer *me, QEvt const *e) {
 QState TServer::busy(TServer *me, QEvt const *e) {
     switch (e->sig) {
         case NEW_REQUEST_SIG: {
-            if (me->m_requestQueue.getNFree() > 0) {             // can defer?
-                                                          // defer the request
-                me->defer(&me->m_requestQueue, e);
+            if (me->defer(&me->m_requestQueue, e)) {           // could defer?
                 printf("Request #%d deferred;\n",
                        (int)((RequestEvt const *)e)->ref_num);
             }

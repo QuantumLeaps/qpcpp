@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QS/C++ port
-// Last Updated for Version: 4.5.03
-// Date of the Last Update:  Nov 28, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Oct 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qs_port_h
 #define qs_port_h
 
@@ -45,7 +45,7 @@
     #define QS_FUN_PTR_SIZE     4
 #endif
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // NOTE: QS might be used with or without other QP components, in which case
 // the separate definitions of the macros Q_ROM, Q_ROM_VAR,
 // QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY, and QF_CRIT_EXIT are needed. In this

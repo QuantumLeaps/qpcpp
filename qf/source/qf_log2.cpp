@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Oct 07, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,14 +31,16 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 
 /// \file
 /// \ingroup qf
 /// \brief QF_log2Lkup[] implementation.
 
-QP_BEGIN_
+#ifdef QF_LOG2LKUP
+
+namespace QP {
 
 // Global objects ------------------------------------------------------------
 uint8_t const Q_ROM Q_ROM_VAR QF_log2Lkup[256] = {
@@ -134,4 +136,7 @@ uint8_t const Q_ROM Q_ROM_VAR QF_log2Lkup[256] = {
     static_cast<uint8_t>(8), static_cast<uint8_t>(8)
 };
 
-QP_END_
+}                                                              // namespace QP
+
+#endif                                                   // #ifdef QF_LOG2LKUP
+

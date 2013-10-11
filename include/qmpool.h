@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jul 02, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qmpool_h
 #define qmpool_h
 
@@ -42,6 +42,7 @@
 /// This header file must be included in all QF ports that use native QF
 /// memory pool implementation.
 
+
 #ifndef QF_MPOOL_SIZ_SIZE
     /// \brief macro to override the default ::QMPoolSize size.
     /// Valid values 1, 2, or 4; default 2
@@ -49,24 +50,20 @@
 #endif
 
 #ifndef QF_MPOOL_CTR_SIZE
-
     /// \brief macro to override the default QMPoolCtr size.
     /// Valid values 1, 2, or 4; default 2
     #define QF_MPOOL_CTR_SIZE 2
 #endif
 
-//////////////////////////////////////////////////////////////////////////////
-QP_BEGIN_
-
+namespace QP {
 #if (QF_MPOOL_SIZ_SIZE == 1)
+    typedef uint8_t QMPoolSize;
+#elif (QF_MPOOL_SIZ_SIZE == 2)
     /// \brief The data type to store the block-size based on the macro
     /// #QF_MPOOL_SIZ_SIZE.
     ///
     /// The dynamic range of this data type determines the maximum size
     /// of blocks that can be managed by the native QF event pool.
-    typedef uint8_t QMPoolSize;
-#elif (QF_MPOOL_SIZ_SIZE == 2)
-
     typedef uint16_t QMPoolSize;
 #elif (QF_MPOOL_SIZ_SIZE == 4)
     typedef uint32_t QMPoolSize;
@@ -75,13 +72,13 @@ QP_BEGIN_
 #endif
 
 #if (QF_MPOOL_CTR_SIZE == 1)
+    typedef uint8_t QMPoolCtr;
+#elif (QF_MPOOL_CTR_SIZE == 2)
     /// \brief The data type to store the block-counter based on the macro
     /// #QF_MPOOL_CTR_SIZE.
     ///
     /// The dynamic range of this data type determines the maximum number
     /// of blocks that can be stored in the pool.
-    typedef uint8_t QMPoolCtr;
-#elif (QF_MPOOL_CTR_SIZE == 2)
     typedef uint16_t QMPoolCtr;
 #elif (QF_MPOOL_CTR_SIZE == 4)
     typedef uint32_t QMPoolCtr;
@@ -89,7 +86,7 @@ QP_BEGIN_
     #error "QF_MPOOL_CTR_SIZE defined incorrectly, expected 1, 2, or 4"
 #endif
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 /// \brief Native QF memory pool class
 ///
 /// This class describes the native QF memory pool, which can be used as
@@ -111,17 +108,17 @@ private:
     /// end of the memory managed by this memory pool
     void *m_end;
 
-    /// linked list of free blocks
-    void *m_free;
+    /// head of linked list of free blocks
+    void * volatile m_free_head;
 
-    ///  maximum block size (in bytes)
+    /// maximum block size (in bytes)
     QMPoolSize m_blockSize;
 
     /// total number of blocks
     QMPoolCtr m_nTot;
 
     /// number of free blocks remaining
-    QMPoolCtr m_nFree;
+    QMPoolCtr volatile m_nFree;
 
     /// minimum number of free blocks ever present in this pool
     ///
@@ -170,7 +167,7 @@ public:
     /// supported.
     ///
     /// \sa QMPool::put()
-    void *get(void);
+    void *get(uint16_t const margin);
 
     /// \brief Returns a memory block back to a memory pool.
     ///
@@ -197,7 +194,7 @@ private:
     friend class QF;
 };
 
-QP_END_
+}                                                              // namespace QP
 
 /// \brief Memory pool element to allocate correctly aligned storage
 /// for QMPool class.

@@ -1,40 +1,39 @@
-/*****************************************************************************
-* Product: "Fly'n'Shoot" game, BSP for Qt (EK-LM3S811 simulation)
-* Last Updated for Version: 4.5.02
-* Date of the Last Update:  Jun 14, 2012
-*
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
-*
-* Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
-*
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 2 of the License, or
-* (at your option) any later version.
-*
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
-*
-* Contact information:
-* Quantum Leaps Web sites: http://www.quantum-leaps.com
-*                          http://www.state-machine.com
-* e-mail:                  info@quantum-leaps.com
-*****************************************************************************/
-#include <QtGui>
+//****************************************************************************
+// Product: "Fly'n'Shoot" game, BSP for Qt5
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Oct 03, 2013
+//
+//                    Q u a n t u m     L e a P s
+//                    ---------------------------
+//                    innovating embedded systems
+//
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+//
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// Alternatively, this program may be distributed and modified under the
+// terms of Quantum Leaps commercial licenses, which expressly supersede
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Contact information:
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
+// e-mail:                  info@quantum-leaps.com
+//****************************************************************************
+#include <QtWidgets>
 #include "pixellabel.h"
-#include "qp_app.h"
 #include "gui.h"
 //-----------------
 #include "qp_port.h"
@@ -52,15 +51,30 @@ static uint8_t l_ship_pos = GAME_SHIP_Y;
         PLAYER_TRIGGER = QP::QS_USER
     };
 
-    static uint8_t const l_clock_tick = 0U;
+    static uint8_t const l_time_tick = 0U;
     static uint8_t const l_bsp = 0U;
 #endif
+
+//............................................................................
+void QP::QF_onClockTick(void) {
+    QP::QF::TICK_X(0U, &l_time_tick);  // perform the QF clock tick processing
+
+    static QP::QEvt const tickEvt(GAME::TIME_TICK_SIG);
+    QP::QF::PUBLISH(&tickEvt, &l_time_tick);         // publish the tick event
+}
+//............................................................................
+void QP::QF::onStartup(void) {
+    QP::QF_setTickRate(BSP_TICKS_PER_SEC);
+}
+//............................................................................
+void QP::QF::onCleanup(void) {
+}
 
 //............................................................................
 void BSP_init() {
     Q_ALLEGE(QS_INIT((char *)0));
     QS_RESET();
-    QS_OBJ_DICTIONARY(&l_clock_tick);
+    QS_OBJ_DICTIONARY(&l_time_tick);
     QS_OBJ_DICTIONARY(&l_bsp);
     QS_USR_DICTIONARY(PLAYER_TRIGGER);
 }
@@ -249,22 +263,7 @@ void Q_onAssert(char_t const * const file, int line) {
     qFatal("Assertion failed in module %s, line %d", file, line);
 }
 
-//............................................................................
-void QPApp::onClockTick(void) {                                        // slot
-    static QP::QEvt const tickEvt(GAME::TIME_TICK_SIG);
-    QP::QF::TICK(&l_clock_tick);       // perform the QF clock tick processing
-    QP::QF::PUBLISH(&tickEvt, &l_clock_tick);        // publish the tick event
-}
-//............................................................................
-void QP::QF::onStartup(void) {
-    QP::QF_setTickRate(BSP_TICKS_PER_SEC);
-    QS_OBJ_DICTIONARY(&l_clock_tick);
-}
-//............................................................................
-void QP::QF::onCleanup(void) {
-}
-
-/*--------------------------------------------------------------------------*/
+//****************************************************************************
 #ifdef Q_SPY
 
 #include "qspy.h"
@@ -273,7 +272,7 @@ static QTime l_time;
 
 //............................................................................
 static int custParserFun(QSpyRecord * const qrec) {
-    int ret = 0;                        // don't perform standard QSPY parsing
+    int ret = 0;                       // do not perform standard QSPY parsing
     switch (qrec->rec) {
         case QP::QS_QF_MPOOL_GET: {                 // example record to parse
             int nFree;
@@ -291,11 +290,11 @@ static int custParserFun(QSpyRecord * const qrec) {
     return ret;
 }
 //............................................................................
-bool QP::QS::onStartup(void const *arg) {
+bool QP::QS::onStartup(void const *) {
     static uint8_t qsBuf[4*1024];                 // 4K buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
-    QSPY_config((QP_VERSION >> 8),  // version
+    QSPY_config(QP_VERSION,         // version
                 QS_OBJ_PTR_SIZE,    // objPtrSize
                 QS_FUN_PTR_SIZE,    // funPtrSize
                 QS_TIME_SIZE,       // tstampSize
@@ -315,7 +314,8 @@ bool QP::QS::onStartup(void const *arg) {
     //QS_FILTER_OFF(QS_ALL_RECORDS);
     QS_FILTER_ON(QS_ALL_RECORDS);
 
-    //QS_FILTER_OFF(QS_QEP_STATE_EMPTY);
+    //QS_FILTER_OFF(QS_QP_RESET);
+
     //QS_FILTER_OFF(QS_QEP_STATE_ENTRY);
     //QS_FILTER_OFF(QS_QEP_STATE_EXIT);
     //QS_FILTER_OFF(QS_QEP_STATE_INIT);
@@ -323,35 +323,37 @@ bool QP::QS::onStartup(void const *arg) {
     //QS_FILTER_OFF(QS_QEP_INTERN_TRAN);
     //QS_FILTER_OFF(QS_QEP_TRAN);
     //QS_FILTER_OFF(QS_QEP_IGNORED);
+    //QS_FILTER_OFF(QS_QEP_DISPATCH);
     //QS_FILTER_OFF(QS_QEP_UNHANDLED);
 
-    QS_FILTER_OFF(QS_QF_ACTIVE_ADD);
-    QS_FILTER_OFF(QS_QF_ACTIVE_REMOVE);
-    QS_FILTER_OFF(QS_QF_ACTIVE_SUBSCRIBE);
-    QS_FILTER_OFF(QS_QF_ACTIVE_UNSUBSCRIBE);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_ADD);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_REMOVE);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_SUBSCRIBE);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_UNSUBSCRIBE);
     //QS_FILTER_OFF(QS_QF_ACTIVE_POST_FIFO);
     //QS_FILTER_OFF(QS_QF_ACTIVE_POST_LIFO);
-    QS_FILTER_OFF(QS_QF_ACTIVE_GET);
-    QS_FILTER_OFF(QS_QF_ACTIVE_GET_LAST);
-    QS_FILTER_OFF(QS_QF_EQUEUE_INIT);
-    QS_FILTER_OFF(QS_QF_EQUEUE_POST_FIFO);
-    QS_FILTER_OFF(QS_QF_EQUEUE_POST_LIFO);
-    QS_FILTER_OFF(QS_QF_EQUEUE_GET);
-    QS_FILTER_OFF(QS_QF_EQUEUE_GET_LAST);
-    QS_FILTER_OFF(QS_QF_MPOOL_INIT);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_GET);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_GET_LAST);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_INIT);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_POST_FIFO);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_POST_LIFO);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_GET);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_GET_LAST);
+    //QS_FILTER_OFF(QS_QF_MPOOL_INIT);
     //QS_FILTER_OFF(QS_QF_MPOOL_GET);
-    QS_FILTER_OFF(QS_QF_MPOOL_PUT);
+    //QS_FILTER_OFF(QS_QF_MPOOL_PUT);
     //QS_FILTER_OFF(QS_QF_PUBLISH);
-    QS_FILTER_OFF(QS_QF_NEW);
-    QS_FILTER_OFF(QS_QF_GC_ATTEMPT);
-    QS_FILTER_OFF(QS_QF_GC);
+    //QS_FILTER_OFF(QS_QF_NEW);
+    //QS_FILTER_OFF(QS_QF_GC_ATTEMPT);
+    //QS_FILTER_OFF(QS_QF_GC);
     QS_FILTER_OFF(QS_QF_TICK);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_ARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_AUTO_DISARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM_ATTEMPT);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_REARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_POST);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_ARM);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_AUTO_DISARM);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM_ATTEMPT);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_REARM);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_POST);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_CTR);
     QS_FILTER_OFF(QS_QF_CRIT_ENTRY);
     QS_FILTER_OFF(QS_QF_CRIT_EXIT);
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
@@ -367,9 +369,7 @@ void QP::QS::onCleanup(void) {
 void QP::QS::onFlush(void) {
     uint16_t nBytes = 1024U;
     uint8_t const *block;
-    QF_CRIT_ENTRY(dummy);
     while ((block = getBlock(&nBytes)) != (uint8_t *)0) {
-        QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
         nBytes = 1024U;
     }
@@ -388,14 +388,14 @@ void QP::QS_onEvent(void) {
         QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
     }
+    else {
+        QF_CRIT_EXIT(dummy);
+    }
 }
 //............................................................................
-void QSPY_onPrintLn(void) {
+extern "C" void QSPY_onPrintLn(void) {
     qDebug(QSPY_line);
 }
 
 #endif                                                                // Q_SPY
-//----------------------------------------------------------------------------
-
-
 

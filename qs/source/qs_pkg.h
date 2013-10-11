@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Mar 28, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 23, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qs_pkg_h
 #define qs_pkg_h
 
@@ -41,45 +41,27 @@
 
 #include "qs_port.h"                                                // QS port
 
-QP_BEGIN_
-
-/// \brief QS ring buffer counter and offset type
-typedef uint16_t QSCtr;
-
 /// \brief Internal QS macro to insert an un-escaped byte into
 /// the QS buffer
 ////
 #define QS_INSERT_BYTE(b_) \
-    QS_PTR_AT_(QS_head_) = (b_); \
-    ++QS_head_; \
-    if (QS_head_ == QS_end_) { \
-        QS_head_ = static_cast<QSCtr>(0); \
-    } \
-    ++QS_used_;
+    *QS_PTR_AT_(head_) = (b_); \
+    ++head_; \
+    if (head_ == end_) { \
+        head_ = static_cast<QSCtr>(0); \
+    }
 
 /// \brief Internal QS macro to insert an escaped byte into the QS buffer
 #define QS_INSERT_ESC_BYTE(b_) \
-    QS_chksum_ = static_cast<uint8_t>(QS_chksum_ + (b_)); \
-    if (((b_) == QS_FRAME) || ((b_) == QS_ESC)) { \
+    chksum_ += (b_); \
+    if (((b_) != QS_FRAME) && ((b_) != QS_ESC)) { \
+        QS_INSERT_BYTE(b_) \
+    } \
+    else { \
         QS_INSERT_BYTE(QS_ESC) \
         QS_INSERT_BYTE(static_cast<uint8_t>((b_) ^ QS_ESC_XOR)) \
-    } \
-    else { \
-        QS_INSERT_BYTE(b_) \
+        ++priv_.used; \
     }
-
-/// \brief Internal QS macro to insert a escaped checksum byte into
-/// the QS buffer
-#define QS_INSERT_CHKSUM_BYTE() \
-    QS_chksum_ = static_cast<uint8_t>(~QS_chksum_); \
-    if ((QS_chksum_ == QS_FRAME) || (QS_chksum_ == QS_ESC)) { \
-        QS_INSERT_BYTE(QS_ESC) \
-        QS_INSERT_BYTE(static_cast<uint8_t>(QS_chksum_ ^ QS_ESC_XOR)) \
-    } \
-    else { \
-        QS_INSERT_BYTE(QS_chksum_) \
-    }
-
 
 /// \brief Internal QS macro to access the QS ring buffer
 ///
@@ -87,20 +69,21 @@ typedef uint16_t QSCtr;
 /// pointer QS_ring_, which violates the MISRA-C 2004 Rule 17.4(req), pointer
 /// arithmetic other than array indexing. Encapsulating this violation in a
 /// macro allows to selectively suppress this specific deviation.
-#define QS_PTR_AT_(i_) (QS_ring_[i_])
+#define QS_PTR_AT_(i_) (buf_ + (i_))
 
-
-/// \brief Frame character of the QS output protocol
-uint8_t const QS_FRAME = static_cast<uint8_t>(0x7E);
-
-/// \brief Escape character of the QS output protocol
-uint8_t const QS_ESC   = static_cast<uint8_t>(0x7D);
-
-/// \brief Escape modifier of the QS output protocol
+/// \brief Internal QS macro to increment the given pointer argument \a ptr_
 ///
-/// The escaped byte is XOR-ed with the escape modifier before it is inserted
-/// into the QS buffer.
-uint8_t const QS_ESC_XOR = static_cast<uint8_t>(0x20);
+/// \note Incrementing a pointer violates the MISRA-C 2004 Rule 17.4(req),
+/// pointer arithmetic other than array indexing. Encapsulating this violation
+/// in a macro allows to selectively suppress this specific deviation.
+#define QS_PTR_INC_(ptr_) (++(ptr_))
+
+/// \brief Internal QS macro to cast enumerated QS record number to uint8_t
+///
+/// \note Casting from enum to unsigned char violates the MISRA-C++ 2008 rules
+/// 5-2-7, 5-2-8 and 5-2-9. Encapsulating this violation in a macro allows to
+/// selectively suppress this specific deviation.
+#define QS_REC_NUM_(enum_) (static_cast<uint8_t>(enum_))
 
 #ifndef Q_ROM_BYTE
     /// \brief Macro to access a byte allocated in ROM
@@ -116,19 +99,23 @@ uint8_t const QS_ESC_XOR = static_cast<uint8_t>(0x20);
     /// cannot handle correctly data allocated in ROM (such as the gcc).
     /// If the macro is left undefined, the default definition simply returns
     /// the argument and lets the compiler generate the correct code.
-    #define Q_ROM_BYTE(rom_var_)   (rom_var_)
+    #define Q_ROM_BYTE(x_)   (x_)
 #endif
 
-//............................................................................
-extern uint8_t *QS_ring_;         ///< pointer to the start of the ring buffer
-extern QSCtr QS_end_;                ///< offset of the end of the ring buffer
-extern QSCtr QS_head_;         ///< offset to where next byte will be inserted
-extern QSCtr QS_tail_;       ///< offset of where next event will be extracted
-extern QSCtr QS_used_;       ///< number of bytes currently in the ring buffer
-extern uint8_t QS_seq_;                        ///< the record sequence number
-extern uint8_t QS_chksum_;             ///< the checksum of the current record
-extern uint8_t QS_full_;              ///< the ring buffer is temporarily full
+namespace QP {
 
-QP_END_
+/// \brief Frame character of the QS output protocol
+uint8_t const QS_FRAME = static_cast<uint8_t>(0x7E);
+
+/// \brief Escape character of the QS output protocol
+uint8_t const QS_ESC   = static_cast<uint8_t>(0x7D);
+
+/// \brief Escape modifier of the QS output protocol
+///
+/// The escaped byte is XOR-ed with the escape modifier before it is inserted
+/// into the QS buffer.
+uint8_t const QS_ESC_XOR = static_cast<uint8_t>(0x20);
+
+}                                                              // namespace QP
 
 #endif                                                             // qs_pkg_h

@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,14 +31,14 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 
 /// \file
 /// \ingroup qf
 /// \brief QTimeEvt::ctr() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 //............................................................................
 QTimeEvtCtr QTimeEvt::ctr(void) const {
@@ -47,16 +47,18 @@ QTimeEvtCtr QTimeEvt::ctr(void) const {
     QF_CRIT_ENTRY_();
     QTimeEvtCtr ret = m_ctr;
 
-    QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_CTR, QS::teObj_, this)
+    QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_CTR, QS::priv_.teObjFilter, this)
         QS_TIME_();                                               // timestamp
         QS_OBJ_(this);                               // this time event object
-        QS_OBJ_(m_act);                                   // the active object
+        QS_OBJ_(m_act);                                       // the target AO
         QS_TEC_(ret);                                   // the current counter
         QS_TEC_(m_interval);                                   // the interval
+        QS_U8_(static_cast<uint8_t>(refCtr_ & u8_0x7F));          // tick rate
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();
     return ret;
 }
 
-QP_END_
+}                                                              // namespace QP
+

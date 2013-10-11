@@ -1,10 +1,39 @@
-#-------------------------------------------------
+#-----------------------------------------------------------------------------
+# Product: QP/C++ port to Qt5
+# Last Updated for Version: 5.1.0
+# Date of the Last Update:  Sep 30, 2013
 #
-# Project created by QtCreator 2012-05-09T19:56:54
+#                    Q u a n t u m     L e a P s
+#                    ---------------------------
+#                    innovating embedded systems
 #
-#-------------------------------------------------
+# Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+#
+# This program is open source software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Alternatively, this program may be distributed and modified under the
+# terms of Quantum Leaps commercial licenses, which expressly supersede
+# the GNU General Public License and are specifically designed for
+# licensees interested in retaining the proprietary status of their code.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+# Contact information:
+# Quantum Leaps Web sites: http://www.quantum-leaps.com
+#                          http://www.state-machine.com
+# e-mail:                  info@quantum-leaps.com
+#-----------------------------------------------------------------------------
 
-QT      += core gui
+QT      += core gui widgets
 TARGET   = qp
 TEMPLATE = lib
 CONFIG  += staticlib
@@ -18,18 +47,27 @@ INCLUDEPATH += . \
 HEADERS +=  \
     qep_port.h \
     qf_port.h \
-    qp_app.h \
+    tickerthread.h \
+    aothread.h \
+    guiapp.h \
+    guiactive.h \
     pixellabel.h
 
 SOURCES += \
     qf_port.cpp \
+    guiapp.cpp \
     pixellabel.cpp \
     ../../../qep/source/qep.cpp \
+    ../../../qep/source/qmsm_dis.cpp \
+    ../../../qep/source/qmsm_ini.cpp \
     ../../../qep/source/qhsm_dis.cpp \
     ../../../qep/source/qhsm_ini.cpp \
     ../../../qep/source/qhsm_in.cpp \
     ../../../qep/source/qhsm_top.cpp \
     ../../../qf/source/qa_defer.cpp \
+    ../../../qf/source/qa_fifo.cpp \
+    ../../../qf/source/qa_get_.cpp \
+    ../../../qf/source/qa_lifo.cpp \
     ../../../qf/source/qa_sub.cpp \
     ../../../qf/source/qa_usub.cpp \
     ../../../qf/source/qa_usuba.cpp \
@@ -63,6 +101,7 @@ CONFIG(debug, debug|release) {
         ../../../qs/source/qs_.cpp \
         ../../../qs/source/qs_blk.cpp \
         ../../../qs/source/qs_byte.cpp \
+        ../../../qs/source/qs_dict.cpp \
         ../../../qs/source/qs_f32.cpp \
         ../../../qs/source/qs_f64.cpp \
         ../../../qs/source/qs_mem.cpp \

@@ -1,15 +1,20 @@
 extern QActive *AO_Table;
 
-QState Philosopher::hungry(Philosopher *me, QEvent const *e) {
-    TableEvt *pe;
+QP::QState Philo::hungry(Philo * const me, QP::QEvt const * const e) {
+    QP::QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            pe = Q_NEW(TableEvt, HUNGRY_SIG);    // dynamically allocate event
-            pe->philNum = me->num_;
-            AO_Table->postFIFO(pe);               // post the event directly
-            return Q_HANDLED();
+            TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
+            pe->philoNum = PHILO_ID(me);
+            AO_Table->POST(pe, me);
+            status = Q_HANDLED();
+            break;
         }
         . . .
+        default: {
+            status = Q_SUPER(&QHsm::top);
+            break;
+        }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }

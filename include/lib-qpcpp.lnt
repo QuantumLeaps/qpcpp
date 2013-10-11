@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 09, 2013
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 07, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -37,6 +37,7 @@
 -esym(1960,                   // Rule 7-3-1, Global declaration of symbol
  char_t,
  int_t,
+ uint_t,
  enum_t,
  float32_t,
  float64_t)
@@ -48,7 +49,8 @@
  *QEvt::poolId_,
  *QEvt::refCtr_)
 -estring(1923,                // 16-2-2(req) could become const variable
- Q_USE_NAMESPACE,
+ QP_VERSION_STR,
+ QP_RELEASE,
  Q_EVT_CTOR,
  Q_SIGNAL_SIZE,
  QP_VERSION)
@@ -69,7 +71,12 @@
 
 
 // Assertions
--esym(1960, Q_onAssert)       // Rule 7-3-1, Global declaration of symbol
+-esym(1960,                   // Rule 7-3-1, Global declaration of symbol
+ Q_onAssert,
+ Q_onTestAssert)
+-emacro(944, Q_ASSERT_COMPILE) // 0-1-1/2/9  operator '?' always evaluates to True 
+-emacro(948, Q_ASSERT_COMPILE) // 0-1-9  Operator '==' always evaluates to True
+-esym(752, Q_assert_compile)   // 0-1-3 local declarator not referenced   
 -estring(1960,                // 16-0-4 function-like macro
  Q_ASSERT,
  Q_ASSERT_ID,
@@ -84,38 +91,59 @@
  Q_INVARIANT,
  Q_INVARIANT_ID,
  Q_ASSERT_COMPILE,
+ Q_TEST_ASSERT,
  Q_DEFINE_THIS_MODULE)
 -emacro(1924,                 // 5-2-4 C-style cast
  Q_ASSERT,
  Q_ALLEGE,
  Q_ERROR)
--emacro(522,                  // Highest operation lacks side-effects 
+-emacro(522,                  // Highest operation lacks side-effects
  Q_ASSERT,
  Q_ALLEGE,
  Q_ERROR)
--function(exit, Q_onAssert)   // give Q_onAssert() the semantics of "exit"
+-function(exit,               // give these functions the semantics of "exit"
+ Q_onAssert,
+ Q_onTestAssert)
 
 
 // QEP
 -emacro(929,                  // 5-2-7(req) cast pointer to pointer
  Q_STATE_CAST,
+ Q_ACTION_CAST,
  Q_EVT_CAST)
 -emacro(1939,                 // 5-2-2, Down cast detected
  Q_EVT_CAST,
- Q_NEW)
+ Q_NEW,
+ Q_NEW_X)
+-estring(1960,*QMAttr)        // 9-5-1 declaration of union
 -esym(1960,                   // 16-0-4 function-like macro
  Q_ROM_BYTE,
  Q_TRAN,
  Q_SUPER,
  Q_STATE_CAST,
+ Q_ACTION_CAST,
  Q_EVT_CAST)
+-esym(1960,                   // 16-0-4 function-like macro
+ QM_ENTRY,
+ QM_EXIT,
+ QM_TRAN,
+ QM_INITIAL,
+ QM_HANDLED,
+ QM_UNHANDLED,
+ QM_SUPER)
 -esym(1712,                   // default constructor not defined
- QFsm,
- QHsm)
+ QMsm,
+ QHsm,
+ QFsm)
 
 
 // QF
--emacro(929, Q_NEW)           // 5-2-7 cast from pointer to pointer
+-emacro(929,                  // 5-2-7 cast from pointer to pointer
+ Q_NEW,
+ Q_NEW_X)
+-efunc(925,                   // 5-2-8, 5-2-9 cast from pointer to pointer
+ *toActive,
+ *toTimeEvt)
 -esym(1927,                   // 8-5-1 Symbol not in the ctor initializer list
  *QActive::m_prio,
  *QActive::m_eQueue,
@@ -124,6 +152,7 @@
 -estring(1923,                // 16-2-2 could become const variable
  QF_MAX_ACTIVE,
  QF_MAX_EPOOL,
+ QF_MAX_TICK_RATE,
  QF_EVENT_SIZ_SIZE,
  QF_EQUEUE_CTR_SIZE,
  QF_MPOOL_SIZ_SIZE,
@@ -134,6 +163,8 @@
  QF_INT_ENABLE,
  QF_CRIT_ENTRY,
  QF_CRIT_EXIT,
+ QF_CRIT_EXIT_NOP,
+ QF_LOG2LKUP,
  QF_QS_CRIT_ENTRY,
  QF_QS_CRIT_EXIT,
  QF_QS_ISR_ENTRY,
@@ -149,11 +180,17 @@
  QF_INT_ENABLE,
  QF_CRIT_ENTRY,
  QF_CRIT_EXIT,
- QF_TICK,
+ QF_CRIT_EXIT_NOP,
+ QF_CPU_SLEEP,
  Q_NEW,
+ Q_NEW_X,
  PUBLISH,
  POST,
- TICK)
+ POST_X,
+ TICK,
+ TICK_X,
+ tick,
+ postFIFO)
 -esym(1960,                   // 16-0-4 function-like macro
  QF_QS_CRIT_EXIT,
  QF_QS_CRIT_ENTRY,
@@ -182,8 +219,11 @@
  *QActive::m_eQueue,
  *QActive::m_osObject,
  *QActive::m_thread)
+-esym(1704,                   // constructor has private access specification
+ *QTimeEvt)
 -esym(1712,                   // default constructor not defined for class
  *QActive,
+ *QMActive,
  *QTimeEvt)
 -esym(641, *Signals)          // Converting enum '*Signals' to 'int'
 -esym(754, sto_)              // local structure member 'sto' not referenced
@@ -223,7 +263,9 @@
  QS_OBJ_PTR_SIZE,
  QS_FUN_PTR_SIZE,
  QS_OBJ_,
- QS_FUN_)
+ QS_FUN_,
+ QS_TEST,
+ QS_TEST_ASSERTION)
 -esym(1960,                   // 16-0-4 function-like macro
  QS_INIT,
  QS_EXIT,
@@ -263,6 +305,8 @@
  QS_FUN_DICTIONARY,
  QS_USR_DICTIONARY,
  QS_ASSERTION,
+ QS_TEST_ASSERTION,
+ QS_TEST,
  QS_FLUSH,
  QS_STR_ROM,
  QS_MEM,
@@ -276,6 +320,7 @@
  QS_BEGIN_NOCRIT_,
  QS_END_NOCRIT_,
  QS_U8_,
+ QS_2U8_,
  QS_U16_,
  QS_U32_,
  QS_U64_,
@@ -340,6 +385,7 @@
  QS_BEGIN_NOCRIT_,
  QS_END_NOCRIT_,
  QS_U8_,
+ QS_2U8_,
  QS_U16_,
  QS_U32_,
  QS_U64_,

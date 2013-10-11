@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 
@@ -39,7 +39,7 @@
 /// \ingroup qf
 /// \brief QMPool::init() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qmp_init")
 
@@ -55,7 +55,7 @@ void QMPool::init(void * const poolSto, uint32_t const poolSize,
               && ((blockSize + static_cast<QMPoolSize>(sizeof(QFreeBlock)))
                     > blockSize));
 
-    m_free = poolSto;
+    m_free_head = poolSto;
 
                 // round up the blockSize to fit an integer number of pointers
     m_blockSize = static_cast<QMPoolSize>(sizeof(QFreeBlock));//start with one
@@ -73,7 +73,7 @@ void QMPool::init(void * const poolSto, uint32_t const poolSize,
     uint32_t availSize = poolSize - static_cast<uint32_t>(m_blockSize);
     m_nTot = static_cast<QMPoolCtr>(1);    // one (the last) block in the pool
                                           //start at the head of the free list
-    QFreeBlock *fb = static_cast<QFreeBlock *>(m_free);
+    QFreeBlock *fb = static_cast<QFreeBlock *>(m_free_head);
     while (availSize >= static_cast<uint32_t>(m_blockSize)) {
         fb->m_next = &QF_PTR_AT_(fb, nblocks);          // setup the next link
         fb = fb->m_next;                              // advance to next block
@@ -88,10 +88,11 @@ void QMPool::init(void * const poolSto, uint32_t const poolSize,
     m_end      = fb;                            // the last block in this pool
 
     QS_CRIT_STAT_
-    QS_BEGIN_(QS_QF_MPOOL_INIT, QS::mpObj_, m_start)
+    QS_BEGIN_(QS_QF_MPOOL_INIT, QS::priv_.mpObjFilter, m_start)
         QS_OBJ_(m_start);                   // the memory managed by this pool
         QS_MPC_(m_nTot);                         // the total number of blocks
     QS_END_()
 }
 
-QP_END_
+}                                                              // namespace QP
+

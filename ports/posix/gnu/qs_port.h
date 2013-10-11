@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QS/C++ port to 32-bit POSIX
 // Last Updated for Version: 4.5.02
 // Date of the Last Update:  Aug 13, 2012
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qs_port_h
 #define qs_port_h
 
@@ -45,7 +45,7 @@
     #define QS_FUN_PTR_SIZE     4
 #endif
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // NOTE: QS might be used with or without other QP components, in which case
 // the separate definitions of the macros Q_ROM, Q_ROM_VAR,
 // QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY, and QF_CRIT_EXIT are needed. In this

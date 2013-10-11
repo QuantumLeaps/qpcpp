@@ -21,6 +21,7 @@
 *.chm
 *.avrsuo
 
+test/
 dbg/
 rel/
 spy/

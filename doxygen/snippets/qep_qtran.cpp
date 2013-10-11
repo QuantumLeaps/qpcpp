@@ -1,5 +1,5 @@
 // state handler function for the QBomb FSM ..................................
-QState QBomb::setting(QBomb *me, QEvent const *e) {
+QState QBomb::setting(QBomb * const me, QEvt const *e) {
     switch (e->sig) {
         . . .
         case ARM_SIG: {
@@ -10,7 +10,7 @@ QState QBomb::setting(QBomb *me, QEvent const *e) {
 }
 
 // state handler function for the QCalc HSM ..................................
-QState QCalc::begin(QCalc *me, QEvent const *e) {
+QState QCalc::begin(QCalc * const me, QEvt const *e) {
     switch (e->sig) {
         . . .
         case OPER_SIG: {

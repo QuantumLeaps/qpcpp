@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: DPP example, QK version
 // Last Updated for Version: 4.5.00
 // Date of the Last Update:  May 20, 2012
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"

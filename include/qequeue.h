@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Jan 16, 2013
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qequeue_h
 #define qequeue_h
 
@@ -45,6 +45,7 @@
 /// and non-framework entities, such as ISRs, device drivers, or legacy
 /// code.
 
+
 #ifndef QF_EQUEUE_CTR_SIZE
 
     /// \brief The size (in bytes) of the ring-buffer counters used in the
@@ -57,7 +58,8 @@
     #define QF_EQUEUE_CTR_SIZE 1
 #endif
 
-QP_BEGIN_
+
+namespace QP {
 
 #if (QF_EQUEUE_CTR_SIZE == 1)
     /// \brief The data type to store the ring-buffer counters based on
@@ -75,7 +77,7 @@ QP_BEGIN_
 #endif
 
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 /// \brief Native QF Event Queue class
 ///
 /// This structure describes the native QF event queue, which can be used as
@@ -99,18 +101,18 @@ QP_BEGIN_
 /// the active object event queue, which needs to block the active object
 /// task when the event queue is empty and unblock it when events are posted
 /// to the queue. The interface for the native active object event queue
-/// consists of the following functions: QActive::postFIFO_(),
-/// QActive::postLIFO_(), and QActive::get_(). Additionally the function
-/// QEQueue_init() is used to initialize the queue.
+/// consists of the following functions: QActive::post(), QActive::postLIFO(),
+/// and QActive::get_(). Additionally the function QEQueue::init() is used to
+/// initialize the queue.
 ///
 /// The other set of functions, uses this structure as a simple "raw" event
 /// queue to pass events between entities other than active objects, such as
 /// ISRs. The "raw" event queue is not capable of blocking on the get()
 /// operation, but is still thread-safe because it uses QF critical section
 /// to protect its integrity. The interface for the "raw" thread-safe queue
-/// consists of the following functions: QEQueue::postFIFO(),
-/// QEQueue::postLIFO(), and QEQueue::get(). Additionally the function
-/// QEQueue::init() is used to initialize the queue.
+/// consists of the following functions: QEQueue::post(), QEQueue::postLIFO(),
+/// and QEQueue::get(). Additionally the function QEQueue::init() is used to
+/// initialize the queue.
 ///
 /// \note Most event queue operations (both the active object queues and
 /// the "raw" queues) internally use  the QF critical section. You should be
@@ -129,7 +131,7 @@ private:
     ///
     /// The additional role of this attribute is to indicate the empty status
     /// of the queue. The queue is empty if the m_frontEvt location is NULL.
-    QEvt const *m_frontEvt;
+    QEvt const * volatile m_frontEvt;
 
     /// \brief pointer to the start of the ring buffer
     QEvt const **m_ring;
@@ -139,13 +141,13 @@ private:
     QEQueueCtr m_end;
 
     /// \brief offset to where next event will be inserted into the buffer
-    QEQueueCtr m_head;
+    QEQueueCtr volatile m_head;
 
     /// \brief offset of where next event will be extracted from the buffer
-    QEQueueCtr m_tail;
+    QEQueueCtr volatile m_tail;
 
     /// \brief number of free events in the ring buffer
-    QEQueueCtr m_nFree;
+    QEQueueCtr volatile m_nFree;
 
     /// \brief minimum number of free events ever in the ring buffer.
     ///
@@ -166,16 +168,20 @@ public:
     /// extra location fornEvt_.
     void init(QEvt const *qSto[], QEQueueCtr const qLen);
 
-    /// \brief "raw" thread-safe QF event queue implementation for the
-    /// First-In-First-Out (FIFO) event posting. You can call this function
-    /// from any task context or ISR context. Please note that this function
-    /// uses internally a critical section.
+    /// \brief "raw" thread-safe QF event queue implementation for the event
+    /// posting (FIFO). You can call this function from any task context or
+    /// ISR context. This function uses internally a critical section.
     ///
-    /// \note The function raises an assertion if the native QF queue becomes
-    /// full and cannot accept the event.
+    /// The argument \a margin specifies the minimum number of free entries
+    /// in the queue that must be available for posting to succeed. The
+    /// function returns true (success) if the posting succeeded (with the
+    /// provided margin) and false (failure) when the posting fails.
+    ///
+    /// \note The function raises an assertion if the \a margin is zero and
+    /// the queue becomes full and cannot accept the event.
     ///
     /// \sa QEQueue::postLIFO(), QEQueue::get()
-    void postFIFO(QEvt const * const e);
+    bool post(QEvt const * const e, uint16_t const margin);
 
     /// \brief "raw" thread-safe QF event queue implementation for the
     /// First-In-First-Out (FIFO) event posting. You can call this function
@@ -234,7 +240,7 @@ private:
     friend class QActive;
 };
 
-QP_END_
+}                                                              // namespace QP
 
 #endif                                                            // qequeue_h
 

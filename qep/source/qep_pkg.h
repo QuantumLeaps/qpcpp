@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QEP/C++
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 09, 2013
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qep_pkg_h
 #define qep_pkg_h
 
@@ -47,9 +47,9 @@
     #include "qs_dummy.h"                   // disable the QS software tracing
 #endif                                                                // Q_SPY
 
-QP_BEGIN_
+namespace QP {
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 /// preallocated reserved events
 extern QEvt const QEP_reservedEvt_[4];
 
@@ -65,7 +65,7 @@ int8_t  const s8_0  = static_cast<int8_t>(0);  ///< \brief constant  (int8_t)0
 int8_t  const s8_1  = static_cast<int8_t>(1);  ///< \brief constant  (int8_t)1
 int8_t  const s8_n1 = static_cast<int8_t>(-1); ///< \brief constant (int8_t)-1
 
-QP_END_
+}                                                              // namespace QP
 
 /// helper macro to trigger internal event in an HSM
 #define QEP_TRIG_(state_, sig_) \
@@ -74,7 +74,7 @@ QP_END_
 /// helper macro to trigger exit action in an HSM
 #define QEP_EXIT_(state_) do { \
     if (QEP_TRIG_(state_, Q_EXIT_SIG) == Q_RET_HANDLED) { \
-        QS_BEGIN_(QS_QEP_STATE_EXIT, QS::smObj_, this) \
+        QS_BEGIN_(QS_QEP_STATE_EXIT, QS::priv_.smObjFilter, this) \
             QS_OBJ_(this); \
             QS_FUN_(state_); \
         QS_END_() \
@@ -84,12 +84,20 @@ QP_END_
 /// helper macro to trigger entry action in an HSM
 #define QEP_ENTER_(state_) do { \
     if (QEP_TRIG_(state_, Q_ENTRY_SIG) == Q_RET_HANDLED) { \
-        QS_BEGIN_(QS_QEP_STATE_ENTRY, QS::smObj_, this) \
+        QS_BEGIN_(QS_QEP_STATE_ENTRY, QS::priv_.smObjFilter, this) \
             QS_OBJ_(this); \
             QS_FUN_(state_); \
         QS_END_() \
     } \
 } while (false)
+
+/// \brief Internal QEP macro to increment the given action table \a act_
+///
+/// \note Incrementing a pointer violates the MISRA-C 2004 Rule 17.4(req),
+/// pointer arithmetic other than array indexing. Encapsulating this violation
+/// in a macro allows to selectively suppress this specific deviation.
+///
+#define QEP_ACT_PTR_INC_(act_) (++(act_))
 
 #endif                                                            // qep_pkg_h
 

@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 08, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,14 +31,14 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 
 /// \file
 /// \ingroup qf
 /// \brief QEQueue::init() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 //............................................................................
 void QEQueue::init(QEvt const *qSto[], QEQueueCtr const qLen) {
@@ -47,14 +47,15 @@ void QEQueue::init(QEvt const *qSto[], QEQueueCtr const qLen) {
     m_end      = qLen;
     m_head     = static_cast<QEQueueCtr>(0);
     m_tail     = static_cast<QEQueueCtr>(0);
-    m_nFree    = qLen;
-    m_nMin     = qLen;
+    m_nFree    = qLen + static_cast<QEQueueCtr>(1);//+1 for the extra frontEvt
+    m_nMin     = m_nFree;
 
     QS_CRIT_STAT_
-    QS_BEGIN_(QS_QF_EQUEUE_INIT, QS::eqObj_, this)
-        QS_OBJ_(qSto);                                  // this QEQueue object
+    QS_BEGIN_(QS_QF_EQUEUE_INIT, QS::priv_.eqObjFilter, this)
+        QS_OBJ_(this);                                  // this QEQueue object
         QS_EQC_(qLen);                              // the length of the queue
     QS_END_()
 }
 
-QP_END_
+}                                                              // namespace QP
+

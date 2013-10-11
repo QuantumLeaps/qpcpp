@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QK/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 07, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,47 +31,33 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qk_pkg.h"
 #include "qassert.h"
 
 /// \file
 /// \ingroup qk
 /// \brief QK_readySet_, QK_currPrio_, and QK_intNest_ definitions and
-/// QK::getVersion(), QF::init(), QF::run(), QF::stop(),
+/// QF::init(), QF::run(), QF::stop(),
 /// QActive::start(), QActive::stop() implementations.
 
 // Public-scope objects ------------------------------------------------------
 extern "C" {
 #if (QF_MAX_ACTIVE <= 8)
-    QP_ QPSet8  QK_readySet_;                               // ready set of QK
+    QP::QPSet8  QK_readySet_;                              // ready set of AOs
 #else
-    QP_ QPSet64 QK_readySet_;                               // ready set of QK
+    QP::QPSet64 QK_readySet_;                              // ready set of AOs
 #endif
                                          // start with the QK scheduler locked
-uint8_t QK_currPrio_ = static_cast<uint8_t>(QF_MAX_ACTIVE + 1);
-uint8_t QK_intNest_;                          // start with nesting level of 0
+uint8_t volatile QK_currPrio_ = static_cast<uint8_t>(QF_MAX_ACTIVE + 1);
+uint8_t volatile QK_intNest_;                 // start with nesting level of 0
 
 }                                                                // extern "C"
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qk")
 
-//............................................................................
-char_t const Q_ROM * Q_ROM_VAR QK::getVersion(void) {
-    uint8_t const u8_zero = static_cast<uint8_t>('0');
-    static char_t const Q_ROM Q_ROM_VAR version[] = {
-        static_cast<char_t>(((QP_VERSION >> 12) & 0xFU) + u8_zero),
-        static_cast<char_t>('.'),
-        static_cast<char_t>(((QP_VERSION >>  8) & 0xFU) + u8_zero),
-        static_cast<char_t>('.'),
-        static_cast<char_t>(((QP_VERSION >>  4) & 0xFU) + u8_zero),
-        static_cast<char_t>((QP_VERSION         & 0xFU) + u8_zero),
-        static_cast<char_t>('\0')
-    };
-    return version;
-}
 //............................................................................
 void QF::init(void) {
     QK_init();           // QK initialization ("C" linkage, might be assembly)
@@ -99,8 +85,10 @@ int16_t QF::run(void) {
     for (;;) {                                             // the QK idle loop
         QK::onIdle();                        // invoke the QK on-idle callback
     }
-                      // this unreachable return is to make the compiler happy
+
+#ifdef __GNUC__                                               // GNU compiler?
     return static_cast<int16_t>(0);
+#endif
 }
 //............................................................................
 void QActive::start(uint8_t const prio,
@@ -126,7 +114,7 @@ void QActive::start(uint8_t const prio,
              && (stkSize == static_cast<uint32_t>(0)));
 #endif
 
-    init(ie);                                    // execute initial transition
+    this->init(ie);               // execute initial transition (virtual call)
 
     QS_FLUSH();                          // flush the trace buffer to the host
 }
@@ -135,4 +123,4 @@ void QActive::stop(void) {
     QF::remove_(this);                // remove this active object from the QF
 }
 
-QP_END_
+}                                                              // namespace QP

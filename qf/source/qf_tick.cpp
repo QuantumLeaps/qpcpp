@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 07, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,103 +31,132 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 /// \file
 /// \ingroup qf
-/// \brief QF::tick() implementation.
+/// \brief QF::tickX() and QF::noTimeEvtsActiveX() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_tick")
 
 //............................................................................
 #ifndef Q_SPY
-void QF::tick(void) {                                            // see NOTE01
+void QF::tickX(uint8_t const tickRate)                           // see NOTE01
 #else
-void QF::tick(void const * const sender) {
+void QF::tickX(uint8_t const tickRate, void const * const sender)
 #endif
-
+{
+    QTimeEvt *prev = &timeEvtHead_[tickRate];
     QF_CRIT_STAT_
+
     QF_CRIT_ENTRY_();
 
     QS_BEGIN_NOCRIT_(QS_QF_TICK, null_void, null_void)
-        QS_TEC_(static_cast<QTimeEvtCtr>(++QS::tickCtr_)); // the tick counter
+        QS_TEC_(static_cast<QTimeEvtCtr>(++prev->m_ctr));          // tick ctr
+        QS_U8_(tickRate);                                         // tick rate
     QS_END_NOCRIT_()
 
-    QTimeEvt *prev = null_tevt;
-    for (QTimeEvt *t = QF_timeEvtListHead_; t != null_tevt; t = t->m_next) {
-        if (t->m_ctr == tc_0) {            // time evt. scheduled for removal?
-            if (t == QF_timeEvtListHead_) {
-                QF_timeEvtListHead_ = t->m_next;
+    for (;;) {
+        QTimeEvt *t = prev->m_next;         // advance down the time evt. list
+        if (t == null_tevt) {                              // end of the list?
+            if (timeEvtHead_[tickRate].m_act != null_void) {
+                Q_ASSERT(prev != null_tevt);                   // sanity check
+                prev->m_next = QF::timeEvtHead_[tickRate].toTimeEvt();
+                timeEvtHead_[tickRate].m_act = null_void;
+                t = prev->m_next;                    // switch to the new list
             }
             else {
-                Q_ASSERT(prev != null_tevt);
-                prev->m_next = t->m_next;
+                break;             // all currently armed time evts. processed
             }
-            QF_EVT_REF_CTR_DEC_(t);                      // mark as not linked
+        }
+
+        if (t->m_ctr == tc_0) {            // time evt. scheduled for removal?
+            prev->m_next = t->m_next;
+            t->refCtr_ &= u8_0x7F;                         // mark as unlinked
+            // do NOT advance the prev pointer
+            QF_CRIT_EXIT_();           // exit crit. section to reduce latency
+            QF_CRIT_EXIT_NOP();                                  // see NOTE02
         }
         else {
             --t->m_ctr;
-            if (t->m_ctr == tc_0) {                        // about to expire?
-                if (t->m_interval != tc_0) {           // periodic time event?
-                    t->m_ctr = t->m_interval;            // rearm the time evt
+            if (t->m_ctr == tc_0) {            // is time evt about to expire?
+                if (t->m_interval != tc_0) {             // periodic time evt?
+                    t->m_ctr = t->m_interval;          // rearm the time event
+                    prev = t;                    // advance to this time event
                 }
-                else {
-                    QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_AUTO_DISARM, QS::teObj_, t)
+                else {            // one-shot time event: automatically disarm
+                    prev->m_next = t->m_next;
+                    t->refCtr_ &= u8_0x7F;                 // mark as unlinked
+                    // do NOT advance the prev pointer
+
+                    QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_AUTO_DISARM,
+                                     QS::priv_.teObjFilter, t)
                         QS_OBJ_(t);                  // this time event object
-                        QS_OBJ_(t->m_act);                // the active object
+                        QS_OBJ_(t->m_act);                    // the target AO
+                        QS_U8_(tickRate);                         // tick rate
                     QS_END_NOCRIT_()
                 }
 
-                QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_POST, QS::teObj_, t)
+                QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_POST, QS::priv_.teObjFilter, t)
                     QS_TIME_();                                   // timestamp
                     QS_OBJ_(t);                       // the time event object
-                    QS_SIG_(t->sig);          // the signal of this time event
-                    QS_OBJ_(t->m_act);                    // the active object
+                    QS_SIG_(t->sig);              // signal of this time event
+                    QS_OBJ_(t->m_act);                        // the target AO
+                    QS_U8_(tickRate);                             // tick rate
                 QS_END_NOCRIT_()
 
-                QF_CRIT_EXIT_();         // leave crit. section before posting
-                           // POST() asserts internally if the queue overflows
-                t->m_act->POST(t, sender);
-                QF_CRIT_ENTRY_();        // re-enter crit. section to continue
+                QF_CRIT_EXIT_();          // exit crit. section before posting
 
-                if (t->m_ctr == tc_0) {             // still marked to expire?
-                    if (t == QF_timeEvtListHead_) {
-                        QF_timeEvtListHead_ = t->m_next;
-                    }
-                    else {
-                        Q_ASSERT(prev != null_tevt);
-                        prev->m_next = t->m_next;
-                    }
-                    QF_EVT_REF_CTR_DEC_(t);                 // mark as removed
-                }
-                else {
-                    prev = t;
-                }
+                                                 // asserts if queue overflows
+                (void)t->toActive()->POST(t, sender);
             }
             else {
-                prev = t;
+                prev = t;                        // advance to this time event
+                QF_CRIT_EXIT_();       // exit crit. section to reduce latency
+                QF_CRIT_EXIT_NOP();                              // see NOTE02
             }
         }
+        QF_CRIT_ENTRY_();                // re-enter crit. section to continue
     }
     QF_CRIT_EXIT_();
 }
+//............................................................................
+bool QF::noTimeEvtsActiveX(uint8_t const tickRate) {             // see NOTE03
+    Q_REQUIRE(tickRate < static_cast<uint8_t>(QF_MAX_TICK_RATE));
+    bool inactive;
+    if (timeEvtHead_[tickRate].m_next == null_tevt) {
+        inactive = false;
+    }
+    else if (timeEvtHead_[tickRate].m_act == null_void) {
+        inactive = false;
+    }
+    else {
+        inactive = true;
+    }
+    return inactive;
+}
 
-QP_END_
+}                                                              // namespace QP
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // NOTE01:
-// QF::tick() must always run to completion and never preempt itself.
-// In particular, if QF::tick() runs in an ISR, the ISR is not allowed to
-// preempt itself. Also, QF::tick() should not be called from two different
+// QF::tickX() must always run to completion and never preempt itself.
+// In particular, if QF::tickX() runs in an ISR, the ISR is not allowed to
+// preempt itself. Also, QF_tickX() should not be called from two different
 // ISRs, which potentially could preempt each other.
 //
 // NOTE02:
-// On many CPUs, the interrupt enabling takes only effect on the next
-// machine instruction, which happens to be here interrupt disabling.
-// The assignment of a volatile variable requires a few instructions, which
-// the compiler cannot optimize away. This ensures that the interrupts get
-// actually enabled, so that the interrupt latency stays low.
+// In some QF ports the critical section exit takes effect only on the next
+// machine instruction. If this case, the next instruction is another entry
+// to a critical section, the critical section won't be really exited, but
+// rather the two adjecent critical sections would be merged.
+// The QF_CRIT_EXIT_NOP() macro contains minimal code required to prevent
+// such merging of critical sections in QF ports, in which it can occur.
 //
+// NOTE03:
+// QF::noTimeEvtsActiveX() must be invoked from within a critical section.
+//
+

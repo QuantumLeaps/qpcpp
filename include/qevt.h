@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 10, 2013
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 10, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qevt_h
 #define qevt_h
 
@@ -42,13 +42,21 @@
 /// This header file must be included, perhaps indirectly, in all modules
 /// (*.cpp files) that use any component of QP/C++ (such as QEP, QF, or QK).
 
-//////////////////////////////////////////////////////////////////////////////
+
+//****************************************************************************
 /// \brief The current QP version number
 ///
-/// \return version of the QP as a hex constant constant 0xXYZZ, where X is
-/// a 1-digit major version number, Y is a 1-digit minor version number, and
-/// ZZ is a 2-digit release number.
-#define QP_VERSION      0x4504U
+/// version of the QP as a hex constant 0x0XYZ, where X is a 1-digit
+/// major version number, Y is a 1-digit minor version number, and Z is
+/// a 1-digit release number.
+///
+#define QP_VERSION      0x0511U
+
+/// \brief The current QP version string
+#define QP_VERSION_STR  "5.1.1"
+
+/** \brief Temperproof current QP release (5.1.1) and date (13-10-10) */
+#define QP_RELEASE      0xB1E973E0U
 
 #ifndef Q_ROM
     /// \brief Macro to specify compiler-specific directive for placing a
@@ -108,33 +116,7 @@
     #define Q_SIGNAL_SIZE 2
 #endif
 
-#ifndef Q_NNAMESPACE
-
-    /// \brief begin of the namespace QP
-    ///
-    /// \note defines to nothing if #Q_USE_NAMESPACE is undefined
-    #define QP_BEGIN_  namespace QP {
-
-    /// \brief end of the namespace QP
-    ///
-    /// \note defines to nothing if #Q_USE_NAMESPACE is undefined
-    #define QP_END_    }
-
-    /// \brief namespace QP prefix
-    ///
-    /// \note defines to nothing if #Q_USE_NAMESPACE is undefined
-    #define QP_        QP::
-
-#else
-
-    #define QP_BEGIN_
-    #define QP_END_
-    #define QP_
-
-#endif
-
-QP_BEGIN_
-
+namespace QP {
 #if (Q_SIGNAL_SIZE == 1)
     typedef uint8_t QSignal;
 #elif (Q_SIGNAL_SIZE == 2)
@@ -156,20 +138,11 @@ QP_BEGIN_
 
 #ifdef Q_EVT_CTOR               // Provide the constructor for the QEvt class?
 
-    //////////////////////////////////////////////////////////////////////////
-    /// \brief QEvt base class.
-    ///
-    /// QEvt represents events without parameters and serves as the base class
-    /// for derivation of events with parameters.
-    ///
-    /// The following example illustrates how to add an event parameter by
-    /// inheriting from the QEvt class.
-    /// \include qep_qevent.cpp
     class QEvt {
     public:
-        QSignal sig;                         ///< signal of the event instance
+        QSignal sig;                           // signal of the event instance
 
-        QEvt(QSignal const s)           // poolId_ intentionally uninitialized
+        QEvt(QSignal const s)   // poolId_/refCtr_ intentionally uninitialized
           : sig(s) {}
 
 #ifdef Q_EVT_VIRTUAL
@@ -177,11 +150,13 @@ QP_BEGIN_
 #endif
 
     private:
-        uint8_t poolId_;                     ///< pool ID (0 for static event)
-        uint8_t refCtr_;                                ///< reference counter
+        uint8_t poolId_;                       // pool ID (0 for static event)
+        uint8_t volatile refCtr_;                         // reference counter
 
         friend class QF;
+        friend class QActive;
         friend class QTimeEvt;
+        friend class QEQueue;
         friend uint8_t QF_EVT_POOL_ID_ (QEvt const * const e);
         friend uint8_t QF_EVT_REF_CTR_ (QEvt const * const e);
         friend void QF_EVT_REF_CTR_INC_(QEvt const * const e);
@@ -190,21 +165,40 @@ QP_BEGIN_
 
 #else                                    // QEvt is a POD (Plain Old Datatype)
 
+    //////////////////////////////////////////////////////////////////////////
+    /// \brief QEvt base class.
+    ///
+    /// QEvt represents events without parameters and serves as the base class
+    /// for derivation of events with parameters.
+    ///
+    /// The following example illustrates how to add an event parameter by
+    /// inheriting from the QEvt class.
+    /// \include qep_qevt.cpp
     struct QEvt {
         QSignal sig;                         ///< signal of the event instance
         uint8_t poolId_;                     ///< pool ID (0 for static event)
-        uint8_t refCtr_;                                ///< reference counter
+        uint8_t volatile refCtr_;                       ///< reference counter
     };
 
 #endif                                                           // Q_EVT_CTOR
 
-QP_END_
+//****************************************************************************
+// facilities for backwards compatibility
+//
+#ifndef Q_NQEVENT
+    /// \brief Deprecated typedef for backwards compatibility
+    ///
+    /// \sa ::QEvt
+    typedef QEvt QEvent;
+#endif
 
-//////////////////////////////////////////////////////////////////////////////
+}                                                              // namespace QP
+
+//****************************************************************************
 /// helper macro to calculate static dimension of a 1-dim array \a array_
 #define Q_DIM(array_) (sizeof(array_) / sizeof(array_[0]))
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // typedefs for basic numerical types; MISRA-C++ 2008 rule 3-9-2(req).
 
 /// \brief typedef for character strings.
@@ -224,6 +218,21 @@ typedef double float64_t;
 /// typedef for enumerations used for event signals
 typedef int enum_t;
 
+/// typedef for ints used for line numbers
+typedef int int_t;
+
+/// typedef for temporary variables, like fast loop counters
+typedef unsigned int uint_t;
+
+
+/// \brief Perform downcast of an event onto a subclass of QEvt \a class_
+///
+/// This macro encapsulates the downcast of QEvt pointers, which violates
+/// MISRA-C 2004 rule 11.4(advisory). This macro helps to localize this
+/// deviation.
+///
+#define Q_EVT_CAST(class_)   (static_cast<class_ const *>(e))
+
 /// \brief Perform cast from unsigned integer \a uint_ to pointer
 /// of type \a type_.
 ///
@@ -239,15 +248,7 @@ typedef int enum_t;
 /// This macro encapsulates the ugly casting of enumerated signals
 /// to QSignal and constants for QEvt.poolID and QEvt.refCtr_.
 ///
-#define QEVT_INITIALIZER(sig_) { static_cast<QP_ QSignal>(sig_), \
+#define QEVT_INITIALIZER(sig_) { static_cast<QP::QSignal>(sig_), \
     static_cast<uint8_t>(0), static_cast<uint8_t>(0) }
-
-//////////////////////////////////////////////////////////////////////////////
-// facilities for backwards compatibility
-//
-#ifndef Q_NQEVENT
-//    typedef struct QEvt QEvent;
-    #define QEvent QEvt
-#endif
 
 #endif                                                               // qevt_h

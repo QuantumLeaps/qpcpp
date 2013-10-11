@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
-// Product: QEP/C++ port to Qt
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jul 23, 2012
+//****************************************************************************
+// Product: QEP/C++ port to Qt5
+// Last Updated for Version: 5.0.0
+// Date of the Last Update:  Aug 13, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qep_port_h
 #define qep_port_h
                               // don't define QEvent to avoid conflict with Qt

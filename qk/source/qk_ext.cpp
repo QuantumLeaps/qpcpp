@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QK/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qk_pkg.h"
 //#include "qassert.h"
 
@@ -39,11 +39,7 @@
 /// \ingroup qk
 /// \brief QK_schedExt_() implementation.
 
-QP_BEGIN_
-
 //Q_DEFINE_THIS_MODULE("qk_ext")
-
-QP_END_
 
 //............................................................................
 // NOTE: the QK scheduler is entered and exited with interrupts DISABLED.
@@ -54,18 +50,18 @@ extern "C" {
 void QK_schedExt_(uint8_t p) {
 
     uint8_t const pin = QK_currPrio_;             // save the initial priority
-    QP_ QActive *a;
+    QP::QActive *a;
 #ifdef QK_TLS                                    // thread-local storage used?
     uint8_t pprev = pin;
 #endif
 #ifdef QK_EXT_SAVE                            // extended context-switch used?
     if (pin != static_cast<uint8_t>(0)) { // no extended context for idle loop
-        a = QP_ QF::active_[pin];           // the pointer to the preempted AO
+        a = QP::QF::active_[pin];           // the pointer to the preempted AO
         QK_EXT_SAVE(a);                           // save the extended context
     }
 #endif
     do {
-        a = QP_ QF::active_[p];                // obtain the pointer to the AO
+        a = QP::QF::active_[p];                // obtain the pointer to the AO
         QK_currPrio_ = p;            // this becomes the current task priority
 
 #ifdef QK_TLS                                    // thread-local storage used?
@@ -74,7 +70,7 @@ void QK_schedExt_(uint8_t p) {
             pprev = p;
         }
 #endif
-        QS_BEGIN_NOCRIT_(QP_ QS_QK_SCHEDULE, QP_ QS::aoObj_, a)
+        QS_BEGIN_NOCRIT_(QP::QS_QK_SCHEDULE, QP::QS::priv_.aoObjFilter, a)
             QS_TIME_();                                           // timestamp
             QS_U8_(p);                    // the priority of the active object
             QS_U8_(pin);                             // the preempted priority
@@ -82,25 +78,33 @@ void QK_schedExt_(uint8_t p) {
 
         QF_INT_ENABLE();                  // unconditionally enable interrupts
 
-        QP_ QEvt const *e = a->get_();     // get the next event for this AO
+        QP::QEvt const *e = a->get_();     // get the next event for this AO
         a->dispatch(e);                               // dispatch e to this AO
-        QP_ QF::gc(e);              // garbage collect the event, if necessary
+        QP::QF::gc(e);              // garbage collect the event, if necessary
 
                         // determine the next highest-priority AO ready to run
         QF_INT_DISABLE();                                // disable interrupts
-        p = QK_readySet_.findMax();
 
-#ifdef QK_NO_MUTEX
-    } while (p > pin);             // is the new priority higher than initial?
-#else                                   // QK priority-ceiling mutexes allowed
-    } while ((p > pin) && (p > QK_ceilingPrio_));
+        p = QK_readySet_.findMax();        // new highest-prio AO ready to run
+
+        if (p <= pin) {             // below the current preemption threshold?
+            p = static_cast<uint8_t>(0);
+        }
+#ifndef QK_NO_MUTEX
+        else if (p <= QK_ceilingPrio_) {           // below the mutex ceiling?
+            p = static_cast<uint8_t>(0);
+        }
+        else {
+            // empty
+        }
 #endif
+    } while (p != static_cast<uint8_t>(0));
 
     QK_currPrio_ = pin;                        // restore the initial priority
 
 #if defined(QK_TLS) || defined(QK_EXT_RESTORE)
     if (pin != static_cast<uint8_t>(0)) { // no extended context for idle loop
-        a = QP_ QF::active_[pin];           // the pointer to the preempted AO
+        a = QP::QF::active_[pin];           // the pointer to the preempted AO
 #ifdef QK_TLS                                    // thread-local storage used?
         QK_TLS(a);                                 // restore the original TLS
 #endif

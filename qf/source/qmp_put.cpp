@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 
@@ -39,7 +39,7 @@
 /// \ingroup qf
 /// \brief QMPool::put() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qmp_put")
 
@@ -61,11 +61,12 @@ void QMPool::put(void * const b) {
     QF_CRIT_ENTRY_();
 
                                                     // link into the free list
-    (static_cast<QFreeBlock*>(b))->m_next = static_cast<QFreeBlock *>(m_free);
-    m_free = b;                            // set as new head of the free list
+    (static_cast<QFreeBlock*>(b))->m_next =
+        static_cast<QFreeBlock *>(m_free_head);
+    m_free_head = b;                       // set as new head of the free list
     ++m_nFree;                             // one more free block in this pool
 
-    QS_BEGIN_NOCRIT_(QS_QF_MPOOL_PUT, QS::mpObj_, m_start)
+    QS_BEGIN_NOCRIT_(QS_QF_MPOOL_PUT, QS::priv_.mpObjFilter, m_start)
         QS_TIME_();                                               // timestamp
         QS_OBJ_(m_start);                   // the memory managed by this pool
         QS_MPC_(m_nFree);             // the number of free blocks in the pool
@@ -74,4 +75,5 @@ void QMPool::put(void * const b) {
     QF_CRIT_EXIT_();
 }
 
-QP_END_
+}                                                              // namespace QP
+

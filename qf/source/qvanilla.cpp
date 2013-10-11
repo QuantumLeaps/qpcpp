@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 07, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 
@@ -40,20 +40,20 @@
 /// \brief "vanilla" cooperative kernel,
 /// QActive::start(), QActive::stop(), and QF::run() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qvanilla")
 
 // Package-scope objects -----------------------------------------------------
 extern "C" {
 #if (QF_MAX_ACTIVE <= 8)
-    QPSet8  QF_readySet_;                       // ready set of active objects
+    QPSet8  QF_readySet_;                                  // ready set of AOs
 #else
-    QPSet64 QF_readySet_;                       // ready set of active objects
+    QPSet64 QF_readySet_;                                  // ready set of AOs
 #endif
 
-uint8_t QF_currPrio_;                     ///< current task/interrupt priority
-uint8_t QF_intNest_;                              ///< interrupt nesting level
+uint8_t volatile QF_currPrio_;            ///< current task/interrupt priority
+uint8_t volatile QF_intNest_;                     ///< interrupt nesting level
 
 }                                                                // extern "C"
 
@@ -78,7 +78,7 @@ int16_t QF::run(void) {
             QF_currPrio_ = p;                     // save the current priority
             QF_INT_ENABLE();
 
-            QEvt const *e = a->get_();     // get the next event for this AO
+            QEvt const *e = a->get_();       // get the next event for this AO
             a->dispatch(e);                         // dispatch evt to the HSM
             gc(e);       // determine if event is garbage and collect it if so
         }
@@ -86,8 +86,10 @@ int16_t QF::run(void) {
             onIdle();                                            // see NOTE01
         }
     }
-                      // this unreachable return is to make the compiler happy
+
+#ifdef __GNUC__                                               // GNU compiler?
     return static_cast<int16_t>(0);
+#endif
 }
 //............................................................................
 void QActive::start(uint8_t const prio,
@@ -101,7 +103,7 @@ void QActive::start(uint8_t const prio,
     m_eQueue.init(qSto, static_cast<QEQueueCtr>(qLen));  // initialize QEQueue
     m_prio = prio;                // set the QF priority of this active object
     QF::add_(this);                     // make QF aware of this active object
-    init(ie);                                    // execute initial transition
+    this->init(ie);               // execute initial transition (virtual call)
 
     QS_FLUSH();                          // flush the trace buffer to the host
 }
@@ -110,9 +112,9 @@ void QActive::stop(void) {
     QF::remove_(this);
 }
 
-QP_END_
+}                                                              // namespace QP
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // NOTE01:
 // QF::onIdle() must be called with interrupts DISABLED because the
 // determination of the idle condition (no events in the queues) can change

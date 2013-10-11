@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Mar 28, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 24, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qp_port_h
 #define qp_port_h
 
@@ -44,13 +44,22 @@
     #include "qs_dummy.h"                 // QS/C++ dummy (inactive) interface
 #endif
 
+///
+/// \file
+/// \ingroup qep qf qk qs
+/// \brief QP/C++ public interface.
+///
+/// This header file must be included directly or indirectly
+/// in all application modules (*.cpp files) that use QP/C++.
+
+
                  // device driver signal offset at the top of the signal range
 #if (Q_SIGNAL_SIZE == 1)
-    #define DEV_DRIVER_SIG  static_cast<QP_ QSignal>(0xFFU - 8U)
+    #define Q_DEV_DRIVER_SIG  static_cast<QP::QSignal>(0xFFU - 8U)
 #elif (Q_SIGNAL_SIZE == 2)
-    #define DEV_DRIVER_SIG  static_cast<QP_ QSignal>(0xFFFFU - 32U)
+    #define Q_DEV_DRIVER_SIG  static_cast<QP::QSignal>(0xFFFFU - 32U)
 #elif (Q_SIGNAL_SIZE == 4)
-    #define DEV_DRIVER_SIG  static_cast<QP_ QSignal>(0xFFFFFFFFU - 256U)
+    #define Q_DEV_DRIVER_SIG  static_cast<QP::QSignal>(0xFFFFFFFFU - 256U)
 #else
     #error "Q_SIGNAL_SIZE not defined or incorrect"
 #endif

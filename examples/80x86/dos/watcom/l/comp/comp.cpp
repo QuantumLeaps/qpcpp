@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: Orthogonal Component state pattern example
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 30, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qp_port.h"
 #include "bsp.h"
 #include "alarm.h"

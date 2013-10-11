@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QP/C++ example
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  Jun 11, 2012
+// Last Updated for Version: 5.0.0
+// Date of the Last Update:  Aug 24, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,9 +31,8 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "gui.h"
-#include "qp_app.h"
 //-----------------
 #include "qp_port.h"
 #include "pelican.h"
@@ -46,8 +45,9 @@ static QF_MPOOL_EL(QP::QEvt) l_smlPoolSto[20]; // storage for small event pool
 
 //............................................................................
 int main(int argc, char *argv[]) {
-    QPApp app(argc, argv);
+    GuiApp app(argc, argv);
     Gui gui;
+
     gui.show();
 
     QP::QF::init();                                // initialize the framework

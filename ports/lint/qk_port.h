@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QK/C++ port to Lint, Generic C++ compiler
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 09, 2013
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 25, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qk_port_h
 #define qk_port_h
 
@@ -42,9 +42,8 @@
 /// \brief QK/C++ port to QK for a "generic" C++ compiler.
 ///
 /// \note This is just an EXAMPLE of a QK port used for "linting" the QK.
-/// Ports of QK are located in the directory &lt;qpcpp_3&gt;/ports.
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // QK extended context (FPU) save/restore
 
 /// \brief Define the method for saving the extended context (e.g.,
@@ -53,9 +52,9 @@
 /// \note This is just an example of #QK_EXT_SAVE macro. You need to define
 /// the macro appropriately for the co-processor you're using. This macro
 /// is only used in the extended QK scheduler QK_scheduleExt_(). If you define
-/// #QK_EXT_SAVE, you also need to provide #QK_EXT_RESTORE and #QK_EXT_TYPE.
+/// #QK_EXT_SAVE, you also need to provide #QK_EXT_RESTORE.
 #define QK_EXT_SAVE(act_)   \
-    FPU_save(static_cast<FPU_context *>((act_)->m_thread))
+    FPU_save(static_cast<void *>((act_)->m_thread))
 
 /// \brief Define the method for restoring the extended context (e.g.,
 /// the context of a floating-point co-processor).
@@ -63,11 +62,11 @@
 /// \note This is just an example of #QK_EXT_RESTORE macro. You need to define
 /// the macro appropriately for the co-processor you're using. This macro
 /// is only used in the extended QK scheduler QK_scheduleExt_(). If you define
-/// #QK_EXT_RESTORE, you also need to provide #QK_EXT_SAVE and #QK_EXT_TYPE.
+/// #QK_EXT_RESTORE, you also need to provide #QK_EXT_SAVE.
 #define QK_EXT_RESTORE(act_) \
-    FPU_restore(static_cast<FPU_context *>((act_)->m_thread))
+    FPU_restore(static_cast<void *>((act_)->m_thread))
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // QK interrupt entry and exit
 
 /// \brief Define the ISR entry sequence, if the compiler supports writing
@@ -99,17 +98,7 @@
     } \
 } while (false)
 
-
-extern "C" {
-
-struct FPU_context {
-    uint32_t align;
-    uint8_t  fpu[108];                  // the x87 FPU context takes 108-bytes
-};
-void FPU_save(FPU_context *ctx);             // defined in assembly
-void FPU_restore(FPU_context *ctx);          // defined in assembly
-
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Thread-Local-Storage switching
 
 /// \brief Define the method for switching the Thread-Local-Storage for
@@ -121,18 +110,17 @@ void FPU_restore(FPU_context *ctx);          // defined in assembly
 /// regular QK scheduler QK_sched_() and the extended QK scheduler
 /// QK_schedExt_().
 #define QK_TLS(act_)        \
-    (impure_ptr = static_cast<reent *>((act_)->m_thread))
+    (impure_ptr = static_cast<void *>((act_)->m_thread))
 
-// fake struct _reent and _impure_ptr elements of Newlib...
-struct reent {
-    uint32_t foo[32];
-};
-extern reent *impure_ptr;
+extern "C" {
+
+void FPU_save(void *ctx);             // defined in assembly
+void FPU_restore(void *ctx);          // defined in assembly
+extern void *impure_ptr;
 
 }                                                                // extern "C"
 
 /*lint -restore */
-
 
 #include "qk.h"                    // QK platform-independent public interface
 

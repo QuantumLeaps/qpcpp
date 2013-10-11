@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QEP/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,50 +31,53 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qep_pkg.h"
 #include "qassert.h"
 
 /// \file
 /// \ingroup qep
-/// \brief QHsm::init() implementation.
+/// \brief QHsm ctor and QHsm::init() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qhsm_ini")
 
 //............................................................................
-QHsm::~QHsm() {
+QHsm::QHsm(QStateHandler const initial)
+  : QMsm(initial)
+{
+    m_state.fun = Q_STATE_CAST(&QHsm::top);
 }
 //............................................................................
 void QHsm::init(QEvt const * const e) {
-    QStateHandler t = m_state;
+    QStateHandler t = m_state.fun;
 
-    Q_REQUIRE((m_temp != Q_STATE_CAST(0))             // ctor must be executed
+    Q_REQUIRE((m_temp.fun != Q_STATE_CAST(0))         // ctor must be executed
               && (t == Q_STATE_CAST(&QHsm::top)));  // initial tran. NOT taken
 
                               // the top-most initial transition must be taken
-    Q_ALLEGE((*m_temp)(this, e) == Q_RET_TRAN);
+    Q_ALLEGE((*m_temp.fun)(this, e) == Q_RET_TRAN);
 
     QS_CRIT_STAT_
     do {                                           // drill into the target...
         QStateHandler path[QEP_MAX_NEST_DEPTH_];
         int8_t ip = s8_0;                       // transition entry path index
 
-        QS_BEGIN_(QS_QEP_STATE_INIT, QS::smObj_, this)
+        QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
             QS_OBJ_(this);                        // this state machine object
             QS_FUN_(t);                                    // the source state
-            QS_FUN_(m_temp);           // the target of the initial transition
+            QS_FUN_(m_temp.fun);       // the target of the initial transition
         QS_END_()
 
-        path[0] = m_temp;
-        (void)QEP_TRIG_(m_temp, QEP_EMPTY_SIG_);
-        while (m_temp != t) {
+        path[0] = m_temp.fun;
+        (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+        while (m_temp.fun != t) {
             ++ip;
-            path[ip] = m_temp;
-            (void)QEP_TRIG_(m_temp, QEP_EMPTY_SIG_);
+            path[ip] = m_temp.fun;
+            (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
         }
-        m_temp = path[0];
+        m_temp.fun = path[0];
                                                // entry path must not overflow
         Q_ASSERT(ip < QEP_MAX_NEST_DEPTH_);
 
@@ -86,15 +89,16 @@ void QHsm::init(QEvt const * const e) {
         t = path[0];                   // current state becomes the new source
     } while (QEP_TRIG_(t, Q_INIT_SIG) == Q_RET_TRAN);
 
-    QS_BEGIN_(QS_QEP_INIT_TRAN, QS::smObj_, this)
+    QS_BEGIN_(QS_QEP_INIT_TRAN, QS::priv_.smObjFilter, this)
         QS_TIME_();                                              // time stamp
         QS_OBJ_(this);                            // this state machine object
         QS_FUN_(t);                                    // the new active state
     QS_END_()
 
-    m_state = t;                            // change the current active state
-    m_temp  = t;                           // mark the configuration as stable
+    m_state.fun = t;                        // change the current active state
+    m_temp.fun  = t;                       // mark the configuration as stable
 }
 
-QP_END_
+}                                                              // namespace QP
+
 

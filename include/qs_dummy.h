@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 08, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 24, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qs_dummy_h
 #define qs_dummy_h
 
@@ -87,6 +87,8 @@
 #define QS_FUN_DICTIONARY(fun_)         ((void)0)
 #define QS_USR_DICTIONARY(rec_)         ((void)0)
 #define QS_ASSERTION(module_, loc_)     ((void)0)
+#define QS_TEST_ASSERTION(file_, loc_)  ((void)0)
+#define QS_TEST(file_, test_)           ((void)0)
 #define QS_FLUSH()                      ((void)0)
 
 // internal QS macros used only in the QP components .........................
@@ -96,6 +98,7 @@
 #define QS_BEGIN_NOCRIT_(rec_, refObj_, obj_) if (false) {
 #define QS_END_NOCRIT_()                }
 #define QS_U8_(data_)                   ((void)0)
+#define QS_2U8_(data1_, data2_)         ((void)0)
 #define QS_U16_(data_)                  ((void)0)
 #define QS_U32_(data_)                  ((void)0)
 #define QS_U64_(data_)                  ((void)0)

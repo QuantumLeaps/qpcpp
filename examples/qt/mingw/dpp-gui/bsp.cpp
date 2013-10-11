@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
-// Product: BSP for DPP example
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 13, 2012
+//****************************************************************************
+// Product: BSP for DPP-GUI example with Qt5
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Oct 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,14 +31,15 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
-#include <QtGui>
-#include "qp_app.h"
+//****************************************************************************
+#include <QtWidgets>
 #include "gui.h"
 //-----------------
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
+
+Q_DEFINE_THIS_FILE
 
 #ifdef Q_SPY
     enum {
@@ -47,19 +48,16 @@
     static uint8_t const l_time_tick = 0U;                           // for QS
 #endif
 
-Q_DEFINE_THIS_FILE
-
 //............................................................................
 static uint32_t l_rnd;                                          // random seed
 
 //............................................................................
-void QPApp::onClockTick(void) {                                        // slot
-    QP::QF::TICK(&l_time_tick);
+void QP::QF_onClockTick(void) {
+    QP::QF::TICK_X(0U, &l_time_tick);
 }
 //............................................................................
 void QP::QF::onStartup(void) {
     QP::QF_setTickRate(BSP_TICKS_PER_SEC);
-    QS_OBJ_DICTIONARY(&l_time_tick);
 }
 //............................................................................
 void QP::QF::onCleanup(void) {
@@ -74,7 +72,7 @@ void BSP_init(void) {
     BSP_randomSeed(1234U);
 }
 //............................................................................
-void BSP_terminate(int result) {
+void BSP_terminate(int) {
     qDebug("terminate");
     QP::QF::stop();                               // stop the QF::run() thread
     qApp->quit();  // quit the Qt application *after* the QF_run() has stopped
@@ -142,7 +140,7 @@ void Q_onAssert(char_t const * const file, int line) {
     qFatal("Assertion failed in module %s, line %d", file, line);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifdef Q_SPY
 
 #include "qspy.h"
@@ -169,11 +167,11 @@ static int custParserFun(QSpyRecord * const qrec) {
     return ret;
 }
 //............................................................................
-bool QP::QS::onStartup(void const *arg) {
+bool QP::QS::onStartup(void const *) {
     static uint8_t qsBuf[4*1024];                 // 4K buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
-    QSPY_config((QP_VERSION >> 8),  // version
+    QSPY_config(QP_VERSION,         // version
                 QS_OBJ_PTR_SIZE,    // objPtrSize
                 QS_FUN_PTR_SIZE,    // funPtrSize
                 QS_TIME_SIZE,       // tstampSize
@@ -193,7 +191,8 @@ bool QP::QS::onStartup(void const *arg) {
     //QS_FILTER_OFF(QS_ALL_RECORDS);
     QS_FILTER_ON(QS_ALL_RECORDS);
 
-    //QS_FILTER_OFF(QS_QEP_STATE_EMPTY);
+    //QS_FILTER_OFF(QS_QP_RESET);
+
     //QS_FILTER_OFF(QS_QEP_STATE_ENTRY);
     //QS_FILTER_OFF(QS_QEP_STATE_EXIT);
     //QS_FILTER_OFF(QS_QEP_STATE_INIT);
@@ -201,35 +200,37 @@ bool QP::QS::onStartup(void const *arg) {
     //QS_FILTER_OFF(QS_QEP_INTERN_TRAN);
     //QS_FILTER_OFF(QS_QEP_TRAN);
     //QS_FILTER_OFF(QS_QEP_IGNORED);
+    //QS_FILTER_OFF(QS_QEP_DISPATCH);
     //QS_FILTER_OFF(QS_QEP_UNHANDLED);
 
-    QS_FILTER_OFF(QS_QF_ACTIVE_ADD);
-    QS_FILTER_OFF(QS_QF_ACTIVE_REMOVE);
-    QS_FILTER_OFF(QS_QF_ACTIVE_SUBSCRIBE);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_ADD);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_REMOVE);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_SUBSCRIBE);
     //QS_FILTER_OFF(QS_QF_ACTIVE_UNSUBSCRIBE);
     //QS_FILTER_OFF(QS_QF_ACTIVE_POST_FIFO);
     //QS_FILTER_OFF(QS_QF_ACTIVE_POST_LIFO);
-    QS_FILTER_OFF(QS_QF_ACTIVE_GET);
-    QS_FILTER_OFF(QS_QF_ACTIVE_GET_LAST);
-    QS_FILTER_OFF(QS_QF_EQUEUE_INIT);
-    QS_FILTER_OFF(QS_QF_EQUEUE_POST_FIFO);
-    QS_FILTER_OFF(QS_QF_EQUEUE_POST_LIFO);
-    QS_FILTER_OFF(QS_QF_EQUEUE_GET);
-    QS_FILTER_OFF(QS_QF_EQUEUE_GET_LAST);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_GET);
+    //QS_FILTER_OFF(QS_QF_ACTIVE_GET_LAST);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_INIT);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_POST_FIFO);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_POST_LIFO);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_GET);
+    //QS_FILTER_OFF(QS_QF_EQUEUE_GET_LAST);
     //QS_FILTER_OFF(QS_QF_MPOOL_INIT);
     //QS_FILTER_OFF(QS_QF_MPOOL_GET);
-    QS_FILTER_OFF(QS_QF_MPOOL_PUT);
+    //QS_FILTER_OFF(QS_QF_MPOOL_PUT);
     //QS_FILTER_OFF(QS_QF_PUBLISH);
-    QS_FILTER_OFF(QS_QF_NEW);
-    QS_FILTER_OFF(QS_QF_GC_ATTEMPT);
-    QS_FILTER_OFF(QS_QF_GC);
+    //QS_FILTER_OFF(QS_QF_NEW);
+    //QS_FILTER_OFF(QS_QF_GC_ATTEMPT);
+    //QS_FILTER_OFF(QS_QF_GC);
     QS_FILTER_OFF(QS_QF_TICK);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_ARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_AUTO_DISARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM_ATTEMPT);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_REARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_POST);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_ARM);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_AUTO_DISARM);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM_ATTEMPT);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_REARM);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_POST);
+    //QS_FILTER_OFF(QS_QF_TIMEEVT_CTR);
     QS_FILTER_OFF(QS_QF_CRIT_ENTRY);
     QS_FILTER_OFF(QS_QF_CRIT_EXIT);
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
@@ -245,9 +246,7 @@ void QP::QS::onCleanup(void) {
 void QP::QS::onFlush(void) {
     uint16_t nBytes = 1024U;
     uint8_t const *block;
-    QF_CRIT_ENTRY(dummy);
     while ((block = getBlock(&nBytes)) != (uint8_t *)0) {
-        QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
         nBytes = 1024U;
     }
@@ -259,12 +258,15 @@ QP::QSTimeCtr QP::QS::onGetTime(void) {
 
 //............................................................................
 void QP::QS_onEvent(void) {
-    uint16_t nBytes = 1024U;
+    uint16_t nBytes = 1024;
     uint8_t const *block;
     QF_CRIT_ENTRY(dummy);
-    if ((block = QP::QS::getBlock(&nBytes)) != (uint8_t *)0) {
+    if ((block = QS::getBlock(&nBytes)) != (uint8_t *)0) {
         QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
+    }
+    else {
+        QF_CRIT_EXIT(dummy);
     }
 }
 //............................................................................

@@ -1,6 +1,241 @@
-/**
-\page rev_page QP/C++ Revision History
+namespace QP {
 
+/**
+\page rev_page Revision History
+
+\section qpcpp_5_1_1 Version 5.1.1, Release date: Oct 10, 2013
+
+This release fixes reversal of logic in the QF::noTimeEvtsActiveX()
+function as well as sleep mode transition in the ARM Cortex-M3/M4 ports
+to the cooperative Vanilla kernel. Also, the native QP event queue
+implementation has been changed to count the extra "front-event"
+location into the number of free entries, which fixes the problem of
+defer queues of depth 1. Finally, the release restores the support for
+linting (with PC-Lint) of the QP/C++ applications for ARM Cortex-M (with
+IAR and GNU compilers).
+
+Changes in detail:
+
+1. In file qf_tick.cpp reversed the logic inside QF::noTimeEvtsActiveX()
+
+2. Modified free entry accounting (nFree) in the files: qeq_init.cpp,
+qeq_fifo.cpp, qeq_get.cpp, and qeq_lifo.cpp.
+
+3. Modified free entry accounting (nFree) in the files: qa_init.cpp,
+qa_fifo.cpp, qa_get_.cpp, and qa_lifo.cpp.
+
+4. Introduced new macro QF_CPU_SLEEP() in the ARM Cortex-M Vanilla ports.
+
+5. Changed Board Support Package files (bsp.cpp) in the ARM Cortex-M
+Vanilla examples.
+
+6. Modified the CMSIS-compliant startup code in all ARM Cortex-M Vanilla
+examples.
+
+7. Modified the application examples with PC-Lint
+(qpcpp/examples/arm-cm/qk/gnu/dpp-qk_ek-lm3s811-lint and
+qpcpp/examples/arm-cm/qk/iar/dpp-qk_ek-lm3s811-lint). Updated lint files
+for the latest PC-Lint
+
+8. Ported all state pattern examples to Win32/MinGW. That way, all these
+examples can be run and modified directly on Windows, without going back
+to DOS.
+
+
+<HR>
+\section qpcpp_5_1_0 Version 5.1.0, Release date: Oct 02, 2013
+
+\note QP/C++ 5.1.0 remains <b>backwards-compatible</b> with the existing
+QP/C 4.x applications, except the <b>ARM Cortex-M applications</b> need to
+adjust the interrupt priorities. Specifically, you need to set the
+interrupt priorities equal or lower than <b>QF_AWARE_ISR_CMSIS_PRI</b>
+constant provided in the qf_port.h header file.
+
+The main purpose of this milestone QP/C++ release is to enable the QM
+modeling tool to generate a new type of state machine code (requires QM
+version 3.0.0, which is still in development as of this writing).
+
+This new type of state machine implementation in QP/C++ 5 is based on
+the new QP::QMsm class, which takes advantage of the QM tool as an advanced
+"state machine compiler". QM can perform optimizations that were not
+possible with the C pre-processor alone. Specifically, the QM can easily
+determine the LCA (Least-Common-Ancestor) state for every transition and
+it can generate the complete transition-sequences (sequences of
+exit/entry/initial actions) at code-generation time. The resulting code
+can be still highly human-readable, but it will no longer be
+human-maintainable. The lab tests indicate that the new "housekeeping"
+code for executing hierarchical state machines can be about twice as
+fast as the previous code based on the QP::QHsm class.
+
+The next important change introduced in QP/C++ 5 is making several
+important functions in QP/C++ base classes virtual. The new virtual
+functions include: QMsm::init() and QMsm::dispatch() and
+QActive::start(), QActive::post(), and QActive::postLIFO() perations.
+Making theses functions virtual means that all these operations can be
+overridden in sub-classes of state machines and active objects. This, in
+turn, allows a single application to use a mix of state machine classes
+derived from the new QMsm base class with state machines derived from
+the QHsm base class, each one using a different state machine
+implementation strategy. Additionally, the virtual QActive::post()
+operation could be very useful for implementing various Proxy active
+objects (e.g., for active object event posting across networks).
+
+Another big feature introduced in QP/C++ 5 are the multiple, independent
+system clock tick rates for time events. The number of system tick rates
+can be now configured in the QP/C++ ports. For example, a digital watch
+can use a "fast" clock tick rate of 100Hz and a "slow" clock tick rate
+of only 1Hz. These clock tick rates can be managed independently, so for
+example, the fast clock tick rate can be shut down in the absence of
+time events assigned to this rate. This feature allows the applications
+to implement sophisticated power-saving policies.
+
+As yet another important feature, QP/C++ adds a new "extended" API for
+non-asserting event allocation and posting. This feature is intended for
+situations, where an application is hammered with external events that
+at times arrive too fast for processing, but that can be ignored under
+the overload conditions. In those cases firing an assertion inside the
+framework is undesirable. The non-asserting API allows a designer to
+request a safety-margin when allocating or posting an event. The event
+is not allocated/posted if the safety margin cannot be satisfied at the
+time of the call. On the other hand, the safety margin allows the
+application to still use the regular (asserting) event allocation and
+posting, because the event pools and event queues are guaranteed to
+maintain a minimal margin for safe operation.
+
+Finally, this QP/C++ release brings significant improvements to the QS
+software tracing implementation and also brings important changes the
+ARM Cortex-M port. Changes in detail are as follows:
+
+0. Removed the conditional compilation of the QP:: namespace based on
+the macro Q_NNAMESPACE. The namespace QP:: is now enabled permanently,
+which is a requirement of MISRA-C++:2004 and is also is part of the QM
+code generation for QP/C++. Also, the use of explicit QP:: namespace
+improves the doxygen documentation (QP/C++ Reference Manual).
+
+1. Added the new QMsm class to qep.h. Changed the inheritance tree by
+deriving QHsm and QFsm from the QMsm base class.
+
+2. Added new source files qmsm_ini.cpp and qmsm_dis.cpp to the QEP. These
+files implement the QMsm::init() and QMsm::dispatch() functions, respectively.
+
+3. Added the new QMActive class to qf.h. Extended the inheritance
+tree to derive QMActive from QActive.
+
+4. Added the multiple system clock tick rates feature in qf.h:
+    - added new configuration macro #QF_MAX_TICK_RATE, which specifies
+      the number of clock tick rates. This macro is to be defined in
+      the QF ports (in the qf_port.h header file). If the macro is
+      undefined, the default value is 1 (one clock tick rate).
+    - renamed and re-implemented the QF::tick() function as the
+      "extended" QF::tickX() function with the argument 'tickRate' for
+      processing time events allocated to different clock rates. The
+      application must call QF::tickX(0), QF::tickX(1), ... at the
+      specified tick rates from ISRs or *tasks*.
+    - added an "extended" time event constructor, which assigns a time
+      event to a specific tick rate as well as specific active object.
+    - renamed and re-implemented the internal function QTimeEvt::arm_()
+      to a public function QTimeEvt::armX() for arming time events
+      initialized with the "extended" constructor. The QTimeEvt::armX()
+      function is the new recommended API for arming time events, both
+      one-shot and periodic.
+    - re-implemented QTimeEvt::disarm() and QTimeEvt::rarm().
+    - renamed QF::noTimeEvtsActive() to the "extended" version
+      QF::noTimeEvtsActiveX(), which checks time events assigned to the
+      given tick rate.
+
+5. Added the new non-asserting API to qf.h:
+    - renamed internal function QF::new_() to QF::newX_(), the latter one
+      taking the argument 'margin' for allocating events. The function
+      returns NULL if the event pool has less free events than the
+      specified margin. The function asserts if the margin is zero and
+      the event can't be allocated.
+    - added function QActive::post() to post an event to the given
+      active object. The function does not post the event if the target
+      event queue has less free slots than the specified margin. The
+      function asserts if the margin is zero and the event can't be
+      posted.
+    - added "extended" macro Q_NEW_X() for allocating events with a
+      margin.
+    - added "extended" macro POST_X() for posting events with a
+      margin.
+
+6. Modified the QActive::defer() function to return the status of the
+   defer operation (true==success), instead of asserting when the defer
+   queue overflows.
+
+7. Modified QS (Quantum Spy) software tracing implementation:
+    - Optimized the internal QS implementation of all functions that
+      insert trace data into the trace buffer. The general idea of the
+      optimization is to extensively use automatic variables instead of
+      global variables (such as buffer head and tail indexes, the
+      running checksum, etc.).
+    - Reduced the number of QS global filters from 256 to 124 (0x7C).
+      This enables the code to avoid escaping the trace record numbers
+    - added additional tick rate byte to the trace records QS_QF_TICK
+      and QS_QFF_TIMEEVT_*.
+    - An empty QS record and the QS_RESET record are now inserted
+      automatically into the trace buffer in the function
+      QS::initBuf(). The empty QS record/QS_RESET pair provides a clean
+      start of a session and allows the QSPY host application to
+       re-synch with the data stream.
+    - added new trace records #QS_QF_ACTIVE_POST_ATTEMPT,
+      #QS_QF_EQUEUE_POST_ATTEMPT, and #QS_QF_MPOOL_GET_ATTEMPT for the
+      "extened" non-asserting event allocation and posting.
+    - added new trace records QS_TEST_RUN and QS_TEST_FAIL for future
+      support for unit testing.
+    - added new QS source file qs_dict.cpp with functions QS_*_dict() to
+      generate various dictionary entries. Changed the macros
+      QS_*_DICTIONARY() to call these functions. This was done to
+      significantly reduce the amount of tracing code needed to send the
+      dictionaries from applications.
+    - grouped together the various QS variables (such as filters, trace
+      buffer indexes, etc.) in a single struct, which results in a more
+      efficient code for various QS operations.
+
+8. Changed the structure of the ARM Cortex-M ports
+    - renamed the sub-directory for ARM Cortex-M ports and examples
+      from "arm-cortex" to "arm-cm". This is done to avoid confusion
+      with other ARM Cortex variants, such as Cortex-A/R, which very
+      different from Cortex-M.
+    - Changed the policy of disabling interrupts for Cortex-M3/M4.
+      For these cores, QP 5.1.0 never completely disables interrupts,
+      even inside the critical sections. The QP port disables
+      interrupts selectively using the BASEPRI register. (NOTE: The
+      BASEPRI register is not implemented in the ARMv6-M architecture
+      (Cortex-M0/M0+), so Cortex-M0/M0+ need to use the PRIMASK
+      register to disable interrupts globally).
+
+    - removed the CMSIS (Cortex Microcontroller Software Interface
+      Standard) directories from the Cortex-M examples and moved it to
+      the common location in the %QPC%\ports\arm-cm\cmsis\ directory.
+      Upgraded the CMSIS to the latest version 3.20.
+    - added the ARM Cortex-M ports and examples with Keil/ARM MDK to
+      the QP Baseline Code.
+    - upgraded ARM Cortex-M ports with IAR to the latest IAR EWARM 6.60
+    - upgraded ARM Cortex-M ports with Sourcery CodeBench to the latest
+      version 2013.05-53.
+
+9. Added the requested simple "Blinky" example for Windows and ARM
+   Cortex-M (with the GNU, IAR, and Keil toolsets).
+    - Added "Getting Started with QP/C++" guide based on the Blinky
+      example.
+
+10. Updated the Doxygen documentation (QP/C++ Reference Manual)
+    - removed the outdated tutorial section
+    - updated and added documentation and code samples
+    - added search box and tree-view panel to the HTML documentation
+
+
+\note This new policy of disabling interrupts in ARM Cortex-M divides
+interrupts into "kernel-unaware" interrupts, which are never disabled,
+and "kernel-aware" interrupts, which are disabled in the QP critical
+sections. Only "kernel-aware" interrupts are allowed to call QP
+services. "Kernel-unaware" interrupts are *NOT* allowed to call any QP
+services and they can communicate with QP only by triggering a
+"kernel-aware" interrupt (which can post or publish events).
+
+
+<HR>
 \section qpcpp_4_5_04 Version 4.5.04 (Product) Release date: Feb 10, 2013
 
 The main purpose of this release is adding support for the ARM Cortex-M4F
@@ -40,6 +275,7 @@ moved them to the separate QDK/C++-Qt.
 and all existing QDKs for QP/C++ 4.5.xx.
 
 
+<HR>
 \section qpcpp_4_5_03 Version 4.5.03 (Product) Release date: Nov 29, 2012
 
 This release changes the directory structure of QP ports to various
@@ -49,6 +285,7 @@ level up to ports\. Also, the OS examples are moved from the
 exampels\80x86\ directory one level up to examples\.
 
 
+<HR>
 \section qpcpp_4_5_02 Version 4.5.02 (Product) Release date: Aug 15, 2012
 
 The main purpose of this release is providing QM models in most
@@ -119,7 +356,7 @@ into a single port to POSIX and placed it in the directory posix\.
 macro Q_EVT_CTOR).
 
 6. Added the conditional compilation with the macro Q_EVT_VIRTUAL
-around the virtual destructor in the QEvt class. 
+around the virtual destructor in the QEvt class.
 
 7. Added macro QF_MPOOL_EL to qmpool.h. Modified all examples to
 demonstrate the use of this macro to allocate properly aligned
@@ -155,6 +392,7 @@ names for user-defined trace records
 when the target resets. This allows QSPY to reset its internal state.
 
 
+<HR>
 \section qpcpp_4_5_01 Version 4.5.01 (Product) Release date: Jun 14, 2012
 
 The main purpose of this minor release is providing improved
@@ -204,6 +442,7 @@ slot function, but instead to allow defining this slot function in
 the BSP of the application.
 
 
+<HR>
 \section qpcpp_4_5_00 Version 4.5.00 (Product) Release date: May 26, 2012
 
 The main pupose of this relase is to improve host-based development of QP
@@ -282,6 +521,7 @@ applications (DPP and PELICAN crossing).
 P-threads, including QP ports and examples for Linux and Mac OS X. 
 
 
+<HR>
 \section qpcpp_4_4_00 Version 4.4.00 (Product) Release date: May 02, 2012
 
 The main pupose of this relase is MISRA-C++:2008 compliance, strong-type
@@ -351,6 +591,7 @@ qpcpp/doc/, with the following Application notes:
 "QP and ARM Cortex-M, and QP and Windows",  
 
 
+<HR>
 \section qpcpp_4_3_00 Version 4.3.00 (Product) Release date: Nov 03, 2011
 
 1. This release changes the names of critical section macros and
@@ -383,6 +624,7 @@ latest IAR EWARM version 6.30.
 latest Sourcery CodeBench 2011.07-60.
 
 
+<HR>
 \section qpcpp_4_2_04 Version 4.2.04 (Product) Release date: Sep 24, 2011
 
 The main pupose of this relase is to provide a bug fix for the QK port
@@ -399,6 +641,7 @@ implemented in the qk_port.s file and consists of clearing the
 PENDSVSET bit programmatically inside PendSV_Handler.
 
 
+<HR>
 \section qpcpp_4_2_02 Version 4.2.02 (Product) Release date: Sep 08, 2011
 
 1. The main pupose of this relase is to repackage the default QP/C++
@@ -413,6 +656,7 @@ distinguish libraries generated by different GNU-toolchains (such
 as CodeRed, Attolic, DevKit ARM, etc.) 
 
 
+<HR>
 \section qpcpp_4_2_01 Version 4.2.01 (Product) Release date: Aug 13, 2011
 
 1. Modified file qassert.h to add assertion macros #Q_ASSERT_ID,
@@ -423,6 +667,7 @@ volatility of line numbers for indentifying assertions.
 2. Added QP port and examples for Mac OS X on 80x86.
 
 
+<HR>
 \section qpcpp_4_2_00 Version 4.2.00 (Product) Release date: Jul 15, 2011
 
 The goal of this milestone release is to extend the number of event
@@ -510,6 +755,7 @@ framework.
 latest IAR EWARM 6.20.
 
 
+<HR>
 \section qpcpp_4_1_07 Version 4.1.07 (Product) Release date: Feb 28, 2011
 
 The goal of this release is to improve the ease of experimenting with
@@ -549,6 +795,7 @@ on 64-bit targets (such as 64-bit Linux).
 latest Sourcery G++ 2011.02-2.
 
 
+<HR>
 \section qpcpp_4_1_06 Version 4.1.06 (Product) Release date: Jan 07, 2011
 
 1. Fixed a bug in the software tracing instrumentation in the function
@@ -567,6 +814,7 @@ IAR EWARM version 6.10.
 latest Sourcery G++ 2010.09-66.
 
 
+<HR>
 \section qpcpp_4_1_05 Version 4.1.05 (Product) Release date: Nov 01, 2010
 
 This release is adds examples for the QM (QP Modeler) graphical modeling
@@ -590,6 +838,7 @@ Additionally, the QP/C++ baseline code has been slighlty modified for
 better conformance to the MISRA C++ 2008 rules and the latest PC-Lint 9.x. 
 
 
+<HR>
 \section qpcpp_4_1_04 Version 4.1.04 (Product) Release date: Mar 16, 2010
 
 This release is adds compatibility of all examples for DOS with the DOSBox
@@ -608,6 +857,7 @@ improvement extends the CMSIS from Sandstorm to Fury, DustDevil, and Tempest
 Stellaris families.  
 
 
+<HR>
 \section qpcpp_4_1_03 Version 4.1.03 (Product) Release date: Jan 21, 2010
 
 This release is concerned with the ARM Cortex ports and examples.
@@ -636,6 +886,7 @@ any way, so the release has NO IMPACT on the QP/C applications except for the
 ARM Cortex ports and applications. 
 
 
+<HR>
 \section qpcpp_4_1_02 Version 4.1.02 (Product) Release date: Jan 14, 2010
 
 The purpose of this minor maintenance release is the change in the directory
@@ -650,6 +901,7 @@ release has NO IMPACT on the QP/C++ applications except for the ARM Cortex
 ports. 
 
 
+<HR>
 \section qpcpp_4_1_01 Version 4.1.01 (Product) Release date: Nov 05, 2009
 
 The main purpose of this release is to replace the Turbo C++ 1.01 toolset
@@ -670,6 +922,7 @@ state machine classes with QP 4.x. The SLS example located in
 new State-Local Storage state design pattern.
 
 
+<HR>
 \section qpcpp_4_1_00 Version 4.1.00 (Product) Release date: Oct 09, 2009
 
 The release provides brings a number of improvements to QP/C++ and updates
@@ -719,6 +972,7 @@ scheduler and two contex-switches if the ready-set is empty.
 - in the game example moved setting up the QS filters from main.cpp to bsp.cpp.
 
 
+<HR>
 \section qpcpp_4_0_04 Version 4.0.04 (Product) Release date: Apr 09, 2009
 
 The maintenance release introduces the virtual destructor in the QHsm and 
@@ -743,6 +997,7 @@ The main changes in QP v4.0.04 with respect to earlier version are as follows:
 a negative array dimension when the asserted condition is not TRUE.
 
 
+<HR>
 \section qpcpp_4_0_03 Version 4.0.03 (Product) Release date: Dec 27, 2008
 
 The main purpose of this release is to fix a bug in the QK preemptive kernel,
@@ -778,6 +1033,7 @@ when the macro QK_NO_MUTEX is not defined.
 when the macro QK_NO_MUTEX is not defined.
 
 
+<HR>
 \section qpcpp_4_0_02 Version 4.0.02 (Product) Release date: Nov 15, 2008
 
 This maintenance release does not change the QP/C API in any way, so the
@@ -792,6 +1048,7 @@ in tunnel.cpp file ("Fly 'n' Shoot" game). The constant event HIT_WALL was not
 declared static.
 
 
+<HR>
 \section qpcpp_4_0_01 Version 4.0.01 (Product) Release date: June 09, 2008
 
 This maintenace release is made to allow using QS software tracing with
@@ -810,6 +1067,7 @@ as static to save stack space, because QF::run() never returns and is not
 reentrant.
 
 
+<HR>
 \section qpcpp_4_0_00 Version 4.0.00 (Product) Release date: Apr 07, 2008
 
 This milestone release is made for the book /ref PSiCC2. The book describes in
@@ -913,628 +1171,6 @@ P-Thread mutex.
 updated to the latest QP API changes.
 - all examples that use QF now contain the QS software tracing support.
 
-  
-\section qpcpp_3_4_01 Version 3.4.01 (Product)
-Release date: Sep 25, 2007
-
-This product release adds the backward-compatibility layer so that previous
-QP/C++ ports continue to work with the new version.
-
-This product release also comes with the updated "QP Programmer's Manual",
-which now includes the QS target component and the QSpy host application.
-
-
-\section qpcpp_3_4_00 Version 3.4.00 (Beta)
-Release date: Sep 03, 2007
-
-This release brings several changes with the overall goal of simplifying and
-improving consistency across the whole QP family of frameworks (QP/C, QP/C++,
-and QP-nano).
-
-The main changes are made to the QEP component. The "static transition
-optimization" has been removed altogether. This simplifies significantly the
-state machine structure (which now contains just the currently active state).
-Also, the efficiency is improved for processing the dynamic transitions and
-the stack usage is lower. This change brings the QEP/C++ implementation much
-closer to QEP-nano.
-
-The other big change in this release is including the Quantum Spy (QS)
-component in the distribution. Previously, the QS component was available only
-under the commercial licensing. It is now open source, just as the rest of QP.
-
-In, the QF/C++ component, the QTimerEvt::publishIn() and
-QTimeEvt::publishEvery() have been removed, because they introduced
-a coupling between time events and publish-subscribe. This is undesirable for
-projects that do not want to include the publish-subscribe facilty.
-
-Finally, the revision history for individual QP/C++ components has been moved
-from the header files and is now consolidated in the header file
-doxygen/qpcpp_rev.h.
-
-The updated "QP Programmer's Manual" is in the works...
-
-
-\section qpcpp_3_3_00 Version 3.3.00 (Product)
-Release date: Jan 23, 2007
-
-The main change in this release is removing #include <stdint.h> from the
-qep.h header file. This has been done becasue vast majority of embedded
-compilers for small MCUs actually do not provide the C-99 Standard header
-file <stdint.h>. Worse, compilers such as Freescale HC(S)08 C/C++ compiler
-will not include <stdint.h> unless it's in the compilers's include
-directory, even though the "stdint.h" file might be in the compiler
-include path.
-
-Removing the "#include <stdint.h>" from qep.h header file allows more
-flexibility in the way the standard exact-width integer types are defined.
-For compilers that do not provide the <stdint.h> file, you provide the
-typedef's in the qep_port.h file before including qep.h. For compilers
-that do provide the <stdint.h> header file, you simply include this file
-in the qep_port.h header file before including qep.h.
-
-The changes in release 3.3.00 have impact on all QP ports, because you
-need to modify the qep_port.h file in all these ports.
-
-The other significant change in this release is adding the macro
-#Q_ROM_VAR for all constant objects allocated in ROM. The #Q_ROM_VAR macro
-has been added for the compilers like Freescale HC(S)08, which require far
-pointers to access the objects in ROM. Please note that specifying the
-pointer size for accessing a ROM objects is syntactically different than
-specifying that the object is allocated in ROM (see macro #Q_ROM).
-
-QS is now better integrated with the rest of QP. This is achieved by using
-the QP macros #Q_ROM, #Q_ROM_VAR, #QF_INT_KEY_TYPE, #QF_INT_LOCK, and
-#QF_INT_UNLOCK. By simply including the header file "qf_port.h" before "qs.h"
-in the "qs_port.h" include, you no longer need to manually ensure that QS
-implements the same policies as the rest of QP. This change still allows
-using QS standalone (without any other QP components), but then the QP
-macros must be explicitly defined in the qs_port.h header file. Also the
-macro #QS_ROM_VAR has been added for all constant objects allocated in ROM
-(see also macro #Q_ROM_VAR added to QEP). The #QS_ROM_VAR macro has been
-added for the compilers like Freescale HC(S)08, which require far pointers
-to access the objects in ROM. Please note that specifying the pointer size
-for accessing a ROM objects is syntactically different than specifying that
-the object is allocated in ROM (see macro #Q_ROM).
-
-Finally, in release 3.3.00 the build strategy for QP ports has been
-simplified as well. Instead of separate Makefile for every QP component,
-such as QEP, QF, QK, and QS, not the "ports" directory contains a batch
-file "make.bat" that builds all the libraries at once.
-
-
--# in file qep.h removed "#include <stdint.h>".
--# in file qassert.h added macro #Q_ROM_VAR for objects allocated in ROM
-and to signatures of functions accessing these objects.
--# in file qep.h added macro #Q_ROM_VAR for objects allocated in ROM
-and to signatures of functions accessing these objects.
--# in file qep.h added default empty definitions and Doxygen comments for
-macros #Q_ROM and #Q_ROM_VAR.
--# in file qep.cpp added macro #Q_ROM_VAR for objects allocated in ROM
-and to signatures of functions accessing these objects.
--# in file qf.cpp added macro #Q_ROM_VAR for objects allocated in ROM
-and to signatures of functions accessing these objects.
--# in file qk.cpp added macro #Q_ROM_VAR for objects allocated in ROM
-and to signatures of functions accessing these objects.
--# in file qep.cpp added Q_ROM_VAR to the signature of QEP::getVersion().
--# in file qep.cpp changed the version number to "3.3.00".
--# in file qf.h added macro #Q_ROM_VAR for objects allocated in ROM
-and to signatures of functions accessing these objects.
--# in file qf.h removed method QF::getTime() and deleted external variable
-QF::tickCtr.
--# deleted obsolete file qa_fifo_.cpp
--# deleted obsolete file qa_lifo_.cpp
--# deleted obsolete file qf_time.cpp
--# in file qf_act.cpp added Q_ROM_VAR to the signature of QF::getVersion()
--# in file qf_log2.cpp added Q_ROM_VAR to the definition of the lookup.
--# in file qf_pwr2.cpp added Q_ROM_VAR to the definition of the lookups.
--# in file qf_tick.cpp removed incrementing QF::tickCtr.
--# In file qf_act.cpp updated version number to 3.3.00
--# Updated the "QP Programmer's Manaul" to Revision E
--# in file qk.h added macro #Q_ROM_VAR for objects allocated in ROM
-and to signatures of functions accessing these objects.
--# In file qk.cpp added #Q_ROM_VAR to the signature of QK::getVersion().
--# In file qk.cpp updated version number to 3.3.00
--# in file qs.h added macro #QS_ROM_VAR for objects allocated in ROM
-and to signatures of functions accessing these objects.
--# In file qs.h added default definitions of the QS macros #Q_ROM,
-#Q_ROM_VAR, and Q_ROM_BYTE.
--# In file qs.h added declaration of QS_tickCtr_.
--# In file qs.cpp added #Q_ROM_VAR to the signature of QS::getVersion().
--# In file qs_.cpp added #Q_ROM_VAR to the signature of QS::str_ROM_().
--# In file qs_.cpp added definition of QS_tickCtr_.
--# In file qs_str.cpp added #Q_ROM_VAR to the signature of QS::str_ROM().
--# In file qs.cpp updated version number to 3.3.00
--# Updated the "QP Programmer's Manaul" to Revision E
-
-
-\section qpcpp_3_2_05 Version 3.2.05
-Release date: Dec 08, 2006
-
-This QF release rolls back the changes made to the reference-counting
-policy. The reference count of a dynamic event is incremented
-when the event is posted, but is NOT decremented when the event is
-retreived from the queue. The reference count is decremented only later,
-in the garbage collector (QF::gc()).
-
-This release adds direct support for event deferral (the "Deferred Event"
-state pattern) through methods QActive::defer() and QActive::recall().
-
--# In file qf.h added methods QActive::defer() and QActive::recall().
--# In file qa_get_.cpp removed decrementing the reference count of a
-dynamic event.
--# In file qeq_get.cpp removed decrementing the reference count of a
-dynamic event.
--# In file qf_gc.cpp restored decrementing of the reference count of a
-dynamic event.
--# Added new file qa_defer.cpp that implements QActive::defer() and
-QActive::recall().
--# In file qf_act.cpp updated version number to 3.2.05
--# Updated the "QP Programmer's Manaul" to Revision D
-
-
-\section qpcpp_3_2_04 Version 3.2.04  (Beta)
-Release date: Dec 01, 2006
-
-This QF release changes the internal policy of reference-counting for
-dynamic events. The reference count of a dynamic event is now incremented
-when the event is posted to a queue and decremented when the event is
-later retreived from the queue. This policy pertains to both active
-object queues and native QF thread-safe queues (QEQueue).
-
-Previously, the reference count of a dynamic event was not decremented
-upon retreival of the event from the event queue, but rather in the
-garbage collector (QF::gc()).
-
-This QK release adds two new features in QK.
-The first feature added is the extended context switch for CPUs with
-co-processors, such as the x87 FPU accompanying the x86 CPU. As a fully-
-preemptive kernel, QK needs to save and restore the context of the co-
-processor accrosss the asynchronous preemption. This QK release adds
-a generic mechanism for saving and restoring extened context in the
-extended scheduler (QK_scheduleExt_()), which is used only at the
-exit from the interrupts (asynchronous preemptions).
-
-The second feature added is the Thread-Local Storage (TLS) for reentrant
-libraries, such as the NewLib. This feature allows assigning per-thread
-memory and providing a hook (callback) activated at every context switch.
-
--# In file qf.h eliminated methods QActive::postFIFO_() and
-QActive::postLIFO_().
--# In file qf.h promoted method QActive::get_() to the public scope
-to make it available to various thread-run routines.
--# In file qf.h promoted method QActive::unsubscribeAll() to the public
-scope to make it available to various thread-run routines.
--# In file qf.h promoted method QF::remove_() to the public
-scope to make it available to various thread-run routines.
--# In file qf.h added friendship between class QActive and
-QK_scheduleExt_() and QK_isrExit_().
--# In file qa_fifo.cpp changed the implementation of QActive::postFIFO()
-to represent the native QF event queue of an active object.
--# In file qa_fifo_.cpp removed the implementation of QActive::postFIFO_()
-and declared the file obsolete (will be removed in future releases).
--# In file qa_lifo.cpp changed the implementation of QActive::postLIFO()
-to represent the native QF event queue of an active object.
--# In file qa_lifo_.cpp removed the implementation of QActive::postLIFO_()
-and declared the file obsolete (will be removed in future releases).
--# In file qa_get_.cpp added decrementing the reference count of a
-dynamic event.
--# In file qf_gc.cpp removed decrementing of the reference count of a
-dynamic event. Also changed the test for recycling an event (reference
-count of zero).
--# In file qf_pspub.cpp removed incrementing the reference count of a
-dynamic event.
--# Removed all uses of the macros #QACTIVE_POST_FIFO_, #QACTIVE_POST_LIFO_
-and QACTIVE_GET_. These macros are made now obsolete.
--# In file qsched.h removed definitions of the obsolete macros
-#QACTIVE_POST_FIFO_, #QACTIVE_POST_LIFO_, and QACTIVE_GET_.
--# In file qf_pspub.cpp replaced the macro QACTIVE_POST_FIFO_() with
-the direct method invocation active_[p]->postFIFO(e).
--# In file qf_tick.cpp replaced the macro QACTIVE_POST_FIFO_() with
-the direct method invocation active_[p]->postFIFO(e).
--# In file qa_run.cpp replaced the macro QACTIVE_POST_GET_() with
-the direct method invocation get_().
--# Changed the uC/OS-II port to reflect new policy of handling reference
-counters inside the dynamic events. Also removed files qa_fifo.cpp and
-qa_lifo.cpp from the uC/OS-II build.
--# In file qf_act.cpp updated version number to 3.2.04
--# In file qk.h updated revision history and added the prototype for the
-extended scheduler QK_scheduleExt_(). This scheduler implements the
-generic extended context via macros #QK_EXT_TYPE, #QK_EXT_SAVE, and
-#QK_EXT_RESTORE.
--# In file qk.h removed definitions of the obsolete macros
-#QACTIVE_POST_FIFO_, #QACTIVE_POST_LIFO_, and QACTIVE_GET_.
--# In file qk_sched.cpp added logic for handling the TLS via the macro
-#QK_TLS.
--# Added new file qk_ext.cpp with the definition of the extended scheduler
-QK_scheduleExt_().
--# Added the file qk_ext.cpp to the Makefile for QK port to 80x86 with
-Turbo C++ 1.01.
--# Extended the QK port to 80x86 with Turbo C++ 1.01 to handle the
-x87 FPU context.
--# Extended the QDPP example for QK with Turbo C++ 1.01 to demonstrate
-threads that use the FPU and require the extended context switch.
--# In file qk.cpp updated version number to 3.2.04
--# Updated the "QP Programmer's Manaul" to Revision C
-
-
-
-\section qpcpp_3_2_03 Version 3.2.03 (Product)
-Release date: Nov 15, 2006
-
-The main purpose of this release is to adapt the code to the shortcomings
-of the gcc compiler for handling data in program ROM for Harvard
-architecture CPUs, such as the Atmel's AVR or the 8051. In such machines,
-the data space (RAM) and program space (ROM) are accessed with different
-instructions. The gcc compiler does not automatically synthesize the
-correct code for accessing data placed in the program ROM, even though
-__attribute__((__progmem__)) is used. The workaround for the gcc is to add
-special assembly instructions to transfer the data from the program space
-to the data space. This version of QP-nano adds macros for each data
-element allocated to the program space (delcared with the Q_ROM attribute)
-Please note that commercial compilers, such as IAR, handle data allocated
-in the program space (ROM) correctly and do not need any workarounds.
-
-This release also fixes a few minor inconsistencies in the code (see the
-list below):
-
--# In file qf.h added default definition of macro #Q_ROM_BYTE
--# In file qf_set.h added macro #Q_ROM_BYTE to access the lookup tables
-allocated in ROM (several places).
--# In file qf_sched.h changed types QF_OS_OBJECT_TYPE and QF_THREAD_TYPE
- to uint8_t from int8_t
--# In file qs_dummy.h added dummy definitions of some missing QS macros
--# In file qa_sub.cpp added macro #Q_ROM_BYTE to access the lookup tables
-allocated in ROM (several places).
--# In file qa_usub.cpp added macro #Q_ROM_BYTE to access the lookup tables
-allocated in ROM (several places).
--# In file qf_usuba.cpp added macro #Q_ROM_BYTE to access the lookup
-tables allocated in ROM (several places).
--# In file qf_pspub.cpp added macro #Q_ROM_BYTE to access the lookup
-tables allocated in ROM (several places).
--# In file qf_tick.cpp replaced QF_tickCtr_ with QS::tickCtr_.
-allocated in ROM (several places).
--# In file qf_act.cpp updated version number to 3.2.03
-
-
-\section qpcpp_3_2_02 Version 3.2.02 (Product)
-Release date: Oct 30, 2006/n
-
--# In file qs.h replaced macro Q_ROM with QS_ROM
--# In file qs.h added methods QS::str_ROM_() and QS::str_ROM()
--# In file qs.h added macros QS_STR_ROM_() and QS_STR_ROM()
--# In file qs.h modified macros QS_???_DICTIONARY() to use ROM strings
--# In file qs.h included qs_dummy.h instead of the dummy definitions
-   of the QS macros
--# In file qs_pkg.h added #ifndef Q_SPY before definition of macro Q_SPY
--# In file qs_.cpp added definition of the function QS::str_ROM_()
--# In file qs_str.cpp added definition of the function QS::str_ROM()
--# In file qs.cpp updated version number to 3.2.02
-
-
-\section qpcpp_3_2_01 Version 3.2.01 (Product)
-Release date: Sep 01, 2006
-
--# In file qep.cpp updated version number to 3.2.01
--# Added makefiles for building ports of all QP/C++ libraries at once.
--# In file qf_act.cpp updated version number to 3.2.01
--# Added makefiles for building ports of all QP/C++ libraries at once.
--# Created the consolidated manual "QP/C++ Programmer's Manual".
--# In file qk.cpp updated version number to 3.2.01
--# Added makefiles for building ports of all QP/C++ libraries at once.
--# Created the consolidated manual "QP/C++ Programmer's Manual".
--# In file qs.cpp updated version number to 3.2.01
--# In file qs.cpp removed superfluous semicolons after QS_INSERT...()
--# In file qs_.cpp removed superfluous semicolons after QS_INSERT...()
--# In file qs_str.cpp removed superfluous semicolons after QS_INSERT...()
--# In file qs_mem.cpp removed superfluous semicolons after QS_INSERT...()
--# In file qs_f32.cpp removed superfluous semicolons after QS_INSERT...()
--# In file qs_f64.cpp removed superfluous semicolons after QS_INSERT...()
--# Added makefiles for building ports of all QP/C++ libraries at once.
--# Created the consolidated manual "QP/C++ Programmer's Manual".
-
-
-\section qpcpp_3_2_00 Version 3.2.00 (Product)
-Release date: Aug 07, 2006
-
--# In file qep.h added the default definition of Q_ROM in case it's not
-defined by the user.
--# In file qassert.h added the macro Q_ROM to allocate constant strings
-to ROM.
--# In file qep.cpp updated version number to 3.2.00
-# Updated the "QEP/C++ Programmer's Manual".
--# In file qf.h added function QF_stop() to be called from the application
-code to stop the framework.
--# In file qf.h added callback function QF_cleanup() to be called from the
-QF port to cleanup before exiting to the OS.
--# In file qf.h deprecated the function QF_exit().
--# In file qf.h changed the semantics of the QF::onIdle() callback.
-This callback is now invoked with interrupts LOCKED from the
-non-preemptive scheduler used in the "vanilla" QF ports to "bare metal"
-target boards.<br>
-<br>
-The modification changes the responsibilities of QF::onIdle(), which now
-MUST at least unlock interrupts. A failure to unlock interrupts in
-QF::onIdle() will leave the interrupts locked all the time and would
-prevent the application from running.<br>
-<br>
-Also, the signature of QF::onIdle() now depends on the interrupt locking
-policy. In case of the "save and restore interrupt status" policy, the
-QF::onIdle() callback takes the interrupt lock key as parameter (to be
-able to unlock the interrups correctly).
--# In file qf.h used the macro Q_ROM to allocate constant objects
-to ROM (/sa qep.h). Objects allocated to ROM are: the version strings, and
-the lookup tables (QF::log2Lkup[], QF::pwr2Lkup[], QF::invPwr2Lkup[], and
-QF::div8Lkup[].
--# Added new platform-independent header file qsched.h to provide the
-interface to the simple non-preemptive scheduler used in the "vanilla"
-ports of QF to "bare metal" targets. This header file is only applicable
-to the "vanilla" ports.
--# Added new platform-independent implementation file qf_run.cpp to
-implement the simple non-preemptive scheduler used in the "vanilla" ports
-of QF to "bare metal" targets. This implementation file eliminates the
-need for qf_port.cpp file in the "vanilla" ports of QF. Also, the
-qf_run.cpp module should only be placed in the QF library in the vanilla
-QF ports.
--# Simplified all "vanilla" ports of QF to use the common platform-
-independent implementation provided in qf_run.cpp.
--# Updated QF::onIdle() callback in all examples of "vanilla" ports of QF
-to unlock interrupts.
--# Updated the "QF/C++ Programmer's Manual".
--# in file qk.h added new idle callback QK::onIdle(), which in contrast
-to QF::onIdle() is invoked with interrupts unlocked.
--# in file qk.h removed QK_schedLock()/QK_schedUnlock() and replaced them
-with QK_mutexLock()/QK_mutexUnlock(), with the semantics of returning the
-mutex.
--# in file qk.h changed the definitions of macros #QF_SCHED_LOCK/
-#QF_SCHED_UNLOCK to use the new QK mutex API.
--# In file qk.h used the macro Q_ROM to allocate constant objects
-to ROM (/sa qep.h).
--# in file qk.h added the typedef for QMutex.
--# in file qk.cpp replaced the callback QF::onIdle() with the new one
-QK::onIdle().
--# removed source file qk_lock.cpp
--# added source file qk_mutex.cpp
--# in file qk.cpp changed the version number to 3.2.00
--# in all QK/C++ examples replaced callback QF::onIdle() with QK::onIdle()
--# Updated "QK/C++ Programmer's Manual"
--# In file qs.h replaced QS_QK_SCHED_LOCK/UNLOCK with QS_QK_MUTEX_LOCK/
-QS_QK_MUTEX_UNLOCK. Also, changed data accompanying the trace records
-QS_QK_MUTEX_LOCK/UNLOCK.
--# In file qs.h used the macro Q_ROM to allocate constant objects
-to ROM (/sa qep.h).
--# in file qs.cpp changed the version number to 3.2.00
--# Updated "QS Programmer's Manual" in PDF.
-
-
-\section qpcpp_3_1_06 Version 3.1.06 (Product)
-Release date: May 11, 2006
-
--# In file qk_sched.cpp removed unlocking of interrupts upon exit from
-QK::schedule_(). Now QK_schedule_() enters and exits with interrupts
-LOCKED.
--# In file qk.h modified macro QACTIVE_OSOBJECT_SIGNAL_() to always unlock
-the interrupts, regardless if QK_schedule_() has been called or not.
--# In file qk.cpp added unlocking interrupts after the call to
-QK_SCHEDULE_() in the function QF::run().
--# In file qk_lock.cpp modified the function QK::schedUnlock() to always
-unlock the interrupts upon exit.
--# Updated licensing information.
--# Updated "QS/C++ Programmer's Manual" in PDF.
-
-
-
-\section qpcpp_3_1_03 Version 3.1.03 (Product)
-Release date: Feb 10, 2006
-
--# In file qep.cpp added the Revision History Doxygen comment, which was
-previously in doxygen/qp.h
--# In file qf_act.cpp added the Revision History Doxygen comment, which
-was previously in doxygen/qp.h
--# In file qf.h augmented comment for QF_run() to cover the case when QF
-is used with QK.
--# In file qf.h added the extern declarations of ::QF_tickCtr_,
-::QF_intLockNest, and ::QF_isrNest_, which were previously declared
-in qf_pkg.h.
--# In file qf.h added macros #QF_QS_INT_LOCK, #QF_QS_INT_UNLOCK(),
-#QF_QS_ISR_ENTRY, and #QF_QS_ISR_EXIT, which were previously declared
-in qs_port.h.
--# In file ports/linux/gcc/qf_port.h added extern uint8_t QF_running_.
--# In file qf/80x86/dos/tcpp101/l/qf_port.cpp replaced deprecated
-QPSet::hasElements() to QPSet::isEmpty().
--# In file qf/80x86/linux/gcc/qf_port.cpp added QF::run()
--# In file qeq_init.cpp changed QS_OBJ(this) to QS_OBJ(qSto) to
-consistently refer to a queue by the ring buffer object
--# In file qf_pkg.h removed extern ::QF_tickCtr_.
--# In file qk.h removed extern QK_intLockNest_ and QK_isrNest_. These
-counters have been moved to QF and renamed in the process to
-QF_intLockNest_ and QF_isrNest_, respectively.
--# In file qk.h added QS instrumentatin to #QF_INT_LOCK and #QF_INT_UNLOCK
-macros for tracing interrupt locking/unlocking. The QS interrupt locking/
-unlocking instrumentation has been previously added at the QK port level.
--# In file qk.h removed macros QK_QS_INT_LOCK()/ QK_QS_INT_UNLOCK(),
-QK_QS_ISR_ENTRY()/ QK_QS_ISR_EXIT(). These macros have been moved to QF
-and renamed in the process to QF_QS_INT_LOCK()/ QF_QS_INT_UNLOCK(),
-QF_QS_ISR_ENTRY()/ QF_QS_ISR_EXIT(), respectively.
--# In file ports/80x86/qk/tcpp101/l/qk_port.h simplified the definition
-of the macros #QK_INT_LOCK/ #QK_INT_UNLOCK to NOT contain the QS
-instrumenation.
--# In file ports/80x86/qk/tcpp101/l/qk_port.h changed the definitions of
-#QK_ISR_ENTRY and #QK_ISR_EXIT to use #QF_QS_ISR_ENTRY/ #QF_QS_ISR_EXIT.
--# In file qk.cpp added the Revision History Doxygen comment
--# In file qk_pkg.h changed the definition of internal QK macros
-#QK_INT_LOCK_/ #QK_INT_UNLOCK_ to use the QS-instrumented #QF_INT_LOCK/
-#QF_INT_UNLOCK.
--# In file qk_lock.cpp corrected a comment
--# In file qk_sched.cpp corrected a comment
--# Provided "QS/C++ Programmer's Manual" in PDF.
--# In file qs.h changed around the pre-defined records. Added records:
-QS_QF_INT_LOCK, QS_QF_INT_UNLOCK, QS_QF_ISR_ENTRY, QS_QF_ISR_EXIT. Removed
-records QS_QK_INT_LOCK, QS_QK_INT_UNLOCK, QS_QK_ISR_ENTRY, QS_QK_ISR_EXIT.
--# In file qs.h renamed functions QS::filterIn()/ QS::filerOut() to
-QS::filterOn()/ QS::filerOff(). Correspondingly, changed macros
-QS_FILTER_IN(), QS_FILTER_OUT(), to QS_FILTER_ON(), QS_FILTER_OFF().
--# In file qs.h changed the signature and semantics of QS::getByte() to
-return QS_EOD (End-Of-Data).
--# In file qs.h changed the signature of QS::getBlock() to take a pointer
-to uint16_t rather than uint32_t.
--# In file qs.h eliminated the callback QS::newRecord()
--# In file qs.h added new callback QS::flush()
--# In file qs.h added application-level local filter object QS::apObj_.
-Consistently, added macro QS_FILTER_AP_OBJ() to set the new local filter.
-Consistently, added object argument to macros QS_BEGIN() and
-QS_BEGIN_NOLOCK().
--# In files qs.cpp, qs_.cpp, qs_blk.cpp, qs_byte.cpp, qs_pkg.h renamed
-some variables and adjusted comments.
--# Ported the QSpy host applicatoin to Linux. Added TCP/IP input to QSpy.
-Added new options.
--# Added redesigned QS port to Linux with TCP/IP data link.
-
-
-\section qpcpp_3_1_02 Version 3.1.02 (Product)
-Release date: Jan 29, 2006
-
--# Removed <A HREF="http://www.state-machine.com/products/">
-Quantum Spy</A> (QS) dependency from the QCalc and QHsmTst examples
--# In file qk.h removed callbacks QK::init(), QK::start(), QK::idle(),
-and QK::exit(), because they duplicate the QF callbacks.
--# Modified qk.cpp to define the following QF "callbacks":
-QF::getPortVersion(), QF::run(), QActive::start(), and QActive::stop_().
--# Added an argument to the signature of QK::schedLock() to allow
-selective QK scheduler locking up to the specified priority level.
--# Changed the implementation of QK::schedLock() in file qk_lock.cpp.
--# Eliminated the need for qf_port.cpp in the QF/C++ ports for QK.
--# Simplified elements that go into qk_port.cpp in the QK/C++ ports.
--# Added the ARM-Simulator port to the standard QK/C++ distribution.
--# Cleaned-up the 80x86 QK port.
--# Provided "QK/C++ Programmer's Manual" in PDF.
-
-
-\section qpcpp_3_1_01 Version 3.1.01 (Snapshot)
-Release date: Oct 18, 2005
-
--# Removed <A HREF="http://www.state-machine.com/products/">
-Quantum Spy</A> (QS) dependency from the examples
--# Added Doxygen documentation to the source code
--# Added running__ member to the QActive structure
--# Added QF_EVENT_SIZ_SIZE configuration macro and related data type
-QEventSize. Made the following changes to the signatures:
-void QF::poolInit(void *poolSto, uint32_t poolSize, QEventSize evtSize);
-QEvent *QF::new_(QEventSize evtSize, QSignal sig);
--# In file qmpool.h changed the definition of the #QF_MPOOL_SIZ_SIZE macro
-to remove the dependency on the #QF_EVENT_SIZ_SIZE. Macro
-#QF_EVENT_SIZ_SIZE might not be defined by the time qmpool.h is included.
--# Added explicit definition of the configuration macro QF_EVENT_SIZ_SIZE
-to all qf_port.h files.
--# Fixed a bug in function QMPool::init() (file qmp_init.cpp) by changing
-the type of variable n from uint8_t to QMPoolCtr. The uint8_t data type
-was failing for bigger block sizes.
--# Added the QF::onIdle() callback to qf.h
--# Improved comments in qpset.h
--# Corrected dependencies in the Makefile for QDPP example
-(directory 80x86/dos/tcpp101/l and 80x86/dos/tcpp101/s)
--# Added Linux QF port to the standard QF/C++ distribution.
--# Released the "QF/C++ Programmer's Manual"
-
-
-\section qpcpp_3_1_00 Version 3.1.00 (Beta)
-Release date: Oct 03, 2005
-
--# Applied new directory structure desribed in
-<A HREF="http://www.state-machine.com/doc/AN_QP_Directory_Structure.pdf">
-Application Note: QP Directory Structure</A>
--# Added <A HREF="http://www.state-machine.com/products/">
-Quantum Spy</A> instrumentation.
--# Removed file qfsm_tra.cpp.
--# Introduced file qfsm_dis.cpp.
--# Applied new directory structure desribed in
-<A HREF="http://www.state-machine.com/doc/AN_QP_Directory_Structure.pdf">
-Application Note: QP Directory Structure</A>
--# Added <A HREF="http://www.state-machine.com/products/">
-Quantum Spy</A> instrumentation.
-
-
-\section qpcpp_3_0_11 Version 3.0.11 (Beta)
-Release date: Aug 14, 2005
-
--# Fixed potential race condition for static transitions
--# Added assertion in QHsm::execTran() to catch potential path[] array
- overrun that previously could go undetected.
-
-
-\section qpcpp_3_0_10 Version 3.0.10 (Beta)
-Release date: Aug 06, 2005
-
-This release contains completely redesigned Quantum Event Processor (QEP).
-The main focus is on compliance with standards (MISRA, Lint, Coding
-Standard), better portability, stack-use efficiency.
-
--# This release includes a comprehensive "QEP/C++ v3.0 Programmer's
-Manual" in PDF.
--# This release contains in-source comments for automatic generation of
-this Reference Manual with <A HREF="http://www.doxygen.org">doxygen</A>.
--# This release includes re-packaging the code into much larger numberof
-modules (.cpp files) with typically one function per module. This
-fine-granularity packaging allows for better automatic elimination of
-unused code at link time and fine-tuning by applying different compiler
-options to different files.
--# Although this is a C++ version, it has been still thoroughly checked
-against the Motor Industry Software Reliability Association (MISRA)
-"Guidelines for the Use of the C Language in Vehicle Based Software",
-April 1998, ISBN 0-9524156-9-0 (see also http://www.misra.org.uk). A
-separate Application Note "QEP/C++ MISRA Compliance Matrix" contains
-detailed account how QEP/C++ compiles with the 127 MISRA rules (See
-http://www.state-machine.com/doc/AN_QP_Cpp_MISRA.pdf).
--# This release is now "lint-free". The source code has been thoroughly
-checked with the latest version of PC-lint(TM) (version 8.00q) from Gimpel
-Software (www.gimpel.com). The PC-lint configuration files and output
-files are included in the distribution. A separate Application Note
-"QEP/C++ PC-Lint Compliance" contains detailed account how QEP/C++
-compiles with PC-Lint.
-(See http://www.state-machine.com/doc/AN_QP_Cpp_PC-Lint.pdf).
--# This release is compliant with the "Quantum Leaps Coding Standard"
-(http://www.state-machine.com/resources/QL_coding_standard.pdf). Among
-others, all public names are prefixed by "Q_", or "QEP_" to minimize
-compile-time and link-time name conflicts. In addition, QEP/C++ uses the
-C99 standard include file <stdint.h> (C99 Standard, Section 7.18).
-Pre-standard compilers are still supported by placing <stdint.h> in the
-compiler's header file directory.
--# The QEvent class has been redesigned to use memory more efficiently.
-QEvent takes up only 2 bytes now.
--# The QHsm class now derives from the QFsm class, which promotes
-better code re-use. In particular, macros Q_INIT() and Q_TRAN() are now
-common for both traditional non-hierarchical FSMs and for HSMs.
--# The QFsm class has been redesigned to allow using entry and exit
-actions. Now the QFsm class strictly avoids recursion, just as QHsm does
-(MISRA rule 70).
--# The QPseudoState type has been eliminated and replaced by QState.
--# The central QHsm class in QEP has been completely redesigned. The basic
-transition algorithm is essentially the same as described in "PSiCC",
-however the implementation is very different. The redesign was necessary
-to comply with the MISRA rules and to eliminate Lint warnings.
--# The event processor is now strictly non-recursive (MISRA rule 70), that
-is, event handlers never call themselves, even indirectly. (Previous
-algorithm required one-level of indirect recursion.)
--# Dynamic state transition is now default. Static transition optimization
-is still supported, but considered optional for performance tuning.
--# The artificial limitation of initial transitions targeting only
-immediate substate of a composite state has been removed (see "PSiCC"
-Figure 5.4[a]). Initial transitions can now target any substate,
-arbitrarily nested within the composite state.
--# This distribution uses the legacy Borland Turbo C++ 1.01 as the default
-compiler. Port to DOS with Turbo C++ 1.01 is provided along with
-GNU-compatible makefiles for the QEP library and sample applications. This
-compiler is not C99-compliant and does not provide the <stdint.h> header
-file. However, the port of QEP includes a minimal <stdint.h>, which should
-be placed into the INCLUDE directory of the Borland Turbo C++ 1.01
-installation.
--# This distribution contains three sample applications: A simple time
-bomb (QBomb) to demonstrate use of QFsm, a calculator (QCalc), and an
-exhaustive test of the QHsm class (QHsmTst). All examples are implemented
-as text-only application compiled with Turbo C++ 1.01. The QHsmTst sample
-application supports interactive and batch mode for exhaustive testing of
-the event processor. The source code for QHsmTst demonstrates also how
-QEP/C++ application code can be MISRA-compliant.
--# This distribution contains make files for the Turbo C++ 1.01 make
-utility, as well as GNU-compatible Makefiles.
-
 */
+
+} // namespace QP

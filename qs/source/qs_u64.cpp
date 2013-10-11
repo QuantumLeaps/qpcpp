@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Mar 28, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 23, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,41 +31,55 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qs_pkg.h"
 
 /// \file
 /// \ingroup qs
 /// \brief QS_u64_() and QS_u64() implementation
 
-QP_BEGIN_
+namespace QP {
 
 #if (QS_OBJ_PTR_SIZE == 8) || (QS_FUN_PTR_SIZE == 8)
 
 //............................................................................
 void QS::u64_(uint64_t d) {
-    QS_INSERT_ESC_BYTE((uint8_t)d)
-    d >>= 8;
-    QS_INSERT_ESC_BYTE((uint8_t)d)
-    d >>= 8;
-    QS_INSERT_ESC_BYTE((uint8_t)d)
-    d >>= 8;
-    QS_INSERT_ESC_BYTE((uint8_t)d)
-    d >>= 8;
-    QS_INSERT_ESC_BYTE((uint8_t)d)
-    d >>= 8;
-    QS_INSERT_ESC_BYTE((uint8_t)d)
-    d >>= 8;
-    QS_INSERT_ESC_BYTE((uint8_t)d)
-    d >>= 8;
-    QS_INSERT_ESC_BYTE((uint8_t)d)
+    uint8_t chksum = priv_.chksum;
+    uint8_t *buf   = priv_.buf;
+    QSCtr   head   = priv_.head;
+    QSCtr   end    = priv_.end;
+
+    priv_.used += static_cast<QSCtr>(8);      // 8 bytes are about to be added
+    for (int_t i = static_cast<int_t>(8); i != static_cast<int_t>(0); --i) {
+        uint8_t b = static_cast<uint8_t>(d);
+        QS_INSERT_ESC_BYTE(b)
+        d >>= 8;
+    }
+
+    priv_.head   = head;                                      // save the head
+    priv_.chksum = chksum;                                // save the checksum
 }
 //............................................................................
 void QS::u64(uint8_t format, uint64_t d) {
-    QS_INSERT_ESC_BYTE(format)
-    u64_(d);
+    uint8_t chksum = priv_.chksum;
+    uint8_t *buf   = priv_.buf;
+    QSCtr   head   = priv_.head;
+    QSCtr   end    = priv_.end;
+
+    priv_.used += static_cast<QSCtr>(9);      // 9 bytes are about to be added
+    QS_INSERT_ESC_BYTE(format)                       // insert the format byte
+
+    for (int_t i = static_cast<int_t>(8); i != static_cast<int_t>(0); --i) {
+        format = static_cast<uint8_t>(d);
+        QS_INSERT_ESC_BYTE(format)
+        d >>= 8;
+    }
+
+    priv_.head   = head;                                      // save the head
+    priv_.chksum = chksum;                                // save the checksum
 }
 
 #endif
 
-QP_END_
+}                                                              // namespace QP
+

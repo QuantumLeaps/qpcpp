@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
-// Product: QP/C++ example
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 13, 2012
+//****************************************************************************
+// Product: QP/C++ GUI example for Qt5
+// Last Updated for Version: 5.0.0
+// Date of the Last Update:  Aug 12, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,8 +31,8 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
-#include <QtGui>
+//****************************************************************************
+#include <QtWidgets>
 #include "gui.h"
 //-----------------
 #include "qp_port.h"

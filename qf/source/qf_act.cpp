@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,16 +31,16 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 
 /// \file
 /// \ingroup qf
-/// \brief QF::active_[], QF::getVersion(), and QF::add_()/QF::remove_()
+/// \brief QF::active_[] and QF::add_(), QF::remove_()
 /// implementation.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_act")
 
@@ -48,20 +48,6 @@ Q_DEFINE_THIS_MODULE("qf_act")
 QActive *QF::active_[QF_MAX_ACTIVE + 1];        // to be used by QF ports only
 uint8_t QF_intLockNest_;                       // interrupt-lock nesting level
 
-//............................................................................
-char_t const Q_ROM * Q_ROM_VAR QF::getVersion(void) {
-    uint8_t const u8_zero = static_cast<uint8_t>('0');
-    static char_t const Q_ROM Q_ROM_VAR version[] = {
-        static_cast<char_t>(((QP_VERSION >> 12) & 0xFU) + u8_zero),
-        static_cast<char_t>('.'),
-        static_cast<char_t>(((QP_VERSION >>  8) & 0xFU) + u8_zero),
-        static_cast<char_t>('.'),
-        static_cast<char_t>(((QP_VERSION >>  4) & 0xFU) + u8_zero),
-        static_cast<char_t>((QP_VERSION         & 0xFU) + u8_zero),
-        static_cast<char_t>('\0')
-    };
-    return version;
-}
 //............................................................................
 void QF::add_(QActive * const a) {
     uint8_t p = a->m_prio;
@@ -74,7 +60,7 @@ void QF::add_(QActive * const a) {
 
     active_[p] = a;            // registger the active object at this priority
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_ADD, QS::aoObj_, a)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_ADD, QS::priv_.aoObjFilter, a)
         QS_TIME_();                                               // timestamp
         QS_OBJ_(a);                                       // the active object
         QS_U8_(p);                        // the priority of the active object
@@ -94,7 +80,7 @@ void QF::remove_(QActive const * const a) {
 
     active_[p] = static_cast<QActive *>(0);      // free-up the priority level
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_REMOVE, QS::aoObj_, a)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_REMOVE, QS::priv_.aoObjFilter, a)
         QS_TIME_();                                               // timestamp
         QS_OBJ_(a);                                       // the active object
         QS_U8_(p);                        // the priority of the active object
@@ -103,5 +89,6 @@ void QF::remove_(QActive const * const a) {
     QF_CRIT_EXIT_();
 }
 
-QP_END_
+}                                                              // namespace QP
+
 

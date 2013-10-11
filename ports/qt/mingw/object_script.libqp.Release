@@ -1,12 +1,18 @@
 CREATE release\libqp.a
 ADDMOD release\qf_port.o
+ADDMOD release\guiapp.o
 ADDMOD release\pixellabel.o
 ADDMOD release\qep.o
+ADDMOD release\qmsm_dis.o
+ADDMOD release\qmsm_ini.o
 ADDMOD release\qhsm_dis.o
 ADDMOD release\qhsm_ini.o
 ADDMOD release\qhsm_in.o
 ADDMOD release\qhsm_top.o
 ADDMOD release\qa_defer.o
+ADDMOD release\qa_fifo.o
+ADDMOD release\qa_get_.o
+ADDMOD release\qa_lifo.o
 ADDMOD release\qa_sub.o
 ADDMOD release\qa_usub.o
 ADDMOD release\qa_usuba.o
@@ -31,6 +37,8 @@ ADDMOD release\qte_ctor.o
 ADDMOD release\qte_ctr.o
 ADDMOD release\qte_darm.o
 ADDMOD release\qte_rarm.o
-ADDMOD release\moc_qp_app.o
+ADDMOD release\moc_tickerthread.o
+ADDMOD release\moc_aothread.o
+ADDMOD release\moc_guiapp.o
 ADDMOD release\moc_pixellabel.o
 SAVE

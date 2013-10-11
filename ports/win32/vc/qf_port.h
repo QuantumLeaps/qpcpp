@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++  port to Win32
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jun 30, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qf_port_h
 #define qf_port_h
                                          // Win32 event queue and thread types
@@ -41,8 +41,9 @@
 
                     // The maximum number of active objects in the application
 #define QF_MAX_ACTIVE               63
-                       // The maximum number of event pools in the application
-#define QF_MAX_EPOOL                8
+                                      // The number of system clock tick rates
+#define QF_MAX_TICK_RATE            2
+
                         // various QF object sizes configuration for this port
 #define QF_EVENT_SIZ_SIZE           4
 #define QF_EQUEUE_CTR_SIZE          4
@@ -52,8 +53,8 @@
 
                                          // Win32 critical section, see NOTE01
 // QF_CRIT_STAT_TYPE not defined
-#define QF_CRIT_ENTRY(dummy)        (QP_ QF_enterCriticalSection())
-#define QF_CRIT_EXIT(dummy)         (QP_ QF_leaveCriticalSection())
+#define QF_CRIT_ENTRY(dummy)        (QP::QF_enterCriticalSection())
+#define QF_CRIT_EXIT(dummy)         (QP::QF_leaveCriticalSection())
 
 #include "qep_port.h"                                              // QEP port
 #include "qequeue.h"                                // Win32 needs event-queue
@@ -61,16 +62,16 @@
 #include "qpset.h"                                 // Win32 needs priority-set
 #include "qf.h"                    // QF platform-independent public interface
 
-QP_BEGIN_
+namespace QP {
 
 void QF_enterCriticalSection(void);
 void QF_leaveCriticalSection(void);
 void QF_setTickRate(uint32_t ticksPerSec);              // set clock tick rate
 void QF_onClockTick(void);        // clock tick callback (provided in the app)
 
-QP_END_
+}                                                              // namespace QP
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // interface used only inside QF, but not in applications
 
 #ifdef qf_pkg_h
@@ -92,14 +93,15 @@ QP_END_
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init(poolSto_, poolSize_, evtSize_)
     #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_)     ((e_) = static_cast<QEvt *>((p_).get()))
+    #define QF_EPOOL_GET_(p_, e_, m_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_))))
     #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
 
     #define WIN32_LEAN_AND_MEAN
     #include <windows.h>                                          // Win32 API
 #endif
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 //
 // NOTE01:
 // QF, like all real-time frameworks, needs to execute certain sections of

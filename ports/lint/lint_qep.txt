@@ -13,6 +13,10 @@
 
 --- Module:   D:\qp\qpcpp\qep\source\qhsm_top.cpp (C++)
 
+--- Module:   D:\qp\qpcpp\qep\source\qmsm_dis.cpp (C++)
+
+--- Module:   D:\qp\qpcpp\qep\source\qmsm_ini.cpp (C++)
+
 /// Start of Pass 2 ///
 
 --- Module:   D:\qp\qpcpp\qep\source\qep.cpp (C++)
@@ -29,64 +33,82 @@
 
 --- Module:   D:\qp\qpcpp\qep\source\qhsm_top.cpp (C++)
 
+--- Module:   D:\qp\qpcpp\qep\source\qmsm_dis.cpp (C++)
+
+--- Module:   D:\qp\qpcpp\qep\source\qmsm_ini.cpp (C++)
+
 --- Global Wrap-up
 
-"D:\qp\qpcpp\ports\lint\stdint.h" 47 1 Info 756: global typedef 'uint32_t' (line 47, file D:\qp\qpcpp\ports\lint\stdint.h) not referenced [MISRA C++ Rule 0-1-5]
-"D:\qp\qpcpp\include\qevt.h" 219 1 Info 756: global typedef 'float32_t' (line 219, file D:\qp\qpcpp\include\qevt.h) not referenced [MISRA C++ Rule 0-1-5]
-"D:\qp\qpcpp\include\qevt.h" 222 1 Info 756: global typedef 'float64_t' (line 222, file D:\qp\qpcpp\include\qevt.h) not referenced [MISRA C++ Rule 0-1-5]
-"D:\qp\qpcpp\ports\lint\stdint.h" 42 1 Info 756: global typedef 'int16_t' (line 42, file D:\qp\qpcpp\ports\lint\stdint.h) not referenced [MISRA C++ Rule 0-1-5]
-"D:\qp\qpcpp\include\qassert.h" 167 1 Warning 526: Symbol 'Q_onAssert(const char_t *, int_t)' (line 167, file D:\qp\qpcpp\include\qassert.h, module D:\qp\qpcpp\qep\source\qfsm_dis.cpp) not defined
-"D:\qp\qpcpp\ports\lint\stdint.h" 43 1 Info 756: global typedef 'int32_t' (line 43, file D:\qp\qpcpp\ports\lint\stdint.h) not referenced [MISRA C++ Rule 0-1-5]
-"D:\qp\qpcpp\include\qevt.h" 243 1 Info 755: global macro 'QEVT_INITIALIZER' (line 243, file D:\qp\qpcpp\include\qevt.h) not referenced
+"D:\qp\qpcpp\ports\lint\stdint.h" 29 1 Info 756: global typedef 'uint32_t' (line 29, file D:\qp\qpcpp\ports\lint\stdint.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\ports\lint\stdint.h" 30 1 Info 756: global typedef 'uint64_t' (line 30, file D:\qp\qpcpp\ports\lint\stdint.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\include\qevt.h" 225 1 Info 756: global typedef 'uint_t' (line 225, file D:\qp\qpcpp\include\qevt.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\ports\lint\stdint.h" 25 1 Info 756: global typedef 'int64_t' (line 25, file D:\qp\qpcpp\ports\lint\stdint.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\include\qevt.h" 213 1 Info 756: global typedef 'float32_t' (line 213, file D:\qp\qpcpp\include\qevt.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\include\qevt.h" 216 1 Info 756: global typedef 'float64_t' (line 216, file D:\qp\qpcpp\include\qevt.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\ports\lint\stdint.h" 23 1 Info 756: global typedef 'int16_t' (line 23, file D:\qp\qpcpp\ports\lint\stdint.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\include\qassert.h" 153 1 Warning 526: Symbol 'Q_onAssert(const char_t *, int_t)' (line 153, file D:\qp\qpcpp\include\qassert.h, module D:\qp\qpcpp\qep\source\qfsm_dis.cpp) not defined
+"D:\qp\qpcpp\ports\lint\stdint.h" 24 1 Info 756: global typedef 'int32_t' (line 24, file D:\qp\qpcpp\ports\lint\stdint.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\include\qevt.h" 252 1 Info 755: global macro 'QEVT_INITIALIZER' (line 252, file D:\qp\qpcpp\include\qevt.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 445 1 Info 755: global macro 'QM_SUPER' (line 445, file D:\qp\qpcpp\include\qep.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 80 1 Info 755: global macro 'QS_MEM' (line 80, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 108 1 Info 755: global macro 'QS_MPC_' (line 108, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 109 1 Info 755: global macro 'QS_MPS_' (line 109, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qevt.h" 250 1 Info 755: global macro 'QEvent' (line 250, file D:\qp\qpcpp\include\qevt.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 111 1 Info 755: global macro 'QS_MPC_' (line 111, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 112 1 Info 755: global macro 'QS_MPS_' (line 112, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 425 1 Info 755: global macro 'QM_TRAN' (line 425, file D:\qp\qpcpp\include\qep.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 418 1 Info 755: global macro 'QM_ENTRY' (line 418, file D:\qp\qpcpp\include\qep.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 419 1 Info 755: global macro 'QM_EXIT' (line 419, file D:\qp\qpcpp\include\qep.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 440 1 Info 755: global macro 'QM_UNHANDLED' (line 440, file D:\qp\qpcpp\include\qep.h) not referenced
+"D:\qp\qpcpp\include\qevt.h" 59 1 Info 755: global macro 'QP_RELEASE' (line 59, file D:\qp\qpcpp\include\qevt.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 82 1 Info 755: global macro 'QS_OBJ' (line 82, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 86 1 Info 755: global macro 'QS_OBJ_DICTIONARY' (line 86, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 192 1 Info 755: global macro 'Q_ENSURE' (line 192, file D:\qp\qpcpp\include\qassert.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 199 1 Info 755: global macro 'Q_ENSURE_ID' (line 199, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 178 1 Info 755: global macro 'Q_ENSURE' (line 178, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 185 1 Info 755: global macro 'Q_ENSURE_ID' (line 185, file D:\qp\qpcpp\include\qassert.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 89 1 Info 755: global macro 'QS_ASSERTION' (line 89, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 103 1 Info 755: global macro 'Q_ASSERT_ID' (line 103, file D:\qp\qpcpp\include\qassert.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 221 1 Info 755: global macro 'Q_ASSERT_COMPILE' (line 221, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 96 1 Info 755: global macro 'Q_ASSERT_ID' (line 96, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 207 1 Info 755: global macro 'Q_ASSERT_COMPILE' (line 207, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 435 1 Info 755: global macro 'QM_HANDLED' (line 435, file D:\qp\qpcpp\include\qep.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 50 1 Info 755: global macro 'QS_RESET' (line 50, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 101 1 Info 755: global macro 'QS_2U8_' (line 101, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 63 1 Info 755: global macro 'QS_BEGIN' (line 63, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 65 1 Info 755: global macro 'QS_BEGIN_NOCRIT' (line 65, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 96 1 Info 755: global macro 'QS_BEGIN_NOCRIT_' (line 96, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qep.h" 52 1 Info 755: global macro 'Q_TRAN' (line 52, file D:\qp\qpcpp\include\qep.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 98 1 Info 755: global macro 'QS_BEGIN_NOCRIT_' (line 98, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 430 1 Info 755: global macro 'QM_INITIAL' (line 430, file D:\qp\qpcpp\include\qep.h) not referenced
+"D:\qp\qpcpp\include\qevt.h" 53 1 Info 755: global macro 'QP_VERSION' (line 53, file D:\qp\qpcpp\include\qevt.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 452 1 Info 755: global macro 'Q_TRAN' (line 452, file D:\qp\qpcpp\include\qep.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 81 1 Info 755: global macro 'QS_SIG' (line 81, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 85 1 Info 755: global macro 'QS_SIG_DICTIONARY' (line 85, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 77 1 Info 755: global macro 'QS_STR' (line 77, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 79 1 Info 755: global macro 'QS_STR_ROM' (line 79, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 116 1 Info 755: global macro 'QF_QS_ACTION' (line 116, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 112 1 Info 755: global macro 'QF_QS_CRIT_ENTRY' (line 112, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 113 1 Info 755: global macro 'QF_QS_CRIT_EXIT' (line 113, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 114 1 Info 755: global macro 'QF_QS_ISR_ENTRY' (line 114, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 115 1 Info 755: global macro 'QF_QS_ISR_EXIT' (line 115, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 119 1 Info 755: global macro 'QF_QS_ACTION' (line 119, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 115 1 Info 755: global macro 'QF_QS_CRIT_ENTRY' (line 115, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 116 1 Info 755: global macro 'QF_QS_CRIT_EXIT' (line 116, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 117 1 Info 755: global macro 'QF_QS_ISR_ENTRY' (line 117, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 118 1 Info 755: global macro 'QF_QS_ISR_EXIT' (line 118, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 49 1 Info 755: global macro 'QS_DUMP' (line 49, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 110 1 Info 755: global macro 'QS_TEC_' (line 110, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 135 1 Info 755: global macro 'Q_ERROR' (line 135, file D:\qp\qpcpp\include\qassert.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 145 1 Info 755: global macro 'Q_ERROR_ID' (line 145, file D:\qp\qpcpp\include\qassert.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 206 1 Info 755: global macro 'Q_INVARIANT' (line 206, file D:\qp\qpcpp\include\qassert.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 213 1 Info 755: global macro 'Q_INVARIANT_ID' (line 213, file D:\qp\qpcpp\include\qassert.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 185 1 Info 755: global macro 'Q_REQUIRE_ID' (line 185, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 91 1 Info 755: global macro 'QS_TEST' (line 91, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 113 1 Info 755: global macro 'QS_TEC_' (line 113, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 90 1 Info 755: global macro 'QS_TEST_ASSERTION' (line 90, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 128 1 Info 755: global macro 'Q_ERROR' (line 128, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 138 1 Info 755: global macro 'Q_ERROR_ID' (line 138, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 192 1 Info 755: global macro 'Q_INVARIANT' (line 192, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 199 1 Info 755: global macro 'Q_INVARIANT_ID' (line 199, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 171 1 Info 755: global macro 'Q_REQUIRE_ID' (line 171, file D:\qp\qpcpp\include\qassert.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 64 1 Info 755: global macro 'QS_END' (line 64, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 66 1 Info 755: global macro 'QS_END_NOCRIT' (line 66, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 97 1 Info 755: global macro 'QS_END_NOCRIT_' (line 97, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 104 1 Info 755: global macro 'QS_EVS_' (line 104, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 107 1 Info 755: global macro 'QS_EQC_' (line 107, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 99 1 Info 755: global macro 'QS_END_NOCRIT_' (line 99, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 107 1 Info 755: global macro 'QS_EVS_' (line 107, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 110 1 Info 755: global macro 'QS_EQC_' (line 110, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 48 1 Info 755: global macro 'QS_EXIT' (line 48, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 71 1 Info 755: global macro 'QS_U16' (line 71, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 99 1 Info 755: global macro 'QS_U16_' (line 99, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 102 1 Info 755: global macro 'QS_U16_' (line 102, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 73 1 Info 755: global macro 'QS_U32' (line 73, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 78 1 Info 755: global macro 'QS_U32_HEX' (line 78, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 100 1 Info 755: global macro 'QS_U32_' (line 100, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 103 1 Info 755: global macro 'QS_U32_' (line 103, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 76 1 Info 755: global macro 'QS_U64' (line 76, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 101 1 Info 755: global macro 'QS_U64_' (line 101, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 104 1 Info 755: global macro 'QS_U64_' (line 104, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 69 1 Info 755: global macro 'QS_U8' (line 69, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 88 1 Info 755: global macro 'QS_USR_DICTIONARY' (line 88, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 98 1 Info 755: global macro 'QS_U8_' (line 98, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qep.h" 58 1 Info 755: global macro 'Q_SUPER' (line 58, file D:\qp\qpcpp\include\qep.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 100 1 Info 755: global macro 'QS_U8_' (line 100, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 458 1 Info 755: global macro 'Q_SUPER' (line 458, file D:\qp\qpcpp\include\qep.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 52 1 Info 755: global macro 'QS_FILTER_OFF' (line 52, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 74 1 Info 755: global macro 'QS_F32' (line 74, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 75 1 Info 755: global macro 'QS_F64' (line 75, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
@@ -97,46 +119,55 @@
 "D:\qp\qpcpp\include\qs_dummy.h" 51 1 Info 755: global macro 'QS_FILTER_ON' (line 51, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 53 1 Info 755: global macro 'QS_FILTER_SM_OBJ' (line 53, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 57 1 Info 755: global macro 'QS_FILTER_TE_OBJ' (line 57, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qs_dummy.h" 90 1 Info 755: global macro 'QS_FLUSH' (line 90, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
+"D:\qp\qpcpp\include\qs_dummy.h" 92 1 Info 755: global macro 'QS_FLUSH' (line 92, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 83 1 Info 755: global macro 'QS_FUN' (line 83, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 87 1 Info 755: global macro 'QS_FUN_DICTIONARY' (line 87, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 73 1 Info 755: global macro 'Q_DEFINE_THIS_FILE' (line 73, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 66 1 Info 755: global macro 'Q_DEFINE_THIS_FILE' (line 66, file D:\qp\qpcpp\include\qassert.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 60 1 Info 755: global macro 'QS_GET_BYTE' (line 60, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 61 1 Info 755: global macro 'QS_GET_BLOCK' (line 61, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qep.h" 75 1 Info 755: global macro 'Q_EVT_CAST' (line 75, file D:\qp\qpcpp\include\qep.h) not referenced
+"D:\qp\qpcpp\include\qevt.h" 234 1 Info 755: global macro 'Q_EVT_CAST' (line 234, file D:\qp\qpcpp\include\qevt.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 47 1 Info 755: global macro 'QS_INIT' (line 47, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 68 1 Info 755: global macro 'QS_I8' (line 68, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 70 1 Info 755: global macro 'QS_I16' (line 70, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
 "D:\qp\qpcpp\include\qs_dummy.h" 72 1 Info 755: global macro 'QS_I32' (line 72, file D:\qp\qpcpp\include\qs_dummy.h) not referenced
-"D:\qp\qpcpp\include\qevt.h" 205 1 Info 755: global macro 'Q_DIM' (line 205, file D:\qp\qpcpp\include\qevt.h) not referenced
-"D:\qp\qpcpp\include\qassert.h" 127 1 Info 755: global macro 'Q_ALLEGE_ID' (line 127, file D:\qp\qpcpp\include\qassert.h) not referenced
-"D:\qp\qpcpp\include\qevt.h" 235 1 Info 755: global macro 'Q_UINT2PTR_CAST' (line 235, file D:\qp\qpcpp\include\qevt.h) not referenced
-"D:\qp\qpcpp\include\qevt.h" 194 1 Info 768: global struct member 'QP::QEvt::sig' (line 194, file D:\qp\qpcpp\include\qevt.h) not referenced
-"D:\qp\qpcpp\include\qevt.h" 195 1 Info 768: global struct member 'QP::QEvt::poolId_' (line 195, file D:\qp\qpcpp\include\qevt.h) not referenced
-"D:\qp\qpcpp\include\qevt.h" 196 1 Info 768: global struct member 'QP::QEvt::refCtr_' (line 196, file D:\qp\qpcpp\include\qevt.h) not referenced
-"D:\qp\qpcpp\qep\source\qep.cpp" 58 1 Info 1714: Member function 'QP::QEP::getVersion(void)' (line 58, file D:\qp\qpcpp\qep\source\qep.cpp) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\qep\source\qfsm_ini.cpp" 50 1 Info 1714: Member function 'QP::QFsm::init(const struct QP::QEvt *)' (line 50, file D:\qp\qpcpp\qep\source\qfsm_ini.cpp) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\qep\source\qfsm_dis.cpp" 47 1 Info 1714: Member function 'QP::QFsm::dispatch(const struct QP::QEvt *)' (line 47, file D:\qp\qpcpp\qep\source\qfsm_dis.cpp) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 185 1 Info 1714: Member function 'QP::QFsm::QFsm(QP::QStateHandler)' (line 185, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 191 1 Info 1714: Member function 'QP::QFsm::state(void) const' (line 191, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 197 1 Info 1714: Member function 'QP::QFsm::Q_IGNORED(void)' (line 197, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 203 1 Info 1714: Member function 'QP::QFsm::Q_HANDLED(void)' (line 203, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 208 1 Info 1714: Member function 'QP::QFsm::Q_UNHANDLED(void)' (line 208, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 211 1 Info 1714: Member function 'QP::QFsm::tran(QP::QStateHandler)' (line 211, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\qep\source\qhsm_ini.cpp" 50 1 Info 1714: Member function 'QP::QHsm::init(const struct QP::QEvt *)' (line 50, file D:\qp\qpcpp\qep\source\qhsm_ini.cpp) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\qep\source\qhsm_dis.cpp" 47 1 Info 1714: Member function 'QP::QHsm::dispatch(const struct QP::QEvt *)' (line 47, file D:\qp\qpcpp\qep\source\qhsm_dis.cpp) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qevt.h" 199 1 Info 755: global macro 'Q_DIM' (line 199, file D:\qp\qpcpp\include\qevt.h) not referenced
+"D:\qp\qpcpp\include\qassert.h" 120 1 Info 755: global macro 'Q_ALLEGE_ID' (line 120, file D:\qp\qpcpp\include\qassert.h) not referenced
+"D:\qp\qpcpp\include\qevt.h" 244 1 Info 755: global macro 'Q_UINT2PTR_CAST' (line 244, file D:\qp\qpcpp\include\qevt.h) not referenced
+"D:\qp\qpcpp\include\qep.h" 371 1 Info 758: global class 'QP::QEP' (line 371, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\include\qevt.h" 178 1 Info 768: global struct member 'QP::QEvt::sig' (line 178, file D:\qp\qpcpp\include\qevt.h) not referenced
+"D:\qp\qpcpp\include\qevt.h" 179 1 Info 768: global struct member 'QP::QEvt::poolId_' (line 179, file D:\qp\qpcpp\include\qevt.h) not referenced
+"D:\qp\qpcpp\include\qevt.h" 180 1 Info 768: global struct member 'QP::QEvt::refCtr_' (line 180, file D:\qp\qpcpp\include\qevt.h) not referenced
+"D:\qp\qpcpp\include\qevt.h" 192 1 Info 756: global typedef 'QP::QEvent' (line 192, file D:\qp\qpcpp\include\qevt.h) not referenced [MISRA C++ Rule 0-1-5]
+"D:\qp\qpcpp\include\qep.h" 149 1 Info 1716: Virtual member function 'QP::QMsm::init(void)' (line 149, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\qep\source\qmsm_dis.cpp" 47 1 Info 1716: Virtual member function 'QP::QMsm::dispatch(const struct QP::QEvt *)' (line 47, file D:\qp\qpcpp\qep\source\qmsm_dis.cpp) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 177 1 Info 1714: Member function 'QP::QMsm::qm_tran_(const struct QP::QMState *, const QP::QActionHandler *)' (line 177, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 186 1 Info 1714: Member function 'QP::QMsm::qm_initial_(const struct QP::QMState *, const QP::QActionHandler *)' (line 186, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 195 1 Info 1714: Member function 'QP::QMsm::qm_entry_(const struct QP::QMState *)' (line 195, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 201 1 Info 1714: Member function 'QP::QMsm::qm_exit_(const struct QP::QMState *)' (line 201, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\qep\source\qmsm_ini.cpp" 47 1 Info 1715: static member 'QP::QMsm::s_emptyAction_' (line 47, file D:\qp\qpcpp\qep\source\qmsm_ini.cpp) not referenced
+"D:\qp\qpcpp\qep\source\qhsm_dis.cpp" 47 1 Info 1716: Virtual member function 'QP::QHsm::dispatch(const struct QP::QEvt *)' (line 47, file D:\qp\qpcpp\qep\source\qhsm_dis.cpp) not referenced [MISRA C++ Rule 0-1-10]
 "D:\qp\qpcpp\qep\source\qhsm_in.cpp" 47 1 Info 1714: Member function 'QP::QHsm::isIn(QP::QStateHandler)' (line 47, file D:\qp\qpcpp\qep\source\qhsm_in.cpp) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 287 1 Info 1714: Member function 'QP::QHsm::QHsm(QP::QStateHandler)' (line 287, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 293 1 Info 1714: Member function 'QP::QHsm::state(void) const' (line 293, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 310 1 Info 1714: Member function 'QP::QHsm::Q_HANDLED(void)' (line 310, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 315 1 Info 1714: Member function 'QP::QHsm::Q_UNHANDLED(void)' (line 315, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 318 1 Info 1714: Member function 'QP::QHsm::tran(QP::QStateHandler)' (line 318, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"D:\qp\qpcpp\include\qep.h" 324 1 Info 1714: Member function 'QP::QHsm::super(QP::QStateHandler)' (line 324, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 248 1 Info 1714: Member function 'QP::QHsm::state(void) const' (line 248, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\qep\source\qhsm_ini.cpp" 47 1 Info 1714: Member function 'QP::QHsm::QHsm(QP::QStateHandler)' (line 47, file D:\qp\qpcpp\qep\source\qhsm_ini.cpp) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 267 1 Info 1714: Member function 'QP::QHsm::Q_HANDLED(void)' (line 267, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 274 1 Info 1714: Member function 'QP::QHsm::Q_UNHANDLED(void)' (line 274, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 279 1 Info 1714: Member function 'QP::QHsm::tran_(QP::QStateHandler)' (line 279, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 285 1 Info 1714: Member function 'QP::QHsm::super_(QP::QStateHandler)' (line 285, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\qep\source\qfsm_dis.cpp" 47 1 Info 1716: Virtual member function 'QP::QFsm::dispatch(const struct QP::QEvt *)' (line 47, file D:\qp\qpcpp\qep\source\qfsm_dis.cpp) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\qep\source\qfsm_ini.cpp" 47 1 Info 1714: Member function 'QP::QFsm::QFsm(QP::QStateHandler)' (line 47, file D:\qp\qpcpp\qep\source\qfsm_ini.cpp) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 340 1 Info 1714: Member function 'QP::QFsm::Q_HANDLED(void)' (line 340, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 347 1 Info 1714: Member function 'QP::QFsm::Q_UNHANDLED(void)' (line 347, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 353 1 Info 1714: Member function 'QP::QFsm::Q_IGNORED(void)' (line 353, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 358 1 Info 1714: Member function 'QP::QFsm::tran_(QP::QStateHandler)' (line 358, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"D:\qp\qpcpp\include\qep.h" 378 1 Info 1714: Member function 'QP::QEP::getVersion(void)' (line 378, file D:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
 
 Count   Type    Number  Text
 
 1       Warning 526     Symbol '___' (___) not defined
-74      Info    755     global macro '___' (___) not referenced
-5       Info    756     global typedef '___' (___) not referenced
+85      Info    755     global macro '___' (___) not referenced
+9       Info    756     global typedef '___' (___) not referenced
+1       Info    758     global ___ '___' (___) not referenced
 3       Info    768     global struct member '___' (___) not referenced
-18      Info    1714    Member function '___' (___) not referenced
+17      Info    1714    Member function '___' (___) not referenced
+1       Info    1715    static member '___' (___) not referenced
+4       Info    1716    Virtual member function '___' (___) not referenced

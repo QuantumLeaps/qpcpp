@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: Calculator Example with inheritance of the whole state model
 // Last Updated for Version: 4.5.02
 // Date of the Last Update:  Aug 15, 2012
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef calc1_h
 #define calc1_h
 

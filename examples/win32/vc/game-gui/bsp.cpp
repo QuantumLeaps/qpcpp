@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
-// Product: Product: BSP for "Fly'n'Shoot" game
-// Last Updated for Version: 4.5.03
-// Date of the Last Update:  Nov 29, 2012
+//****************************************************************************
+// Product: Product: BSP for "Fly'n'Shoot" game for Win32-GUI
+// Last Updated for Version: 5.0.0
+// Date of the Last Update:  Aug 24, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qp_port.h"
 #include "game.h"
 #include "bsp.h"
@@ -41,7 +41,7 @@
 
 #include <stdio.h>                                        // for _snprintf_s()
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 namespace GAME {
 
 Q_DEFINE_THIS_FILE
@@ -56,7 +56,7 @@ static HINSTANCE l_hInst;                         // this application instance
 static HWND      l_hWnd;                                 // main window handle
 static LPSTR     l_cmdLine;                         // the command line string
 
-static DotMatrix        l_oled;    // the OLED display of the EK-LM3S811 board
+static GraphicDisplay   l_oled;    // the OLED display of the EK-LM3S811 board
 static SegmentDisplay   l_userLED;         // USER LED of the EK-LM3S811 board
 static SegmentDisplay   l_scoreBoard;         // segment display for the score
 static OwnerDrawnButton l_userBtn;      // USER button of the EK-LM3S811 board
@@ -104,12 +104,12 @@ extern "C" int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
     return msg.wParam;
 }
 //............................................................................
-extern "C" int main(void);                        // prototype for appThread()
+extern "C" int main_gui(void);                    // prototype for appThread()
 
 // thread function for running the application main()
 static DWORD WINAPI appThread(LPVOID par) {
     (void)par;                                             // unused parameter
-    return main();                                   // run the QF application
+    return main_gui();                               // run the QF application
 }
 //............................................................................
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
@@ -449,7 +449,7 @@ void BSP_moveShipDown(void) {
 }
 
 }                                                             // namespace DPP
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 
 namespace QP {
 
@@ -538,7 +538,7 @@ bool QP::QS::onStartup(void const * /* arg */) {
     static uint8_t qsBuf[4*1024];                 // 4K buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
-    QSPY_config((QP_VERSION >> 8),  // version
+    QSPY_config(QP_VERSION,         // version
                 QS_OBJ_PTR_SIZE,    // objPtrSize
                 QS_FUN_PTR_SIZE,    // funPtrSize
                 QS_TIME_SIZE,       // tstampSize
@@ -608,9 +608,7 @@ void QP::QS::onCleanup(void) {
 void QP::QS::onFlush(void) {
     uint16_t nBytes = 1000;
     uint8_t const *block;
-    QF_CRIT_ENTRY(dummy);
     while ((block = getBlock(&nBytes)) != (uint8_t *)0) {
-        QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
         nBytes = 1024;
     }

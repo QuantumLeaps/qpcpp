@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: Win32 GUI facilities for building realistic embedded front panels
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 04, 2012
+// Last Updated for Version: 5.0.0
+// Date of the Last Update:  Aug 16, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -26,7 +26,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "win32_gui.h"
 #include <stdlib.h>
 
@@ -109,9 +109,9 @@ OwnerDrawnButton::OwnerDrawnButtonAction OwnerDrawnButton::draw(
 }
 
 //----------------------------------------------------------------------------
-void DotMatrix::init(UINT width,  UINT xScale,
-                     UINT height, UINT yScale,
-                     HWND hItem,  BYTE const bgColor[3])
+void GraphicDisplay::init(UINT width,  UINT xScale,
+                          UINT height, UINT yScale,
+                          HWND hItem,  BYTE const bgColor[3])
 {
     HDC hDC;
     BITMAPINFO bi24BitInfo;
@@ -143,11 +143,11 @@ void DotMatrix::init(UINT width,  UINT xScale,
     redraw();
 }
 //............................................................................
-DotMatrix::~DotMatrix() {
+GraphicDisplay::~GraphicDisplay() {
     DeleteObject(m_hBitmap);
 }
 //............................................................................
-void DotMatrix::clear(void) {
+void GraphicDisplay::clear(void) {
     BYTE r = m_bgColor[0];
     BYTE g = m_bgColor[1];
     BYTE b = m_bgColor[2];
@@ -163,7 +163,7 @@ void DotMatrix::clear(void) {
     }
 }
 //............................................................................
-void DotMatrix::setPixel(UINT x, UINT y, BYTE const color[3]) {
+void GraphicDisplay::setPixel(UINT x, UINT y, BYTE const color[3]) {
     BYTE *pixelRGB = &m_bits[3*(m_xScale*x
                   + m_xScale*m_width * m_yScale*(m_height - 1U - y))];
     BYTE r = color[0];
@@ -180,7 +180,7 @@ void DotMatrix::setPixel(UINT x, UINT y, BYTE const color[3]) {
     }
 }
 //............................................................................
-void DotMatrix::redraw(void) {
+void GraphicDisplay::redraw(void) {
     SendMessage(m_hItem, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)m_hBitmap);
 }
 

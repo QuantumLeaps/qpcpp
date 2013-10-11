@@ -1,14 +1,14 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for 80x86, QK port, Open Watcom compiler
-:: Last Updated for Version: 4.4.00
-:: Date of the Last Update:  Apr 19, 2012
+:: Last Updated for Version: 5.1.0
+:: Date of the Last Update:  Sep 30, 2013
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
 ::                    innovating embedded systems
 ::
-:: Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -26,7 +26,7 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http:::www.gnu.org/licenses/>.
+:: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
 :: Quantum Leaps Web sites: http://www.quantum-leaps.com
@@ -75,6 +75,8 @@ set CCINC=@inc_qep.rsp
 
 @echo on
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qep.obj      %SRCDIR%\qep.cpp
+%CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qmsm_ini.obj %SRCDIR%\qmsm_ini.cpp
+%CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qmsm_dis.obj %SRCDIR%\qmsm_dis.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qfsm_ini.obj %SRCDIR%\qfsm_ini.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qfsm_dis.obj %SRCDIR%\qfsm_dis.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qhsm_ini.obj %SRCDIR%\qhsm_ini.cpp
@@ -85,6 +87,8 @@ set CCINC=@inc_qep.rsp
 erase %LIBDIR%\qep.lib
 %LIB% -n %LIBDIR%\qep
 %LIB% %LIBDIR%\qep +%BINDIR%\qep
+%LIB% %LIBDIR%\qep +%BINDIR%\qmsm_ini
+%LIB% %LIBDIR%\qep +%BINDIR%\qmsm_dis
 %LIB% %LIBDIR%\qep +%BINDIR%\qfsm_ini
 %LIB% %LIBDIR%\qep +%BINDIR%\qfsm_dis
 %LIB% %LIBDIR%\qep +%BINDIR%\qhsm_ini
@@ -193,6 +197,7 @@ set CCINC=@inc_qs.rsp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qs_.obj     %SRCDIR%\qs_.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qs_blk.obj  %SRCDIR%\qs_blk.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qs_byte.obj %SRCDIR%\qs_byte.cpp
+%CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qs_dict.obj %SRCDIR%\qs_dict.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qs_f32.obj  %SRCDIR%\qs_f32.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qs_f64.obj  %SRCDIR%\qs_f64.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qs_mem.obj  %SRCDIR%\qs_mem.cpp
@@ -200,14 +205,15 @@ set CCINC=@inc_qs.rsp
 
 erase %LIBDIR%\qs.lib
 %LIB% -n %LIBDIR%\qs
-%LIB% %LIBDIR%\qs +%BINDIR%\qs.obj
-%LIB% %LIBDIR%\qs +%BINDIR%\qs_.obj
-%LIB% %LIBDIR%\qs +%BINDIR%\qs_blk.obj
-%LIB% %LIBDIR%\qs +%BINDIR%\qs_byte.obj
-%LIB% %LIBDIR%\qs +%BINDIR%\qs_f32.obj
-%LIB% %LIBDIR%\qs +%BINDIR%\qs_f64.obj
-%LIB% %LIBDIR%\qs +%BINDIR%\qs_mem.obj
-%LIB% %LIBDIR%\qs +%BINDIR%\qs_str.obj
+%LIB% %LIBDIR%\qs +%BINDIR%\qs
+%LIB% %LIBDIR%\qs +%BINDIR%\qs_
+%LIB% %LIBDIR%\qs +%BINDIR%\qs_blk
+%LIB% %LIBDIR%\qs +%BINDIR%\qs_byte
+%LIB% %LIBDIR%\qs +%BINDIR%\qs_dict
+%LIB% %LIBDIR%\qs +%BINDIR%\qs_f32
+%LIB% %LIBDIR%\qs +%BINDIR%\qs_f64
+%LIB% %LIBDIR%\qs +%BINDIR%\qs_mem
+%LIB% %LIBDIR%\qs +%BINDIR%\qs_str
 @echo off
 
 :clean

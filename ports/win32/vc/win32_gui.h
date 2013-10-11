@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: Win32 GUI facilities for building realistic embedded front panels
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 04, 2012
+// Last Updated for Version: 5.0.0
+// Date of the Last Update:  Aug 16, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -26,7 +26,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef win32_gui_h
 #define win32_gui_h
 
@@ -57,8 +57,8 @@ public:
     OwnerDrawnButtonAction draw(LPDRAWITEMSTRUCT lpdis);
 };
 
-// DotMatrix "class" for drawing graphic displays with up to 24-bit color.....
-class DotMatrix {
+// GraphicDisplay "class" for drawing graphic displays with up to 24-bit color
+class GraphicDisplay {
     UINT    m_width;
     UINT    m_xScale;
     UINT    m_height;
@@ -72,7 +72,7 @@ public:
     void init(UINT width,  UINT xScale,
               UINT height, UINT yScale,
               HWND hItem,  BYTE const bgColor[3]);
-    virtual ~DotMatrix();
+    virtual ~GraphicDisplay();
     void clear(void);
     void setPixel(UINT x, UINT y, BYTE const color[3]);
     void clearPixel(UINT x, UINT y) {

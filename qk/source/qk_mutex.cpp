@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QK/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qk_pkg.h"
 //#include "qassert.h"
 
@@ -45,10 +45,10 @@
 
 // package-scope objects -----------------------------------------------------
 extern "C" {
-    uint8_t QK_ceilingPrio_;                    // ceiling priority of a mutex
+    uint8_t volatile QK_ceilingPrio_;           // ceiling priority of a mutex
 }
 
-QP_BEGIN_
+namespace QP {
 
 //Q_DEFINE_THIS_MODULE("qk_mutex")
 
@@ -93,4 +93,5 @@ void QK::mutexUnlock(QMutex mutex) {
     QF_CRIT_EXIT_();
 }
 
-QP_END_
+}                                                              // namespace QP
+

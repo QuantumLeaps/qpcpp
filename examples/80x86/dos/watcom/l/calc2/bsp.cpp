@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product:  Board Support Package (BSP) for the Calculator example
 // Last Updated for Version: 4.1.05
 // Date of the Last Update:  Aug 27, 2010
@@ -24,7 +24,7 @@
 // Contact information:
 // Quantum Leaps Web site:  http://www.quantum-leaps.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "bsp.h"
 
 #include <iostream.h>

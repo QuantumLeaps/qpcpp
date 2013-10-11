@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Mar 28, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 23, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,41 +31,47 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qs_pkg.h"
 
 /// \file
 /// \ingroup qs
 /// \brief QS::getBlock() implementation
 
-QP_BEGIN_
+namespace QP {
 
 //............................................................................
 // get up to *pn bytes of contiguous memory
 uint8_t const *QS::getBlock(uint16_t * const pNbytes) {
-    uint8_t *block;
-    if (QS_used_ == static_cast<QSCtr>(0)) {
-        *pNbytes = static_cast<uint16_t>(0);
-        block = static_cast<uint8_t *>(0);     // no bytes to return right now
+    QSCtr used_ = priv_.used;                 // put in a temporary (register)
+    uint8_t *buf_;
+    if (used_ == static_cast<QSCtr>(0)) {
+        *pNbytes = static_cast<uint16_t>(0);   // no bytes available right now
+        buf_     = static_cast<uint8_t *>(0);  // no bytes available right now
     }
     else {
-        QSCtr n = static_cast<QSCtr>(QS_end_ - QS_tail_);
-        if (n > QS_used_) {
-            n = QS_used_;
+        QSCtr tail_ = priv_.tail;             // put in a temporary (register)
+        QSCtr end_  = priv_.end;              // put in a temporary (register)
+        QSCtr n = static_cast<QSCtr>(end_ - tail_);
+        if (n > used_) {
+            n = used_;
         }
         if (n > static_cast<QSCtr>(*pNbytes)) {
             n = static_cast<QSCtr>(*pNbytes);
         }
-        *pNbytes = static_cast<uint16_t>(n);
-        QS_used_ = static_cast<QSCtr>(QS_used_ - n);
-        QSCtr t  = QS_tail_;
-        QS_tail_ = static_cast<QSCtr>(QS_tail_ + n);
-        if (QS_tail_ == QS_end_) {
-            QS_tail_ = static_cast<QSCtr>(0);
+        *pNbytes = static_cast<uint16_t>(n);              // n-bytes available
+        buf_ = priv_.buf;
+        buf_ = QS_PTR_AT_(tail_);                 // the bytes are at the tail
+
+        priv_.used -= n;
+        tail_      += n;
+        if (tail_ == end_) {
+            tail_ = static_cast<QSCtr>(0);
         }
-        block = &QS_PTR_AT_(t);
+        priv_.tail = tail_;
     }
-    return block;
+    return buf_;
 }
 
-QP_END_
+}                                                              // namespace QP
+

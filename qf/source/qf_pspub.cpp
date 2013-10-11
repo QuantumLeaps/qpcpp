@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 04, 2013
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 
@@ -39,7 +39,7 @@
 /// \ingroup qf
 /// \brief QF::publish() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_pspub")
 
@@ -59,11 +59,10 @@ void QF::publish(QEvt const * const e, void const * const sender) {
         QS_TIME_();                                           // the timestamp
         QS_OBJ_(sender);                                  // the sender object
         QS_SIG_(e->sig);                            // the signal of the event
-        QS_U8_(QF_EVT_POOL_ID_(e));                // the pool Id of the event
-        QS_U8_(QF_EVT_REF_CTR_(e));              // the ref count of the event
+        QS_2U8_(e->poolId_, e->refCtr_);        // pool Id & refCtr of the evt
     QS_END_NOCRIT_()
 
-    if (QF_EVT_POOL_ID_(e) != u8_0) {                // is it a dynamic event?
+    if (e->poolId_ != u8_0) {                        // is it a dynamic event?
         QF_EVT_REF_CTR_INC_(e);     // increment the reference counter, NOTE01
     }
     QF_CRIT_EXIT_();
@@ -76,7 +75,7 @@ void QF::publish(QEvt const * const e, void const * const sender) {
         Q_ASSERT(active_[p] != static_cast<QActive *>(0));//must be registered
 
                            // POST() asserts internally if the queue overflows
-        active_[p]->POST(e, sender);
+        (void)active_[p]->POST(e, sender);
     }
 #else
                                                 // number of bytes in the list
@@ -92,7 +91,7 @@ void QF::publish(QEvt const * const e, void const * const sender) {
             Q_ASSERT(active_[p] != static_cast<QActive *>(0));   // registered
 
                            // POST() asserts internally if the queue overflows
-            active_[p]->POST(e, sender);
+            (void)active_[p]->POST(e, sender);               // asserting post
         }
     } while (i != u8_0);
 #endif
@@ -100,9 +99,9 @@ void QF::publish(QEvt const * const e, void const * const sender) {
     gc(e);                            // run the garbage collector, see NOTE01
 }
 
-QP_END_
+}                                                              // namespace QP
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // NOTE01:
 // QF::publish() increments the reference counter to prevent premature
 // recycling of the event while the multicasting is still in progress.

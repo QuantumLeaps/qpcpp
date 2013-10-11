@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: DPP example
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 13, 2012
+// Last Updated for Version: 5.0.0
+// Date of the Last Update:  Aug 24, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
@@ -43,7 +43,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 namespace DPP {
 
 Q_DEFINE_THIS_FILE
@@ -106,7 +106,7 @@ void BSP_randomSeed(uint32_t seed) {
 
 } // namespace DPP
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 
 namespace QP {
 
@@ -190,7 +190,7 @@ bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[4*1024];                 // 4K buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
-    QSPY_config((QP_VERSION >> 8),  // version
+    QSPY_config(QP_VERSION,         // version
                 QS_OBJ_PTR_SIZE,    // objPtrSize
                 QS_FUN_PTR_SIZE,    // funPtrSize
                 QS_TIME_SIZE,       // tstampSize
@@ -289,9 +289,7 @@ void QS::onCleanup(void) {
 void QS::onFlush(void) {
     uint16_t nBytes = 1024U;
     uint8_t const *block;
-    QF_CRIT_ENTRY(dummy);
     while ((block = getBlock(&nBytes)) != (uint8_t *)0) {
-        QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
         nBytes = 1024U;
     }
@@ -306,7 +304,7 @@ void QSPY_onPrintLn(void) {
     fputc('\n', stdout);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // NOTE01:
 // clock() is the most portable facility, but might not provide the desired
 // granularity. Other, less-portable alternatives are clock_gettime(),

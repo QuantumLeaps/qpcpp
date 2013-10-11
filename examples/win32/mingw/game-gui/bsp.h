@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
-// Product: "Fly 'n' Shoot" game example
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 09, 2012
+//****************************************************************************
+// Product: "Fly 'n' Shoot" game example for Win32-GUI
+// Last Updated for Version: 5.0.0
+// Date of the Last Update:  Aug 23, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,20 +31,20 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef bsp_h
 #define bsp_h
 
 namespace GAME {
 
-uint32_t const BSP_TICKS_PER_SEC = static_cast<uint32_t>(30);
+uint32_t const BSP_TICKS_PER_SEC = static_cast<uint32_t>(33);
 uint32_t const BSP_SCREEN_WIDTH  = static_cast<uint32_t>(96);
 uint32_t const BSP_SCREEN_HEIGHT = static_cast<uint32_t>(16);
 
 void BSP_init(void);
 void BSP_drawBitmap(uint8_t const *bitmap);
-void BSP_drawNString(uint8_t x,                              /* x in pixels */
-                     uint8_t y,                      /* y position in chars */
+void BSP_drawNString(uint8_t x,                                 // x in pixels
+                     uint8_t y,                         // y position in chars
                      char_t const *str);
 void BSP_updateScore(uint16_t score);
 
@@ -58,5 +58,8 @@ void BSP_moveShipDown(void);
 void BSP_terminate(int result);
 
 } // namespace GAME
+
+// Windows-GUI does not use the regular main()
+#define main()  main_gui()
 
 #endif                                                                // bsp_h

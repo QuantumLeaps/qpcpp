@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="2.2.00">
+<model version="2.3.2">
  <documentation>Dining Philosopher Problem example</documentation>
  <framework name="qpcpp"/>
  <package name="Events" stereotype="0x01" namespace="DPP::">
@@ -10,7 +10,9 @@
  <package name="AOs" stereotype="0x02" namespace="DPP::">
   <class name="Philo" superclass="qpcpp::QActive">
    <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
-   <operation name="Philo" type="QActive(Q_STATE_CAST(&amp;Philo::initial)), m_timeEvt(TIMEOUT_SIG)" visibility="0x00" properties="0x00"/>
+   <operation name="Philo" type="QActive(Q_STATE_CAST(&amp;Philo::initial)), m_timeEvt(TIMEOUT_SIG)" visibility="0x00" properties="0x00">
+    <code>// empty</code>
+   </operation>
    <statechart>
     <initial target="../1">
      <action>static bool registered = false; // starts off with 0, per C-standard

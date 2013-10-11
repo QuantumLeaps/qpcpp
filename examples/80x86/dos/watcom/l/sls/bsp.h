@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: Board Support Package (BSP) for the UI example
 // Last Updated for Version: 4.0.01
 // Date of the Last Update:  Sep 19, 2008
@@ -24,7 +24,7 @@
 // Contact information:
 // Quantum Leaps Web site:  http://www.quantum-leaps.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef bsp_h
 #define bsp_h
 

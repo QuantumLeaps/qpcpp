@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QEP/C++
-// Last Updated for Version: 4.5.01
-// Date of the Last Update:  Jun 13, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qep_pkg.h"
 #include "qassert.h"
 
@@ -39,21 +39,21 @@
 /// \ingroup qep
 /// \brief QHsm::dispatch() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qhsm_dis")
 
 //............................................................................
 void QHsm::dispatch(QEvt const * const e) {
-    QStateHandler t = m_state;
+    QStateHandler t = m_state.fun;
 
-    Q_REQUIRE(t == m_temp);          // the state configuration must be stable
+    Q_REQUIRE(t == m_temp.fun);      // the state configuration must be stable
 
     QStateHandler s;
     QState r;
     QS_CRIT_STAT_
 
-    QS_BEGIN_(QS_QEP_DISPATCH, QS::smObj_, this)
+    QS_BEGIN_(QS_QEP_DISPATCH, QS::priv_.smObjFilter, this)
         QS_TIME_();                                              // time stamp
         QS_SIG_(e->sig);                            // the signal of the event
         QS_OBJ_(this);                            // this state machine object
@@ -61,12 +61,12 @@ void QHsm::dispatch(QEvt const * const e) {
     QS_END_()
 
     do {                                // process the event hierarchically...
-        s = m_temp;
+        s = m_temp.fun;
         r = (*s)(this, e);                           // invoke state handler s
 
         if (r == Q_RET_UNHANDLED) {               // unhandled due to a guard?
 
-            QS_BEGIN_(QS_QEP_UNHANDLED, QS::smObj_, this)
+            QS_BEGIN_(QS_QEP_UNHANDLED, QS::priv_.smObjFilter, this)
                 QS_SIG_(e->sig);                    // the signal of the event
                 QS_OBJ_(this);                    // this state machine object
                 QS_FUN_(s);                               // the current state
@@ -84,19 +84,19 @@ void QHsm::dispatch(QEvt const * const e) {
         QStateHandler src = s;       // save the transition source for tracing
 #endif
 
-        path[0] = m_temp;                 // save the target of the transition
+        path[0] = m_temp.fun;             // save the target of the transition
         path[1] = t;
 
         while (t != s) {       // exit current state to transition source s...
             if (QEP_TRIG_(t, Q_EXIT_SIG) == Q_RET_HANDLED) {   //exit handled?
-                QS_BEGIN_(QS_QEP_STATE_EXIT, QS::smObj_, this)
+                QS_BEGIN_(QS_QEP_STATE_EXIT, QS::priv_.smObjFilter, this)
                     QS_OBJ_(this);                // this state machine object
                     QS_FUN_(t);                            // the exited state
                 QS_END_()
 
                 (void)QEP_TRIG_(t, QEP_EMPTY_SIG_);    // find superstate of t
             }
-            t = m_temp;                         // m_temp holds the superstate
+            t = m_temp.fun;                 // m_temp.fun holds the superstate
         }
 
         t = path[0];                               // target of the transition
@@ -107,20 +107,20 @@ void QHsm::dispatch(QEvt const * const e) {
         }
         else {
             (void)QEP_TRIG_(t, QEP_EMPTY_SIG_);        // superstate of target
-            t = m_temp;
+            t = m_temp.fun;
             if (s == t) {                   // (b) check source==target->super
                 ip = s8_0;               // enter the target
             }
             else {
                 (void)QEP_TRIG_(s, QEP_EMPTY_SIG_);       // superstate of src
                                      // (c) check source->super==target->super
-                if (m_temp == t) {
+                if (m_temp.fun == t) {
                     QEP_EXIT_(s);                           // exit the source
                     ip = s8_0;           // enter the target
                 }
                 else {
                                             // (d) check source->super==target
-                    if (m_temp == path[0]) {
+                    if (m_temp.fun == path[0]) {
                         QEP_EXIT_(s);                       // exit the source
                     }
                     else { // (e) check rest of source==target->super->super..
@@ -129,13 +129,13 @@ void QHsm::dispatch(QEvt const * const e) {
                         iq = s8_0; // indicate LCA not found
                         ip = s8_1; // enter target's superst
                         path[1] = t;          // save the superstate of target
-                        t = m_temp;                      // save source->super
+                        t = m_temp.fun;                  // save source->super
                                                   // find target->super->super
                         r = QEP_TRIG_(path[1], QEP_EMPTY_SIG_);
                         while (r == Q_RET_SUPER) {
                             ++ip;
-                            path[ip] = m_temp;         // store the entry path
-                            if (m_temp == s) {            // is it the source?
+                            path[ip] = m_temp.fun;     // store the entry path
+                            if (m_temp.fun == s) {        // is it the source?
                                                     // indicate that LCA found
                                 iq = s8_1;
                                                // entry path must not overflow
@@ -144,7 +144,7 @@ void QHsm::dispatch(QEvt const * const e) {
                                 r = Q_RET_HANDLED;       // terminate the loop
                             }
                             else {      // it is not the source, keep going up
-                                r = QEP_TRIG_(m_temp, QEP_EMPTY_SIG_);
+                                r = QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
                             }
                         }
                         if (iq == s8_0) {  // LCA found yet?
@@ -183,14 +183,14 @@ void QHsm::dispatch(QEvt const * const e) {
                                         == Q_RET_HANDLED)
                                     {
                                         QS_BEGIN_(QS_QEP_STATE_EXIT,
-                                                  QS::smObj_, this)
+                                                  QS::priv_.smObjFilter, this)
                                             QS_OBJ_(this);
                                             QS_FUN_(t);
                                         QS_END_()
 
                                         (void)QEP_TRIG_(t, QEP_EMPTY_SIG_);
                                     }
-                                    t = m_temp;          //  set to super of t
+                                    t = m_temp.fun;      //  set to super of t
                                     iq = ip;
                                     do {
                                         if (t == path[iq]) {   // is this LCA?
@@ -216,26 +216,26 @@ void QHsm::dispatch(QEvt const * const e) {
             QEP_ENTER_(path[ip]);                            // enter path[ip]
         }
         t = path[0];                         // stick the target into register
-        m_temp = t;                                   // update the next state
+        m_temp.fun = t;                               // update the next state
 
                                          // drill into the target hierarchy...
         while (QEP_TRIG_(t, Q_INIT_SIG) == Q_RET_TRAN) {
 
-            QS_BEGIN_(QS_QEP_STATE_INIT, QS::smObj_, this)
+            QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
                 QS_OBJ_(this);                    // this state machine object
                 QS_FUN_(t);                        // the source (pseudo)state
-                QS_FUN_(m_temp);              // the target of the transition
+                QS_FUN_(m_temp.fun);           // the target of the transition
             QS_END_()
 
             ip = s8_0;
-            path[0] = m_temp;
-            (void)QEP_TRIG_(m_temp, QEP_EMPTY_SIG_);       // find superstate
-            while (m_temp != t) {
+            path[0] = m_temp.fun;
+            (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);    // find superstate
+            while (m_temp.fun != t) {
                 ++ip;
-                path[ip] = m_temp;
-                (void)QEP_TRIG_(m_temp, QEP_EMPTY_SIG_);   // find superstate
+                path[ip] = m_temp.fun;
+                (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);// find superstate
             }
-            m_temp = path[0];
+            m_temp.fun = path[0];
                                                // entry path must not overflow
             Q_ASSERT(ip < QEP_MAX_NEST_DEPTH_);
 
@@ -247,7 +247,7 @@ void QHsm::dispatch(QEvt const * const e) {
             t = path[0];
         }
 
-        QS_BEGIN_(QS_QEP_TRAN, QS::smObj_, this)
+        QS_BEGIN_(QS_QEP_TRAN, QS::priv_.smObjFilter, this)
             QS_TIME_();                                          // time stamp
             QS_SIG_(e->sig);                        // the signal of the event
             QS_OBJ_(this);                        // this state machine object
@@ -260,29 +260,30 @@ void QHsm::dispatch(QEvt const * const e) {
 #ifdef Q_SPY
         if (r == Q_RET_HANDLED) {
 
-            QS_BEGIN_(QS_QEP_INTERN_TRAN, QS::smObj_, this)
+            QS_BEGIN_(QS_QEP_INTERN_TRAN, QS::priv_.smObjFilter, this)
                 QS_TIME_();                                      // time stamp
                 QS_SIG_(e->sig);                    // the signal of the event
                 QS_OBJ_(this);                    // this state machine object
-                QS_FUN_(m_state);          // the state that handled the event
+                QS_FUN_(m_state.fun);      // the state that handled the event
             QS_END_()
 
         }
         else {
 
-            QS_BEGIN_(QS_QEP_IGNORED, QS::smObj_, this)
+            QS_BEGIN_(QS_QEP_IGNORED, QS::priv_.smObjFilter, this)
                 QS_TIME_();                                      // time stamp
                 QS_SIG_(e->sig);                    // the signal of the event
                 QS_OBJ_(this);                    // this state machine object
-                QS_FUN_(m_state);                         // the current state
+                QS_FUN_(m_state.fun);                     // the current state
             QS_END_()
 
         }
 #endif
     }
 
-    m_state = t;                            // change the current active state
-    m_temp  = t;                           // mark the configuration as stable
+    m_state.fun = t;                        // change the current active state
+    m_temp.fun  = t;                       // mark the configuration as stable
 }
 
-QP_END_
+}                                                              // namespace QP
+

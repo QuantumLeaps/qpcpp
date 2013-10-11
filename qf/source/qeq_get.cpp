@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 08, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,17 +31,17 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
-//#include "qassert.h"
+#include "qassert.h"
 
 /// \file
 /// \ingroup qf
 /// \brief QEQueue::get() implementation.
 
-QP_BEGIN_
+namespace QP {
 
-//Q_DEFINE_THIS_MODULE("qeq_get")
+Q_DEFINE_THIS_MODULE("qeq_get")
 
 //............................................................................
 QEvt const *QEQueue::get(void) {
@@ -49,39 +49,39 @@ QEvt const *QEQueue::get(void) {
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();
-    if (m_frontEvt == null_evt) {                       // is the queue empty?
-        e = null_evt;                       // no event available at this time
-    }
-    else {
-        e = m_frontEvt;
+    e = m_frontEvt;
 
-        if (m_nFree != m_end) {          // any events in the the ring buffer?
+    if (e != static_cast<QEvt const *>(0)) {        // is the queue not empty?
+        QEQueueCtr nFree = m_nFree + static_cast<QEQueueCtr>(1);
+        m_nFree = nFree;                           // upate the number of free
+
+        if (nFree <= m_end) {            // any events in the the ring buffer?
             m_frontEvt = QF_PTR_AT_(m_ring, m_tail);   // remove from the tail
             if (m_tail == static_cast<QEQueueCtr>(0)) {       // need to wrap?
                 m_tail = m_end;                                 // wrap around
             }
             --m_tail;
 
-            ++m_nFree;               // one more free event in the ring buffer
-
-            QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_GET, QS::eqObj_, this)
+            QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_GET, QS::priv_.eqObjFilter, this)
                 QS_TIME_();                                       // timestamp
                 QS_SIG_(e->sig);                   // the signal of this event
                 QS_OBJ_(this);                            // this queue object
-                QS_U8_(QF_EVT_POOL_ID_(e));        // the pool Id of the event
-                QS_U8_(QF_EVT_REF_CTR_(e));      // the ref count of the event
-                QS_EQC_(m_nFree);                    // number of free entries
+                QS_2U8_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
+                QS_EQC_(nFree);                      // number of free entries
             QS_END_NOCRIT_()
         }
         else {
             m_frontEvt = null_evt;                  // the queue becomes empty
 
-            QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_GET_LAST, QS::eqObj_, this)
+                     // all entries in the queue must be free (+1 for fronEvt)
+            Q_ASSERT(nFree == (m_end + static_cast<QEQueueCtr>(1)));
+
+            QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_GET_LAST, QS::priv_.eqObjFilter,
+                             this)
                 QS_TIME_();                                       // timestamp
                 QS_SIG_(e->sig);                   // the signal of this event
                 QS_OBJ_(this);                            // this queue object
-                QS_U8_(QF_EVT_POOL_ID_(e));        // the pool Id of the event
-                QS_U8_(QF_EVT_REF_CTR_(e));      // the ref count of the event
+                QS_2U8_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
             QS_END_NOCRIT_()
         }
     }
@@ -89,4 +89,5 @@ QEvt const *QEQueue::get(void) {
     return e;
 }
 
-QP_END_
+}                                                              // namespace QP
+

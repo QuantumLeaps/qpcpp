@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QK/C++ port to 80x86, QK, Open Watcom
 // Last Updated for Version: 4.4.00
 // Date of the Last Update:  Apr 19, 2012
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qk_port_h
 #define qk_port_h
                                              // QK-specific ISR entry and exit
@@ -102,7 +102,7 @@ extern "C" __declspec(__cdecl) void FPU_restore(FPU_context *ctx); // assembly
 
 #endif                                                            // qk_port_h
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // NOTE01:
 // The QK port on x86 is not a pure play, but rather, QK is based in this
 // case on DOS.

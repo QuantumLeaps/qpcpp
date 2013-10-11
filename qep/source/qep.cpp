@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QEP/C++
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 09, 2013
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,14 +31,14 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qep_pkg.h"
 
 /// \file
 /// \ingroup qep
-/// \brief ::QEP_reservedEvt_ definition and QEP::getVersion() implementation.
+/// \brief ::QEP_reservedEvt_ definition implementation.
 
-QP_BEGIN_
+namespace QP {
 
 // Package-scope objects -----------------------------------------------------
 QEvt const QEP_reservedEvt_[4] = {
@@ -54,19 +54,5 @@ QEvt const QEP_reservedEvt_[4] = {
     { static_cast<QSignal>(3), u8_0, u8_0 }
 #endif
 };
-//............................................................................
-char_t const Q_ROM * Q_ROM_VAR QEP::getVersion(void) {
-    uint8_t const u8_zero = static_cast<uint8_t>('0');
-    static char_t const Q_ROM Q_ROM_VAR version[] = {
-        static_cast<char_t>(((QP_VERSION >> 12) & 0xFU) + u8_zero),
-        static_cast<char_t>('.'),
-        static_cast<char_t>(((QP_VERSION >>  8) & 0xFU) + u8_zero),
-        static_cast<char_t>('.'),
-        static_cast<char_t>(((QP_VERSION >>  4) & 0xFU) + u8_zero),
-        static_cast<char_t>((QP_VERSION         & 0xFU) + u8_zero),
-        static_cast<char_t>('\0')
-    };
-    return version;
-}
 
-QP_END_
+}                                                              // namespace QP

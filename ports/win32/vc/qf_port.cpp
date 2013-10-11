@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product:  QF/C++ port to Win32
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jun 30, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,13 +31,13 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 
 #include <stdio.h>
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
@@ -90,7 +90,7 @@ int16_t QF::run(void) {
 
     do {
         Sleep(l_tickMsec);                       // wait for the tick interval
-        QF_onClockTick();         // clock tick callback (must call QF_TICK())
+        QF_onClockTick();        // clock tick callback (must call QF_TICKX())
     } while (l_running);
     onCleanup();                                           // cleanup callback
     QS_EXIT();                                  // cleanup the QSPY connection
@@ -148,4 +148,4 @@ void QActive::stop(void) {
     m_thread = NULL;                           // stop the QActive::run() loop
 }
 
-QP_END_
+}                                                              // namespace QP

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: Generic State-Table event processor
 // Last Updated for Version: 4.0.00
 // Date of the Last Update:  Apr 07, 2008
@@ -24,7 +24,7 @@
 // Contact information:
 // Quantum Leaps Web site:  http://www.quantum-leaps.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "bsp.h"             // for the C99-standard exact-width integer types
 #include "statetbl.h"
 

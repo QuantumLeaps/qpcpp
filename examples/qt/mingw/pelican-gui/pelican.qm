@@ -1,14 +1,171 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="2.2.00">
+<model version="2.3.2">
  <documentation>PEdestrian LIghto CONtrolled (PELICA) crossing</documentation>
  <framework name="qpcpp"/>
+ <package name="Qt-port" stereotype="0x00" namespace="QP::">
+  <class name="GuiQActive" superclass="qpcpp::QActive">
+   <operation name="GuiQActive" type="QActive(initial)" visibility="0x00" properties="0x00">
+    <parameter name="initial" type="QStateHandler"/>
+   </operation>
+   <operation name="start" type="void" visibility="0x00" properties="0x00">
+    <documentation>Starts execution of an active object and registers the object with the framework. This function is strongly OS-dependent and must be defined in the QP port to a particular platform.
+
+The function takes six arguments:
+
+'prio' is the priority of the active object. QP allows you to start up to 63 active objects, each one having a *unique* priority number between 1 and 63 inclusive, where higher numerical values correspond to higher priority (urgency) of the active object relative to the others.
+
+'qSto[]' and 'qLen' arguments are the storage and size of the event queue used by this active object.
+
+'stkSto' and 'stkSize' are the stack storage and size in bytes. Please note that a per-active object stack is used only when the underlying OS requies it. If the stack is not required, or the underlying OS allocates the stack internally, the stkSto should be NULL and/or stkSize should be 0.
+
+'ie' is an optional initialization event that can be used to pass additional startup data to the active object. (Pass NULL if your active object does not expect the initialization event).</documentation>
+    <parameter name="prio" type="uint8_t"/>
+    <parameter name="qSto[]" type="QEvt const *"/>
+    <parameter name="qLen" type="uint32_t"/>
+    <parameter name="stkSto" type="void *"/>
+    <parameter name="stkSize" type="uint32_t"/>
+    <parameter name="ie" type="QEvt const *"/>
+    <code>// Example:
+
+static Table l_table;   // Table active object instance
+static QEvt const *l_tableQueueSto[N]; // storage for Table queue
+static int l_tableStk[256]; // storage for the stack for Table AO
+. . .
+int main() {
+    TableEvt ie;            // initialization event for the Table AO
+    . . .
+    ie.philNum = n;         // build the initialization event
+    . . .
+    l_table.start(
+        6,                     // unique priority (1..QF_MAX_ACTIVE)
+        l_tableQueueSto,       // event queue of the active object
+        Q_DIM(l_tableQueueSto),// the depth of the event queue
+        l_tableStk,            // the stack of the acitve object (optional)
+        sizeof(l_tableStk),    // the size of the stack in bytes (optional)
+        &amp;ie);                  // initialization event (optional)
+    . . .
+}</code>
+   </operation>
+   <operation name="postFIFO" type="void" visibility="0x00" properties="0x00">
+    <documentation>Posts an event e directly to the event queue of the acitve object me using the First-In-First-Out (FIFO) policy.
+
+Direct event posting is the simplest asynchronous communication method available in QP.
+
+NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <parameter name="e" type="QEvt const *"/>
+    <code>// Example:
+
+extern QActive *AO_Table;
+
+. . .
+pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
+pe-&gt;philNum = me-&gt;num;
+
+AO_Table-&gt;postFIFO(pe); // &lt;==</code>
+   </operation>
+   <operation name="postLIFO" type="void" visibility="0x00" properties="0x00">
+    <documentation>Posts an event e directly to the event queue of the acitve object me using the Last-In-First-Out (LIFO) policy.
+
+Direct event posting is the simplest asynchronous communication method available in QP.
+
+NOTE: You should be very careful with the LIFO (Last In First Out) policy, because it *reverses* the order of events in the queue. Typically, the QActive_postLIFO() operation shuould be only used for self-posting of events as reminders (see the &quot;Reminder&quot; state pattern) for continuing a processing. The postLIFO() operation is also used in the QActive::recall() operation.
+
+NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <parameter name="e" type="QEvt const *"/>
+    <code>// Example:
+. . .
+pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
+pe-&gt;philNum = me-&gt;num;
+. . .
+me-&gt;postLIFO(pe); // &lt;==</code>
+   </operation>
+  </class>
+  <class name="GuiQMActive" superclass="qpcpp::QActive">
+   <operation name="GuiQMActive" type="QMActive(initial)" visibility="0x00" properties="0x00">
+    <parameter name="initial" type="QStateHandler"/>
+   </operation>
+   <operation name="start" type="void" visibility="0x00" properties="0x00">
+    <documentation>Starts execution of an active object and registers the object with the framework. This function is strongly OS-dependent and must be defined in the QP port to a particular platform.
+
+The function takes six arguments:
+
+'prio' is the priority of the active object. QP allows you to start up to 63 active objects, each one having a *unique* priority number between 1 and 63 inclusive, where higher numerical values correspond to higher priority (urgency) of the active object relative to the others.
+
+'qSto[]' and 'qLen' arguments are the storage and size of the event queue used by this active object.
+
+'stkSto' and 'stkSize' are the stack storage and size in bytes. Please note that a per-active object stack is used only when the underlying OS requies it. If the stack is not required, or the underlying OS allocates the stack internally, the stkSto should be NULL and/or stkSize should be 0.
+
+'ie' is an optional initialization event that can be used to pass additional startup data to the active object. (Pass NULL if your active object does not expect the initialization event).</documentation>
+    <parameter name="prio" type="uint8_t"/>
+    <parameter name="qSto[]" type="QEvt const *"/>
+    <parameter name="qLen" type="uint32_t"/>
+    <parameter name="stkSto" type="void *"/>
+    <parameter name="stkSize" type="uint32_t"/>
+    <parameter name="ie" type="QEvt const *"/>
+    <code>// Example:
+
+static Table l_table;   // Table active object instance
+static QEvt const *l_tableQueueSto[N]; // storage for Table queue
+static int l_tableStk[256]; // storage for the stack for Table AO
+. . .
+int main() {
+    TableEvt ie;            // initialization event for the Table AO
+    . . .
+    ie.philNum = n;         // build the initialization event
+    . . .
+    l_table.start(
+        6,                     // unique priority (1..QF_MAX_ACTIVE)
+        l_tableQueueSto,       // event queue of the active object
+        Q_DIM(l_tableQueueSto),// the depth of the event queue
+        l_tableStk,            // the stack of the acitve object (optional)
+        sizeof(l_tableStk),    // the size of the stack in bytes (optional)
+        &amp;ie);                  // initialization event (optional)
+    . . .
+}</code>
+   </operation>
+   <operation name="postFIFO" type="void" visibility="0x00" properties="0x00">
+    <documentation>Posts an event e directly to the event queue of the acitve object me using the First-In-First-Out (FIFO) policy.
+
+Direct event posting is the simplest asynchronous communication method available in QP.
+
+NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <parameter name="e" type="QEvt const *"/>
+    <code>// Example:
+
+extern QActive *AO_Table;
+
+. . .
+pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
+pe-&gt;philNum = me-&gt;num;
+
+AO_Table-&gt;postFIFO(pe); // &lt;==</code>
+   </operation>
+   <operation name="postLIFO" type="void" visibility="0x00" properties="0x00">
+    <documentation>Posts an event e directly to the event queue of the acitve object me using the Last-In-First-Out (LIFO) policy.
+
+Direct event posting is the simplest asynchronous communication method available in QP.
+
+NOTE: You should be very careful with the LIFO (Last In First Out) policy, because it *reverses* the order of events in the queue. Typically, the QActive_postLIFO() operation shuould be only used for self-posting of events as reminders (see the &quot;Reminder&quot; state pattern) for continuing a processing. The postLIFO() operation is also used in the QActive::recall() operation.
+
+NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <parameter name="e" type="QEvt const *"/>
+    <code>// Example:
+. . .
+pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
+pe-&gt;philNum = me-&gt;num;
+. . .
+me-&gt;postLIFO(pe); // &lt;==</code>
+   </operation>
+  </class>
+ </package>
  <package name="components" stereotype="0x02" namespace="PELCAN::">
-  <class name="Pelican" superclass="qpcpp::QActive">
+  <class name="Pelican" superclass="Qt-port::GuiQActive">
    <documentation>PEdestrian LIght CONtrolled (PELICAN) crossing</documentation>
    <attribute name="m_timeout" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
    <attribute name="m_flashCtr" type="uint8_t" visibility="0x02" properties="0x00"/>
-   <operation name="Pelican" type="QActive(Q_STATE_CAST(&amp;Pelican::initial)), m_timeout(TIMEOUT_SIG)" visibility="0x00" properties="0x02">
+   <operation name="Pelican" type="GuiQActive(Q_STATE_CAST(&amp;Pelican::initial)), m_timeout(TIMEOUT_SIG)" visibility="0x00" properties="0x02">
     <documentation>constructor</documentation>
+    <code>// empty</code>
    </operation>
    <statechart>
     <initial target="../1">

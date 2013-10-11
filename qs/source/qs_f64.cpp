@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Mar 28, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 23, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,42 +31,49 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qs_pkg.h"
 
 /// \file
 /// \ingroup qs
 /// \brief QS::f64() implementation
 
-QP_BEGIN_
+namespace QP {
 
 //............................................................................
-void QS::f64(uint8_t const format, float64_t const d) {
+void QS::f64(uint8_t format, float64_t const d) {
     union F64Rep {
         float64_t d;
         struct UInt2 {
-            uint32_t u1, u2;
+            uint32_t u1;
+            uint32_t u2;
         } i;
-    } fu64;
-    fu64.d = d;
+    } fu64;                              // the internal binary representation
+    uint8_t chksum_ = priv_.chksum;
+    uint8_t *buf_   = priv_.buf;
+    QSCtr   head_   = priv_.head;
+    QSCtr   end_    = priv_.end;
+    int_t   i;
 
-    QS_INSERT_ESC_BYTE(format)
+    fu64.d = d;                            // assign the binary representation
 
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(fu64.i.u1))
-    fu64.i.u1 >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(fu64.i.u1))
-    fu64.i.u1 >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(fu64.i.u1))
-    fu64.i.u1 >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(fu64.i.u1))
+    priv_.used += static_cast<QSCtr>(9);          // 9 bytes about to be added
+    QS_INSERT_ESC_BYTE(format)                       // insert the format byte
 
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(fu64.i.u2))
-    fu64.i.u2 >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(fu64.i.u2))
-    fu64.i.u2 >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(fu64.i.u2))
-    fu64.i.u2 >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(fu64.i.u2))
+    for (i = static_cast<int_t>(4); i != static_cast<int_t>(0); --i) {
+        format = static_cast<uint8_t>(fu64.i.u1);
+        QS_INSERT_ESC_BYTE(format)
+        fu64.i.u1 >>= 8;
+    }
+    for (i = static_cast<int_t>(4); i != static_cast<int_t>(0); --i) {
+        format = static_cast<uint8_t>(fu64.i.u2);
+        QS_INSERT_ESC_BYTE(format)
+        fu64.i.u2 >>= 8;
+    }
+
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
 }
 
-QP_END_
+}                                                              // namespace QP
+

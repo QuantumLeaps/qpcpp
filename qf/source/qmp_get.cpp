@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 
@@ -39,46 +39,59 @@
 /// \ingroup qf
 /// \brief QMPool::get() and QF::getPoolMargin() implementation.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qmp_get")
 
 //............................................................................
-void *QMPool::get(void) {
+void *QMPool::get(uint16_t const margin) {
+    QFreeBlock *fb;
     QF_CRIT_STAT_
+
     QF_CRIT_ENTRY_();
-
-    QFreeBlock *fb = static_cast<QFreeBlock *>(m_free);  // free block or NULL
-    if (fb != static_cast<QFreeBlock *>(0)) {         // free block available?
-        m_free = fb->m_next;        // adjust list head to the next free block
-
-        Q_ASSERT(m_nFree > static_cast<QMPoolCtr>(0));    // at least one free
+    if (m_nFree > static_cast<QMPoolCtr>(margin)) {   // have the than margin?
+        fb = static_cast<QFreeBlock *>(m_free_head);       // get a free block
+        Q_ASSERT(fb != static_cast<QFreeBlock *>(0));     // must be available
+        m_free_head = fb->m_next;   // adjust list head to the next free block
         --m_nFree;                                      // one free block less
+
         if (m_nMin > m_nFree) {
             m_nMin = m_nFree;                   // remember the minimum so far
         }
+
+        QS_BEGIN_NOCRIT_(QS_QF_MPOOL_GET, QS::priv_.mpObjFilter, m_start)
+            QS_TIME_();                                           // timestamp
+            QS_OBJ_(m_start);               // the memory managed by this pool
+            QS_MPC_(m_nFree);         // the number of free blocks in the pool
+            QS_MPC_(m_nMin); // the mninimum number of free blocks in the pool
+        QS_END_NOCRIT_()
     }
+    else {
+        fb = static_cast<QFreeBlock *>(0);
 
-    QS_BEGIN_NOCRIT_(QS_QF_MPOOL_GET, QS::mpObj_, m_start)
-        QS_TIME_();                                               // timestamp
-        QS_OBJ_(m_start);                   // the memory managed by this pool
-        QS_MPC_(m_nFree);             // the number of free blocks in the pool
-        QS_MPC_(m_nMin);     // the mninimum number of free blocks in the pool
-    QS_END_NOCRIT_()
-
+        QS_BEGIN_NOCRIT_(QS_QF_MPOOL_GET_ATTEMPT,
+                         QS::priv_.mpObjFilter, m_start)
+            QS_TIME_();                                           // timestamp
+            QS_OBJ_(m_start);               // the memory managed by this pool
+            QS_MPC_(m_nFree);         // the number of free blocks in the pool
+            QS_MPC_(static_cast<QMPoolCtr>(margin));   // the requested margin
+        QS_END_NOCRIT_()
+    }
     QF_CRIT_EXIT_();
+
     return fb;               // return the block or NULL pointer to the caller
 }
 //............................................................................
-uint32_t QF::getPoolMargin(uint8_t const poolId) {
-    Q_REQUIRE((u8_1 <= poolId) && (poolId <= QF_maxPool_));
+uint16_t QF::getPoolMin(uint_t const poolId) {
+    Q_REQUIRE((u_1 <= poolId) && (poolId <= QF_maxPool_));
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-    uint32_t margin = static_cast<uint32_t>(QF_pool_[poolId - u8_1].m_nMin);
+    uint16_t min = static_cast<uint16_t>(QF_pool_[poolId - u_1].m_nMin);
     QF_CRIT_EXIT_();
 
-    return margin;
+    return min;
 }
 
-QP_END_
+}                                                              // namespace QP
+

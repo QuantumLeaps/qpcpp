@@ -1,19 +1,21 @@
-QState Table::initial(Table *me, QEvent const *) {
-    uint8_t n;
+static Table l_table;
 
-    QS_SIG_DICTIONARY(HUNGRY_SIG, me);   // output signal dictionary QS record
-    QS_SIG_DICTIONARY(DONE_SIG, me);     // output signal dictionary QS record
-    QS_SIG_DICTIONARY(EAT_SIG, 0);       // output signal dictionary QS record
+QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
+    (void)e; // suppress the compiler warning about unused parameter
 
-    QS_FUN_DICTIONARY(Table::serving);
+    QS_OBJ_DICTIONARY(&l_table);
+    QS_FUN_DICTIONARY(&QP::QHsm::top);
+    QS_FUN_DICTIONARY(&Table::initial);
+    QS_FUN_DICTIONARY(&Table::active);
+    QS_FUN_DICTIONARY(&Table::serving);
+    QS_FUN_DICTIONARY(&Table::paused);
 
-    subscribe(HUNGRY_SIG);
-    subscribe(DONE_SIG);
-    subscribe(TERMINATE_SIG);
+    QS_SIG_DICTIONARY(DONE_SIG,      (void *)0); // global signals
+    QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
+    QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
+    QS_SIG_DICTIONARY(TERMINATE_SIG, (void *)0);
 
-    for (n = 0; n < N; ++n) {
-        me->fork__[n] = FREE;
-        me->isHungry__[n] = 0;
-    }
-    return Q_TRAN(&Table::serving);
+    QS_SIG_DICTIONARY(HUNGRY_SIG,    me); // signal just for Table
+
+    . . .
 }

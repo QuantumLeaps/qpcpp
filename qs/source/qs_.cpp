@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Mar 28, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 23, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,68 +31,124 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qs_pkg.h"
 
 /// \file
 /// \ingroup qs
 /// \brief QS functions for internal use inside QP components
 
-QP_BEGIN_
-
-//............................................................................
-void const *QS::smObj_;                  // local state machine for QEP filter
-void const *QS::aoObj_;                   // local active object for QF filter
-void const *QS::mpObj_;                     //  local event pool for QF filter
-void const *QS::eqObj_;                      //  local raw queue for QF filter
-void const *QS::teObj_;                     //  local time event for QF filter
-void const *QS::apObj_;                    //  local object Application filter
-
-QSTimeCtr QS::tickCtr_;              // tick counter for the QS_QF_TICK record
+namespace QP {
 
 //............................................................................
 void QS::u8_(uint8_t const d) {
+    uint8_t chksum_ = priv_.chksum;           // put in a temporary (register)
+    uint8_t *buf_   = priv_.buf;              // put in a temporary (register)
+    QSCtr   head_   = priv_.head;             // put in a temporary (register)
+    QSCtr   end_    = priv_.end;              // put in a temporary (register)
+
+    ++priv_.used;                                  // 1 byte about to be added
     QS_INSERT_ESC_BYTE(d)
+
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
+}
+//............................................................................
+void QS::u8u8_(uint8_t const d1, uint8_t const d2) {
+    uint8_t chksum_ = priv_.chksum;           // put in a temporary (register)
+    uint8_t *buf_   = priv_.buf;              // put in a temporary (register)
+    QSCtr   head_   = priv_.head;             // put in a temporary (register)
+    QSCtr   end_    = priv_.end;              // put in a temporary (register)
+
+    priv_.used += static_cast<QSCtr>(2);          // 2 bytes about to be added
+    QS_INSERT_ESC_BYTE(d1)
+    QS_INSERT_ESC_BYTE(d2)
+
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
 }
 //............................................................................
 void QS::u16_(uint16_t d) {
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(d))
+    uint8_t b = static_cast<uint8_t>(d);
+    uint8_t chksum_ = priv_.chksum;           // put in a temporary (register)
+    uint8_t *buf_   = priv_.buf;              // put in a temporary (register)
+    QSCtr   head_   = priv_.head;             // put in a temporary (register)
+    QSCtr   end_    = priv_.end;              // put in a temporary (register)
+
+    priv_.used += static_cast<QSCtr>(2);          // 2 bytes about to be added
+
+    QS_INSERT_ESC_BYTE(b)
+
     d >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(d))
+    b = static_cast<uint8_t>(d);
+    QS_INSERT_ESC_BYTE(b)
+
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
 }
 //............................................................................
 void QS::u32_(uint32_t d) {
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(d))
-    d >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(d))
-    d >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(d))
-    d >>= 8;
-    QS_INSERT_ESC_BYTE(static_cast<uint8_t>(d))
+    uint8_t chksum_ = priv_.chksum;           // put in a temporary (register)
+    uint8_t *buf_   = priv_.buf;              // put in a temporary (register)
+    QSCtr   head_   = priv_.head;             // put in a temporary (register)
+    QSCtr   end_    = priv_.end;              // put in a temporary (register)
+
+    priv_.used += static_cast<QSCtr>(4);          // 4 bytes about to be added
+    for (int_t i = static_cast<int_t>(4); i != static_cast<int_t>(0); --i) {
+        uint8_t b = static_cast<uint8_t>(d);
+        QS_INSERT_ESC_BYTE(b)
+        d >>= 8;
+    }
+
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
 }
 //............................................................................
 void QS::str_(char_t const *s) {
     uint8_t b = static_cast<uint8_t>(*s);
+    uint8_t chksum_ = priv_.chksum;           // put in a temporary (register)
+    uint8_t *buf_   = priv_.buf;              // put in a temporary (register)
+    QSCtr   head_   = priv_.head;             // put in a temporary (register)
+    QSCtr   end_    = priv_.end;              // put in a temporary (register)
+    QSCtr   used_   = priv_.used;             // put in a temporary (register)
+
     while (b != static_cast<uint8_t>(0)) {
-                                       // ASCII characters don't need escaping
-        QS_chksum_ = static_cast<uint8_t>(QS_chksum_ + b);
-        QS_INSERT_BYTE(b)
-        ++s;
+        chksum_ += b;                                       // update checksum
+        QS_INSERT_BYTE(b)              // ASCII characters don't need escaping
+        QS_PTR_INC_(s);
         b = static_cast<uint8_t>(*s);
+        ++used_;
     }
-    QS_INSERT_BYTE(static_cast<uint8_t>(0))
+    QS_INSERT_BYTE(static_cast<uint8_t>(0))       // zero-terminate the string
+    ++used_;
+
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
+    priv_.used   = used_;                       // save # of used buffer space
 }
 //............................................................................
 void QS::str_ROM_(char_t const Q_ROM * Q_ROM_VAR s) {
     uint8_t b = static_cast<uint8_t>(Q_ROM_BYTE(*s));
+    uint8_t chksum_ = priv_.chksum;           // put in a temporary (register)
+    uint8_t *buf_   = priv_.buf;              // put in a temporary (register)
+    QSCtr   head_   = priv_.head;             // put in a temporary (register)
+    QSCtr   end_    = priv_.end;              // put in a temporary (register)
+    QSCtr   used_   = priv_.used;             // put in a temporary (register)
+
     while (b != static_cast<uint8_t>(0)) {
-                                       // ASCII characters don't need escaping
-        QS_chksum_ = static_cast<uint8_t>(QS_chksum_ + b);
-        QS_INSERT_BYTE(b)
-        ++s;
+        chksum_ += b;                                       // update checksum
+        QS_INSERT_BYTE(b)              // ASCII characters don't need escaping
+        QS_PTR_INC_(s);
         b = static_cast<uint8_t>(Q_ROM_BYTE(*s));
+        ++used_;
     }
-    QS_INSERT_BYTE(static_cast<uint8_t>(0))
+    QS_INSERT_BYTE(static_cast<uint8_t>(0))       // zero-terminate the string
+    ++used_;
+
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
+    priv_.used   = used_;                       // save # of used buffer space
 }
 
-QP_END_
+}                                                              // namespace QP
+

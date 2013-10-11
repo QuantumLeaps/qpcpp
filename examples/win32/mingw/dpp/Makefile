@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: DPP example, Win32, MinGW compiler
-# Last Updated for Version: 4.5.03
-# Date of the Last Update:  Nov 26, 2012
+# Last Updated for Version: 5.0.0
+# Date of the Last Update:  Aug 14, 2013
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -125,7 +125,7 @@ C_SRCS += qspy.c
 
 ASFLAGS =
 
-CFLAGS = -c -g $(INCLUDES) $(DEFINES) -DQ_SPY
+CFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES) -DQ_SPY
 
 CPPFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES) -DQ_SPY
 

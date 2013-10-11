@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
-// Product: QF/C++  port to Qt (single thread)
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jun 14, 2012
+//****************************************************************************
+// Product: QF/C++  port to Qt5
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,66 +31,53 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
-#include <QTimer>
-#include <QTime>
-#include "qp_app.h"
+//****************************************************************************
+#include <QtWidgets>
 //-----------------
 #include "qf_pkg.h"
+#include "aothread.h"
+#include "tickerthread.h"
 #include "qassert.h"
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
-static QEvent::Type qp_event_type = QEvent::MaxUser;
-static QTimer      *qp_tick_timer;
+//****************************************************************************
+static TickerThread l_tickerThread;
 
-//////////////////////////////////////////////////////////////////////////////
-class QP_Event : public QEvent {
-public:
-    QP_Event(QP::QEvt const *e, QP::QActive *a)
-      : QEvent(qp_event_type),
-        m_qpe(e),
-        m_act(a)
-    {}
-
-private:
-    QP::QEvt    const *m_qpe;                              // QP event pointer
-    QP::QActive       *m_act;      // QP active object pointer (the recipient)
-
-    friend class QPApp;
-};
-
-//............................................................................
-QPApp::QPApp(int &argc, char **argv)
-  : QApplication(argc, argv)
-{
-    qp_event_type =
-        static_cast<QEvent::Type>(QEvent::registerEventType(QEvent::MaxUser));
+//****************************************************************************
+AOThread::~AOThread() {
+    wait();
 }
 //............................................................................
-bool QPApp::event(QEvent *e) {
-    bool ret;
-    if (e->type() == qp_event_type) {
+void AOThread::run() {
+    Q_REQUIRE(m_act != static_cast<void *>(0));
+    QP::QF::thread_(static_cast<QP::QActive *>(m_act));
+}
 
-        QP::QEvt const *qpe = (static_cast<QP_Event *>(e))->m_qpe;
-        (static_cast<QP_Event *>(e))->m_act->dispatch(qpe);    // dispatch evt
-        QP::QF::gc(qpe); // determine if event is garbage and collect it if so
+//****************************************************************************
+TickerThread::~TickerThread() {
+    wait();
+}
+//............................................................................
+void TickerThread::run() {
+    m_isRunning = true;
+    do {
+        msleep(m_tickInterval);
+        QP::QF_onClockTick();
 #ifdef Q_SPY
-        QP_ QS_onEvent();
+        QP::QS_onEvent();
 #endif
-        ret = true;                            // event recognized and handled
-    }
-    else {
-        ret = QApplication::event(e);            // delegate to the superclass
-    }
-
-    return ret;
+    } while (m_isRunning);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-QP_BEGIN_
+//****************************************************************************
+namespace QP {
 
-static int qp_tick_interval_ms = 10;             // default 10ms tick interval
+QMutex QF_qtMutex_;
+
+//............................................................................
+void QF_enterCriticalSection() { QF_qtMutex_.lock();   }
+void QF_leaveCriticalSection() { QF_qtMutex_.unlock(); }
 
 //............................................................................
 void QF::init(void) {
@@ -98,23 +85,60 @@ void QF::init(void) {
 //............................................................................
 int16_t QF::run(void) {
     onStartup();                                // invoke the startup callback
-    qp_tick_timer = new QTimer(qApp);
-    QObject::connect(qp_tick_timer, SIGNAL(timeout()),
-                     qApp,          SLOT(onClockTick()));
-    qp_tick_timer->setSingleShot(false);                      // periodic timer
-    qp_tick_timer->setInterval(qp_tick_interval_ms);   // set system clock tick
-    qp_tick_timer->start();
 
-    return static_cast<int16_t>(qApp->exec());        // run the Qt event loop
+    l_tickerThread.setStackSize(1024U*4U);                     // 4KB of stack
+    l_tickerThread.start();
+
+    // run the Qt event loop (console or GUI)
+    return static_cast<int16_t>(QCoreApplication::instance()->exec());
+}
+//............................................................................
+void QF::thread_(QActive *act) {
+    QThread::Priority qt_prio = QThread::IdlePriority;
+    switch (act->m_prio) {              // remap QF priority to Win32 priority
+        case 1:
+            qt_prio = QThread::IdlePriority;
+            break;
+        case 2:
+            qt_prio = QThread::LowestPriority;
+            break;
+        case 3:
+            qt_prio = QThread::LowPriority;
+            break;
+        case (QF_MAX_ACTIVE - 2):
+            qt_prio = QThread::HighPriority;
+            break;
+        case (QF_MAX_ACTIVE - 1):
+            qt_prio = QThread::HighestPriority;
+            break;
+        case QF_MAX_ACTIVE:
+            qt_prio = QThread::TimeCriticalPriority;
+            break;
+        default:
+            qt_prio = QThread::NormalPriority;
+            break;
+    }
+
+    AOThread *thread = static_cast<AOThread *>(act->m_thread);
+    thread->setPriority(qt_prio);
+    thread->m_isRunning = true;
+    do {                  // loop until m_thread is cleared in QActive::stop()
+        QEvt const *e = act->get_();                         // wait for event
+        act->dispatch(e);     // dispatch to the active object's state machine
+        gc(e);          // check if the event is garbage, and collect it if so
+    } while (thread->m_isRunning);
+
+    QF::remove_(act);
+    delete thread;
+    delete static_cast<QWaitCondition *>(act->m_osObject);
 }
 //............................................................................
 void QF::stop(void) {
-    qp_tick_timer->stop();
-    delete qp_tick_timer;
+    l_tickerThread.m_isRunning = false;
 }
 //............................................................................
-void QF_setTickRate(int ticks_per_sec) {
-    qp_tick_interval_ms = 1000 / ticks_per_sec;         // tick interval in ms
+void QF_setTickRate(unsigned ticksPerSec) {
+    l_tickerThread.m_tickInterval = 1000U/ticksPerSec;
 }
 //............................................................................
 void QActive::start(uint8_t prio,
@@ -122,62 +146,26 @@ void QActive::start(uint8_t prio,
                     void *stkSto, uint32_t stkSize,
                     QEvt const *ie)
 {
-    Q_REQUIRE((qSto == static_cast<QEvt const **>(0))     /* no event queue */
-              && (qLen == 0U)                             /* no event queue */
-              && (stkSto == static_cast<void *>(0))    /* no per-task stack */
-              && (stkSize == 0U));                        // no per-task stack
+    Q_REQUIRE(stkSto == static_cast<void *>(0));          // no per-task stack
 
+    m_thread   = new AOThread(this);
+    m_osObject = new QWaitCondition;
+    m_eQueue.init(qSto, qLen);
     m_prio = prio;
+
     QF::add_(this);                     // make QF aware of this active object
     init(ie);                                // execute the initial transition
 
     QS_FLUSH();                          // flush the trace buffer to the host
+
+    AOThread *thread = static_cast<AOThread *>(m_thread);
+    thread->setStackSize(stkSize);
+    thread->start();
 }
 //............................................................................
 void QActive::stop(void) {
-    QF::remove_(this);
-}
-//............................................................................
-#ifndef Q_SPY
-void QActive::postFIFO(QEvt const * const e)
-#else
-void QActive::postFIFO(QEvt const * const e, void const * const sender)
-#endif
-{
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::aoObj_, this)
-        QS_TIME_();                                               // timestamp
-        QS_OBJ_(sender);                                  // the sender object
-        QS_SIG_(e->sig);                            // the signal of the event
-        QS_OBJ_(this);                                   // this active object
-        QS_U8_(QF_EVT_POOL_ID_(e));                // the pool Id of the event
-        QS_U8_(QF_EVT_REF_CTR_(e));              // the ref count of the event
-        QS_EQC_(0);                       // number of free entries (not used)
-        QS_EQC_(0);                   // min number of free entries (not used)
-    QS_END_NOCRIT_()
-
-    if (QF_EVT_POOL_ID_(e) != u8_0) {                // is it a dynamic event?
-        QF_EVT_REF_CTR_INC_(e);             // increment the reference counter
-    }
-    QCoreApplication::postEvent(qApp, new QP_Event(e, this), m_prio);
-}
-//............................................................................
-void QActive::postLIFO(QEvt const * const e) {
-
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::aoObj_, this)
-        QS_TIME_();                                               // timestamp
-        QS_SIG_(e->sig);                           // the signal of this event
-        QS_OBJ_(this);                                   // this active object
-        QS_U8_(QF_EVT_POOL_ID_(e));                // the pool Id of the event
-        QS_U8_(QF_EVT_REF_CTR_(e));              // the ref count of the event
-        QS_EQC_(0);                       // number of free entries (not used)
-        QS_EQC_(0);                   // min number of free entries (not used)
-    QS_END_NOCRIT_()
-
-    if (QF_EVT_POOL_ID_(e) != u8_0) {                // is it a dynamic event?
-        QF_EVT_REF_CTR_INC_(e);             // increment the reference counter
-    }
-    QCoreApplication::postEvent(qApp, new QP_Event(e, this),
-                                QF_MAX_ACTIVE + 1);
+    Q_REQUIRE(m_thread != 0);
+    static_cast<AOThread *>(m_thread)->m_isRunning = false;
 }
 
-QP_END_
+}                                                              // namespace QP

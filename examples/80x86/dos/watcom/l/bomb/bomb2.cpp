@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product:  Time Bomb Example with "State Table"
 // Last Updated for Version: 4.5.03
 // Date of the Last Update:  Nov 22, 2009
@@ -24,7 +24,7 @@
 // Contact information:
 // Quantum Leaps Web site:  http://www.quantum-leaps.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "bsp.h"
 #include "statetbl.h"
 

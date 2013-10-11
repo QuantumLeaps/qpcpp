@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 09, 2013
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 24, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -42,7 +42,7 @@
 -i.               // QP/C port includes
 -i../../include   // QP/C includes
 
--si4              // sizeof(int) 
+-si4              // sizeof(int)
 -ss2              // sizeof(short)
 -spD4             // sizeof(void *)
 -spP4             // sizeof(function pointer)
@@ -59,7 +59,8 @@ lib-qpcpp.lnt     // QP/C++ options
 -esym(1960,                 // 16-0-4 function-like macro
  QEP_TRIG_,
  QEP_ENTER_,
- QEP_EXIT_)
+ QEP_EXIT_,
+ QEP_ACT_PTR_INC_)
 -efunc(639, *getVersion)    // Strong type mismatch in binary operation
 -efunc(778, *getVersion)    // Constant expression evaluates to 0
 -efunc(835, *getVersion)    // 0 as left argument to operator '+'
@@ -115,21 +116,23 @@ lib-qpcpp.lnt     // QP/C++ options
  QK_EXT_SAVE,
  QK_EXT_RESTORE,
  QK_TLS)
+-efunc(527, *QF::run)        // 0-1-1 Unreachable code
 
- 
+
 // QS -- the following options are needed only when Q_SPY is defined
 -emacro(1960,               // 5-0-15, pointer arithmetic
  QS_PTR_AT_,
  QS_PTR_INC_)
--efunc(1960,                // 9-5-1 declaration of union
- *QS::f32,
- *QS::f64)
+-estring(1960,              // 9-5-1 declaration of union
+ *F32Rep,
+ *F64Rep)
 -estring(1960,              // 16-0-4 function-like macro
  QS_INSERT_BYTE,
  QS_INSERT_ESC_BYTE,
  QS_INSERT_CHKSUM_BYTE,
  QS_PTR_AT_,
- QS_PTR_INC_)
+ QS_PTR_INC_,
+ QS_REC_NUM_)
 -emacro(944,                // Operator ... always evaluates to True
  QS_BEGIN_,
  QS_BEGIN_NOCRIT_)
@@ -142,7 +145,11 @@ lib-qpcpp.lnt     // QP/C++ options
 -efunc(930,                 // 5-2-7 cast from enum to unsigned char
  *QS::mem,
  *QS::str,
- *QS::str_ROM)
+ *QS::str_ROM,
+ *QS::sig_dict,
+ *QS::obj_dict,
+ *QS::fun_dict,
+ *QS::usr_dict)
 -emacro(930,                // 5-2-7 cast from enum to unsigned char
  QS_BEGIN_,
  QS_BEGIN_NOCRIT_)

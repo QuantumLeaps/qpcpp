@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++ port to 80x86, QK, Open Watcom
 // Last Updated for Version: 4.4.00
 // Date of the Last Update:  Apr 19, 2012
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qf_port_h
 #define qf_port_h
                     // The maximum number of active objects in the application

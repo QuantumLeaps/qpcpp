@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 19, 2012
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 08, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,56 +31,90 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 
 /// \file
 /// \ingroup qf
-/// \brief QEQueue::postFIFO() implementation.
+/// \brief QEQueue::post() implementation.
+///
+/// \note this function is used for the "raw" thread-safe queues and NOT
+/// for the queues of active objects.
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qeq_fifo")
 
 //............................................................................
-void QEQueue::postFIFO(QEvt const * const e) {
+bool QEQueue::post(QEvt const * const e, uint16_t const margin) {
+    bool status;
     QF_CRIT_STAT_
+
+    Q_REQUIRE(e != null_evt);                       // the event must be valid
+
     QF_CRIT_ENTRY_();
+    QEQueueCtr nFree = m_nFree;   // temporary to avoid UB for volatile access
 
-    QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_FIFO, QS::eqObj_, this)
-        QS_TIME_();                                               // timestamp
-        QS_SIG_(e->sig);                           // the signal of this event
-        QS_OBJ_(this);                                    // this queue object
-        QS_U8_(QF_EVT_POOL_ID_(e));                // the pool Id of the event
-        QS_U8_(QF_EVT_REF_CTR_(e));              // the ref count of the event
-        QS_EQC_(m_nFree);                            // number of free entries
-        QS_EQC_(m_nMin);                         // min number of free entries
-    QS_END_NOCRIT_()
+    if (nFree > static_cast<QEQueueCtr>(margin)) {        // margin available?
 
-    if (QF_EVT_POOL_ID_(e) != u8_0) {                // is it a dynamic event?
-        QF_EVT_REF_CTR_INC_(e);             // increment the reference counter
-    }
+        QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_FIFO, QS::priv_.eqObjFilter, this)
+            QS_TIME_();                                           // timestamp
+            QS_SIG_(e->sig);                       // the signal of this event
+            QS_OBJ_(this);                                // this queue object
+            QS_2U8_(e->poolId_, e->refCtr_);    // pool Id & refCtr of the evt
+            QS_EQC_(nFree);                          // number of free entries
+            QS_EQC_(m_nMin);                     // min number of free entries
+        QS_END_NOCRIT_()
 
-    if (m_frontEvt == null_evt) {                       // is the queue empty?
-        m_frontEvt = e;                              // deliver event directly
-    }
-    else {               // queue is not empty, leave event in the ring-buffer
-               // the queue must be able to accept the event (cannot overflow)
-        Q_ASSERT(m_nFree != static_cast<QEQueueCtr>(0));
-
-        QF_PTR_AT_(m_ring, m_head) = e; // insert event into the buffer (FIFO)
-        if (m_head == static_cast<QEQueueCtr>(0)) {           // need to wrap?
-            m_head = m_end;                                     // wrap around
+        if (e->poolId_ != u8_0) {                    // is it a dynamic event?
+            QF_EVT_REF_CTR_INC_(e);         // increment the reference counter
         }
-        --m_head;
 
-        --m_nFree;                             // update number of free events
-        if (m_nMin > m_nFree) {
-            m_nMin = m_nFree;                         // update minimum so far
+        --nFree;                                // one free entry just used up
+        m_nFree = nFree;                                // update the volatile
+        if (m_nMin > nFree) {
+            m_nMin = nFree;                           // update minimum so far
         }
+
+        if (m_frontEvt == null_evt) {                   // is the queue empty?
+            m_frontEvt = e;                          // deliver event directly
+        }
+        else {           // queue is not empty, leave event in the ring-buffer
+                                   // insert event into the ring buffer (FIFO)
+            QF_PTR_AT_(m_ring, m_head) = e;            // insert e into buffer
+            if (m_head == static_cast<QEQueueCtr>(0)) {       // need to wrap?
+                m_head = m_end;                                 // wrap around
+            }
+            --m_head;
+        }
+        status = true;                            // event posted successfully
+    }
+    else {
+        Q_ASSERT(margin != u16_0);             // can tollerate dropping evts?
+
+        QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_ATTEMPT, QS::priv_.eqObjFilter,
+                         this)
+            QS_TIME_();                                           // timestamp
+            QS_SIG_(e->sig);                       // the signal of this event
+            QS_OBJ_(this);                                // this queue object
+            QS_2U8_(e->poolId_, e->refCtr_);    // pool Id & refCtr of the evt
+            QS_EQC_(nFree);                          // number of free entries
+            QS_EQC_(static_cast<QEQueueCtr>(margin));      // margin requested
+        QS_END_NOCRIT_()
+
+        status = false;                                    // event not posted
     }
     QF_CRIT_EXIT_();
+
+    return status;
 }
 
-QP_END_
+}                                                              // namespace QP
+
+//****************************************************************************
+// NOTE01:
+// The zero value of the 'margin' argument is special and denotes situation
+// when the post() operation is assumed to succeed (event delivery guarantee).
+// An assertion fires, when the event cannot be delivered in this case.
+//

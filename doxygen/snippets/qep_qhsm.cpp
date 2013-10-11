@@ -1,4 +1,4 @@
-class QCalc : public QHsm {                // Quantum Calculator state machine
+class QCalc : public QHsm {  // derived from QHsm
 private:
     double  m_operand1;
     double  m_operand2;
@@ -7,25 +7,15 @@ private:
     uint8_t m_opKey;
 
 public:
-    QCalc() : QHsm((QStateHandler)&QCalc::initial) {                   // ctor
+    QCalc() : QHsm(Q_STATE_CAST(&QCalc::initial)) {  // ctor
     }
 
 protected:
-    static QState initial  (QCalc *me, QEvent const *e);
-    static QState on       (QCalc *me, QEvent const *e);
-    static QState error    (QCalc *me, QEvent const *e);
-    static QState ready    (QCalc *me, QEvent const *e);
-    static QState result   (QCalc *me, QEvent const *e);
-    static QState begin    (QCalc *me, QEvent const *e);
-    static QState negated1 (QCalc *me, QEvent const *e);
-    static QState operand1 (QCalc *me, QEvent const *e);
-    static QState zero1    (QCalc *me, QEvent const *e);
-    static QState int1     (QCalc *me, QEvent const *e);
-    static QState frac1    (QCalc *me, QEvent const *e);
-    static QState opEntered(QCalc *me, QEvent const *e);
-    static QState negated2 (QCalc *me, QEvent const *e);
-    static QState operand2 (QCalc *me, QEvent const *e);
-    static QState zero2    (QCalc *me, QEvent const *e);
-    static QState int2     (QCalc *me, QEvent const *e);
-    static QState frac2    (QCalc *me, QEvent const *e);
+    static QState initial  (QCalc * const me, QEvt const *e);
+    static QState on       (QCalc * const me, QEvt const *e);
+    static QState error    (QCalc * const me, QEvt const *e);
+    static QState ready    (QCalc * const me, QEvt const *e);
+    static QState result   (QCalc * const me, QEvt const *e);
+    static QState begin    (QCalc * const me, QEvt const *e);
+    . . .
 };

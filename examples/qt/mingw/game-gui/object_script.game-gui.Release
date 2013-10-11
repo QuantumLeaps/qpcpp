@@ -7,6 +7,6 @@ INPUT(
 ./release\mine1.o
 ./release\tunnel.o
 ./release\ship.o
-./release\moc_gui.o
 ./release\qrc_gui.o
+./release\moc_gui.o
 );

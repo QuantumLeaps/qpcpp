@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 09, 2013
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qf_pkg_h
 #define qf_pkg_h
 
@@ -48,7 +48,7 @@
 /// \brief helper macro to cast const away from an event pointer \a e_
 #define QF_EVT_CONST_CAST_(e_) const_cast<QEvt *>(e_)
 
-QP_BEGIN_
+namespace QP {
                                                // QF-specific critical section
 #ifndef QF_CRIT_STAT_TYPE
     /// \brief This is an internal macro for defining the critical section
@@ -92,9 +92,8 @@ QP_BEGIN_
 #endif
 
 // package-scope objects -----------------------------------------------------
-extern QTimeEvt *QF_timeEvtListHead_;  ///< head of linked list of time events
 extern QF_EPOOL_TYPE_ QF_pool_[QF_MAX_EPOOL];        ///< allocate event pools
-extern uint8_t QF_maxPool_;                  ///< # of initialized event pools
+extern uint_t QF_maxPool_;                   ///< # of initialized event pools
 extern QSubscrList *QF_subscrList_;             ///< the subscriber list array
 extern enum_t QF_maxSignal_;                 ///< the maximum published signal
 
@@ -102,10 +101,10 @@ extern enum_t QF_maxSignal_;                 ///< the maximum published signal
 /// \brief Structure representing a free block in the Native QF Memory Pool
 /// \sa ::QMPool
 struct QFreeBlock {
-    QFreeBlock *m_next;
+    QFreeBlock * volatile m_next;
 };
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // internal helper inline functions
 
 /// \brief access to the poolId_ of an event \a e
@@ -124,26 +123,30 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
     --(QF_EVT_CONST_CAST_(e))->refCtr_;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // internal frequently used srongly-typed constants
 
-uint8_t  const u8_0 = static_cast<uint8_t>(0); ///< \brief constant (uint8_t)0
-uint8_t  const u8_1 = static_cast<uint8_t>(1); ///< \brief constant (uint8_t)1
-int8_t   const s8_0 = static_cast<int8_t>(0);  ///< \brief constant  (int8_t)0
-int8_t   const s8_1 = static_cast<int8_t>(1);  ///< \brief constant  (int8_t)1
+uint8_t const u8_0 = static_cast<uint8_t>(0);  ///< \brief constant (uint8_t)0
+uint8_t const u8_1 = static_cast<uint8_t>(1);  ///< \brief constant (uint8_t)1
+uint8_t const u8_0x80 = static_cast<uint8_t>(0x80);  ///< \brief constant 0x80
+uint8_t const u8_0x7F = static_cast<uint8_t>(0x7F);  ///< \brief constant 0x7F
+uint16_t const u16_0 = static_cast<uint16_t>(0); ///< \brief const (uint16_t)0
+uint_t const u_0 = static_cast<uint_t>(0);      ///< \brief constant (uint_t)0
+uint_t const u_1 = static_cast<uint_t>(1);      ///< \brief constant (uint_t)1
 QTimeEvtCtr const tc_0 = static_cast<QTimeEvtCtr>(0);
 
-void     * const null_void = static_cast<void *>(0);
+void       * const null_void = static_cast<void *>(0);
 QEvt const * const null_evt  = static_cast<QEvt const *>(0);
-QTimeEvt * const null_tevt = static_cast<QTimeEvt *>(0);
-QActive  * const null_act  = static_cast<QActive *>(0);
+QTimeEvt   * const null_tevt = static_cast<QTimeEvt *>(0);
+QActive    * const null_act  = static_cast<QActive *>(0);
 
-QP_END_
+}                                                              // namespace QP
+
 
 /// \brief access element at index \a i_ from the base pointer \a base_
 #define QF_PTR_AT_(base_, i_) (base_[i_])
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifdef Q_SPY                                   // QS software tracing enabled?
 
     #include "qs_port.h"                                    // include QS port

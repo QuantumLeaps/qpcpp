@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++ port to Lint, Generic C++ compiler
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 09, 2013
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qf_port_h
 #define qf_port_h
 
@@ -254,6 +254,20 @@ extern "C" void intEnable(void);
 /// macro #QF_CRIT_EXIT.
 ///
 #define QF_CRIT_EXIT(stat_)         critExit(stat_)
+
+/// \brief Macro to put the CPU to sleep safely in the cooperative
+/// Vanilla kernel (inside QF::idle()).
+///
+/// This macro is provided in some QP ports for the Vanilla kernel and
+/// in general it depends on the interrupt disabling policy.
+///
+/// \note The provided code is just an example (for ARM Cortex-M).
+#define QF_CPU_SLEEP() do { \
+    __disable_interrupt(); \
+    QF_INT_ENABLE(); \
+    __WFI(); \
+    __enable_interrupt(); \
+} while (false)
 
 typedef unsigned int crit_stat_t;
 extern "C" QF_CRIT_STAT_TYPE critEntry(void);

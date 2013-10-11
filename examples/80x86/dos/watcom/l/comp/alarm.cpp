@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: Orthogonal Component state pattern example
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 30, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qp_port.h"
 #include "bsp.h"
 #include "alarm.h"
@@ -110,7 +110,7 @@ QState Alarm::on(Alarm *me, QEvt const *e) {
             if (((TimeEvt *)e)->current_time == me->m_alarm_time) {
                 printf("ALARM!!!\n");
                           // asynchronously post the event to the container AO
-                APP_alarmClock->postFIFO(Q_NEW(QEvt, ALARM_SIG));
+                APP_alarmClock->POST(Q_NEW(QEvt, ALARM_SIG), me);
             }
             return Q_HANDLED();
         }

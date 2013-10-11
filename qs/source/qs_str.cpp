@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 4.4.00
-// Date of the Last Update:  Mar 28, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 24, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,44 +31,69 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qs_pkg.h"
 
 /// \file
 /// \ingroup qs
 /// \brief QS::str() and QS::str_ROM() implementation
 
-QP_BEGIN_
+namespace QP {
 
 //............................................................................
 void QS::str(char_t const *s) {
-    uint8_t b = static_cast<uint8_t>(*s);
-    QS_INSERT_BYTE(static_cast<uint8_t>(QS_STR_T))
-    QS_chksum_ =
-        static_cast<uint8_t>(QS_chksum_ + static_cast<uint8_t>(QS_STR_T));
+    uint8_t b       = static_cast<uint8_t>(*s);
+    uint8_t chksum_ = static_cast<uint8_t>(
+                          priv_.chksum + static_cast<uint8_t>(STR_T));
+    uint8_t *buf_   = priv_.buf;              // put in a temporary (register)
+    QSCtr   head_   = priv_.head;             // put in a temporary (register)
+    QSCtr   end_    = priv_.end;              // put in a temporary (register)
+    QSCtr   used_   = priv_.used;             // put in a temporary (register)
+
+    used_ += static_cast<QSCtr>(2);   // the format byte and the terminating-0
+
+    QS_INSERT_BYTE(static_cast<uint8_t>(STR_T))
     while (b != static_cast<uint8_t>(0)) {
                                        // ASCII characters don't need escaping
+        chksum_ += b;                                       // update checksum
         QS_INSERT_BYTE(b)
-        QS_chksum_ = static_cast<uint8_t>(QS_chksum_ + b);
-        ++s;
+        QS_PTR_INC_(s);
         b = static_cast<uint8_t>(*s);
+        ++used_;
     }
-    QS_INSERT_BYTE(static_cast<uint8_t>(0))
+    QS_INSERT_BYTE(static_cast<uint8_t>(0))       // zero-terminate the string
+
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
+    priv_.used   = used_;                       // save # of used buffer space
 }
 //............................................................................
 void QS::str_ROM(char_t const Q_ROM * Q_ROM_VAR s) {
-    uint8_t b = static_cast<uint8_t>(Q_ROM_BYTE(*s));
-    QS_INSERT_BYTE(static_cast<uint8_t>(QS_STR_T))
-    QS_chksum_ =
-        static_cast<uint8_t>(QS_chksum_ + static_cast<uint8_t>(QS_STR_T));
+    uint8_t b       = static_cast<uint8_t>(Q_ROM_BYTE(*s));
+    uint8_t chksum_ = static_cast<uint8_t>(
+                          priv_.chksum + static_cast<uint8_t>(STR_T));
+    uint8_t *buf_   = priv_.buf;              // put in a temporary (register)
+    QSCtr   head_   = priv_.head;             // put in a temporary (register)
+    QSCtr   end_    = priv_.end;              // put in a temporary (register)
+    QSCtr   used_   = priv_.used;             // put in a temporary (register)
+
+    used_ += static_cast<QSCtr>(2);   // the format byte and the terminating-0
+
+    QS_INSERT_BYTE(static_cast<uint8_t>(STR_T))
     while (b != static_cast<uint8_t>(0)) {
                                        // ASCII characters don't need escaping
+        chksum_ += b;                                       // update checksum
         QS_INSERT_BYTE(b)
-        QS_chksum_ = static_cast<uint8_t>(QS_chksum_ + b);
-        ++s;
+        QS_PTR_INC_(s);
         b = static_cast<uint8_t>(Q_ROM_BYTE(*s));
+        ++used_;
     }
-    QS_INSERT_BYTE(static_cast<uint8_t>(0))
+    QS_INSERT_BYTE(static_cast<uint8_t>(0))       // zero-terminate the string
+
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
+    priv_.used   = used_;                       // save # of used buffer space
 }
 
-QP_END_
+}                                                              // namespace QP
+

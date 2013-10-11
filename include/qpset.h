@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 04, 2013
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Oct 07, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef qpset_h
 #define qpset_h
 
@@ -42,9 +42,9 @@
 /// This header file must be included in those QF ports that use the
 /// cooperative multitasking QF scheduler or the QK.
 
-QP_BEGIN_
+namespace QP {
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // useful lookup tables
 
 #ifndef QF_LOG2
@@ -69,6 +69,7 @@ QP_BEGIN_
     ///
     extern uint8_t const Q_ROM Q_ROM_VAR QF_log2Lkup[256];
 
+    #define QF_LOG2LKUP 1
 #endif                                                              // QF_LOG2
 
 /// \brief Lookup table for (1 << ((n-1) % 8)), where n is the index
@@ -91,7 +92,7 @@ extern uint8_t const Q_ROM Q_ROM_VAR QF_invPwr2Lkup[65];
 /// be used.
 extern uint8_t const Q_ROM Q_ROM_VAR QF_div8Lkup[65];
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 /// \brief Priority Set of up to 8 elements for building various schedulers,
 /// but also useful as a general set of up to 8 elements of any kind.
 ///
@@ -102,7 +103,7 @@ class QPSet8 {
 
     //////////////////////////////////////////////////////////////////////////
     /// \brief bimask representing elements of the set
-    uint8_t m_bits;
+    uint8_t volatile m_bits;
 
 public:
 
@@ -144,7 +145,7 @@ public:
     friend class QPSet64;
 };
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 /// \brief Priority Set of up to 64 elements for building various schedulers,
 /// but also useful as a general set of up to 64 elements of any kind.
 ///
@@ -156,22 +157,21 @@ public:
 /// to manage up to 64 tasks. It is also used in the Quantum Kernel (QK)
 /// preemptive scheduler.
 ///
-/// The inherited 8-bit set is used as the 8-element set of of 8-bit subsets
-/// Each bit in the super.bits set represents a subset (8-elements)
-/// as follows: \n
-/// bit 0 in this->m_bits is 1 when subset[0] is not empty \n
-/// bit 1 in this->m_bits is 1 when subset[1] is not empty \n
-/// bit 2 in this->m_bits is 1 when subset[2] is not empty \n
-/// bit 3 in this->m_bits is 1 when subset[3] is not empty \n
-/// bit 4 in this->m_bits is 1 when subset[4] is not empty \n
-/// bit 5 in this->m_bits is 1 when subset[5] is not empty \n
-/// bit 6 in this->m_bits is 1 when subset[6] is not empty \n
-/// bit 7 in this->m_bits is 1 when subset[7] is not empty \n
 class QPSet64 {
 
     //////////////////////////////////////////////////////////////////////////
     /// \brief bimask representing 8-element subsets of the set
-    uint8_t m_bytes;
+    /// Each bit in the bytes set represents a subset (8-elements)
+    /// as follows: \n
+    /// bit 0 in m_bytes is 1 when m_bits[0] is not empty \n
+    /// bit 1 in m_bytes is 1 when m_bits[1] is not empty \n
+    /// bit 2 in m_bytes is 1 when m_bits[2] is not empty \n
+    /// bit 3 in m_bytes is 1 when m_bits[3] is not empty \n
+    /// bit 4 in m_bytes is 1 when m_bits[4] is not empty \n
+    /// bit 5 in m_bytes is 1 when m_bits[5] is not empty \n
+    /// bit 6 in m_bytes is 1 when m_bits[6] is not empty \n
+    /// bit 7 in m_bytes is 1 when m_bits[7] is not empty \n
+    uint8_t volatile m_bytes;
 
     /// \brief bits representing elements in the set as follows: \n
     /// m_bits[0] represent elements  1..8  \n
@@ -182,7 +182,7 @@ class QPSet64 {
     /// m_bits[5] represent elements 41..48 \n
     /// m_bits[6] represent elements 49..56 \n
     /// m_bits[7] represent elements 57..64 \n
-    uint8_t m_bits[8];
+    uint8_t volatile m_bits[8];
 
 public:
 
@@ -217,7 +217,7 @@ public:
     void remove(uint8_t const n) {
         uint8_t m = Q_ROM_BYTE(QF_div8Lkup[n]);
         if ((m_bits[m] &= Q_ROM_BYTE(QF_invPwr2Lkup[n]))
-             == static_cast<uint8_t>(0))
+             == 0U)
         {
             m_bytes &=Q_ROM_BYTE(QF_invPwr2Lkup[m + static_cast<uint8_t>(1)]);
         }
@@ -240,7 +240,7 @@ public:
     }
 };
 
-QP_END_
+}                                                              // namespace QP
 
 #endif                                                              // qpset_h
 

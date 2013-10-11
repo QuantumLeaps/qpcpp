@@ -149,7 +149,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Offline</string>
+    <string>ON</string>
    </property>
   </widget>
   <widget class="QLabel" name="m_stateLabel">

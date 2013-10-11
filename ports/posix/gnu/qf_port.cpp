@@ -1,13 +1,13 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: QF/C++ port to POSIX/P-threads, GNU
-// Last Updated for Version: 4.5.03
-// Date of the Last Update:  Oct 30, 2012
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Sep 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,14 +31,14 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #include "qf_pkg.h"
 #include "qassert.h"
 
 #include <sys/mman.h>                                        // for mlockall()
 #include <sys/select.h>
 
-QP_BEGIN_
+namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
@@ -71,7 +71,7 @@ int16_t QF::run(void) {
     struct timeval timeout = { 0 };                    // timeout for select()
     l_running = true;
     while (l_running) {
-        QF_onClockTick();         // clock tick callback (must call QF_TICK())
+        QF_onClockTick();        // clock tick callback (must call QF_TICKX())
 
         timeout.tv_usec = l_tickUsec;
         select(0, 0, 0, 0, &timeout);      // sleep for the full tick , NOTE05
@@ -155,9 +155,9 @@ void QActive::stop(void) {
     m_thread = static_cast<uint8_t>(0);         // stop the QF::thread_() loop
 }
 
-QP_END_
+}                                                              // namespace QP
 
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // NOTE01:
 // In Linux, the scheduler policy closest to real-time is the SCHED_FIFO
 // policy, available only with superuser privileges. QF::run() attempts to set

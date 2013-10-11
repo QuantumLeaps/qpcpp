@@ -1,9 +1,8 @@
-    QMutex mux;
-    . . .
-    mux = QK::mutexLock(PRIO_CEILING);
+QMutex mux;
+. . .
+mux = QK::mutexLock(PRIO_CEILING);
 
-    // access the shared resource
+// access the shared resource
 
-    QK::mutexUnlock(mux);
-
-    . . . 
+QK::mutexUnlock(mux);
+ . . . 

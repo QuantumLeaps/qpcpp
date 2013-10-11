@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Product: Product: "Fly'n'Shoot" game
 // Last Updated for Version: 4.1.03
 // Date of the Last Update:  Feb 19, 2010
@@ -24,7 +24,7 @@
 // Contact information:
 // Quantum Leaps Web site:  http://www.quantum-leaps.com
 // e-mail:                  info@quantum-leaps.com
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 #ifndef bsp_h
 #define bsp_h
 
