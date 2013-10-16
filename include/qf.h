@@ -11,7 +11,7 @@
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 2 of the License, or
+// by the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Alternatively, this program may be distributed and modified under the
@@ -235,7 +235,8 @@ public:
     virtual bool post(QEvt const * const e, uint16_t const margin);
 #else
     virtual bool post(QEvt const * const e, uint16_t const margin,
-                      void const * const sender);
+                      void const * const
+ sender);
 #endif
 
     /// \brief Posts an event directly to the event queue of the active object
@@ -715,13 +716,13 @@ public:
     /// must implement QF::run().
     ///
     /// \note When the Quantum Kernel (QK) is used as the underlying real-time
-    /// kernel for the QF, all platfrom dependencies are handled in the QK, so
+    /// kernel for the QF, all platform dependencies are handled in the QK, so
     /// no porting of QF is necessary. In other words, you only need to
     /// recompile the QF platform-independent code with the compiler for your
     /// platform, but you don't need to provide any platform-specific
     /// implementation (so, no qf_port.cpp file is necessary). Moreover, QK
     /// implements the function QF::run() in a platform-independent way,
-    /// in the modile qk.cpp.
+    /// in the module qk.cpp.
     static int16_t run(void);
 
     /// \brief Startup QF callback.
@@ -777,7 +778,7 @@ public:
     /// This function stops the QF application. After calling this function,
     /// QF attempts to gracefully stop the  application. This graceful
     /// shutdown might take some time to complete. The typical use of this
-    /// funcition is for terminating the QF application to return back to the
+    /// function is for terminating the QF application to return back to the
     /// operating system or for handling fatal errors that require shutting
     /// down (and possibly re-setting) the system.
     ///
@@ -802,7 +803,7 @@ public:
     /// This function is designed to be callable from any part of the system,
     /// including ISRs, device drivers, and active objects.
     ///
-    /// In the general case, event publishing requires multi-casting the
+    /// In the general case, event publishing requires multicasting the
     /// event to multiple subscribers. This happens in the caller's thread
     /// with the scheduler locked to prevent preemption during the
     /// multicasting process. (Please note that the interrupts are enabled.)
@@ -1076,7 +1077,7 @@ private:                                        // to be used in QF ports only
     /// without delivery guarantee.
     ///
     /// The macro takes the argument \a margin_, which specifies the
-    /// minumum free slots in the queue, which must still be available
+    /// minimum free slots in the queue, which must still be available
     /// after posting the event. The macro returns true if the posting
     /// succeeded, and false if the posting failed due to insufficient
     /// margin of free slots available in the queue.
@@ -1117,3 +1118,4 @@ private:                                        // to be used in QF ports only
 #endif                                                                // Q_SPY
 
 #endif                                                                 // qf_h
+
