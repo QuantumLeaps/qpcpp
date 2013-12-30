@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Model: game.qm
 // File:  ./main.cpp
 //
@@ -13,29 +13,27 @@
 // WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
-//////////////////////////////////////////////////////////////////////////////
-// @(/3/6) ...................................................................
+//****************************************************************************
+// @(/3/1) ...................................................................
 #include "qp_port.h"
 #include "bsp.h"
 #include "game.h"
 
-namespace GAME {
-
 //............................................................................
-extern "C" int_t main() {
+int main() {
     static QP::QEvt const * missileQueueSto[2];
     static QP::QEvt const * shipQueueSto[3];
     static QP::QEvt const * tunnelQueueSto[GAME_MINES_MAX + 5];
 
-    static QF_MPOOL_EL(QP::QEvt)       smlPoolSto[10];
-    static QF_MPOOL_EL(ObjectImageEvt) medPoolSto[2*GAME_MINES_MAX + 10];
+    static QF_MPOOL_EL(QP::QEvt) smlPoolSto[10];
+    static QF_MPOOL_EL(GAME::ObjectImageEvt) medPoolSto[2*GAME_MINES_MAX + 10];
 
-    static QP::QSubscrList    subscrSto[MAX_PUB_SIG];
+    static QP::QSubscrList subscrSto[GAME::MAX_PUB_SIG];
 
 
     QP::QF::init();   // initialize the framework and the underlying RT kernel
 
-    BSP_init();                        // initialize the Board Support Package
+    GAME::BSP_init();                  // initialize the Board Support Package
 
                                               // initialize the event pools...
     QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
@@ -53,24 +51,22 @@ extern "C" int_t main() {
     QS_OBJ_DICTIONARY(medPoolSto);
 
                   // send signal dictionaries for globally published events...
-    QS_SIG_DICTIONARY(TIME_TICK_SIG,      static_cast<void *>(0));
-    QS_SIG_DICTIONARY(PLAYER_TRIGGER_SIG, static_cast<void *>(0));
-    QS_SIG_DICTIONARY(PLAYER_QUIT_SIG,    static_cast<void *>(0));
-    QS_SIG_DICTIONARY(GAME_OVER_SIG,      static_cast<void *>(0));
+    QS_SIG_DICTIONARY(GAME::TIME_TICK_SIG,      static_cast<void *>(0));
+    QS_SIG_DICTIONARY(GAME::PLAYER_TRIGGER_SIG, static_cast<void *>(0));
+    QS_SIG_DICTIONARY(GAME::PLAYER_QUIT_SIG,    static_cast<void *>(0));
+    QS_SIG_DICTIONARY(GAME::GAME_OVER_SIG,      static_cast<void *>(0));
 
                                                 // start the active objects...
-    AO_Tunnel ->start(1U,                                          // priority
+    GAME::AO_Tunnel ->start(1U,                                    // priority
                       tunnelQueueSto, Q_DIM(tunnelQueueSto),      // evt queue
                       static_cast<void *>(0), 0U);      // no per-thread stack
-    AO_Missile->start(2U,                                          // priority
+    GAME::AO_Missile->start(2U,                                    // priority
                       missileQueueSto, Q_DIM(missileQueueSto),    // evt queue
                       static_cast<void *>(0), 0U);      // no per-thread stack
-    AO_Ship   ->start(3U,                                          // priority
+    GAME::AO_Ship   ->start(3U,                                    // priority
                       shipQueueSto, Q_DIM(shipQueueSto),          // evt queue
                       static_cast<void *>(0), 0U);      // no per-thread stack
 
     return QP::QF::run();                            // run the QF application
 }
-
-} // namespace GAME
 

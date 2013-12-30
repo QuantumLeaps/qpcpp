@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: Game-GUI exampe for Qt5
-# Last Updated for Version: 5.0.0
-# Date of the Last Update:  Aug 24, 2013
+# Last Updated for Version: QP 5.1.1/Qt 5.1.1
+# Date of the Last Update:  Nov 05, 2013
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -41,7 +41,7 @@ TARGET   = game-gui
 
 INCLUDEPATH = . \
     $(QPCPP)/include \
-    $(QPCPP)/ports/qt/mingw \
+    $(QPCPP)/ports/qt \
 
 SOURCES += \
     main.cpp \

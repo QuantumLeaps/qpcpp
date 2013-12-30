@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Fly 'n' Shoot" game example with preemptive QK kernel
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Oct 01, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -69,6 +69,7 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 
 // ISRs defined in this BSP --------------------------------------------------
 extern "C" void SysTick_Handler(void);
+extern "C" void ADCSeq3_IRQHandler(void);
 extern "C" void GPIOPortA_IRQHandler(void);
 
 // Local-scope objects -------------------------------------------------------
@@ -107,7 +108,7 @@ extern "C" void SysTick_Handler(void) {
     QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
 #endif
 
-    QP::QF::TICK(&l_SysTick_Handler);         // process all armed time events
+    QP::QF::TICK_X(0U, &l_SysTick_Handler);   // process time events at rate 0
 
     static QP::QEvt const tickEvt = QEVT_INITIALIZER(TIME_TICK_SIG);
     QP::QF::PUBLISH(&tickEvt, &l_SysTick_Handler);//publish to all subscribers
@@ -241,7 +242,6 @@ void BSP_init(void) {
     Display96x16x1Init(1);                      // initialize the OLED display
 
     Q_ALLEGE(QS_INIT((void *)0));        // initialize the QS software tracing
-    QS_RESET();
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_ADCSeq3_IRQHandler);
     QS_OBJ_DICTIONARY(&l_GPIOPortA_IRQHandler);
@@ -270,8 +270,21 @@ void BSP_displayOff(void) {
 }
 
 }                                                             // namespace DPP
-//****************************************************************************
 
+//............................................................................
+extern "C" void Q_onAssert(char const Q_ROM * const file, int_t line) {
+    assert_failed(file, line);
+}
+//............................................................................
+// error routine that is called if the CMSIS library encounters an error
+extern "C" void assert_failed(char const *file, int line) {
+    (void)file;                                      // avoid compiler warning
+    (void)line;                                      // avoid compiler warning
+    QF_INT_DISABLE();            // make sure that all interrupts are disabled
+    NVIC_SystemReset();                                // perform system reset
+}
+
+//****************************************************************************
 namespace QP {
 
 //............................................................................
@@ -331,19 +344,6 @@ void QK::onIdle(void) {
 #endif
 }
 
-//............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const file, int line) {
-    (void)file;                                      // avoid compiler warning
-    (void)line;                                      // avoid compiler warning
-    QF_INT_DISABLE();            // make sure that all interrupts are disabled
-    for (;;) {          // NOTE: replace the loop with reset for final version
-    }
-}
-//............................................................................
-// error routine that is called if the CMSIS library encounters an error
-extern "C" void assert_failed(char const *file, int line) {
-    Q_onAssert(file, line);
-}
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 26, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -37,7 +37,7 @@
 
 /// \file
 /// \ingroup qf
-/// \brief QF::active_[] and QF::add_(), QF::remove_()
+/// \brief QF::active_[] and QF::add_(), QF::remove_(), QF::bzero()
 /// implementation.
 
 namespace QP {
@@ -46,7 +46,6 @@ Q_DEFINE_THIS_MODULE("qf_act")
 
 // public objects ------------------------------------------------------------
 QActive *QF::active_[QF_MAX_ACTIVE + 1];        // to be used by QF ports only
-uint8_t QF_intLockNest_;                       // interrupt-lock nesting level
 
 //............................................................................
 void QF::add_(QActive * const a) {
@@ -87,6 +86,22 @@ void QF::remove_(QActive const * const a) {
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();
+}
+
+//............................................................................
+// macro to encapsulate pointer incrementing, which violates
+// MISRA-C:2004 required rule 17.4 (pointer arithmetic used).
+//
+#define QF_PTR_INC_(p_) (++(p_))
+
+//............................................................................
+void QF::bzero(void * const start, uint_t len) {
+    uint8_t *ptr = static_cast<uint8_t *>(start);
+    while (len != u_0) {
+        *ptr = u8_0;
+        QF_PTR_INC_(ptr);
+        --len;
+    }
 }
 
 }                                                              // namespace QP

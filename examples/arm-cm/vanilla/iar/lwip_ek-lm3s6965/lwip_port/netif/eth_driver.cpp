@@ -1,7 +1,7 @@
 //****************************************************************************
 //
 // lwIP Ethernet CMSIS-compliant driver for Stellaris MCUs
-// Copyright (c) 2012 Quantum Leaps, LLC, www.state-machine.com
+// Copyright (c) 2013 Quantum Leaps, LLC, www.state-machine.com
 //
 
 //
@@ -132,6 +132,7 @@ public:
 static struct netif l_netif;                /* the single network interface */
 static QActive *l_active;      /* active object associated with this driver */
 static PbufQueue l_txq;                  /* queue of pbufs for transmission */
+static QEvt l_lwipEvt[LWIP_MAX_OFFSET];        /* static LwIP events issued */
 
 static err_t ethernetif_init(struct netif *netif);
 static err_t ethernetif_output(struct netif *netif, struct pbuf *p);
@@ -154,18 +155,18 @@ extern "C" void Ethernet_IRQHandler(void) {
     eth_stat &= ETH->IM;                   /* mask only the enabled sources */
 
     if ((eth_stat & ETH_INT_RX) != 0) {
-        static QEvt const evt_eth_rx = { LWIP_RX_READY_SIG, 0 };
-        l_active->POST(&evt_eth_rx, &l_Ethernet_IRQHandler);
+        l_active->POST(&l_lwipEvt[LWIP_RX_READY_OFFSET],
+                       &l_Ethernet_IRQHandler);
         ETH->IM &= ~ETH_INT_RX;                       /* disable further RX */
     }
     if ((eth_stat & ETH_INT_TX) != 0) {
-        static QEvt const evt_eth_tx = { LWIP_TX_READY_SIG, 0 };
-        l_active->POST(&evt_eth_tx, &l_Ethernet_IRQHandler);
+        l_active->POST(&l_lwipEvt[LWIP_TX_READY_OFFSET],
+                       &l_Ethernet_IRQHandler);
     }
 #if LINK_STATS
     if ((eth_stat & ETH_INT_RXOF) != 0) {
-        static QEvt const evt_eth_er = { LWIP_RX_OVERRUN_SIG, 0 };
-        l_active->POST(&evt_eth_er, &l_Ethernet_IRQHandler);
+        l_active->POST(&l_lwipEvt[LWIP_RX_OVERRUN_OFFSET],
+                       &l_Ethernet_IRQHandler);
     }
 #endif
 
@@ -176,6 +177,7 @@ extern "C" void Ethernet_IRQHandler(void) {
 
 /*..........................................................................*/
 struct netif *eth_driver_init(QActive *active,
+                              enum_t base_sig,
                               u8_t macaddr[NETIF_MAX_HWADDR_LEN])
 {
     struct ip_addr ipaddr;
@@ -189,6 +191,11 @@ struct netif *eth_driver_init(QActive *active,
     memcpy(&l_netif.hwaddr[0], macaddr, NETIF_MAX_HWADDR_LEN);
 
     l_active = active; /*save the active object associated with this driver */
+
+                        /* set up the static events issed by this driver... */
+    l_lwipEvt[LWIP_RX_READY_OFFSET]  .sig = base_sig + LWIP_RX_READY_OFFSET;
+    l_lwipEvt[LWIP_TX_READY_OFFSET]  .sig = base_sig + LWIP_TX_READY_OFFSET;
+    l_lwipEvt[LWIP_RX_OVERRUN_OFFSET].sig = base_sig + LWIP_RX_OVERRUN_OFFSET;
 
 #if LWIP_NETIF_HOSTNAME
     l_netif.hostname = "lwIP";             /* initialize interface hostname */

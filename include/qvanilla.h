@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 29, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,6 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//****************************************************************************
 //****************************************************************************
 #ifndef qvanilla_h
 #define qvanilla_h
@@ -72,14 +71,14 @@
         (QF_readySet_.remove((me_)->m_prio))
 
                                             // native QF event pool operations
-    #define QF_EPOOL_TYPE_     QMPool
+    #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-        (p_).init((poolSto_), (poolSize_), static_cast<QMPoolSize>(evtSize_))
+        (p_).init((poolSto_), (poolSize_), (evtSize_))
     #define QF_EPOOL_EVENT_SIZE_(p_) \
-        static_cast<uint32_t>((p_).getBlockSize())
+        static_cast<uint_t>((p_).getBlockSize())
     #define QF_EPOOL_GET_(p_, e_, m_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
-    #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
+    #define QF_EPOOL_PUT_(p_, e_) ((p_).put(e_))
 
     extern "C" {
         #if (QF_MAX_ACTIVE <= 8)
@@ -88,7 +87,6 @@
             extern QP::QPSet64 QF_readySet_;     ///< \brief ready set of AOs
         #endif
         extern uint8_t volatile QF_currPrio_;///<\brief current task/ISR prio.
-        extern uint8_t volatile QF_intNest_;///<\brief interrupt nesting level
     }                                                            // extern "C"
 
 #endif                                                       // ifdef qf_pkg_h

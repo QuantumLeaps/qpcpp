@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -66,25 +66,6 @@ QTimeEvt::QTimeEvt(QActive * const act,
     refCtr_ = tickRate;                                          // see NOTE02
 }
 //............................................................................
-QTimeEvt::QTimeEvt(enum_t const sgnl)
-  :
-#ifdef Q_EVT_CTOR
-    QEvt(static_cast<QSignal>(sgnl)),
-#endif
-    m_next(null_tevt),
-    m_act(null_act),                                             // see NOTE03
-    m_ctr(tc_0),
-    m_interval(tc_0)
-{
-#ifndef Q_EVT_CTOR
-    Q_REQUIRE(sgnl >= Q_USER_SIG);                     // signal must be valid
-    sig = static_cast<QSignal>(sgnl);      // set QEvt::sig of this time event
-#endif
-                                      // time event must be static, see NOTE01
-    poolId_ = u8_0;                                 // not from any event pool
-    refCtr_ = u8_0;                              // default rate 0, see NOTE02
-}
-//............................................................................
 QTimeEvt::QTimeEvt()             // private default ctor for internal use only
   :
 #ifdef Q_EVT_CTOR
@@ -115,10 +96,4 @@ QTimeEvt::QTimeEvt()             // private default ctor for internal use only
 // Time Events it is reused to hold the tickRate in the bits [0..6] and the
 // linkedFlag in the MSB (bit [7]). The linkedFlag is 0 for time events
 // unlinked from any list and 1 otherwise.
-//
-// NOTE03:
-// For backwards compatibility with QTimeEvt ctor, the active object pointer
-// can be uninitialized (NULL) and is _not_ validated in the precondition.
-// The active object pointer is validated in preconditions to QTimeEvt::armX()
-// and QTimeEvt::rearm().
 //

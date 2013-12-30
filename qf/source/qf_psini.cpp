@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -46,10 +46,21 @@ QSubscrList *QF_subscrList_;
 enum_t QF_maxSignal_;
 
 //............................................................................
-void QF::psInit(QSubscrList * const subscrSto, uint32_t const maxSignal) {
+void QF::psInit(QSubscrList * const subscrSto, enum_t const maxSignal) {
     QF_subscrList_ = subscrSto;
-    QF_maxSignal_  = static_cast<enum_t>(maxSignal);
+    QF_maxSignal_  = maxSignal;
+                                    /* zero the subscriber list, see NOTE01 */
+    bzero(subscrSto,
+             static_cast<uint_t>(static_cast<uint_t>(maxSignal)
+              * static_cast<uint_t>(sizeof(QSubscrList))));
 }
 
 }                                                              // namespace QP
+
+//****************************************************************************
+// NOTE01:
+// The QF::psInit() function clears the subscriber list, so that the
+// framework can start correctly even if the startup code fails to clear
+// the uninitialized data (as is required by the C/C++ Standard).
+//
 

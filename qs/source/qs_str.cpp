@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 24, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -68,7 +68,7 @@ void QS::str(char_t const *s) {
     priv_.used   = used_;                       // save # of used buffer space
 }
 //............................................................................
-void QS::str_ROM(char_t const Q_ROM * Q_ROM_VAR s) {
+void QS::str_ROM(char_t const Q_ROM *s) {
     uint8_t b       = static_cast<uint8_t>(Q_ROM_BYTE(*s));
     uint8_t chksum_ = static_cast<uint8_t>(
                           priv_.chksum + static_cast<uint8_t>(STR_T));

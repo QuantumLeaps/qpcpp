@@ -1,13 +1,13 @@
 ##############################################################################
-# Product: game-gui example, Win32, MinGW compiler
-# Last Updated for Version: 4.5.03
-# Date of the Last Update:  Nov 26, 2012
+# Product: Generic Makefile for QP/C++ GUI application, Win32-GUI, MinGW
+# Last Updated for Version: 5.2.0
+# Date of the Last Update:  Dec 03, 2013
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -42,6 +42,11 @@
 # make clean
 # make CONF=rel clean
 # make CONF=spy clean
+##############################################################################
+#
+# NOTE: Typically, you should have no need to change anything in this Makefile
+#
+##############################################################################
 
 #-----------------------------------------------------------------------------
 # NOTE: the Makefile expects that the QPCPP environment variable is defined
@@ -52,43 +57,36 @@ $(error The QPCPP environment variable must be defined)
 endif
 
 #-----------------------------------------------------------------------------
-# general utilities
-#
-RM = del
-
-#-----------------------------------------------------------------------------
 # NOTE: this Makefile assumes that the MinGW\bin directory is added
 # to the PATH variable.
 #
 CC    := gcc
 CPP   := g++
-#LINK  := gcc                                                # for C programs
-LINK  := g++                                               # for C++ programs
+#LINK  := gcc                                                 # for C programs
+LINK  := g++                                                # for C++ programs
 RC    := windres
+RM    := rm
 
 #-----------------------------------------------------------------------------
 # directories
 #
-QP_PORT_DIR := $(QPCPP)\ports\win32\mingw
+# Project name is derived from the directory name
+PROJECT := $(notdir $(CURDIR))
+QP_PORT_DIR := $(QPCPP)/ports\win32
 APP_DIR     := .
 
-VPATH = $(APP_DIR) \
-	$(QTOOLS)\qspy\source \
-
-# Output file basename
-OUTPUT    := game-gui
+VPATH = $(APP_DIR)
 
 # include directories
 INCLUDES  = -I. \
-	-I$(QPCPP)\include	\
-	-I$(QP_PORT_DIR) \
-	-I$(QTOOLS)\qspy\include
+	-I$(QPCPP)/include	\
+	-I$(QP_PORT_DIR)
 
 # resource directory
 RCINCLUDES = -IRes
 
 # defines
-DEFINES =
+DEFINES =-DQP_API_VERSION=9999
 
 #-----------------------------------------------------------------------------
 # files
@@ -122,13 +120,15 @@ CFLAGS = -c -Wall -O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -Wall -O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
-LINKFLAGS = -s -L$(QP_PORT_DIR)\$(BIN_DIR) -mwindows
+LINKFLAGS = -s -L$(QP_PORT_DIR)/mingw\$(BIN_DIR) -mwindows
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
 BIN_DIR := spy
 
-C_SRCS += qspy.c
+INCLUDES +=	-I$(QTOOLS)/qspy\include
+VPATH    += $(QTOOLS)/qspy\source
+C_SRCS   += qspy.c
 
 ASFLAGS =
 
@@ -136,7 +136,7 @@ CFLAGS = -c -g $(INCLUDES) $(DEFINES) -DQ_SPY
 
 CPPFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES) -DQ_SPY
 
-LINKFLAGS = -s -L$(QP_PORT_DIR)\$(BIN_DIR) -mwindows
+LINKFLAGS = -s -L$(QP_PORT_DIR)/mingw\$(BIN_DIR) -mwindows
 
 else                     # default Debug configuration .......................
 
@@ -148,7 +148,7 @@ CFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES)
 
 CPPFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES)
 
-LINKFLAGS = -s -L$(QP_PORT_DIR)\$(BIN_DIR) -mwindows
+LINKFLAGS = -s -L$(QP_PORT_DIR)/mingw\$(BIN_DIR) -mwindows
 
 endif
 
@@ -157,8 +157,8 @@ C_OBJS       := $(patsubst %.c,%.o,$(C_SRCS))
 CPP_OBJS     := $(patsubst %.cpp,%.o,$(CPP_SRCS))
 RC_OBJS      := $(patsubst %.rc,%.o,$(RC_SRCS))
 
-TARGET_BIN   := $(BIN_DIR)/$(OUTPUT).bin
-TARGET_EXE   := $(BIN_DIR)/$(OUTPUT).exe
+TARGET_BIN   := $(BIN_DIR)/$(PROJECT).bin
+TARGET_EXE   := $(BIN_DIR)/$(PROJECT).exe
 ASM_OBJS_EXT := $(addprefix $(BIN_DIR)/, $(ASM_OBJS))
 C_OBJS_EXT   := $(addprefix $(BIN_DIR)/, $(C_OBJS))
 C_DEPS_EXT   := $(patsubst %.o, %.d, $(C_OBJS_EXT))
@@ -206,19 +206,19 @@ $(BIN_DIR)/%.o : %.rc
 
 .PHONY : clean
 clean:
-	-$(RM) $(BIN_DIR)\*.o \
-	$(BIN_DIR)\*.d \
-	$(BIN_DIR)\*.exe \
-	$(BIN_DIR)\*.map
+	-$(RM) $(BIN_DIR)/*.o \
+	$(BIN_DIR)/*.d \
+	$(BIN_DIR)/*.exe \
+	$(BIN_DIR)/*.map
 	
 show:
-	@echo CONF = $(CONF)
+	@echo PROJECT  = $(PROJECT)
+	@echo CONF     = $(CONF)
 	@echo ASM_SRCS = $(ASM_SRCS)
-	@echo C_SRCS = $(C_SRCS)
+	@echo VPATH    = $(VPATH)
+	@echo C_SRCS   = $(C_SRCS)
 	@echo CPP_SRCS = $(CPP_SRCS)
 	@echo ASM_OBJS_EXT = $(ASM_OBJS_EXT)
-	@echo C_OBJS_EXT = $(C_OBJS_EXT)
-	@echo C_DEPS_EXT = $(C_DEPS_EXT)
-	@echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)
-	@echo RC_OBJS_EXT = $(RC_OBJS_EXT)
-	@echo TARGET_ELF = $(TARGET_ELF)
+	@echo C_OBJS_EXT   = $(C_OBJS_EXT)
+	@echo C_DEPS_EXT   = $(C_DEPS_EXT)
+	@echo RC_OBJS_EXT  = $(RC_OBJS_EXT)

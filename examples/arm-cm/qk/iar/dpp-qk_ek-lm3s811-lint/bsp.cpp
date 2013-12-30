@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Dining Philosophers Problem" example, preemptive QK kernel
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -101,7 +101,7 @@ extern "C" void SysTick_Handler(void) {
     QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
 #endif
 
-    QP::QF::TICK(&l_SysTick_Handler);         // process all armed time events
+    QP::QF::TICK_X(0U, &l_SysTick_Handler);   // process time events at rate 0
 
     static uint32_t btn_debounced  = PUSH_BUTTON;
     static uint8_t  debounce_state = 0U;
@@ -224,18 +224,23 @@ void BSP_terminate(int16_t const result) {
     (void)result;
 }
 
+}                                                             // namespace DPP
+//****************************************************************************
 
 //............................................................................
-extern "C" void Q_onAssert(char_t const Q_ROM * const Q_ROM_VAR file, int_t const line) {
+extern "C" void Q_onAssert(char const Q_ROM * const file, int_t line) {
+    assert_failed(file, line);
+}
+
+//............................................................................
+// error routine that is called if the CMSIS library encounters an error
+extern "C" void assert_failed(char const *file, int line) {
     (void)file;                                      // avoid compiler warning
     (void)line;                                      // avoid compiler warning
     QF_INT_DISABLE();            // make sure that all interrupts are disabled
-    for (;;) {          // NOTE: replace the loop with reset for final version
-    }
+    NVIC_SystemReset();                                // perform system reset
 }
 
-}                                                             // namespace DPP
-//****************************************************************************
 
 namespace QP {
 

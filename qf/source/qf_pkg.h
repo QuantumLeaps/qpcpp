@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -38,6 +38,10 @@
 /// \file
 /// \ingroup qf
 /// \brief Internal (package scope) QF/C++ interface.
+
+#ifndef QP_API_VERSION
+    #define QP_API_VERSION 9999
+#endif
 
 #include "qf_port.h"                                                // QF port
 

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -44,7 +44,7 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qmp_get")
 
 //............................................................................
-void *QMPool::get(uint16_t const margin) {
+void *QMPool::get(uint_t const margin) {
     QFreeBlock *fb;
     QF_CRIT_STAT_
 
@@ -82,12 +82,12 @@ void *QMPool::get(uint16_t const margin) {
     return fb;               // return the block or NULL pointer to the caller
 }
 //............................................................................
-uint16_t QF::getPoolMin(uint_t const poolId) {
+uint_t QF::getPoolMin(uint_t const poolId) {
     Q_REQUIRE((u_1 <= poolId) && (poolId <= QF_maxPool_));
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-    uint16_t min = static_cast<uint16_t>(QF_pool_[poolId - u_1].m_nMin);
+    uint_t min = static_cast<uint_t>(QF_pool_[poolId - u_1].m_nMin);
     QF_CRIT_EXIT_();
 
     return min;

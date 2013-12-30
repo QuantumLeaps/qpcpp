@@ -1,0 +1,459 @@
+default selected
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qep\source -o.\dbg\ ..\..\..\..\qep\source\qep.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 16 bytes of CONST memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qep\source -o.\dbg\ ..\..\..\..\qep\source\qmsm_ini.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 128 bytes of CODE  memory (+ 12 bytes shared)
+   4 bytes of CONST memory (+ 31 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qep\source -o.\dbg\ ..\..\..\..\qep\source\qmsm_dis.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 178 bytes of CODE  memory
+   0 bytes of CONST memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qep\source -o.\dbg\ ..\..\..\..\qep\source\qfsm_ini.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 114 bytes of CODE  memory (+ 72 bytes shared)
+   0 bytes of CONST memory (+ 31 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qep\source -o.\dbg\ ..\..\..\..\qep\source\qfsm_dis.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 84 bytes of CODE  memory
+  0 bytes of CONST memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qep\source -o.\dbg\ ..\..\..\..\qep\source\qhsm_ini.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 226 bytes of CODE  memory (+ 72 bytes shared)
+   0 bytes of CONST memory (+ 31 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qep\source -o.\dbg\ ..\..\..\..\qep\source\qhsm_dis.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 636 bytes of CODE  memory
+   0 bytes of CONST memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qep\source -o.\dbg\ ..\..\..\..\qep\source\qhsm_top.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 4 bytes of CODE  memory
+ 0 bytes of CONST memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qep\source -o.\dbg\ ..\..\..\..\qep\source\qhsm_in.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 76 bytes of CODE  memory
+  0 bytes of CONST memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iarchive --create .\dbg\libqp_cortex-m4f.a .\dbg\qep.o .\dbg\qmsm_ini.o .\dbg\qmsm_dis.o .\dbg\qfsm_ini.o .\dbg\qfsm_dis.o .\dbg\qhsm_ini.o .\dbg\qhsm_dis.o .\dbg\qhsm_top.o .\dbg\qhsm_in.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qa_defer.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 110 bytes of CODE  memory (+ 8 bytes shared)
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qa_fifo.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 200 bytes of CODE  memory (+ 64 bytes shared)
+   0 bytes of CONST memory (+  4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qa_lifo.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 158 bytes of CODE  memory (+ 64 bytes shared)
+   0 bytes of CONST memory (+  4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qa_get_.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 192 bytes of CODE  memory (+ 60 bytes shared)
+   0 bytes of CONST memory (+  4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qa_sub.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 134 bytes of CODE  memory
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qa_usub.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 134 bytes of CODE  memory
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qa_usuba.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 162 bytes of CODE  memory
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qeq_fifo.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 158 bytes of CODE  memory (+ 8 bytes shared)
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qeq_get.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 106 bytes of CODE  memory
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qeq_init.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 34 bytes of CODE  memory
+  0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qeq_lifo.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 120 bytes of CODE  memory (+ 8 bytes shared)
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qf_act.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 152 bytes of CODE  memory
+   0 bytes of CONST memory (+ 4 bytes shared)
+ 132 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qf_gc.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 100 bytes of CODE  memory (+ 12 bytes shared)
+   0 bytes of CONST memory (+  4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qf_log2.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qf_new.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 132 bytes of CODE  memory (+ 4 bytes shared)
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qf_pool.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 116 bytes of CODE  memory (+ 4 bytes shared)
+   0 bytes of CONST memory (+ 4 bytes shared)
+  64 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qf_psini.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 28 bytes of CODE  memory
+  0 bytes of CONST memory (+ 4 bytes shared)
+  8 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qf_pspub.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 186 bytes of CODE  memory (+ 8 bytes shared)
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qf_pwr2.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 204 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qf_tick.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 312 bytes of CODE  memory (+ 8 bytes shared)
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qmp_get.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 138 bytes of CODE  memory
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qmp_init.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 156 bytes of CODE  memory
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qmp_put.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 80 bytes of CODE  memory
+  0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qte_ctor.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 124 bytes of CODE  memory
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qte_arm.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 158 bytes of CODE  memory (+ 4 bytes shared)
+   0 bytes of CONST memory (+ 4 bytes shared)
+  32 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qte_darm.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 34 bytes of CODE  memory
+  0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qte_rarm.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 142 bytes of CODE  memory (+ 4 bytes shared)
+   0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qf\source -o.\dbg\ ..\..\..\..\qf\source\qte_ctr.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 18 bytes of CODE  memory
+  0 bytes of CONST memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iarchive -r .\dbg\libqp_cortex-m4f.a .\dbg\qa_defer.o .\dbg\qa_fifo.o .\dbg\qa_lifo.o .\dbg\qa_get_.o .\dbg\qa_sub.o .\dbg\qa_usub.o .\dbg\qa_usuba.o .\dbg\qeq_fifo.o .\dbg\qeq_get.o .\dbg\qeq_init.o .\dbg\qeq_lifo.o .\dbg\qf_act.o .\dbg\qf_gc.o .\dbg\qf_log2.o .\dbg\qf_new.o .\dbg\qf_pool.o .\dbg\qf_psini.o .\dbg\qf_pspub.o .\dbg\qf_pwr2.o .\dbg\qf_tick.o .\dbg\qmp_get.o .\dbg\qmp_init.o .\dbg\qmp_put.o .\dbg\qte_ctor.o .\dbg\qte_arm.o .\dbg\qte_darm.o .\dbg\qte_rarm.o  .\dbg\qte_ctr.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qk\source -o.\dbg\ ..\..\..\..\qk\source\qk.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 240 bytes of CODE  memory (+ 94 bytes shared)
+   0 bytes of CONST memory (+ 48 bytes shared)
+  17 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qk\source -o.\dbg\ ..\..\..\..\qk\source\qk_sched.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 150 bytes of CODE  memory (+ 46 bytes shared)
+   0 bytes of CONST memory (+  4 bytes shared)
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iccarm -D DEBUG --debug --endian little --cpu=cortex-m4f --fpu VFPv4_sp --eec++ -e --dlib_config "C:\tools\IAR\ARM_6.60"\ARM\INC\c\DLib_Config_Normal.h --diag_suppress Pa050 --no_static_destruction -Ol -I. -I..\..\..\..\include -I..\..\..\..\qk\source -o.\dbg\ ..\..\..\..\qk\source\qk_mutex.cpp 
+
+   IAR ANSI C/C++ Compiler V6.60.1.5097/W32 for ARM
+   Copyright 1999-2013 IAR Systems AB.
+ 
+ 86 bytes of CODE  memory
+  0 bytes of CONST memory (+ 4 bytes shared)
+  1 byte  of DATA  memory
+
+Errors: none
+Warnings: none
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iasmarm -s+ -w+ -r --cpu cortex-m4f --fpu VFPv4_sp -I"C:\tools\IAR\ARM_6.60"\ARM\INC\   -o .\dbg\qk_port.o qk_port.s 
+
+    IAR Assembler V6.60.1.5097/W32 for ARM
+    Copyright 1999-2013 IAR Systems AB.
+
+Errors:   0
+Warnings: 0
+Bytes: 116
+
+D:\qp\qpcpp\ports\arm-cm\qk\iar>iarchive -r .\dbg\libqp_cortex-m4f.a .\dbg\qk.o .\dbg\qk_sched.o .\dbg\qk_mutex.o .\dbg\qk_port.o 

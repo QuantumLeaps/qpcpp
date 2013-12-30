@@ -82,7 +82,7 @@ void QMsm::init(QEvt const * const e) {
              *a != Q_ACTION_CAST(0);
              QEP_ACT_PTR_INC_(a))
         {
-            r = (**a)(this);
+            r = (*(*a))(this);                           // execute the action
 #ifdef Q_SPY
             if (r == Q_RET_ENTRY) {
                 QS_BEGIN_(QS_QEP_STATE_ENTRY, QS::priv_.smObjFilter, this)

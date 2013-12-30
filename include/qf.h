@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 24, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -199,15 +199,15 @@ public:
     /// The following example shows starting of the Philosopher object when a
     /// per-task stack is required:
     /// \include qf_start.cpp
-    virtual void start(uint8_t const prio,
-                       QEvt const *qSto[], uint32_t const qLen,
-                       void * const stkSto, uint32_t const stkSize,
+    virtual void start(uint_t const prio,
+                       QEvt const *qSto[], uint_t const qLen,
+                       void * const stkSto, uint_t const stkSize,
                        QEvt const * const ie);
 
     /// \brief Overloaded start function (no initialization event)
-    virtual void start(uint8_t const prio,
-                       QEvt const *qSto[], uint32_t const qLen,
-                       void * const stkSto, uint32_t const stkSize)
+    virtual void start(uint_t const prio,
+                       QEvt const *qSto[], uint_t const qLen,
+                       void * const stkSto, uint_t const stkSize)
     {
         this->start(prio, qSto, qLen, stkSto, stkSize,
                     static_cast<QEvt const *>(0));
@@ -221,10 +221,8 @@ public:
     /// active object posts directly the HUNGRY event to the Table active
     /// object. \include qf_post.cpp
     ///
-    /// \note The producer of the event (Philosopher in this case) must only
-    /// "know" the recipient (Table) by a generic (QActive *AO_Table)
-    /// pointer, but the specific definition of the Table class is not
-    /// required.
+    /// \note QActive::post_() should not be called directly, but only via the
+    /// macro POST() or POST_X().
     ///
     /// \note Direct event posting should not be confused with direct event
     /// dispatching. In contrast to asynchronous event posting through event
@@ -232,10 +230,10 @@ public:
     /// dispatching occurs when you call QHsm::dispatch(), or QFsm::dispatch()
     /// function.
 #ifndef Q_SPY
-    virtual bool post(QEvt const * const e, uint16_t const margin);
+    virtual bool post_(QEvt const * const e, uint_t const margin);
 #else
-    virtual bool post(QEvt const * const e, uint16_t const margin,
-                      void const * const
+    virtual bool post_(QEvt const * const e, uint_t const margin,
+                       void const * const
  sender);
 #endif
 
@@ -265,7 +263,7 @@ public:
     /// time events, can be still delivered to the event queue of the active
     /// object.
     ///
-    /// \sa QF::publish(), QActive::subscribe(), and QActive::unsubscribe()
+    /// \sa QF::publish_(), QActive::subscribe(), and QActive::unsubscribe()
     void unsubscribeAll(void) const;
 
 protected:
@@ -278,8 +276,7 @@ protected:
     /// \note The constructor is protected to prevent direct instantiation
     /// of QActive objects. This class is intended only for derivation
     /// (abstract class).
-    QActive(QStateHandler const initial) : QHsm(initial) {
-    }
+    QActive(QStateHandler const initial) : QHsm(initial) {}
 
     /// \brief Stops execution of an active object and removes it from the
     /// framework's supervision.
@@ -307,7 +304,7 @@ protected:
     /// to three signals in the initial transition:
     /// \include qf_subscribe.cpp
     ///
-    /// \sa QF::publish(), QActive::unsubscribe(), and
+    /// \sa QF::publish_(), QActive::unsubscribe(), and
     /// QActive::unsubscribeAll()
     void subscribe(enum_t const sig) const;
 
@@ -328,7 +325,7 @@ protected:
     /// \note Un-subscribing from a signal that has never been subscribed in
     /// the first place is considered an error and QF will raise an assertion.
     ///
-    /// \sa QF::publish(), QActive::subscribe(), and QActive::unsubscribeAll()
+    /// \sa QF::publish_(), QActive::subscribe(), and QActive::unsubscribeAll()
     void unsubscribe(enum_t const sig) const;
 
     /// \brief Defer an event to a given separate event queue.
@@ -385,7 +382,7 @@ private:
     /// from thread-run routines with difficult to foresee signature (so
     /// declaring friendship with such function(s) is not possible.)
     ///
-    /// \sa QActive::post(), QActive::postLIFO()
+    /// \sa QActive::post_(), QActive::postLIFO()
     QEvt const *get_(void);
 
     friend class QF;
@@ -410,7 +407,7 @@ public:
     virtual void init(QEvt const * const e) {
         this->QMsm::init(e);
     }
-    virtual void init() {
+    virtual void init(void) {
         this->QMsm::init();
     }
     virtual void dispatch(QEvt const * const e) {
@@ -455,14 +452,17 @@ protected:
 ///
 /// Internally, the armed time events are organized into a bi-directional
 /// linked list. This linked list is scanned in every invocation of the
-/// QF::tickX() function. Only armed (timing out) time events are in the list,
+/// QF::tickX_() function. Only armed (timing out) time events are in the list,
 /// so only armed time events consume CPU cycles.
 ///
-/// \note QF manages the time events in the function QF::tickX(), which
-/// must be called periodically, preferably from the clock tick ISR.
+/// \note QF manages the time events in the macro QF::TICK_X(), which
+/// must be called periodically, eitehr from a clock tick ISR, or from
+/// a task level.
+///
 /// \note In this version of QF QTimeEvt objects should be allocated
 /// statically rather than dynamically from event pools. Currently, QF will
 /// not correctly recycle the dynamically allocated Time Events.
+///
 class QTimeEvt : public QEvt {
 private:
 
@@ -476,7 +476,7 @@ private:
     void * volatile m_act;
 
     /// the internal down-counter of the time event. The down-counter
-    /// is decremented by 1 in every QF::tickX() invocation. The time event
+    /// is decremented by 1 in every QF::TICK_X() invocation. The time event
     /// fires (gets posted or published) when the down-counter reaches zero.
     QTimeEvtCtr volatile m_ctr;
 
@@ -503,9 +503,6 @@ public:
     QTimeEvt(QActive * const act, enum_t const sgnl,
              uint8_t const tickRate = static_cast<uint8_t>(0));
 
-    /// \brief Deprecated TimeEvt ctor provided for backwards compatibility.
-    QTimeEvt(enum_t const sgnl);
-
     /// \brief Arm a time event (one shot or periodic) for event posting.
     ///
     /// Arms this time event to fire in \a nTicks_ with an interval of
@@ -529,18 +526,6 @@ public:
     ///
     void armX(QTimeEvtCtr const nTicks,
               QTimeEvtCtr const interval = static_cast<QTimeEvtCtr>(0));
-
-    /// \brief Deprecated interface provided for backwards compatibility.
-    void postIn(QActive * const act, QTimeEvtCtr const nTicks) {
-        m_act = act;
-        armX(nTicks, static_cast<QTimeEvtCtr>(0));
-    }
-
-    /// \brief Deprecated interface provided for backwards compatibility.
-    void postEvery(QActive * const act, QTimeEvtCtr const nTicks) {
-        m_act = act;
-        armX(nTicks, nTicks);
-    }
 
     /// \brief Disarm a time event.
     ///
@@ -581,14 +566,49 @@ public:
     /// /note The function is thread-safe.
     QTimeEvtCtr ctr(void) const;
 
+#if (QP_API_VERSION < 500)
+
+    /// \brief Deprecated TimeEvt ctor provided for backwards compatibility.
+    QTimeEvt(enum_t const sgnl) :
+#ifdef Q_EVT_CTOR
+        QEvt(static_cast<QSignal>(sgnl)),
+#endif
+        m_next(static_cast<QTimeEvt *>(0)),
+        m_act(static_cast<void *>(0)),
+        m_ctr(static_cast<QTimeEvtCtr>(0)),
+        m_interval(static_cast<QTimeEvtCtr >(0))
+    {
+#ifndef Q_EVT_CTOR
+        sig = static_cast<QSignal>(sgnl);  // set QEvt::sig of this time event
+#endif
+                                      // time event must be static, see NOTE01
+        poolId_ = static_cast<uint8_t>(0);          // not from any event pool
+        refCtr_ = static_cast<uint8_t>(0);       // default rate 0, see NOTE02
+    }
+
+    /// \brief Deprecated interface provided for backwards compatibility.
+    void postIn(QActive * const act, QTimeEvtCtr const nTicks) {
+        m_act = act;
+        armX(nTicks, static_cast<QTimeEvtCtr>(0));
+    }
+
+    /// \brief Deprecated interface provided for backwards compatibility.
+    void postEvery(QActive * const act, QTimeEvtCtr const nTicks) {
+        m_act = act;
+        armX(nTicks, nTicks);
+    }
+#endif                                                 // QP_API_VERSION < 500
+
 private:
-    QTimeEvt();                                      ///< private default ctor
+    QTimeEvt(void);                  ///< default constructor only for friends
+    QTimeEvt(QTimeEvt const &);             ///< disallow copying of QTimeEvts
+    QTimeEvt & operator=(QTimeEvt const &); ///< disallow assign. of QTimeEvts
 
     /// \brief encapsulate the cast the m_act attribute to QActive*
-    QActive  *toActive()   { return static_cast<QActive  *>(m_act); }
+    QActive  *toActive(void)  { return static_cast<QActive  *>(m_act); }
 
     /// \brief encapsulate the cast the m_act attribute to QTimeEvt*
-    QTimeEvt *toTimeEvt()  { return static_cast<QTimeEvt *>(m_act); }
+    QTimeEvt *toTimeEvt(void) { return static_cast<QTimeEvt *>(m_act); }
 
     friend class QF;
 };
@@ -664,7 +684,7 @@ public:
     /// The following example shows the typical initialization sequence of
     /// QF: \include qf_main.cpp
     static void psInit(QSubscrList * const subscrSto,
-                       uint32_t const maxSignal);
+                       enum_t const maxSignal);
 
     /// \brief Event pool initialization for dynamic allocation of events.
     ///
@@ -690,7 +710,7 @@ public:
     /// \note The actual number of events available in the pool might be
     /// actually less than (\a poolSize / \a evtSize) due to the internal
     /// alignment of the blocks that the pool might perform. You can always
-    /// check the capacity of the pool by calling QF::getPoolMargin().
+    /// check the capacity of the pool by calling QF::getPoolMin().
     ///
     /// \note The dynamic allocation of events is optional, meaning that you
     /// might choose not to use dynamic events. In that case calling
@@ -698,8 +718,8 @@ public:
     /// unnecessary.
     ///
     /// \sa QF initialization example for QF::init()
-    static void poolInit(void * const poolSto, uint32_t const poolSize,
-                         uint32_t const evtSize);
+    static void poolInit(void * const poolSto, uint_t const poolSize,
+                         uint_t const evtSize);
 
     /// \brief Transfers control to QF to run the application.
     ///
@@ -723,7 +743,7 @@ public:
     /// implementation (so, no qf_port.cpp file is necessary). Moreover, QK
     /// implements the function QF::run() in a platform-independent way,
     /// in the module qk.cpp.
-    static int16_t run(void);
+    static int_t run(void);
 
     /// \brief Startup QF callback.
     ///
@@ -792,8 +812,8 @@ public:
     static void stop(void);
 
 #ifndef Q_SPY
-    static void publish(QEvt const *e);
-    static void tickX(uint8_t const tickRate);
+    static void publish_(QEvt const *e);
+    static void tickX_(uint8_t const tickRate);
 #else
 
     /// \brief Publish event to the framework.
@@ -803,22 +823,28 @@ public:
     /// This function is designed to be callable from any part of the system,
     /// including ISRs, device drivers, and active objects.
     ///
+    /// \note QF::publish_() should not be called directly, but only via the
+    /// macro PUBLISH().
+    ///
     /// In the general case, event publishing requires multicasting the
     /// event to multiple subscribers. This happens in the caller's thread
     /// with the scheduler locked to prevent preemption during the
     /// multicasting process. (Please note that the interrupts are enabled.)
-    static void publish(QEvt const *e, void const *sender);
+    static void publish_(QEvt const *e, void const *sender);
 
     /// \brief Processes all armed time events at every clock tick.
     ///
     /// This function must be called periodically from a time-tick ISR or from
     /// a task so that QF can manage the timeout events.
     ///
+    /// \note QF::tickX_() should not be called directly, but only via the
+    /// macro TICK_X().
+    ///
     /// \sa ::QTimeEvt.
     ///
-    /// The following example illustrates the call to QF::tickX():
+    /// The following example illustrates the call to QF::TICK_X():
     /// \include qf_tick.cpp
-    static void tickX(uint8_t const tickRate, void const * const sender);
+    static void tickX_(uint8_t const tickRate, void const * const sender);
 
 #endif
 
@@ -833,7 +859,7 @@ public:
     /// \return version of the QF as a constant 5-character string of the
     /// form X.Y.Z, where X is a 1-digit major version number, Y is a
     /// 1-digit minor version number, and Z is a 1-digit release number.
-    static char_t const Q_ROM * Q_ROM_VAR getVersion(void) {
+    static char_t const Q_ROM *getVersion(void) {
         return QP_VERSION_STR;
     }
 
@@ -847,7 +873,7 @@ public:
     ///
     /// \note Requesting the minimum of an un-initialized pool raises an
     /// assertion in the QF.
-    static uint16_t getPoolMin(uint_t const poolId);
+    static uint_t getPoolMin(uint_t const poolId);
 
     /// \brief This function returns the minimum of free entries of
     /// the given event queue.
@@ -860,7 +886,7 @@ public:
     /// queue implementation is used. Requesting the queue minimum of an
     /// unused priority level raises an assertion in the QF. (A priority
     /// level becomes used in QF after the call to the QF::add_() function.)
-    static uint16_t getQueueMin(uint8_t const prio);
+    static uint_t getQueueMin(uint8_t const prio);
 
     /// \brief Internal QF implementation of the dynamic event allocator.
     ///
@@ -871,8 +897,8 @@ public:
     ///
     /// \note The application code should not call this function directly.
     /// The only allowed use is trhrough the macros #Q_NEW or #Q_NEW_X.
-    static QEvt *newX_(QEvtSize const evtSize,
-                       uint16_t const margin, enum_t const sig);
+    static QEvt *newX_(uint_t const evtSize,
+                       uint_t const margin, enum_t const sig);
 
     /// \brief Recycle a dynamic event.
     ///
@@ -919,7 +945,6 @@ public:
     /// to be called by the active object thread routine.
     static void thread_(QActive *act);
 
-
     /// \brief Register an active object to be managed by the framework
     ///
     /// This function should not be called by the application directly, only
@@ -931,6 +956,14 @@ public:
     /// raises an assertion if the priority of the active object is already in
     /// use. (QF requires each active object to have a UNIQUE priority.)
     static void add_(QActive * const a);
+
+    /// \brief Clear a specified region of memory to zero.
+    ///
+    /// This function is used to clear the internal QF variables upon startup.
+    /// This is done to avoid problems with non-standard startup code provided
+    /// with some compilers (e.g. TI DSPs or Microchip MPLAB), which does not
+    /// zero the uninitialized variables, as required by the C++ Standard.
+    static void bzero(void * const start, uint_t len);
 
 private:                                        // to be used in QF ports only
     /// heads of linked lists of time events, one for every clock tick rate
@@ -959,12 +992,12 @@ private:                                        // to be used in QF ports only
 #ifdef Q_EVT_CTOR               // Provide the constructor for the QEvt class?
 
     #define Q_NEW(evtT_, sig_, ...) \
-        (new(QP::QF::newX_(static_cast<QP::QEvtSize>(sizeof(evtT_)), \
-                     static_cast<uint16_t>(0), static_cast<enum_t>(0))) \
+        (new(QP::QF::newX_(static_cast<uint_t>(sizeof(evtT_)), \
+                     static_cast<uint_t>(0), static_cast<enum_t>(0))) \
             evtT_((sig_),  ##__VA_ARGS__))
 
     #define Q_NEW_X(e_, evtT_, margin_, sig_, ...) do { \
-        (e_) = static_cast<evtT_ *>(QP::QF::newX_(static_cast<QP::QEvtSize>(\
+        (e_) = static_cast<evtT_ *>(QP::QF::newX_(static_cast<uint_t>(\
                   sizeof(evtT_)), (margin_), static_cast<enum_t>(0))); \
         if ((e_) != static_cast<evtT_ *>(0)) { \
             new((e_)) evtT_((sig_),  ##__VA_ARGS__); \
@@ -977,15 +1010,15 @@ private:                                        // to be used in QF ports only
     ///
     /// This macro returns a valid event pointer cast to the type \a evtT_.
     /// The event is initialized by the event constructor. The macro calls
-    /// the internal QF function QF_newX_() with margin==0, which causes
+    /// the internal QF function QF::newX_() with margin==0, which causes
     /// an assertion when the event can't be successfully allocated.
     ///
     /// The following example illustrates dynamic allocation of an event:
     /// \include qf_post.cpp
     #define Q_NEW(evtT_, sig_) \
         (static_cast<evtT_ *>(QP::QF::newX_( \
-                static_cast<QP::QEvtSize>(sizeof(evtT_)), \
-                static_cast<uint16_t>(0), (sig_))))
+                static_cast<uint_t>(sizeof(evtT_)), \
+                static_cast<uint_t>(0), (sig_))))
 
     /// \brief Allocate a dynamic event (non-asserting version).
     ///
@@ -996,7 +1029,7 @@ private:                                        // to be used in QF ports only
     /// The following example illustrates dynamic allocation of an event:
     /// \include qf_postx.cpp
     #define Q_NEW_X(e_, evtT_, margin_, sig_)  ((e_) = static_cast<evtT_ *>(\
-        QP::QF::newX_(static_cast<QP::QEvtSize>(sizeof(evtT_)),\
+        QP::QF::newX_(static_cast<uint_t>(sizeof(evtT_)),\
                       (margin_), (sig_))))
 
 #endif
@@ -1005,7 +1038,7 @@ private:                                        // to be used in QF ports only
 // QS software tracing integration, only if enabled
 #ifdef Q_SPY                                   // QS software tracing enabled?
 
-    /// \brief Invoke the system clock tick processing QF::tickX(). This macro
+    /// \brief Invoke the system clock tick processing QF::tickX_(). This macro
     /// is the recommended way of invoking clock tick processing, because it
     /// provides the vital information for software tracing and avoids any
     /// overhead when the tracing is disabled.
@@ -1013,7 +1046,7 @@ private:                                        // to be used in QF ports only
     /// This macro takes the argument \a sender_, which is a pointer to the
     /// sender object. This argument is actually only used when QS software
     /// tracing is enabled (macro #Q_SPY is defined). When QS software
-    /// tracing is disabled, the macro calls QF::tickX() without any
+    /// tracing is disabled, the macro calls QF::tickX_() without any
     /// arguments, so the overhead of passing this extra argument is
     /// entirely avoided.
     ///
@@ -1023,16 +1056,10 @@ private:                                        // to be used in QF ports only
     /// just to unambiguously identify the ISR as the sender of the time
     /// events.
     ///
-    /// \sa QF::tickX()
-    #define TICK_X(tickRate_, sender_) tickX((tickRate_), (sender_))
+    /// \sa QF::tickX_()
+    #define TICK_X(tickRate_, sender_) tickX_((tickRate_), (sender_))
 
-    /// \brief Deprecated interface defined for backwards compatibility
-    #define tick(sender_)            tickX(static_cast<uint8_t>(0), (sender_))
-
-    /// \brief Deprecated interface defined for backwards compatibility
-    #define TICK(sender_)            tickX(static_cast<uint8_t>(0), (sender_))
-
-    /// \brief Invoke the event publishing facility QF::publish(). This macro
+    /// \brief Invoke the event publishing facility QF::publish_(). This macro
     /// is the recommended way of publishing events, because it provides the
     /// vital information for software tracing and avoids any overhead when
     /// the tracing is disabled.
@@ -1040,7 +1067,7 @@ private:                                        // to be used in QF ports only
     /// This macro takes the last argument \a sender_, which is a pointer to
     /// the sender object. This argument is actually only used when QS
     /// tracing is enabled (macro #Q_SPY is defined). When QS software
-    /// tracing is disabled, the macro calls QF::publish() without the
+    /// tracing is disabled, the macro calls QF::publish_() without the
     /// \a sender_ argument, so the overhead of passing this extra argument
     /// is entirely avoided.
     ///
@@ -1049,10 +1076,10 @@ private:                                        // to be used in QF ports only
     /// interrupt or other context, you can create a unique object just to
     /// unambiguously identify the publisher of the event.
     ///
-    /// \sa QF::publish()
-    #define PUBLISH(e_, sender_)     publish((e_), (sender_))
+    /// \sa QF::publish_()
+    #define PUBLISH(e_, sender_)    publish_((e_), (sender_))
 
-    /// \brief Invoke the direct event posting facility QActive::post().
+    /// \brief Invoke the direct event posting facility QActive::post_().
     /// This macro is the recommended way of posting events, because it
     /// provides the vital information for software tracing and avoids any
     /// overhead when the tracing is disabled.
@@ -1060,7 +1087,7 @@ private:                                        // to be used in QF ports only
     /// This macro takes the last argument \a sender_, which is a pointer to
     /// the sender object. This argument is actually only used when QS
     /// tracing is disabled (macro #Q_SPY is defined). When QS software
-    /// tracing is not enabled, the macro calls QActive::post() without
+    /// tracing is not enabled, the macro calls QActive::post_() without
     /// the \a sender_ argument, so the overhead of passing this extra
     /// argument is entirely avoided.
     ///
@@ -1069,11 +1096,11 @@ private:                                        // to be used in QF ports only
     /// interrupt or other context, you can create a unique object just to
     /// unambiguously identify the publisher of the event.
     ///
-    /// \sa QActive::post()
+    /// \sa QActive::post_()
     #define POST(e_, sender_) \
-        post((e_), static_cast<uint16_t>(0), (sender_))
+        post_((e_), static_cast<uint_t>(0), (sender_))
 
-    /// \brief Invoke the direct event posting facility QActive::post()
+    /// \brief Invoke the direct event posting facility QActive::post_()
     /// without delivery guarantee.
     ///
     /// The macro takes the argument \a margin_, which specifies the
@@ -1085,7 +1112,7 @@ private:                                        // to be used in QF ports only
     /// This macro takes the last argument \a sender_, which is a pointer to
     /// the sender object. This argument is actually only used when QS
     /// tracing is disabled (macro #Q_SPY is defined). When QS software
-    /// tracing is not enabled, the macro calls QActive::post() without
+    /// tracing is not enabled, the macro calls QActive::post_() without
     /// the \a sender_ argument, so the overhead of passing this extra
     /// argument is entirely avoided.
     ///
@@ -1094,28 +1121,23 @@ private:                                        // to be used in QF ports only
     /// interrupt or other context, you can create a unique object just to
     /// unambiguously identify the sender of the event.
     ///
-    /// \sa #POST, QActive::post().
+    /// \sa #POST, QActive::post_().
     /// \include qf_postx.cpp
     #define POST_X(e_, margin_, sender_) \
-        post((e_), (margin_), (sender_))
-
-
-    /// \brief Deprecated interface for backwards compatibility.
-    #define postFIFO(e_, sender_) \
-        post((e_), static_cast<uint16_t>(0), (sender_))
+        post_((e_), (margin_), (sender_))
 
 #else
 
-    #define TICK_X(tickRate_, dummy_)   tickX((tickRate_))
-    #define TICK(dummy_)                tickX(static_cast<uint8_t>(0))
-    #define PUBLISH(e_, dummy_)         publish((e_))
-    #define POST(e_, dummy_)            post((e_), static_cast<uint16_t>(0))
-    #define POST_X(e_, margin_, dummy_) post((e_), (margin_))
-
-    #define postFIFO(e_)                post((e_), static_cast<uint16_t>(0))
-    #define tick()                      tickX(static_cast<uint8_t>(0))
+    #define TICK_X(tickRate_, dummy_)   tickX_((tickRate_))
+    #define PUBLISH(e_, dummy_)         publish_((e_))
+    #define POST(e_, dummy_)            post_((e_), static_cast<uint_t>(0))
+    #define POST_X(e_, margin_, dummy_) post_((e_), (margin_))
 
 #endif                                                                // Q_SPY
+
+/// \brief Invoke the system clock tick processing for rate 0
+/// \sa TICK_X()
+#define TICK(sender_) TICK_X(static_cast<uint8_t>(0), (sender_))
 
 #endif                                                                 // qf_h
 

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QEP/C++ platform-independent public interface
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -64,7 +64,7 @@ typedef QState (*QActionHandler)(void * const me);
 /// and should not be used in hand-crafted code.
 ///
 struct QMState {
-    QMState const *parent;                   ///< parent state (state nesting)
+    QMState        const *parent;            ///< parent state (state nesting)
     QStateHandler  stateHandler;                  ///<  state handler function
     QActionHandler exitAction;               ///< exit action handler function
 };
@@ -75,7 +75,7 @@ struct QMState {
 /// attributes of the QMsm class.
 ///
 union QMAttr {
-    QMState const *obj;                         ///< pointer to QMState object
+    QMState        const *obj;                  ///< pointer to QMState object
     QActionHandler const *act;                   ///< array of action handlers
     QStateHandler  fun;               ///< pointer to a state handler function
 };
@@ -146,7 +146,7 @@ public:
     ///
     /// \note Must be called only ONCE before QMsm::dispatch()
     virtual void init(QEvt const * const e);
-    virtual void init() { this->init(static_cast<QEvt const *>(0)); }
+    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
 
     /// \brief Dispatches an event to QMsm
     ///
@@ -205,6 +205,10 @@ protected:
 
     static QActionHandler const s_emptyAction_[1];
 
+private:
+    /// \brief internal helper function to take a transition
+    void msm_tran(void);
+
     friend class QFsm;
     friend class QHsm;
     friend class QMActive;
@@ -232,7 +236,7 @@ public:
     /// \brief Performs the second step of FSM initialization by triggering
     /// the top-most initial transition.
     virtual void init(QEvt const * const e);
-    virtual void init() { this->init(static_cast<QEvt const *>(0)); }
+    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
 
     /// \brief Dispatches an event to a HSM
     virtual void dispatch(QEvt const * const e);
@@ -293,6 +297,13 @@ protected:
         Q_INIT_SIG                  ///< signal for nested initial transitions
     };
 
+private:
+    /// maximum depth of state nesting (including the top level), must be >= 3
+    static int_t const MAX_NEST_DEPTH = static_cast<int_t>(6);
+
+    /// \brief internal helper function to take a transition
+    int_t hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH]);
+
     friend class QMActive;
 };
 
@@ -316,7 +327,7 @@ public:
     virtual void init(QEvt const * const e);
 
     /// \brief Overloaded init operation (no initialization event)
-    virtual void init() { this->init(static_cast<QEvt const *>(0)); }
+    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
 
     /// \brief Dispatches an event to a FSM
     virtual void dispatch(QEvt const * const e);
@@ -375,7 +386,7 @@ public:
     /// \return version of QEP as a constant 5-character string of the
     /// form X.Y.Z, where X is a 1-digit major version number, Y is a
     /// 1-digit minor version number, and Z is a 1-digit release number.
-    static char_t const Q_ROM * Q_ROM_VAR getVersion(void) {
+    static char_t const Q_ROM *getVersion(void) {
         return QP_VERSION_STR;
     }
 };

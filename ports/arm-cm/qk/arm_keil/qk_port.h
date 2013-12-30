@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QK/C++, Cortex-M, QK port, Generic C++ compiler
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 29, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 08, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -38,13 +38,17 @@
 #define QK_ISR_ENTRY() do { \
     QF_INT_DISABLE(); \
     ++QK_intNest_; \
+    QF_QS_ISR_ENTRY(QK_intNest_, QK_currPrio_); \
     QF_INT_ENABLE(); \
 } while (0)
 
 #define QK_ISR_EXIT()  do { \
     QF_INT_DISABLE(); \
+    QF_QS_ISR_EXIT(QK_intNest_, QK_currPrio_); \
     --QK_intNest_; \
-    *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (uint32_t)0x10000000U; \
+    if (QK_schedPrio_() != (uint8_t)0) { \
+        *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (uint32_t)0x10000000U; \
+    } \
     QF_INT_ENABLE(); \
 } while (0)
 

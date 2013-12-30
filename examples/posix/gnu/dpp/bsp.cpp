@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example
-// Last Updated for Version: 5.0.0
-// Date of the Last Update:  Aug 24, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -134,7 +134,7 @@ void QF_onClockTick(void) {
     struct timeval timeout = { 0 };                    // timeout for select()
     fd_set con;                             // FD set representing the console
 
-    QF::TICK(&DPP::l_clock_tick);      // perform the QF clock tick processing
+    QF::TICK_X(0U, &DPP::l_clock_tick);       // process time events at rate 0
 
     FD_ZERO(&con);
     FD_SET(0, &con);

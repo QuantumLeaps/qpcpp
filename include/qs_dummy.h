@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 24, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -47,7 +47,6 @@
 #define QS_INIT(arg_)                   (true)
 #define QS_EXIT()                       ((void)0)
 #define QS_DUMP()                       ((void)0)
-#define QS_RESET()                      ((void)0)
 #define QS_FILTER_ON(rec_)              ((void)0)
 #define QS_FILTER_OFF(rec_)             ((void)0)
 #define QS_FILTER_SM_OBJ(obj_)          ((void)0)
@@ -74,8 +73,8 @@
 #define QS_F32(width_, data_)           ((void)0)
 #define QS_F64(width_, data_)           ((void)0)
 #define QS_U64(width_, data_)           ((void)0)
-#define QS_STR(str_)                    ((void)0)
 #define QS_U32_HEX(width_, data_)       ((void)0)
+#define QS_STR(str_)                    ((void)0)
 #define QS_STR_ROM(str_)                ((void)0)
 #define QS_MEM(mem_, size_)             ((void)0)
 #define QS_SIG(sig_, obj_)              ((void)0)

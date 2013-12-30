@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Oct 10, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -46,17 +46,17 @@
 //****************************************************************************
 /// \brief The current QP version number
 ///
-/// version of the QP as a hex constant 0x0XYZ, where X is a 1-digit
+/// version of the QP as a decimal constant XYZ, where X is a 1-digit
 /// major version number, Y is a 1-digit minor version number, and Z is
 /// a 1-digit release number.
 ///
-#define QP_VERSION      0x0511U
+#define QP_VERSION      520
 
 /// \brief The current QP version string
-#define QP_VERSION_STR  "5.1.1"
+#define QP_VERSION_STR  "5.2.0"
 
-/** \brief Temperproof current QP release (5.1.1) and date (13-10-10) */
-#define QP_RELEASE      0xB1E973E0U
+/// \brief Tamperproof current QP release (5.2.0) and date (13-12-28)
+#define QP_RELEASE      0xB1C83037U
 
 #ifndef Q_ROM
     /// \brief Macro to specify compiler-specific directive for placing a
@@ -72,22 +72,6 @@
     /// Q_ROM macro definitions are: __code (IAR 8051 compiler), code (Keil
     /// Cx51 compiler), PROGMEM (gcc for AVR), __flash (IAR for AVR).
     #define Q_ROM
-#endif
-#ifndef Q_ROM_VAR            // if NOT defined, provide the default definition
-    /// \brief Macro to specify compiler-specific directive for accessing a
-    /// constant object in ROM.
-    ///
-    /// Many compilers for MCUs provide different size pointers for
-    /// accessing objects in various memories. Constant objects allocated
-    /// in ROM (see #Q_ROM macro) often mandate the use of specific-size
-    /// pointers (e.g., far pointers) to get access to ROM objects. The
-    /// macro Q_ROM_VAR specifies the kind of the pointer to be used to access
-    /// the ROM objects.
-    ///
-    /// To override the following empty definition, you need to define the
-    /// Q_ROM_VAR macro in the qep_port.h header file. An example of valid
-    /// Q_ROM_VAR macro definition is: __far (Freescale HC(S)08 compiler).
-    #define Q_ROM_VAR
 #endif
 #ifndef Q_ROM_BYTE
     /// \brief Macro to access a byte allocated in ROM
@@ -115,84 +99,6 @@
     /// default of 1 byte is chosen.
     #define Q_SIGNAL_SIZE 2
 #endif
-
-namespace QP {
-#if (Q_SIGNAL_SIZE == 1)
-    typedef uint8_t QSignal;
-#elif (Q_SIGNAL_SIZE == 2)
-    /// \brief QSignal represents the signal of an event.
-    ///
-    /// The relationship between an event and a signal is as follows. A signal
-    /// in UML is the specification of an asynchronous stimulus that triggers
-    /// reactions [<A HREF="http://www.omg.org/docs/ptc/03-08-02.pdf">UML
-    /// document ptc/03-08-02</A>], and as such is an essential part of an
-    /// event. (The signal conveys the type of the occurrence-what happened?)
-    /// However, an event can also contain additional quantitative information
-    /// about the occurrence in form of event parameters. Please refer to the
-    typedef uint16_t QSignal;
-#elif (Q_SIGNAL_SIZE == 4)
-    typedef uint32_t QSignal;
-#else
-    #error "Q_SIGNAL_SIZE defined incorrectly, expected 1, 2, or 4"
-#endif
-
-#ifdef Q_EVT_CTOR               // Provide the constructor for the QEvt class?
-
-    class QEvt {
-    public:
-        QSignal sig;                           // signal of the event instance
-
-        QEvt(QSignal const s)   // poolId_/refCtr_ intentionally uninitialized
-          : sig(s) {}
-
-#ifdef Q_EVT_VIRTUAL
-        virtual ~QEvt() {}                               // virtual destructor
-#endif
-
-    private:
-        uint8_t poolId_;                       // pool ID (0 for static event)
-        uint8_t volatile refCtr_;                         // reference counter
-
-        friend class QF;
-        friend class QActive;
-        friend class QTimeEvt;
-        friend class QEQueue;
-        friend uint8_t QF_EVT_POOL_ID_ (QEvt const * const e);
-        friend uint8_t QF_EVT_REF_CTR_ (QEvt const * const e);
-        friend void QF_EVT_REF_CTR_INC_(QEvt const * const e);
-        friend void QF_EVT_REF_CTR_DEC_(QEvt const * const e);
-    };
-
-#else                                    // QEvt is a POD (Plain Old Datatype)
-
-    //////////////////////////////////////////////////////////////////////////
-    /// \brief QEvt base class.
-    ///
-    /// QEvt represents events without parameters and serves as the base class
-    /// for derivation of events with parameters.
-    ///
-    /// The following example illustrates how to add an event parameter by
-    /// inheriting from the QEvt class.
-    /// \include qep_qevt.cpp
-    struct QEvt {
-        QSignal sig;                         ///< signal of the event instance
-        uint8_t poolId_;                     ///< pool ID (0 for static event)
-        uint8_t volatile refCtr_;                       ///< reference counter
-    };
-
-#endif                                                           // Q_EVT_CTOR
-
-//****************************************************************************
-// facilities for backwards compatibility
-//
-#ifndef Q_NQEVENT
-    /// \brief Deprecated typedef for backwards compatibility
-    ///
-    /// \sa ::QEvt
-    typedef QEvt QEvent;
-#endif
-
-}                                                              // namespace QP
 
 //****************************************************************************
 /// helper macro to calculate static dimension of a 1-dim array \a array_
@@ -250,5 +156,79 @@ typedef unsigned int uint_t;
 ///
 #define QEVT_INITIALIZER(sig_) { static_cast<QP::QSignal>(sig_), \
     static_cast<uint8_t>(0), static_cast<uint8_t>(0) }
+
+
+//****************************************************************************
+namespace QP {
+
+#if (Q_SIGNAL_SIZE == 1)
+    typedef uint8_t QSignal;
+#elif (Q_SIGNAL_SIZE == 2)
+    /// \brief QSignal represents the signal of an event.
+    ///
+    /// The relationship between an event and a signal is as follows. A signal
+    /// in UML is the specification of an asynchronous stimulus that triggers
+    /// reactions, and as such is an essential part of an event. (The signal
+    /// conveys the type of the occurrence--what happened?) However, an event
+    /// can also contain additional quantitative information about the
+    /// occurrence in form of event parameters.
+    ///
+    typedef uint16_t QSignal;
+#elif (Q_SIGNAL_SIZE == 4)
+    typedef uint32_t QSignal;
+#else
+    #error "Q_SIGNAL_SIZE defined incorrectly, expected 1, 2, or 4"
+#endif
+
+#ifdef Q_EVT_CTOR               // Provide the constructor for the QEvt class?
+
+    //////////////////////////////////////////////////////////////////////////
+    class QEvt {
+    public:
+        QSignal sig;                           // signal of the event instance
+
+        // the constructor
+        QEvt(QSignal const s)   // poolId_/refCtr_ intentionally uninitialized
+          : sig(s) {}
+
+#ifdef Q_EVT_VIRTUAL
+        // virtual destructor
+        virtual ~QEvt() {}
+#endif
+
+    private:
+        uint8_t poolId_;                       // pool ID (0 for static event)
+        uint8_t volatile refCtr_;                         // reference counter
+
+        friend class QF;
+        friend class QActive;
+        friend class QTimeEvt;
+        friend class QEQueue;
+        friend uint8_t QF_EVT_POOL_ID_ (QEvt const * const e);
+        friend uint8_t QF_EVT_REF_CTR_ (QEvt const * const e);
+        friend void QF_EVT_REF_CTR_INC_(QEvt const * const e);
+        friend void QF_EVT_REF_CTR_DEC_(QEvt const * const e);
+    };
+
+#else                                    // QEvt is a POD (Plain Old Datatype)
+
+    //////////////////////////////////////////////////////////////////////////
+    /// \brief QEvt base class.
+    ///
+    /// QEvt represents events without parameters and serves as the base class
+    /// for derivation of events with parameters.
+    ///
+    /// The following example illustrates how to add an event parameter by
+    /// inheriting from the QEvt class.
+    /// \include qep_qevt.cpp
+    struct QEvt {
+        QSignal sig;                         ///< signal of the event instance
+        uint8_t poolId_;                     ///< pool ID (0 for static event)
+        uint8_t volatile refCtr_;                       ///< reference counter
+    };
+
+#endif                                                           // Q_EVT_CTOR
+
+}                                                              // namespace QP
 
 #endif                                                               // qevt_h

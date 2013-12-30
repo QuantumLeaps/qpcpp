@@ -174,7 +174,6 @@
           <name>CCDefines</name>
           <state>ewarm</state>
           <state>PART_LM3S811</state>
-          <state>STACK_SIZE=600</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -305,8 +304,8 @@
           <name>CCIncludePath2</name>
           <state>$PROJ_DIR$\.</state>
           <state>$_QPCPP_$\include</state>
-          <state>$_QPCPP_$\ports\arm-cortex\qk\iar</state>
-          <state>$PROJ_DIR$\cmsis</state>
+          <state>$_QPCPP_$\ports\arm-cm\qk\iar</state>
+          <state>$_QPCPP_$\ports\arm-cm\cmsis</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -707,7 +706,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\lm3s811.icf</state>
+          <state>$PROJ_DIR$\game-qk.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -755,7 +754,7 @@
         </option>
         <option>
           <name>IlinkAdditionalLibs</name>
-          <state>$_QPCPP_$\ports\arm-cortex\qk\iar\dbg\libqp_cortex-m3.a</state>
+          <state>$_QPCPP_$\ports\arm-cm\qk\iar\dbg\libqp_cortex-m3.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
@@ -1112,7 +1111,6 @@
           <state>ewarm</state>
           <state>PART_LM3S811</state>
           <state>NDEBUG</state>
-          <state>STACK_SIZE=600</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -1173,7 +1171,7 @@
         <option>
           <name>CCAllowList</name>
           <version>1</version>
-          <state>1111111</state>
+          <state>0111111</state>
         </option>
         <option>
           <name>CCDebugInfo</name>
@@ -1243,8 +1241,8 @@
           <name>CCIncludePath2</name>
           <state>$PROJ_DIR$\.</state>
           <state>$_QPCPP_$\include</state>
-          <state>$_QPCPP_$\ports\arm-cortex\qk\iar</state>
-          <state>$PROJ_DIR$\cmsis</state>
+          <state>$_QPCPP_$\ports\arm-cm\qk\iar</state>
+          <state>$_QPCPP_$\ports\arm-cm\cmsis</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1645,7 +1643,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\lm3s811.icf</state>
+          <state>$PROJ_DIR$\game-qk.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -1693,7 +1691,7 @@
         </option>
         <option>
           <name>IlinkAdditionalLibs</name>
-          <state>$_QPCPP_$\ports\arm-cortex\qk\iar\rel\libqp_cortex-m3.a</state>
+          <state>$_QPCPP_$\ports\arm-cm\qk\iar\rel\libqp_cortex-m3.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
@@ -2050,7 +2048,6 @@
           <state>ewarm</state>
           <state>PART_LM3S811</state>
           <state>Q_SPY</state>
-          <state>STACK_SIZE=600</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -2181,8 +2178,8 @@
           <name>CCIncludePath2</name>
           <state>$PROJ_DIR$\.</state>
           <state>$_QPCPP_$\include</state>
-          <state>$_QPCPP_$\ports\arm-cortex\qk\iar</state>
-          <state>$PROJ_DIR$\cmsis</state>
+          <state>$_QPCPP_$\ports\arm-cm\qk\iar</state>
+          <state>$_QPCPP_$\ports\arm-cm\cmsis</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -2583,7 +2580,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\lm3s811.icf</state>
+          <state>$PROJ_DIR$\game-qk.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -2631,7 +2628,7 @@
         </option>
         <option>
           <name>IlinkAdditionalLibs</name>
-          <state>$_QPCPP_$\ports\arm-cortex\qk\iar\spy\libqp_cortex-m3.a</state>
+          <state>$_QPCPP_$\ports\arm-cm\qk\iar\spy\libqp_cortex-m3.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
@@ -2816,24 +2813,6 @@
     </settings>
   </configuration>
   <group>
-    <name>CMSIS</name>
-    <file>
-      <name>$PROJ_DIR$\cmsis\core_cm3.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\cmsis\lm3s_cmsis.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\cmsis\startup_lm3s.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\cmsis\system_lm3s.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\cmsis\system_lm3s.h</name>
-    </file>
-  </group>
-  <group>
     <name>Source</name>
     <file>
       <name>$PROJ_DIR$\bsp.cpp</name>
@@ -2867,6 +2846,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\ship.cpp</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\startup_lm3s.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\system_lm3s.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\tunnel.cpp</name>

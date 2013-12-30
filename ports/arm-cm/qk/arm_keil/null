@@ -1,0 +1,93 @@
+default selected
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qep.cpp      -o.\dbg\qep.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qmsm_ini.cpp -o.\dbg\qmsm_ini.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qmsm_dis.cpp -o.\dbg\qmsm_dis.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qmsm_ini.cpp -o.\dbg\qhsm_ini.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qmsm_dis.cpp -o.\dbg\qhsm_dis.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qfsm_ini.cpp -o.\dbg\qfsm_ini.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qfsm_dis.cpp -o.\dbg\qfsm_dis.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qhsm_ini.cpp -o.\dbg\qhsm_ini.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qhsm_dis.cpp -o.\dbg\qhsm_dis.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qhsm_top.cpp -o.\dbg\qhsm_top.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qhsm_in.cpp  -o.\dbg\qhsm_in.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armar -r .\dbg\libqp_Cortex-M4.fp.a .\dbg\qep.o .\dbg\qmsm_ini.o .\dbg\qmsm_dis.o .\dbg\qfsm_ini.o .\dbg\qfsm_dis.o .\dbg\qhsm_ini.o .\dbg\qhsm_dis.o .\dbg\qhsm_top.o .\dbg\qhsm_in.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qa_defer.cpp -o.\dbg\qa_defer.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qa_fifo.cpp  -o.\dbg\qa_fifo.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qa_lifo.cpp  -o.\dbg\qa_lifo.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qa_get_.cpp  -o.\dbg\qa_get_.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qa_sub.cpp   -o.\dbg\qa_sub.o   
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qa_usub.cpp  -o.\dbg\qa_usub.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qa_usuba.cpp -o.\dbg\qa_usuba.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qeq_fifo.cpp -o.\dbg\qeq_fifo.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qeq_get.cpp  -o.\dbg\qeq_get.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qeq_init.cpp -o.\dbg\qeq_init.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qeq_lifo.cpp -o.\dbg\qeq_lifo.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qf_act.cpp   -o.\dbg\qf_act.o   
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qf_gc.cpp    -o.\dbg\qf_gc.o       
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qf_log2.cpp  -o.\dbg\qf_log2.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qf_new.cpp   -o.\dbg\qf_new.o   
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qf_pool.cpp  -o.\dbg\qf_pool.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qf_psini.cpp -o.\dbg\qf_psini.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qf_pspub.cpp -o.\dbg\qf_pspub.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qf_pwr2.cpp  -o.\dbg\qf_pwr2.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qf_tick.cpp  -o.\dbg\qf_tick.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qmp_get.cpp  -o.\dbg\qmp_get.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qmp_init.cpp -o.\dbg\qmp_init.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qmp_put.cpp  -o.\dbg\qmp_put.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qte_ctor.cpp -o.\dbg\qte_ctor.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qte_arm.cpp  -o.\dbg\qte_arm.o  
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qte_darm.cpp -o.\dbg\qte_darm.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qte_rarm.cpp -o.\dbg\qte_rarm.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O0 ..\..\..\..\qf\source\qte_ctr.cpp  -o.\dbg\qte_ctr.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armar -r .\dbg\libqp_Cortex-M4.fp.a .\dbg\qa_defer.o .\dbg\qa_fifo.o .\dbg\qa_lifo.o .\dbg\qa_get_.o .\dbg\qa_sub.o .\dbg\qa_usub.o .\dbg\qa_usuba.o .\dbg\qeq_fifo.o .\dbg\qeq_get.o .\dbg\qeq_init.o .\dbg\qeq_lifo.o .\dbg\qf_act.o .\dbg\qf_gc.o .\dbg\qf_log2.o .\dbg\qf_new.o .\dbg\qf_pool.o .\dbg\qf_psini.o .\dbg\qf_pspub.o .\dbg\qf_pwr2.o .\dbg\qf_tick.o .\dbg\qmp_get.o .\dbg\qmp_init.o .\dbg\qmp_put.o .\dbg\qte_ctor.o .\dbg\qte_arm.o .\dbg\qte_darm.o .\dbg\qte_rarm.o .\dbg\qte_ctr.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qk\source ..\..\..\..\qk\source\qk.cpp       -o.\dbg\qk.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qk\source ..\..\..\..\qk\source\qk_sched.cpp -o.\dbg\qk_sched.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armcc -g -c --cpu Cortex-M4.fp --apcs=interwork --split_sections -O0 -I. -I..\..\..\..\include -I..\..\..\..\qk\source ..\..\..\..\qk\source\qk_mutex.cpp -o.\dbg\qk_mutex.o 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armasm qk_port.s -o .\dbg\qk_port.o -g --cpu Cortex-M4.fp --apcs=interwork 
+
+D:\qp\qpcpp\ports\arm-cm\qk\arm_keil>"C:\tools\Keil\ARM\ARMCC"\bin\armar -r .\dbg\libqp_Cortex-M4.fp.a .\dbg\qk.o .\dbg\qk_sched.o .\dbg\qk_mutex.o .\dbg\qk_port.o 

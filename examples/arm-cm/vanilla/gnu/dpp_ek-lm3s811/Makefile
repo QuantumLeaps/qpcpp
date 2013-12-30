@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++, EK-LM3811, Vanilla, GNU/Sourcery G++
-# Last Updated for Version: 5.1.0
-# Date of the Last Update:  Oct 01, 2013
+# Last Updated for Version: 5.2.0
+# Date of the Last Update:  Dec 28, 2013
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -96,6 +96,9 @@ DEFINES =
 
 ARM_CORE = cortex-m3
 
+LD_SCRIPT := $(PROJECT).ld
+LIBS    := -lqp_$(ARM_CORE)_cs
+
 #-----------------------------------------------------------------------------
 # files
 #
@@ -108,9 +111,6 @@ C_SRCS := $(wildcard *.c)
 
 # C++ source files
 CPP_SRCS :=	$(wildcard *.cpp)
-
-LD_SCRIPT := lm3s811.ld
-LIBS    := -lqp_$(ARM_CORE)_cs
 
 #-----------------------------------------------------------------------------
 # build options for various configurations
@@ -214,8 +214,12 @@ $(BIN_DIR)/%.o : %.c
 $(BIN_DIR)/%.o : %.cpp
 	$(CPP) $(CPPFLAGS) -c $< -o $@
 
+# include dependency files only if our goal depends on their existence
+ifneq ($(MAKECMDGOALS),clean)
+  ifneq ($(MAKECMDGOALS),show)
 -include $(C_DEPS_EXT) $(CPP_DEPS_EXT)
-
+  endif
+endif
 
 .PHONY : clean
 clean:

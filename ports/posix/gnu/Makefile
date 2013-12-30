@@ -1,7 +1,7 @@
 ##############################################################################
 # Product:  QP/C++, POSIX port, GNU compiler
-# Last Updated for Version: 5.1.0
-# Date of the Last Update:  Sep 29, 2013
+# Last Updated for Version: 5.1.2
+# Date of the Last Update:  Nov 04, 2013
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -45,24 +45,19 @@
 # make CONF=spy clean
 
 #-----------------------------------------------------------------------------
-# general utilities
-#
-RM = rm -f
-
-#-----------------------------------------------------------------------------
 CC  = g++
 LIB = ar
+RM  = rm -f
 
 QPCPP      = ../../..
+QP_PRTDIR  = ..
 QP_INCDIR  = $(QPCPP)/include
 QEP_SRCDIR = $(QPCPP)/qep/source
 QF_SRCDIR  = $(QPCPP)/qf/source
 QS_SRCDIR  = $(QPCPP)/qs/source
-QP_PRTDIR  = .
-LIBFLAGS   = rs
-QS_OBJS    =
 
 CCINC      = -I$(QP_PRTDIR) -I$(QP_INCDIR)
+LIBFLAGS   = rs
 
 #-----------------------------------------------------------------------------
 # build options for various configurations
@@ -109,7 +104,7 @@ VPATH = $(QEP_SRCDIR) $(QF_SRCDIR) $(QS_SRCDIR)
 all: $(BINDIR) $(BINDIR)/libqp.a
 
 $(BINDIR) :
-	mkdir -p $@
+	mkdir $@
 
 # the objects to build =======================================================
 QEP_OBJS = \
@@ -282,7 +277,7 @@ $(BINDIR)/qte_rarm.o: $(QF_SRCDIR)/qte_rarm.cpp
 $(BINDIR)/qte_ctr.o: $(QF_SRCDIR)/qte_ctr.cpp
 	$(CC) $(CCFLAGS) $(CCINC) -I$(QF_SRCDIR) $<
 
-$(BINDIR)/qf_port.o: qf_port.cpp
+$(BINDIR)/qf_port.o: $(QP_PRTDIR)/qf_port.cpp
 	$(CC) $(CCFLAGS) $(CCINC) -I$(QF_SRCDIR) $<
 
 # QS -----------------------------------------

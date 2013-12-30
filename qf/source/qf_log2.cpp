@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Oct 07, 2012
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -43,7 +43,7 @@
 namespace QP {
 
 // Global objects ------------------------------------------------------------
-uint8_t const Q_ROM Q_ROM_VAR QF_log2Lkup[256] = {
+uint8_t const Q_ROM QF_log2Lkup[256] = {
     static_cast<uint8_t>(0),
     static_cast<uint8_t>(1),
     static_cast<uint8_t>(2), static_cast<uint8_t>(2),

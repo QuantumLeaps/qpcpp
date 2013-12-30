@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 23, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -44,7 +44,7 @@ namespace QP {
 
 //............................................................................
 void QS::sig_dict(enum_t const sig, void const * const obj,
-                  char_t const Q_ROM * const Q_ROM_VAR name)
+                  char_t const Q_ROM * const name)
 {
     QS_CRIT_STAT_
     QS_CRIT_ENTRY_();
@@ -58,7 +58,7 @@ void QS::sig_dict(enum_t const sig, void const * const obj,
 }
 //............................................................................
 void QS::obj_dict(void const * const obj,
-                  char_t const Q_ROM * const Q_ROM_VAR name)
+                  char_t const Q_ROM * const name)
 {
     QS_CRIT_STAT_
     QS_CRIT_ENTRY_();
@@ -71,7 +71,7 @@ void QS::obj_dict(void const * const obj,
 }
 //............................................................................
 void QS::fun_dict(void (* const fun)(void),
-                  char_t const Q_ROM * const Q_ROM_VAR name)
+                  char_t const Q_ROM * const name)
 {
     QS_CRIT_STAT_
     QS_CRIT_ENTRY_();
@@ -84,7 +84,7 @@ void QS::fun_dict(void (* const fun)(void),
 }
 //............................................................................
 void QS::usr_dict(enum_t const rec,
-                  char_t const Q_ROM * const Q_ROM_VAR name)
+                  char_t const Q_ROM * const name)
 {
     QS_CRIT_STAT_
     QS_CRIT_ENTRY_();

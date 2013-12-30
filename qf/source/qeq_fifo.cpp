@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Oct 08, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -47,7 +47,7 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qeq_fifo")
 
 //............................................................................
-bool QEQueue::post(QEvt const * const e, uint16_t const margin) {
+bool QEQueue::post(QEvt const * const e, uint_t const margin) {
     bool status;
     QF_CRIT_STAT_
 
@@ -91,7 +91,7 @@ bool QEQueue::post(QEvt const * const e, uint16_t const margin) {
         status = true;                            // event posted successfully
     }
     else {
-        Q_ASSERT(margin != u16_0);             // can tollerate dropping evts?
+        Q_ASSERT(margin != u_0);               // can tollerate dropping evts?
 
         QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_ATTEMPT, QS::priv_.eqObjFilter,
                          this)

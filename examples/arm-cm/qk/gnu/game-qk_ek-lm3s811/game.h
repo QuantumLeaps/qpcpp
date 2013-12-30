@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Model: game.qm
 // File:  ./game.h
 //
@@ -13,7 +13,7 @@
 // WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // @(/3/0) ...................................................................
 #ifndef game_h
 #define game_h
@@ -52,50 +52,6 @@ enum GameSignals {                                 // signals used in the game
     MAX_SIG                              // the last signal (keep always last)
 };
 
-// @(/1/0) ...................................................................
-class ObjectPosEvt : public QP::QEvt {
-public:
-    uint8_t x;
-    uint8_t y;
-};
-
-// @(/1/1) ...................................................................
-class ObjectImageEvt : public QP::QEvt {
-public:
-    uint8_t x;
-    int8_t y;
-    uint8_t bmp;
-};
-
-// @(/1/2) ...................................................................
-class MineEvt : public QP::QEvt {
-public:
-    uint8_t id;
-
-public:
-    MineEvt(QP::QSignal sig_p, uint8_t id_p) 
-    {
-        sig     = sig_p;
-        poolId_ = 0U;
-        id      = id_p;
-    }
-};
-
-// @(/1/3) ...................................................................
-class ScoreEvt : public QP::QEvt {
-public:
-    uint16_t score;
-
-public:
-    ScoreEvt(QP::QSignal sig_p, uint16_t score_p) 
-    {
-        sig     = sig_p;
-        poolId_ = 0U;
-        score   = score_p;
-    }
-};
-
-
 #define GAME_SCREEN_WIDTH          BSP_SCREEN_WIDTH
 #define GAME_SCREEN_HEIGHT         BSP_SCREEN_HEIGHT
 #define GAME_MINES_MAX             5U
@@ -119,15 +75,86 @@ enum GameBitmapIds {
     MAX_BMP
 };
 
+// obtain instances of the Mines orthogonal components
+QP::QMsm *Mine1_getInst(uint8_t id);
+QP::QMsm *Mine2_getInst(uint8_t id);
+
+} // namespace GAME
+
+namespace GAME {
+
+// @(/1/0) ...................................................................
+class ObjectPosEvt : public QP::QEvt {
+public:
+    uint8_t x;
+    uint8_t y;
+};
+
+} // namespace GAME
+namespace GAME {
+
+// @(/1/1) ...................................................................
+class ObjectImageEvt : public QP::QEvt {
+public:
+    uint8_t x;
+    int8_t y;
+    uint8_t bmp;
+};
+
+} // namespace GAME
+namespace GAME {
+
+// @(/1/2) ...................................................................
+class MineEvt : public QP::QEvt {
+public:
+    uint8_t id;
+
+public:
+    MineEvt(QP::QSignal sig_p, uint8_t id_p)    {
+        sig     = sig_p;
+        poolId_ = 0U;
+        id      = id_p;
+    }
+};
+
+} // namespace GAME
+namespace GAME {
+
+// @(/1/3) ...................................................................
+class ScoreEvt : public QP::QEvt {
+public:
+    uint16_t score;
+
+public:
+    ScoreEvt(QP::QSignal sig_p, uint16_t score_p)    {
+        sig     = sig_p;
+        poolId_ = 0U;
+        score   = score_p;
+    }
+};
+
+} // namespace GAME
+
 // opaque pointers to active objects in the application
+namespace GAME {
+
 extern QP::QActive * const AO_Tunnel;
+
+} // namespace GAME
+namespace GAME {
 
 extern QP::QActive * const AO_Ship;
 
+} // namespace GAME
+namespace GAME {
+
 extern QP::QActive * const AO_Missile;
 
+} // namespace GAME
 
 // helper function for all AOs
+namespace GAME {
+
 // @(/2/8) ...................................................................
 bool do_bitmaps_overlap(
     uint8_t bmp_id1,
@@ -136,10 +163,6 @@ bool do_bitmaps_overlap(
     uint8_t bmp_id2,
     uint8_t x2,
     uint8_t y2);
-
-// obtain instances of the Mines orthogonal components
-QP::QHsm *Mine1_getInst(uint8_t id);
-QP::QHsm *Mine2_getInst(uint8_t id);
 
 } // namespace GAME
 

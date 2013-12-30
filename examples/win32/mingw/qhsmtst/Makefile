@@ -1,13 +1,13 @@
 ##############################################################################
-# Product: QHsmTst example, Win32, MinGW compiler
-# Last Updated for Version: 4.5.03
-# Date of the Last Update:  Nov 29, 2012
+# Product: Generic Makefile for QP/C++ application, Win32, MinGW compiler
+# Last Updated for Version: 5.2.0
+# Date of the Last Update:  Dec 03, 2013
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -42,19 +42,19 @@
 # make clean
 # make CONF=rel clean
 # make CONF=spy clean
+##############################################################################
+#
+# NOTE: Typically, you should have no need to change anything in this Makefile
+#
+##############################################################################
 
 #-----------------------------------------------------------------------------
 # NOTE: the Makefile expects that the QPCPP environment variable is defined
-# and points to the QP/C installation directory
+# and points to the QP/C++ installation directory
 #
 ifndef QPCPP
 $(error The QPCPP environment variable must be defined)
 endif
-
-#-----------------------------------------------------------------------------
-# general utilities
-#
-RM = del
 
 #-----------------------------------------------------------------------------
 # NOTE: this Makefile assumes that the MinGW\bin directory is added
@@ -62,26 +62,25 @@ RM = del
 #
 CC    := gcc
 CPP   := g++
-#LINK  := gcc                                                # for C programs
-LINK  := g++                                               # for C++ programs
+#LINK  := gcc                                                 # for C programs
+LINK  := g++                                                # for C++ programs
+RM    := rm
 
 #-----------------------------------------------------------------------------
 # directories
 #
-QP_PORT_DIR := $(QPCPP)\ports\win32\mingw
+# Project name is derived from the directory name
+PROJECT := $(notdir $(CURDIR))
+
+QP_PORT_DIR := $(QPCPP)/ports/win32
 APP_DIR     := .
 
-VPATH = $(APP_DIR) \
-	$(QTOOLS)\qspy\source \
-
-# Output file basename
-OUTPUT    := qhsmtst
+VPATH = $(APP_DIR)
 
 # include directories
 INCLUDES  = -I. \
-	-I$(QPCPP)\include	\
-	-I$(QP_PORT_DIR) \
-	-I$(QTOOLS)\qspy\include
+	-I$(QPCPP)/include	\
+	-I$(QP_PORT_DIR)
 
 # defines
 DEFINES =
@@ -115,21 +114,23 @@ CFLAGS = -c -Wall -O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -Wall -O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
-LINKFLAGS = -L$(QP_PORT_DIR)\$(BIN_DIR)
+LINKFLAGS = -L$(QP_PORT_DIR)/mingw/$(BIN_DIR)
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
 BIN_DIR := spy
 
-C_SRCS += qspy.c
+INCLUDES +=	-I$(QTOOLS)/qspy/include
+VPATH    += $(QTOOLS)/qspy/source
+C_SRCS   += qspy.c
 
 ASFLAGS =
 
-CFLAGS = -c -g $(INCLUDES) $(DEFINES) -DQ_SPY
+CFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES) -DQ_SPY
 
 CPPFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES) -DQ_SPY
 
-LINKFLAGS = -L$(QP_PORT_DIR)\$(BIN_DIR)
+LINKFLAGS = -L$(QP_PORT_DIR)/mingw/$(BIN_DIR)
 
 else                     # default Debug configuration .......................
 
@@ -141,18 +142,17 @@ CFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES)
 
 CPPFLAGS = -c -Wall -g $(INCLUDES) $(DEFINES)
 
-LINKFLAGS = -L$(QP_PORT_DIR)\$(BIN_DIR)
-
+LINKFLAGS = -L$(QP_PORT_DIR)/mingw/$(BIN_DIR)
 
 endif
-
+#-----------------------------------------------------------------------------
 
 ASM_OBJS     := $(patsubst %.s,%.o,$(ASM_SRCS))
 C_OBJS       := $(patsubst %.c,%.o,$(C_SRCS))
 CPP_OBJS     := $(patsubst %.cpp,%.o,$(CPP_SRCS))
 
-TARGET_BIN   := $(BIN_DIR)/$(OUTPUT).bin
-TARGET_EXE   := $(BIN_DIR)/$(OUTPUT).exe
+TARGET_BIN   := $(BIN_DIR)/$(PROJECT).bin
+TARGET_EXE   := $(BIN_DIR)/$(PROJECT).exe
 ASM_OBJS_EXT := $(addprefix $(BIN_DIR)/, $(ASM_OBJS))
 C_OBJS_EXT   := $(addprefix $(BIN_DIR)/, $(C_OBJS))
 C_DEPS_EXT   := $(patsubst %.o, %.d, $(C_OBJS_EXT))
@@ -192,23 +192,28 @@ $(BIN_DIR)/%.o : %.cpp
 $(BIN_DIR)/%.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# include dependency files only if our goal depends on their existence
+ifneq ($(MAKECMDGOALS),clean)
+  ifneq ($(MAKECMDGOALS),show)
 -include $(C_DEPS_EXT) $(CPP_DEPS_EXT)
-
+  endif
+endif
 
 .PHONY : clean
 clean:
-	-$(RM) $(BIN_DIR)\*.o \
-	$(BIN_DIR)\*.d \
-	$(BIN_DIR)\*.exe \
-	$(BIN_DIR)\*.map
+	-$(RM) $(BIN_DIR)/*.o \
+	$(BIN_DIR)/*.d \
+	$(BIN_DIR)/*.exe \
+	$(BIN_DIR)/*.map
 	
 show:
-	@echo CONF = $(CONF)
+	@echo PROJECT  = $(PROJECT)
+	@echo CONF     = $(CONF)
 	@echo ASM_SRCS = $(ASM_SRCS)
-	@echo C_SRCS = $(C_SRCS)
+	@echo VPATH    = $(VPATH)
+	@echo C_SRCS   = $(C_SRCS)
 	@echo CPP_SRCS = $(CPP_SRCS)
 	@echo ASM_OBJS_EXT = $(ASM_OBJS_EXT)
-	@echo C_OBJS_EXT = $(C_OBJS_EXT)
-	@echo C_DEPS_EXT = $(C_DEPS_EXT)
+	@echo C_OBJS_EXT   = $(C_OBJS_EXT)
+	@echo C_DEPS_EXT   = $(C_DEPS_EXT)
 	@echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)
-	@echo TARGET_ELF = $(TARGET_ELF)

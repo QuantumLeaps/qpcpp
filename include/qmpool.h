@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -124,10 +124,11 @@ private:
     ///
     /// \note this attribute remembers the low watermark of the pool,
     /// which provides a valuable information for sizing event pools.
-    /// \sa QF::getPoolMargin().
+    /// \sa QF::getPoolMin().
     QMPoolCtr m_nMin;
 
 public:
+    QMPool(void);                              ///< public default constructor
 
     /// \brief Initializes the native QF event pool
     ///
@@ -145,9 +146,8 @@ public:
     ///
     /// \note Due to the rounding of block size the actual capacity of the
     /// pool might be less than (\a poolSize / \a blockSize). You can check
-    ///  the capacity of the pool by calling the QF::getPoolMargin() function.
-    void init(void * const poolSto, uint32_t const poolSize,
-              QMPoolSize const blockSize);
+    ///  the capacity of the pool by calling the QF::getPoolMin() function.
+    void init(void * const poolSto, uint_t poolSize, uint_t blockSize);
 
     /// \brief Obtains a memory block from a memory pool.
     ///
@@ -167,7 +167,7 @@ public:
     /// supported.
     ///
     /// \sa QMPool::put()
-    void *get(uint16_t const margin);
+    void *get(uint_t const margin);
 
     /// \brief Returns a memory block back to a memory pool.
     ///
@@ -191,6 +191,9 @@ public:
     }
 
 private:
+    QMPool(QMPool const &);                   ///< disallow copying of QMPools
+    QMPool &operator=(QMPool const &);      ///< disallow assigning of QMPools
+
     friend class QF;
 };
 

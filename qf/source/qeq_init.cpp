@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Oct 08, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -36,24 +36,34 @@
 
 /// \file
 /// \ingroup qf
-/// \brief QEQueue::init() implementation.
+/// \brief QEQueue::QEQueue() and QEQueue::init() implementation.
 
 namespace QP {
 
 //............................................................................
-void QEQueue::init(QEvt const *qSto[], QEQueueCtr const qLen) {
+QEQueue::QEQueue(void)
+  : m_frontEvt(null_evt),
+    m_ring(static_cast<QEvt const **>(0)),
+    m_end(static_cast<QEQueueCtr>(0)),
+    m_head(static_cast<QEQueueCtr>(0)),
+    m_tail(static_cast<QEQueueCtr>(0)),
+    m_nFree(static_cast<QEQueueCtr>(0)),
+    m_nMin(static_cast<QEQueueCtr>(0))
+{}
+//............................................................................
+void QEQueue::init(QEvt const *qSto[], uint_t const qLen) {
     m_frontEvt = null_evt;                           // no events in the queue
     m_ring     = &qSto[0];
-    m_end      = qLen;
+    m_end      = static_cast<QEQueueCtr>(qLen);
     m_head     = static_cast<QEQueueCtr>(0);
     m_tail     = static_cast<QEQueueCtr>(0);
-    m_nFree    = qLen + static_cast<QEQueueCtr>(1);//+1 for the extra frontEvt
+    m_nFree    = static_cast<QEQueueCtr>(qLen + u_1);  //+1 for extra frontEvt
     m_nMin     = m_nFree;
 
     QS_CRIT_STAT_
     QS_BEGIN_(QS_QF_EQUEUE_INIT, QS::priv_.eqObjFilter, this)
         QS_OBJ_(this);                                  // this QEQueue object
-        QS_EQC_(qLen);                              // the length of the queue
+        QS_EQC_(m_end);                             // the length of the queue
     QS_END_()
 }
 

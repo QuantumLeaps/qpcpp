@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 26, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -63,7 +63,8 @@ bool QTimeEvt::disarm(void) {
     else {                                     // the time event was not armed
         wasArmed = false;
 
-        QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_DISARM_ATTEMPT, QS::priv_.teObjFilter, this)
+        QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_DISARM_ATTEMPT,
+                         QS::priv_.teObjFilter, this)
             QS_TIME_();                                           // timestamp
             QS_OBJ_(this);                           // this time event object
             QS_OBJ_(m_act);                                   // the target AO

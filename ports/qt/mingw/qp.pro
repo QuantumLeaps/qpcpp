@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QP/C++ port to Qt5
-# Last Updated for Version: 5.1.0
-# Date of the Last Update:  Sep 30, 2013
+# Last Updated for Version: QP 5.1.1/Qt 5.1.0
+# Date of the Last Update:  Nov 04, 2013
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -39,24 +39,24 @@ TEMPLATE = lib
 CONFIG  += staticlib
 DEFINES += QT_NO_STATEMACHINE
 
-INCLUDEPATH += . \
+INCLUDEPATH += .. \
     ../../../include \
     ../../../qep/source \
     ../../../qf/source
 
 HEADERS +=  \
-    qep_port.h \
-    qf_port.h \
-    tickerthread.h \
-    aothread.h \
-    guiapp.h \
-    guiactive.h \
-    pixellabel.h
+    ../qep_port.h \
+    ../qf_port.h \
+    ../tickerthread.h \
+    ../aothread.h \
+    ../guiapp.h \
+    ../guiactive.h \
+    ../pixellabel.h
 
 SOURCES += \
-    qf_port.cpp \
-    guiapp.cpp \
-    pixellabel.cpp \
+    ../qf_port.cpp \
+    ../guiapp.cpp \
+    ../pixellabel.cpp \
     ../../../qep/source/qep.cpp \
     ../../../qep/source/qmsm_dis.cpp \
     ../../../qep/source/qmsm_ini.cpp \

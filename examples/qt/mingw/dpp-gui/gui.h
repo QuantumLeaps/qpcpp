@@ -1,7 +1,7 @@
 //****************************************************************************
-// Product: QP/C++ example
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 13, 2012
+// Product: QP/C++ example for Qt with GUI
+// Last Updated for Version: QP 5.1.1/Qt 5.1.1
+// Date of the Last Update:  Nov 05, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -46,7 +46,7 @@ Q_DEFINE_THIS_MODULE("qa_defer")
 
 //............................................................................
 bool QActive::defer(QEQueue * const eq, QEvt const * const e) const {
-    return eq->post(e, static_cast<uint16_t>(1));     // non-asserting posting
+    return eq->post(e, static_cast<uint_t>(1));       // non-asserting posting
 }
 //............................................................................
 bool QActive::recall(QEQueue * const eq) {

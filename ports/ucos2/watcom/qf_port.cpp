@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++ port to x86, uC/OS-II, Open Watcom, Large model
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 30, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -82,17 +82,17 @@ extern "C" void task_function(void *pdata) {        // uC/OS-II task signature
     QF::thread_(static_cast<QActive *>(pdata));
 }
 //............................................................................
-void QActive::start(uint8_t prio,
-                    QEvt const *qSto[], uint32_t qLen,
-                    void *stkSto, uint32_t stkSize,
+void QActive::start(uint_t prio,
+                    QEvt const *qSto[], uint_t qLen,
+                    void *stkSto, uint_t stkSize,
                     QEvt const *ie)
 {
     m_eQueue = OSQCreate((void **)qSto, qLen);
     Q_ASSERT(m_eQueue != (OS_EVENT *)0);             // uC/OS-II queue created
-    m_prio = prio;                                      // set the QF priority
-    QF::add_(this);                     // make QF aware of this active object
-    init(ie);                                // execute the initial transition
+    m_prio = static_cast<uint8_t>(prio);     // set the QF priority of this AO
+    QF::add_(this);                                // make QF aware of this AO
 
+    this->init(ie);               // execute initial transition (virtual call)
     QS_FLUSH();                          // flush the trace buffer to the host
 
     uint8_t p_ucos = QF_MAX_ACTIVE - m_prio;    // map QF priority to uC/OS-II

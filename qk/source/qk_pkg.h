@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 // Product: QK/C++
-// Last Updated for Version: 5.0.0
-// Date of the Last Update:  Aug 04, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -38,6 +38,10 @@
 /// \file
 /// \ingroup qk
 /// \brief Internal (package scope) QK/C interface.
+
+#ifndef QP_API_VERSION
+    #define QP_API_VERSION 9999
+#endif
 
 #include "qf_port.h"                    // QF port include; includes qk_port.h
 

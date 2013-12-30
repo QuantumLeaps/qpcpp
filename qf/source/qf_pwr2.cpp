@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -41,7 +41,7 @@
 namespace QP {
 
 // Global objects ------------------------------------------------------------
-uint8_t const Q_ROM Q_ROM_VAR QF_pwr2Lkup[65] = {
+uint8_t const Q_ROM QF_pwr2Lkup[65] = {
     static_cast<uint8_t>(0x00),                             // unused location
     static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
     static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
@@ -77,7 +77,7 @@ uint8_t const Q_ROM Q_ROM_VAR QF_pwr2Lkup[65] = {
     static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80)
 };
 
-uint8_t const Q_ROM Q_ROM_VAR QF_invPwr2Lkup[65] = {
+uint8_t const Q_ROM QF_invPwr2Lkup[65] = {
     static_cast<uint8_t>(0xFF),                             // unused location
     static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
     static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
@@ -113,7 +113,7 @@ uint8_t const Q_ROM Q_ROM_VAR QF_invPwr2Lkup[65] = {
     static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F)
 };
 
-uint8_t const Q_ROM Q_ROM_VAR QF_div8Lkup[65] = {
+uint8_t const Q_ROM QF_div8Lkup[65] = {
     static_cast<uint8_t>(0),                                // unused location
     static_cast<uint8_t>(0), static_cast<uint8_t>(0), static_cast<uint8_t>(0),
     static_cast<uint8_t>(0), static_cast<uint8_t>(0), static_cast<uint8_t>(0),

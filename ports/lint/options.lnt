@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 24, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -64,12 +64,15 @@ lib-qpcpp.lnt     // QP/C++ options
 -efunc(639, *getVersion)    // Strong type mismatch in binary operation
 -efunc(778, *getVersion)    // Constant expression evaluates to 0
 -efunc(835, *getVersion)    // 0 as left argument to operator '+'
+-efunc(1960,*hsm_tran)      // pointer arithmetic other than array indexing
+                            // reported incorrectly for array reference
 -emacro(717,                // do ... while(0);
  QEP_ENTER_,
  QEP_EXIT_)
 -esym(613,                  // Possible use of null pointer
  *m_state,
- *m_temp)
+ *m_temp,
+ act)
 
 // QF
 -emacro(1960, QF_EVT_CONST_CAST_) // 5-2-5 attempt to cast away const
@@ -80,6 +83,7 @@ lib-qpcpp.lnt     // QP/C++ options
  *QF_EVT_REF_CTR_DEC_)
 -emacro(1960, QF_PTR_AT_)   // 5-0-15 pointer arithmetic
 -efunc(925,                 // 5-2-8, 5-2-9 cast from pointer to pointer
+ *QF::bzero,
  *QMPool::init,
  *QMPool::get,
  *QMPool::put)
@@ -89,10 +93,11 @@ lib-qpcpp.lnt     // QP/C++ options
  QF_EVT_CONST_CAST_,
  QF_EVT_POOL_ID_,
  QF_EVT_REF_CTR_,
- QF_PTR_AT_,
  QF_CRIT_ENTRY_,
  QF_CRIT_EXIT_,
- QF_PTR_RANGE_)
+ QF_PTR_AT_,
+ QF_PTR_RANGE_,
+ QF_PTR_INC_)
 -efunc(818,                 // 7-1-2 'stkSto' could be const
  *QActive::start,
  *QActive::stop)
@@ -101,6 +106,9 @@ lib-qpcpp.lnt     // QP/C++ options
 -emacro(717, QACTIVE_EQUEUE_SIGNAL_) // do ... while(0);
 -efunc(529, *QF::tick)      // Symbol 'dummy' not accessed
 -efunc(438, *QF::tick)      // Value assigned to 'dummy' not used
+-esym(613,                  // warning Possible use of null pointer
+ QP::QEQueue::*,
+ QP::QMPool::*)
 -esym(1960, QP::QF_*)       // 3-2-3, object/function previously declared
                             // reported incorrectly for qf_pkg.h
 

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++ example for Qt5
-// Last Updated for Version: 5.0.0
-// Date of the Last Update:  Aug 16, 2013
+// Last Updated for Version: QP 5.1.1/Qt 5.1.1
+// Date of the Last Update:  Nov 05, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -47,7 +47,7 @@ static QF_MPOOL_EL(DPP::TableEvt) l_smlPoolSto[2*N_PHILO];       // small pool
 
 //............................................................................
 int main(int argc, char *argv[]) {
-    GuiApp app(argc, argv);
+    QP::GuiApp app(argc, argv);
     Gui gui;
 
     gui.show();

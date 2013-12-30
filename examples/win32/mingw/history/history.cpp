@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: History state pattern example
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 15, 2012
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //****************************************************************************
-#include "qep_port.h"
+#include "qp_port.h"
 #include "qassert.h"
 
 #include <stdio.h>
@@ -58,7 +58,7 @@ private:
     QStateHandler m_doorClosed_history;
 
 public:
-    ToasterOven() : QHsm((QStateHandler)&ToasterOven::initial) {    }
+    ToasterOven() : QHsm(Q_STATE_CAST(&ToasterOven::initial)) {}
 
 private:
     static QState initial   (ToasterOven *me, QEvt const *e);

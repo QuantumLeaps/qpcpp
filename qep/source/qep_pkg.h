@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QEP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -39,6 +39,10 @@
 /// \ingroup qep
 /// \brief Internal (package scope) QEP/C++ interface.
 
+#ifndef QP_API_VERSION
+    #define QP_API_VERSION 9999
+#endif
+
 #include "qep_port.h"                                              // QEP port
 
 #ifdef Q_SPY                                   // QS software tracing enabled?
@@ -56,14 +60,11 @@ extern QEvt const QEP_reservedEvt_[4];
 /// empty signal for internal use only
 QSignal const QEP_EMPTY_SIG_ = static_cast<QSignal>(0);
 
-/// maximum depth of state nesting (including the top level), must be >= 3
-int8_t const QEP_MAX_NEST_DEPTH_ = static_cast<int8_t>(6);
-
 uint8_t const u8_0  = static_cast<uint8_t>(0); ///< \brief constant (uint8_t)0
 uint8_t const u8_1  = static_cast<uint8_t>(1); ///< \brief constant (uint8_t)1
-int8_t  const s8_0  = static_cast<int8_t>(0);  ///< \brief constant  (int8_t)0
-int8_t  const s8_1  = static_cast<int8_t>(1);  ///< \brief constant  (int8_t)1
-int8_t  const s8_n1 = static_cast<int8_t>(-1); ///< \brief constant (int8_t)-1
+int_t   const s_0   = static_cast<int_t>(0);    ///< \brief constant  (int_t)0
+int_t   const s_1   = static_cast<int_t>(1);    ///< \brief constant  (int_t)1
+int_t   const s_n1  = static_cast<int_t>(-1);   ///< \brief constant (int_t)-1
 
 }                                                              // namespace QP
 

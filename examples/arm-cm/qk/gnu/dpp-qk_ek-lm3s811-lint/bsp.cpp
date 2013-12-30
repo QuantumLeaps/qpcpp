@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Dining Philosophers Problem" example, preemptive QK kernel
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Oct 01, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -49,9 +49,8 @@ Q_DEFINE_THIS_FILE
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
 // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-//
 enum KernelUnawareISRs {                                         // see NOTE00
-    // ...
+    //...
     MAX_KERNEL_UNAWARE_CMSIS_PRI                           // keep always last
 };
 // "kernel-unaware" interrupts can't overlap "kernel-aware" interrupts
@@ -60,7 +59,7 @@ Q_ASSERT_COMPILE(MAX_KERNEL_UNAWARE_CMSIS_PRI <= QF_AWARE_ISR_CMSIS_PRI);
 enum KernelAwareISRs {
     GPIOPORTA_PRIO = QF_AWARE_ISR_CMSIS_PRI,                     // see NOTE00
     SYSTICK_PRIO,
-    // ...
+    //...
     MAX_KERNEL_AWARE_CMSIS_PRI                             // keep always last
 };
 // "kernel-aware" interrupts should not overlap the PendSV priority
@@ -102,7 +101,7 @@ extern "C" void SysTick_Handler(void) {
     QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
 #endif
 
-    QP::QF::TICK(&l_SysTick_Handler);         // process all armed time events
+    QP::QF::TICK_X(0U, &l_SysTick_Handler);   // process time events at rate 0
 
     static uint32_t btn_debounced  = PUSH_BUTTON;
     static uint8_t  debounce_state = 0U;
@@ -186,7 +185,6 @@ void BSP_init(void) {
     Display96x16x1StringDraw(&"0 ,1 ,2 ,3 ,4"[0], 0U, 1U);
 
     Q_ALLEGE(QS_INIT(static_cast<void *>(0)));
-    QS_RESET();
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_GPIOPortA_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
@@ -226,25 +224,23 @@ void BSP_terminate(int16_t const result) {
     (void)result;
 }
 
+}                                                             // namespace DPP
+//****************************************************************************
 
 //............................................................................
-extern "C" void Q_onAssert(char_t const Q_ROM * const Q_ROM_VAR file,
-                           int_t const line)
-{
-    (void)file;                                      // avoid compiler warning
-    (void)line;                                      // avoid compiler warning
-    QF_INT_DISABLE();            // make sure that all interrupts are disabled
-    for (;;) {          // NOTE: replace the loop with reset for final version
-    }
+extern "C" void Q_onAssert(char const Q_ROM * const file, int_t line) {
+    assert_failed(file, line);
 }
+
 //............................................................................
 // error routine that is called if the CMSIS library encounters an error
 extern "C" void assert_failed(char const *file, int line) {
-    Q_onAssert(file, line);
+    (void)file;                                      // avoid compiler warning
+    (void)line;                                      // avoid compiler warning
+    QF_INT_DISABLE();            // make sure that all interrupts are disabled
+    NVIC_SystemReset();                                // perform system reset
 }
 
-}                                                             // namespace DPP
-//****************************************************************************
 
 namespace QP {
 
@@ -258,10 +254,9 @@ void QF::onStartup(void) {
 
     // set priorities of ALL ISRs used in the system, see NOTE00
     //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority()
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-    //
     NVIC_SetPriority(SysTick_IRQn,   DPP::SYSTICK_PRIO);
     NVIC_SetPriority(GPIOPortA_IRQn, DPP::GPIOPORTA_PRIO);
 
@@ -422,13 +417,14 @@ void QS::onFlush(void) {
 //
 // Only ISRs prioritized at or below the QF_AWARE_ISR_CMSIS_PRI level (i.e.,
 // with the numerical values of priorities equal or higher than
-// QF_AWARE_ISR_CMSIS_PRI) are allowed to call any QF services. These ISRs
-// are "QF-aware".
+// QF_AWARE_ISR_CMSIS_PRI) are allowed to call the QK_ISR_ENTRY/QK_ISR_ENTRY
+// macros or any other QF/QK  services. These ISRs are "QF-aware".
 //
 // Conversely, any ISRs prioritized above the QF_AWARE_ISR_CMSIS_PRI priority
 // level (i.e., with the numerical values of priorities less than
 // QF_AWARE_ISR_CMSIS_PRI) are never disabled and are not aware of the kernel.
-// Such "QF-unaware" ISRs cannot call any QF services. The only mechanism
+// Such "QF-unaware" ISRs cannot call any QF/QK services. In particular they
+// can NOT call the macros QK_ISR_ENTRY/QK_ISR_ENTRY. The only mechanism
 // by which a "QF-unaware" ISR can communicate with the QF framework is by
 // triggering a "QF-aware" ISR, which can post/publish events.
 //

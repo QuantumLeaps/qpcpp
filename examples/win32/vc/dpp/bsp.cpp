@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example
 // Last Updated for Version: 5.0.0
-// Date of the Last Update:  Sep 06, 2013
+// Date of the Last Update:  Aug 24, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -38,7 +38,6 @@
 
 #include <conio.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 //****************************************************************************
 namespace DPP {
@@ -131,7 +130,7 @@ void QF_onClockTick(void) {
 //............................................................................
 extern "C" void Q_onAssert(char const Q_ROM * const file, int line) {
     fprintf(stderr, "Assertion failed in %s, line %d", file, line);
-    exit(-1);
+    QF::stop();
 }
 
 //----------------------------------------------------------------------------

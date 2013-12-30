@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Oct 07, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -67,7 +67,7 @@ namespace QP {
     /// This lookup delivers the 1-based number of the most significant 1-bit
     /// of a byte.
     ///
-    extern uint8_t const Q_ROM Q_ROM_VAR QF_log2Lkup[256];
+    extern uint8_t const Q_ROM QF_log2Lkup[256];
 
     #define QF_LOG2LKUP 1
 #endif                                                              // QF_LOG2
@@ -77,20 +77,20 @@ namespace QP {
 ///
 /// \note Index range n = 0..64. The first index (n == 0) should never
 /// be used.
-extern uint8_t const Q_ROM Q_ROM_VAR QF_pwr2Lkup[65];
+extern uint8_t const Q_ROM QF_pwr2Lkup[65];
 
 /// \brief Lookup table for ~(1 << ((n-1) % 8)), where n is the index
 /// into the table.
 ///
 /// \note Index range n = 0..64. The first index (n == 0) should never
 /// be used.
-extern uint8_t const Q_ROM Q_ROM_VAR QF_invPwr2Lkup[65];
+extern uint8_t const Q_ROM QF_invPwr2Lkup[65];
 
 /// \brief Lookup table for (n-1)/8
 ///
 /// \note Index range n = 0..64. The first index (n == 0) should never
 /// be used.
-extern uint8_t const Q_ROM Q_ROM_VAR QF_div8Lkup[65];
+extern uint8_t const Q_ROM QF_div8Lkup[65];
 
 //****************************************************************************
 /// \brief Priority Set of up to 8 elements for building various schedulers,
@@ -216,9 +216,8 @@ public:
     /// \brief remove element \a n from the set, n = 1..64
     void remove(uint8_t const n) {
         uint8_t m = Q_ROM_BYTE(QF_div8Lkup[n]);
-        if ((m_bits[m] &= Q_ROM_BYTE(QF_invPwr2Lkup[n]))
-             == 0U)
-        {
+        m_bits[m] &= Q_ROM_BYTE(QF_invPwr2Lkup[n]);
+        if (m_bits[m] == static_cast<uint8_t>(0)) {
             m_bytes &=Q_ROM_BYTE(QF_invPwr2Lkup[m + static_cast<uint8_t>(1)]);
         }
     }

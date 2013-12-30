@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -37,7 +37,7 @@
 
 /// \file
 /// \ingroup qf
-/// \brief QF::publish() implementation.
+/// \brief QF::publish_() implementation.
 
 namespace QP {
 
@@ -45,9 +45,9 @@ Q_DEFINE_THIS_MODULE("qf_pspub")
 
 //............................................................................
 #ifndef Q_SPY
-void QF::publish(QEvt const * const e) {
+void QF::publish_(QEvt const * const e) {
 #else
-void QF::publish(QEvt const * const e, void const * const sender) {
+void QF::publish_(QEvt const * const e, void const * const sender) {
 #endif
          // make sure that the published signal is within the configured range
     Q_REQUIRE(static_cast<enum_t>(e->sig) < QF_maxSignal_);

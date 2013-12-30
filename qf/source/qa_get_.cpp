@@ -37,7 +37,7 @@
 
 /// \file
 /// \ingroup qf
-/// \brief QActive::get_() and QF::getQueueMargin() definitions.
+/// \brief QActive::get_() and QF::getQueueMin() definitions.
 ///
 /// \note this source file is only included in the QF library when the native
 /// QF active object queue is used (instead of a message queue of an RTOS).
@@ -92,13 +92,13 @@ QEvt const *QActive::get_(void) {
     return e;
 }
 //............................................................................
-uint16_t QF::getQueueMin(uint8_t const prio) {
+uint_t QF::getQueueMin(uint8_t const prio) {
     Q_REQUIRE((prio <= static_cast<uint8_t>(QF_MAX_ACTIVE))
               && (active_[prio] != static_cast<QActive *>(0)));
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-    uint16_t min = static_cast<uint16_t>(active_[prio]->m_eQueue.m_nMin);
+    uint_t min = static_cast<uint_t>(active_[prio]->m_eQueue.m_nMin);
     QF_CRIT_EXIT_();
 
     return min;

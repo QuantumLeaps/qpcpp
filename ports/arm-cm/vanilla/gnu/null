@@ -1,0 +1,101 @@
+spy selected
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -O -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qep.cpp      -o.\spy\qep.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -O -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qmsm_ini.cpp -o.\spy\qmsm_ini.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -O -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qmsm_dis.cpp -o.\spy\qmsm_dis.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -O -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qfsm_ini.cpp -o.\spy\qfsm_ini.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -O -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qfsm_dis.cpp -o.\spy\qfsm_dis.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -O -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qhsm_ini.cpp -o.\spy\qhsm_ini.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -O -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qhsm_dis.cpp -o.\spy\qhsm_dis.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -O -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qhsm_top.cpp -o.\spy\qhsm_top.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -O -I. -I..\..\..\..\include -I..\..\..\..\qep\source ..\..\..\..\qep\source\qhsm_in.cpp  -o.\spy\qhsm_in.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-ar rs .\spy\libqp_cortex-m3_cs.a .\spy\qep.o .\spy\qmsm_dis.o .\spy\qmsm_ini.o .\spy\qfsm_ini.o .\spy\qfsm_dis.o .\spy\qhsm_ini.o .\spy\qhsm_dis.o .\spy\qhsm_top.o .\spy\qhsm_in.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qa_defer.cpp -o.\spy\qa_defer.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qa_fifo.cpp  -o.\spy\qa_fifo.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qa_lifo.cpp  -o.\spy\qa_lifo.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qa_get_.cpp  -o.\spy\qa_get_.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qa_sub.cpp   -o.\spy\qa_sub.o   
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qa_usub.cpp  -o.\spy\qa_usub.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qa_usuba.cpp -o.\spy\qa_usuba.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qeq_fifo.cpp -o.\spy\qeq_fifo.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qeq_get.cpp  -o.\spy\qeq_get.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qeq_init.cpp -o.\spy\qeq_init.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qeq_lifo.cpp -o.\spy\qeq_lifo.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qf_act.cpp   -o.\spy\qf_act.o   
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qf_gc.cpp    -o.\spy\qf_gc.o       
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qf_log2.cpp  -o.\spy\qf_log2.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qf_new.cpp   -o.\spy\qf_new.o   
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qf_pool.cpp  -o.\spy\qf_pool.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qf_psini.cpp -o.\spy\qf_psini.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qf_pspub.cpp -o.\spy\qf_pspub.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qf_pwr2.cpp  -o.\spy\qf_pwr2.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qf_tick.cpp  -o.\spy\qf_tick.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qmp_get.cpp  -o.\spy\qmp_get.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qmp_init.cpp -o.\spy\qmp_init.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qmp_put.cpp  -o.\spy\qmp_put.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qte_ctor.cpp -o.\spy\qte_ctor.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qte_arm.cpp  -o.\spy\qte_arm.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qte_darm.cpp -o.\spy\qte_darm.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qte_rarm.cpp -o.\spy\qte_rarm.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qte_ctr.cpp  -o.\spy\qte_ctr.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qf\source -O ..\..\..\..\qf\source\qvanilla.cpp -o.\spy\qvanilla.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-ar rs .\spy\libqp_cortex-m3_cs.a .\spy\qa_defer.o .\spy\qa_fifo.o .\spy\qa_lifo.o .\spy\qa_get_.o .\spy\qa_sub.o .\spy\qa_usub.o .\spy\qa_usuba.o .\spy\qeq_fifo.o .\spy\qeq_get.o .\spy\qeq_init.o .\spy\qeq_lifo.o .\spy\qf_act.o .\spy\qf_gc.o .\spy\qf_log2.o .\spy\qf_new.o .\spy\qf_pool.o .\spy\qf_psini.o .\spy\qf_pspub.o .\spy\qf_pwr2.o .\spy\qf_tick.o .\spy\qmp_get.o .\spy\qmp_init.o .\spy\qmp_put.o .\spy\qte_ctor.o .\spy\qte_arm.o .\spy\qte_darm.o .\spy\qte_rarm.o .\spy\qte_ctr.o .\spy\qvanilla.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qs\source -Os ..\..\..\..\qs\source\qs.cpp      -o.\spy\qs.o      
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qs\source -Os ..\..\..\..\qs\source\qs_.cpp     -o.\spy\qs_.o      
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qs\source -Os ..\..\..\..\qs\source\qs_blk.cpp  -o.\spy\qs_blk.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qs\source -Os ..\..\..\..\qs\source\qs_byte.cpp -o.\spy\qs_byte.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qs\source -Os ..\..\..\..\qs\source\qs_dict.cpp -o.\spy\qs_dict.o 
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qs\source -Os ..\..\..\..\qs\source\qs_f32.cpp  -o.\spy\qs_f32.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qs\source -Os ..\..\..\..\qs\source\qs_f64.cpp  -o.\spy\qs_f64.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qs\source -Os ..\..\..\..\qs\source\qs_mem.cpp  -o.\spy\qs_mem.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-g++ -g -c -mcpu=cortex-m3 -mthumb -Wall -fno-rtti -fno-exceptions -DQ_SPY -I. -I..\..\..\..\include -I..\..\..\..\qs\source -Os ..\..\..\..\qs\source\qs_str.cpp  -o.\spy\qs_str.o  
+
+D:\qp\qpcpp\ports\arm-cm\vanilla\gnu>"C:\tools\CodeSourcery"\bin\arm-none-eabi-ar rs .\spy\libqp_cortex-m3_cs.a .\spy\qs.o .\spy\qs_.o .\spy\qs_blk.o .\spy\qs_byte.o .\spy\qs_dict.o .\spy\qs_f32.o .\spy\qs_f64.o .\spy\qs_mem.o .\spy\qs_str.o 

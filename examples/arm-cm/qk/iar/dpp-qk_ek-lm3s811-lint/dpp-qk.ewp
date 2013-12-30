@@ -174,7 +174,6 @@
           <name>CCDefines</name>
           <state>ewarm</state>
           <state>PART_LM3S811</state>
-          <state>STACK_SIZE=600</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -707,7 +706,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\lm3s811.icf</state>
+          <state>$PROJ_DIR$\dpp-qk.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -1024,7 +1023,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>6.40.1.53794</state>
+          <state>6.60.1.5099</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -1112,7 +1111,6 @@
           <state>ewarm</state>
           <state>PART_LM3S811</state>
           <state>NDEBUG</state>
-          <state>STACK_SIZE=600</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -1645,7 +1643,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\lm3s811.icf</state>
+          <state>$PROJ_DIR$\dpp-qk.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -1962,7 +1960,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>6.40.1.53794</state>
+          <state>6.60.1.5099</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -2050,7 +2048,6 @@
           <state>ewarm</state>
           <state>PART_LM3S811</state>
           <state>Q_SPY</state>
-          <state>STACK_SIZE=600</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -2583,7 +2580,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\lm3s811.icf</state>
+          <state>$PROJ_DIR$\dpp-qk.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>

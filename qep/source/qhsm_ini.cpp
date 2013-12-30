@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QEP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 26, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -61,8 +61,8 @@ void QHsm::init(QEvt const * const e) {
 
     QS_CRIT_STAT_
     do {                                           // drill into the target...
-        QStateHandler path[QEP_MAX_NEST_DEPTH_];
-        int8_t ip = s8_0;                       // transition entry path index
+        QStateHandler path[MAX_NEST_DEPTH];
+        int_t ip = s_0;                         // transition entry path index
 
         QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
             QS_OBJ_(this);                        // this state machine object
@@ -79,12 +79,12 @@ void QHsm::init(QEvt const * const e) {
         }
         m_temp.fun = path[0];
                                                // entry path must not overflow
-        Q_ASSERT(ip < QEP_MAX_NEST_DEPTH_);
+        Q_ASSERT(ip < MAX_NEST_DEPTH);
 
         do {           // retrace the entry path in reverse (desired) order...
             QEP_ENTER_(path[ip]);                            // enter path[ip]
             --ip;
-        } while (ip >= s8_0);
+        } while (ip >= s_0);
 
         t = path[0];                   // current state becomes the new source
     } while (QEP_TRIG_(t, Q_INIT_SIG) == Q_RET_TRAN);

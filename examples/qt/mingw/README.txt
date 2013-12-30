@@ -15,7 +15,7 @@ compiled libraries are located in the %QPCPP%\ports\qt\mingw
 directory. Howver, if you want to change the QP settings, or
 if you want to use different compiler options, you need to
 re-bulid the QP libraries from sources. The QP library
-directory contains the makefile for re-building the libraries.
+directory contains the .pro file for building the libraries.
 
 
 Editing the Environment Variables on Windows

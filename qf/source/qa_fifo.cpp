@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Oct 08, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Nov 30, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -37,7 +37,7 @@
 
 /// \file
 /// \ingroup qf
-/// \brief QActive::post() implementation.
+/// \brief QActive::post_() implementation.
 ///
 /// \note this source file is only included in the QF library when the native
 /// QF active object queue is used (instead of a message queue of an RTOS).
@@ -48,10 +48,10 @@ Q_DEFINE_THIS_MODULE("qa_fifo")
 
 //............................................................................
 #ifndef Q_SPY
-bool QActive::post(QEvt const * const e, uint16_t const margin)
+bool QActive::post_(QEvt const * const e, uint_t const margin)
 #else
-bool QActive::post(QEvt const * const e, uint16_t const margin,
-                   void const * const sender)
+bool QActive::post_(QEvt const * const e, uint_t const margin,
+                    void const * const sender)
 #endif
 {
     bool status;
@@ -98,7 +98,7 @@ bool QActive::post(QEvt const * const e, uint16_t const margin,
         status = true;                            // event posted successfully
     }
     else {
-        Q_ASSERT(margin != u16_0);             // can tollerate dropping evts?
+        Q_ASSERT(margin != u_0);               // can tollerate dropping evts?
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT, QS::priv_.aoObjFilter,
                          this)
@@ -111,6 +111,7 @@ bool QActive::post(QEvt const * const e, uint16_t const margin,
             QS_EQC_(static_cast<QEQueueCtr>(margin));      // margin requested
         QS_END_NOCRIT_()
 
+        QF::gc(e);                        // recycle the evnet to avoid a leak
         status = false;                                    // event not posted
     }
     QF_CRIT_EXIT_();
@@ -123,7 +124,7 @@ bool QActive::post(QEvt const * const e, uint16_t const margin,
 //****************************************************************************
 // NOTE01:
 // The zero value of the 'margin' argument is special and denotes situation
-// when the post() operation is assumed to succeed (event delivery guarantee).
+// when the post_() operation is assumed to succeed (event delivery guarantee).
 // An assertion fires, when the event cannot be delivered in this case.
 //
 

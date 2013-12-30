@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -96,7 +96,7 @@ public:
     /// \return version of QK as a constant 5-character string of the
     /// form X.Y.Z, where X is a 1-digit major version number, Y is a
     /// 1-digit minor version number, and Z is a 1-digit release number.
-    static char_t const Q_ROM * Q_ROM_VAR getVersion(void) {
+    static char_t const Q_ROM *getVersion(void) {
         return QP_VERSION_STR;
     }
 
@@ -178,7 +178,7 @@ uint8_t QK_schedPrio_(void);
 #endif
 
 extern uint8_t volatile QK_currPrio_;     ///< current task/interrupt priority
-extern uint8_t volatile QK_intNest_;              ///< interrupt nesting level
+extern uint_t  volatile QK_intNest_;              ///< interrupt nesting level
 
 }                                                                // extern "C"
 
@@ -191,7 +191,7 @@ extern uint8_t volatile QK_intNest_;              ///< interrupt nesting level
         Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
         QK_readySet_.insert((me_)->m_prio); \
-        if (QK_intNest_ == static_cast<uint8_t>(0)) { \
+        if (QK_intNest_ == static_cast<uint_t>(0)) { \
             uint8_t p = QK_schedPrio_(); \
             if (p != static_cast<uint8_t>(0)) { \
                 QK_sched_(p); \
@@ -201,15 +201,15 @@ extern uint8_t volatile QK_intNest_;              ///< interrupt nesting level
     #define QACTIVE_EQUEUE_ONEMPTY_(me_) \
         QK_readySet_.remove((me_)->m_prio)
 
+                                            // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-        (p_).init((poolSto_), (poolSize_), \
-            static_cast<QMPoolSize>(evtSize_))
-    #define QF_EPOOL_EVENT_SIZE_(p_)    \
-        static_cast<uint32_t>((p_).getBlockSize())
+        (p_).init((poolSto_), (poolSize_), (evtSize_))
+    #define QF_EPOOL_EVENT_SIZE_(p_) \
+        static_cast<uint_t>((p_).getBlockSize())
     #define QF_EPOOL_GET_(p_, e_, m_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
-    #define QF_EPOOL_PUT_(p_, e_)       ((p_).put(e_))
+    #define QF_EPOOL_PUT_(p_, e_) ((p_).put(e_))
 
 #endif                                                      // #ifdef qf_pkg_h
 

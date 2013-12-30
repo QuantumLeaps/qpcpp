@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: History state pattern example
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Aug 15, 2012
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -217,7 +217,7 @@ int main() {
     return 0;
 }
 //............................................................................
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
+void Q_onAssert(char const Q_ROM * const file, int line) {
     fprintf(stderr, "Assertion failed in %s, line %d", file, line);
     _exit(-1);
 }

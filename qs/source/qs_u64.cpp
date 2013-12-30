@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 23, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Nov 12, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -44,10 +44,10 @@ namespace QP {
 
 //............................................................................
 void QS::u64_(uint64_t d) {
-    uint8_t chksum = priv_.chksum;
-    uint8_t *buf   = priv_.buf;
-    QSCtr   head   = priv_.head;
-    QSCtr   end    = priv_.end;
+    uint8_t chksum_ = priv_.chksum;
+    uint8_t *buf_   = priv_.buf;
+    QSCtr   head_   = priv_.head;
+    QSCtr   end_    = priv_.end;
 
     priv_.used += static_cast<QSCtr>(8);      // 8 bytes are about to be added
     for (int_t i = static_cast<int_t>(8); i != static_cast<int_t>(0); --i) {
@@ -56,15 +56,15 @@ void QS::u64_(uint64_t d) {
         d >>= 8;
     }
 
-    priv_.head   = head;                                      // save the head
-    priv_.chksum = chksum;                                // save the checksum
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
 }
 //............................................................................
 void QS::u64(uint8_t format, uint64_t d) {
-    uint8_t chksum = priv_.chksum;
-    uint8_t *buf   = priv_.buf;
-    QSCtr   head   = priv_.head;
-    QSCtr   end    = priv_.end;
+    uint8_t chksum_ = priv_.chksum;
+    uint8_t *buf_   = priv_.buf;
+    QSCtr   head_   = priv_.head;
+    QSCtr   end_    = priv_.end;
 
     priv_.used += static_cast<QSCtr>(9);      // 9 bytes are about to be added
     QS_INSERT_ESC_BYTE(format)                       // insert the format byte
@@ -75,8 +75,8 @@ void QS::u64(uint8_t format, uint64_t d) {
         d >>= 8;
     }
 
-    priv_.head   = head;                                      // save the head
-    priv_.chksum = chksum;                                // save the checksum
+    priv_.head   = head_;                                     // save the head
+    priv_.chksum = chksum_;                               // save the checksum
 }
 
 #endif

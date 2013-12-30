@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Oct 07, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -53,13 +53,16 @@ extern "C" {
 #endif
 
 uint8_t volatile QF_currPrio_;            ///< current task/interrupt priority
-uint8_t volatile QF_intNest_;                     ///< interrupt nesting level
-
 }                                                                // extern "C"
 
 //............................................................................
 void QF::init(void) {
-    // nothing to do for the "vanilla" kernel
+    QF_maxPool_ = u_0;
+    bzero(&QF_readySet_,       static_cast<uint_t>(sizeof(QF_readySet_)));
+    bzero(&QF::timeEvtHead_[0],static_cast<uint_t>(sizeof(QF::timeEvtHead_)));
+    bzero(&QF::active_[0],     static_cast<uint_t>(
+                                 static_cast<uint_t>(QF_MAX_ACTIVE)
+                                   * static_cast<uint_t>(sizeof(QActive *))));
 }
 //............................................................................
 void QF::stop(void) {
@@ -67,7 +70,7 @@ void QF::stop(void) {
     // nothing else to do for the "vanilla" kernel
 }
 //............................................................................
-int16_t QF::run(void) {
+int_t QF::run(void) {
     onStartup();                                           // startup callback
 
     for (;;) {                                           // the bacground loop
@@ -88,23 +91,23 @@ int16_t QF::run(void) {
     }
 
 #ifdef __GNUC__                                               // GNU compiler?
-    return static_cast<int16_t>(0);
+    return u_0;
 #endif
 }
 //............................................................................
-void QActive::start(uint8_t const prio,
-                    QEvt const *qSto[], uint32_t const qLen,
-                    void * const stkSto, uint32_t const,
+void QActive::start(uint_t const prio,
+                    QEvt const *qSto[], uint_t const qLen,
+                    void * const stkSto, uint_t const,
                     QEvt const * const ie)
 {
-    Q_REQUIRE((u8_0 < prio) && (prio <= static_cast<uint8_t>(QF_MAX_ACTIVE))
+    Q_REQUIRE((u_0 < prio) && (prio <= static_cast<uint_t>(QF_MAX_ACTIVE))
               && (stkSto == null_void));      // does not need per-actor stack
 
-    m_eQueue.init(qSto, static_cast<QEQueueCtr>(qLen));  // initialize QEQueue
-    m_prio = prio;                // set the QF priority of this active object
-    QF::add_(this);                     // make QF aware of this active object
-    this->init(ie);               // execute initial transition (virtual call)
+    m_eQueue.init(qSto, qLen);                // initialize QEQueue of this AO
+    m_prio = static_cast<uint8_t>(prio);     // set the QF priority of this AO
+    QF::add_(this);                                // make QF aware of this AO
 
+    this->init(ie);               // execute initial transition (virtual call)
     QS_FLUSH();                          // flush the trace buffer to the host
 }
 //............................................................................

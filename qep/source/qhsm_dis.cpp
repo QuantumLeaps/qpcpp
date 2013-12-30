@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QEP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -77,15 +77,11 @@ void QHsm::dispatch(QEvt const * const e) {
     } while (r == Q_RET_SUPER);
 
     if (r == Q_RET_TRAN) {                                // transition taken?
-        QStateHandler path[QEP_MAX_NEST_DEPTH_];
-        int8_t ip = s8_n1;                      // transition entry path index
-        int8_t iq;                       // helper transition entry path index
-#ifdef Q_SPY
-        QStateHandler src = s;       // save the transition source for tracing
-#endif
+        QStateHandler path[MAX_NEST_DEPTH];
 
         path[0] = m_temp.fun;             // save the target of the transition
         path[1] = t;
+        path[2] = s;
 
         while (t != s) {       // exit current state to transition source s...
             if (QEP_TRIG_(t, Q_EXIT_SIG) == Q_RET_HANDLED) {   //exit handled?
@@ -99,120 +95,10 @@ void QHsm::dispatch(QEvt const * const e) {
             t = m_temp.fun;                 // m_temp.fun holds the superstate
         }
 
-        t = path[0];                               // target of the transition
+        int_t ip = hsm_tran(path);                  // take the HSM transition
 
-        if (s == t) {         // (a) check source==target (transition to self)
-            QEP_EXIT_(s);                                   // exit the source
-            ip = s8_0;                                     // enter the target
-        }
-        else {
-            (void)QEP_TRIG_(t, QEP_EMPTY_SIG_);        // superstate of target
-            t = m_temp.fun;
-            if (s == t) {                   // (b) check source==target->super
-                ip = s8_0;               // enter the target
-            }
-            else {
-                (void)QEP_TRIG_(s, QEP_EMPTY_SIG_);       // superstate of src
-                                     // (c) check source->super==target->super
-                if (m_temp.fun == t) {
-                    QEP_EXIT_(s);                           // exit the source
-                    ip = s8_0;           // enter the target
-                }
-                else {
-                                            // (d) check source->super==target
-                    if (m_temp.fun == path[0]) {
-                        QEP_EXIT_(s);                       // exit the source
-                    }
-                    else { // (e) check rest of source==target->super->super..
-                           // and store the entry path along the way
-                           //
-                        iq = s8_0; // indicate LCA not found
-                        ip = s8_1; // enter target's superst
-                        path[1] = t;          // save the superstate of target
-                        t = m_temp.fun;                  // save source->super
-                                                  // find target->super->super
-                        r = QEP_TRIG_(path[1], QEP_EMPTY_SIG_);
-                        while (r == Q_RET_SUPER) {
-                            ++ip;
-                            path[ip] = m_temp.fun;     // store the entry path
-                            if (m_temp.fun == s) {        // is it the source?
-                                                    // indicate that LCA found
-                                iq = s8_1;
-                                               // entry path must not overflow
-                                Q_ASSERT(ip < QEP_MAX_NEST_DEPTH_);
-                                --ip;               // do not enter the source
-                                r = Q_RET_HANDLED;       // terminate the loop
-                            }
-                            else {      // it is not the source, keep going up
-                                r = QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
-                            }
-                        }
-                        if (iq == s8_0) {  // LCA found yet?
-
-                                               // entry path must not overflow
-                            Q_ASSERT(ip < QEP_MAX_NEST_DEPTH_);
-
-                            QEP_EXIT_(s);                   // exit the source
-
-                            // (f) check the rest of source->super
-                            //                  == target->super->super...
-                            //
-                            iq = ip;
-                            r = Q_RET_IGNORED;       // indicate LCA NOT found
-                            do {
-                                if (t == path[iq]) {       // is this the LCA?
-                                    r = Q_RET_HANDLED;   // indicate LCA found
-                                                           // do not enter LCA
-                                    ip = static_cast<int8_t>(iq - s8_1);
-                                                         // terminate the loop
-                                    iq = s8_n1;
-                                }
-                                else {
-                                    --iq;    // try lower superstate of target
-                                }
-                            } while (iq >= s8_0);
-
-                            if (r != Q_RET_HANDLED) {    // LCA not found yet?
-                                // (g) check each source->super->...
-                                // for each target->super...
-                                //
-                                r = Q_RET_IGNORED;             // keep looping
-                                do {
-                                                          // exit t unhandled?
-                                    if (QEP_TRIG_(t, Q_EXIT_SIG)
-                                        == Q_RET_HANDLED)
-                                    {
-                                        QS_BEGIN_(QS_QEP_STATE_EXIT,
-                                                  QS::priv_.smObjFilter, this)
-                                            QS_OBJ_(this);
-                                            QS_FUN_(t);
-                                        QS_END_()
-
-                                        (void)QEP_TRIG_(t, QEP_EMPTY_SIG_);
-                                    }
-                                    t = m_temp.fun;      //  set to super of t
-                                    iq = ip;
-                                    do {
-                                        if (t == path[iq]) {   // is this LCA?
-                                                           // do not enter LCA
-                                            ip = static_cast<int8_t>(iq-s8_1);
-                                                // break out of the inner loop
-                                            iq = s8_n1;
-                                            r = Q_RET_HANDLED;  // break outer
-                                        }
-                                        else {
-                                            --iq;
-                                        }
-                                    } while (iq >= s8_0);
-                                } while (r != Q_RET_HANDLED);
-                            }
-                        }
-                    }
-                }
-            }
-        }
                        // retrace the entry path in reverse (desired) order...
-        for (; ip >= s8_0; --ip) {
+        for (; ip >= s_0; --ip) {
             QEP_ENTER_(path[ip]);                            // enter path[ip]
         }
         t = path[0];                         // stick the target into register
@@ -227,7 +113,7 @@ void QHsm::dispatch(QEvt const * const e) {
                 QS_FUN_(m_temp.fun);           // the target of the transition
             QS_END_()
 
-            ip = s8_0;
+            ip = s_0;
             path[0] = m_temp.fun;
             (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);    // find superstate
             while (m_temp.fun != t) {
@@ -237,12 +123,12 @@ void QHsm::dispatch(QEvt const * const e) {
             }
             m_temp.fun = path[0];
                                                // entry path must not overflow
-            Q_ASSERT(ip < QEP_MAX_NEST_DEPTH_);
+            Q_ASSERT(ip < MAX_NEST_DEPTH);
 
             do {       // retrace the entry path in reverse (correct) order...
                 QEP_ENTER_(path[ip]);                        // enter path[ip]
                 --ip;
-            } while (ip >= s8_0);
+            } while (ip >= s_0);
 
             t = path[0];
         }
@@ -251,7 +137,7 @@ void QHsm::dispatch(QEvt const * const e) {
             QS_TIME_();                                          // time stamp
             QS_SIG_(e->sig);                        // the signal of the event
             QS_OBJ_(this);                        // this state machine object
-            QS_FUN_(src);                      // the source of the transition
+            QS_FUN_(s);                        // the source of the transition
             QS_FUN_(t);                                // the new active state
         QS_END_()
 
@@ -283,6 +169,125 @@ void QHsm::dispatch(QEvt const * const e) {
 
     m_state.fun = t;                        // change the current active state
     m_temp.fun  = t;                       // mark the configuration as stable
+}
+//............................................................................
+int_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH]) {
+    int_t ip = s_n1;                            // transition entry path index
+    int_t iq;                            // helper transition entry path index
+    QStateHandler t = path[0];
+    QStateHandler s = path[2];
+    QState r;
+    QS_CRIT_STAT_
+
+    if (s == t) {             // (a) check source==target (transition to self)
+        QEP_EXIT_(s);                                       // exit the source
+        ip = s_0;                                          // enter the target
+    }
+    else {
+        (void)QEP_TRIG_(t, QEP_EMPTY_SIG_);            // superstate of target
+        t = m_temp.fun;
+        if (s == t) {                       // (b) check source==target->super
+            ip = s_0;                                      // enter the target
+        }
+        else {
+            (void)QEP_TRIG_(s, QEP_EMPTY_SIG_);           // superstate of src
+                                     // (c) check source->super==target->super
+            if (m_temp.fun == t) {
+                QEP_EXIT_(s);                               // exit the source
+                ip = s_0;                                  // enter the target
+            }
+            else {
+                                            // (d) check source->super==target
+                if (m_temp.fun == path[0]) {
+                    QEP_EXIT_(s);                           // exit the source
+                }
+                else { // (e) check rest of source==target->super->super..
+                       // and store the entry path along the way
+                       //
+                    iq = s_0;                        // indicate LCA not found
+                    ip = s_1;                        // enter target's superst
+                    path[1] = t;              // save the superstate of target
+                    t = m_temp.fun;                      // save source->super
+                                                  // find target->super->super
+                    r = QEP_TRIG_(path[1], QEP_EMPTY_SIG_);
+                    while (r == Q_RET_SUPER) {
+                        ++ip;
+                        path[ip] = m_temp.fun;         // store the entry path
+                        if (m_temp.fun == s) {            // is it the source?
+                                                    // indicate that LCA found
+                            iq = s_1;
+                                               // entry path must not overflow
+                            Q_ASSERT(ip < MAX_NEST_DEPTH);
+                            --ip;                   // do not enter the source
+                            r = Q_RET_HANDLED;           // terminate the loop
+                        }
+                        else {      // it is not the source, keep going up
+                            r = QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+                        }
+                    }
+                    if (iq == s_0) {                         // LCA found yet?
+                                               // entry path must not overflow
+                        Q_ASSERT(ip < MAX_NEST_DEPTH);
+
+                        QEP_EXIT_(s);                       // exit the source
+
+                        // (f) check the rest of source->super
+                        //                  == target->super->super...
+                        //
+                        iq = ip;
+                        r = Q_RET_IGNORED;           // indicate LCA NOT found
+                        do {
+                            if (t == path[iq]) {           // is this the LCA?
+                                r = Q_RET_HANDLED;       // indicate LCA found
+                                                           // do not enter LCA
+                                ip = static_cast<int_t>(iq - s_1);
+                                                         // terminate the loop
+                                iq = s_n1;
+                            }
+                            else {
+                                --iq;        // try lower superstate of target
+                            }
+                        } while (iq >= s_0);
+
+                        if (r != Q_RET_HANDLED) {        // LCA not found yet?
+                            // (g) check each source->super->...
+                            // for each target->super...
+                            //
+                            r = Q_RET_IGNORED;                 // keep looping
+                            do {
+                                                          // exit t unhandled?
+                                if (QEP_TRIG_(t, Q_EXIT_SIG) == Q_RET_HANDLED)
+                                {
+                                    QS_BEGIN_(QS_QEP_STATE_EXIT,
+                                              QS::priv_.smObjFilter, this)
+                                        QS_OBJ_(this);
+                                        QS_FUN_(t);
+                                    QS_END_()
+
+                                    (void)QEP_TRIG_(t, QEP_EMPTY_SIG_);
+                                }
+                                t = m_temp.fun;          //  set to super of t
+                                iq = ip;
+                                do {
+                                    if (t == path[iq]) {       // is this LCA?
+                                                           // do not enter LCA
+                                        ip = static_cast<int_t>(iq - s_1);
+                                                // break out of the inner loop
+                                        iq = s_n1;
+                                        r = Q_RET_HANDLED;      // break outer
+                                    }
+                                    else {
+                                        --iq;
+                                    }
+                                } while (iq >= s_0);
+                            } while (r != Q_RET_HANDLED);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ip;
 }
 
 }                                                              // namespace QP

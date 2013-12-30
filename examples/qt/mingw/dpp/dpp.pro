@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
-# Product: DPP console exampe for Qt5
-# Last Updated for Version: 5.1.0
-# Date of the Last Update:  Oct 03, 2013
+# Product: DPP console exampe for Qt
+# Last Updated for Version: QP 5.1.1/Qt 5.1.1
+# Date of the Last Update:  Nov 05, 2013
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -44,7 +44,7 @@ DEFINES += QT_NO_STATEMACHINE
 
 INCLUDEPATH = . \
     $(QPCPP)/include \
-    $(QPCPP)/ports/qt/mingw \
+    $(QPCPP)/ports/qt \
 
 SOURCES += \
     main.cpp \

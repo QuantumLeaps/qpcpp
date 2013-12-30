@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QK/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 26, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -41,12 +41,12 @@
 
 //Q_DEFINE_THIS_MODULE("qk_ext")
 
+extern "C" {
+
 //............................................................................
 // NOTE: the QK scheduler is entered and exited with interrupts DISABLED.
 // QK_schedExt_() is extern "C", so it does not belong to the QP namespace.
 //
-extern "C" {
-
 void QK_schedExt_(uint8_t p) {
 
     uint8_t const pin = QK_currPrio_;             // save the initial priority

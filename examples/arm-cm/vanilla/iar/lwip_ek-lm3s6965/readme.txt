@@ -1,7 +1,7 @@
 About this example
 ------------------
 This example application demonstrates the lightweight TCP/IP stack called lwIP
-(version 1.4.0-rc2) running on top of the QP state machine framework, which are
+(version 1.4.1) running on top of the QP state machine framework, which are
 both briefly described below.
 
 The example is currently configured to use DHCP to obtain the IP address, so

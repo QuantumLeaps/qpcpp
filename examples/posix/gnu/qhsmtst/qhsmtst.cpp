@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Model: qhsmtst.qm
 // File:  ./qhsmtst.cpp
 //
@@ -13,9 +13,9 @@
 // WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // @(/2/1) ...................................................................
-#include "qep_port.h"
+#include "qp_port.h"
 #include "qhsmtst.h"
 
 namespace QHSMTST {
@@ -27,9 +27,8 @@ private:
 
 public:
     QHsmTst()
-      : QHsm(Q_STATE_CAST(&QHsmTst::initial)) 
-    {
-    }
+      : QHsm(Q_STATE_CAST(&QHsmTst::initial))
+    {}
 
 protected:
     static QP::QState initial(QHsmTst * const me, QP::QEvt const * const e);
@@ -105,7 +104,7 @@ QP::QState QHsmTst::s(QHsmTst * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm::top);
+            status_ = Q_SUPER(&QP::QHsm::top);
             break;
         }
     }

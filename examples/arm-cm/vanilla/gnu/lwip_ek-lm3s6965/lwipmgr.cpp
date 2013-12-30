@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: lwIP-Manager Active Object
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Oct 02, 2013
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 21, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -47,7 +47,7 @@
 Q_DEFINE_THIS_FILE
 
                // application signals cannot overlap the device-driver signals
-Q_ASSERT_COMPILE(MAX_SIG < Q_DEV_DRIVER_SIG);
+Q_ASSERT_COMPILE((LWIP_DRIVER_END - LWIP_DRIVER_GROUP) >= LWIP_MAX_OFFSET);
 
 #define FLASH_USERREG0          (*(uint32_t const *)0x400FE1E0)
 #define FLASH_USERREG1          (*(uint32_t const *)0x400FE1E4)
@@ -152,7 +152,7 @@ QState LwIPMgr::initial(LwIPMgr *me, QEvt const *e) {
     macaddr[4] = (uint8_t)user1; user1 >>= 8;
     macaddr[5] = (uint8_t)user1;
                                              // initialize the Ethernet Driver
-    me->m_netif = eth_driver_init((QActive *)me, macaddr);
+    me->m_netif = eth_driver_init((QActive *)me, LWIP_DRIVER_GROUP, macaddr);
 
     me->m_ip_addr = 0xFFFFFFFF;              // initialize to impossible value
 
@@ -171,11 +171,11 @@ QState LwIPMgr::initial(LwIPMgr *me, QEvt const *e) {
     QS_FUN_DICTIONARY(&LwIPMgr::initial);
     QS_FUN_DICTIONARY(&LwIPMgr::running);
 
-    QS_SIG_DICTIONARY(SEND_UDP_SIG,        me);
-    QS_SIG_DICTIONARY(LWIP_SLOW_TICK_SIG,  me);
-    QS_SIG_DICTIONARY(LWIP_RX_READY_SIG,   me);
-    QS_SIG_DICTIONARY(LWIP_TX_READY_SIG,   me);
-    QS_SIG_DICTIONARY(LWIP_RX_OVERRUN_SIG, me);
+    QS_SIG_DICTIONARY(SEND_UDP_SIG,       me);
+    QS_SIG_DICTIONARY(LWIP_SLOW_TICK_SIG, me);
+    QS_SIG_DICTIONARY(LWIP_DRIVER_GROUP + LWIP_RX_READY_OFFSET,   me);
+    QS_SIG_DICTIONARY(LWIP_DRIVER_GROUP + LWIP_TX_READY_OFFSET,   me);
+    QS_SIG_DICTIONARY(LWIP_DRIVER_GROUP + LWIP_RX_OVERRUN_OFFSET, me);
 
     return Q_TRAN(&LwIPMgr::running);
 }
@@ -204,11 +204,11 @@ QState LwIPMgr::running(LwIPMgr *me, QEvt const *e) {
             return Q_HANDLED();
         }
 
-        case LWIP_RX_READY_SIG: {
+        case LWIP_DRIVER_GROUP + LWIP_RX_READY_OFFSET: {
             eth_driver_read();
             return Q_HANDLED();
         }
-        case LWIP_TX_READY_SIG: {
+        case LWIP_DRIVER_GROUP + LWIP_TX_READY_OFFSET: {
             eth_driver_write();
             return Q_HANDLED();
         }
@@ -261,7 +261,7 @@ QState LwIPMgr::running(LwIPMgr *me, QEvt const *e) {
 #endif
             return Q_HANDLED();
         }
-        case LWIP_RX_OVERRUN_SIG: {
+        case LWIP_DRIVER_GROUP + LWIP_RX_OVERRUN_OFFSET: {
             LINK_STATS_INC(link.err);
             return Q_HANDLED();
         }

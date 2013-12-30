@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 26, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -153,10 +153,11 @@ private:
     ///
     /// \note this attribute remembers the low-watermark of the ring buffer,
     /// which provides a valuable information for sizing event queues.
-    /// \sa QF::getQueueMargin().
+    /// \sa QF::getQueueMin().
     QEQueueCtr m_nMin;
 
 public:
+    QEQueue(void);                             ///< public default constructor
 
     /// \brief Initializes the native QF event queue
     ///
@@ -166,7 +167,7 @@ public:
     ///
     /// \note The actual capacity of the queue is qLen + 1, because of the
     /// extra location fornEvt_.
-    void init(QEvt const *qSto[], QEQueueCtr const qLen);
+    void init(QEvt const *qSto[], uint_t const qLen);
 
     /// \brief "raw" thread-safe QF event queue implementation for the event
     /// posting (FIFO). You can call this function from any task context or
@@ -181,7 +182,7 @@ public:
     /// the queue becomes full and cannot accept the event.
     ///
     /// \sa QEQueue::postLIFO(), QEQueue::get()
-    bool post(QEvt const * const e, uint16_t const margin);
+    bool post(QEvt const * const e, uint_t const margin);
 
     /// \brief "raw" thread-safe QF event queue implementation for the
     /// First-In-First-Out (FIFO) event posting. You can call this function
@@ -204,7 +205,7 @@ public:
     /// any task context or ISR context. Please note that this function uses
     /// internally a critical section.
     ///
-    /// \sa QEQueue::postFIFO(), QEQueue::get()
+    /// \sa QEQueue::post(), QEQueue::postLIFO(), QEQueue::get()
     QEvt const *get(void);
 
     /// \brief "raw" thread-safe QF event queue operation for
@@ -236,6 +237,9 @@ public:
     }
 
 private:
+    QEQueue(QEQueue const &);                ///< disallow copying of QEQueues
+    QEQueue & operator=(QEQueue const &); ///< disallow assignment of QEQueues
+
     friend class QF;
     friend class QActive;
 };

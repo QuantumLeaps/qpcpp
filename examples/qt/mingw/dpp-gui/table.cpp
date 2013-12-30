@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Model: dpp.qm
 // File:  ./table.cpp
 //
@@ -13,7 +13,7 @@
 // WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // @(/4/2) ...................................................................
 #include "qp_port.h"
 #include "dpp.h"
@@ -24,8 +24,10 @@ namespace DPP {
 Q_DEFINE_THIS_FILE
 
 // Active object class -------------------------------------------------------
+namespace DPP {
+
 // @(/3/1) ...................................................................
-class Table : public QP::GuiQActive {
+class Table : public QP::GuiQMActive {
 private:
     uint8_t m_fork[N_PHILO];
     bool m_isHungry[N_PHILO];
@@ -40,6 +42,7 @@ protected:
     static QP::QState paused(Table * const me, QP::QEvt const * const e);
 };
 
+} // namespace DPP
 
 // helper function to provide the RIGHT neighbour of a Philo[n]
 inline uint8_t RIGHT(uint8_t const n) {
@@ -65,10 +68,12 @@ static Table l_table; // the single instance of the Table active object
 QP::QActive * const AO_Table = &l_table; // "opaque" AO pointer
 
 //............................................................................
+namespace DPP {
+
 // @(/3/1) ...................................................................
 // @(/3/1/2) .................................................................
-Table::Table() 
-  : GuiQActive(Q_STATE_CAST(&Table::initial))
+Table::Table()
+  : GuiQMActive(Q_STATE_CAST(&Table::initial))
 {
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         m_fork[n] = FREE;
@@ -123,7 +128,7 @@ QP::QState Table::active(Table * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm::top);
+            status_ = Q_SUPER(&QP::QHsm::top);
             break;
         }
     }
@@ -280,5 +285,6 @@ QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
     return status_;
 }
 
+} // namespace DPP
 
 }                                                             // namespace DPP

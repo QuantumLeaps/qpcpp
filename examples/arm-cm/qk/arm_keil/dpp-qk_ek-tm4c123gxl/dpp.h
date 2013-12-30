@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Model: dpp.qm
 // File:  ./dpp.h
 //
@@ -13,7 +13,7 @@
 // WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // @(/3/0) ...................................................................
 #ifndef dpp_h
 #define dpp_h
@@ -31,21 +31,31 @@ enum DPPSignals {
     MAX_SIG                   // the last signal
 };
 
+} // namespace DPP
+
+namespace DPP {
+
 // @(/1/0) ...................................................................
 class TableEvt : public QP::QEvt {
 public:
     uint8_t philoNum;
 };
 
+} // namespace DPP
 
 // number of philosophers
 #define N_PHILO ((uint8_t)5)
 
+namespace DPP {
+
 extern QP::QActive * const AO_Philo[N_PHILO];
+
+} // namespace DPP
+
+namespace DPP {
 
 extern QP::QActive * const AO_Table;
 
+} // namespace DPP
 
-}                             // namespace DPP
-
-#endif                        // dpp_h
+#endif // dpp_h

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -44,15 +44,13 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qf_new")
 
 //............................................................................
-QEvt *QF::newX_(QEvtSize const evtSize,
-                uint16_t const margin, enum_t const sig)
+QEvt *QF::newX_(uint_t const evtSize,
+                uint_t const margin, enum_t const sig)
 {
     uint_t idx;
                     // find the pool id that fits the requested event size ...
     for (idx = u_0; idx < QF_maxPool_; ++idx) {
-        if (evtSize
-            <= static_cast<QEvtSize>(QF_EPOOL_EVENT_SIZE_(QF_pool_[idx])))
-        {
+        if (evtSize <= QF_EPOOL_EVENT_SIZE_(QF_pool_[idx])) {
             break;
         }
     }
@@ -61,7 +59,7 @@ QEvt *QF::newX_(QEvtSize const evtSize,
     QS_CRIT_STAT_
     QS_BEGIN_(QS_QF_NEW, null_void, null_void)
         QS_TIME_();                                               // timestamp
-        QS_EVS_(evtSize);                             // the size of the event
+        QS_EVS_(static_cast<QEvtSize>(evtSize));      // the size of the event
         QS_SIG_(static_cast<QSignal>(sig));         // the signal of the event
     QS_END_()
 
@@ -73,7 +71,7 @@ QEvt *QF::newX_(QEvtSize const evtSize,
         e->refCtr_ = u8_0;                   // set the reference counter to 0
     }
     else {
-        Q_ASSERT(margin != u16_0);            // must tollerate bad allocation
+        Q_ASSERT(margin != u_0);              // must tollerate bad allocation
     }
     return e;
 }

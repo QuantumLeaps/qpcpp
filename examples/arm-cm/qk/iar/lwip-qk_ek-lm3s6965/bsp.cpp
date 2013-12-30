@@ -1,7 +1,7 @@
 //****************************************************************************
-// Product: BSP for DPP application with lwIP on EV-LM3S9665 board, QK kernel
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Oct 02, 2013
+// Product: BSP for DPP with lwIP on EK-LM3S9665 board, QK kernel
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 28, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -101,7 +101,7 @@ extern "C" void SysTick_Handler(void) {
     QS_tickTime_ += QS_tickPeriod_;          // account for the clock rollover
 #endif
 
-    QF::TICK(&l_SysTick_Handler);             // process all armed time events
+    QF::TICK_X(0U, &l_SysTick_Handler);       // process time events at rate 0
 
     tmp = GPIOF->DATA_Bits[USER_BTN];                  // read the User Button
     switch (debounce_state) {
@@ -240,17 +240,16 @@ void QK::onIdle(void) {
 }
 
 //............................................................................
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
-    (void)file;                                      // avoid compiler warning
-    (void)line;                                      // avoid compiler warning
-    QF_INT_DISABLE();            // make sure that all interrupts are disabled
-    for (;;) {          // NOTE: replace the loop with reset for final version
-    }
+extern "C" void Q_onAssert(char const Q_ROM * const file, int_t line) {
+    assert_failed(file, line);
 }
 //............................................................................
 // error routine that is called if the CMSIS library encounters an error
 extern "C" void assert_failed(char const *file, int line) {
-    Q_onAssert(file, line);
+    (void)file;                                      // avoid compiler warning
+    (void)line;                                      // avoid compiler warning
+    QF_INT_DISABLE();            // make sure that all interrupts are disabled
+    NVIC_SystemReset();                                // perform system reset
 }
 //............................................................................
 // sys_now() is used in the lwIP stack

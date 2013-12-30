@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -50,7 +50,7 @@ uint_t QF_maxPool_;                       // number of initialized event pools
 
 //............................................................................
 void QF::poolInit(void * const poolSto,
-                  uint32_t const poolSize, uint32_t const evtSize)
+                  uint_t const poolSize, uint_t const evtSize)
 {
                          // cannot exceed the number of available memory pools
     Q_REQUIRE(QF_maxPool_ < static_cast<uint_t>(Q_DIM(QF_pool_)));

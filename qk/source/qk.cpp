@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QK/C++
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Oct 07, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 03, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -48,10 +48,9 @@ extern "C" {
 #else
     QP::QPSet64 QK_readySet_;                              // ready set of AOs
 #endif
-                                         // start with the QK scheduler locked
-uint8_t volatile QK_currPrio_ = static_cast<uint8_t>(QF_MAX_ACTIVE + 1);
-uint8_t volatile QK_intNest_;                 // start with nesting level of 0
 
+uint8_t volatile QK_currPrio_;
+uint_t  volatile QK_intNest_;
 }                                                                // extern "C"
 
 namespace QP {
@@ -60,6 +59,20 @@ Q_DEFINE_THIS_MODULE("qk")
 
 //............................................................................
 void QF::init(void) {
+    extern uint_t QF_maxPool_;
+
+    QK_intNest_  = static_cast<uint_t>(0);                 // no nesting level
+    QK_currPrio_ = static_cast<uint8_t>(QF_MAX_ACTIVE + 1);// scheduler locked
+#ifndef QK_NO_MUTEX
+    QK_ceilingPrio_ = static_cast<uint8_t>(0);
+#endif
+    QF_maxPool_  = static_cast<uint_t>(0);
+    bzero(&QK_readySet_,       static_cast<uint_t>(sizeof(QK_readySet_)));
+    bzero(&QF::timeEvtHead_[0],static_cast<uint_t>(sizeof(QF::timeEvtHead_)));
+    bzero(&QF::active_[0],     static_cast<uint_t>(
+                                 static_cast<uint_t>(QF_MAX_ACTIVE)
+                                   * static_cast<uint_t>(sizeof(QActive *))));
+
     QK_init();           // QK initialization ("C" linkage, might be assembly)
 }
 //............................................................................
@@ -76,7 +89,7 @@ static void initialize(void) {
     }
 }
 //............................................................................
-int16_t QF::run(void) {
+int_t QF::run(void) {
     QF_INT_DISABLE();
     initialize();
     onStartup();                                           // startup callback
@@ -87,35 +100,34 @@ int16_t QF::run(void) {
     }
 
 #ifdef __GNUC__                                               // GNU compiler?
-    return static_cast<int16_t>(0);
+    return static_cast<uint_t>(0);
 #endif
 }
 //............................................................................
-void QActive::start(uint8_t const prio,
-                   QEvt const *qSto[], uint32_t const qLen,
-                   void * const stkSto, uint32_t const stkSize,
-                   QEvt const * const ie)
+void QActive::start(uint_t const prio,
+                    QEvt const *qSto[], uint_t const qLen,
+                    void * const stkSto, uint_t const stkSize,
+                    QEvt const * const ie)
 {
-    Q_REQUIRE((static_cast<uint8_t>(0) < prio)
-              && (prio <= static_cast<uint8_t>(QF_MAX_ACTIVE)));
+    Q_REQUIRE((static_cast<uint_t>(0) < prio)
+               && (prio <= static_cast<uint_t>(QF_MAX_ACTIVE)));
 
-    m_eQueue.init(qSto, static_cast<QEQueueCtr>(qLen));    // initialize queue
-    m_prio = prio;
-    QF::add_(this);                     // make QF aware of this active object
+    m_eQueue.init(qSto, qLen);                // initialize QEQueue of this AO
+    m_prio = static_cast<uint8_t>(prio);     // set the QF priority of this AO
+    QF::add_(this);                                // make QF aware of this AO
 
 #if defined(QK_TLS) || defined(QK_EXT_SAVE)
     // in the QK port the parameter stkSize is used as the thread flags
     m_osObject = static_cast<uint8_t>(stkSize);   // m_osObject contains flags
 
     // in the QK port the parameter stkSto is used as the thread-local-storage
-    m_thread   = stkSto;   // contains the pointer to the thread-local-storage
+    m_thread = stkSto;     // contains the pointer to the thread-local-storage
 #else
     Q_ASSERT((stkSto == static_cast<void *>(0))
-             && (stkSize == static_cast<uint32_t>(0)));
+             && (stkSize == static_cast<uint_t>(0)));
 #endif
 
     this->init(ie);               // execute initial transition (virtual call)
-
     QS_FLUSH();                          // flush the trace buffer to the host
 }
 //............................................................................

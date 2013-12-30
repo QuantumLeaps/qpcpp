@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 27, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -37,47 +37,55 @@
 
 /// \file
 /// \ingroup qf
-/// \brief QMPool::init() implementation.
+/// \brief QMPool::QMPool() and QMPool::init() implementation.
 
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qmp_init")
 
 //............................................................................
-void QMPool::init(void * const poolSto, uint32_t const poolSize,
-                  QMPoolSize const blockSize)
-{
+QMPool::QMPool(void)
+  : m_start(null_void),
+    m_end(null_void),
+    m_free_head(null_void),
+    m_blockSize(static_cast<QMPoolSize>(0)),
+    m_nTot(static_cast<QMPoolCtr>(0)),
+    m_nFree(static_cast<QMPoolCtr>(0)),
+    m_nMin(static_cast<QMPoolCtr>(0))
+{}
+//............................................................................
+void QMPool::init(void * const poolSto, uint_t poolSize, uint_t blockSize) {
     // The memory block must be valid
     // and the poolSize must fit at least one free block
     // and the blockSize must not be too close to the top of the dynamic range
     Q_REQUIRE((poolSto != null_void)
-              && (poolSize >= static_cast<uint32_t>(sizeof(QFreeBlock)))
-              && ((blockSize + static_cast<QMPoolSize>(sizeof(QFreeBlock)))
+              && (poolSize >= static_cast<uint_t>(sizeof(QFreeBlock)))
+              && ((blockSize + static_cast<uint_t>(sizeof(QFreeBlock)))
                     > blockSize));
 
     m_free_head = poolSto;
 
                 // round up the blockSize to fit an integer number of pointers
     m_blockSize = static_cast<QMPoolSize>(sizeof(QFreeBlock));//start with one
-    uint32_t nblocks = static_cast<uint32_t>(1);//# free blocks in a mem block
-    while (m_blockSize < blockSize) {
+    uint_t nblocks = u_1;                       //# free blocks in a mem block
+    while (m_blockSize < static_cast<QMPoolSize>(blockSize)) {
         m_blockSize += static_cast<QMPoolSize>(sizeof(QFreeBlock));
         ++nblocks;
     }
+    blockSize = static_cast<uint_t>(m_blockSize);      // use rounded-up value
 
                // the whole pool buffer must fit at least one rounded-up block
-    Q_ASSERT(poolSize >= static_cast<uint32_t>(m_blockSize));
+    Q_ASSERT(poolSize >= blockSize);
 
                                 // chain all blocks together in a free-list...
-                                                     // don't chain last block
-    uint32_t availSize = poolSize - static_cast<uint32_t>(m_blockSize);
+    poolSize -= blockSize;                       // don't count the last block
     m_nTot = static_cast<QMPoolCtr>(1);    // one (the last) block in the pool
                                           //start at the head of the free list
     QFreeBlock *fb = static_cast<QFreeBlock *>(m_free_head);
-    while (availSize >= static_cast<uint32_t>(m_blockSize)) {
+    while (poolSize >= blockSize) {
         fb->m_next = &QF_PTR_AT_(fb, nblocks);          // setup the next link
         fb = fb->m_next;                              // advance to next block
-        availSize -= static_cast<uint32_t>(m_blockSize);// less available size
+        poolSize -= blockSize;               // reduce the available pool size
         ++m_nTot;                     // increment the number of blocks so far
     }
 

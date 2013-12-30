@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Oct 07, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -36,7 +36,7 @@
 #include "qassert.h"
 /// \file
 /// \ingroup qf
-/// \brief QF::tickX() and QF::noTimeEvtsActiveX() implementation.
+/// \brief QF::tickX_() and QF::noTimeEvtsActiveX() implementation.
 
 namespace QP {
 
@@ -44,9 +44,9 @@ Q_DEFINE_THIS_MODULE("qf_tick")
 
 //............................................................................
 #ifndef Q_SPY
-void QF::tickX(uint8_t const tickRate)                           // see NOTE01
+void QF::tickX_(uint8_t const tickRate)                          // see NOTE01
 #else
-void QF::tickX(uint8_t const tickRate, void const * const sender)
+void QF::tickX_(uint8_t const tickRate, void const * const sender)
 #endif
 {
     QTimeEvt *prev = &timeEvtHead_[tickRate];
@@ -83,6 +83,8 @@ void QF::tickX(uint8_t const tickRate, void const * const sender)
         else {
             --t->m_ctr;
             if (t->m_ctr == tc_0) {            // is time evt about to expire?
+                QActive *act = t->toActive();        // temporary for volatile
+
                 if (t->m_interval != tc_0) {             // periodic time evt?
                     t->m_ctr = t->m_interval;          // rearm the time event
                     prev = t;                    // advance to this time event
@@ -95,7 +97,7 @@ void QF::tickX(uint8_t const tickRate, void const * const sender)
                     QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_AUTO_DISARM,
                                      QS::priv_.teObjFilter, t)
                         QS_OBJ_(t);                  // this time event object
-                        QS_OBJ_(t->m_act);                    // the target AO
+                        QS_OBJ_(act);                         // the target AO
                         QS_U8_(tickRate);                         // tick rate
                     QS_END_NOCRIT_()
                 }
@@ -104,14 +106,13 @@ void QF::tickX(uint8_t const tickRate, void const * const sender)
                     QS_TIME_();                                   // timestamp
                     QS_OBJ_(t);                       // the time event object
                     QS_SIG_(t->sig);              // signal of this time event
-                    QS_OBJ_(t->m_act);                        // the target AO
+                    QS_OBJ_(act);                             // the target AO
                     QS_U8_(tickRate);                             // tick rate
                 QS_END_NOCRIT_()
 
                 QF_CRIT_EXIT_();          // exit crit. section before posting
 
-                                                 // asserts if queue overflows
-                (void)t->toActive()->POST(t, sender);
+                (void)act->POST(t, sender);      // asserts if queue overflows
             }
             else {
                 prev = t;                        // advance to this time event

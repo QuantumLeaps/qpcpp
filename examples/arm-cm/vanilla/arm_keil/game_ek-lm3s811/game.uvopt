@@ -122,6 +122,11 @@
       <TargetDriverDllRegistry>
         <SetRegEntry>
           <Number>0</Number>
+          <Key>UL2CM3</Key>
+          <Name>UL2CM3(-UU0101L5E -O14 -S0 -C0 -N00("ARM Cortex-M3") -D00(1BA00477) -L00(4) -FO7 -FD20000000 -FC800 -FN1 -FF0LM3S_64 -FS00 -FL010000)</Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
           <Key>lmidk-agdi</Key>
           <Name>-U0E10259B -O4622 -S4 -FO29</Name>
         </SetRegEntry>
@@ -414,10 +419,6 @@
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
-          <Key>DLGUARM</Key>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
           <Key>lmidk-agdi</Key>
           <Name>-UTI000001A -O4878 -S4 -FO29</Name>
         </SetRegEntry>
@@ -533,13 +534,13 @@
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>79</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>171</TopLine>
-      <CurrentLine>200</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\startup_keil.s</PathWithFileName>
-      <FilenameWithoutPath>startup_keil.s</FilenameWithoutPath>
+      <PathWithFileName>.\startup_lm3s.s</PathWithFileName>
+      <FilenameWithoutPath>startup_lm3s.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QS/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 23, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -48,17 +48,14 @@ Q_DEFINE_THIS_MODULE("qs")
 QS QS::priv_;                                               // QS private data
 
 //............................................................................
-void QS::initBuf(uint8_t sto[], uint32_t const stoSize) {
+void QS::initBuf(uint8_t sto[], uint_t const stoSize) {
     uint8_t *buf_ = &sto[0];
 
-    Q_REQUIRE(stoSize > static_cast<uint32_t>(8));  // at least 8 bytes in buf
+    Q_REQUIRE(stoSize > static_cast<uint_t>(8));    // at least 8 bytes in buf
 
+    QF::bzero(&priv_, static_cast<uint_t>(sizeof(priv_)));       // see NOTE01
     priv_.buf  = buf_;
     priv_.end  = static_cast<QSCtr>(stoSize);
-    priv_.seq  = static_cast<uint8_t>(0);
-    priv_.head = static_cast<QSCtr>(0);
-    priv_.tail = static_cast<QSCtr>(0);
-    priv_.used = static_cast<QSCtr>(0);
 
     beginRec(QS_REC_NUM_(QS_EMPTY));
     endRec();
@@ -222,4 +219,12 @@ void QS::u32(uint8_t format, uint32_t d) {
 }
 
 }                                                              // namespace QP
+
+//****************************************************************************
+// NOTE01:
+// The QS::initBuf() function clears the internal QS variables, so that the
+// tracing can start correctly even if the startup code fails to clear
+// the uninitialized data (as is required by the C Standard).
+//
+
 

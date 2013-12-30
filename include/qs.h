@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Dec 02, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -49,9 +49,6 @@
 
 #ifndef Q_ROM                      // provide the default if Q_ROM NOT defined
     #define Q_ROM
-#endif
-#ifndef Q_ROM_VAR              // provide the default if Q_ROM_VAR NOT defined
-    #define Q_ROM_VAR
 #endif
 #ifndef Q_ROM_BYTE            // provide the default if Q_ROM_BYTE NOT defined
     #define Q_ROM_BYTE(rom_var_)   (rom_var_)
@@ -204,7 +201,7 @@ public:
     /// \return version of QS as a constant 5-character string of the
     /// form X.Y.Z, where X is a 1-digit major version number, Y is a
     /// 1-digit minor version number, and Z is a 1-digit release number.
-    static char_t const Q_ROM * Q_ROM_VAR getVersion(void) {
+    static char_t const Q_ROM * getVersion(void) {
         return QP_VERSION_STR;
     }
 
@@ -226,7 +223,7 @@ public:
     /// consistent with the "last-is-best" QS policy. The record sequence
     /// counters and check sums on each record allow to easily detect data
     /// loss.
-    static void initBuf(uint8_t sto[], uint32_t const stoSize);
+    static void initBuf(uint8_t sto[], uint_t const stoSize);
 
     /// \brief Turn the global Filter on for a given record type \a rec.
     ///
@@ -305,7 +302,7 @@ public:
     /// without format information
     /// \note This function is only to be used through macros, never in the
     /// client code directly.
-    static void str_ROM_(char_t const Q_ROM * Q_ROM_VAR s);
+    static void str_ROM_(char_t const Q_ROM *s);
 
     // formatted data elements output ........................................
 
@@ -346,7 +343,7 @@ public:
     /// with format information
     /// \note This function is only to be used through macros, never in the
     /// client code directly.
-    static void str_ROM(char_t const Q_ROM * Q_ROM_VAR s);
+    static void str_ROM(char_t const Q_ROM *s);
 
     /// \brief Output memory block of up to 255-bytes with format information
     /// \note This function is only to be used through macros, never in the
@@ -368,22 +365,22 @@ public:
     /// \brief Output signal dictionary record
     /// \note This function is only to be used through macro #QS_SIG_DICTIONARY
     static void sig_dict(enum_t const sig, void const * const obj,
-                         char_t const Q_ROM * const Q_ROM_VAR name);
+                         char_t const Q_ROM * const name);
 
     /// \brief Output object dictionary record
     /// \note This function is only to be used through macro #QS_OBJ_DICTIONARY
     static void obj_dict(void const * const obj,
-                         char_t const Q_ROM * const Q_ROM_VAR name);
+                         char_t const Q_ROM * const name);
 
     /// \brief Output function dictionary record
     /// \note This function is only to be used through macro #QS_FUN_DICTIONARY
     static void fun_dict(void (* const fun)(void),
-                        char_t const Q_ROM *const Q_ROM_VAR name);
+                        char_t const Q_ROM *const name);
 
     /// \brief Output user dictionary record
     /// \note This function is only to be used through macro #QS_USR_DICTIONARY
     static void usr_dict(enum_t const rec,
-                         char_t const Q_ROM * const Q_ROM_VAR name);
+                         char_t const Q_ROM * const name);
 
     // QS buffer access ......................................................
 
@@ -982,13 +979,6 @@ public:
 #endif
 
 
-/// \brief Deprecated macro for generating QS-Reset trace record.
-///
-/// This Reset QS trace record is generated automatically upon initialization
-/// of the QS buffer, \sa QS::initBuf().
-#define QS_RESET() ((void)0)
-
-
 /// \brief Output signal dictionary record
 ///
 /// A signal dictionary record associates the numerical value of the signal
@@ -1030,7 +1020,7 @@ public:
 /// \include qs_sigLog0.txt
 #define QS_SIG_DICTIONARY(sig_, obj_) do { \
     if (QS_GLB_FILTER_(QP::QS_SIG_DICT)) { \
-        static char_t const Q_ROM Q_ROM_VAR sig_name_[] = #sig_; \
+        static char_t const Q_ROM sig_name_[] = #sig_; \
         QP::QS::sig_dict((sig_), (obj_), &sig_name_[0]); \
     } \
 } while (false)
@@ -1049,7 +1039,7 @@ public:
 /// \include qs_objDic.cpp
 #define QS_OBJ_DICTIONARY(obj_) do { \
     if (QS_GLB_FILTER_(QP::QS_OBJ_DICT)) { \
-        static char_t const Q_ROM Q_ROM_VAR obj_name_[] = #obj_; \
+        static char_t const Q_ROM obj_name_[] = #obj_; \
         QP::QS::obj_dict((obj_), &obj_name_[0]); \
     } \
 } while (false)
@@ -1067,7 +1057,7 @@ public:
 /// dictionary.
 #define QS_FUN_DICTIONARY(fun_) do { \
     if (QS_GLB_FILTER_(QP::QS_FUN_DICT)) { \
-        static char_t const Q_ROM Q_ROM_VAR fun_name_[] = #fun_; \
+        static char_t const Q_ROM fun_name_[] = #fun_; \
         QP::QS::fun_dict((void (*)(void))(fun_), &fun_name_[0]); \
     } \
 } while (false)
@@ -1078,7 +1068,7 @@ public:
 /// user record with the human-readable identifier.
 #define QS_USR_DICTIONARY(rec_) do { \
     if (QS_GLB_FILTER_(QP::QS_USR_DICT)) { \
-        static char_t const Q_ROM Q_ROM_VAR usr_name_[] = #rec_; \
+        static char_t const Q_ROM usr_name_[] = #rec_; \
         QP::QS::usr_dict((rec_), &usr_name_[0]); \
     } \
 } while (false)
