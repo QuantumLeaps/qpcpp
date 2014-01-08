@@ -99,7 +99,7 @@ QP::QState Mine2::initial(Mine2 * const me, QP::QEvt const * const e) {
     QS_SIG_DICTIONARY(MINE_RECYCLE_SIG,  me);
     QS_SIG_DICTIONARY(SHIP_IMG_SIG,      me);
     QS_SIG_DICTIONARY(MISSILE_IMG_SIG,   me);
-    return QM_INITIAL(&Mine2::unused_s, QP::QMsm::s_emptyAction_);
+    return QM_INITIAL(&Mine2::unused_s, &QP::QMsm::s_emptyAction_[0]);
 }
 // @(/2/4/4/1) ...............................................................
 QP::QMState const Mine2::unused_s = {
@@ -114,7 +114,7 @@ QP::QState Mine2::unused(Mine2 * const me, QP::QEvt const * const e) {
         case MINE_PLANT_SIG: {
             me->m_x = Q_EVT_CAST(ObjectPosEvt)->x;
             me->m_y = Q_EVT_CAST(ObjectPosEvt)->y;
-            status_ = QM_TRAN(&planted_s, QP::QMsm::s_emptyAction_);
+            status_ = QM_TRAN(&planted_s, &QP::QMsm::s_emptyAction_[0]);
             break;
         }
         default: {

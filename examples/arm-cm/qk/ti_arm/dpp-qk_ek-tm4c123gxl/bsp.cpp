@@ -188,7 +188,6 @@ void BSP_init(void) {
     BSP_randomSeed(1234U);
 
     Q_ALLEGE(QS_INIT(static_cast<void *>(0)));
-    QS_RESET();
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_GPIOPortA_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);

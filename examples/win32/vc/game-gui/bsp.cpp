@@ -264,7 +264,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
 //............................................................................
 void BSP_init(void) {
     Q_ALLEGE(QS_INIT(l_cmdLine));
-    QS_RESET();
     QS_OBJ_DICTIONARY(&l_clock_tick);
     QS_USR_DICTIONARY(PLAYER_TRIGGER);
 }
@@ -471,7 +470,7 @@ void QF::onCleanup(void) {
 //............................................................................
 void QF_onClockTick(void) {
     static QP::QEvt const tickEvt = QEVT_INITIALIZER(GAME::TIME_TICK_SIG);
-    QP::QF::TICK(&GAME::l_clock_tick); //perform the QF clock tick processing
+    QP::QF::TICK_X(0U, &GAME::l_clock_tick); // process time events at rate 0
     QP::QF::PUBLISH(&tickEvt, &GAME::l_clock_tick); // publish the tick event
 }
 //............................................................................

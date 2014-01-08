@@ -80,7 +80,7 @@ QP::QState Missile::initial(Missile * const me, QP::QEvt const * const e) {
     QS_SIG_DICTIONARY(MISSILE_FIRE_SIG,   &l_missile);     // local signals
     QS_SIG_DICTIONARY(HIT_WALL_SIG,       &l_missile);
     QS_SIG_DICTIONARY(DESTROYED_MINE_SIG, &l_missile);
-    return QM_INITIAL(&Missile::armed_s, QP::QMsm::s_emptyAction_);
+    return QM_INITIAL(&Missile::armed_s, &QP::QMsm::s_emptyAction_[0]);
 }
 // @(/2/2/4/1) ...............................................................
 QP::QMState const Missile::armed_s = {
@@ -95,7 +95,7 @@ QP::QState Missile::armed(Missile * const me, QP::QEvt const * const e) {
         case MISSILE_FIRE_SIG: {
             me->m_x = Q_EVT_CAST(ObjectPosEvt)->x;
             me->m_y = Q_EVT_CAST(ObjectPosEvt)->y;
-            status_ = QM_TRAN(&flying_s, QP::QMsm::s_emptyAction_);
+            status_ = QM_TRAN(&flying_s, &QP::QMsm::s_emptyAction_[0]);
             break;
         }
         default: {
@@ -129,7 +129,7 @@ QP::QState Missile::flying(Missile * const me, QP::QEvt const * const e) {
             }
             // @(/2/2/4/2/0/1)
             else {
-                status_ = QM_TRAN(&armed_s, QP::QMsm::s_emptyAction_);
+                status_ = QM_TRAN(&armed_s, &QP::QMsm::s_emptyAction_[0]);
             }
             break;
         }
@@ -145,7 +145,7 @@ QP::QState Missile::flying(Missile * const me, QP::QEvt const * const e) {
         // @(/2/2/4/2/2)
         case DESTROYED_MINE_SIG: {
             AO_Ship->POST(e, me);
-            status_ = QM_TRAN(&armed_s, QP::QMsm::s_emptyAction_);
+            status_ = QM_TRAN(&armed_s, &QP::QMsm::s_emptyAction_[0]);
             break;
         }
         default: {
@@ -185,7 +185,7 @@ QP::QState Missile::exploding(Missile * const me, QP::QEvt const * const e) {
             }
             // @(/2/2/4/3/0/1)
             else {
-                status_ = QM_TRAN(&armed_s, QP::QMsm::s_emptyAction_);
+                status_ = QM_TRAN(&armed_s, &QP::QMsm::s_emptyAction_[0]);
             }
             break;
         }

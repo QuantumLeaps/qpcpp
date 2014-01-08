@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QF/C++ port to POSIX/P-threads, GNU
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Dec 27, 2013
+// Last Updated for Version: 5.2.1
+// Date of the Last Update:  Jan 06, 2014
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -118,8 +118,6 @@ void QActive::start(uint_t prio,
     m_prio = static_cast<uint8_t>(prio);     // set the QF priority of this AO
     QF::add_(this);                                // make QF aware of this AO
     this->init(ie);               // execute initial transition (virtual call)
-
-    QS_FLUSH();                          // flush the trace buffer to the host
 
     pthread_attr_t attr;
     pthread_attr_init(&attr);

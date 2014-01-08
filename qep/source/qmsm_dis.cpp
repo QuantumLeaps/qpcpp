@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QEP/C++
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Dec 26, 2013
+// Last Updated for Version: 5.2.1
+// Date of the Last Update:  Jan 06, 2014
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2014 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -79,6 +79,8 @@ void QMsm::dispatch(QEvt const * const e) {
     if (r == Q_RET_TRAN) {                                // transition taken?
         Q_ASSERT(t != static_cast<QMState const *>(0));// source can't be null
 
+        QActionHandler const *a = m_temp.act;
+
             // exit states starting from the current state to the source state
         for (; s != t; s = s->parent) {
             if (s->exitAction != Q_ACTION_CAST(0)) {   // exit action defined?
@@ -91,7 +93,7 @@ void QMsm::dispatch(QEvt const * const e) {
             }
         }
 
-        msm_tran();                                 // take the MSM transition
+        msm_tran(a);                                // take the MSM transition
 
         QS_BEGIN_(QS_QEP_TRAN, QS::priv_.smObjFilter, this)
             QS_TIME_();                                          // time stamp
@@ -133,8 +135,7 @@ void QMsm::dispatch(QEvt const * const e) {
 }
 
 //............................................................................
-void QMsm::msm_tran(void) {
-    QActionHandler const *a = m_temp.act;
+void QMsm::msm_tran(QActionHandler const *a) {
     QState r = Q_RET_TRAN;
 #ifdef Q_SPY
     QMState const *t = m_state.obj;                // target of the transition

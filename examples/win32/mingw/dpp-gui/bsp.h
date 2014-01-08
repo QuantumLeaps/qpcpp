@@ -1,13 +1,13 @@
 //****************************************************************************
-// Product: QS/C++
-// Last Updated for Version: 5.2.1
-// Date of the Last Update:  Jan 06, 2014
+// Product: DPP example
+// Last Updated for Version: 5.1.0
+// Date of the Last Update:  Oct 10, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2014 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -32,37 +32,24 @@
 //                          http://www.state-machine.com
 // e-mail:                  info@quantum-leaps.com
 //****************************************************************************
-#include "qs_pkg.h"
+#ifndef bsp_h
+#define bsp_h
 
-/// \file
-/// \ingroup qs
-/// \brief QS::mem() implementation
+namespace DPP {
 
-namespace QP {
+uint32_t const BSP_TICKS_PER_SEC = static_cast<uint32_t>(50);
 
-//............................................................................
-void QS::mem(uint8_t const *blk, uint8_t size) {
-    uint8_t b = static_cast<uint8_t>(MEM_T);
-    uint8_t chksum_ = static_cast<uint8_t>(priv_.chksum + b);
-    uint8_t *buf_   = priv_.buf;              // put in a temporary (register)
-    QSCtr   head_   = priv_.head;             // put in a temporary (register)
-    QSCtr   end_    = priv_.end;              // put in a temporary (register)
+void BSP_init(void);
+void BSP_displayPaused(uint8_t const paused);
+void BSP_displayPhilStat(uint8_t const n, char_t const *stat);
+void BSP_terminate(int16_t const result);
 
-    priv_.used += (static_cast<QSCtr>(size)        // size+2 bytes to be added
-                   + static_cast<QSCtr>(2));
+void BSP_randomSeed(uint32_t const seed);                       // random seed
+uint32_t BSP_random(void);                          // pseudo-random generator
 
-    QS_INSERT_BYTE(b)
-    QS_INSERT_ESC_BYTE(size)
-    while (size != static_cast<uint8_t>(0)) {
-        b = *blk;
-        QS_INSERT_ESC_BYTE(b)
-        QS_PTR_INC_(blk);
-        --size;
-    }
+}                                                             // namespace DPP
 
-    priv_.head   = head_;                                     // save the head
-    priv_.chksum = chksum_;                               // save the checksum
-}
+// Windows-GUI does not use the regular main()
+#define main()  main_gui()
 
-}                                                              // namespace QP
-
+#endif                                                                // bsp_h

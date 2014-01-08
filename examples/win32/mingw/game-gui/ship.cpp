@@ -108,7 +108,7 @@ QP::QMState const Ship::active_s = {
     Q_ACTION_CAST(0)
 };
 QP::QState Ship::active_i(Ship * const me) {
-    return QM_INITIAL(&Ship::parked_s, QP::QMsm::s_emptyAction_);
+    return QM_INITIAL(&Ship::parked_s, &QP::QMsm::s_emptyAction_[0]);
 }
 QP::QState Ship::active(Ship * const me, QP::QEvt const * const e) {
     QP::QState status_;
@@ -259,7 +259,7 @@ QP::QState Ship::exploding(Ship * const me, QP::QEvt const * const e) {
                 ScoreEvt *gameOver = Q_NEW(ScoreEvt, GAME_OVER_SIG);
                 gameOver->score = me->m_score;
                 AO_Tunnel->POST(gameOver, me);
-                status_ = QM_TRAN(&parked_s, QP::QMsm::s_emptyAction_);
+                status_ = QM_TRAN(&parked_s, &QP::QMsm::s_emptyAction_[0]);
             }
             break;
         }

@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QMsmTst Example
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Nov 25, 2013
+// Last Updated for Version: 5.2.0
+// Date of the Last Update:  Jan 06, 2014
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2014 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -146,3 +146,32 @@ static void dispatch(QP::QSignal sig) {
 }
 
 } // namespace QMSMTST
+
+//----------------------------------------------------------------------------
+#ifdef Q_SPY
+
+#include "qs_port.h"
+
+namespace QP {
+
+//............................................................................
+void QF::onStartup(void) {
+}
+//............................................................................
+void QF_onClockTick(void) {
+}
+//............................................................................
+void QF::onCleanup(void) {
+}
+//............................................................................
+void QS::onCleanup(void) {
+}
+//............................................................................
+QSTimeCtr QS::onGetTime(void) {
+    return static_cast<QSTimeCtr>(clock());
+}
+
+} // namespace QP
+
+#endif // Q_SPY
+

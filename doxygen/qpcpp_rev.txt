@@ -3,6 +3,23 @@ namespace QP {
 /**
 \page rev_page Revision History
 
+\section qpcpp_5_2_1 Version 5.2.1, Release date: Jan 06, 2014
+
+This release fixes two bugs.
+
+1. In file qmsm_dis.cpp added saving of the action-table into a
+temporary variable *before* exiting the current state to the transition
+source. Also, changed the signature of the QMsm::msm_tran() helper
+function to take the action table as parameter. NOTE: This bug only
+affected the Spy configuration and because of this escaped regression
+testing. The internal testing process have been updated to test all
+build configurations: Debug, Release, and Spy.
+
+2. In file qs_mem.cpp fixed an error in accounting used bytes in the QS
+trace buffer.
+
+
+<HR>
 \section qpcpp_5_2_0 Version 5.2.0, Release date: Dec 28, 2013
 
 This release matches the new QM 3.0.0, for which it provides model
@@ -23,33 +40,38 @@ standard code metrics (e.g., lines of code), is now included in the
 "QP/C++ Reference Manual", see
 http://www.state-machine.com/qp/qpcpp/metrics.html
 
+Also, in this release all internal QP data that were previously
+uninitialized are now explicitly initialized to zero. In other words,
+this release no longer assumes that all uninitialized data (global and
+static inside functions) is implicitly initialized to zero before the
+control is transferred to main(). This is a requirement of the C
+Standard, but some embedded startup code fails to do this.
+
 Finally, this release demonstrates safer stack allocation and safer
 exception handlers in all ARM Cortex-M examples. The techniques are
 described in the Embedded.com article "Are We Shooting Ourselves in the
 Foot with Stack Overflow?".
 
-
 Changes in detail:
 
-1. In file qp_port.h defined "API Compatibility Layer", which is
-controlled by the macro #QP_API_VERSION. For example, specifying
-QP_API_VERSION=500 chooses API compatible with QP version 5.0.0 or
-newer, but excludes APIs that became deprecated in the earlier versions.
-If the macro #QP_API_VERSION is not defined by the user (typically on
-the command line for the compiler), the default value of 0 is assumed.
-This default means maximum backwards compatibility (from version 0.0.0).
-On the other hand, higher values of #QP_API_VERSION mean less backwards
-compatibility. For example QP_API_VERSION=9999 will specify
-compatibility only with the latest version of QP.
-
-The API Compatibility Layer for QP_API_VERSION < 500 provides macros:
-postLIFO(), publish(), and tick(). These macros resolve to POST(),
-PUBLISH(), and TICK_X() respectively.
+1. for backwards compatibility, in file qp_port.h defined "API
+Compatibility Layer", which is controlled by the macro #QP_API_VERSION.
+For example, specifying QP_API_VERSION=500 chooses API compatible with
+QP version 5.0.0 or newer, but excludes APIs that became deprecated in
+the earlier versions. If the macro #QP_API_VERSION is not defined by the
+user (typically on the command line for the compiler), the default value
+of 0 is assumed. This default means maximum backwards compatibility
+(from version 0.0.0). On the other hand, higher values of
+#QP_API_VERSION mean less backwards compatibility. For example
+QP_API_VERSION=9999 will specify compatibility only with the latest
+version of QP. The API Compatibility Layer for QP_API_VERSION < 500
+provides macros: postLIFO(), publish(), and tick(). These macros resolve
+to POST(), PUBLISH(), and TICK_X() respectively.
 
 2. In file qhsm_dis.cpp, broken up the function QHsm::dispatch() into
 two functions QHsm::dispatch() and a private helper QHsm::hsm_tran().
 This has reduced the cyclomatic complexity from 25 for the original
-function, to 11 and 15 for QHsm::dispatch() and QHsm::hsm_tran(),
+function, to 11 and 15 for QHsm::dispatch_() and QHsm::hsm_tran(),
 respectively.
 
 3. In file qmsm_dis.cpp, broken up the function QMsm::dispatch() into
@@ -65,7 +87,12 @@ capabilities of QM3.
 5. Added the QMsmTst example application analogous to the QHsmTst to
 test the QMsm base class. The QMsmTst comes with the QM model qmsmtst.qm.
 
-6. Updated all examples for ARM Cortex-M to use safer stack allocation
+6. In file qf_act.cpp added the function QF::bzero(), and in files
+qvanilla.cpp and qk.cpp added calls to QF::bzero() to explicitly clear
+the uninitialized data. Also added calls to QF::bzero() inside
+qf_psini.cpp.
+
+7. Updated all examples for ARM Cortex-M to use safer stack allocation
 and safer exception handlers in all ARM Cortex-M examples, as described
 in the Embedded.com article "Are We Shooting Ourselves in the Foot with
 Stack Overflow?".
