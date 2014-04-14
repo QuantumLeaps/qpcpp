@@ -14,13 +14,13 @@
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
 //****************************************************************************
-// @(/2/1) ...................................................................
+//${.::qmsmtst.cpp} ..........................................................
 #include "qp_port.h"
 #include "qmsmtst.h"
 
 namespace QMSMTST {
 
-// @(/1/0) ...................................................................
+//${SMs::QMsmTst} ............................................................
 class QMsmTst : public QP::QMsm {
 private:
     bool m_foo;
@@ -68,51 +68,72 @@ static QMsmTst l_msmtst; // the only instance of the QMsmTst class
 // global-scope definitions -----------------------------------------
 QP::QMsm * const the_msm = &l_msmtst; // the opaque pointer
 
-// @(/1/0) ...................................................................
+//${SMs::QMsmTst} ............................................................
 
-// @(/1/0/2) .................................................................
-// @(/1/0/2/0)
+//${SMs::QMsmTst::SM} ........................................................
 QP::QState QMsmTst::initial(QMsmTst * const me, QP::QEvt const * const e) {
-    static QP::QActionHandler const act_[] = {
-        Q_ACTION_CAST(&QMsmTst::s_e),
-        Q_ACTION_CAST(&QMsmTst::s2_e),
-        Q_ACTION_CAST(&QMsmTst::s2_i),
-        Q_ACTION_CAST(0)
+    static struct {
+        QP::QMState const *target;
+        QP::QActionHandler act[4];
+    } const tatbl_ = { // transition-action table
+        &s2_s,
+        {
+            Q_ACTION_CAST(&QMsmTst::s_e), // entry
+            Q_ACTION_CAST(&QMsmTst::s2_e), // entry
+            Q_ACTION_CAST(&QMsmTst::s2_i), // initial tran.
+            Q_ACTION_CAST(0)  // zero terminator
+        }
     };
+    // ${SMs::QMsmTst::SM::initial}
     (void)e; // avoid compiler warning
     me->m_foo = 0U;
     BSP_display("top-INIT;");
-    return QM_INITIAL(&QMsmTst::s2_s, act_);
+    return QM_TRAN_INIT(&tatbl_);
 }
-// @(/1/0/2/1) ...............................................................
+//${SMs::QMsmTst::SM::s} .....................................................
 QP::QMState const QMsmTst::s_s = {
-    static_cast<QP::QMState const *>(0),
+    static_cast<QP::QMState const *>(0), // superstate (top)
     Q_STATE_CAST(&QMsmTst::s),
-    Q_ACTION_CAST(&QMsmTst::s_x)
+    Q_ACTION_CAST(&QMsmTst::s_e),
+    Q_ACTION_CAST(&QMsmTst::s_x),
+    Q_ACTION_CAST(&QMsmTst::s_i)
 };
+// ${SMs::QMsmTst::SM::s}
 QP::QState QMsmTst::s_e(QMsmTst * const me) {
     BSP_display("s-ENTRY;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_ENTRY(&s_s);
 }
+// ${SMs::QMsmTst::SM::s}
 QP::QState QMsmTst::s_x(QMsmTst * const me) {
     BSP_display("s-EXIT;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_EXIT(&s_s);
 }
+// ${SMs::QMsmTst::SM::s::initial}
 QP::QState QMsmTst::s_i(QMsmTst * const me) {
-    static QP::QActionHandler const act_[] = {
-        Q_ACTION_CAST(&QMsmTst::s1_e),
-        Q_ACTION_CAST(&QMsmTst::s11_e),
-        Q_ACTION_CAST(0)
+    static struct {
+        QP::QMState const *target;
+        QP::QActionHandler act[3];
+    } const tatbl_ = { // transition-action table
+        &s11_s,
+        {
+            Q_ACTION_CAST(&QMsmTst::s1_e), // entry
+            Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+            Q_ACTION_CAST(0)  // zero terminator
+        }
     };
+    // ${SMs::QMsmTst::SM::s::initial}
     BSP_display("s-INIT;");
-    return QM_INITIAL(&QMsmTst::s11_s, act_);
+    return QM_TRAN_INIT(&tatbl_);
 }
+// ${SMs::QMsmTst::SM::s}
 QP::QState QMsmTst::s(QMsmTst * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/1/0/2/1/1)
+        // ${SMs::QMsmTst::SM::s::I}
         case I_SIG: {
-            // @(/1/0/2/1/1/0)
+            // ${SMs::QMsmTst::SM::s::I::[me->m_foo]}
             if (me->m_foo) {
                 me->m_foo = 0U;
                 BSP_display("s-I;");
@@ -123,18 +144,24 @@ QP::QState QMsmTst::s(QMsmTst * const me, QP::QEvt const * const e) {
             }
             break;
         }
-        // @(/1/0/2/1/2)
+        // ${SMs::QMsmTst::SM::s::E}
         case E_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s1_e),
-                Q_ACTION_CAST(&QMsmTst::s11_e),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[3];
+            } const tatbl_ = { // transition-action table
+                &s11_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s-E;");
-            status_ = QM_TRAN(&s11_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // @(/1/0/2/1/3)
+        // ${SMs::QMsmTst::SM::s::TERMINATE}
         case TERMINATE_SIG: {
             BSP_terminate(0);
             status_ = QM_HANDLED();
@@ -145,102 +172,148 @@ QP::QState QMsmTst::s(QMsmTst * const me, QP::QEvt const * const e) {
             break;
         }
     }
+    (void)me; /* avoid compiler warning in case 'me' is not used */
     return status_;
 }
-// @(/1/0/2/1/4) .............................................................
+//${SMs::QMsmTst::SM::s::s1} .................................................
 QP::QMState const QMsmTst::s1_s = {
-    &QMsmTst::s_s,
+    &QMsmTst::s_s, // superstate
     Q_STATE_CAST(&QMsmTst::s1),
-    Q_ACTION_CAST(&QMsmTst::s1_x)
+    Q_ACTION_CAST(&QMsmTst::s1_e),
+    Q_ACTION_CAST(&QMsmTst::s1_x),
+    Q_ACTION_CAST(&QMsmTst::s1_i)
 };
+// ${SMs::QMsmTst::SM::s::s1}
 QP::QState QMsmTst::s1_e(QMsmTst * const me) {
     BSP_display("s1-ENTRY;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_ENTRY(&s1_s);
 }
+// ${SMs::QMsmTst::SM::s::s1}
 QP::QState QMsmTst::s1_x(QMsmTst * const me) {
     BSP_display("s1-EXIT;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_EXIT(&s1_s);
 }
+// ${SMs::QMsmTst::SM::s::s1::initial}
 QP::QState QMsmTst::s1_i(QMsmTst * const me) {
-    static QP::QActionHandler const act_[] = {
-        Q_ACTION_CAST(&QMsmTst::s11_e),
-        Q_ACTION_CAST(0)
+    static struct {
+        QP::QMState const *target;
+        QP::QActionHandler act[2];
+    } const tatbl_ = { // transition-action table
+        &s11_s,
+        {
+            Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+            Q_ACTION_CAST(0)  // zero terminator
+        }
     };
+    // ${SMs::QMsmTst::SM::s::s1::initial}
     BSP_display("s1-INIT;");
-    return QM_INITIAL(&QMsmTst::s11_s, act_);
+    return QM_TRAN_INIT(&tatbl_);
 }
+// ${SMs::QMsmTst::SM::s::s1}
 QP::QState QMsmTst::s1(QMsmTst * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/1/0/2/1/4/1)
+        // ${SMs::QMsmTst::SM::s::s1::I}
         case I_SIG: {
             BSP_display("s1-I;");
             status_ = QM_HANDLED();
             break;
         }
-        // @(/1/0/2/1/4/2)
+        // ${SMs::QMsmTst::SM::s::s1::D}
         case D_SIG: {
-            // @(/1/0/2/1/4/2/0)
+            // ${SMs::QMsmTst::SM::s::s1::D::[!me->m_foo]}
             if (!me->m_foo) {
-                static QP::QActionHandler const act_[] = {
-                    Q_ACTION_CAST(&QMsmTst::s1_x),
-                    Q_ACTION_CAST(&QMsmTst::s_i),
-                    Q_ACTION_CAST(0)
+                static struct {
+                    QP::QMState const *target;
+                    QP::QActionHandler act[3];
+                } const tatbl_ = { // transition-action table
+                    &s_s,
+                    {
+                        Q_ACTION_CAST(&QMsmTst::s1_x), // exit
+                        Q_ACTION_CAST(&QMsmTst::s_i), // initial tran.
+                        Q_ACTION_CAST(0)  // zero terminator
+                    }
                 };
                 me->m_foo = true;
                 BSP_display("s1-D;");
-                status_ = QM_TRAN(&s_s, act_);
+                status_ = QM_TRAN(&tatbl_);
             }
             else {
                 status_ = QM_UNHANDLED();
             }
             break;
         }
-        // @(/1/0/2/1/4/3)
+        // ${SMs::QMsmTst::SM::s::s1::A}
         case A_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s1_x),
-                Q_ACTION_CAST(&QMsmTst::s1_e),
-                Q_ACTION_CAST(&QMsmTst::s1_i),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[4];
+            } const tatbl_ = { // transition-action table
+                &s1_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s1_i), // initial tran.
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s1-A;");
-            status_ = QM_TRAN(&s1_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // @(/1/0/2/1/4/4)
+        // ${SMs::QMsmTst::SM::s::s1::B}
         case B_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s11_e),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[2];
+            } const tatbl_ = { // transition-action table
+                &s11_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s1-B;");
-            status_ = QM_TRAN(&s11_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // @(/1/0/2/1/4/5)
+        // ${SMs::QMsmTst::SM::s::s1::F}
         case F_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s1_x),
-                Q_ACTION_CAST(&QMsmTst::s2_e),
-                Q_ACTION_CAST(&QMsmTst::s21_e),
-                Q_ACTION_CAST(&QMsmTst::s211_e),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[5];
+            } const tatbl_ = { // transition-action table
+                &s211_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s2_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s21_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s1-F;");
-            status_ = QM_TRAN(&s211_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // @(/1/0/2/1/4/6)
+        // ${SMs::QMsmTst::SM::s::s1::C}
         case C_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s1_x),
-                Q_ACTION_CAST(&QMsmTst::s2_e),
-                Q_ACTION_CAST(&QMsmTst::s2_i),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[4];
+            } const tatbl_ = { // transition-action table
+                &s2_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s2_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s2_i), // initial tran.
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s1-C;");
-            status_ = QM_TRAN(&s2_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
         default: {
@@ -250,65 +323,90 @@ QP::QState QMsmTst::s1(QMsmTst * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/1/0/2/1/4/7) ...........................................................
+//${SMs::QMsmTst::SM::s::s1::s11} ............................................
 QP::QMState const QMsmTst::s11_s = {
-    &QMsmTst::s1_s,
+    &QMsmTst::s1_s, // superstate
     Q_STATE_CAST(&QMsmTst::s11),
-    Q_ACTION_CAST(&QMsmTst::s11_x)
+    Q_ACTION_CAST(&QMsmTst::s11_e),
+    Q_ACTION_CAST(&QMsmTst::s11_x),
+    Q_ACTION_CAST(0)  // no intitial tran.
 };
+// ${SMs::QMsmTst::SM::s::s1::s11}
 QP::QState QMsmTst::s11_e(QMsmTst * const me) {
     BSP_display("s11-ENTRY;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_ENTRY(&s11_s);
 }
+// ${SMs::QMsmTst::SM::s::s1::s11}
 QP::QState QMsmTst::s11_x(QMsmTst * const me) {
     BSP_display("s11-EXIT;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_EXIT(&s11_s);
 }
+// ${SMs::QMsmTst::SM::s::s1::s11}
 QP::QState QMsmTst::s11(QMsmTst * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/1/0/2/1/4/7/0)
+        // ${SMs::QMsmTst::SM::s::s1::s11::H}
         case H_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s11_x),
-                Q_ACTION_CAST(&QMsmTst::s1_x),
-                Q_ACTION_CAST(&QMsmTst::s_i),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[4];
+            } const tatbl_ = { // transition-action table
+                &s_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s11_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s_i), // initial tran.
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s11-H;");
-            status_ = QM_TRAN(&s_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // @(/1/0/2/1/4/7/1)
+        // ${SMs::QMsmTst::SM::s::s1::s11::D}
         case D_SIG: {
-            // @(/1/0/2/1/4/7/1/0)
+            // ${SMs::QMsmTst::SM::s::s1::s11::D::[me->m_foo]}
             if (me->m_foo) {
-                static QP::QActionHandler const act_[] = {
-                    Q_ACTION_CAST(&QMsmTst::s11_x),
-                    Q_ACTION_CAST(&QMsmTst::s1_i),
-                    Q_ACTION_CAST(0)
+                static struct {
+                    QP::QMState const *target;
+                    QP::QActionHandler act[3];
+                } const tatbl_ = { // transition-action table
+                    &s1_s,
+                    {
+                        Q_ACTION_CAST(&QMsmTst::s11_x), // exit
+                        Q_ACTION_CAST(&QMsmTst::s1_i), // initial tran.
+                        Q_ACTION_CAST(0)  // zero terminator
+                    }
                 };
                 me->m_foo = false;
                 BSP_display("s11-D;");
-                status_ = QM_TRAN(&s1_s, act_);
+                status_ = QM_TRAN(&tatbl_);
             }
             else {
                 status_ = QM_UNHANDLED();
             }
             break;
         }
-        // @(/1/0/2/1/4/7/2)
+        // ${SMs::QMsmTst::SM::s::s1::s11::G}
         case G_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s11_x),
-                Q_ACTION_CAST(&QMsmTst::s1_x),
-                Q_ACTION_CAST(&QMsmTst::s2_e),
-                Q_ACTION_CAST(&QMsmTst::s21_e),
-                Q_ACTION_CAST(&QMsmTst::s211_e),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[6];
+            } const tatbl_ = { // transition-action table
+                &s211_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s11_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s2_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s21_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s11-G;");
-            status_ = QM_TRAN(&s211_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
         default: {
@@ -318,35 +416,50 @@ QP::QState QMsmTst::s11(QMsmTst * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/1/0/2/1/5) .............................................................
+//${SMs::QMsmTst::SM::s::s2} .................................................
 QP::QMState const QMsmTst::s2_s = {
-    &QMsmTst::s_s,
+    &QMsmTst::s_s, // superstate
     Q_STATE_CAST(&QMsmTst::s2),
-    Q_ACTION_CAST(&QMsmTst::s2_x)
+    Q_ACTION_CAST(&QMsmTst::s2_e),
+    Q_ACTION_CAST(&QMsmTst::s2_x),
+    Q_ACTION_CAST(&QMsmTst::s2_i)
 };
+// ${SMs::QMsmTst::SM::s::s2}
 QP::QState QMsmTst::s2_e(QMsmTst * const me) {
     BSP_display("s2-ENTRY;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_ENTRY(&s2_s);
 }
+// ${SMs::QMsmTst::SM::s::s2}
 QP::QState QMsmTst::s2_x(QMsmTst * const me) {
     BSP_display("s2-EXIT;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_EXIT(&s2_s);
 }
+// ${SMs::QMsmTst::SM::s::s2::initial}
 QP::QState QMsmTst::s2_i(QMsmTst * const me) {
-    static QP::QActionHandler const act_[] = {
-        Q_ACTION_CAST(&QMsmTst::s21_e),
-        Q_ACTION_CAST(&QMsmTst::s211_e),
-        Q_ACTION_CAST(0)
+    static struct {
+        QP::QMState const *target;
+        QP::QActionHandler act[3];
+    } const tatbl_ = { // transition-action table
+        &s211_s,
+        {
+            Q_ACTION_CAST(&QMsmTst::s21_e), // entry
+            Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+            Q_ACTION_CAST(0)  // zero terminator
+        }
     };
+    // ${SMs::QMsmTst::SM::s::s2::initial}
     BSP_display("s2-INIT;");
-    return QM_INITIAL(&QMsmTst::s211_s, act_);
+    return QM_TRAN_INIT(&tatbl_);
 }
+// ${SMs::QMsmTst::SM::s::s2}
 QP::QState QMsmTst::s2(QMsmTst * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/1/0/2/1/5/1)
+        // ${SMs::QMsmTst::SM::s::s2::I}
         case I_SIG: {
-            // @(/1/0/2/1/5/1/0)
+            // ${SMs::QMsmTst::SM::s::s2::I::[!me->m_foo]}
             if (!me->m_foo) {
                 me->m_foo = true;
                 BSP_display("s2-I;");
@@ -357,28 +470,40 @@ QP::QState QMsmTst::s2(QMsmTst * const me, QP::QEvt const * const e) {
             }
             break;
         }
-        // @(/1/0/2/1/5/2)
+        // ${SMs::QMsmTst::SM::s::s2::F}
         case F_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s2_x),
-                Q_ACTION_CAST(&QMsmTst::s1_e),
-                Q_ACTION_CAST(&QMsmTst::s11_e),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[4];
+            } const tatbl_ = { // transition-action table
+                &s11_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s2_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s2-F;");
-            status_ = QM_TRAN(&s11_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // @(/1/0/2/1/5/3)
+        // ${SMs::QMsmTst::SM::s::s2::C}
         case C_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s2_x),
-                Q_ACTION_CAST(&QMsmTst::s1_e),
-                Q_ACTION_CAST(&QMsmTst::s1_i),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[4];
+            } const tatbl_ = { // transition-action table
+                &s1_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s2_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s1_i), // initial tran.
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s2-C;");
-            status_ = QM_TRAN(&s1_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
         default: {
@@ -388,64 +513,97 @@ QP::QState QMsmTst::s2(QMsmTst * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/1/0/2/1/5/4) ...........................................................
+//${SMs::QMsmTst::SM::s::s2::s21} ............................................
 QP::QMState const QMsmTst::s21_s = {
-    &QMsmTst::s2_s,
+    &QMsmTst::s2_s, // superstate
     Q_STATE_CAST(&QMsmTst::s21),
-    Q_ACTION_CAST(&QMsmTst::s21_x)
+    Q_ACTION_CAST(&QMsmTst::s21_e),
+    Q_ACTION_CAST(&QMsmTst::s21_x),
+    Q_ACTION_CAST(&QMsmTst::s21_i)
 };
+// ${SMs::QMsmTst::SM::s::s2::s21}
 QP::QState QMsmTst::s21_e(QMsmTst * const me) {
     BSP_display("s21-ENTRY;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_ENTRY(&s21_s);
 }
+// ${SMs::QMsmTst::SM::s::s2::s21}
 QP::QState QMsmTst::s21_x(QMsmTst * const me) {
     BSP_display("s21-EXIT;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_EXIT(&s21_s);
 }
+// ${SMs::QMsmTst::SM::s::s2::s21::initial}
 QP::QState QMsmTst::s21_i(QMsmTst * const me) {
-    static QP::QActionHandler const act_[] = {
-        Q_ACTION_CAST(&QMsmTst::s211_e),
-        Q_ACTION_CAST(0)
+    static struct {
+        QP::QMState const *target;
+        QP::QActionHandler act[2];
+    } const tatbl_ = { // transition-action table
+        &s211_s,
+        {
+            Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+            Q_ACTION_CAST(0)  // zero terminator
+        }
     };
+    // ${SMs::QMsmTst::SM::s::s2::s21::initial}
     BSP_display("s21-INIT;");
-    return QM_INITIAL(&QMsmTst::s211_s, act_);
+    return QM_TRAN_INIT(&tatbl_);
 }
+// ${SMs::QMsmTst::SM::s::s2::s21}
 QP::QState QMsmTst::s21(QMsmTst * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/1/0/2/1/5/4/1)
+        // ${SMs::QMsmTst::SM::s::s2::s21::G}
         case G_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s21_x),
-                Q_ACTION_CAST(&QMsmTst::s2_x),
-                Q_ACTION_CAST(&QMsmTst::s1_e),
-                Q_ACTION_CAST(&QMsmTst::s1_i),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[5];
+            } const tatbl_ = { // transition-action table
+                &s1_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s21_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s2_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s1_i), // initial tran.
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s21-G;");
-            status_ = QM_TRAN(&s1_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // @(/1/0/2/1/5/4/2)
+        // ${SMs::QMsmTst::SM::s::s2::s21::A}
         case A_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s21_x),
-                Q_ACTION_CAST(&QMsmTst::s21_e),
-                Q_ACTION_CAST(&QMsmTst::s21_i),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[4];
+            } const tatbl_ = { // transition-action table
+                &s21_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s21_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s21_e), // entry
+                    Q_ACTION_CAST(&QMsmTst::s21_i), // initial tran.
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s21-A;");
-            status_ = QM_TRAN(&s21_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // @(/1/0/2/1/5/4/3)
+        // ${SMs::QMsmTst::SM::s::s2::s21::B}
         case B_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s211_e),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[2];
+            } const tatbl_ = { // transition-action table
+                &s211_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s21-B;");
-            status_ = QM_TRAN(&s211_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
         default: {
@@ -455,45 +613,64 @@ QP::QState QMsmTst::s21(QMsmTst * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/1/0/2/1/5/4/4) .........................................................
+//${SMs::QMsmTst::SM::s::s2::s21::s211} ......................................
 QP::QMState const QMsmTst::s211_s = {
-    &QMsmTst::s21_s,
+    &QMsmTst::s21_s, // superstate
     Q_STATE_CAST(&QMsmTst::s211),
-    Q_ACTION_CAST(&QMsmTst::s211_x)
+    Q_ACTION_CAST(&QMsmTst::s211_e),
+    Q_ACTION_CAST(&QMsmTst::s211_x),
+    Q_ACTION_CAST(0)  // no intitial tran.
 };
+// ${SMs::QMsmTst::SM::s::s2::s21::s211}
 QP::QState QMsmTst::s211_e(QMsmTst * const me) {
     BSP_display("s211-ENTRY;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_ENTRY(&s211_s);
 }
+// ${SMs::QMsmTst::SM::s::s2::s21::s211}
 QP::QState QMsmTst::s211_x(QMsmTst * const me) {
     BSP_display("s211-EXIT;");
+    (void)me; // avoid compiler warning in case 'me' is not used
     return QM_EXIT(&s211_s);
 }
+// ${SMs::QMsmTst::SM::s::s2::s21::s211}
 QP::QState QMsmTst::s211(QMsmTst * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/1/0/2/1/5/4/4/0)
+        // ${SMs::QMsmTst::SM::s::s2::s21::s211::H}
         case H_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s211_x),
-                Q_ACTION_CAST(&QMsmTst::s21_x),
-                Q_ACTION_CAST(&QMsmTst::s2_x),
-                Q_ACTION_CAST(&QMsmTst::s_i),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[5];
+            } const tatbl_ = { // transition-action table
+                &s_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s211_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s21_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s2_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s_i), // initial tran.
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s211-H;");
-            status_ = QM_TRAN(&s_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // @(/1/0/2/1/5/4/4/1)
+        // ${SMs::QMsmTst::SM::s::s2::s21::s211::D}
         case D_SIG: {
-            static QP::QActionHandler const act_[] = {
-                Q_ACTION_CAST(&QMsmTst::s211_x),
-                Q_ACTION_CAST(&QMsmTst::s21_i),
-                Q_ACTION_CAST(0)
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[3];
+            } const tatbl_ = { // transition-action table
+                &s21_s,
+                {
+                    Q_ACTION_CAST(&QMsmTst::s211_x), // exit
+                    Q_ACTION_CAST(&QMsmTst::s21_i), // initial tran.
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
             };
             BSP_display("s211-D;");
-            status_ = QM_TRAN(&s21_s, act_);
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
         default: {

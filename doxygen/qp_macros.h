@@ -1,7 +1,6 @@
 ///
 /// \file
-/// \ingroup qep qf qk qs
-/// macros for porting QP, and command-line macros
+/// command-line macros and macros for porting QP
 
 
 /// \brief The preprocessor switch to disable checking assertions

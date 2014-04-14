@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Dec 27, 2013
+// Last updated for version 5.3.0
+// Last updated on  2014-04-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,16 +28,14 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 
-// general (evt.h)
+// general
 -esym(1960,                   // Rule 7-3-1, Global declaration of symbol
  char_t,
  int_t,
- uint_t,
  enum_t,
  float32_t,
  float64_t)
@@ -96,12 +94,18 @@
  Q_DEFINE_THIS_MODULE)
 -emacro(1924,                 // 5-2-4 C-style cast
  Q_ASSERT,
+ Q_ASSERT_ID,
  Q_ALLEGE,
- Q_ERROR)
+ Q_ALLEGE_ID,
+ Q_ERROR,
+ Q_ERROR_ID)
 -emacro(522,                  // Highest operation lacks side-effects
  Q_ASSERT,
+ Q_ASSERT_ID,
  Q_ALLEGE,
- Q_ERROR)
+ Q_ALLEGE_ID,
+ Q_ERROR,
+ Q_ERROR_ID)
 -function(exit,               // give these functions the semantics of "exit"
  Q_onAssert,
  Q_onTestAssert)
@@ -120,6 +124,7 @@
 -esym(1960,                   // 16-0-4 function-like macro
  Q_ROM_BYTE,
  Q_TRAN,
+ Q_TRAN_HIST,
  Q_SUPER,
  Q_STATE_CAST,
  Q_ACTION_CAST,
@@ -128,10 +133,14 @@
  QM_ENTRY,
  QM_EXIT,
  QM_TRAN,
- QM_INITIAL,
+ QM_TRAN_HIST,
+ QM_TRAN_INIT,
+ QM_TRAN_EP,
+ QM_TRAN_XP,
  QM_HANDLED,
  QM_UNHANDLED,
- QM_SUPER)
+ QM_SUPER,
+ QM_SUPER_SUB)
 -esym(1712,                   // default constructor not defined
  QMsm,
  QHsm,

@@ -1,14 +1,14 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for Cortex-M4F, Vanilla port, TI_ARM compiler
-:: Last Updated for Version: 4.5.04
-:: Date of the Last Update:  Feb 15, 2013
+:: Last updated for version 5.3.0
+:: Last updated on  2014-04-13
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
 ::                    innovating embedded systems
 ::
-:: Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) Quantum Leaps, www.state-machine.com.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -26,12 +26,11 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http:::www.gnu.org/licenses/>.
+:: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: Quantum Leaps Web sites: http://www.quantum-leaps.com
-::                          http://www.state-machine.com
-:: e-mail:                  info@quantum-leaps.com
+:: Web:   www.state-machine.com
+:: Email: info@state-machine.com
 :: ===========================================================================
 setlocal
 
@@ -80,6 +79,9 @@ set CCINC=-I. -I%QP_INCDIR% -I%SRCDIR% -fr%BINDIR%
 
 @echo on
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qep.cpp
+%CC% %CCFLAGS% %CCINC% %SRCDIR%\qmsm_ini.cpp
+%CC% %CCFLAGS% %CCINC% %SRCDIR%\qmsm_dis.cpp
+%CC% %CCFLAGS% %CCINC% %SRCDIR%\qmsm_in.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qfsm_ini.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qfsm_dis.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qhsm_ini.cpp
@@ -87,7 +89,7 @@ set CCINC=-I. -I%QP_INCDIR% -I%SRCDIR% -fr%BINDIR%
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qhsm_top.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qhsm_in.cpp
 
-%LIB% %LIBFLAGS% %LIBDIR%\qp_%ARM_CORE%f_ti.lib %BINDIR%\qep.obj %BINDIR%\qfsm_ini.obj %BINDIR%\qfsm_dis.obj %BINDIR%\qhsm_ini.obj %BINDIR%\qhsm_dis.obj %BINDIR%\qhsm_top.obj %BINDIR%\qhsm_in.obj
+%LIB% %LIBFLAGS% %LIBDIR%\qp_%ARM_CORE%f_ti.lib %BINDIR%\qep.obj %BINDIR%\qfsm_ini.obj %BINDIR%\qfsm_dis.obj %BINDIR%\qmsm_ini.obj %BINDIR%\qmsm_dis.obj %BINDIR%\qmsm_in.obj %BINDIR%\qhsm_ini.obj %BINDIR%\qhsm_dis.obj %BINDIR%\qhsm_top.obj %BINDIR%\qhsm_in.obj
 @echo off
 erase %BINDIR%\*.obj
 
@@ -141,12 +143,13 @@ set CCINC=-I. -I%QP_INCDIR% -I%SRCDIR% -fr%BINDIR%
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qs_.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qs_blk.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qs_byte.cpp
+%CC% %CCFLAGS% %CCINC% %SRCDIR%\qs_dict.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qs_f32.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qs_f64.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qs_mem.cpp
 %CC% %CCFLAGS% %CCINC% %SRCDIR%\qs_str.cpp
 
-%LIB% %LIBFLAGS% %LIBDIR%\qp_%ARM_CORE%f_ti.lib %BINDIR%\qs.obj %BINDIR%\qs_.obj %BINDIR%\qs_blk.obj %BINDIR%\qs_byte.obj %BINDIR%\qs_f32.obj %BINDIR%\qs_f64.obj %BINDIR%\qs_mem.obj %BINDIR%\qs_str.obj
+%LIB% %LIBFLAGS% %LIBDIR%\qp_%ARM_CORE%f_ti.lib %BINDIR%\qs.obj %BINDIR%\qs_.obj %BINDIR%\qs_blk.obj %BINDIR%\qs_byte.obj %BINDIR%\qs_dict.obj %BINDIR%\qs_f32.obj %BINDIR%\qs_f64.obj %BINDIR%\qs_mem.obj %BINDIR%\qs_str.obj
 @echo off
 erase %BINDIR%\*.obj
 

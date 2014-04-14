@@ -35,7 +35,7 @@
 #ifndef qep_port_h
 #define qep_port_h
 
-#include <stdint.h>  // exact-width integers, WG14/N843 C99 Standard, 7.18.1.1
-#include "qep.h"                  // QEP platform-independent public interface
+#include <stdint.h> // exact-width integers, WG14/N843 C99 Standard, 7.18.1.1
+#include "qep.h"    // QEP platform-independent public interface
 
-#endif                                                           // qep_port_h
+#endif // qep_port_h

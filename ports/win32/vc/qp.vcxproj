@@ -152,6 +152,7 @@
     <ClCompile Include="..\..\..\qep\source\qhsm_ini.cpp" />
     <ClCompile Include="..\..\..\qep\source\qhsm_top.cpp" />
     <ClCompile Include="..\..\..\qep\source\qmsm_dis.cpp" />
+    <ClCompile Include="..\..\..\qep\source\qmsm_in.cpp" />
     <ClCompile Include="..\..\..\qep\source\qmsm_ini.cpp" />
     <ClCompile Include="..\..\..\qf\source\qa_defer.cpp" />
     <ClCompile Include="..\..\..\qf\source\qa_fifo.cpp" />

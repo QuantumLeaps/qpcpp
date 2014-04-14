@@ -1,128 +1,218 @@
-//****************************************************************************
-// Product: QF/C++
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Dec 03, 2013
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
-//****************************************************************************
+/// \file
+/// \brief cooperative "vanilla" kernel, definition of QP::QF_readySet_ and
+/// implementation of kernel-specific functins.
+/// \ingroup qf
+/// \cond
+///***************************************************************************
+/// Product: QF/C++
+/// Last updated for version 5.3.0
+/// Last updated on  2014-04-10
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, www.state-machine.com.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// Web:   www.state-machine.com
+/// Email: info@state-machine.com
+///***************************************************************************
+/// \endcond
+
+#define QP_IMPL           // this is QP implementation
+#include "qf_port.h"      // QF port
 #include "qf_pkg.h"
 #include "qassert.h"
-
-/// \file
-/// \ingroup qf
-/// \brief "vanilla" cooperative kernel,
-/// QActive::start(), QActive::stop(), and QF::run() implementation.
+#ifdef Q_SPY              // QS software tracing enabled?
+    #include "qs_port.h"  // include QS port
+#else
+    #include "qs_dummy.h" // disable the QS software tracing
+#endif // Q_SPY
 
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qvanilla")
 
-// Package-scope objects -----------------------------------------------------
+/// \note The functions implemented in this module can have a different
+/// implementation in other QF ports. The implementations included here
+/// are appropriate for the "vanilla" cooperative kernel only.
+
+// Package-scope objects *****************************************************
 extern "C" {
 #if (QF_MAX_ACTIVE <= 8)
-    QPSet8  QF_readySet_;                                  // ready set of AOs
+    QPSet8  QF_readySet_;  // ready set of AOs
 #else
-    QPSet64 QF_readySet_;                                  // ready set of AOs
+    QPSet64 QF_readySet_;  // ready set of AOs
 #endif
 
-uint8_t volatile QF_currPrio_;            ///< current task/interrupt priority
-}                                                                // extern "C"
+} // extern "C"
 
-//............................................................................
+//****************************************************************************
+/// \description
+/// Initializes QF and must be called exactly once before any other QF
+/// function. Typcially, QP::QF::init() is called from main() even before
+/// initializing the Board Support Package (BSP).
+///
+/// \note QP::QF::init() clears the internal QF variables, so that the
+/// framework can start correctly even if the startup code fails to clear
+/// the uninitialized data (as is required by the C Standard).
+///
 void QF::init(void) {
-    QF_maxPool_ = u_0;
-    bzero(&QF_readySet_,       static_cast<uint_t>(sizeof(QF_readySet_)));
-    bzero(&QF::timeEvtHead_[0],static_cast<uint_t>(sizeof(QF::timeEvtHead_)));
-    bzero(&QF::active_[0],     static_cast<uint_t>(
-                                 static_cast<uint_t>(QF_MAX_ACTIVE)
-                                   * static_cast<uint_t>(sizeof(QActive *))));
+    QF_maxPool_ = uf8_0;
+    bzero(&QF_readySet_, static_cast<uint_fast16_t>(sizeof(QF_readySet_)));
+    bzero(&QF::timeEvtHead_[0],
+          static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
+    bzero(&QF::active_[0],
+          static_cast<uint_fast16_t>(
+              static_cast<uint_fast16_t>(QF_MAX_ACTIVE)
+                  * static_cast<uint_fast16_t>(sizeof(QActive *))));
 }
-//............................................................................
+
+//****************************************************************************
+/// \description
+/// This function stops the QF application. After calling this function,
+/// QF attempts to gracefully stop the application. This graceful shutdown
+/// might take some time to complete. The typical use of this function is
+/// for terminating the QF application to return back to the operating
+/// system or for handling fatal errors that require shutting down
+/// (and possibly re-setting) the system.
+///
+/// \sa QP::QF::onCleanup()
+///
 void QF::stop(void) {
-    onCleanup();                                           // cleanup callback
+    onCleanup(); // cleanup callback
     // nothing else to do for the "vanilla" kernel
 }
-//............................................................................
-int_t QF::run(void) {
-    onStartup();                                           // startup callback
 
-    for (;;) {                                           // the bacground loop
+//****************************************************************************
+/// \description
+/// QP::QF::run() is typically called from your startup code after you
+/// initialize the QF and start at least one active object with
+/// QP::QActive::start().
+///
+/// \returns QP::QF::run() typically does not return in embedded applications.
+/// However, when QP runs on top of an operating system, QP::QF::run() might
+/// return and in this case the return represents the error code (0 for
+/// success). Typically the value returned from QP::QF::run() is subsequently
+/// passed on as return from main().
+///
+/// \note This function is strongly platform-dependent and is not implemented
+/// in the QF, but either in the QF port or in the Board Support Package (BSP)
+/// for the given application. All QF ports must implement QP::QF::run().
+///
+int_t QF::run(void) {
+    onStartup(); // startup callback
+
+    // the bacground loop of the "Vanilla" kernel
+    for (;;) {
         QF_INT_DISABLE();
         if (QF_readySet_.notEmpty()) {
-            uint8_t p = QF_readySet_.findMax();
+            uint_fast8_t p = QF_readySet_.findMax();
             QActive *a = active_[p];
-            QF_currPrio_ = p;                     // save the current priority
             QF_INT_ENABLE();
 
-            QEvt const *e = a->get_();       // get the next event for this AO
-            a->dispatch(e);                         // dispatch evt to the HSM
-            gc(e);       // determine if event is garbage and collect it if so
+            // perform the run-to-completion (RTS) step...
+            // 1. retrieve the event from the AO's event queue, which by this
+            //    time must be non-empty and The "Vanialla" kernel asserts it.
+            // 2. dispatch the event to the AO's state machine.
+            // 3. determine if event is garbage and collect it if so
+            //
+            QEvt const *e = a->get_();
+            a->dispatch(e);
+            gc(e);
         }
         else {
-            onIdle();                                            // see NOTE01
+            // QF::onIdle() must be called with interrupts DISABLED because
+            // the determination of the idle condition (no events in the
+            // queues) can change at any time by an interrupt posting events
+            // to a queue. QF_onIdle() MUST enable interrupts internally,
+            // perhaps at the same time as putting the CPU into a power-saving
+            // mode.
+            //
+            onIdle();
         }
     }
 
-#ifdef __GNUC__                                               // GNU compiler?
-    return u_0;
+#ifdef __GNUC__ // GNU compiler?
+    return static_cast<int_t>(0);
 #endif
 }
-//............................................................................
-void QActive::start(uint_t const prio,
-                    QEvt const *qSto[], uint_t const qLen,
-                    void * const stkSto, uint_t const,
+
+//****************************************************************************
+/// \description
+/// Starts execution of the AO and registers the AO with the framework.
+///
+/// \arguments
+/// \arg[in] \c prio    priority at which to start the active object
+/// \arg[in] \c qSto    pointer to the storage for the ring buffer of the
+///                     event queue (used only with the built-in ::QEQueue)
+/// \arg[in] \c qLen    length of the event queue (in events)
+/// \arg[in] \c stkSto  pointer to the stack storage (used only when
+///                     per-AO stack is needed)
+/// \arg[in] \c stkSize stack size (in bytes)
+/// \arg[in] \c ie      pointer to the optional initialization event
+///                     (might be NULL).
+///
+/// \note This function should be called via the macro START().
+///
+/// \usage
+/// The following example shows starting an AO when a per-task stack is needed
+/// \include qf_start.cpp
+///
+void QActive::start(uint_fast8_t const prio,
+                    QEvt const *qSto[], uint_fast16_t const qLen,
+                    void * const stkSto, uint_fast16_t const,
                     QEvt const * const ie)
 {
-    Q_REQUIRE((u_0 < prio) && (prio <= static_cast<uint_t>(QF_MAX_ACTIVE))
-              && (stkSto == null_void));      // does not need per-actor stack
+    /// \pre the priority must be in range and the stack storage must not
+    /// be provided, because "Vanilla" kernel does not need per-AO stacks.
+    ///
+    Q_REQUIRE_ID(400, (uf8_0 < prio)
+              && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
+              && (stkSto == null_void));
 
-    m_eQueue.init(qSto, qLen);                // initialize QEQueue of this AO
-    m_prio = static_cast<uint8_t>(prio);     // set the QF priority of this AO
-    QF::add_(this);                                // make QF aware of this AO
+    m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
+    m_prio = prio;  // set the QF priority of this AO
+    QF::add_(this); // make QF aware of this AO
 
-    this->init(ie);               // execute initial transition (virtual call)
-    QS_FLUSH();                          // flush the trace buffer to the host
+    this->init(ie); // execute initial transition (virtual call)
+    QS_FLUSH();     // flush the trace buffer to the host
 }
-//............................................................................
+
+//****************************************************************************
+/// \description
+/// The preferred way of calling this function is from within the active
+/// object that needs to stop. In other words, an active object should stop
+/// itself rather than being stopped by someone else. This policy works
+/// best, because only the active object itself "knows" when it has reached
+/// the appropriate state for the shutdown.
+///
+/// \note By the time the AO calls QP::QActive::stop(), it should have
+/// unsubscribed from all events and no more events should be directly-posted
+/// to it.
+///
 void QActive::stop(void) {
     QF::remove_(this);
 }
 
-}                                                              // namespace QP
-
-//****************************************************************************
-// NOTE01:
-// QF::onIdle() must be called with interrupts DISABLED because the
-// determination of the idle condition (no events in the queues) can change
-// at any time by an interrupt posting events to a queue. The QF::onIdle()
-// MUST enable interrups internally, perhaps at the same time as putting the
-// CPU into a power-saving mode.
-//
+} // namespace QP
 

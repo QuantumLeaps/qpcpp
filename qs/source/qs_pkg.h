@@ -1,53 +1,46 @@
-//****************************************************************************
-// Product: QS/C++
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Dec 03, 2013
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
-//****************************************************************************
-#ifndef qs_pkg_h
-#define qs_pkg_h
-
 /// \file
 /// \ingroup qs
 /// \brief Internal (package scope) QS/C++ interface.
+/// \cond
+///***************************************************************************
+/// Product: QEP/C++
+/// Last updated for version 5.3.0
+/// Last updated on  2014-02-27
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, www.state-machine.com.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// Web:   www.state-machine.com
+/// Email: info@state-machine.com
+///***************************************************************************
+/// \endcond
 
-#ifndef QP_API_VERSION
-    #define QP_API_VERSION 9999
-#endif
+#ifndef qs_pkg_h
+#define qs_pkg_h
 
-#include "qs_port.h"                                                // QS port
-
-/// \brief Internal QS macro to insert an un-escaped byte into
-/// the QS buffer
-////
+//! Internal QS macro to insert an un-escaped byte into the QS buffer
 #define QS_INSERT_BYTE(b_) \
     *QS_PTR_AT_(head_) = (b_); \
     ++head_; \
@@ -55,7 +48,7 @@
         head_ = static_cast<QSCtr>(0); \
     }
 
-/// \brief Internal QS macro to insert an escaped byte into the QS buffer
+//! Internal QS macro to insert an escaped byte into the QS buffer
 #define QS_INSERT_ESC_BYTE(b_) \
     chksum_ += (b_); \
     if (((b_) != QS_FRAME) && ((b_) != QS_ESC)) { \
@@ -67,7 +60,7 @@
         ++priv_.used; \
     }
 
-/// \brief Internal QS macro to access the QS ring buffer
+//! Internal QS macro to access the QS ring buffer
 ///
 /// \note The QS buffer is allocated by the user and is accessed through the
 /// pointer QS_ring_, which violates the MISRA-C 2004 Rule 17.4(req), pointer
@@ -75,22 +68,22 @@
 /// macro allows to selectively suppress this specific deviation.
 #define QS_PTR_AT_(i_) (buf_ + (i_))
 
-/// \brief Internal QS macro to increment the given pointer argument \a ptr_
+//! Internal QS macro to increment the given pointer argument \a ptr_
 ///
 /// \note Incrementing a pointer violates the MISRA-C 2004 Rule 17.4(req),
 /// pointer arithmetic other than array indexing. Encapsulating this violation
 /// in a macro allows to selectively suppress this specific deviation.
 #define QS_PTR_INC_(ptr_) (++(ptr_))
 
-/// \brief Internal QS macro to cast enumerated QS record number to uint8_t
+//! Internal QS macro to cast enumerated QS record number to uint8_t
 ///
 /// \note Casting from enum to unsigned char violates the MISRA-C++ 2008 rules
 /// 5-2-7, 5-2-8 and 5-2-9. Encapsulating this violation in a macro allows to
 /// selectively suppress this specific deviation.
-#define QS_REC_NUM_(enum_) (static_cast<uint8_t>(enum_))
+#define QS_REC_NUM_(enum_) (static_cast<uint_fast8_t>(enum_))
 
 #ifndef Q_ROM_BYTE
-    /// \brief Macro to access a byte allocated in ROM
+    //! Macro to access a byte allocated in ROM
     ///
     /// Some compilers for Harvard-architecture MCUs, such as gcc for AVR, do
     /// not generate correct code for accessing data allocated in the program
@@ -120,6 +113,6 @@ uint8_t const QS_ESC   = static_cast<uint8_t>(0x7D);
 /// into the QS buffer.
 uint8_t const QS_ESC_XOR = static_cast<uint8_t>(0x20);
 
-}                                                              // namespace QP
+} // namespace QP
 
-#endif                                                             // qs_pkg_h
+#endif  // qs_pkg_h

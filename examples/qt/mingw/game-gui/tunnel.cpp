@@ -14,7 +14,7 @@
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
 //****************************************************************************
-// @(/4/3) ...................................................................
+//${.::tunnel.cpp} ...........................................................
 #include "qp_port.h"
 #include "bsp.h"
 #include "game.h"
@@ -27,7 +27,7 @@ Q_DEFINE_THIS_FILE
 // local objects -------------------------------------------------------------
 namespace GAME {
 
-// @(/3/0) ...................................................................
+//${AOs::Tunnel} .............................................................
 class Tunnel : public QP::GuiQMActive {
 private:
     QP::QTimeEvt m_blinkTimeEvt;
@@ -237,8 +237,8 @@ static Bitmap const l_bitmap[MAX_BMP] = {
 // Active object definition ==================================================
 namespace GAME {
 
-// @(/3/0) ...................................................................
-// @(/3/0/11) ................................................................
+//${AOs::Tunnel} .............................................................
+//${AOs::Tunnel::Tunnel} .....................................................
 Tunnel::Tunnel()
   : GuiQMActive(Q_STATE_CAST(&Tunnel::initial)),
     m_blinkTimeEvt(this, BLINK_TIMEOUT_SIG, 0U),
@@ -252,7 +252,7 @@ Tunnel::Tunnel()
     }
 }
 
-// @(/3/0/12) ................................................................
+//${AOs::Tunnel::advance} ....................................................
 void Tunnel::advance() {
     uint32_t bmp1; // bimap representing 1 column of the image
 
@@ -307,7 +307,7 @@ void Tunnel::advance() {
     // copy the Tunnel layer to the main frame buffer
     memcpy(l_frame, l_walls, (GAME_SCREEN_WIDTH * GAME_SCREEN_HEIGHT/8U));
 }
-// @(/3/0/13) ................................................................
+//${AOs::Tunnel::plantMine} ..................................................
 void Tunnel::plantMine() {
     uint32_t rnd = (random() & 0xFFU);
 
@@ -351,7 +351,7 @@ void Tunnel::plantMine() {
         }
     }
 }
-// @(/3/0/14) ................................................................
+//${AOs::Tunnel::addImageAt} .................................................
 void Tunnel::addImageAt(
     uint8_t bmp,
     uint8_t x_pos,
@@ -375,7 +375,7 @@ void Tunnel::addImageAt(
         l_frame[x_pos + x + GAME_SCREEN_WIDTH] |= (uint8_t)(bmp1 >> 8);
     }
 }
-// @(/3/0/15) ................................................................
+//${AOs::Tunnel::dispatchToAllMines} .........................................
 void Tunnel::dispatchToAllMines(QP::QEvt const * e) {
     for (uint8_t n = 0U; n < GAME_MINES_MAX; ++n) {
         if (m_mines[n] != static_cast<QMsm *>(0)) { // is the mine used?
@@ -383,7 +383,7 @@ void Tunnel::dispatchToAllMines(QP::QEvt const * e) {
         }
     }
 }
-// @(/3/0/16) ................................................................
+//${AOs::Tunnel::isWallHit} ..................................................
 bool Tunnel::isWallHit(
     uint8_t bmp,
     uint8_t x_pos,
@@ -406,9 +406,9 @@ bool Tunnel::isWallHit(
     }
     return false;
 }
-// @(/3/0/17) ................................................................
-// @(/3/0/17/0)
+//${AOs::Tunnel::SM} .........................................................
 QP::QState Tunnel::initial(Tunnel * const me, QP::QEvt const * const e) {
+    // ${AOs::Tunnel::SM::initial}
     for (uint8_t n = 0; n < GAME_MINES_MAX; ++n) {
        me->m_mine1_pool[n]->init();       // take the initial tran. for Mine1
        me->m_mine2_pool[n]->init();       // take the initial tran. for Mine2
@@ -442,13 +442,13 @@ QP::QState Tunnel::initial(Tunnel * const me, QP::QEvt const * const e) {
     QS_SIG_DICTIONARY(MINE_DISABLED_SIG,  &l_tunnel);
     QS_SIG_DICTIONARY(EXPLOSION_SIG,      &l_tunnel);
     QS_SIG_DICTIONARY(SCORE_SIG,          &l_tunnel);
-    return Q_TRAN(&Tunnel::show_logo);
+    return Q_TRAN(&GAME::Tunnel::show_logo);
 }
-// @(/3/0/17/1) ..............................................................
+//${AOs::Tunnel::SM::active} .................................................
 QP::QState Tunnel::active(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/0/17/1/0)
+        // ${AOs::Tunnel::SM::active::MINE_DISABLED}
         case MINE_DISABLED_SIG: {
             Q_ASSERT((Q_EVT_CAST(MineEvt)->id < GAME_MINES_MAX)
                 && (me->m_mines[Q_EVT_CAST(MineEvt)->id] != static_cast<QMsm *>(0)));
@@ -456,9 +456,9 @@ QP::QState Tunnel::active(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/1)
+        // ${AOs::Tunnel::SM::active::PLAYER_QUIT}
         case PLAYER_QUIT_SIG: {
-            status_ = Q_TRAN(&Tunnel::final);
+            status_ = Q_TRAN(&final);
             break;
         }
         default: {
@@ -468,11 +468,11 @@ QP::QState Tunnel::active(Tunnel * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/3/0/17/1/2) ............................................................
+//${AOs::Tunnel::SM::active::show_logo} ......................................
 QP::QState Tunnel::show_logo(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/0/17/1/2)
+        // ${AOs::Tunnel::SM::active::show_logo}
         case Q_ENTRY_SIG: {
             me->m_blinkTimeEvt.armX(BSP_TICKS_PER_SEC/2U,
                                     BSP_TICKS_PER_SEC/2U); // every 1/2 sec
@@ -483,28 +483,28 @@ QP::QState Tunnel::show_logo(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/2)
+        // ${AOs::Tunnel::SM::active::show_logo}
         case Q_EXIT_SIG: {
             me->m_blinkTimeEvt.disarm();
             me->m_screenTimeEvt.disarm();
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/2/0)
+        // ${AOs::Tunnel::SM::active::show_logo::SCREEN_TIMEOUT}
         case SCREEN_TIMEOUT_SIG: {
-            status_ = Q_TRAN(&Tunnel::demo);
+            status_ = Q_TRAN(&demo);
             break;
         }
-        // @(/3/0/17/1/2/1)
+        // ${AOs::Tunnel::SM::active::show_logo::BLINK_TIMEOUT}
         case BLINK_TIMEOUT_SIG: {
             me->m_blink_ctr ^= 1U; // toggle the blink couner
-            // @(/3/0/17/1/2/1/0)
+            // ${AOs::Tunnel::SM::active::show_logo::BLINK_TIMEOUT::[me->m_blink_c~]}
             if (me->m_blink_ctr == 0U) {
                 BSP_drawNString(6U*9U, 0U,         " LeAps");
                 BSP_drawNString(0U,    1U, "state-machine.co");
                 status_ = Q_HANDLED();
             }
-            // @(/3/0/17/1/2/1/1)
+            // ${AOs::Tunnel::SM::active::show_logo::BLINK_TIMEOUT::[else]}
             else {
                 BSP_drawNString(6U*9U, 0U,         "LeaPs ");
                 BSP_drawNString(0U,    1U, "tate-machine.com");
@@ -519,11 +519,11 @@ QP::QState Tunnel::show_logo(Tunnel * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/3/0/17/1/3) ............................................................
+//${AOs::Tunnel::SM::active::demo} ...........................................
 QP::QState Tunnel::demo(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/0/17/1/3)
+        // ${AOs::Tunnel::SM::active::demo}
         case Q_ENTRY_SIG: {
             me->m_last_mine_x = 0U; // last mine at right edge of the tunnel
             me->m_last_mine_y = 0U;
@@ -544,25 +544,25 @@ QP::QState Tunnel::demo(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/3)
+        // ${AOs::Tunnel::SM::active::demo}
         case Q_EXIT_SIG: {
             me->m_blinkTimeEvt.disarm();
             me->m_screenTimeEvt.disarm();
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/3/0)
+        // ${AOs::Tunnel::SM::active::demo::BLINK_TIMEOUT}
         case BLINK_TIMEOUT_SIG: {
             me->m_blink_ctr ^= 1U; /* toggle the blink cunter */
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/3/1)
+        // ${AOs::Tunnel::SM::active::demo::SCREEN_TIMEOUT}
         case SCREEN_TIMEOUT_SIG: {
-            status_ = Q_TRAN(&Tunnel::screen_saver);
+            status_ = Q_TRAN(&screen_saver);
             break;
         }
-        // @(/3/0/17/1/3/2)
+        // ${AOs::Tunnel::SM::active::demo::TIME_TICK}
         case TIME_TICK_SIG: {
             me->advance();
             if (me->m_blink_ctr != 0U) {
@@ -575,9 +575,9 @@ QP::QState Tunnel::demo(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/3/3)
+        // ${AOs::Tunnel::SM::active::demo::PLAYER_TRIGGER}
         case PLAYER_TRIGGER_SIG: {
-            status_ = Q_TRAN(&Tunnel::playing);
+            status_ = Q_TRAN(&playing);
             break;
         }
         default: {
@@ -587,11 +587,11 @@ QP::QState Tunnel::demo(Tunnel * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/3/0/17/1/4) ............................................................
+//${AOs::Tunnel::SM::active::playing} ........................................
 QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/0/17/1/4)
+        // ${AOs::Tunnel::SM::active::playing}
         case Q_ENTRY_SIG: {
             static QP::QEvt const takeoff = QEVT_INITIALIZER(TAKE_OFF_SIG);
             me->m_minimal_gap = GAME_SCREEN_HEIGHT - 3U;
@@ -602,7 +602,7 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/4)
+        // ${AOs::Tunnel::SM::active::playing}
         case Q_EXIT_SIG: {
             QP::QEvt recycle;
             recycle.sig = MINE_RECYCLE_SIG;
@@ -610,7 +610,7 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/4/0)
+        // ${AOs::Tunnel::SM::active::playing::TIME_TICK}
         case TIME_TICK_SIG: {
             // render this frame on the display
             BSP_drawBitmap(l_frame);
@@ -620,7 +620,7 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/4/1)
+        // ${AOs::Tunnel::SM::active::playing::SHIP_IMG}
         case SHIP_IMG_SIG: {
             uint8_t x   = Q_EVT_CAST(ObjectImageEvt)->x;
             int8_t  y   = Q_EVT_CAST(ObjectImageEvt)->y;
@@ -636,7 +636,7 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/4/2)
+        // ${AOs::Tunnel::SM::active::playing::MISSILE_IMG}
         case MISSILE_IMG_SIG: {
             uint8_t x   = Q_EVT_CAST(ObjectImageEvt)->x;
             int8_t  y   = Q_EVT_CAST(ObjectImageEvt)->y;
@@ -652,7 +652,7 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/4/3)
+        // ${AOs::Tunnel::SM::active::playing::MINE_IMG}
         case MINE_IMG_SIG: {
             me->addImageAt(Q_EVT_CAST(ObjectImageEvt)->bmp,
                            Q_EVT_CAST(ObjectImageEvt)->x,
@@ -660,7 +660,7 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/4/4)
+        // ${AOs::Tunnel::SM::active::playing::EXPLOSION}
         case EXPLOSION_SIG: {
             me->addImageAt(Q_EVT_CAST(ObjectImageEvt)->bmp,
                            Q_EVT_CAST(ObjectImageEvt)->x,
@@ -668,7 +668,7 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/4/5)
+        // ${AOs::Tunnel::SM::active::playing::SCORE}
         case SCORE_SIG: {
             BSP_updateScore(Q_EVT_CAST(ScoreEvt)->score);
             // increase difficulty of the game:
@@ -679,7 +679,7 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/4/6)
+        // ${AOs::Tunnel::SM::active::playing::GAME_OVER}
         case GAME_OVER_SIG: {
             uint16_t score = Q_EVT_CAST(ScoreEvt)->score;
             BSP_updateScore(score);
@@ -697,7 +697,7 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             str[1] = '0' + (score % 10U); score /= 10U;
             str[0] = '0' + (score % 10U);
             BSP_drawNString((GAME_SCREEN_WIDTH - 6U*10U)/2U + 6U*6U, 1U, str);
-            status_ = Q_TRAN(&Tunnel::game_over);
+            status_ = Q_TRAN(&game_over);
             break;
         }
         default: {
@@ -707,11 +707,11 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/3/0/17/1/5) ............................................................
+//${AOs::Tunnel::SM::active::game_over} ......................................
 QP::QState Tunnel::game_over(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/0/17/1/5)
+        // ${AOs::Tunnel::SM::active::game_over}
         case Q_ENTRY_SIG: {
             me->m_blinkTimeEvt.armX(BSP_TICKS_PER_SEC/2U,
                                     BSP_TICKS_PER_SEC/2U); // every 1/2 sec
@@ -721,7 +721,7 @@ QP::QState Tunnel::game_over(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/5)
+        // ${AOs::Tunnel::SM::active::game_over}
         case Q_EXIT_SIG: {
             me->m_blinkTimeEvt.disarm();
             me->m_screenTimeEvt.disarm();
@@ -729,7 +729,7 @@ QP::QState Tunnel::game_over(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/5/0)
+        // ${AOs::Tunnel::SM::active::game_over::BLINK_TIMEOUT}
         case BLINK_TIMEOUT_SIG: {
             me->m_blink_ctr ^= 1U; // toggle the blink couner
             BSP_drawNString((GAME_SCREEN_WIDTH - 6U*9U)/2U, 0U,
@@ -739,9 +739,9 @@ QP::QState Tunnel::game_over(Tunnel * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/5/1)
+        // ${AOs::Tunnel::SM::active::game_over::SCREEN_TIMEOUT}
         case SCREEN_TIMEOUT_SIG: {
-            status_ = Q_TRAN(&Tunnel::demo);
+            status_ = Q_TRAN(&demo);
             break;
         }
         default: {
@@ -751,18 +751,18 @@ QP::QState Tunnel::game_over(Tunnel * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/3/0/17/1/6) ............................................................
+//${AOs::Tunnel::SM::active::screen_saver} ...................................
 QP::QState Tunnel::screen_saver(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/0/17/1/6/0)
+        // ${AOs::Tunnel::SM::active::screen_saver::initial}
         case Q_INIT_SIG: {
             status_ = Q_TRAN(&Tunnel::screen_saver_hide);
             break;
         }
-        // @(/3/0/17/1/6/1)
+        // ${AOs::Tunnel::SM::active::screen_saver::PLAYER_TRIGGER}
         case PLAYER_TRIGGER_SIG: {
-            status_ = Q_TRAN(&Tunnel::demo);
+            status_ = Q_TRAN(&demo);
             break;
         }
         default: {
@@ -772,27 +772,27 @@ QP::QState Tunnel::screen_saver(Tunnel * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/3/0/17/1/6/2) ..........................................................
+//${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide} ................
 QP::QState Tunnel::screen_saver_hide(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/0/17/1/6/2)
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide}
         case Q_ENTRY_SIG: {
             BSP_displayOff(); // power down the display
             me->m_screenTimeEvt.armX(BSP_TICKS_PER_SEC*3U, 0U); // in 3 sec
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/6/2)
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide}
         case Q_EXIT_SIG: {
             me->m_screenTimeEvt.disarm();
             BSP_displayOn(); // power up the display
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/6/2/0)
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide::SCREEN_TIMEOUT}
         case SCREEN_TIMEOUT_SIG: {
-            status_ = Q_TRAN(&Tunnel::screen_saver_show);
+            status_ = Q_TRAN(&screen_saver_show);
             break;
         }
         default: {
@@ -802,11 +802,11 @@ QP::QState Tunnel::screen_saver_hide(Tunnel * const me, QP::QEvt const * const e
     }
     return status_;
 }
-// @(/3/0/17/1/6/3) ..........................................................
+//${AOs::Tunnel::SM::active::screen_saver::screen_saver_show} ................
 QP::QState Tunnel::screen_saver_show(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/0/17/1/6/3)
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show}
         case Q_ENTRY_SIG: {
             uint32_t rnd = random();
             // clear the screen frame buffer
@@ -820,7 +820,7 @@ QP::QState Tunnel::screen_saver_show(Tunnel * const me, QP::QEvt const * const e
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/6/3)
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show}
         case Q_EXIT_SIG: {
             me->m_screenTimeEvt.disarm();
             // clear the screen frame buffer
@@ -830,9 +830,9 @@ QP::QState Tunnel::screen_saver_show(Tunnel * const me, QP::QEvt const * const e
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/0/17/1/6/3/0)
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show::SCREEN_TIMEOUT}
         case SCREEN_TIMEOUT_SIG: {
-            status_ = Q_TRAN(&Tunnel::screen_saver_hide);
+            status_ = Q_TRAN(&screen_saver_hide);
             break;
         }
         default: {
@@ -842,11 +842,11 @@ QP::QState Tunnel::screen_saver_show(Tunnel * const me, QP::QEvt const * const e
     }
     return status_;
 }
-// @(/3/0/17/2) ..............................................................
+//${AOs::Tunnel::SM::final} ..................................................
 QP::QState Tunnel::final(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/0/17/2)
+        // ${AOs::Tunnel::SM::final}
         case Q_ENTRY_SIG: {
             // clear the screen
             memset(l_frame, (uint8_t)0,

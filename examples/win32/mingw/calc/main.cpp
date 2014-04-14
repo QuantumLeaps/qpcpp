@@ -47,7 +47,7 @@ using namespace std;
 int main() {
 
     cout << "Calculator example, QEP version: "
-         << QEP::getVersion() << endl
+         << QP::QEP::getVersion() << endl
          << "Press '0' .. '9'     to enter a digit\n"
             "Press '.'            to enter the decimal point\n"
             "Press '+' or '#'     to add\n"
@@ -74,16 +74,16 @@ int main() {
         switch (e.key_code) {
             case 'c':                            // intentionally fall through
             case 'C': {
-                ((QEvt *)&e)->sig = C_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = C_SIG;
                 break;
             }
             case 'e':                            // intentionally fall through
             case 'E': {
-                ((QEvt *)&e)->sig = CE_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = CE_SIG;
                 break;
             }
             case '0': {
-                ((QEvt *)&e)->sig = DIGIT_0_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = DIGIT_0_SIG;
                 break;
             }
             case '1':                            // intentionally fall through
@@ -95,41 +95,41 @@ int main() {
             case '7':                            // intentionally fall through
             case '8':                            // intentionally fall through
             case '9': {
-                ((QEvt *)&e)->sig = DIGIT_1_9_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = DIGIT_1_9_SIG;
                 break;
             }
             case '.': {
-                ((QEvt *)&e)->sig = POINT_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = POINT_SIG;
                 break;
             }
             case '+':                            // intentionally fall through
             case '-':                            // intentionally fall through
             case '*':                            // intentionally fall through
             case '/': {
-                ((QEvt *)&e)->sig = OPER_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = OPER_SIG;
                 break;
             }
             case '#': {                                     // alternative '+'
-                ((QEvt *)&e)->sig = OPER_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = OPER_SIG;
                 e.key_code = '+';
                 break;
             }
             case '=':                            // intentionally fall through
             case '\r': {                                          // Enter key
-                ((QEvt *)&e)->sig = EQUALS_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = EQUALS_SIG;
                 break;
             }
             case '\33': {                                           // ESC key
-                ((QEvt *)&e)->sig = OFF_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = OFF_SIG;
                 break;
             }
             default: {
-                ((QEvt *)&e)->sig = 0;                      // invalid event
+                static_cast<QP::QEvt *>(&e)->sig = 0;         // invalid event
                 break;
             }
         }
 
-        if (((QEvt *)&e)->sig != 0) {              // valid event generated?
+        if (static_cast<QP::QEvt *>(&e)->sig != 0) { // valid event generated?
             the_calc->dispatch(&e);                          // dispatch event
         }
     }

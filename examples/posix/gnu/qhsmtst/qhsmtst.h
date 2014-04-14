@@ -14,7 +14,7 @@
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
 //****************************************************************************
-// @(/2/0) ...................................................................
+//${.::qhsmtst.h} ............................................................
 #ifndef qhsmtst_h
 #define qhsmtst_h
 

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Model: pelican.qm
 // File:  ./pelican.h
 //
@@ -13,8 +13,8 @@
 // WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
-//////////////////////////////////////////////////////////////////////////////
-// @(/3/0) ...................................................................
+//****************************************************************************
+//${.::pelican.h} ............................................................
 #ifndef pelican_h
 #define pelican_h
 
@@ -33,8 +33,11 @@ enum PelicanSignals {
 };
 
 // active objects ..................................................
+namespace PELCAN {
+
 extern QP::QActive * const AO_Pelican;
-  // opaque pointer to Pelican AO
+
+} // namespace PELCAN  // opaque pointer to Pelican AO
 
 } // namespace PELICAN
 

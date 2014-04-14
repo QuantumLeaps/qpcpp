@@ -14,7 +14,7 @@
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
 //****************************************************************************
-// @(/3/1) ...................................................................
+//${.::main.cpp} .............................................................
 #include "qp_port.h"
 #include "bsp.h"
 #include "game.h"

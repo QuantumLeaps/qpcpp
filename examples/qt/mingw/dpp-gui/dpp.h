@@ -14,7 +14,7 @@
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
 //****************************************************************************
-// @(/4/0) ...................................................................
+//${.::dpp.h} ................................................................
 #ifndef dpp_h
 #define dpp_h
 
@@ -33,7 +33,7 @@ enum DPPSignals {
 
 namespace DPP {
 
-// @(/2/0) ...................................................................
+//${Events::TableEvt} ........................................................
 class TableEvt : public QP::QEvt {
 public:
     uint8_t philoNum;

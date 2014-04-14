@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QEP/C++  port to Win32
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Jul 02, 2012
+// Last updated for version 5.3.0
+// Last updated on  2014-03-04
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,14 +28,23 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
+
 #ifndef qep_port_h
 #define qep_port_h
 
-#include <stdint.h>      // Exact-width types. WG14/N843 C99, Section 7.18.1.1
-#include "qep.h"                  // QEP platform-independent public interface
+#include <stdint.h> // Exact-width types. WG14/N843 C99, Section 7.18.1.1
 
-#endif                                                           // qep_port_h
+#ifdef _MSC_VER
+#pragma warning (disable: 4510 4512 4610)
+#endif
+
+#include "qep.h"    // QEP platform-independent public interface
+
+#ifdef _MSC_VER
+#pragma warning (default: 4510 4512 4610)
+#endif
+
+#endif // qep_port_h

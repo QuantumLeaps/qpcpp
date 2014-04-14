@@ -1,13 +1,13 @@
 ##############################################################################
-# Product:  QP/C++, Win32 build, GNU compiler
-# Last Updated for Version: 5.2.0
-# Date of the Last Update:  Dec 03, 2013
+# Product:  QP/C++, Win32 build, GNU compiler (MinGW)
+# Last Updated for Version: 5.3.0
+# Date of the Last Update:  2014-03-16
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -28,9 +28,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# Quantum Leaps Web sites: http://www.quantum-leaps.com
-#                          http://www.state-machine.com
-# e-mail:                  info@quantum-leaps.com
+# Web:   www.state-machine.com
+# Email: info@state-machine.com
 ##############################################################################
 
 # examples of invoking this Makefile:
@@ -71,20 +70,20 @@ ifeq (rel, $(CONF))       # Release configuration ............................
 BINDIR  = rel
 
 # gcc options
-CCFLAGS = -c -O2 -Wall -o$@
+CCFLAGS = -c -O2 -Wall -W -o$@
 
 # g++ options
-CPPFLAGS  = -c -O2 -fno-rtti -fno-exceptions -Wall -o$@
+CPPFLAGS  = -c -O2 -fno-rtti -fno-exceptions -Wall -W -o$@
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
 BINDIR   = spy
 
 # gcc options
-CCFLAGS = -c -g -O -DQ_SPY -Wall -o$@
+CCFLAGS = -c -g -O -DQ_SPY -Wall -W -o$@
 
 # g++ options
-CPPFLAGS  = -c -g -O -DQ_SPY -fno-rtti -fno-exceptions -Wall -o$@
+CPPFLAGS  = -c -g -O -DQ_SPY -fno-rtti -fno-exceptions -Wall -W -o$@
 
 QS_OBJS = \
 	$(BINDIR)/qs.o \
@@ -107,7 +106,7 @@ QP_DEP  = $(QP_INCDIR)/qassert.h
 CCFLAGS = -c -g -O -Wall -o$@
 
 # g++ options
-CPPFLAGS  = -c -g -O -fno-rtti -fno-exceptions -Wall -o$@
+CPPFLAGS  = -c -g -O -fno-rtti -fno-exceptions -Wall -W -o$@
 
 endif
 
@@ -118,12 +117,13 @@ QEP_OBJS = \
 	$(BINDIR)/qep.o \
 	$(BINDIR)/qmsm_ini.o \
 	$(BINDIR)/qmsm_dis.o \
+	$(BINDIR)/qmsm_in.o \
 	$(BINDIR)/qfsm_ini.o \
 	$(BINDIR)/qfsm_dis.o \
 	$(BINDIR)/qhsm_ini.o \
+	$(BINDIR)/qhsm_in.o \
 	$(BINDIR)/qhsm_dis.o \
-	$(BINDIR)/qhsm_top.o \
-	$(BINDIR)/qhsm_in.o
+	$(BINDIR)/qhsm_top.o
 
 QF_OBJS = \
 	$(BINDIR)/qa_defer.o \
@@ -157,12 +157,12 @@ QF_OBJS = \
 	$(BINDIR)/qf_port.o \
 	$(BINDIR)/win32_gui.o
 
-# the 'all' target ===========================================================
+# the targets ================================================================
 
-all: $(BINDIR)/libqp.a $(BIN_DIR)
+all: $(BINDIR) $(BINDIR)/libqp.a
 	-$(RM) $(BINDIR)/*.o
 
-$(BIN_DIR):
+$(BINDIR) :
 	mkdir $@
 
 $(BINDIR)/libqp.a: 	$(QEP_OBJS) $(QF_OBJS) $(QS_OBJS)
@@ -182,6 +182,9 @@ $(BINDIR)/qmsm_ini.o: $(QEP_SRCDIR)/qmsm_ini.cpp
 $(BINDIR)/qmsm_dis.o: $(QEP_SRCDIR)/qmsm_dis.cpp
 	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
 
+$(BINDIR)/qmsm_in.o: $(QEP_SRCDIR)/qmsm_in.cpp
+	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
+
 $(BINDIR)/qfsm_ini.o: $(QEP_SRCDIR)/qfsm_ini.cpp
 	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
 
@@ -191,13 +194,13 @@ $(BINDIR)/qfsm_dis.o: $(QEP_SRCDIR)/qfsm_dis.cpp
 $(BINDIR)/qhsm_ini.o: $(QEP_SRCDIR)/qhsm_ini.cpp
 	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
 
+$(BINDIR)/qhsm_in.o: $(QEP_SRCDIR)/qhsm_in.cpp
+	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
+
 $(BINDIR)/qhsm_dis.o: $(QEP_SRCDIR)/qhsm_dis.cpp
 	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
 
 $(BINDIR)/qhsm_top.o: $(QEP_SRCDIR)/qhsm_top.cpp
-	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
-
-$(BINDIR)/qhsm_in.o: $(QEP_SRCDIR)/qhsm_in.cpp
 	$(CPP) $(CPPFLAGS) $(CCINC) -I$(QEP_SRCDIR) $<
 
 # QF -----------------------------------------

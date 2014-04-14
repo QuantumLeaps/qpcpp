@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: "Fly 'n' Shoot" game example for Win32-GUI
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Nov 04, 2013
+// Last Updated for Version: 5.3.0
+// Date of the Last Update:  2014-04-13
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,9 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #include "qp_port.h"
 #include "game.h"
@@ -72,7 +71,7 @@ static SegmentDisplay   l_scoreBoard;         // segment display for the score
 static OwnerDrawnButton l_userBtn;      // USER button of the EK-LM3S811 board
 
 // (R,G,B) colors for the OLED display
-static BYTE const c_onColor [3] = { 255U, 255U,   0U };              // yellow
+static BYTE const c_onColor [3] = { 255U, 255U, 255U };               // white
 static BYTE const c_offColor[3] = {  15U,  15U,  15U };      // very dark grey
 
 static BYTE l_ship_pos = GAME_SHIP_Y;           // the current ship Y-position

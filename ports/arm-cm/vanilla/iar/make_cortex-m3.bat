@@ -1,14 +1,14 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for ARM Cortex-M3, Vanilla port, IAR compiler
-:: Last Updated for Version: 5.2.0
-:: Date of the Last Update:  Dec 30, 2013
+:: Last updated for version 5.3.0
+:: Last updated on  2014-04-13
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
 ::                    innovating embedded systems
 ::
-:: Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) Quantum Leaps, www.state-machine.com.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -29,9 +29,8 @@
 :: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: Quantum Leaps Web sites: http://www.quantum-leaps.com
-::                          http://www.state-machine.com
-:: e-mail:                  info@quantum-leaps.com
+:: Web:   www.state-machine.com
+:: Email: info@state-machine.com
 :: ===========================================================================
 setlocal
 
@@ -89,6 +88,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 %CC% %CCFLAGS% %CCOPT% %CCINC% -o%BINDIR%\ %SRCDIR%\qep.cpp
 %CC% %CCFLAGS% %CCOPT% %CCINC% -o%BINDIR%\ %SRCDIR%\qmsm_ini.cpp
 %CC% %CCFLAGS% %CCOPT% %CCINC% -o%BINDIR%\ %SRCDIR%\qmsm_dis.cpp
+%CC% %CCFLAGS% %CCOPT% %CCINC% -o%BINDIR%\ %SRCDIR%\qmsm_in.cpp
 %CC% %CCFLAGS% %CCOPT% %CCINC% -o%BINDIR%\ %SRCDIR%\qfsm_ini.cpp
 %CC% %CCFLAGS% %CCOPT% %CCINC% -o%BINDIR%\ %SRCDIR%\qfsm_dis.cpp
 %CC% %CCFLAGS% %CCOPT% %CCINC% -o%BINDIR%\ %SRCDIR%\qhsm_ini.cpp
@@ -96,7 +96,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 %CC% %CCFLAGS% %CCOPT% %CCINC% -o%BINDIR%\ %SRCDIR%\qhsm_top.cpp
 %CC% %CCFLAGS% %CCOPT% %CCINC% -o%BINDIR%\ %SRCDIR%\qhsm_in.cpp
 
-%LIB% --create %LIBDIR%\libqp_%ARM_CORE%.a %BINDIR%\qep.o %BINDIR%\qmsm_ini.o %BINDIR%\qmsm_dis.o %BINDIR%\qfsm_ini.o %BINDIR%\qfsm_dis.o %BINDIR%\qhsm_ini.o %BINDIR%\qhsm_dis.o %BINDIR%\qhsm_top.o %BINDIR%\qhsm_in.o
+%LIB% --create %LIBDIR%\libqp_%ARM_CORE%.a %BINDIR%\qep.o %BINDIR%\qmsm_ini.o %BINDIR%\qmsm_dis.o %BINDIR%\qmsm_in.o %BINDIR%\qfsm_ini.o %BINDIR%\qfsm_dis.o %BINDIR%\qhsm_ini.o %BINDIR%\qhsm_dis.o %BINDIR%\qhsm_top.o %BINDIR%\qhsm_in.o
 @echo off
 erase %BINDIR%\*.o
 

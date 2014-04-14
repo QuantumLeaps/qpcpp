@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QF/C++  port to POSIX/P-threads, GNU compiler
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
+// Last updated for version 5.3.0
+// Last updated on  2014-04-14
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,46 +28,49 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #ifndef qf_port_h
 #define qf_port_h
-                                         // Linux event queue and thread types
+
+// Linux event queue and thread types
 #define QF_EQUEUE_TYPE              QEQueue
 #define QF_OS_OBJECT_TYPE           pthread_cond_t
 #define QF_THREAD_TYPE              uint8_t
 
-                    // The maximum number of active objects in the application
+// The maximum number of active objects in the application
 #define QF_MAX_ACTIVE               63
-                                      // The number of system clock tick rates
+
+// The number of system clock tick rates
 #define QF_MAX_TICK_RATE            2
 
-                        // various QF object sizes configuration for this port
+// various QF object sizes configuration for this port
 #define QF_EVENT_SIZ_SIZE           4
 #define QF_EQUEUE_CTR_SIZE          4
 #define QF_MPOOL_SIZ_SIZE           4
 #define QF_MPOOL_CTR_SIZE           4
 #define QF_TIMEEVT_CTR_SIZE         4
 
-                       // QF critical section entry/exit for Linux, see NOTE01
+// QF critical section entry/exit for POSIX, see NOTE01
 // QF_CRIT_STAT_TYPE not defined
 #define QF_CRIT_ENTRY(dummy)    pthread_mutex_lock(&(QP::QF_pThreadMutex_))
 #define QF_CRIT_EXIT(dummy)     pthread_mutex_unlock(&(QP::QF_pThreadMutex_))
 
 #include <pthread.h>
 #include <errno.h>
-#include "qep_port.h"                                              // QEP port
-#include "qequeue.h"                                // Linux needs event-queue
-#include "qmpool.h"                                 // Linux needs memory-pool
-#include "qf.h"                    // QF platform-independent public interface
+#include "qep_port.h"  // QEP port
+#include "qequeue.h"   // POSIX needs event-queue
+#include "qmpool.h"    // POSIX needs memory-pool
+#include "qpset.h"     // POSIX needs priority-set
+#include "qf.h"        // QF platform-independent public interface
 
 //****************************************************************************
 // interface used only inside QF, but not in applications
 //
-#ifdef qf_pkg_h
-                                           // native QF event queue operations
+#ifdef QP_IMPL
+
+    // native QF event queue operations
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) \
             pthread_cond_wait(&(me_)->m_osObject, &QF_pThreadMutex_)
@@ -77,7 +80,7 @@
 
     #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
 
-                                            // native QF event pool operations
+    // native QF event pool operations
     #define QF_EPOOL_TYPE_            QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init(poolSto_, poolSize_, evtSize_)
@@ -86,16 +89,16 @@
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
     #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
 
-#endif
+#endif // QP_IMPL
 
 namespace QP {
 
-void QF_setTickRate(uint32_t ticksPerSec);              // set clock tick rate
-void QF_onClockTick(void);        // clock tick callback (provided in the app)
+void QF_setTickRate(uint32_t ticksPerSec); // set clock tick rate
+void QF_onClockTick(void); // clock tick callback (provided in the app)
 
-extern pthread_mutex_t QF_pThreadMutex_;      // mutex for QF critical section
+extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
 
-}                                                              // namespace QP
+} // namespace QP
 
 // NOTES: ////////////////////////////////////////////////////////////////////
 //
@@ -127,4 +130,4 @@ extern pthread_mutex_t QF_pThreadMutex_;      // mutex for QF critical section
 // inheritance protocol.
 //
 
-#endif                                                            // qf_port_h
+#endif // qf_port_h

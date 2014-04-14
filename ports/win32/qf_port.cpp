@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product:  QF/C++ port to Win32
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Dec 27, 2013
+// Last updated for version 5.3.0
+// Last updated on  2014-03-04
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,100 +28,111 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
+
+#define QP_IMPL           // this is QP implementation
+#include "qf_port.h"      // QF port
 #include "qf_pkg.h"
 #include "qassert.h"
+#ifdef Q_SPY              // QS software tracing enabled?
+    #include "qs_port.h"  // include QS port
+#else
+    #include "qs_dummy.h" // disable the QS software tracing
+#endif // Q_SPY
 
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
-// Global objects ------------------------------------------------------------
+// Global objects ************************************************************
 CRITICAL_SECTION l_win32CritSect;
 
-// Local objects -------------------------------------------------------------
+// Local objects *************************************************************
 static DWORD WINAPI thread_function(LPVOID arg);
-static DWORD l_tickMsec = 10U;    // clock tick in msec (argument for Sleep())
+static DWORD l_tickMsec = 10U; // clock tick in msec (argument for Sleep())
 static bool l_running;
 
 static DWORD WINAPI thread_function(LPVOID arg);
 
-//............................................................................
+//****************************************************************************
 void QF::init(void) {
     InitializeCriticalSection(&l_win32CritSect);
 }
-//............................................................................
+//****************************************************************************
 void QF_enterCriticalSection(void) {
     EnterCriticalSection(&l_win32CritSect);
 }
-//............................................................................
+//****************************************************************************
 void QF_leaveCriticalSection(void) {
     LeaveCriticalSection(&l_win32CritSect);
 }
-//............................................................................
+//****************************************************************************
 void QF::stop(void) {
     l_running = false;
 }
-//............................................................................
+//****************************************************************************
 void QF::thread_(QActive *act) {
-    do {                  // loop until m_thread is cleared in QActive::stop()
-        QEvt const *e = act->get_();                       // wait for event
-        act->dispatch(e);     // dispatch to the active object's state machine
-        gc(e);          // check if the event is garbage, and collect it if so
+    // loop until m_thread is cleared in QActive::stop()
+    do {
+        QEvt const *e = act->get_(); // wait for event
+        act->dispatch(e); // dispatch to the active object's state machine
+        gc(e); // check if the event is garbage, and collect it if so
     } while (act->m_thread != NULL);
-    QF::remove_(act);             // remove this object from any subscriptions
-    CloseHandle(act->m_osObject);                      // cleanup the OS event
+    QF::remove_(act); // remove this object from any subscriptions
+    CloseHandle(act->m_osObject); // cleanup the OS event
 }
-//............................................................................
+//****************************************************************************
 int_t QF::run(void) {
     l_running = true;
-    onStartup();                                           // startup callback
+    onStartup();  // startup callback
 
-               // raise the priority of this (main) thread to tick more timely
-    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+    // if necessary, raise the priority of this (main) thread
+    // to tick more timely
+    //SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 
     do {
-        Sleep(l_tickMsec);                       // wait for the tick interval
-        QF_onClockTick();       // clock tick callback (must call QF_TICK_X())
+        Sleep(l_tickMsec);  // wait for the tick interval
+        QF_onClockTick();   // clock tick callback (must call QF_TICK_X())
     } while (l_running);
-    onCleanup();                                           // cleanup callback
-    QS_EXIT();                                  // cleanup the QSPY connection
+
+    onCleanup();            // cleanup callback
+    QS_EXIT();              // cleanup the QSPY connection
     //DeleteCriticalSection(&l_win32CritSect);
-    return static_cast<int_t>(0);                            // return success
+    return static_cast<int_t>(0); // return success
 }
-//............................................................................
+//****************************************************************************
 void QF_setTickRate(uint32_t ticksPerSec) {
     l_tickMsec = 1000UL / ticksPerSec;
 }
-//............................................................................
-void QActive::start(uint_t prio,
-                    QEvt const *qSto[], uint_t qLen,
-                    void *stkSto, uint_t stkSize,
+//****************************************************************************
+void QActive::start(uint_fast8_t prio,
+                    QEvt const *qSto[], uint_fast16_t qLen,
+                    void *stkSto, uint_fast16_t stkSize,
                     QEvt const *ie)
 {
     Q_REQUIRE((qSto != static_cast<QEvt const **>(0)) /*valid queue storage */
-       && (stkSto == (void *)0));        // Windows allocates stack internally
+       && (stkSto == (void *)0)); // Windows allocates stack internally
 
-    m_prio = static_cast<uint8_t>(prio);     // set the QF priority of this AO
-    QF::add_(this);                                // make QF aware of this AO
+    m_prio = prio;  // set the QF priority of this AO
+    QF::add_(this); // make QF aware of this AO
 
-                         // create the Win32 event object to block the QEQueue
+    // create the Win32 event object to block the QEQueue
     m_osObject = CreateEvent(NULL, FALSE, FALSE, NULL);
     m_eQueue.init(qSto, qLen);
 
-    this->init(ie);               // execute initial transition (virtual call)
+    this->init(ie); // execute initial transition (virtual call)
 
-    if (stkSize == 0U) {                           // stack size not provided?
-        stkSize = 1024U;       // NOTE: will be rounded up to the nearest page
+    // stack size not provided?
+    if (stkSize == 0U) {
+        stkSize = 1024U; // NOTE: will be rounded up to the nearest page
     }
     m_thread = CreateThread(NULL, stkSize, &thread_function, this, 0, NULL);
-    Q_ASSERT(m_thread != NULL);                    // thread must be created
+    Q_ASSERT(m_thread != NULL); // thread must be created
 
     int p;
-    switch (m_prio) {                   // remap QF priority to Win32 priority
+    switch (m_prio) { // remap QF priority to Win32 priority
         case 1:
             p = THREAD_PRIORITY_IDLE;
             break;
@@ -143,14 +154,14 @@ void QActive::start(uint_t prio,
     }
     SetThreadPriority(m_thread, p);
 }
-//............................................................................
+//****************************************************************************
 void QActive::stop(void) {
-    m_thread = NULL;                           // stop the QActive::run() loop
+    m_thread = NULL;  // stop the QActive::run() loop
 }
-//............................................................................
-static DWORD WINAPI thread_function(LPVOID me) {         // for CreateThread()
+//****************************************************************************
+static DWORD WINAPI thread_function(LPVOID me) { // for CreateThread()
     QF::thread_(static_cast<QActive *>(me));
-    return 0;                                                // return success
+    return 0; // return success
 }
 
-}                                                              // namespace QP
+} // namespace QP

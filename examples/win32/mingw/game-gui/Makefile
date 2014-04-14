@@ -201,8 +201,12 @@ $(BIN_DIR)/%.o : %.c
 $(BIN_DIR)/%.o : %.rc
 	$(RC) $(RCINCLUDES) -i $< -o $@
 
+# include dependency files only if our goal depends on their existence
+ifneq ($(MAKECMDGOALS),clean)
+  ifneq ($(MAKECMDGOALS),show)
 -include $(C_DEPS_EXT) $(CPP_DEPS_EXT)
-
+  endif
+endif
 
 .PHONY : clean
 clean:

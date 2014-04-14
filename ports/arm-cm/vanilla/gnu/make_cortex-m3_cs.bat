@@ -1,14 +1,14 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for ARM Cortex-M3, Vanilla port, Code Sourcery
-:: Last Updated for Version: 5.1.0
-:: Date of the Last Update:  Oct 01, 2013
+:: Last updated for version 5.3.0
+:: Last updated on  2014-04-13
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
 ::                    innovating embedded systems
 ::
-:: Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) Quantum Leaps, www.state-machine.com.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -26,12 +26,11 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http:::www.gnu.org/licenses/>.
+:: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: Quantum Leaps Web sites: http://www.quantum-leaps.com
-::                          http://www.state-machine.com
-:: e-mail:                  info@quantum-leaps.com
+:: Web:   www.state-machine.com
+:: Email: info@state-machine.com
 :: ===========================================================================
 setlocal
 
@@ -86,6 +85,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 %CC% %CCFLAGS% %CCOPT% %CCINC% %SRCDIR%\qep.cpp      -o%BINDIR%\qep.o
 %CC% %CCFLAGS% %CCOPT% %CCINC% %SRCDIR%\qmsm_ini.cpp -o%BINDIR%\qmsm_ini.o
 %CC% %CCFLAGS% %CCOPT% %CCINC% %SRCDIR%\qmsm_dis.cpp -o%BINDIR%\qmsm_dis.o
+%CC% %CCFLAGS% %CCOPT% %CCINC% %SRCDIR%\qmsm_in.cpp  -o%BINDIR%\qmsm_in.o
 %CC% %CCFLAGS% %CCOPT% %CCINC% %SRCDIR%\qfsm_ini.cpp -o%BINDIR%\qfsm_ini.o
 %CC% %CCFLAGS% %CCOPT% %CCINC% %SRCDIR%\qfsm_dis.cpp -o%BINDIR%\qfsm_dis.o
 %CC% %CCFLAGS% %CCOPT% %CCINC% %SRCDIR%\qhsm_ini.cpp -o%BINDIR%\qhsm_ini.o
@@ -93,7 +93,7 @@ set CCINC=-I%QP_PRTDIR% -I%QP_INCDIR% -I%SRCDIR%
 %CC% %CCFLAGS% %CCOPT% %CCINC% %SRCDIR%\qhsm_top.cpp -o%BINDIR%\qhsm_top.o
 %CC% %CCFLAGS% %CCOPT% %CCINC% %SRCDIR%\qhsm_in.cpp  -o%BINDIR%\qhsm_in.o
 
-%LIB% %LIBFLAGS% %LIBDIR%\libqp_%ARM_CORE%_cs.a %BINDIR%\qep.o %BINDIR%\qmsm_dis.o %BINDIR%\qmsm_ini.o %BINDIR%\qfsm_ini.o %BINDIR%\qfsm_dis.o %BINDIR%\qhsm_ini.o %BINDIR%\qhsm_dis.o %BINDIR%\qhsm_top.o %BINDIR%\qhsm_in.o
+%LIB% %LIBFLAGS% %LIBDIR%\libqp_%ARM_CORE%_cs.a %BINDIR%\qep.o %BINDIR%\qmsm_ini.o %BINDIR%\qmsm_dis.o %BINDIR%\qmsm_in.o %BINDIR%\qfsm_ini.o %BINDIR%\qfsm_dis.o %BINDIR%\qhsm_ini.o %BINDIR%\qhsm_dis.o %BINDIR%\qhsm_top.o %BINDIR%\qhsm_in.o
 @echo off
 erase %BINDIR%\*.o
 

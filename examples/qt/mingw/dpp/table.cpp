@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//****************************************************************************
 // Model: dpp.qm
 // File:  ./table.cpp
 //
@@ -13,8 +13,8 @@
 // WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
-//////////////////////////////////////////////////////////////////////////////
-// @(/4/2) ...................................................................
+//****************************************************************************
+//${.::table.cpp} ............................................................
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
@@ -24,8 +24,10 @@ namespace DPP {
 Q_DEFINE_THIS_FILE
 
 // Active object class -------------------------------------------------------
-// @(/3/1) ...................................................................
-class Table : public QP::QActive {
+namespace DPP {
+
+//${AOs::Table} ..............................................................
+class Table : public QP::GuiQMActive {
 private:
     uint8_t m_fork[N_PHILO];
     bool m_isHungry[N_PHILO];
@@ -40,6 +42,7 @@ protected:
     static QP::QState paused(Table * const me, QP::QEvt const * const e);
 };
 
+} // namespace DPP
 
 // helper function to provide the RIGHT neighbour of a Philo[n]
 inline uint8_t RIGHT(uint8_t const n) {
@@ -65,10 +68,12 @@ static Table l_table; // the single instance of the Table active object
 QP::QActive * const AO_Table = &l_table; // "opaque" AO pointer
 
 //............................................................................
-// @(/3/1) ...................................................................
-// @(/3/1/2) .................................................................
-Table::Table() 
-  : QActive(Q_STATE_CAST(&Table::initial))
+namespace DPP {
+
+//${AOs::Table} ..............................................................
+//${AOs::Table::Table} .......................................................
+Table::Table()
+  : GuiQMActive(Q_STATE_CAST(&Table::initial))
 {
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         m_fork[n] = FREE;
@@ -76,9 +81,9 @@ Table::Table()
     }
 }
 
-// @(/3/1/3) .................................................................
-// @(/3/1/3/0)
+//${AOs::Table::SM} ..........................................................
 QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
+    // ${AOs::Table::SM::initial}
     (void)e; // suppress the compiler warning about unused parameter
 
     QS_OBJ_DICTIONARY(&l_table);
@@ -104,36 +109,36 @@ QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
         me->m_isHungry[n] = false;
         BSP_displayPhilStat(n, THINKING);
     }
-    return Q_TRAN(&Table::serving);
+    return Q_TRAN(&DPP::Table::serving);
 }
-// @(/3/1/3/1) ...............................................................
+//${AOs::Table::SM::active} ..................................................
 QP::QState Table::active(Table * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/1/3/1/0)
+        // ${AOs::Table::SM::active::TERMINATE}
         case TERMINATE_SIG: {
             BSP_terminate(0);
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/1/3/1/1)
+        // ${AOs::Table::SM::active::EAT}
         case EAT_SIG: {
             Q_ERROR();
             status_ = Q_HANDLED();
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm::top);
+            status_ = Q_SUPER(&QP::QHsm::top);
             break;
         }
     }
     return status_;
 }
-// @(/3/1/3/1/2) .............................................................
+//${AOs::Table::SM::active::serving} .........................................
 QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/1/3/1/2)
+        // ${AOs::Table::SM::active::serving}
         case Q_ENTRY_SIG: {
             for (uint8_t n = 0U; n < N_PHILO; ++n) { // give permissions to eat...
                 if (me->m_isHungry[n]
@@ -150,7 +155,7 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/1/3/1/2/0)
+        // ${AOs::Table::SM::active::serving::HUNGRY}
         case HUNGRY_SIG: {
             uint8_t n = Q_EVT_CAST(TableEvt)->philoNum;
             // phil ID must be in range and he must be not hungry
@@ -158,7 +163,7 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
 
             BSP_displayPhilStat(n, HUNGRY);
             uint8_t m = LEFT(n);
-            // @(/3/1/3/1/2/0/0)
+            // ${AOs::Table::SM::active::serving::HUNGRY::[bothfree]}
             if ((me->m_fork[m] == FREE) && (me->m_fork[n] == FREE)) {
                 me->m_fork[m] = USED;
                 me->m_fork[n] = USED;
@@ -166,14 +171,14 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
                 BSP_displayPhilStat(n, EATING);
                 status_ = Q_HANDLED();
             }
-            // @(/3/1/3/1/2/0/1)
+            // ${AOs::Table::SM::active::serving::HUNGRY::[else]}
             else {
                 me->m_isHungry[n] = true;
                 status_ = Q_HANDLED();
             }
             break;
         }
-        // @(/3/1/3/1/2/1)
+        // ${AOs::Table::SM::active::serving::DONE}
         case DONE_SIG: {
             uint8_t n = Q_EVT_CAST(TableEvt)->philoNum;
             // phil ID must be in range and he must be not hungry
@@ -207,15 +212,15 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/1/3/1/2/2)
+        // ${AOs::Table::SM::active::serving::EAT}
         case EAT_SIG: {
             Q_ERROR();
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/1/3/1/2/3)
+        // ${AOs::Table::SM::active::serving::PAUSE}
         case PAUSE_SIG: {
-            status_ = Q_TRAN(&Table::paused);
+            status_ = Q_TRAN(&paused);
             break;
         }
         default: {
@@ -225,28 +230,28 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-// @(/3/1/3/1/3) .............................................................
+//${AOs::Table::SM::active::paused} ..........................................
 QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // @(/3/1/3/1/3)
+        // ${AOs::Table::SM::active::paused}
         case Q_ENTRY_SIG: {
             BSP_displayPaused(1U);
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/1/3/1/3)
+        // ${AOs::Table::SM::active::paused}
         case Q_EXIT_SIG: {
             BSP_displayPaused(0U);
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/1/3/1/3/0)
+        // ${AOs::Table::SM::active::paused::PAUSE}
         case PAUSE_SIG: {
-            status_ = Q_TRAN(&Table::serving);
+            status_ = Q_TRAN(&serving);
             break;
         }
-        // @(/3/1/3/1/3/1)
+        // ${AOs::Table::SM::active::paused::HUNGRY}
         case HUNGRY_SIG: {
             uint8_t n = Q_EVT_CAST(TableEvt)->philoNum;
             // philo ID must be in range and he must be not hungry
@@ -256,7 +261,7 @@ QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        // @(/3/1/3/1/3/2)
+        // ${AOs::Table::SM::active::paused::DONE}
         case DONE_SIG: {
             uint8_t n = Q_EVT_CAST(TableEvt)->philoNum;
             // phil ID must be in range and he must be not hungry
@@ -280,5 +285,6 @@ QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
     return status_;
 }
 
+} // namespace DPP
 
 }                                                             // namespace DPP

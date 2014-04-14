@@ -1,53 +1,60 @@
-//****************************************************************************
-// Product: QEP/C++
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
-//****************************************************************************
-#include "qep_pkg.h"
-
 /// \file
+/// \brief ::QEP_reservedEvt_[] definition.
 /// \ingroup qep
-/// \brief ::QEP_reservedEvt_ definition implementation.
+/// \cond
+///***************************************************************************
+/// Product: QEP/C++
+/// Last updated for version 5.3.0
+/// Last updated on  2014-04-08
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, www.state-machine.com.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// Web:   www.state-machine.com
+/// Email: info@state-machine.com
+///***************************************************************************
+/// \endcond
+
+#include "qep_port.h"     // QEP port
+#include "qep_pkg.h"      // QEP internal interface
 
 namespace QP {
 
-// Package-scope objects -----------------------------------------------------
+//****************************************************************************/
+/// \description
+/// Static, preallocated standard events that the QEP event processor sends
+/// to state handler functions of QP::QHsm and QP::QFsm subclasses to execute
+/// entry actions, exit actions, and initial transitions.
+///
 QEvt const QEP_reservedEvt_[4] = {
-#ifdef Q_EVT_CTOR                         // Is the QEvt constructor provided?
+#ifdef Q_EVT_CTOR // Is the QEvt constructor provided?
     static_cast<QSignal>(0),
     static_cast<QSignal>(1),
     static_cast<QSignal>(2),
     static_cast<QSignal>(3)
-#else                                    // QEvt is a POD (Plain Old Datatype)
+#else // QEvt is a POD (Plain Old Datatype)
     { static_cast<QSignal>(0), u8_0, u8_0 },
     { static_cast<QSignal>(1), u8_0, u8_0 },
     { static_cast<QSignal>(2), u8_0, u8_0 },
@@ -55,4 +62,4 @@ QEvt const QEP_reservedEvt_[4] = {
 #endif
 };
 
-}                                                              // namespace QP
+} // namespace QP

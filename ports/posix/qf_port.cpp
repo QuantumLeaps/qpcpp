@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QF/C++ port to POSIX/P-threads, GNU
-// Last Updated for Version: 5.2.1
-// Date of the Last Update:  Jan 06, 2014
+// Last updated for version 5.3.0
+// Last updated on  2014-04-14
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,15 +28,22 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
+
+#define QP_IMPL           // this is QP implementation
+#include "qf_port.h"      // QF port
 #include "qf_pkg.h"
 #include "qassert.h"
+#ifdef Q_SPY              // QS software tracing enabled?
+    #include "qs_port.h"  // include QS port
+#else
+    #include "qs_dummy.h" // disable the QS software tracing
+#endif // Q_SPY
 
-#include <limits.h>                                   // for PTHREAD_STACK_MIN
-#include <sys/mman.h>                                        // for mlockall()
+#include <limits.h>      // for PTHREAD_STACK_MIN
+#include <sys/mman.h>    // for mlockall()
 #include <sys/select.h>
 
 namespace QP {
@@ -47,39 +54,40 @@ Q_DEFINE_THIS_MODULE("qf_port")
 pthread_mutex_t QF_pThreadMutex_ = PTHREAD_MUTEX_INITIALIZER;
 
 // Local-scope objects -------------------------------------------------------
-static long int l_tickUsec = 10000UL;      // clock tick in usec (for tv_usec)
+static long int l_tickUsec = 10000UL; // clock tick in usec (for tv_usec)
 static bool l_running;
 
 //............................................................................
 void QF::init(void) {
-                             // lock memory so we're never swapped out to disk
-    //mlockall(MCL_CURRENT | MCL_FUTURE);          // uncomment when supported
+    // lock memory so we're never swapped out to disk
+    //mlockall(MCL_CURRENT | MCL_FUTURE); // uncomment when supported
 }
 //............................................................................
 int_t QF::run(void) {
-    onStartup();                                    // invoke startup callback
+    onStartup(); // invoke startup callback
 
     struct sched_param sparam;
-                    // try to maximize the priority of this thread, see NOTE01
+
+    // try to maximize the priority of this thread, see NOTE01
     sparam.sched_priority = sched_get_priority_max(SCHED_FIFO);
     if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &sparam) == 0) {
-                        // success, this application has sufficient privileges
+        // success, this application has sufficient privileges
     }
     else {
-            // setting priority failed, probably due to insufficient privieges
+        // setting priority failed, probably due to insufficient privieges
     }
 
-    struct timeval timeout = { 0 };                    // timeout for select()
+    struct timeval timeout = { 0 }; // timeout for select()
     l_running = true;
     while (l_running) {
-        QF_onClockTick();       // clock tick callback (must call QF_TICK_X())
+        QF_onClockTick(); // clock tick callback (must call QF_TICK_X())
 
         timeout.tv_usec = l_tickUsec;
-        select(0, 0, 0, 0, &timeout);      // sleep for the full tick , NOTE05
+        select(0, 0, 0, 0, &timeout); // sleep for the full tick , NOTE05
     }
-    onCleanup();                                    // invoke cleanup callback
+    onCleanup(); // invoke cleanup callback
     pthread_mutex_destroy(&QF_pThreadMutex_);
-    return static_cast<int_t>(0);                            // return success
+    return static_cast<int_t>(0); // return success
 }
 //............................................................................
 void QF_setTickRate(uint32_t ticksPerSec) {
@@ -87,37 +95,39 @@ void QF_setTickRate(uint32_t ticksPerSec) {
 }
 //............................................................................
 void QF::stop(void) {
-    l_running = false;                           // stop the loop in QF::run()
+    l_running = false; // stop the loop in QF::run()
 }
 //............................................................................
 void QF::thread_(QActive *act) {
-    do {                  // loop until m_thread is cleared in QActive::stop()
-        QEvt const *e = act->get_();                         // wait for event
-        act->dispatch(e);     // dispatch to the active object's state machine
-        gc(e);          // check if the event is garbage, and collect it if so
+    // loop until m_thread is cleared in QActive::stop()
+    do {
+        QEvt const *e = act->get_(); // wait for event
+        act->dispatch(e); // dispatch to the active object's state machine
+        gc(e); // check if the event is garbage, and collect it if so
     } while (act->m_thread != static_cast<uint8_t>(0));
-    QF::remove_(act);             // remove this object from any subscriptions
-    pthread_cond_destroy(&act->m_osObject);  // cleanup the condition variable
+
+    QF::remove_(act); // remove this object from any subscriptions
+    pthread_cond_destroy(&act->m_osObject); // cleanup the condition variable
 }
 //............................................................................
-extern "C" void *thread_routine(void *arg) {   // the expected POSIX signature
+extern "C" void *thread_routine(void *arg) { // the expected POSIX signature
     QF::thread_(static_cast<QActive *>(arg));
-    return (void *)0;                                        // return success
+    return (void *)0; // return success
 }
 //............................................................................
-void QActive::start(uint_t prio,
-                    QEvt const *qSto[], uint_t qLen,
-                    void *stkSto, uint_t stkSize,
+void QActive::start(uint_fast8_t prio,
+                    QEvt const *qSto[], uint_fast16_t qLen,
+                    void *stkSto, uint_fast16_t stkSize,
                     QEvt const *ie)
 {
-    Q_REQUIRE(stkSto == (void *)0);     // p-threads allocate stack internally
+    Q_REQUIRE(stkSto == (void *)0); // p-threads allocate stack internally
 
     pthread_cond_init(&m_osObject, 0);
 
     m_eQueue.init(qSto, qLen);
-    m_prio = static_cast<uint8_t>(prio);     // set the QF priority of this AO
-    QF::add_(this);                                // make QF aware of this AO
-    this->init(ie);               // execute initial transition (virtual call)
+    m_prio = static_cast<uint8_t>(prio); // set the QF priority of this AO
+    QF::add_(this); // make QF aware of this AO
+    this->init(ie); // execute initial transition (virtual call)
 
     pthread_attr_t attr;
     pthread_attr_init(&attr);
@@ -125,7 +135,8 @@ void QActive::start(uint_t prio,
     // SCHED_FIFO corresponds to real-time preemptive priority-based scheduler
     // NOTE: This scheduling policy requires the superuser privileges
     pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
-                                                                 // see NOTE04
+
+    // see NOTE04
     struct sched_param param;
     param.sched_priority = prio
                            + (sched_get_priority_max(SCHED_FIFO)
@@ -134,15 +145,17 @@ void QActive::start(uint_t prio,
     pthread_attr_setschedparam(&attr, &param);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    if (stkSize == 0U) {                           // stack size not provided?
-        stkSize = (uint_t)PTHREAD_STACK_MIN;        // set the allowed minimum
+    // stack size not provided?
+    if (stkSize == 0U) {
+        stkSize = (uint_fast16_t)PTHREAD_STACK_MIN; // the minimum
     }
     pthread_t thread;
     if (pthread_create(&thread, &attr, &thread_routine, this) != 0) {
-               // Creating the p-thread with the SCHED_FIFO policy failed.
-               // Most probably this application has no superuser privileges,
-               // so we just fall back to the default SCHED_OTHER policy
-               // and priority 0.
+
+        // Creating the p-thread with the SCHED_FIFO policy failed.
+        // Most probably this application has no superuser privileges,
+        // so we just fall back to the default SCHED_OTHER policy
+        // and priority 0.
 
         pthread_attr_setschedpolicy(&attr, SCHED_OTHER);
         param.sched_priority = 0;
@@ -154,10 +167,10 @@ void QActive::start(uint_t prio,
 }
 //............................................................................
 void QActive::stop(void) {
-    m_thread = static_cast<uint8_t>(0);         // stop the QF::thread_() loop
+    m_thread = static_cast<uint8_t>(0); // stop the QF::thread_() loop
 }
 
-}                                                              // namespace QP
+} // namespace QP
 
 //****************************************************************************
 // NOTE01:

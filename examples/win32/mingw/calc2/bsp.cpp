@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product:  Board Support Package (BSP) for the Calculator example
-// Last Updated for Version: 4.1.05
-// Date of the Last Update:  Aug 27, 2010
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 08, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2010 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This software may be distributed and modified under the terms of the GNU
 // General Public License version 2 (GPL) as published by the Free Software
@@ -27,10 +27,12 @@
 //****************************************************************************
 #include "bsp.h"
 
-#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+using namespace std;
 
 #define DISP_WIDTH  9
 

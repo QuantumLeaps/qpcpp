@@ -39,9 +39,9 @@ echo usage:
 echo make
 echo make -CHM
 
-set VERSION=5.2.0
+set VERSION=5.3.0
 
-set DOXHOME="C:\tools\Doxygen\bin\Release64"
+set DOXHOME="C:\tools\doxygen\bin"
 set RCMHOME="C:\tools\MSquared\M2 RSM"
 
 set RSM_OUTPUT=qpcpp_metrics.txt

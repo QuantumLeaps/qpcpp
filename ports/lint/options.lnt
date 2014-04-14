@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Dec 27, 2013
+// Last Updated for Version: 5.3.0
+// Date of the Last Update:  Mar 05, 2014
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2014 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,9 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 
 // library headers
@@ -73,6 +72,8 @@ lib-qpcpp.lnt     // QP/C++ options
  *m_state,
  *m_temp,
  act)
+-efunc(661, *execTatbl_)    // Possible access of out-of-bounds pointer
+-efunc(644, *enterHistory_) // Variable 'entry' may not be initialized
 
 // QF
 -emacro(1960, QF_EVT_CONST_CAST_) // 5-2-5 attempt to cast away const

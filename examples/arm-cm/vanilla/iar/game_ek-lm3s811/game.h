@@ -14,7 +14,7 @@
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
 //****************************************************************************
-// @(/3/0) ...................................................................
+//${.::game.h} ...............................................................
 #ifndef game_h
 #define game_h
 
@@ -83,7 +83,7 @@ QP::QMsm *Mine2_getInst(uint8_t id);
 
 namespace GAME {
 
-// @(/1/0) ...................................................................
+//${Events::ObjectPosEvt} ....................................................
 class ObjectPosEvt : public QP::QEvt {
 public:
     uint8_t x;
@@ -93,7 +93,7 @@ public:
 } // namespace GAME
 namespace GAME {
 
-// @(/1/1) ...................................................................
+//${Events::ObjectImageEvt} ..................................................
 class ObjectImageEvt : public QP::QEvt {
 public:
     uint8_t x;
@@ -104,7 +104,7 @@ public:
 } // namespace GAME
 namespace GAME {
 
-// @(/1/2) ...................................................................
+//${Events::MineEvt} .........................................................
 class MineEvt : public QP::QEvt {
 public:
     uint8_t id;
@@ -120,7 +120,7 @@ public:
 } // namespace GAME
 namespace GAME {
 
-// @(/1/3) ...................................................................
+//${Events::ScoreEvt} ........................................................
 class ScoreEvt : public QP::QEvt {
 public:
     uint16_t score;
@@ -155,7 +155,7 @@ extern QP::QActive * const AO_Missile;
 // helper function for all AOs
 namespace GAME {
 
-// @(/2/8) ...................................................................
+//${AOs::do_bitmaps_overlap} .................................................
 bool do_bitmaps_overlap(
     uint8_t bmp_id1,
     uint8_t x1,

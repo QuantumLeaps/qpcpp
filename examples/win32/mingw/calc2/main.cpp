@@ -1,13 +1,13 @@
 //****************************************************************************
-// Product: Calculator Example with inheritance of the whole state model
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 20, 2012
+// Product:  Calculator2 Example
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 08, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -36,20 +36,18 @@
 #include "bsp.h"                                      // board support package
 #include "calc2.h"
 
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include <conio.h>
 #include <dos.h>
-#include <stdio.h>
 
-// Local objects -------------------------------------------------------------
-static Calc2 l_calc;                                // instantiate Calculator2
+using namespace std;
 
 //............................................................................
 int main() {
 
     cout << "Calculator2 example, QEP version: "
-         << QEP::getVersion() << endl
+         << QP::QEP::getVersion() << endl
          << "Press '0' .. '9'     to enter a digit\n"
             "Press '.'            to enter the decimal point\n"
             "Press '+' or '#'     to add\n"
@@ -57,12 +55,11 @@ int main() {
             "Press '*'            to multiply\n"
             "Press '/'            to divide\n"
             "Press '=' or <Enter> to get the result\n"
-            "Press '%'            to enter %\n"
             "Press 'c' or 'C'     to Cancel\n"
             "Press 'e' or 'E'     to Cancel Entry\n"
             "Press <Esc>          to quit.\n\n";
 
-    l_calc.init();                               // trigger initial transition
+    the_calc->init();                            // trigger initial transition
 
     for (;;) {                                                   // event loop
         CalcEvt e;                                         // Calculator event
@@ -70,22 +67,23 @@ int main() {
         BSP_display();                                     // show the display
 
         cout << ": ";
-        fflush(stdout);                // cout.flush() doesn't work in Watcom!
-        e.key_code = (uint8_t)_getch();               // get a char with echo
+        cout.flush();
+
+        e.key_code = (uint8_t)_getche();               // get a char with echo
 
         switch (e.key_code) {
             case 'c':                            // intentionally fall through
             case 'C': {
-                ((QEvt *)&e)->sig = C_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = C_SIG;
                 break;
             }
             case 'e':                            // intentionally fall through
             case 'E': {
-                ((QEvt *)&e)->sig = CE_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = CE_SIG;
                 break;
             }
             case '0': {
-                ((QEvt *)&e)->sig = DIGIT_0_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = DIGIT_0_SIG;
                 break;
             }
             case '1':                            // intentionally fall through
@@ -97,46 +95,46 @@ int main() {
             case '7':                            // intentionally fall through
             case '8':                            // intentionally fall through
             case '9': {
-                ((QEvt *)&e)->sig = DIGIT_1_9_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = DIGIT_1_9_SIG;
                 break;
             }
             case '.': {
-                ((QEvt *)&e)->sig = POINT_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = POINT_SIG;
                 break;
             }
             case '+':                            // intentionally fall through
             case '-':                            // intentionally fall through
             case '*':                            // intentionally fall through
             case '/': {
-                ((QEvt *)&e)->sig = OPER_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = OPER_SIG;
                 break;
             }
             case '#': {                                     // alternative '+'
-                ((QEvt *)&e)->sig = OPER_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = OPER_SIG;
                 e.key_code = '+';
-                break;
-            }
-            case '%': {                                 // new event for Calc2
-                ((QEvt *)&e)->sig = PERCENT_SIG;
                 break;
             }
             case '=':                            // intentionally fall through
             case '\r': {                                          // Enter key
-                ((QEvt *)&e)->sig = EQUALS_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = EQUALS_SIG;
+                break;
+            }
+            case '%': {                                         // Percent key
+                static_cast<QP::QEvt *>(&e)->sig = PERCENT_SIG;
                 break;
             }
             case '\33': {                                           // ESC key
-                ((QEvt *)&e)->sig = OFF_SIG;
+                static_cast<QP::QEvt *>(&e)->sig = OFF_SIG;
                 break;
             }
             default: {
-                ((QEvt *)&e)->sig = 0;                      // invalid event
+                static_cast<QP::QEvt *>(&e)->sig = 0;         // invalid event
                 break;
             }
         }
 
-        if (((QEvt *)&e)->sig != 0) {              // valid event generated?
-            l_calc.dispatch(&e);                             // dispatch event
+        if (static_cast<QP::QEvt *>(&e)->sig != 0) { // valid event generated?
+            the_calc->dispatch(&e);                          // dispatch event
         }
     }
 

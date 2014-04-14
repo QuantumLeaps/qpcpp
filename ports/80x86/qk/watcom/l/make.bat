@@ -1,14 +1,14 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for 80x86, QK port, Open Watcom compiler
-:: Last Updated for Version: 5.1.0
-:: Date of the Last Update:  Sep 30, 2013
+:: Last updated for version 5.3.0
+:: Last updated on  2014-04-13
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
 ::                    innovating embedded systems
 ::
-:: Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) Quantum Leaps, www.state-machine.com.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -29,9 +29,8 @@
 :: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: Quantum Leaps Web sites: http://www.quantum-leaps.com
-::                          http://www.state-machine.com
-:: e-mail:                  info@quantum-leaps.com
+:: Web:   www.state-machine.com
+:: Email: info@state-machine.com
 :: ===========================================================================
 
 :: If you have defined the WATCOM environment variable, the following line has
@@ -77,6 +76,7 @@ set CCINC=@inc_qep.rsp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qep.obj      %SRCDIR%\qep.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qmsm_ini.obj %SRCDIR%\qmsm_ini.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qmsm_dis.obj %SRCDIR%\qmsm_dis.cpp
+%CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qmsm_in.obj  %SRCDIR%\qmsm_in.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qfsm_ini.obj %SRCDIR%\qfsm_ini.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qfsm_dis.obj %SRCDIR%\qfsm_dis.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qhsm_ini.obj %SRCDIR%\qhsm_ini.cpp
@@ -89,6 +89,7 @@ erase %LIBDIR%\qep.lib
 %LIB% %LIBDIR%\qep +%BINDIR%\qep
 %LIB% %LIBDIR%\qep +%BINDIR%\qmsm_ini
 %LIB% %LIBDIR%\qep +%BINDIR%\qmsm_dis
+%LIB% %LIBDIR%\qep +%BINDIR%\qmsm_in
 %LIB% %LIBDIR%\qep +%BINDIR%\qfsm_ini
 %LIB% %LIBDIR%\qep +%BINDIR%\qfsm_dis
 %LIB% %LIBDIR%\qep +%BINDIR%\qhsm_ini
@@ -172,8 +173,8 @@ set CCINC=@inc_qk.rsp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qk_sched.obj %SRCDIR%\qk_sched.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qk_mutex.obj %SRCDIR%\qk_mutex.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qk_ext.obj   %SRCDIR%\qk_ext.cpp
-%CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qk_port.obj  src\qk_port.cpp
-%AS% %ASFLAGS%         -fo=%BINDIR%\fpu.obj      src\fpu.asm
+%CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qk_port.obj  qk_port.cpp
+%AS% %ASFLAGS%         -fo=%BINDIR%\fpu.obj      fpu.asm
 
 erase %LIBDIR%\qk.lib
 %LIB% -n %LIBDIR%\qk

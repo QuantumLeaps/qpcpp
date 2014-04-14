@@ -1,60 +1,63 @@
-//****************************************************************************
-// Product: QP/C++
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Dec 26, 2013
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
-//****************************************************************************
+/// \file
+/// \ingroup qf
+/// \brief platform-independent fast "raw" thread-safe event queue interface
+/// \cond
+///***************************************************************************
+/// Product: QF/C++
+/// Last updated for version 5.3.0
+/// Last updated on  2014-03-08
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, www.state-machine.com.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// Web:   www.state-machine.com
+/// Email: info@state-machine.com
+///***************************************************************************
+/// \endcond
+
 #ifndef qequeue_h
 #define qequeue_h
 
-/// \file
-/// \ingroup qep qf qk qs
-/// \brief platform-independent event queue interface.
-///
+/// \description
 /// This header file must be included in all QF ports that use native QF
-/// event queue implementation. Also, this file is needed when the "raw"
+/// event queue for active objects. Also, this file needs to be included
+/// in the QP/C++ library when the application uses QP::QActive::defer() /
+/// QP::QActive::recall(). Finally, this file is also needed when the "raw"
 /// thread-safe queues are used for communication between active objects
 /// and non-framework entities, such as ISRs, device drivers, or legacy
 /// code.
 
-
 #ifndef QF_EQUEUE_CTR_SIZE
 
-    /// \brief The size (in bytes) of the ring-buffer counters used in the
-    /// native QF event queue implementation. Valid values: 1, 2, or 4;
-    /// default 1.
-    ///
+    //! The size (in bytes) of the ring-buffer counters used in the
+    //! native QF event queue implementation. Valid values: 1, 2, or 4;
+    //! default 1.
+    /// \description
     /// This macro can be defined in the QF port file (qf_port.h) to
-    /// configure the ::QEQueueCtr type. Here the macro is not defined so the
-    /// default of 1 byte is chosen.
+    /// configure the QP::QEQueueCtr type. Here the macro is not defined
+    /// so the default of 1 byte is chosen.
     #define QF_EQUEUE_CTR_SIZE 1
 #endif
 
@@ -62,58 +65,58 @@
 namespace QP {
 
 #if (QF_EQUEUE_CTR_SIZE == 1)
-    /// \brief The data type to store the ring-buffer counters based on
-    /// the macro #QF_EQUEUE_CTR_SIZE.
-    ///
+    //! The data type to store the ring-buffer counters based on
+    //! the macro #QF_EQUEUE_CTR_SIZE.
+    /// \description
     /// The dynamic range of this data type determines the maximum length
     /// of the ring buffer managed by the native QF event queue.
-    typedef uint8_t QEQueueCtr;
+    typedef uint_fast8_t QEQueueCtr;
 #elif (QF_EQUEUE_CTR_SIZE == 2)
-    typedef uint16_t QEQueueCtr;
+    typedef uint_fast16_t QEQueueCtr;
 #elif (QF_EQUEUE_CTR_SIZE == 4)
-    typedef uint32_t QEQueueCtr;
+    typedef uint_fast32_t QEQueueCtr;
 #else
     #error "QF_EQUEUE_CTR_SIZE defined incorrectly, expected 1, 2, or 4"
 #endif
 
 
 //****************************************************************************
-/// \brief Native QF Event Queue class
-///
+//! Native QF Event Queue class
+/// \description
 /// This structure describes the native QF event queue, which can be used as
 /// the event queue for active objects, or as a simple "raw" event queue for
 /// thread-safe event passing among non-framework entities, such as ISRs,
-/// device drivers, or other third-party components.
-///
+/// device drivers, or other third-party components.\n
+/// \n
 /// The native QF event queue is configured by defining the macro
-/// #QF_EQUEUE_TYPE as ::QEQueue in the specific QF port header file.
-///
-/// The ::QEQueue structure contains only data members for managing an event
+/// #QF_EQUEUE_TYPE as QP::QEQueue in the specific QF port header file.\n
+/// \n
+/// The QP::QEQueue class contains only data members for managing an event
 /// queue, but does not contain the storage for the queue buffer, which must
-/// be provided externally during the queue initialization.
-///
+/// be provided externally during the queue initialization.\n
+/// \n
 /// The event queue can store only event pointers, not the whole events. The
 /// internal implementation uses the standard ring-buffer plus one external
 /// location that optimizes the queue operation for the most frequent case
-/// of empty queue.
-///
-/// The ::QEQueue structure is used with two sets of functions. One set is for
+/// of empty queue.\n
+/// \n
+/// The QP::QEQueue class is used with two sets of functions. One set is for
 /// the active object event queue, which needs to block the active object
 /// task when the event queue is empty and unblock it when events are posted
 /// to the queue. The interface for the native active object event queue
-/// consists of the following functions: QActive::post(), QActive::postLIFO(),
-/// and QActive::get_(). Additionally the function QEQueue::init() is used to
-/// initialize the queue.
-///
-/// The other set of functions, uses this structure as a simple "raw" event
+/// consists of the following functions: QP::QActive::post(),
+/// QP::QActive::postLIFO(), and QP::QActive::get_(). Additionally the
+/// function QP::QEQueue::init() is used to initialize the queue.\n
+/// \n
+/// The other set of functions, uses this class as a simple "raw" event
 /// queue to pass events between entities other than active objects, such as
 /// ISRs. The "raw" event queue is not capable of blocking on the get()
 /// operation, but is still thread-safe because it uses QF critical section
 /// to protect its integrity. The interface for the "raw" thread-safe queue
-/// consists of the following functions: QEQueue::post(), QEQueue::postLIFO(),
-/// and QEQueue::get(). Additionally the function QEQueue::init() is used to
-/// initialize the queue.
-///
+/// consists of the following functions: QP::QEQueue::post(),
+/// QP::QEQueue::postLIFO(), and QP::QEQueue::get(). Additionally the
+/// function QP::QEQueue::init() is used to initialize the queue.\n
+/// \n
 /// \note Most event queue operations (both the active object queues and
 /// the "raw" queues) internally use  the QF critical section. You should be
 /// careful not to invoke those operations from other critical sections when
@@ -121,130 +124,133 @@ namespace QP {
 class QEQueue {
 private:
 
-    /// \brief pointer to event at the front of the queue
-    ///
+    //! pointer to event at the front of the queue
+    /// \description
     /// All incoming and outgoing events pass through the m_frontEvt location.
     /// When the queue is empty (which is most of the time), the extra
     /// m_frontEvt location allows to bypass the ring buffer altogether,
     /// greatly optimizing the performance of the queue. Only bursts of events
-    /// engage the ring buffer.
-    ///
+    /// engage the ring buffer.\n
+    /// \n
     /// The additional role of this attribute is to indicate the empty status
     /// of the queue. The queue is empty if the m_frontEvt location is NULL.
     QEvt const * volatile m_frontEvt;
 
-    /// \brief pointer to the start of the ring buffer
+    //! pointer to the start of the ring buffer
     QEvt const **m_ring;
 
-    /// \brief offset of the end of the ring buffer from the start of the
-    /// buffer m_ring
+    //! offset of the end of the ring buffer from the start of the buffer
     QEQueueCtr m_end;
 
-    /// \brief offset to where next event will be inserted into the buffer
+    //! offset to where next event will be inserted into the buffer
     QEQueueCtr volatile m_head;
 
-    /// \brief offset of where next event will be extracted from the buffer
+    //! offset of where next event will be extracted from the buffer
     QEQueueCtr volatile m_tail;
 
-    /// \brief number of free events in the ring buffer
+    //! number of free events in the ring buffer
     QEQueueCtr volatile m_nFree;
 
-    /// \brief minimum number of free events ever in the ring buffer.
-    ///
+    //! minimum number of free events ever in the ring buffer.
     /// \note this attribute remembers the low-watermark of the ring buffer,
     /// which provides a valuable information for sizing event queues.
-    /// \sa QF::getQueueMin().
+    /// \sa QP::QF::getQueueMin().
     QEQueueCtr m_nMin;
 
 public:
-    QEQueue(void);                             ///< public default constructor
+    //! public default constructor
+    QEQueue(void);
 
-    /// \brief Initializes the native QF event queue
-    ///
+    //! Initializes the native QF event queue
+    /// \description
     /// The parameters are as follows: \a qSto[] is the ring buffer storage,
     /// \a qLen is the length of the ring buffer in the units of event-
     /// pointers.
     ///
     /// \note The actual capacity of the queue is qLen + 1, because of the
     /// extra location fornEvt_.
-    void init(QEvt const *qSto[], uint_t const qLen);
+    void init(QEvt const *qSto[], uint_fast16_t const qLen);
 
-    /// \brief "raw" thread-safe QF event queue implementation for the event
-    /// posting (FIFO). You can call this function from any task context or
-    /// ISR context. This function uses internally a critical section.
-    ///
+    //! "raw" thread-safe QF event queue implementation for the event
+    //! posting (FIFO). You can call this function from any task context or
+    //! ISR context. This function uses internally a critical section.
+    /// \description
     /// The argument \a margin specifies the minimum number of free entries
     /// in the queue that must be available for posting to succeed. The
     /// function returns true (success) if the posting succeeded (with the
     /// provided margin) and false (failure) when the posting fails.
     ///
-    /// \note The function raises an assertion if the \a margin is zero and
-    /// the queue becomes full and cannot accept the event.
+    /// \note
+    /// The function raises an assertion if the \a margin is zero and the
+    /// queue becomes full and cannot accept the event.
     ///
-    /// \sa QEQueue::postLIFO(), QEQueue::get()
-    bool post(QEvt const * const e, uint_t const margin);
+    /// \sa QP::QEQueue::postLIFO(), QP::QEQueue::get()
+    bool post(QEvt const * const e, uint_fast16_t const margin);
 
-    /// \brief "raw" thread-safe QF event queue implementation for the
-    /// First-In-First-Out (FIFO) event posting. You can call this function
-    /// from any task context or ISR context. Please note that this function
-    ///  uses internally a critical section.
-    ///
+    //! "raw" thread-safe QF event queue implementation for the
+    //! First-In-First-Out (FIFO) event posting. You can call this function
+    //! from any task context or ISR context. Please note that this function
+    //! uses internally a critical section.
     /// \note The function raises an assertion if the native QF queue becomes
     /// full and cannot accept the event.
     ///
-    /// \sa QEQueue::postLIFO(), QEQueue::get()
+    /// \sa QP::QEQueue::postLIFO(), QP::QEQueue::get()
     void postLIFO(QEvt const * const e);
 
-    /// \brief "raw" thread-safe QF event queue implementation for the
-    /// Last-In-First-Out (LIFO) event posting.
-    ///
-    /// \note The LIFO policy should be used only with great caution because
-    /// it alters order of events in the queue.
-    /// \note The function raises an assertion if the native QF queue becomes
+    //! "raw" thread-safe QF event queue implementation for the
+    //! Last-In-First-Out (LIFO) event posting.
+    /// \note
+    /// The LIFO policy should be used only with great caution because it
+    /// alters order of events in the queue.
+    /// \note
+    /// The function raises an assertion if the native QF queue becomes
     /// full and cannot accept the event. You can call this function from
     /// any task context or ISR context. Please note that this function uses
     /// internally a critical section.
     ///
-    /// \sa QEQueue::post(), QEQueue::postLIFO(), QEQueue::get()
+    /// \sa QP::QEQueue::post(), QP::QEQueue::postLIFO(), QP::QEQueue::get()
     QEvt const *get(void);
 
-    /// \brief "raw" thread-safe QF event queue operation for
-    /// obtaining the number of free entries still available in the queue.
-    ///
-    /// \note This operation needs to be used with caution because the
+    //! "raw" thread-safe QF event queue operation for obtaining the number
+    //! of free entries still available in the queue.
+    /// \note
+    /// This operation needs to be used with caution because the
     /// number of free entries can change unexpectedly. The main intent for
     /// using this operation is in conjunction with event deferral. In this
     /// case the queue is accessed only from a single thread (by a single AO),
     /// so the number of free entries cannot change unexpectedly.
     ///
-    /// \sa QActive::defer(), QActive::recall()
+    /// \sa QP::QActive::defer(), QP::QActive::recall()
     QEQueueCtr getNFree(void) const {
         return m_nFree;
     }
 
-    /// \brief "raw" thread-safe QF event queue operation to find out
-    /// if the queue is empty
-    ///
-    /// \note This operation needs to be used with caution because the
+    //! "raw" thread-safe QF event queue operation to find out if the queue
+    //! is empty
+    /// \note
+    /// This operation needs to be used with caution because the
     /// queue status can change unexpectedly. The main intent for using
-    /// this operation is in conjunction with event deferral. In this
-    /// case the queue is accessed only from a single thread (by a single AO),
+    /// this operation is in conjunction with event deferral. In this case
+    /// the queue is accessed only from a single thread (by a single AO),
     /// so no other entity can post events to the queue.
     ///
-    /// \sa QActive::defer(), QActive::recall()
+    /// \sa QP::QActive::defer(), QP::QActive::recall()
     bool isEmpty(void) const {
         return m_frontEvt == static_cast<QEvt const *>(0);
     }
 
 private:
-    QEQueue(QEQueue const &);                ///< disallow copying of QEQueues
-    QEQueue & operator=(QEQueue const &); ///< disallow assignment of QEQueues
+    //! disallow copying of QEQueue
+    QEQueue(QEQueue const &);
+
+    //! disallow assignment of QEQueue
+    QEQueue & operator=(QEQueue const &);
 
     friend class QF;
     friend class QActive;
 };
 
-}                                                              // namespace QP
+} // namespace QP
 
-#endif                                                            // qequeue_h
+#endif // qequeue_h
 
