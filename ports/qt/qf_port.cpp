@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QF/C++ port to Qt
-// Last Updated for Version: QP 5.1.1/Qt 5.1.1
-// Date of the Last Update:  Nov 05, 2013
+// Last Updated for Version: QP 5.3.0/Qt 5.1.1
+// Last updated on  2014-04-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,16 +28,22 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #include <QtWidgets>
 //-----------------
+#define QP_IMPL           // this is QP implementation
+#include "qf_port.h"      // QF port
 #include "qf_pkg.h"
+#include "qassert.h"
 #include "aothread.h"
 #include "tickerthread.h"
-#include "qassert.h"
+#ifdef Q_SPY              // QS software tracing enabled?
+    #include "qs_port.h"  // include QS port
+#else
+    #include "qs_dummy.h" // disable the QS software tracing
+#endif // Q_SPY
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
@@ -84,19 +90,19 @@ void TickerThread::run() {
 void QF::init(void) {
 }
 //............................................................................
-int16_t QF::run(void) {
-    onStartup();                                // invoke the startup callback
+int_t QF::run(void) {
+    onStartup(); // invoke the startup callback
 
-    l_tickerThread.setStackSize(1024U*4U);                     // 4KB of stack
+    l_tickerThread.setStackSize(1024U*4U); // 4KB of stack
     l_tickerThread.start();
 
     // run the Qt event loop (console or GUI)
-    return static_cast<int16_t>(QCoreApplication::instance()->exec());
+    return static_cast<int_t>(QCoreApplication::instance()->exec());
 }
 //............................................................................
 void QF::thread_(QActive *act) {
     QThread::Priority qt_prio = QThread::IdlePriority;
-    switch (act->m_prio) {              // remap QF priority to Win32 priority
+    switch (act->m_prio) { // remap QF priority to Win32 priority
         case 1:
             qt_prio = QThread::IdlePriority;
             break;
@@ -123,10 +129,12 @@ void QF::thread_(QActive *act) {
     AOThread *thread = static_cast<AOThread *>(act->m_thread);
     thread->setPriority(qt_prio);
     thread->m_isRunning = true;
-    do {                  // loop until m_thread is cleared in QActive::stop()
-        QEvt const *e = act->get_();                         // wait for event
-        act->dispatch(e);     // dispatch to the active object's state machine
-        gc(e);          // check if the event is garbage, and collect it if so
+
+    // loop until m_thread is cleared in QActive::stop()...
+    do {
+        QEvt const *e = act->get_(); // wait for event
+        act->dispatch(e); // dispatch to the active object's state machine
+        gc(e); // check if the event is garbage, and collect it if so
     } while (thread->m_isRunning);
 
     QF::remove_(act);
@@ -142,22 +150,22 @@ void QF_setTickRate(unsigned ticksPerSec) {
     l_tickerThread.m_tickInterval = 1000U/ticksPerSec;
 }
 //............................................................................
-void QActive::start(uint8_t prio,
-                    QEvt const **qSto, uint32_t qLen,
-                    void *stkSto, uint32_t stkSize,
-                    QEvt const *ie)
+void QActive::start(uint_fast8_t const prio,
+                    QEvt const **qSto, uint_fast16_t qLen,
+                    void * const stkSto, uint_fast16_t const stkSize,
+                    QEvt const * const ie)
 {
-    Q_REQUIRE(stkSto == static_cast<void *>(0));          // no per-task stack
+    Q_REQUIRE(stkSto == static_cast<void *>(0)); // no per-task stack
 
     m_thread   = new AOThread(this);
     m_osObject = new QWaitCondition;
     m_eQueue.init(qSto, qLen);
     m_prio = prio;
 
-    QF::add_(this);                     // make QF aware of this active object
-    init(ie);                                // execute the initial transition
+    QF::add_(this); // make QF aware of this active object
+    init(ie);       // execute the initial transition
 
-    QS_FLUSH();                          // flush the trace buffer to the host
+    QS_FLUSH();     // flush the trace buffer to the host
 
     AOThread *thread = static_cast<AOThread *>(m_thread);
     thread->setStackSize(stkSize);
@@ -169,4 +177,4 @@ void QActive::stop(void) {
     static_cast<AOThread *>(m_thread)->m_isRunning = false;
 }
 
-}                                                              // namespace QP
+} // namespace QP

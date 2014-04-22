@@ -52,6 +52,26 @@ enum GameSignals {                                 // signals used in the game
     MAX_SIG                              // the last signal (keep always last)
 };
 
+enum GameBitmapIds {
+    PRESS_BUTTON_BMP,
+    SHIP_BMP,
+    MISSILE_BMP,
+    MINE1_BMP,
+    MINE2_BMP,
+    MINE2_MISSILE_BMP,
+    EXPLOSION0_BMP,
+    EXPLOSION1_BMP,
+    EXPLOSION2_BMP,
+    EXPLOSION3_BMP,
+    MAX_BMP
+};
+
+// obtain instances of the Mines orthogonal components
+QP::QMsm *Mine1_getInst(uint8_t id);
+QP::QMsm *Mine2_getInst(uint8_t id);
+
+} // namespace GAME
+
 namespace GAME {
 
 //${Events::ObjectPosEvt} ....................................................
@@ -137,20 +157,6 @@ public:
 #define GAME_SHIP_X                10U
 #define GAME_SHIP_Y                (GAME_SCREEN_HEIGHT / 2U)
 
-enum GameBitmapIds {
-    PRESS_BUTTON_BMP,
-    SHIP_BMP,
-    MISSILE_BMP,
-    MINE1_BMP,
-    MINE2_BMP,
-    MINE2_MISSILE_BMP,
-    EXPLOSION0_BMP,
-    EXPLOSION1_BMP,
-    EXPLOSION2_BMP,
-    EXPLOSION3_BMP,
-    MAX_BMP
-};
-
 // opaque pointers to active objects in the application
 namespace GAME {
 
@@ -179,12 +185,6 @@ bool do_bitmaps_overlap(
     uint8_t bmp_id2,
     uint8_t x2,
     uint8_t y2);
-
-} // namespace GAME
-
-// obtain instances of the Mines orthogonal components
-QP::QHsm *Mine1_getInst(uint8_t id);
-QP::QHsm *Mine2_getInst(uint8_t id);
 
 } // namespace GAME
 

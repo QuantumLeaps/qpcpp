@@ -31,6 +31,8 @@ enum DPPSignals {
     MAX_SIG                   // the last signal
 };
 
+} // namespace DPP
+
 namespace DPP {
 
 //${Events::TableEvt} ........................................................
@@ -61,6 +63,4 @@ extern QP::QActive * const AO_Table;
 
 } // namespace DPP
 
-}                             // namespace DPP
-
-#endif                        // dpp_h
+#endif // dpp_h

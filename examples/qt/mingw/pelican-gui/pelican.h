@@ -32,13 +32,13 @@ enum PelicanSignals {
     MAX_SIG   // keep always last
 };
 
+} // namespace PELICAN
+
 // active objects ..................................................
-namespace PELCAN {
+namespace PELICAN {
 
 extern QP::QActive * const AO_Pelican;
 
-} // namespace PELCAN  // opaque pointer to Pelican AO
-
-} // namespace PELICAN
+} // namespace PELICAN  // opaque pointer to Pelican AO
 
 #endif // pelican_h

@@ -19,8 +19,6 @@
 #include "bsp.h"
 #include "game.h"
 
-namespace GAME {
-
 //Q_DEFINE_THIS_FILE
 
 #define SHIP_WIDTH  5U
@@ -57,11 +55,14 @@ protected:
 
 } // namespace GAME
 
+namespace GAME {
+
 // local objects -------------------------------------------------------------
-static Ship l_ship;             // the sole instance of the Ship active object
+static Ship l_ship; // the sole instance of the Ship active object
 
 // Public-scope objects ------------------------------------------------------
-QP::QActive * const AO_Ship = &l_ship;                       // opaque pointer
+QP::QActive * const AO_Ship = &l_ship; // opaque pointer
+} // namespace GAME
 
 // Active object definition --------------------------------------------------
 namespace GAME {
@@ -69,9 +70,9 @@ namespace GAME {
 //${AOs::Ship} ...............................................................
 //${AOs::Ship::Ship} .........................................................
 Ship::Ship()
-  : QMActive(Q_STATE_CAST(&Ship::initial)),
-    m_x(GAME_SHIP_X),
-    m_y(GAME_SHIP_Y)
+ : QMActive(Q_STATE_CAST(&Ship::initial)),
+   m_x(GAME_SHIP_X),
+   m_y(GAME_SHIP_Y)
 {}
 
 //${AOs::Ship::SM} ...........................................................
@@ -187,9 +188,7 @@ QP::QMState const Ship::flying_s = {
 // ${AOs::Ship::SM::active::flying}
 QP::QState Ship::flying_e(Ship * const me) {
     me->m_score = 0U; /* reset the score */
-    ScoreEvt *sev = Q_NEW(ScoreEvt, SCORE_SIG);
-    sev->score = me->m_score;
-    AO_Tunnel->POST(sev, me);
+    AO_Tunnel->POST(Q_NEW(ScoreEvt, SCORE_SIG, me->m_score), me);
     return QM_ENTRY(&flying_s);
 }
 // ${AOs::Ship::SM::active::flying}
@@ -199,28 +198,22 @@ QP::QState Ship::flying(Ship * const me, QP::QEvt const * const e) {
         // ${AOs::Ship::SM::active::flying::TIME_TICK}
         case TIME_TICK_SIG: {
             // tell the Tunnel to draw the Ship and test for hits
-            ObjectImageEvt *oie = Q_NEW(ObjectImageEvt, SHIP_IMG_SIG);
-            oie->x   = me->m_x;
-            oie->y   = me->m_y;
-            oie->bmp = SHIP_BMP;
-            AO_Tunnel->POST(oie, me);
-
+            AO_Tunnel->POST(Q_NEW(ObjectImageEvt, SHIP_IMG_SIG,
+                                  me->m_x, me->m_y, SHIP_BMP),
+                            me);
             ++me->m_score; // increment the score for surviving another tick
 
             if ((me->m_score % 10U) == 0U) { // is the score "round"?
-                ScoreEvt *sev = Q_NEW(ScoreEvt, SCORE_SIG);
-                sev->score = me->m_score;
-                AO_Tunnel->POST(sev, me);
+                AO_Tunnel->POST(Q_NEW(ScoreEvt, SCORE_SIG, me->m_score), me);
             }
             status_ = QM_HANDLED();
             break;
         }
         // ${AOs::Ship::SM::active::flying::PLAYER_TRIGGER}
         case PLAYER_TRIGGER_SIG: {
-            ObjectPosEvt *ope = Q_NEW(ObjectPosEvt, MISSILE_FIRE_SIG);
-            ope->x = me->m_x;
-            ope->y = me->m_y + SHIP_HEIGHT - 1U;
-            AO_Missile->POST(ope, me);
+            AO_Missile->POST(Q_NEW(ObjectPosEvt, MISSILE_FIRE_SIG,
+                                   me->m_x, me->m_y + SHIP_HEIGHT - 1U),
+                             me);
             status_ = QM_HANDLED();
             break;
         }
@@ -291,11 +284,10 @@ QP::QState Ship::exploding(Ship * const me, QP::QEvt const * const e) {
             if (me->m_exp_ctr < 15U) {
                 ++me->m_exp_ctr;
                 // tell the Tunnel to draw the current stage of Explosion
-                ObjectImageEvt *oie = Q_NEW(ObjectImageEvt, EXPLOSION_SIG);
-                oie->bmp = EXPLOSION0_BMP + (me->m_exp_ctr >> 2);
-                oie->x   = me->m_x; // x of explosion
-                oie->y   = (int8_t)((int)me->m_y - 4U + SHIP_HEIGHT);
-                AO_Tunnel->POST(oie, me);
+                AO_Tunnel->POST(Q_NEW(ObjectImageEvt, EXPLOSION_SIG,
+                                      me->m_x, (int8_t)((int)me->m_y - 4U + SHIP_HEIGHT),
+                                      EXPLOSION0_BMP + (me->m_exp_ctr >> 2)),
+                                me);
                 status_ = QM_HANDLED();
             }
             // ${AOs::Ship::SM::active::exploding::TIME_TICK::[else]}
@@ -306,9 +298,7 @@ QP::QState Ship::exploding(Ship * const me, QP::QEvt const * const e) {
                         Q_ACTION_CAST(0)  // zero terminator
                     }
                 };
-                ScoreEvt *gameOver = Q_NEW(ScoreEvt, GAME_OVER_SIG);
-                gameOver->score = me->m_score;
-                AO_Tunnel->POST(gameOver, me);
+                AO_Tunnel->POST(Q_NEW(ScoreEvt, GAME_OVER_SIG, me->m_score), me);
                 status_ = QM_TRAN(&tatbl_);
             }
             break;
@@ -320,7 +310,5 @@ QP::QState Ship::exploding(Ship * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-
-} // namespace GAME
 
 } // namespace GAME

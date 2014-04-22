@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QP/C++ port to Qt
-// Last Updated for Version: QP 5.1.1/Qt 5.1.1
-// Date of the Last Update:  Nov 05, 2013
+// Last Updated for Version: QP 5.3.0/Qt 5.1.1
+// Last updated on  2014-04-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,9 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #ifndef guiactive_h
 #define guiactive_h
@@ -41,16 +40,16 @@ namespace QP {
 class GuiQActive : public QActive {
 public:
     GuiQActive(QStateHandler const initial) : QActive(initial) {}
-    virtual void start(uint8_t const prio,
-                       QEvt const *qSto[], uint32_t const qLen,
-                       void * const stkSto, uint32_t const stkSize,
+    virtual void start(uint_fast8_t const prio,
+                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       void * const stkSto, uint_fast16_t const stkSize,
                        QEvt const * const ie);
 #ifndef Q_SPY
-    virtual bool post(QEvt const * const e, uint16_t const margin);
+    virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
 #else
-    virtual bool post(QEvt const * const e, uint16_t const margin,
-                      void const * const sender);
-#endif
+    virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
+                       void const * const sender);
+#endif // Q_SPY
     virtual void postLIFO(QEvt const * const e);
 };
 
@@ -58,19 +57,19 @@ public:
 class GuiQMActive : public QMActive {
 public:
     GuiQMActive(QStateHandler const initial) : QMActive(initial) {}
-    virtual void start(uint8_t const prio,
-                       QEvt const *qSto[], uint32_t const qLen,
-                       void * const stkSto, uint32_t const stkSize,
+    virtual void start(uint_fast8_t const prio,
+                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       void * const stkSto, uint_fast16_t const stkSize,
                        QEvt const * const ie);
 #ifndef Q_SPY
-    virtual bool post(QEvt const * const e, uint16_t const margin);
+    virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
 #else
-    virtual bool post(QEvt const * const e, uint16_t const margin,
-                      void const * const sender);
-#endif
+    virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
+                       void const * const sender);
+#endif // Q_SPY
     virtual void postLIFO(QEvt const * const e);
 };
 
-}                                                              // namespace QP
+} // namespace QP
 
-#endif                                                          // guiactive_h
+#endif // guiactive_h

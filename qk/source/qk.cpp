@@ -41,12 +41,12 @@
 #define QP_IMPL           // this is QF/QK implementation
 #include "qf_port.h"      // QF port
 #include "qk_pkg.h"       // QK package-scope internal interface
-#include "qassert.h"      // QP assertions
 #ifdef Q_SPY              // QS software tracing enabled?
     #include "qs_port.h"  // include QS port
 #else
     #include "qs_dummy.h" // disable the QS software tracing
 #endif // Q_SPY
+#include "qassert.h"      // QP assertions
 
 // Public-scope objects ******************************************************
 extern "C" {

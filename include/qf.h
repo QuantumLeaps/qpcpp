@@ -191,8 +191,7 @@ public:
     virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
 #else
     virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
-                       void const * const
- sender);
+                       void const * const sender);
 #endif
 
     //! Posts an event directly to the event queue of the active object

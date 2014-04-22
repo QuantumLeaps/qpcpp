@@ -19,8 +19,6 @@
 #include "dpp.h"
 #include "bsp.h"
 
-namespace DPP {
-
 Q_DEFINE_THIS_FILE
 
 // Active object class -------------------------------------------------------
@@ -50,6 +48,8 @@ protected:
 };
 
 } // namespace DPP
+
+namespace DPP {
 
 // Local objects -------------------------------------------------------------
 static Philo l_philo[N_PHILO];   // storage for all Philos
@@ -84,14 +84,16 @@ QP::QActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AO
     &l_philo[4]
 };
 
+} // namespace DPP
+
 // Philo definition ----------------------------------------------------------
 namespace DPP {
 
 //${AOs::Philo} ..............................................................
 //${AOs::Philo::Philo} .......................................................
 Philo::Philo()
-  : QMActive(Q_STATE_CAST(&Philo::initial)),
-    m_timeEvt(this, TIMEOUT_SIG, 0U)
+ : QMActive(Q_STATE_CAST(&Philo::initial)),
+   m_timeEvt(this, TIMEOUT_SIG, 0U)
 {}
 
 //${AOs::Philo::SM} ..........................................................
@@ -144,7 +146,7 @@ QP::QMState const Philo::thinking_s = {
 };
 // ${AOs::Philo::SM::thinking}
 QP::QState Philo::thinking_e(Philo * const me) {
-    me->m_timeEvt.armX(think_time(), 0U);
+    me->m_timeEvt.armX(think_time());
     return QM_ENTRY(&thinking_s);
 }
 // ${AOs::Philo::SM::thinking}
@@ -249,7 +251,7 @@ QP::QMState const Philo::eating_s = {
 };
 // ${AOs::Philo::SM::eating}
 QP::QState Philo::eating_e(Philo * const me) {
-    me->m_timeEvt.armX(think_time(), 0U);
+    me->m_timeEvt.armX(think_time());
     return QM_ENTRY(&eating_s);
 }
 // ${AOs::Philo::SM::eating}
@@ -295,5 +297,3 @@ QP::QState Philo::eating(Philo * const me, QP::QEvt const * const e) {
 }
 
 } // namespace DPP
-
-}                                                             // namespace DPP

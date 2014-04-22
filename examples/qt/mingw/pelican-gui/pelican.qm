@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.1.0">
- <documentation>PEdestrian LIghto CONtrolled (PELICA) crossing example for Qt</documentation>
+<model version="3.1.1">
+ <documentation>PEdestrian LIghto CONtrolled (PELICA) crossing for Qt with GUI</documentation>
  <framework name="qpcpp"/>
  <package name="Qt-port" stereotype="0x00" namespace="QP::">
   <class name="GuiQActive" superclass="qpcpp::QActive">
@@ -80,7 +80,7 @@ pe-&gt;philNum = me-&gt;num;
 me-&gt;postLIFO(pe); // &lt;==</code>
    </operation>
   </class>
-  <class name="GuiQMActive" superclass="qpcpp::QActive">
+  <class name="GuiQMActive" superclass="qpcpp::QMActive">
    <operation name="GuiQMActive" type="QMActive(initial)" visibility="0x00" properties="0x00">
     <parameter name="initial" type="QStateHandler"/>
    </operation>
@@ -158,14 +158,15 @@ me-&gt;postLIFO(pe); // &lt;==</code>
    </operation>
   </class>
  </package>
- <package name="components" stereotype="0x02" namespace="PELCAN::">
-  <class name="Pelican" superclass="Qt-port::GuiQActive">
+ <package name="components" stereotype="0x02" namespace="PELICAN::">
+  <class name="Pelican" superclass="Qt-port::GuiQMActive">
    <documentation>PEdestrian LIght CONtrolled (PELICAN) crossing</documentation>
    <attribute name="m_timeout" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
    <attribute name="m_flashCtr" type="uint8_t" visibility="0x02" properties="0x00"/>
-   <operation name="Pelican" type="GuiQActive(Q_STATE_CAST(&amp;Pelican::initial)), m_timeout(TIMEOUT_SIG)" visibility="0x00" properties="0x02">
+   <operation name="Pelican" type="" visibility="0x00" properties="0x02">
     <documentation>constructor</documentation>
-    <code>// empty</code>
+    <code> : GuiQMActive(Q_STATE_CAST(&amp;Pelican::initial)),
+   m_timeout(TIMEOUT_SIG)</code>
    </operation>
    <statechart>
     <initial target="../1">
@@ -434,10 +435,10 @@ enum PelicanSignals {
     MAX_SIG   // keep always last
 };
 
+} // namespace PELICAN
+
 // active objects ..................................................
 $declare(components::AO_Pelican)  // opaque pointer to Pelican AO
-
-} // namespace PELICAN
 
 #endif // pelican_h</text>
   </file>
@@ -446,9 +447,12 @@ $declare(components::AO_Pelican)  // opaque pointer to Pelican AO
 #include &quot;bsp.h&quot;
 #include &quot;pelican.h&quot;
 
-namespace PELICAN {
-
 Q_DEFINE_THIS_FILE
+
+// Pelican class -------------------------------------------------------------
+$declare(components::Pelican)
+
+namespace PELICAN {
 
 enum PelicanTimeouts {  // various timeouts in ticks
     CARS_GREEN_MIN_TOUT = BSP_TICKS_PER_SEC * 8, // min green for cars
@@ -459,19 +463,16 @@ enum PelicanTimeouts {  // various timeouts in ticks
     OFF_FLASH_TOUT   = BSP_TICKS_PER_SEC / 2   // flashing timeout when off
 };
 
-// Pelican class -------------------------------------------------------------
-$declare(components::Pelican)
-
 // Local objects -------------------------------------------------------------
 static Pelican l_Pelican; // the single instance of Pelican active object
 
 // Global objects ------------------------------------------------------------
 QP::QActive * const AO_Pelican = &amp;l_Pelican; // the opaque pointer
 
-// Pelican class definition --------------------------------------------------
-$define(components::Pelican)
+} // namespace PELICAN
 
-} // namespace PELICAN</text>
+// Pelican class definition --------------------------------------------------
+$define(components::Pelican)</text>
   </file>
  </directory>
 </model>

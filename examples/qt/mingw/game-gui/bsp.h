@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: "Fly'n'Shoot" game, BSP for Qt5
-// Last Updated for Version: 5.0.0
-// Date of the Last Update:  Aug 24, 2013
+// Last Updated for Version: QP 5.3.0/Qt 5.1.1
+// Last updated on  2014-04-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,9 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #ifndef bsp_h
 #define bsp_h
@@ -42,8 +41,8 @@
 void BSP_init();
 void BSP_terminate(int16_t result);
 void BSP_drawBitmap(uint8_t const *bitmap);
-void BSP_drawNString(uint8_t x,                              /* x in pixels */
-                     uint8_t y,                      /* y position in chars */
+void BSP_drawNString(uint8_t x,    // x in pixels
+                     uint8_t y,    // y position in chars
                      char const *str);
 void BSP_updateScore(uint16_t score);
 
@@ -53,4 +52,4 @@ void BSP_displayOff(void);
 void BSP_moveShipUp(void);
 void BSP_moveShipDown(void);
 
-#endif                                                             /* bsp_h */
+#endif // bsp_h

@@ -50,22 +50,23 @@ int main(int argc, char *argv[]) {
 
     gui.show();
 
-    QP::QF::init();                                // initialize the framework
-    BSP_init();                        // initialize the Board Support Package
+    QP::QF::init();  // initialize the framework
+    BSP_init();      // initialize the Board Support Package
 
-                                                     // object dictionaries...
+    // object dictionaries...
     QS_OBJ_DICTIONARY(l_smlPoolSto);
 
-    QP::QF::psInit(l_subscrSto, Q_DIM(l_subscrSto)); // init publish-subscribe
+    // initialize publish-subscribe...
+    QP::QF::psInit(l_subscrSto, Q_DIM(l_subscrSto));
 
-                                                  // initialize event pools...
+    // initialize event pools...
     QP::QF::poolInit(l_smlPoolSto,
                 sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
 
-                                                // start the active objects...
+    // start the active objects...
     PELICAN::AO_Pelican->start(1U,
-                               (QP::QEvt const **)0, (uint32_t)0,  // no queue
-                               (void *)0, (uint32_t)0);            // no stack
+                 (QP::QEvt const **)0,  (uint_fast16_t)0,  // no queue
+                 (void *)0, (uint_fast32_t)0);             // no stack
 
-    return QP::QF::run();                                // calls qApp->exec()
+    return QP::QF::run(); // calls qApp->exec()
 }

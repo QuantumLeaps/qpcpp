@@ -19,15 +19,13 @@
 #include "dpp.h"
 #include "bsp.h"
 
-namespace DPP {
-
 Q_DEFINE_THIS_FILE
 
 // Active object class -------------------------------------------------------
 namespace DPP {
 
 //${AOs::Table} ..............................................................
-class Table : public QP::GuiQMActive {
+class Table : public QP::QMActive {
 private:
     uint8_t m_fork[N_PHILO];
     bool m_isHungry[N_PHILO];
@@ -37,12 +35,20 @@ public:
 
 protected:
     static QP::QState initial(Table * const me, QP::QEvt const * const e);
-    static QP::QState active(Table * const me, QP::QEvt const * const e);
-    static QP::QState serving(Table * const me, QP::QEvt const * const e);
-    static QP::QState paused(Table * const me, QP::QEvt const * const e);
+    static QP::QState active  (Table * const me, QP::QEvt const * const e);
+    static QP::QMState const active_s;
+    static QP::QState serving  (Table * const me, QP::QEvt const * const e);
+    static QP::QState serving_e(Table * const me);
+    static QP::QMState const serving_s;
+    static QP::QState paused  (Table * const me, QP::QEvt const * const e);
+    static QP::QState paused_e(Table * const me);
+    static QP::QState paused_x(Table * const me);
+    static QP::QMState const paused_s;
 };
 
 } // namespace DPP
+
+namespace DPP {
 
 // helper function to provide the RIGHT neighbour of a Philo[n]
 inline uint8_t RIGHT(uint8_t const n) {
@@ -67,13 +73,15 @@ static Table l_table; // the single instance of the Table active object
 // Global-scope objects ------------------------------------------------------
 QP::QActive * const AO_Table = &l_table; // "opaque" AO pointer
 
+} // namespace DPP
+
 //............................................................................
 namespace DPP {
 
 //${AOs::Table} ..............................................................
 //${AOs::Table::Table} .......................................................
 Table::Table()
-  : GuiQMActive(Q_STATE_CAST(&Table::initial))
+: QMActive(Q_STATE_CAST(&Table::initial))
 {
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         m_fork[n] = FREE;
@@ -83,6 +91,16 @@ Table::Table()
 
 //${AOs::Table::SM} ..........................................................
 QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
+    static struct {
+        QP::QMState const *target;
+        QP::QActionHandler act[2];
+    } const tatbl_ = { // transition-action table
+        &serving_s,
+        {
+            Q_ACTION_CAST(&Table::serving_e), // entry
+            Q_ACTION_CAST(0)  // zero terminator
+        }
+    };
     // ${AOs::Table::SM::initial}
     (void)e; // suppress the compiler warning about unused parameter
 
@@ -109,52 +127,68 @@ QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
         me->m_isHungry[n] = false;
         BSP_displayPhilStat(n, THINKING);
     }
-    return Q_TRAN(&DPP::Table::serving);
+    return QM_TRAN_INIT(&tatbl_);
 }
 //${AOs::Table::SM::active} ..................................................
+QP::QMState const Table::active_s = {
+    static_cast<QP::QMState const *>(0), // superstate (top)
+    Q_STATE_CAST(&Table::active),
+    Q_ACTION_CAST(0), // no entry action
+    Q_ACTION_CAST(0), // no exit action
+    Q_ACTION_CAST(0)  // no intitial tran.
+};
+// ${AOs::Table::SM::active}
 QP::QState Table::active(Table * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
         // ${AOs::Table::SM::active::TERMINATE}
         case TERMINATE_SIG: {
             BSP_terminate(0);
-            status_ = Q_HANDLED();
+            status_ = QM_HANDLED();
             break;
         }
         // ${AOs::Table::SM::active::EAT}
         case EAT_SIG: {
             Q_ERROR();
-            status_ = Q_HANDLED();
+            status_ = QM_HANDLED();
             break;
         }
         default: {
-            status_ = Q_SUPER(&QP::QHsm::top);
+            status_ = QM_SUPER();
             break;
         }
     }
+    (void)me; /* avoid compiler warning in case 'me' is not used */
     return status_;
 }
 //${AOs::Table::SM::active::serving} .........................................
+QP::QMState const Table::serving_s = {
+    &Table::active_s, // superstate
+    Q_STATE_CAST(&Table::serving),
+    Q_ACTION_CAST(&Table::serving_e),
+    Q_ACTION_CAST(0), // no exit action
+    Q_ACTION_CAST(0)  // no intitial tran.
+};
+// ${AOs::Table::SM::active::serving}
+QP::QState Table::serving_e(Table * const me) {
+    for (uint8_t n = 0U; n < N_PHILO; ++n) { // give permissions to eat...
+        if (me->m_isHungry[n]
+            && (me->m_fork[LEFT(n)] == FREE)
+            && (me->m_fork[n] == FREE))
+        {
+            me->m_fork[LEFT(n)] = USED;
+            me->m_fork[n] = USED;
+            QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, n), me);
+            me->m_isHungry[n] = false;
+            BSP_displayPhilStat(n, EATING);
+        }
+    }
+    return QM_ENTRY(&serving_s);
+}
+// ${AOs::Table::SM::active::serving}
 QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // ${AOs::Table::SM::active::serving}
-        case Q_ENTRY_SIG: {
-            for (uint8_t n = 0U; n < N_PHILO; ++n) { // give permissions to eat...
-                if (me->m_isHungry[n]
-                    && (me->m_fork[LEFT(n)] == FREE)
-                    && (me->m_fork[n] == FREE))
-                {
-                    me->m_fork[LEFT(n)] = USED;
-                    me->m_fork[n] = USED;
-                    QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, n), me);
-                    me->m_isHungry[n] = false;
-                    BSP_displayPhilStat(n, EATING);
-                }
-            }
-            status_ = Q_HANDLED();
-            break;
-        }
         // ${AOs::Table::SM::active::serving::HUNGRY}
         case HUNGRY_SIG: {
             uint8_t n = Q_EVT_CAST(TableEvt)->philoNum;
@@ -169,12 +203,12 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
                 me->m_fork[n] = USED;
                 QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, n), me);
                 BSP_displayPhilStat(n, EATING);
-                status_ = Q_HANDLED();
+                status_ = QM_HANDLED();
             }
             // ${AOs::Table::SM::active::serving::HUNGRY::[else]}
             else {
                 me->m_isHungry[n] = true;
-                status_ = Q_HANDLED();
+                status_ = QM_HANDLED();
             }
             break;
         }
@@ -209,46 +243,75 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
                 QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, m), me);
                 BSP_displayPhilStat(m, EATING);
             }
-            status_ = Q_HANDLED();
+            status_ = QM_HANDLED();
             break;
         }
         // ${AOs::Table::SM::active::serving::EAT}
         case EAT_SIG: {
             Q_ERROR();
-            status_ = Q_HANDLED();
+            status_ = QM_HANDLED();
             break;
         }
         // ${AOs::Table::SM::active::serving::PAUSE}
         case PAUSE_SIG: {
-            status_ = Q_TRAN(&paused);
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[2];
+            } const tatbl_ = { // transition-action table
+                &paused_s,
+                {
+                    Q_ACTION_CAST(&Table::paused_e), // entry
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
+            };
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
         default: {
-            status_ = Q_SUPER(&Table::active);
+            status_ = QM_SUPER();
             break;
         }
     }
     return status_;
 }
 //${AOs::Table::SM::active::paused} ..........................................
+QP::QMState const Table::paused_s = {
+    &Table::active_s, // superstate
+    Q_STATE_CAST(&Table::paused),
+    Q_ACTION_CAST(&Table::paused_e),
+    Q_ACTION_CAST(&Table::paused_x),
+    Q_ACTION_CAST(0)  // no intitial tran.
+};
+// ${AOs::Table::SM::active::paused}
+QP::QState Table::paused_e(Table * const me) {
+    BSP_displayPaused(1U);
+    (void)me; // avoid compiler warning in case 'me' is not used
+    return QM_ENTRY(&paused_s);
+}
+// ${AOs::Table::SM::active::paused}
+QP::QState Table::paused_x(Table * const me) {
+    BSP_displayPaused(0U);
+    (void)me; // avoid compiler warning in case 'me' is not used
+    return QM_EXIT(&paused_s);
+}
+// ${AOs::Table::SM::active::paused}
 QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // ${AOs::Table::SM::active::paused}
-        case Q_ENTRY_SIG: {
-            BSP_displayPaused(1U);
-            status_ = Q_HANDLED();
-            break;
-        }
-        // ${AOs::Table::SM::active::paused}
-        case Q_EXIT_SIG: {
-            BSP_displayPaused(0U);
-            status_ = Q_HANDLED();
-            break;
-        }
         // ${AOs::Table::SM::active::paused::PAUSE}
         case PAUSE_SIG: {
-            status_ = Q_TRAN(&serving);
+            static struct {
+                QP::QMState const *target;
+                QP::QActionHandler act[3];
+            } const tatbl_ = { // transition-action table
+                &serving_s,
+                {
+                    Q_ACTION_CAST(&Table::paused_x), // exit
+                    Q_ACTION_CAST(&Table::serving_e), // entry
+                    Q_ACTION_CAST(0)  // zero terminator
+                }
+            };
+            status_ = QM_TRAN(&tatbl_);
             break;
         }
         // ${AOs::Table::SM::active::paused::HUNGRY}
@@ -258,7 +321,7 @@ QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
             Q_ASSERT((n < N_PHILO) && (!me->m_isHungry[n]));
             me->m_isHungry[n] = true;
             BSP_displayPhilStat(n, HUNGRY);
-            status_ = Q_HANDLED();
+            status_ = QM_HANDLED();
             break;
         }
         // ${AOs::Table::SM::active::paused::DONE}
@@ -274,11 +337,11 @@ QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
 
             me->m_fork[m] = FREE;
             me->m_fork[n] = FREE;
-            status_ = Q_HANDLED();
+            status_ = QM_HANDLED();
             break;
         }
         default: {
-            status_ = Q_SUPER(&Table::active);
+            status_ = QM_SUPER();
             break;
         }
     }
@@ -286,5 +349,3 @@ QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
 }
 
 } // namespace DPP
-
-}                                                             // namespace DPP

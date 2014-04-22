@@ -41,12 +41,12 @@
 #define QP_IMPL           // this is QP implementation
 #include "qep_port.h"     // QEP port
 #include "qep_pkg.h"      // QEP internal interface
-#include "qassert.h"
 #ifdef Q_SPY              // QS software tracing enabled?
     #include "qs_port.h"  // include QS port
 #else
     #include "qs_dummy.h" // disable the QS software tracing
 #endif // Q_SPY
+#include "qassert.h"
 
 namespace QP {
 

@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QS/C++ port
-// Last Updated for Version: QP 5.1.1/Qt 5.1.1
-// Date of the Last Update:  Nov 05, 2013
+// Last Updated for Version: QP 5.3.0/Qt 5.1.1
+// Last updated on  2014-04-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,19 +28,18 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #ifndef qs_port_h
 #define qs_port_h
 
 #define QS_TIME_SIZE            4
 
-#if defined(__LP64__) || defined(_LP64)                // 64-bit architecture?
+#if defined(__LP64__) || defined(_LP64) // 64-bit architecture?
     #define QS_OBJ_PTR_SIZE     8
     #define QS_FUN_PTR_SIZE     8
-#else                                                   // 32-bit architecture
+#else  // 32-bit architecture
     #define QS_OBJ_PTR_SIZE     4
     #define QS_FUN_PTR_SIZE     4
 #endif
@@ -52,7 +51,7 @@
 // port QS is configured to be used with the QF framework component, by
 // simply including "qf_port.h" *before* "qs.h".
 //
-#include "qf_port.h"                                         // use QS with QF
-#include "qs.h"                    // QS platform-independent public interface
+#include "qf_port.h" // use QS with QF
+#include "qs.h"      // QS platform-independent public interface
 
-#endif                                                            // qs_port_h
+#endif // qs_port_h

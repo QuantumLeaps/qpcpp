@@ -19,8 +19,6 @@
 #include "bsp.h"
 #include "game.h"
 
-namespace GAME {
-
 //Q_DEFINE_THIS_FILE
 
 // local objects -------------------------------------------------------------
@@ -48,10 +46,15 @@ protected:
 };
 
 } // namespace GAME
+
+namespace GAME {
+
 static Missile l_missile;    // the sole instance of the Missile active object
 
 // Public-scope objects ------------------------------------------------------
 QP::QActive * const AO_Missile = &l_missile;                 // opaque pointer
+
+} // namespace GAME
 
 // Active object definition --------------------------------------------------
 namespace GAME {
@@ -59,7 +62,7 @@ namespace GAME {
 //${AOs::Missile} ............................................................
 //${AOs::Missile::Missile} ...................................................
 Missile::Missile()
-  : QMActive(Q_STATE_CAST(&Missile::initial))
+ : QMActive(Q_STATE_CAST(&Missile::initial))
 {}
 
 //${AOs::Missile::SM} ........................................................
@@ -135,11 +138,9 @@ QP::QState Missile::flying(Missile * const me, QP::QEvt const * const e) {
             if (me->m_x + GAME_MISSILE_SPEED_X < GAME_SCREEN_WIDTH) {
                 me->m_x += GAME_MISSILE_SPEED_X;
                 // tell the Tunnel to draw the Missile and test for wall hits
-                ObjectImageEvt *oie = Q_NEW(ObjectImageEvt, MISSILE_IMG_SIG);
-                oie->x   = me->m_x;
-                oie->y   = me->m_y;
-                oie->bmp = MISSILE_BMP;
-                AO_Tunnel->POST(oie, me);
+                AO_Tunnel->POST(Q_NEW(ObjectImageEvt, MISSILE_IMG_SIG,
+                                      me->m_x, me->m_y, MISSILE_BMP),
+                                me);
                 status_ = QM_HANDLED();
             }
             // ${AOs::Missile::SM::flying::TIME_TICK::[else]}
@@ -213,11 +214,11 @@ QP::QState Missile::exploding(Missile * const me, QP::QEvt const * const e) {
                 me->m_x -= GAME_SPEED_X;   // move the explosion by one step
 
                 // tell the Tunnel to render the current stage of Explosion
-                ObjectImageEvt *oie = Q_NEW(ObjectImageEvt, EXPLOSION_SIG);
-                oie->x   = me->m_x + 3U;   // x-pos of explosion
-                oie->y   = (int8_t)((int)me->m_y - 4U); // y-pos
-                oie->bmp = EXPLOSION0_BMP + (me->m_exp_ctr >> 2);
-                AO_Tunnel->POST(oie, me);
+                AO_Tunnel->POST(Q_NEW(ObjectImageEvt, EXPLOSION_SIG,
+                                      me->m_x + 3U,
+                                      (int8_t)((int)me->m_y - 4U),
+                                      EXPLOSION0_BMP + (me->m_exp_ctr >> 2)),
+                                me);
                 status_ = QM_HANDLED();
             }
             // ${AOs::Missile::SM::exploding::TIME_TICK::[else]}
@@ -239,7 +240,5 @@ QP::QState Missile::exploding(Missile * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-
-} // namespace GAME
 
 } // namespace GAME

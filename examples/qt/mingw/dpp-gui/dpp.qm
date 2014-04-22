@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.1.0">
- <documentation>Dining Philosopher Problem example for Qt</documentation>
+<model version="3.1.1">
+ <documentation>Dining Philosopher Problem example for Qt with GUI</documentation>
  <framework name="qpcpp"/>
  <package name="Qt-port" stereotype="0x00" namespace="QP::">
   <class name="GuiQActive" superclass="qpcpp::QActive">
@@ -80,7 +80,7 @@ pe-&gt;philNum = me-&gt;num;
 me-&gt;postLIFO(pe); // &lt;==</code>
    </operation>
   </class>
-  <class name="GuiQMActive" superclass="qpcpp::QActive">
+  <class name="GuiQMActive" superclass="qpcpp::QMActive">
    <operation name="GuiQMActive" type="QMActive(initial)" visibility="0x00" properties="0x00">
     <parameter name="initial" type="QStateHandler"/>
    </operation>
@@ -171,8 +171,8 @@ me-&gt;postLIFO(pe); // &lt;==</code>
   <class name="Philo" superclass="qpcpp::QMActive">
    <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
    <operation name="Philo" type="" visibility="0x00" properties="0x00">
-    <code>  : QMActive(Q_STATE_CAST(&amp;Philo::initial)),
-    m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
+    <code> : QMActive(Q_STATE_CAST(&amp;Philo::initial)),
+   m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
    </operation>
    <statechart>
     <initial target="../1">
@@ -206,7 +206,7 @@ me-&gt;subscribe(EAT_SIG);</action>
      </initial_glyph>
     </initial>
     <state name="thinking">
-     <entry>me-&gt;m_timeEvt.armX(think_time(), 0U);</entry>
+     <entry>me-&gt;m_timeEvt.postIn(me, think_time());</entry>
      <exit>(void)me-&gt;m_timeEvt.disarm();</exit>
      <tran trig="TIMEOUT" target="../../2">
       <tran_glyph conn="2,14,3,1,20,11,-3">
@@ -250,7 +250,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
      </state_glyph>
     </state>
     <state name="eating">
-     <entry>me-&gt;m_timeEvt.armX(think_time(), 0U);</entry>
+     <entry>me-&gt;m_timeEvt.postIn(me, think_time());</entry>
      <exit>QP::QF::PUBLISH(Q_NEW(TableEvt, DONE_SIG, PHILO_ID(me)), me);
 (void)me-&gt;m_timeEvt.disarm();</exit>
      <tran trig="TIMEOUT" target="../../1">
@@ -277,7 +277,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
    <attribute name="m_fork[N_PHILO]" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_isHungry[N_PHILO]" type="bool" visibility="0x02" properties="0x00"/>
    <operation name="Table" type="" visibility="0x00" properties="0x00">
-    <code>  : GuiQMActive(Q_STATE_CAST(&amp;Table::initial))
+    <code> : GuiQMActive(Q_STATE_CAST(&amp;Table::initial))
 
 for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     m_fork[n] = FREE;
@@ -483,6 +483,8 @@ enum DPPSignals {
     MAX_SIG                   // the last signal
 };
 
+} // namespace DPP
+
 $declare(Events::TableEvt)
 
 // number of philosophers
@@ -491,21 +493,19 @@ $declare(Events::TableEvt)
 $declare(AOs::AO_Philo[N_PHILO])
 $declare(AOs::AO_Table)
 
-}                             // namespace DPP
-
-#endif                        // dpp_h</text>
+#endif // dpp_h</text>
   </file>
   <file name="philo.cpp">
    <text>#include &quot;qp_port.h&quot;
 #include &quot;dpp.h&quot;
 #include &quot;bsp.h&quot;
 
-namespace DPP {
-
 Q_DEFINE_THIS_FILE
 
 // Active object class -------------------------------------------------------
 $declare(AOs::Philo)
+
+namespace DPP {
 
 // Local objects -------------------------------------------------------------
 static Philo l_philo[N_PHILO];   // storage for all Philos
@@ -540,22 +540,22 @@ QP::QActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Phil
     &amp;l_philo[4]
 };
 
-// Philo definition ----------------------------------------------------------
-$define(AOs::Philo)
+} // namespace DPP
 
-}                                                             // namespace DPP</text>
+// Philo definition ----------------------------------------------------------
+$define(AOs::Philo)</text>
   </file>
   <file name="table.cpp">
    <text>#include &quot;qp_port.h&quot;
 #include &quot;dpp.h&quot;
 #include &quot;bsp.h&quot;
 
-namespace DPP {
-
 Q_DEFINE_THIS_FILE
 
 // Active object class -------------------------------------------------------
 $declare(AOs::Table)
+
+namespace DPP {
 
 // helper function to provide the RIGHT neighbour of a Philo[n]
 inline uint8_t RIGHT(uint8_t const n) {
@@ -580,10 +580,10 @@ static Table l_table; // the single instance of the Table active object
 // Global-scope objects ------------------------------------------------------
 QP::QActive * const AO_Table = &amp;l_table; // &quot;opaque&quot; AO pointer
 
-//............................................................................
-$define(AOs::Table)
+} // namespace DPP
 
-}                                                             // namespace DPP</text>
+//............................................................................
+$define(AOs::Table)</text>
   </file>
  </directory>
 </model>

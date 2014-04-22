@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: BSP for DPP-console example with Qt5
-// Last Updated for Version: 5.0.0
-// Date of the Last Update:  Aug 17, 2013
+// Last Updated for Version: QP 5.3.0/Qt 5.1.1
+// Last updated on  2014-04-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,9 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #include <QCoreApplication>
 #include <QTextStream>
@@ -45,19 +44,20 @@
     enum {
         PHILO_STAT = QP::QS_USER
     };
-    static uint8_t const l_time_tick = 0U;                           // for QS
+    static uint8_t const l_time_tick = 0U; // for QS
 #endif
 
 Q_DEFINE_THIS_FILE
 
 //............................................................................
-static uint32_t l_rnd;                                          // random seed
+static uint32_t l_rnd; // random seed
 //static QTextStream l_stdInStream(stdin,   QIODevice::ReadOnly);
 static QTextStream l_stdOutStream(stdout, QIODevice::WriteOnly);
 
 //............................................................................
 void BSP_init(void) {
     Q_ALLEGE(QS_INIT((char *)0));
+    QS_RESET();
     QS_OBJ_DICTIONARY(&l_time_tick);
     QS_USR_DICTIONARY(PHILO_STAT);
 
@@ -69,7 +69,7 @@ void BSP_init(void) {
 //............................................................................
 void BSP_terminate(int) {
     qDebug("terminate");
-    QP::QF::stop();                               // stop the QF::run() thread
+    QP::QF::stop(); // stop the QF::run() thread
     qApp->quit(); // quit the Qt application *after* the QF::run() has stopped
 }
 //............................................................................
@@ -89,7 +89,7 @@ void BSP_displayPaused(uint8_t paused) {
     }
 }
 //............................................................................
-uint32_t BSP_random(void) {     // a very cheap pseudo-random-number generator
+uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     l_rnd = l_rnd * (3*7*11*13*23);
@@ -102,7 +102,7 @@ void BSP_randomSeed(uint32_t seed) {
 
 //****************************************************************************
 void Q_onAssert(char_t const * const file, int line) {
-    QS_ASSERTION(file, line);       // send the assertion info to the QS trace
+    QS_ASSERTION(file, line); // send the assertion info to the QS trace
     qFatal("Assertion failed in module %s, line %d", file, line);
 }
 
@@ -130,7 +130,7 @@ static QTime l_time;
 
 //............................................................................
 bool QS::onStartup(void const *) {
-    static uint8_t qsBuf[4*1024];                 // 4K buffer for Quantum Spy
+    static uint8_t qsBuf[4*1024]; // 4K buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
     QSPY_config(QP_VERSION,         // version
@@ -198,7 +198,7 @@ bool QS::onStartup(void const *) {
     QS_FILTER_OFF(QS_QF_ISR_ENTRY);
     QS_FILTER_OFF(QS_QF_ISR_EXIT);
 
-    return true;                                                    // success
+    return true; // success
 }
 //............................................................................
 void QS::onCleanup(void) {
@@ -236,6 +236,6 @@ extern "C" void QSPY_onPrintLn(void) {
     qDebug(QSPY_line);
 }
 
-#endif                                                                // Q_SPY
+#endif // Q_SPY
 
-}                                                              // namespace QP
+} // namespace QP

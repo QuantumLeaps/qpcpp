@@ -5,6 +5,7 @@ ADDMOD debug\pixellabel.o
 ADDMOD debug\qep.o
 ADDMOD debug\qmsm_dis.o
 ADDMOD debug\qmsm_ini.o
+ADDMOD debug\qmsm_in.o
 ADDMOD debug\qhsm_dis.o
 ADDMOD debug\qhsm_ini.o
 ADDMOD debug\qhsm_in.o

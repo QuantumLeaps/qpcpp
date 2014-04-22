@@ -5,6 +5,7 @@ ADDMOD release\pixellabel.o
 ADDMOD release\qep.o
 ADDMOD release\qmsm_dis.o
 ADDMOD release\qmsm_ini.o
+ADDMOD release\qmsm_in.o
 ADDMOD release\qhsm_dis.o
 ADDMOD release\qhsm_ini.o
 ADDMOD release\qhsm_in.o

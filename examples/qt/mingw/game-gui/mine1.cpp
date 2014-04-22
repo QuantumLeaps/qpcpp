@@ -19,8 +19,6 @@
 #include "bsp.h"
 #include "game.h"
 
-namespace GAME {
-
 Q_DEFINE_THIS_FILE
 
 // encapsulated delcaration of the Mine1 HSM ---------------------------------
@@ -31,12 +29,12 @@ class Mine1 : public QP::QMsm {
 private:
     uint8_t m_x;
     uint8_t m_y;
+
+public:
     uint8_t m_exp_ctr;
 
 public:
-    Mine1()
-      : QMsm(Q_STATE_CAST(&Mine1::initial))
-    {}
+    Mine1();
 
 protected:
     static QP::QState initial(Mine1 * const me, QP::QEvt const * const e);
@@ -54,11 +52,13 @@ protected:
 
 } // namespace GAME
 
+namespace GAME {
+
 // local objects -------------------------------------------------------------
 static Mine1 l_mine1[GAME_MINES_MAX]; // a pool of type-1 mines
 
 //............................................................................
-QP::QHsm *Mine1_getInst(uint8_t id) {
+QP::QMsm *Mine1_getInst(uint8_t id) {
     Q_REQUIRE(id < GAME_MINES_MAX);
     return &l_mine1[id];
 }
@@ -68,10 +68,16 @@ static inline uint8_t MINE_ID(Mine1 const * const me) {
     return static_cast<uint8_t>(me - l_mine1);
 }
 
+} // namespace GAME
+
 // Mine1 class definition ----------------------------------------------------
 namespace GAME {
 
 //${AOs::Mine1} ..............................................................
+//${AOs::Mine1::Mine1} .......................................................
+Mine1::Mine1()
+ : QMsm(Q_STATE_CAST(&Mine1::initial))
+{}
 
 //${AOs::Mine1::SM} ..........................................................
 QP::QState Mine1::initial(Mine1 * const me, QP::QEvt const * const e) {
@@ -148,9 +154,7 @@ QP::QMState const Mine1::used_s = {
 // ${AOs::Mine1::SM::used}
 QP::QState Mine1::used_x(Mine1 * const me) {
     // tell the Tunnel that this mine is becoming disabled
-    MineEvt *mev = Q_NEW(MineEvt, MINE_DISABLED_SIG);
-    mev->id = MINE_ID(me);
-    AO_Tunnel->POST(mev, me);
+    AO_Tunnel->POST(Q_NEW(MineEvt, MINE_DISABLED_SIG, MINE_ID(me)), me);
     return QM_EXIT(&used_s);
 }
 // ${AOs::Mine1::SM::used}
@@ -204,11 +208,10 @@ QP::QState Mine1::exploding(Mine1 * const me, QP::QEvt const * const e) {
                 me->m_x -= GAME_SPEED_X; // move explosion by 1 step
 
                 // tell the Game to render the current stage of Explosion
-                ObjectImageEvt *oie = Q_NEW(ObjectImageEvt, EXPLOSION_SIG);
-                oie->x   = me->m_x + 1U;  // x of explosion
-                oie->y   = (int8_t)((int)me->m_y - 4 + 2); // y of explosion
-                oie->bmp = EXPLOSION0_BMP + (me->m_exp_ctr >> 2);
-                AO_Tunnel->POST(oie, me);
+                AO_Tunnel->POST(Q_NEW(ObjectImageEvt, EXPLOSION_SIG,
+                                      me->m_x + 1U, (int8_t)((int)me->m_y - 4 + 2),
+                                      EXPLOSION0_BMP + (me->m_exp_ctr >> 2)),
+                                me);
                 status_ = QM_HANDLED();
             }
             // ${AOs::Mine1::SM::used::exploding::TIME_TICK::[else]}
@@ -252,11 +255,9 @@ QP::QState Mine1::planted(Mine1 * const me, QP::QEvt const * const e) {
             if (me->m_x >= GAME_SPEED_X) {
                 me->m_x -= GAME_SPEED_X; // move the mine 1 step
                 // tell the Tunnel to draw the Mine
-                ObjectImageEvt *oie = Q_NEW(ObjectImageEvt, MINE_IMG_SIG);
-                oie->x   = me->m_x;
-                oie->y   = me->m_y;
-                oie->bmp = MINE1_BMP;
-                AO_Tunnel->POST(oie, me);
+                AO_Tunnel->POST(Q_NEW(ObjectImageEvt, MINE_IMG_SIG,
+                                      me->m_x, me->m_y, MINE1_BMP),
+                                me);
                 status_ = QM_HANDLED();
             }
             // ${AOs::Mine1::SM::used::planted::TIME_TICK::[else]}
@@ -336,7 +337,5 @@ QP::QState Mine1::planted(Mine1 * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-
-} // namespace GAME
 
 } // namespace GAME

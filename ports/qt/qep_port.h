@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QEP/C++ port to Qt
-// Last Updated for Version: QP 5.1.1/Qt 5.1.1
-// Date of the Last Update:  Nov 05, 2013
+// Last Updated for Version: QP 5.3.0/Qt 5.1.1
+// Last updated on  2014-04-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,19 +28,21 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #ifndef qep_port_h
 #define qep_port_h
-                              // don't define QEvent to avoid conflict with Qt
+
+// don't define QEvent to avoid conflict with Qt
 #define Q_NQEVENT    1
-                                                  // provide QEvt constructors
+
+// provide QEvt constructors
 #define Q_EVT_CTOR   1
 
-#include <stdint.h>      // Exact-width types. WG14/N843 C99, Section 7.18.1.1
 
-#include "qep.h"                  // QEP platform-independent public interface
+#include <stdint.h> // Exact-width types. WG14/N843 C99, Section 7.18.1.1
 
-#endif                                                           // qep_port_h
+#include "qep.h"    // QEP platform-independent public interface
+
+#endif // qep_port_h
