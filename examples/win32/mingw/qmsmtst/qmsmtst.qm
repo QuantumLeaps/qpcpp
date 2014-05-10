@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.1.0">
+<model version="3.1.2">
  <documentation>QMsmTst is a test for the QMsm state machine based on Chapter 2 of the PSiCC2 book.</documentation>
  <framework name="qpcpp"/>
  <package name="SMs" stereotype="0x02">
@@ -7,7 +7,7 @@
    <documentation>Test active object</documentation>
    <attribute name="m_foo" type="bool" visibility="0x02" properties="0x00"/>
    <operation name="QMsmTst" type="" visibility="0x00" properties="0x02">
-    <code>  : QMsm(Q_STATE_CAST(&amp;QMsmTst::initial))</code>
+    <code>  : QMsm(Q_STATE_CAST(&amp;initial))</code>
    </operation>
    <statechart>
     <initial target="../1/5">

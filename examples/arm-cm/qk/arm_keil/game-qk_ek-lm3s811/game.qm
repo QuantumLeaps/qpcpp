@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.1.0">
+<model version="3.1.2">
  <documentation>&quot;Fly 'n' Shoot&quot; game example from Chapters 1 &amp; 9 of PSiCC2 with MSM</documentation>
  <framework name="qpcpp"/>
  <package name="Events" stereotype="0x01" namespace="GAME::">
@@ -52,7 +52,7 @@ score   = score_p;</code>
    <attribute name="m_wall_thickness_bottom" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_minimal_gap" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Tunnel" type="" visibility="0x00" properties="0x00">
-    <code>  : QMActive(Q_STATE_CAST(&amp;Tunnel::initial)),
+    <code>  : QMActive(Q_STATE_CAST(&amp;initial)),
     m_blinkTimeEvt(this, BLINK_TIMEOUT_SIG, 0U),
     m_screenTimeEvt(this, SCREEN_TIMEOUT_SIG, 0U),
     m_last_mine_x(0U), m_last_mine_y(0U)
@@ -567,7 +567,7 @@ QP::QF::stop(); /* stop QF and cleanup */</entry>
    <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_score" type="uint16_t" visibility="0x02" properties="0x00"/>
    <operation name="Ship" type="" visibility="0x00" properties="0x00">
-    <code>  : QMActive(Q_STATE_CAST(&amp;Ship::initial)),
+    <code>  : QMActive(Q_STATE_CAST(&amp;initial)),
     m_x(GAME_SHIP_X),
     m_y(GAME_SHIP_Y)</code>
    </operation>
@@ -712,7 +712,7 @@ AO_Tunnel-&gt;POST(gameOver, me);</action>
    <attribute name="m_y" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Missile" type="" visibility="0x00" properties="0x00">
-    <code>  : QMActive(Q_STATE_CAST(&amp;Missile::initial))</code>
+    <code>  : QMActive(Q_STATE_CAST(&amp;initial))</code>
    </operation>
    <statechart>
     <initial target="../1">
@@ -821,7 +821,7 @@ AO_Tunnel-&gt;POST(oie, me);</action>
    <attribute name="m_y" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Mine1" type="" visibility="0x00" properties="0x02">
-    <code>  : QMsm(Q_STATE_CAST(&amp;Mine1::initial))</code>
+    <code>  : QMsm(Q_STATE_CAST(&amp;initial))</code>
    </operation>
    <statechart>
     <initial target="../1">
@@ -976,7 +976,7 @@ AO_Missile-&gt;POST(&amp;mine1_destroyed, me);</action>
    <attribute name="m_y" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Mine2" type="" visibility="0x00" properties="0x02">
-    <code>  : QMsm(Q_STATE_CAST(&amp;Mine2::initial))</code>
+    <code>  : QMsm(Q_STATE_CAST(&amp;initial))</code>
    </operation>
    <statechart>
     <initial target="../1">

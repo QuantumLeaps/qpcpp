@@ -78,10 +78,10 @@ enum InternalSignals {           // internal signals
 // Global objects ------------------------------------------------------------
 QP::QActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AO
     &l_philo[0],
-    &l_philo[1],
-    &l_philo[2],
-    &l_philo[3],
-    &l_philo[4]
+    //&l_philo[1],
+    //&l_philo[2],
+    //&l_philo[3],
+    //&l_philo[4]
 };
 
 } // namespace DPP
@@ -116,14 +116,14 @@ QP::QState Philo::initial(Philo * const me, QP::QEvt const * const e) {
 
         QS_OBJ_DICTIONARY(&l_philo[0]);
         QS_OBJ_DICTIONARY(&l_philo[0].m_timeEvt);
-        QS_OBJ_DICTIONARY(&l_philo[1]);
-        QS_OBJ_DICTIONARY(&l_philo[1].m_timeEvt);
-        QS_OBJ_DICTIONARY(&l_philo[2]);
-        QS_OBJ_DICTIONARY(&l_philo[2].m_timeEvt);
-        QS_OBJ_DICTIONARY(&l_philo[3]);
-        QS_OBJ_DICTIONARY(&l_philo[3].m_timeEvt);
-        QS_OBJ_DICTIONARY(&l_philo[4]);
-        QS_OBJ_DICTIONARY(&l_philo[4].m_timeEvt);
+        //QS_OBJ_DICTIONARY(&l_philo[1]);
+        //QS_OBJ_DICTIONARY(&l_philo[1].m_timeEvt);
+        //QS_OBJ_DICTIONARY(&l_philo[2]);
+        //QS_OBJ_DICTIONARY(&l_philo[2].m_timeEvt);
+        //QS_OBJ_DICTIONARY(&l_philo[3]);
+        //QS_OBJ_DICTIONARY(&l_philo[3].m_timeEvt);
+        //QS_OBJ_DICTIONARY(&l_philo[4]);
+        //QS_OBJ_DICTIONARY(&l_philo[4].m_timeEvt);
 
         QS_FUN_DICTIONARY(&Philo::initial);
         QS_FUN_DICTIONARY(&Philo::thinking);

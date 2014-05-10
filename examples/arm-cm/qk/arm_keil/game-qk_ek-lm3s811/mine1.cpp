@@ -33,7 +33,7 @@ private:
 
 public:
     Mine1()
-      : QMsm(Q_STATE_CAST(&Mine1::initial))
+      : QMsm(Q_STATE_CAST(&initial))
     {}
 
 protected:
@@ -110,7 +110,7 @@ QP::QState Mine1::initial(Mine1 * const me, QP::QEvt const * const e) {
 //${AOs::Mine1::SM::unused} ..................................................
 QP::QMState const Mine1::unused_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Mine1::unused),
+    Q_STATE_CAST(&unused),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
@@ -142,9 +142,9 @@ QP::QState Mine1::unused(Mine1 * const me, QP::QEvt const * const e) {
 //${AOs::Mine1::SM::used} ....................................................
 QP::QMState const Mine1::used_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Mine1::used),
+    Q_STATE_CAST(&used),
     Q_ACTION_CAST(0), // no entry action
-    Q_ACTION_CAST(&Mine1::used_x),
+    Q_ACTION_CAST(&used_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${AOs::Mine1::SM::used}
@@ -167,7 +167,7 @@ QP::QState Mine1::used(Mine1 * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &unused_s,
                 {
-                    Q_ACTION_CAST(&Mine1::used_x), // exit
+                    Q_ACTION_CAST(&used_x), // exit
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -184,8 +184,8 @@ QP::QState Mine1::used(Mine1 * const me, QP::QEvt const * const e) {
 //${AOs::Mine1::SM::used::exploding} .........................................
 QP::QMState const Mine1::exploding_s = {
     &Mine1::used_s, // superstate
-    Q_STATE_CAST(&Mine1::exploding),
-    Q_ACTION_CAST(&Mine1::exploding_e),
+    Q_STATE_CAST(&exploding),
+    Q_ACTION_CAST(&exploding_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -221,7 +221,7 @@ QP::QState Mine1::exploding(Mine1 * const me, QP::QEvt const * const e) {
                 } const tatbl_ = { // transition-action table
                     &unused_s,
                     {
-                        Q_ACTION_CAST(&Mine1::used_x), // exit
+                        Q_ACTION_CAST(&used_x), // exit
                         Q_ACTION_CAST(0)  // zero terminator
                     }
                 };
@@ -239,7 +239,7 @@ QP::QState Mine1::exploding(Mine1 * const me, QP::QEvt const * const e) {
 //${AOs::Mine1::SM::used::planted} ...........................................
 QP::QMState const Mine1::planted_s = {
     &Mine1::used_s, // superstate
-    Q_STATE_CAST(&Mine1::planted),
+    Q_STATE_CAST(&planted),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
@@ -269,7 +269,7 @@ QP::QState Mine1::planted(Mine1 * const me, QP::QEvt const * const e) {
                 } const tatbl_ = { // transition-action table
                     &unused_s,
                     {
-                        Q_ACTION_CAST(&Mine1::used_x), // exit
+                        Q_ACTION_CAST(&used_x), // exit
                         Q_ACTION_CAST(0)  // zero terminator
                     }
                 };
@@ -290,7 +290,7 @@ QP::QState Mine1::planted(Mine1 * const me, QP::QEvt const * const e) {
                 } const tatbl_ = { // transition-action table
                     &unused_s,
                     {
-                        Q_ACTION_CAST(&Mine1::used_x), // exit
+                        Q_ACTION_CAST(&used_x), // exit
                         Q_ACTION_CAST(0)  // zero terminator
                     }
                 };
@@ -318,7 +318,7 @@ QP::QState Mine1::planted(Mine1 * const me, QP::QEvt const * const e) {
                 } const tatbl_ = { // transition-action table
                     &exploding_s,
                     {
-                        Q_ACTION_CAST(&Mine1::exploding_e), // entry
+                        Q_ACTION_CAST(&exploding_e), // entry
                         Q_ACTION_CAST(0)  // zero terminator
                     }
                 };

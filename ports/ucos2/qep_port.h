@@ -1,7 +1,7 @@
 //****************************************************************************
-// Product: QP/C++ example
-// Last Updated for Version: QP 5.3.0/Qt 5.1.1
-// Last updated on  2014-04-21
+// Product: QEP/C++ generic port to uC/OS-II
+// Last updated for version 5.3.1
+// Last updated on  2014-05-10
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,41 +31,10 @@
 // Web:   www.state-machine.com
 // Email: info@state-machine.com
 //****************************************************************************
-#include "gui.h"
-//-----------------
-#include "qp_port.h"
-#include "pelican.h"
-#include "bsp.h"
+#ifndef qep_port_h
+#define qep_port_h
 
-//............................................................................
-static QP::QSubscrList l_subscrSto[PELICAN::MAX_PUB_SIG];
+#include <stdint.h>   // Exact-width types. WG14/N843 C99 Standard
+#include "qep.h"      // QEP platform-independent public interface
 
-static QF_MPOOL_EL(QP::QEvt) l_smlPoolSto[20]; // storage for small event pool
-
-//............................................................................
-int main(int argc, char *argv[]) {
-    QP::GuiApp app(argc, argv);
-    Gui gui;
-
-    gui.show();
-
-    QP::QF::init();  // initialize the framework
-    BSP_init();      // initialize the Board Support Package
-
-    // object dictionaries...
-    QS_OBJ_DICTIONARY(l_smlPoolSto);
-
-    // initialize publish-subscribe...
-    QP::QF::psInit(l_subscrSto, Q_DIM(l_subscrSto));
-
-    // initialize event pools...
-    QP::QF::poolInit(l_smlPoolSto,
-                sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
-
-    // start the active objects...
-    PELICAN::AO_Pelican->start(1U,
-                 (QP::QEvt const **)0, 0U, // no queue
-                 (void *)0, 0U);           // no stack
-
-    return QP::QF::run(); // calls qApp->exec()
-}
+#endif // qep_port_h

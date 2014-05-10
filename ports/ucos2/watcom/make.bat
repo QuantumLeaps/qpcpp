@@ -1,7 +1,7 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ buld script for uC/OS-II port, Open Watcom compiler
-:: Last updated for version 5.3.0
+:: Last updated for version 5.3.1
 :: Last updated on  2014-04-13
 ::
 ::                    Q u a n t u m     L e a P s
@@ -142,7 +142,7 @@ set CCINC=@inc_qf.rsp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qte_darm.obj %SRCDIR%\qte_darm.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qte_rarm.obj %SRCDIR%\qte_rarm.cpp
 %CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qte_ctr.obj  %SRCDIR%\qte_ctr.cpp
-%CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qf_port.obj  qf_port.cpp
+%CC% %CCFLAGS% %CCINC% -fo=%BINDIR%\qf_port.obj  ..\qf_port.cpp
 
 %LIB% %LIBDIR%\qp +%BINDIR%\qa_defer
 %LIB% %LIBDIR%\qp +%BINDIR%\qa_sub

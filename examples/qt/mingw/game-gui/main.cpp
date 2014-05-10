@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QP/C++ example for Qt5
-// Last Updated for Version: QP 5.1.1/Qt 5.1.1
-// Date of the Last Update:  Nov 05, 2013
+// Last Updated for Version: QP 5.3.0/Qt 5.1.1
+// Last updated on  2014-04-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,9 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #include "gui.h"
 //-----------------
@@ -53,16 +52,16 @@ int main(int argc, char *argv[]) {
 
     gui.show();
 
-    QP::QF::init();   // initialize the framework and the underlying RT kernel
-    BSP_init();                        // initialize the Board Support Package
+    QP::QF::init(); // initialize the framework and the underlying RT kernel
+    BSP_init();     // initialize the Board Support Package
 
-                                              // initialize the event pools...
+    // initialize the event pools...
     QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
     QP::QF::poolInit(medPoolSto, sizeof(medPoolSto), sizeof(medPoolSto[0]));
 
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));     // init publish-subscribe
+    QP::QF::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
 
-                                // send object dictionaries for event pools...
+    // send object dictionaries for event pools...
     QS_OBJ_DICTIONARY(smlPoolSto);
     QS_OBJ_DICTIONARY(medPoolSto);
 
@@ -72,17 +71,17 @@ int main(int argc, char *argv[]) {
     QS_SIG_DICTIONARY(GAME::PLAYER_QUIT_SIG,    static_cast<void *>(0));
     QS_SIG_DICTIONARY(GAME::GAME_OVER_SIG,      static_cast<void *>(0));
 
-                                                // start the active objects...
-    GAME::AO_Tunnel ->start(1U,                                    // priority
-                      (QP::QEvt const **)0, (uint32_t)0,       // no evt queue
-                      static_cast<void *>(0), 0U);      // no per-thread stack
-    GAME::AO_Missile->start(2U,                                    // priority
-                      missileQueueSto, Q_DIM(missileQueueSto),    // evt queue
-                      static_cast<void *>(0), 0U);      // no per-thread stack
-    GAME::AO_Ship   ->start(3U,                                    // priority
-                      shipQueueSto, Q_DIM(shipQueueSto),          // evt queue
-                      static_cast<void *>(0), 0U);      // no per-thread stack
+    // start the active objects...
+    GAME::AO_Tunnel ->start(1U, // priority
+                      (QP::QEvt const **)0, 0U,    // no evt queue
+                      static_cast<void *>(0), 0U); // no per-thread stack
+    GAME::AO_Missile->start(2U,                    // priority
+                      missileQueueSto, Q_DIM(missileQueueSto), // evt queue
+                      static_cast<void *>(0), 0U); // no per-thread stack
+    GAME::AO_Ship   ->start(3U,                    // priority
+                      shipQueueSto, Q_DIM(shipQueueSto), // evt queue
+                      static_cast<void *>(0), 0U); // no per-thread stack
 
-    return QP::QF::run();                            // run the QF application
+    return QP::QF::run(); // run the QF application
 }
 

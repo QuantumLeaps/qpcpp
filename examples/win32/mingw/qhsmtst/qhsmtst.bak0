@@ -27,7 +27,7 @@ private:
 
 public:
     QHsmTst()
-      : QHsm(Q_STATE_CAST(&initial))
+      : QHsm(Q_STATE_CAST(&QHsmTst::initial))
     {}
 
 protected:
@@ -54,7 +54,7 @@ QP::QState QHsmTst::initial(QHsmTst * const me, QP::QEvt const * const e) {
     (void)e; // avoid compiler warning
     me->m_foo = 0U;
     BSP_display("top-INIT;");
-    return Q_TRAN(&s2);
+    return Q_TRAN(&QHsmTst::s2);
 }
 //${HSMs::QHsmTst::SM::s} ....................................................
 QP::QState QHsmTst::s(QHsmTst * const me, QP::QEvt const * const e) {
@@ -75,7 +75,7 @@ QP::QState QHsmTst::s(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::initial}
         case Q_INIT_SIG: {
             BSP_display("s-INIT;");
-            status_ = Q_TRAN(&s11);
+            status_ = Q_TRAN(&QHsmTst::s11);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::I}
@@ -94,7 +94,7 @@ QP::QState QHsmTst::s(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::E}
         case E_SIG: {
             BSP_display("s-E;");
-            status_ = Q_TRAN(&s11);
+            status_ = Q_TRAN(&QHsmTst::s11);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::TERMINATE}
@@ -129,7 +129,7 @@ QP::QState QHsmTst::s1(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s1::initial}
         case Q_INIT_SIG: {
             BSP_display("s1-INIT;");
-            status_ = Q_TRAN(&s11);
+            status_ = Q_TRAN(&QHsmTst::s11);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s1::I}
@@ -144,7 +144,7 @@ QP::QState QHsmTst::s1(QHsmTst * const me, QP::QEvt const * const e) {
             if (!me->m_foo) {
                 me->m_foo = true;
                 BSP_display("s1-D;");
-                status_ = Q_TRAN(&s);
+                status_ = Q_TRAN(&QHsmTst::s);
             }
             else {
                 status_ = Q_UNHANDLED();
@@ -154,29 +154,29 @@ QP::QState QHsmTst::s1(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s1::A}
         case A_SIG: {
             BSP_display("s1-A;");
-            status_ = Q_TRAN(&s1);
+            status_ = Q_TRAN(&QHsmTst::s1);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s1::B}
         case B_SIG: {
             BSP_display("s1-B;");
-            status_ = Q_TRAN(&s11);
+            status_ = Q_TRAN(&QHsmTst::s11);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s1::F}
         case F_SIG: {
             BSP_display("s1-F;");
-            status_ = Q_TRAN(&s211);
+            status_ = Q_TRAN(&QHsmTst::s211);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s1::C}
         case C_SIG: {
             BSP_display("s1-C;");
-            status_ = Q_TRAN(&s2);
+            status_ = Q_TRAN(&QHsmTst::s2);
             break;
         }
         default: {
-            status_ = Q_SUPER(&s);
+            status_ = Q_SUPER(&QHsmTst::s);
             break;
         }
     }
@@ -201,7 +201,7 @@ QP::QState QHsmTst::s11(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s1::s11::H}
         case H_SIG: {
             BSP_display("s11-H;");
-            status_ = Q_TRAN(&s);
+            status_ = Q_TRAN(&QHsmTst::s);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s1::s11::D}
@@ -210,7 +210,7 @@ QP::QState QHsmTst::s11(QHsmTst * const me, QP::QEvt const * const e) {
             if (me->m_foo) {
                 me->m_foo = false;
                 BSP_display("s11-D;");
-                status_ = Q_TRAN(&s1);
+                status_ = Q_TRAN(&QHsmTst::s1);
             }
             else {
                 status_ = Q_UNHANDLED();
@@ -220,11 +220,11 @@ QP::QState QHsmTst::s11(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s1::s11::G}
         case G_SIG: {
             BSP_display("s11-G;");
-            status_ = Q_TRAN(&s211);
+            status_ = Q_TRAN(&QHsmTst::s211);
             break;
         }
         default: {
-            status_ = Q_SUPER(&s1);
+            status_ = Q_SUPER(&QHsmTst::s1);
             break;
         }
     }
@@ -249,7 +249,7 @@ QP::QState QHsmTst::s2(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s2::initial}
         case Q_INIT_SIG: {
             BSP_display("s2-INIT;");
-            status_ = Q_TRAN(&s211);
+            status_ = Q_TRAN(&QHsmTst::s211);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s2::I}
@@ -268,17 +268,17 @@ QP::QState QHsmTst::s2(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s2::F}
         case F_SIG: {
             BSP_display("s2-F;");
-            status_ = Q_TRAN(&s11);
+            status_ = Q_TRAN(&QHsmTst::s11);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s2::C}
         case C_SIG: {
             BSP_display("s2-C;");
-            status_ = Q_TRAN(&s1);
+            status_ = Q_TRAN(&QHsmTst::s1);
             break;
         }
         default: {
-            status_ = Q_SUPER(&s);
+            status_ = Q_SUPER(&QHsmTst::s);
             break;
         }
     }
@@ -303,29 +303,29 @@ QP::QState QHsmTst::s21(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s2::s21::initial}
         case Q_INIT_SIG: {
             BSP_display("s21-INIT;");
-            status_ = Q_TRAN(&s211);
+            status_ = Q_TRAN(&QHsmTst::s211);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s2::s21::G}
         case G_SIG: {
             BSP_display("s21-G;");
-            status_ = Q_TRAN(&s1);
+            status_ = Q_TRAN(&QHsmTst::s1);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s2::s21::A}
         case A_SIG: {
             BSP_display("s21-A;");
-            status_ = Q_TRAN(&s21);
+            status_ = Q_TRAN(&QHsmTst::s21);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s2::s21::B}
         case B_SIG: {
             BSP_display("s21-B;");
-            status_ = Q_TRAN(&s211);
+            status_ = Q_TRAN(&QHsmTst::s211);
             break;
         }
         default: {
-            status_ = Q_SUPER(&s2);
+            status_ = Q_SUPER(&QHsmTst::s2);
             break;
         }
     }
@@ -350,17 +350,17 @@ QP::QState QHsmTst::s211(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s2::s21::s211::H}
         case H_SIG: {
             BSP_display("s211-H;");
-            status_ = Q_TRAN(&s);
+            status_ = Q_TRAN(&QHsmTst::s);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s2::s21::s211::D}
         case D_SIG: {
             BSP_display("s211-D;");
-            status_ = Q_TRAN(&s21);
+            status_ = Q_TRAN(&QHsmTst::s21);
             break;
         }
         default: {
-            status_ = Q_SUPER(&s21);
+            status_ = Q_SUPER(&QHsmTst::s21);
             break;
         }
     }
