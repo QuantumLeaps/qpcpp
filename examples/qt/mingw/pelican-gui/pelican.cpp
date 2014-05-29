@@ -116,8 +116,8 @@ QP::QState Pelican::initial(Pelican * const me, QP::QEvt const * const e) {
     } const tatbl_ = { // transition-action table
         &operational_s,
         {
-            Q_ACTION_CAST(&Pelican::operational_e), // entry
-            Q_ACTION_CAST(&Pelican::operational_i), // initial tran.
+            Q_ACTION_CAST(&operational_e), // entry
+            Q_ACTION_CAST(&operational_i), // initial tran.
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -152,10 +152,10 @@ QP::QState Pelican::initial(Pelican * const me, QP::QEvt const * const e) {
 //${components::Pelican::SM::operational} ....................................
 QP::QMState const Pelican::operational_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Pelican::operational),
-    Q_ACTION_CAST(&Pelican::operational_e),
+    Q_STATE_CAST(&operational),
+    Q_ACTION_CAST(&operational_e),
     Q_ACTION_CAST(0), // no exit action
-    Q_ACTION_CAST(&Pelican::operational_i)
+    Q_ACTION_CAST(&operational_i)
 };
 // ${components::Pelican::SM::operational}
 QP::QState Pelican::operational_e(Pelican * const me) {
@@ -172,7 +172,7 @@ QP::QState Pelican::operational_i(Pelican * const me) {
     } const tatbl_ = { // transition-action table
         &carsEnabled_s,
         {
-            Q_ACTION_CAST(&Pelican::carsEnabled_i), // initial tran.
+            Q_ACTION_CAST(&carsEnabled_i), // initial tran.
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -191,7 +191,7 @@ QP::QState Pelican::operational(Pelican * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &offline_s,
                 {
-                    Q_ACTION_CAST(&Pelican::offline_e), // entry
+                    Q_ACTION_CAST(&offline_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -215,10 +215,10 @@ QP::QState Pelican::operational(Pelican * const me, QP::QEvt const * const e) {
 //${components::Pelican::SM::operational::carsEnabled} .......................
 QP::QMState const Pelican::carsEnabled_s = {
     &Pelican::operational_s, // superstate
-    Q_STATE_CAST(&Pelican::carsEnabled),
+    Q_STATE_CAST(&carsEnabled),
     Q_ACTION_CAST(0), // no entry action
-    Q_ACTION_CAST(&Pelican::carsEnabled_x),
-    Q_ACTION_CAST(&Pelican::carsEnabled_i)
+    Q_ACTION_CAST(&carsEnabled_x),
+    Q_ACTION_CAST(&carsEnabled_i)
 };
 // ${components::Pelican::SM::operational::carsEnabled}
 QP::QState Pelican::carsEnabled_x(Pelican * const me) {
@@ -234,8 +234,8 @@ QP::QState Pelican::carsEnabled_i(Pelican * const me) {
     } const tatbl_ = { // transition-action table
         &carsGreen_s,
         {
-            Q_ACTION_CAST(&Pelican::carsGreen_e), // entry
-            Q_ACTION_CAST(&Pelican::carsGreen_i), // initial tran.
+            Q_ACTION_CAST(&carsGreen_e), // entry
+            Q_ACTION_CAST(&carsGreen_i), // initial tran.
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -257,10 +257,10 @@ QP::QState Pelican::carsEnabled(Pelican * const me, QP::QEvt const * const e) {
 //${components::Pelican::SM::operational::carsEnabled::carsGreen} ............
 QP::QMState const Pelican::carsGreen_s = {
     &Pelican::carsEnabled_s, // superstate
-    Q_STATE_CAST(&Pelican::carsGreen),
-    Q_ACTION_CAST(&Pelican::carsGreen_e),
-    Q_ACTION_CAST(&Pelican::carsGreen_x),
-    Q_ACTION_CAST(&Pelican::carsGreen_i)
+    Q_STATE_CAST(&carsGreen),
+    Q_ACTION_CAST(&carsGreen_e),
+    Q_ACTION_CAST(&carsGreen_x),
+    Q_ACTION_CAST(&carsGreen_i)
 };
 // ${components::Pelican::SM::operational::carsEnabled::carsGreen}
 QP::QState Pelican::carsGreen_e(Pelican * const me) {
@@ -281,7 +281,7 @@ QP::QState Pelican::carsGreen_i(Pelican * const me) {
     } const tatbl_ = { // transition-action table
         &carsGreenNoPed_s,
         {
-            Q_ACTION_CAST(&Pelican::carsGreenNoPed_e), // entry
+            Q_ACTION_CAST(&carsGreenNoPed_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -303,8 +303,8 @@ QP::QState Pelican::carsGreen(Pelican * const me, QP::QEvt const * const e) {
 //${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenNoPed} 
 QP::QMState const Pelican::carsGreenNoPed_s = {
     &Pelican::carsGreen_s, // superstate
-    Q_STATE_CAST(&Pelican::carsGreenNoPed),
-    Q_ACTION_CAST(&Pelican::carsGreenNoPed_e),
+    Q_STATE_CAST(&carsGreenNoPed),
+    Q_ACTION_CAST(&carsGreenNoPed_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -326,7 +326,7 @@ QP::QState Pelican::carsGreenNoPed(Pelican * const me, QP::QEvt const * const e)
             } const tatbl_ = { // transition-action table
                 &carsGreenPedWait_s,
                 {
-                    Q_ACTION_CAST(&Pelican::carsGreenPedWait_e), // entry
+                    Q_ACTION_CAST(&carsGreenPedWait_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -341,7 +341,7 @@ QP::QState Pelican::carsGreenNoPed(Pelican * const me, QP::QEvt const * const e)
             } const tatbl_ = { // transition-action table
                 &carsGreenInt_s,
                 {
-                    Q_ACTION_CAST(&Pelican::carsGreenInt_e), // entry
+                    Q_ACTION_CAST(&carsGreenInt_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -358,8 +358,8 @@ QP::QState Pelican::carsGreenNoPed(Pelican * const me, QP::QEvt const * const e)
 //${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenInt} 
 QP::QMState const Pelican::carsGreenInt_s = {
     &Pelican::carsGreen_s, // superstate
-    Q_STATE_CAST(&Pelican::carsGreenInt),
-    Q_ACTION_CAST(&Pelican::carsGreenInt_e),
+    Q_STATE_CAST(&carsGreenInt),
+    Q_ACTION_CAST(&carsGreenInt_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -381,8 +381,8 @@ QP::QState Pelican::carsGreenInt(Pelican * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &carsYellow_s,
                 {
-                    Q_ACTION_CAST(&Pelican::carsGreen_x), // exit
-                    Q_ACTION_CAST(&Pelican::carsYellow_e), // entry
+                    Q_ACTION_CAST(&carsGreen_x), // exit
+                    Q_ACTION_CAST(&carsYellow_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -399,8 +399,8 @@ QP::QState Pelican::carsGreenInt(Pelican * const me, QP::QEvt const * const e) {
 //${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenPedWait} 
 QP::QMState const Pelican::carsGreenPedWait_s = {
     &Pelican::carsGreen_s, // superstate
-    Q_STATE_CAST(&Pelican::carsGreenPedWait),
-    Q_ACTION_CAST(&Pelican::carsGreenPedWait_e),
+    Q_STATE_CAST(&carsGreenPedWait),
+    Q_ACTION_CAST(&carsGreenPedWait_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -422,8 +422,8 @@ QP::QState Pelican::carsGreenPedWait(Pelican * const me, QP::QEvt const * const 
             } const tatbl_ = { // transition-action table
                 &carsYellow_s,
                 {
-                    Q_ACTION_CAST(&Pelican::carsGreen_x), // exit
-                    Q_ACTION_CAST(&Pelican::carsYellow_e), // entry
+                    Q_ACTION_CAST(&carsGreen_x), // exit
+                    Q_ACTION_CAST(&carsYellow_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -440,9 +440,9 @@ QP::QState Pelican::carsGreenPedWait(Pelican * const me, QP::QEvt const * const 
 //${components::Pelican::SM::operational::carsEnabled::carsYellow} ...........
 QP::QMState const Pelican::carsYellow_s = {
     &Pelican::carsEnabled_s, // superstate
-    Q_STATE_CAST(&Pelican::carsYellow),
-    Q_ACTION_CAST(&Pelican::carsYellow_e),
-    Q_ACTION_CAST(&Pelican::carsYellow_x),
+    Q_STATE_CAST(&carsYellow),
+    Q_ACTION_CAST(&carsYellow_e),
+    Q_ACTION_CAST(&carsYellow_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${components::Pelican::SM::operational::carsEnabled::carsYellow}
@@ -469,9 +469,9 @@ QP::QState Pelican::carsYellow(Pelican * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &pedsEnabled_s,
                 {
-                    Q_ACTION_CAST(&Pelican::carsYellow_x), // exit
-                    Q_ACTION_CAST(&Pelican::carsEnabled_x), // exit
-                    Q_ACTION_CAST(&Pelican::pedsEnabled_i), // initial tran.
+                    Q_ACTION_CAST(&carsYellow_x), // exit
+                    Q_ACTION_CAST(&carsEnabled_x), // exit
+                    Q_ACTION_CAST(&pedsEnabled_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -488,10 +488,10 @@ QP::QState Pelican::carsYellow(Pelican * const me, QP::QEvt const * const e) {
 //${components::Pelican::SM::operational::pedsEnabled} .......................
 QP::QMState const Pelican::pedsEnabled_s = {
     &Pelican::operational_s, // superstate
-    Q_STATE_CAST(&Pelican::pedsEnabled),
+    Q_STATE_CAST(&pedsEnabled),
     Q_ACTION_CAST(0), // no entry action
-    Q_ACTION_CAST(&Pelican::pedsEnabled_x),
-    Q_ACTION_CAST(&Pelican::pedsEnabled_i)
+    Q_ACTION_CAST(&pedsEnabled_x),
+    Q_ACTION_CAST(&pedsEnabled_i)
 };
 // ${components::Pelican::SM::operational::pedsEnabled}
 QP::QState Pelican::pedsEnabled_x(Pelican * const me) {
@@ -507,7 +507,7 @@ QP::QState Pelican::pedsEnabled_i(Pelican * const me) {
     } const tatbl_ = { // transition-action table
         &pedsWalk_s,
         {
-            Q_ACTION_CAST(&Pelican::pedsWalk_e), // entry
+            Q_ACTION_CAST(&pedsWalk_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -529,9 +529,9 @@ QP::QState Pelican::pedsEnabled(Pelican * const me, QP::QEvt const * const e) {
 //${components::Pelican::SM::operational::pedsEnabled::pedsWalk} .............
 QP::QMState const Pelican::pedsWalk_s = {
     &Pelican::pedsEnabled_s, // superstate
-    Q_STATE_CAST(&Pelican::pedsWalk),
-    Q_ACTION_CAST(&Pelican::pedsWalk_e),
-    Q_ACTION_CAST(&Pelican::pedsWalk_x),
+    Q_STATE_CAST(&pedsWalk),
+    Q_ACTION_CAST(&pedsWalk_e),
+    Q_ACTION_CAST(&pedsWalk_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${components::Pelican::SM::operational::pedsEnabled::pedsWalk}
@@ -558,8 +558,8 @@ QP::QState Pelican::pedsWalk(Pelican * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &pedsFlash_s,
                 {
-                    Q_ACTION_CAST(&Pelican::pedsWalk_x), // exit
-                    Q_ACTION_CAST(&Pelican::pedsFlash_e), // entry
+                    Q_ACTION_CAST(&pedsWalk_x), // exit
+                    Q_ACTION_CAST(&pedsFlash_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -576,9 +576,9 @@ QP::QState Pelican::pedsWalk(Pelican * const me, QP::QEvt const * const e) {
 //${components::Pelican::SM::operational::pedsEnabled::pedsFlash} ............
 QP::QMState const Pelican::pedsFlash_s = {
     &Pelican::pedsEnabled_s, // superstate
-    Q_STATE_CAST(&Pelican::pedsFlash),
-    Q_ACTION_CAST(&Pelican::pedsFlash_e),
-    Q_ACTION_CAST(&Pelican::pedsFlash_x),
+    Q_STATE_CAST(&pedsFlash),
+    Q_ACTION_CAST(&pedsFlash_e),
+    Q_ACTION_CAST(&pedsFlash_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash}
@@ -621,9 +621,9 @@ QP::QState Pelican::pedsFlash(Pelican * const me, QP::QEvt const * const e) {
                 } const tatbl_ = { // transition-action table
                     &carsEnabled_s,
                     {
-                        Q_ACTION_CAST(&Pelican::pedsFlash_x), // exit
-                        Q_ACTION_CAST(&Pelican::pedsEnabled_x), // exit
-                        Q_ACTION_CAST(&Pelican::carsEnabled_i), // initial tran.
+                        Q_ACTION_CAST(&pedsFlash_x), // exit
+                        Q_ACTION_CAST(&pedsEnabled_x), // exit
+                        Q_ACTION_CAST(&carsEnabled_i), // initial tran.
                         Q_ACTION_CAST(0)  // zero terminator
                     }
                 };
@@ -641,9 +641,9 @@ QP::QState Pelican::pedsFlash(Pelican * const me, QP::QEvt const * const e) {
 //${components::Pelican::SM::offline} ........................................
 QP::QMState const Pelican::offline_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Pelican::offline),
-    Q_ACTION_CAST(&Pelican::offline_e),
-    Q_ACTION_CAST(&Pelican::offline_x),
+    Q_STATE_CAST(&offline),
+    Q_ACTION_CAST(&offline_e),
+    Q_ACTION_CAST(&offline_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${components::Pelican::SM::offline}
@@ -687,9 +687,9 @@ QP::QState Pelican::offline(Pelican * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &operational_s,
                 {
-                    Q_ACTION_CAST(&Pelican::offline_x), // exit
-                    Q_ACTION_CAST(&Pelican::operational_e), // entry
-                    Q_ACTION_CAST(&Pelican::operational_i), // initial tran.
+                    Q_ACTION_CAST(&offline_x), // exit
+                    Q_ACTION_CAST(&operational_e), // entry
+                    Q_ACTION_CAST(&operational_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };

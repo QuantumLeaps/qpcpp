@@ -1,7 +1,7 @@
 //****************************************************************************
-// Product: QF/C++ generic port to uC/OS-II + DOS-specific port
+// Product: QF/C++ generic port to uC/OS-II
 // Last updated for version 5.3.1
-// Last updated on  2014-05-10
+// Last updated on  2014-05-29
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -41,21 +41,12 @@
     #include "qs_dummy.h" // disable the QS software tracing
 #endif // Q_SPY
 
-#include <dos.h> //!!! DOS-specific: _dos_setvect()/_dos_getvect()
-
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
-// Local objects -------------------------------------------------------------
-static void interrupt (*l_dosSpareISR)(void); //!!! DOS-specific
-
 //............................................................................
 int_t QF::run(void) { //!!! DOS-specific
-
-    // install uC/OS-II context switch vector
-    l_dosSpareISR = _dos_getvect(uCOS);
-    _dos_setvect(uCOS, (void interrupt (*)(void))&OSCtxSw);
 
     // NOTE the QF::onStartup() callback must be invoked from the task level
     OSStart(); // start uC/OS-II multitasking (does not return)
@@ -63,11 +54,7 @@ int_t QF::run(void) { //!!! DOS-specific
     return static_cast<int_t>(0); // return success (just in case)
 }
 //............................................................................
-void QF::stop(void) { //!!! DOS-specific
-    QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
-    _dos_setvect(uCOS, l_dosSpareISR); // restore the original DOS vector
-    QF_CRIT_EXIT_();
+void QF::stop(void) {
     onCleanup();  // cleanup callback
 }
 //............................................................................
@@ -109,7 +96,6 @@ void QActive::start(uint_fast8_t const prio,
     Q_ASSERT(err == OS_NO_ERR); // uC/OS-II task must be created correctly
 }
 
-// Generic port --------------------------------------------------------------
 //............................................................................
 void QF::init(void) {
     OSInit(); // initialize uC/OS-II

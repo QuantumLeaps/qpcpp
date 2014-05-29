@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QEP/C++ port to Qt
 // Last Updated for Version: QP 5.3.0/Qt 5.1.1
-// Last updated on  2014-04-21
+// Last updated on  2014-05-27
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -40,9 +40,10 @@
 // provide QEvt constructors
 #define Q_EVT_CTOR   1
 
+// provide QEvt virtual destructor
+#define Q_EVT_VIRTUAL 1
 
 #include <stdint.h> // Exact-width types. WG14/N843 C99, Section 7.18.1.1
-
 #include "qep.h"    // QEP platform-independent public interface
 
 #endif // qep_port_h

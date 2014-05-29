@@ -104,7 +104,7 @@ QP::QState Philo::initial(Philo * const me, QP::QEvt const * const e) {
     } const tatbl_ = { // transition-action table
         &thinking_s,
         {
-            Q_ACTION_CAST(&Philo::thinking_e), // entry
+            Q_ACTION_CAST(&thinking_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -139,9 +139,9 @@ QP::QState Philo::initial(Philo * const me, QP::QEvt const * const e) {
 //${AOs::Philo::SM::thinking} ................................................
 QP::QMState const Philo::thinking_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Philo::thinking),
-    Q_ACTION_CAST(&Philo::thinking_e),
-    Q_ACTION_CAST(&Philo::thinking_x),
+    Q_STATE_CAST(&thinking),
+    Q_ACTION_CAST(&thinking_e),
+    Q_ACTION_CAST(&thinking_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${AOs::Philo::SM::thinking}
@@ -166,8 +166,8 @@ QP::QState Philo::thinking(Philo * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &hungry_s,
                 {
-                    Q_ACTION_CAST(&Philo::thinking_x), // exit
-                    Q_ACTION_CAST(&Philo::hungry_e), // entry
+                    Q_ACTION_CAST(&thinking_x), // exit
+                    Q_ACTION_CAST(&hungry_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -192,8 +192,8 @@ QP::QState Philo::thinking(Philo * const me, QP::QEvt const * const e) {
 //${AOs::Philo::SM::hungry} ..................................................
 QP::QMState const Philo::hungry_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Philo::hungry),
-    Q_ACTION_CAST(&Philo::hungry_e),
+    Q_STATE_CAST(&hungry),
+    Q_ACTION_CAST(&hungry_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -216,7 +216,7 @@ QP::QState Philo::hungry(Philo * const me, QP::QEvt const * const e) {
                 } const tatbl_ = { // transition-action table
                     &eating_s,
                     {
-                        Q_ACTION_CAST(&Philo::eating_e), // entry
+                        Q_ACTION_CAST(&eating_e), // entry
                         Q_ACTION_CAST(0)  // zero terminator
                     }
                 };
@@ -244,9 +244,9 @@ QP::QState Philo::hungry(Philo * const me, QP::QEvt const * const e) {
 //${AOs::Philo::SM::eating} ..................................................
 QP::QMState const Philo::eating_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Philo::eating),
-    Q_ACTION_CAST(&Philo::eating_e),
-    Q_ACTION_CAST(&Philo::eating_x),
+    Q_STATE_CAST(&eating),
+    Q_ACTION_CAST(&eating_e),
+    Q_ACTION_CAST(&eating_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${AOs::Philo::SM::eating}
@@ -272,8 +272,8 @@ QP::QState Philo::eating(Philo * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &thinking_s,
                 {
-                    Q_ACTION_CAST(&Philo::eating_x), // exit
-                    Q_ACTION_CAST(&Philo::thinking_e), // entry
+                    Q_ACTION_CAST(&eating_x), // exit
+                    Q_ACTION_CAST(&thinking_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };

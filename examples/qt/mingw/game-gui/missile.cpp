@@ -91,7 +91,7 @@ QP::QState Missile::initial(Missile * const me, QP::QEvt const * const e) {
 //${AOs::Missile::SM::armed} .................................................
 QP::QMState const Missile::armed_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Missile::armed),
+    Q_STATE_CAST(&armed),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
@@ -123,7 +123,7 @@ QP::QState Missile::armed(Missile * const me, QP::QEvt const * const e) {
 //${AOs::Missile::SM::flying} ................................................
 QP::QMState const Missile::flying_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Missile::flying),
+    Q_STATE_CAST(&flying),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
@@ -163,7 +163,7 @@ QP::QState Missile::flying(Missile * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &exploding_s,
                 {
-                    Q_ACTION_CAST(&Missile::exploding_e), // entry
+                    Q_ACTION_CAST(&exploding_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -192,8 +192,8 @@ QP::QState Missile::flying(Missile * const me, QP::QEvt const * const e) {
 //${AOs::Missile::SM::exploding} .............................................
 QP::QMState const Missile::exploding_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Missile::exploding),
-    Q_ACTION_CAST(&Missile::exploding_e),
+    Q_STATE_CAST(&exploding),
+    Q_ACTION_CAST(&exploding_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };

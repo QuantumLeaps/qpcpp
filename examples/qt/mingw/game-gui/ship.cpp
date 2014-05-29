@@ -83,7 +83,7 @@ QP::QState Ship::initial(Ship * const me, QP::QEvt const * const e) {
     } const tatbl_ = { // transition-action table
         &active_s,
         {
-            Q_ACTION_CAST(&Ship::active_i), // initial tran.
+            Q_ACTION_CAST(&active_i), // initial tran.
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -109,10 +109,10 @@ QP::QState Ship::initial(Ship * const me, QP::QEvt const * const e) {
 //${AOs::Ship::SM::active} ...................................................
 QP::QMState const Ship::active_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Ship::active),
+    Q_STATE_CAST(&active),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
-    Q_ACTION_CAST(&Ship::active_i)
+    Q_ACTION_CAST(&active_i)
 };
 // ${AOs::Ship::SM::active::initial}
 QP::QState Ship::active_i(Ship * const me) {
@@ -146,7 +146,7 @@ QP::QState Ship::active(Ship * const me, QP::QEvt const * const e) {
 //${AOs::Ship::SM::active::parked} ...........................................
 QP::QMState const Ship::parked_s = {
     &Ship::active_s, // superstate
-    Q_STATE_CAST(&Ship::parked),
+    Q_STATE_CAST(&parked),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
@@ -163,7 +163,7 @@ QP::QState Ship::parked(Ship * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &flying_s,
                 {
-                    Q_ACTION_CAST(&Ship::flying_e), // entry
+                    Q_ACTION_CAST(&flying_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -180,8 +180,8 @@ QP::QState Ship::parked(Ship * const me, QP::QEvt const * const e) {
 //${AOs::Ship::SM::active::flying} ...........................................
 QP::QMState const Ship::flying_s = {
     &Ship::active_s, // superstate
-    Q_STATE_CAST(&Ship::flying),
-    Q_ACTION_CAST(&Ship::flying_e),
+    Q_STATE_CAST(&flying),
+    Q_ACTION_CAST(&flying_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -232,7 +232,7 @@ QP::QState Ship::flying(Ship * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &exploding_s,
                 {
-                    Q_ACTION_CAST(&Ship::exploding_e), // entry
+                    Q_ACTION_CAST(&exploding_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -247,7 +247,7 @@ QP::QState Ship::flying(Ship * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &exploding_s,
                 {
-                    Q_ACTION_CAST(&Ship::exploding_e), // entry
+                    Q_ACTION_CAST(&exploding_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -264,8 +264,8 @@ QP::QState Ship::flying(Ship * const me, QP::QEvt const * const e) {
 //${AOs::Ship::SM::active::exploding} ........................................
 QP::QMState const Ship::exploding_s = {
     &Ship::active_s, // superstate
-    Q_STATE_CAST(&Ship::exploding),
-    Q_ACTION_CAST(&Ship::exploding_e),
+    Q_STATE_CAST(&exploding),
+    Q_ACTION_CAST(&exploding_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
