@@ -4,8 +4,8 @@
 /// \cond
 ///***************************************************************************
 /// Product: QEP/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-04-12
+/// Last updated for version 5.3.1
+/// Last updated on  2014-09-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -47,13 +47,13 @@
 /// major version number, Y is a 1-digit minor version number, and Z is
 /// a 1-digit release number.
 ///
-#define QP_VERSION      530
+#define QP_VERSION      531
 
 //! The current QP version string
-#define QP_VERSION_STR  "5.3.0"
+#define QP_VERSION_STR  "5.3.1"
 
-//! Tamperproof current QP release (5.3.0) and date (14-04-14)
-#define QP_RELEASE      0xAC4E840DU
+//! Tamperproof current QP release (5.3.1) and date (14-09-18)
+#define QP_RELEASE      0xAC019C8CU
 
 #ifndef Q_ROM
     //! Macro to specify compiler-specific directive for placing a
@@ -462,7 +462,7 @@ private:
     //! the top state object for the QMsm
     static QMState const msm_top_s;
 
-friend class QFsm;
+    friend class QFsm;
     friend class QHsm;
     friend class QMActive;
 };

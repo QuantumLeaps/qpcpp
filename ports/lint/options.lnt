@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last Updated for Version: 5.3.0
-// Date of the Last Update:  Mar 05, 2014
+// Last Updated for Version: 5.3.1
+// Date of the Last Update:  2014-09-05
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -53,6 +53,8 @@ au-ds.lnt         // Dan Saks recommendations
 lib-qpcpp.lnt     // QP/C++ options
 -strong(AXJ)      // Strong type checking
 
+
+-esym(750, QP_IMPL)         // local macro 'QP_IMPL' not referenced
 
 // QEP
 -esym(1960,                 // 16-0-4 function-like macro

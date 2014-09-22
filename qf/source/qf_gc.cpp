@@ -4,8 +4,8 @@
 /// \cond
 ///***************************************************************************
 /// Product: QF/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-04-09
+/// Last updated for version 5.3.1
+/// Last updated on  2014-09-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -72,7 +72,7 @@ Q_DEFINE_THIS_MODULE("qf_gc")
 /// The QP::QF::gc() function is exposed only for special cases when your
 /// application sends dynamic events to the "raw" thread-safe queues
 /// (see QP::QEQueue). Such queues are processed outside of QF and the
-/// automatic garbage collection is __cannot__ be performed for these events.
+/// automatic garbage collection is **NOT** performed for these events.
 /// In this case you need to call QP::QF::gc() explicitly.
 ///
 void QF::gc(QEvt const * const e) {

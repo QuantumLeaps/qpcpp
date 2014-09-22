@@ -7,7 +7,7 @@
 \anchor main_page
 \mainpage About QP/C++
 
-\image html qp_banner.jpg
+\tableofcontents
 
 <a href="http://www.state-machine.com/qm/"><strong>QP&trade; (Quantum Platform)</strong></a> is a family of lightweight, open source software frameworks for building responsive and modular real-time embedded applications as systems of cooperating, event-driven <a href="http://www.state-machine.com/qp/index.php#Active">active objects</a> (<a href="http://en.wikipedia.org/wiki/Actor_model">actors</a>). The QP&trade; family consists of QP/C, QP/C++, and QP-nano frameworks, which are all strictly quality controlled, superbly documented, and commercially licensable.
 
@@ -26,9 +26,9 @@ QP is available for download from <a href="http://sourceforge.net/projects/qpc">
 For more information about QP, please visit:
 <a href="http://www.state-machine.com/qp"><strong>state-machine.com/qp</strong></a>
 
-<HR>
-QP/C++ Licensing
-==============
+--------
+\section licensing QP/C++ Licensing
+
 
 QP/C++ is licensed under the increasingly popular dual licensing model, in which both the open source software distribution mechanism and traditional closed source software distribution models are combined.
 
@@ -42,25 +42,21 @@ Closed Source Projects:
 -----------------------
 If you are developing and distributing traditional closed source applications, you can purchase one of Quantum Leaps commercial licenses, which are specifically designed for users interested in retaining the proprietary status of their code. All Quantum Leaps commercial licenses expressly supersede the GPL open source license. This means that when you license Quantum Leaps software under a commercial license, you specifically do not use the software under the open source license and therefore you are not subject to any of its terms. 
 
-<HR>
-Contact Information
-===================
+--------
+\section contact Contact Information
+
 - Quantum Leaps Web site:   http://www.state-machine.com
 - Quantum Leaps licensing:  http://www.state-machine.com/licensing
 - QP/QM on SourceForge.net: http://sourceforge.net/projects/qpc
 - e-mail: info@state-machine.com
 
-\image html logo_ql_TM.jpg
-Copyright &copy; 2002-2013 Quantum Leaps, LLC. All Rights Reserved.\n
-http://www.state-machine.com
-
-<HR>
+--------
 \section files Directories and Files
 
 The following annotated directory tree lists the most important directories
 and files provided in the standard QP/C++ distribution.
 
-\code
+\verbatim
 qpcpp\               - QP/C++ root directory
   |
   +-qpcpp.chm        - "QP/C++ Reference Manual" in CHM Help format
@@ -73,7 +69,7 @@ qpcpp\               - QP/C++ root directory
   +-examples\        - QP examples
   | | +-posix\       - Examples for POSIX (Linux, BSD, etc.)
   | | | +-gnu\       - Examples with the GNU compiler
-  | | | | +-dpp\     - Dining Philosopher Problem (DPP) example for Linux
+  | | | | +-dpp\     - Dining Philosopher Problem (DPP) example
   | | | | | +-dbg\   - Debug build
   | | | | | +-rel\     - Release build
   | | | | | +-spy\     - Spy build (with software instrumentation)
@@ -83,7 +79,7 @@ qpcpp\               - QP/C++ root directory
   | | |
   | | +-win32\       - Examples for Win32 (Windows)
   | | | +-mingw\     - Examples for the MinGW (GNU) compiler
-  | | | | +-dpp\     - Dining Philosopher Problem (DPP) example for Linux
+  | | | | +-dpp\     - Dining Philosopher Problem (DPP) example
   | | | | | +-dbg\   - Debug build
   | | | | | | +-dpp.exe - DPP executable (Debug configuration)
   | | | | | +-rel\      - Release build
@@ -117,29 +113,29 @@ qpcpp\               - QP/C++ root directory
   | +-arm-cm\        - Examples for ARM Cortex-M processor
   | | +-vanilla\     - Examples for the cooperative "vanilla" kernel
   | | | +-arm_keil\  - Examples with the ARM/Keil compiler (Keil MDK)
-  | | | | +-blinky_ek-tm4c123gxl\ - Blinky example for for EK-TM4C123GXL board
+  | | | | +-blinky_ek-tm4c123gxl\ - Blinky example for for EK-TM4C123GXL
   | | | | +-dpp_qk-lm3s811\  - DPP example for for EK-LM3S811 board
-  | | | | +-game_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811 board
+  | | | | +-game_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811
   | | | | +-. . .    - Other examples for ARM Cortex
   | | | +-gnu\       - Examples with the GNU compiler (Code Sourcery G++)
-  | | | | +-blinky_ek-tm4c123gxl\ - Blinky example for for EK-TM4C123GXL board
-  | | | | +-dpp_qk-lm3s811\  - DPP example for for EK-LM3S811 board
-  | | | | +-game_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811 board
+  | | | | +-blinky_ek-tm4c123gxl\ - Blinky example for for EK-TM4C123GXL
+  | | | | +-dpp_qk-lm3s811\  - DPP example for for EK-LM3S811
+  | | | | +-game_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811
   | | | | +-. . .    - Other examples for ARM Cortex
   | | | +-iar\       - Examples with the IAR compiler
-  | | | | +-blinky_ek-tm4c123gxl\ - Blinky example for for EK-TM4C123GXL board
-  | | | | +-dpp_qk-lm3s811\  - DPP example for for EK-LM3S811 board
-  | | | | +-game_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811 board
+  | | | | +-blinky_ek-tm4c123gxl\ - Blinky example for for EK-TM4C123GXL
+  | | | | +-dpp_qk-lm3s811\  - DPP example for for EK-LM3S811
+  | | | | +-game_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811
   | | | | +-. . .    - Other examples for ARM Cortex
   | | |
   | | +-qk\          - Examples for the preemptive QK kernel
   | | | +-iar\       - Examples with the IAR compiler
-  | | | | +-dpp-qk_qk-lm3s811\  - DPP example for for EK-LM3S811 board
-  | | | | +-game-qk_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811 board
+  | | | | +-dpp-qk_qk-lm3s811\  - DPP example for for EK-LM3S811
+  | | | | +-game-qk_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811
   | | | | +-. . .    - Other examples for ARM Cortex
-  | | | +-gnu\       - Examples with the GNU compiler (Code Sourcery G++)
-  | | | | +-dpp-qk_qk-lm3s811\  - DPP example for for EK-LM3S811 board
-  | | | | +-game-qk_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811 board
+  | | | +-gnu\       - Examples with the GNU (Sourcery CodeBench)
+  | | | | +-dpp-qk_qk-lm3s811\  - DPP example for for EK-LM3S811
+  | | | | +-game-qk_qk-lm3s811\ - "Fly 'n' Shoot" example for EK-LM3S811
   | | | | +-. . .    - Other examples for ARM Cortex-M
   | |
   | +-. . .          - Examples for other CPUs and compiler
@@ -159,14 +155,14 @@ qpcpp\               - QP/C++ root directory
   | +- qp_port.h     - QP port include file
   |
   +-ports\           - Platform-specific QP ports
-  | +-posix\         - Ports to the POSIX operating systems (Linux, BSD, etc.)
+  | +-posix\         - Ports to the POSIX (Linux, BSD, etc.)
   | | +-gnu\         - Ports with the GNU compiler
   | | | +-Makefile   - make file to build the QP libraries
   | | | +-. . .
   | |
-  | +-win32\         - Ports to the POSIX operating systems (Linux, BSD, etc.)
+  | +-win32\         - Ports to the POSIX (Linux, BSD, etc.)
   | | +-mingw\       - Port with the MinGW (GNU) compiler
-  | | | +-qp.sln     - Visual Studio solution to build the QP libraries
+  | | | +-qp.sln     - Visual Studio solution to build QP libraries
   | | | +-. . .
   | | |
   | | +-vc\          - Port with the Visual C++ compiler
@@ -178,17 +174,17 @@ qpcpp\               - QP/C++ root directory
   | | | | | +-dbg\   - Debug build
   | | | | | +-rel\   - Release build
   | | | | | +-spy\   - Spy build (with software instrumentation)
-  | | | | | +-make_Cortex-M3.bat - batch script for building QP libraries for M3
+  | | | | | +-make_Cortex-M3.bat - batch script for QP libraries for M3
   | | | | | +-qep_port.h - QEP platform-dependent include file
   | | | | | +-qf_port.h  - QF  platform-dependent include file
   | | | | | +-qs_port.h  - QS  platform-dependent include file
   | | | | | +-qp_port.h  - QP  platform-dependent include file
   | | | . . .
-  | | | +-gnu\       - Ports with the GNU compiler (Code Sourcery G++)
+  | | | +-gnu\       - Ports with the GNU compiler (Sourcery CodeBench)
   | | | | | +-dbg\   - Debug build
   | | | | | +-rel\   - Release build
   | | | | | +-spy\   - Spy build (with software instrumentation)
-  | | | | | +-make_cortex-m3_cs.bat - batch script for building QP libraries for M3
+  | | | | | +-make_cortex-m3_cs.bat - batch script for QP libraries for M3
   | | | | | +-qep_port.h - QEP platform-dependent include file
   | | | | | +-qf_port.h  - QF  platform-dependent include file
   | | | | | +-qs_port.h  - QS  platform-dependent include file
@@ -198,7 +194,7 @@ qpcpp\               - QP/C++ root directory
   | | | | | +-dbg\   - Debug build
   | | | | | +-rel\   - Release build
   | | | | | +-spy\   - Spy build (with software instrumentation)
-  | | | | | +-make_cortex-m3.bat - batch script for building QP libraries for M3
+  | | | | | +-make_cortex-m3.bat - batch script for QP libraries for M3
   | | | | | +-qep_port.h - QEP platform-dependent include file
   | | | | | +-qf_port.h  - QF  platform-dependent include file
   | | | | | +-qs_port.h  - QS  platform-dependent include file
@@ -206,35 +202,36 @@ qpcpp\               - QP/C++ root directory
   | | | . . .
   | | +-qk\          - Ports to the preemptive QK kernel
   | |   +-iar\       - Ports with the IAR compiler
-  | |   +-gnu\       - Ports with the GNU compiler (Code Sourcery G++)
+  | |   +-gnu\       - Ports with the GNU (Sourcery CodeBench)
   | |                - Ports to other CPUs
   | +-lint\          - Ports for "linting" QP/C++
-  | | +- qep_port.h  - example qep_port.h header file for portintg the QEP component
-  | | +- qf_port.h   - example qf_port.h header file for portintg the QF component
-  | | +- qk_port.h   - example qk_port.h header file for portintg the QK component
-  | | +- qs_port.h   - example qs_port.h header file for portintg the QS component
+  | | +- qep_port.h  - example qep_port.h header file for portintg QEP
+  | | +- qf_port.h   - example qf_port.h header file for portintg QF
+  | | +- qk_port.h   - example qk_port.h header file for portintg QK
+  | | +- qs_port.h   - example qs_port.h header file for portintg QS
   |
   +-qep\             - QEP hierarchical event processor
   | +-source\        - QEP platform-independent source code (*.cpp files)
   | | +- . . .
   |
   +-qf\              - QF real-time framework
-  | +-source\        - QF platform-independent source code (*.cpp files)
+  | +-source\        - QF platform-independent source code
   | | +- . . .
   |
   +-qk\              - QK preemptive kernel
-  | +-source\        - QK platform-independent source code (*.cpp files)
+  | +-source\        - QK platform-independent source code
   | | +- . . .
   |
   +-qs\              - QS software tracing (target component)
-  | +-source\        - QS platform-independent source code (*.cpp files)
+  | +-source\        - QS platform-independent source code
   | | +- . . .
-\endcode
+\endverbatim
 
 
-<HR>
+--------
 \image html logo_ql_TM.jpg
-Copyright &copy; 2002-2013 Quantum Leaps, LLC. All Rights Reserved.\n
+Copyright &copy; 2002-2014 Quantum Leaps, LLC. All Rights Reserved.\n
 http://www.state-machine.com
+
 */
 

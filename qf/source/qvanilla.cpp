@@ -5,8 +5,8 @@
 /// \cond
 ///***************************************************************************
 /// Product: QF/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-04-10
+/// Last updated for version 5.3.1
+/// Last updated on  2014-09-05
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -77,7 +77,9 @@ extern "C" {
 /// the uninitialized data (as is required by the C Standard).
 ///
 void QF::init(void) {
-    QF_maxPool_ = uf8_0;
+    extern uint_fast8_t QF_maxPool_;
+
+    QF_maxPool_ = static_cast<uint_fast8_t>(0);
     bzero(&QF_readySet_, static_cast<uint_fast16_t>(sizeof(QF_readySet_)));
     bzero(&QF::timeEvtHead_[0],
           static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
@@ -186,9 +188,9 @@ void QActive::start(uint_fast8_t const prio,
     /// \pre the priority must be in range and the stack storage must not
     /// be provided, because "Vanilla" kernel does not need per-AO stacks.
     ///
-    Q_REQUIRE_ID(400, (uf8_0 < prio)
+    Q_REQUIRE_ID(400, (static_cast<uint_fast8_t>(0) < prio)
               && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
-              && (stkSto == null_void));
+              && (stkSto == static_cast<void *>(0)));
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
     m_prio = prio;  // set the QF priority of this AO

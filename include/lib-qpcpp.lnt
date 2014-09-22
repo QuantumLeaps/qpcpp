@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.3.0
-// Last updated on  2014-04-12
+// Last updated for version 5.3.1
+// Last updated on  2014-09-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -157,6 +157,9 @@
 -esym(1927,                   // 8-5-1 Symbol not in the ctor initializer list
  QP::QActive::m_prio,
  QP::QActive::m_eQueue,
+ QP::QActive::m_osObject,
+ QP::QActive::m_thread)
+-esym(1536,                   // 9-3-1, 9-3-2 Exposing low access member
  QP::QActive::m_osObject,
  QP::QActive::m_thread)
 -estring(1923,                // 16-2-2 could become const variable

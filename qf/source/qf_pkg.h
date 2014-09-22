@@ -4,8 +4,8 @@
 /// \cond
 ///***************************************************************************
 /// Product: QF/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-04-03
+/// Last updated for version 5.3.1
+/// Last updated on  2014-09-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -42,8 +42,6 @@
 
 //! helper macro to cast const away from an event pointer \a e_
 #define QF_EVT_CONST_CAST_(e_) const_cast<QEvt *>(e_)
-
-namespace QP {
 
 // QF-specific critical section...
 #ifndef QF_CRIT_STAT_TYPE
@@ -84,6 +82,9 @@ namespace QP {
     #define QF_CRIT_ENTRY_()    QF_CRIT_ENTRY(critStat_)
     #define QF_CRIT_EXIT_()     QF_CRIT_EXIT(critStat_)
 #endif  // QF_CRIT_STAT_TYPE
+
+
+namespace QP {
 
 // package-scope objects -----------------------------------------------------
 extern QF_EPOOL_TYPE_ QF_pool_[QF_MAX_EPOOL]; //!< allocate event pools
@@ -157,7 +158,7 @@ QActive    * const null_act  = static_cast<QActive *>(0);
     #if (QF_EQUEUE_CTR_SIZE == 1)
 
         //! Internal QS macro to output an unformatted event queue
-        /// counter data element
+        //! counter data element
         /// \note the counter size depends on the macro #QF_EQUEUE_CTR_SIZE.
         #define QS_EQC_(ctr_)       QS::u8_(static_cast<uint8_t>(ctr_))
     #elif (QF_EQUEUE_CTR_SIZE == 2)
@@ -172,7 +173,7 @@ QActive    * const null_act  = static_cast<QActive *>(0);
     #if (QF_EVENT_SIZ_SIZE == 1)
 
         //! Internal QS macro to output an unformatted event size
-        /// data element
+        //! data element
         /// \note the event size depends on the macro #QF_EVENT_SIZ_SIZE.
         #define QS_EVS_(size_)      QS::u8_(static_cast<uint8_t>(size_))
     #elif (QF_EVENT_SIZ_SIZE == 2)

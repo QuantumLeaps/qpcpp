@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QK/C++ port to Lint, Generic C++ compiler
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 25, 2013
+// Last updated for version 5.3.1
+// Last updated on  2014-09-08
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,9 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #ifndef qk_port_h
 #define qk_port_h
@@ -54,7 +53,7 @@
 /// is only used in the extended QK scheduler QK_scheduleExt_(). If you define
 /// #QK_EXT_SAVE, you also need to provide #QK_EXT_RESTORE.
 #define QK_EXT_SAVE(act_)   \
-    FPU_save(static_cast<void *>((act_)->m_thread))
+    FPU_save(static_cast<void *>((act_)->getThread()))
 
 /// \brief Define the method for restoring the extended context (e.g.,
 /// the context of a floating-point co-processor).
@@ -64,7 +63,7 @@
 /// is only used in the extended QK scheduler QK_scheduleExt_(). If you define
 /// #QK_EXT_RESTORE, you also need to provide #QK_EXT_SAVE.
 #define QK_EXT_RESTORE(act_) \
-    FPU_restore(static_cast<void *>((act_)->m_thread))
+    FPU_restore(static_cast<void *>((act_)->getThread()))
 
 //****************************************************************************
 // QK interrupt entry and exit
@@ -106,22 +105,22 @@
 ///
 /// \note This is just an example of #QK_TLS macro. You need to define
 /// the macro appropriately for the runtime library you're using. This macro
-/// is optional and you don't need to define it. The macro is used in both the
-/// regular QK scheduler QK_sched_() and the extended QK scheduler
+/// is optional and you don't need to define it. The macro is used in both
+/// the regular QK scheduler QK_sched_() and the extended QK scheduler
 /// QK_schedExt_().
 #define QK_TLS(act_)        \
-    (impure_ptr = static_cast<void *>((act_)->m_thread))
+    (impure_ptr = static_cast<void *>((act_)->getThread()))
 
 extern "C" {
 
-void FPU_save(void *ctx);             // defined in assembly
-void FPU_restore(void *ctx);          // defined in assembly
+void FPU_save(void *ctx);     // defined in assembly
+void FPU_restore(void *ctx);  // defined in assembly
 extern void *impure_ptr;
 
-}                                                                // extern "C"
+} // extern "C"
 
 /*lint -restore */
 
-#include "qk.h"                    // QK platform-independent public interface
+#include "qk.h" // QK platform-independent public interface
 
-#endif                                                            // qk_port_h
+#endif // qk_port_h

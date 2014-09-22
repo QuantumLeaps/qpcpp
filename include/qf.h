@@ -4,8 +4,8 @@
 /// \cond
 ///***************************************************************************
 /// Product: QF/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-04-03
+/// Last updated for version 5.3.1
+/// Last updated on  2014-09-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -226,17 +226,24 @@ protected:
         m_prio = prio;
     }
 
-private:
+public:
+#ifdef QF_OS_OBJECT_TYPE
+    //! accessor to the OS-object for extern "C" functions, such as
+    //! the QK scheduler
+    QF_OS_OBJECT_TYPE &getOsObject(void) { return m_osObject; }
+#endif
+
+#ifdef QF_THREAD_TYPE
+    //! accessor to the Thread for extern "C" functions, such as
+    //! the QK scheduler
+    QF_THREAD_TYPE &getThread(void) { return m_thread; }
+#endif
+
     //! Get an event from the event queue of an active object.
     QEvt const *get_(void);
 
     friend class QF;
     friend class QTimeEvt;
-
-#ifdef qk_h // is this QK port?
-    friend void ::QK_schedExt_(uint_fast8_t p);
-    friend void ::QK_sched_(uint_fast8_t p);
-#endif
 };
 
 //****************************************************************************

@@ -4,8 +4,8 @@
 /// \cond
 ///***************************************************************************
 /// Product: QEP/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-04-10
+/// Last updated for version 5.3.1
+/// Last updated on  2014-09-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -40,11 +40,6 @@
 #define QP_IMPL           // this is QP implementation
 #include "qep_port.h"     // QEP port
 #include "qep_pkg.h"      // QEP internal interface
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
-#else
-    #include "qs_dummy.h" // disable the QS software tracing
-#endif // Q_SPY
 
 namespace QP {
 
@@ -52,7 +47,7 @@ namespace QP {
 /// \description
 /// Tests if a state machine derived from QMsm is-in a given state.
 ///
-/// \note For a MSM, to "be-in" a state means also to "be-in" a substate of
+/// \note For a MSM, to "be-in" a state means also to "be-in" a superstate of
 /// of the state.
 ///
 /// \arguments
@@ -61,13 +56,14 @@ namespace QP {
 ///
 /// \returns 'true' if the MSM is in the \c state and 'false' otherwise
 ///
-bool QMsm::isInState(QMState const *state) const {
+bool QMsm::isInState(QMState const * const state) const {
     bool inState = false; // assume that this MSM is not in 'state'
 
-    for (; state != static_cast<QMState const *>(0);
-         state = state->superstate)
+    for (QMState const *s = m_state.obj;
+         s != static_cast<QMState const *>(0);
+         s = s->superstate)
     {
-        if (state == m_state.obj) {
+        if (s == state) {
             inState = true; // match found, return 'true'
             break;
         }

@@ -4,8 +4,8 @@
 /// \cond
 ///***************************************************************************
 /// Product: QEP/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-04-09
+/// Last updated for version 5.3.1
+/// Last updated on  2014-09-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -40,11 +40,6 @@
 #define QP_IMPL           // this is QP implementation
 #include "qep_port.h"     // QEP port
 #include "qep_pkg.h"      // QEP internal interface
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
-#else
-    #include "qs_dummy.h" // disable the QS software tracing
-#endif // Q_SPY
 #include "qassert.h"
 
 namespace QP {
@@ -55,7 +50,7 @@ Q_DEFINE_THIS_MODULE("qhsm_in")
 /// \description
 /// Tests if a state machine derived from QHsm is-in a given state.
 ///
-/// \note For a HSM, to "be in a state" means also to be in a substate of
+/// \note For a HSM, to "be in a state" means also to be in a superstate of
 /// of the state.
 ///
 /// \arguments
