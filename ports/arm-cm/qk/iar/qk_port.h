@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QK/C++, Cortex-M, QK port, Generic C++ compiler
-// Last Updated for Version: 5.2.0
-// Date of the Last Update:  Dec 08, 2013
+// Last Updated for Version: 5.3.1
+// Date of the Last Update:  2014-09-24
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,13 +28,13 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   http://www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #ifndef qk_port_h
 #define qk_port_h
-                                                // QK interrupt entry and exit
+
+// QK interrupt entry and exit
 #define QK_ISR_ENTRY() do { \
     QF_INT_DISABLE(); \
     ++QK_intNest_; \
@@ -46,12 +46,10 @@
     QF_INT_DISABLE(); \
     QF_QS_ISR_EXIT(QK_intNest_, QK_currPrio_); \
     --QK_intNest_; \
-    if (QK_schedPrio_() != (uint8_t)0) { \
-        *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (uint32_t)0x10000000U; \
-    } \
+    *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (uint32_t)0x10000000U; \
     QF_INT_ENABLE(); \
 } while (0)
 
-#include "qk.h"                    // QK platform-independent public interface
+#include "qk.h" // QK platform-independent public interface
 
-#endif                                                            // qk_port_h
+#endif  // qk_port_h

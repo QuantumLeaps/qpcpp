@@ -1,13 +1,13 @@
 //****************************************************************************
-// Product: QK/C++, Cortex-M, QK port, Generic C++ compiler
+// Product: DPP example, QP-FreeRTOS port
 // Last Updated for Version: 5.3.1
-// Date of the Last Update:  2014-09-24
+// Date of the Last Update:  2014-09-29
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,25 +31,21 @@
 // Web:   http://www.state-machine.com
 // Email: info@state-machine.com
 //****************************************************************************
-#ifndef qk_port_h
-#define qk_port_h
+#ifndef bsp_h
+#define bsp_h
 
-// QK interrupt entry and exit
-#define QK_ISR_ENTRY() do { \
-    QF_INT_DISABLE(); \
-    ++QK_intNest_; \
-    QF_QS_ISR_ENTRY(QK_intNest_, QK_currPrio_); \
-    QF_INT_ENABLE(); \
-} while (0)
+namespace DPP {
 
-#define QK_ISR_EXIT()  do { \
-    QF_INT_DISABLE(); \
-    QF_QS_ISR_EXIT(QK_intNest_, QK_currPrio_); \
-    --QK_intNest_; \
-    *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (uint32_t)0x10000000U; \
-    QF_INT_ENABLE(); \
-} while (0)
+uint32_t const BSP_TICKS_PER_SEC = static_cast<uint32_t>(configTICK_RATE_HZ);
 
-#include "qk.h" // QK platform-independent public interface
+void BSP_init(void);
+void BSP_displayPaused(uint8_t const paused);
+void BSP_displayPhilStat(uint8_t const n, char_t const *stat);
+void BSP_terminate(int16_t const result);
 
-#endif  // qk_port_h
+void BSP_randomSeed(uint32_t const seed); // random seed
+uint32_t BSP_random(void);                // pseudo-random generator
+
+} // namespace DPP
+
+#endif // bsp_h

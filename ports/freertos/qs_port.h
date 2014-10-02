@@ -1,13 +1,13 @@
 //****************************************************************************
-// Product: QK/C++, Cortex-M, QK port, Generic C++ compiler
-// Last Updated for Version: 5.3.1
-// Date of the Last Update:  2014-09-24
+// Product: QS/C++ port to embOS for 32-bit targets
+// Last updated for version 5.3.0
+// Last updated on  2014-06-27
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, www.state-machine.com.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,28 +28,24 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   http://www.state-machine.com
+// Web:   www.state-machine.com
 // Email: info@state-machine.com
 //****************************************************************************
-#ifndef qk_port_h
-#define qk_port_h
+#ifndef qs_port_h
+#define qs_port_h
 
-// QK interrupt entry and exit
-#define QK_ISR_ENTRY() do { \
-    QF_INT_DISABLE(); \
-    ++QK_intNest_; \
-    QF_QS_ISR_ENTRY(QK_intNest_, QK_currPrio_); \
-    QF_INT_ENABLE(); \
-} while (0)
+#define QS_TIME_SIZE            4
+#define QS_OBJ_PTR_SIZE         4
+#define QS_FUN_PTR_SIZE         4
 
-#define QK_ISR_EXIT()  do { \
-    QF_INT_DISABLE(); \
-    QF_QS_ISR_EXIT(QK_intNest_, QK_currPrio_); \
-    --QK_intNest_; \
-    *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (uint32_t)0x10000000U; \
-    QF_INT_ENABLE(); \
-} while (0)
+//****************************************************************************
+// NOTE: QS might be used with or without other QP components, in which case
+// the separate definitions of the macros Q_ROM, Q_ROM_VAR,
+// QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY, and QF_CRIT_EXIT are needed. In this
+// port QS is configured to be used with the QF framework component, by
+// simply including "qf_port.h" *before* "qs.h".
+//
+#include "qf_port.h" // use QS with QF
+#include "qs.h"      // QS platform-independent public interface
 
-#include "qk.h" // QK platform-independent public interface
-
-#endif  // qk_port_h
+#endif // qs_port_h
