@@ -208,7 +208,7 @@ QP::QState Philo::hungry(Philo * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${AOs::Philo::SM::hungry::EAT}
         case EAT_SIG: {
-            // ${AOs::Philo::SM::hungry::EAT::[Q_EVT_CAST(Ta~]}
+            // ${AOs::Philo::SM::hungry::EAT::[Q_EVT_CAST(Tabl~}
             if (Q_EVT_CAST(TableEvt)->philoNum == PHILO_ID(me)) {
                 static struct {
                     QP::QMState const *target;

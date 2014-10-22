@@ -61,8 +61,8 @@ QP::QState ToastOven::initial(ToastOven * const me, QP::QEvt const * const e) {
     // ${SMs::ToastOven::SM::initial}
     (void)e; /* avoid compiler warning */
     // state history attributes
-    me->his_doorClosed = Q_STATE_CAST(&ToastOven::off);
-    return Q_TRAN(&ToastOven::doorOpen);
+    me->his_doorClosed = Q_STATE_CAST(&off);
+    return Q_TRAN(&doorOpen);
 }
 //${SMs::ToastOven::SM::doorClosed} ..........................................
 QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e) {
@@ -76,13 +76,13 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
         }
         // ${SMs::ToastOven::SM::doorClosed}
         case Q_EXIT_SIG: {
-            me->his_doorClosed = me->state(); /* save history */
+            me->his_doorClosed = me->state(); // save history
             status_ = Q_HANDLED();
             break;
         }
         // ${SMs::ToastOven::SM::doorClosed::initial}
         case Q_INIT_SIG: {
-            status_ = Q_TRAN(&ToastOven::off);
+            status_ = Q_TRAN(&off);
             break;
         }
         // ${SMs::ToastOven::SM::doorClosed::TERMINATE}
@@ -134,7 +134,7 @@ QP::QState ToastOven::heating(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&ToastOven::doorClosed);
+            status_ = Q_SUPER(&doorClosed);
             break;
         }
     }
@@ -151,7 +151,7 @@ QP::QState ToastOven::toasting(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&ToastOven::heating);
+            status_ = Q_SUPER(&heating);
             break;
         }
     }
@@ -168,7 +168,7 @@ QP::QState ToastOven::baking(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&ToastOven::heating);
+            status_ = Q_SUPER(&heating);
             break;
         }
     }
@@ -185,7 +185,7 @@ QP::QState ToastOven::off(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&ToastOven::doorClosed);
+            status_ = Q_SUPER(&doorClosed);
             break;
         }
     }

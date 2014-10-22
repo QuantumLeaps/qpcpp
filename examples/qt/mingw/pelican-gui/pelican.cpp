@@ -599,15 +599,15 @@ QP::QState Pelican::pedsFlash(Pelican * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT}
         case TIMEOUT_SIG: {
-            // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCt~]}
+            // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCtr!~}
             if (me->m_flashCtr != 0U) {
                 --me->m_flashCtr;
-                // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCt~]::[(me->m_flashC~]}
+                // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCtr!~::[(me->m_flashCtr~}
                 if ((me->m_flashCtr & 1U) == 0U) {
                     BSP_signalPeds(PEDS_DONT_WALK);
                     status_ = QM_HANDLED();
                 }
-                // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCt~]::[else]}
+                // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCtr!~::[else]}
                 else {
                     BSP_signalPeds(PEDS_BLANK);
                     status_ = QM_HANDLED();
@@ -665,7 +665,7 @@ QP::QState Pelican::offline(Pelican * const me, QP::QEvt const * const e) {
         // ${components::Pelican::SM::offline::TIMEOUT}
         case TIMEOUT_SIG: {
             me->m_flashCtr ^= 1U;
-            // ${components::Pelican::SM::offline::TIMEOUT::[(me->m_flashC~]}
+            // ${components::Pelican::SM::offline::TIMEOUT::[(me->m_flashCtr~}
             if ((me->m_flashCtr & 1U) == 0U) {
                 BSP_signalCars(CARS_RED);
                 BSP_signalPeds(PEDS_DONT_WALK);

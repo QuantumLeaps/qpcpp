@@ -91,7 +91,7 @@ QP::QState Missile::initial(Missile * const me, QP::QEvt const * const e) {
 //${AOs::Missile::SM::armed} .................................................
 QP::QMState const Missile::armed_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Missile::armed),
+    Q_STATE_CAST(&armed),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
@@ -123,7 +123,7 @@ QP::QState Missile::armed(Missile * const me, QP::QEvt const * const e) {
 //${AOs::Missile::SM::flying} ................................................
 QP::QMState const Missile::flying_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Missile::flying),
+    Q_STATE_CAST(&flying),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
@@ -134,7 +134,7 @@ QP::QState Missile::flying(Missile * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${AOs::Missile::SM::flying::TIME_TICK}
         case TIME_TICK_SIG: {
-            // ${AOs::Missile::SM::flying::TIME_TICK::[me->m_x+GAME_~]}
+            // ${AOs::Missile::SM::flying::TIME_TICK::[me->m_x+GAME_MI~}
             if (me->m_x + GAME_MISSILE_SPEED_X < GAME_SCREEN_WIDTH) {
                 me->m_x += GAME_MISSILE_SPEED_X;
                 // tell the Tunnel to draw the Missile and test for wall hits
@@ -165,7 +165,7 @@ QP::QState Missile::flying(Missile * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &exploding_s,
                 {
-                    Q_ACTION_CAST(&Missile::exploding_e), // entry
+                    Q_ACTION_CAST(&exploding_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -194,8 +194,8 @@ QP::QState Missile::flying(Missile * const me, QP::QEvt const * const e) {
 //${AOs::Missile::SM::exploding} .............................................
 QP::QMState const Missile::exploding_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Missile::exploding),
-    Q_ACTION_CAST(&Missile::exploding_e),
+    Q_STATE_CAST(&exploding),
+    Q_ACTION_CAST(&exploding_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -210,7 +210,7 @@ QP::QState Missile::exploding(Missile * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${AOs::Missile::SM::exploding::TIME_TICK}
         case TIME_TICK_SIG: {
-            // ${AOs::Missile::SM::exploding::TIME_TICK::[(me->m_x>=GAM~]}
+            // ${AOs::Missile::SM::exploding::TIME_TICK::[(me->m_x>=GAME_~}
             if ((me->m_x >= GAME_SPEED_X) && (me->m_exp_ctr < 15U)) {
                 ++me->m_exp_ctr;           // advance the explosion counter
                 me->m_x -= GAME_SPEED_X;   // move the explosion by one step

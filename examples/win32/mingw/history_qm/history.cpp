@@ -82,7 +82,7 @@ QP::QState ToastOven::initial(ToastOven * const me, QP::QEvt const * const e) {
     } const tatbl_ = { // transition-action table
         &doorOpen_s,
         {
-            Q_ACTION_CAST(&ToastOven::doorOpen_e), // entry
+            Q_ACTION_CAST(&doorOpen_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -95,10 +95,10 @@ QP::QState ToastOven::initial(ToastOven * const me, QP::QEvt const * const e) {
 //${SMs::ToastOven::SM::doorClosed} ..........................................
 QP::QMState const ToastOven::doorClosed_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&ToastOven::doorClosed),
-    Q_ACTION_CAST(&ToastOven::doorClosed_e),
-    Q_ACTION_CAST(&ToastOven::doorClosed_x),
-    Q_ACTION_CAST(&ToastOven::doorClosed_i)
+    Q_STATE_CAST(&doorClosed),
+    Q_ACTION_CAST(&doorClosed_e),
+    Q_ACTION_CAST(&doorClosed_x),
+    Q_ACTION_CAST(&doorClosed_i)
 };
 // ${SMs::ToastOven::SM::doorClosed}
 QP::QState ToastOven::doorClosed_e(ToastOven * const me) {
@@ -119,7 +119,7 @@ QP::QState ToastOven::doorClosed_i(ToastOven * const me) {
     } const tatbl_ = { // transition-action table
         &off_s,
         {
-            Q_ACTION_CAST(&ToastOven::off_e), // entry
+            Q_ACTION_CAST(&off_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -138,8 +138,8 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             } const tatbl_ = { // transition-action table
                 &final_s,
                 {
-                    Q_ACTION_CAST(&ToastOven::doorClosed_x), // exit
-                    Q_ACTION_CAST(&ToastOven::final_e), // entry
+                    Q_ACTION_CAST(&doorClosed_x), // exit
+                    Q_ACTION_CAST(&final_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -154,8 +154,8 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             } const tatbl_ = { // transition-action table
                 &doorOpen_s,
                 {
-                    Q_ACTION_CAST(&ToastOven::doorClosed_x), // exit
-                    Q_ACTION_CAST(&ToastOven::doorOpen_e), // entry
+                    Q_ACTION_CAST(&doorClosed_x), // exit
+                    Q_ACTION_CAST(&doorOpen_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -170,8 +170,8 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             } const tatbl_ = { // transition-action table
                 &toasting_s,
                 {
-                    Q_ACTION_CAST(&ToastOven::heating_e), // entry
-                    Q_ACTION_CAST(&ToastOven::toasting_e), // entry
+                    Q_ACTION_CAST(&heating_e), // entry
+                    Q_ACTION_CAST(&toasting_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -186,8 +186,8 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             } const tatbl_ = { // transition-action table
                 &baking_s,
                 {
-                    Q_ACTION_CAST(&ToastOven::heating_e), // entry
-                    Q_ACTION_CAST(&ToastOven::baking_e), // entry
+                    Q_ACTION_CAST(&heating_e), // entry
+                    Q_ACTION_CAST(&baking_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -202,7 +202,7 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             } const tatbl_ = { // transition-action table
                 &off_s,
                 {
-                    Q_ACTION_CAST(&ToastOven::off_e), // entry
+                    Q_ACTION_CAST(&off_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -219,9 +219,9 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
 //${SMs::ToastOven::SM::doorClosed::heating} .................................
 QP::QMState const ToastOven::heating_s = {
     &ToastOven::doorClosed_s, // superstate
-    Q_STATE_CAST(&ToastOven::heating),
-    Q_ACTION_CAST(&ToastOven::heating_e),
-    Q_ACTION_CAST(&ToastOven::heating_x),
+    Q_STATE_CAST(&heating),
+    Q_ACTION_CAST(&heating_e),
+    Q_ACTION_CAST(&heating_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${SMs::ToastOven::SM::doorClosed::heating}
@@ -251,8 +251,8 @@ QP::QState ToastOven::heating(ToastOven * const me, QP::QEvt const * const e) {
 //${SMs::ToastOven::SM::doorClosed::heating::toasting} .......................
 QP::QMState const ToastOven::toasting_s = {
     &ToastOven::heating_s, // superstate
-    Q_STATE_CAST(&ToastOven::toasting),
-    Q_ACTION_CAST(&ToastOven::toasting_e),
+    Q_STATE_CAST(&toasting),
+    Q_ACTION_CAST(&toasting_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -277,8 +277,8 @@ QP::QState ToastOven::toasting(ToastOven * const me, QP::QEvt const * const e) {
 //${SMs::ToastOven::SM::doorClosed::heating::baking} .........................
 QP::QMState const ToastOven::baking_s = {
     &ToastOven::heating_s, // superstate
-    Q_STATE_CAST(&ToastOven::baking),
-    Q_ACTION_CAST(&ToastOven::baking_e),
+    Q_STATE_CAST(&baking),
+    Q_ACTION_CAST(&baking_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -303,8 +303,8 @@ QP::QState ToastOven::baking(ToastOven * const me, QP::QEvt const * const e) {
 //${SMs::ToastOven::SM::doorClosed::off} .....................................
 QP::QMState const ToastOven::off_s = {
     &ToastOven::doorClosed_s, // superstate
-    Q_STATE_CAST(&ToastOven::off),
-    Q_ACTION_CAST(&ToastOven::off_e),
+    Q_STATE_CAST(&off),
+    Q_ACTION_CAST(&off_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -329,9 +329,9 @@ QP::QState ToastOven::off(ToastOven * const me, QP::QEvt const * const e) {
 //${SMs::ToastOven::SM::doorOpen} ............................................
 QP::QMState const ToastOven::doorOpen_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&ToastOven::doorOpen),
-    Q_ACTION_CAST(&ToastOven::doorOpen_e),
-    Q_ACTION_CAST(&ToastOven::doorOpen_x),
+    Q_STATE_CAST(&doorOpen),
+    Q_ACTION_CAST(&doorOpen_e),
+    Q_ACTION_CAST(&doorOpen_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${SMs::ToastOven::SM::doorOpen}
@@ -358,8 +358,8 @@ QP::QState ToastOven::doorOpen(ToastOven * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &doorClosed_s,
                 {
-                    Q_ACTION_CAST(&ToastOven::doorOpen_x), // exit
-                    Q_ACTION_CAST(&ToastOven::doorClosed_e), // entry
+                    Q_ACTION_CAST(&doorOpen_x), // exit
+                    Q_ACTION_CAST(&doorClosed_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -376,8 +376,8 @@ QP::QState ToastOven::doorOpen(ToastOven * const me, QP::QEvt const * const e) {
 //${SMs::ToastOven::SM::final} ...............................................
 QP::QMState const ToastOven::final_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&ToastOven::final),
-    Q_ACTION_CAST(&ToastOven::final_e),
+    Q_STATE_CAST(&final),
+    Q_ACTION_CAST(&final_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };

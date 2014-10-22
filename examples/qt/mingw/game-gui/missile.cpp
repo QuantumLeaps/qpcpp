@@ -134,7 +134,7 @@ QP::QState Missile::flying(Missile * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${AOs::Missile::SM::flying::TIME_TICK}
         case TIME_TICK_SIG: {
-            // ${AOs::Missile::SM::flying::TIME_TICK::[me->m_x+GAME_~]}
+            // ${AOs::Missile::SM::flying::TIME_TICK::[me->m_x+GAME_MI~}
             if (me->m_x + GAME_MISSILE_SPEED_X < GAME_SCREEN_WIDTH) {
                 me->m_x += GAME_MISSILE_SPEED_X;
                 // tell the Tunnel to draw the Missile and test for wall hits
@@ -208,7 +208,7 @@ QP::QState Missile::exploding(Missile * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${AOs::Missile::SM::exploding::TIME_TICK}
         case TIME_TICK_SIG: {
-            // ${AOs::Missile::SM::exploding::TIME_TICK::[(me->m_x>=GAM~]}
+            // ${AOs::Missile::SM::exploding::TIME_TICK::[(me->m_x>=GAME_~}
             if ((me->m_x >= GAME_SPEED_X) && (me->m_exp_ctr < 15U)) {
                 ++me->m_exp_ctr;           // advance the explosion counter
                 me->m_x -= GAME_SPEED_X;   // move the explosion by one step

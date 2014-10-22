@@ -465,7 +465,7 @@ void Tunnel::addImageAt(
         l_frame[x_pos + x + GAME_SCREEN_WIDTH] |= (uint8_t)(bmp1 >> 8);
     }
 }
-//${AOs::Tunnel::dispatchToAllMines} .........................................
+//${AOs::Tunnel::dispatchToAllMin~} ..........................................
 void Tunnel::dispatchToAllMines(QP::QEvt const * e) {
     for (uint8_t n = 0U; n < GAME_MINES_MAX; ++n) {
         if (m_mines[n] != static_cast<QMsm *>(0)) { // is the mine used?
@@ -504,7 +504,7 @@ QP::QState Tunnel::initial(Tunnel * const me, QP::QEvt const * const e) {
     } const tatbl_ = { // transition-action table
         &show_logo_s,
         {
-            Q_ACTION_CAST(&Tunnel::show_logo_e), // entry
+            Q_ACTION_CAST(&show_logo_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -547,7 +547,7 @@ QP::QState Tunnel::initial(Tunnel * const me, QP::QEvt const * const e) {
 //${AOs::Tunnel::SM::active} .................................................
 QP::QMState const Tunnel::active_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Tunnel::active),
+    Q_STATE_CAST(&active),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
@@ -572,7 +572,7 @@ QP::QState Tunnel::active(Tunnel * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &final_s,
                 {
-                    Q_ACTION_CAST(&Tunnel::final_e), // entry
+                    Q_ACTION_CAST(&final_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -589,9 +589,9 @@ QP::QState Tunnel::active(Tunnel * const me, QP::QEvt const * const e) {
 //${AOs::Tunnel::SM::active::show_logo} ......................................
 QP::QMState const Tunnel::show_logo_s = {
     &Tunnel::active_s, // superstate
-    Q_STATE_CAST(&Tunnel::show_logo),
-    Q_ACTION_CAST(&Tunnel::show_logo_e),
-    Q_ACTION_CAST(&Tunnel::show_logo_x),
+    Q_STATE_CAST(&show_logo),
+    Q_ACTION_CAST(&show_logo_e),
+    Q_ACTION_CAST(&show_logo_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${AOs::Tunnel::SM::active::show_logo}
@@ -622,8 +622,8 @@ QP::QState Tunnel::show_logo(Tunnel * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &demo_s,
                 {
-                    Q_ACTION_CAST(&Tunnel::show_logo_x), // exit
-                    Q_ACTION_CAST(&Tunnel::demo_e), // entry
+                    Q_ACTION_CAST(&show_logo_x), // exit
+                    Q_ACTION_CAST(&demo_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -633,7 +633,7 @@ QP::QState Tunnel::show_logo(Tunnel * const me, QP::QEvt const * const e) {
         // ${AOs::Tunnel::SM::active::show_logo::BLINK_TIMEOUT}
         case BLINK_TIMEOUT_SIG: {
             me->m_blink_ctr ^= 1U; // toggle the blink couner
-            // ${AOs::Tunnel::SM::active::show_logo::BLINK_TIMEOUT::[me->m_blink_c~]}
+            // ${AOs::Tunnel::SM::active::show_logo::BLINK_TIMEOUT::[me->m_blink_ctr~}
             if (me->m_blink_ctr == 0U) {
                 BSP_drawNString(6U*9U, 0U,         " LeAps");
                 BSP_drawNString(0U,    1U, "state-machine.co");
@@ -658,9 +658,9 @@ QP::QState Tunnel::show_logo(Tunnel * const me, QP::QEvt const * const e) {
 //${AOs::Tunnel::SM::active::demo} ...........................................
 QP::QMState const Tunnel::demo_s = {
     &Tunnel::active_s, // superstate
-    Q_STATE_CAST(&Tunnel::demo),
-    Q_ACTION_CAST(&Tunnel::demo_e),
-    Q_ACTION_CAST(&Tunnel::demo_x),
+    Q_STATE_CAST(&demo),
+    Q_ACTION_CAST(&demo_e),
+    Q_ACTION_CAST(&demo_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${AOs::Tunnel::SM::active::demo}
@@ -707,8 +707,8 @@ QP::QState Tunnel::demo(Tunnel * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &screen_saver_s,
                 {
-                    Q_ACTION_CAST(&Tunnel::demo_x), // exit
-                    Q_ACTION_CAST(&Tunnel::screen_saver_i), // initial tran.
+                    Q_ACTION_CAST(&demo_x), // exit
+                    Q_ACTION_CAST(&screen_saver_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -736,8 +736,8 @@ QP::QState Tunnel::demo(Tunnel * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &playing_s,
                 {
-                    Q_ACTION_CAST(&Tunnel::demo_x), // exit
-                    Q_ACTION_CAST(&Tunnel::playing_e), // entry
+                    Q_ACTION_CAST(&demo_x), // exit
+                    Q_ACTION_CAST(&playing_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -754,9 +754,9 @@ QP::QState Tunnel::demo(Tunnel * const me, QP::QEvt const * const e) {
 //${AOs::Tunnel::SM::active::playing} ........................................
 QP::QMState const Tunnel::playing_s = {
     &Tunnel::active_s, // superstate
-    Q_STATE_CAST(&Tunnel::playing),
-    Q_ACTION_CAST(&Tunnel::playing_e),
-    Q_ACTION_CAST(&Tunnel::playing_x),
+    Q_STATE_CAST(&playing),
+    Q_ACTION_CAST(&playing_e),
+    Q_ACTION_CAST(&playing_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${AOs::Tunnel::SM::active::playing}
@@ -857,8 +857,8 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &game_over_s,
                 {
-                    Q_ACTION_CAST(&Tunnel::playing_x), // exit
-                    Q_ACTION_CAST(&Tunnel::game_over_e), // entry
+                    Q_ACTION_CAST(&playing_x), // exit
+                    Q_ACTION_CAST(&game_over_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -891,9 +891,9 @@ QP::QState Tunnel::playing(Tunnel * const me, QP::QEvt const * const e) {
 //${AOs::Tunnel::SM::active::game_over} ......................................
 QP::QMState const Tunnel::game_over_s = {
     &Tunnel::active_s, // superstate
-    Q_STATE_CAST(&Tunnel::game_over),
-    Q_ACTION_CAST(&Tunnel::game_over_e),
-    Q_ACTION_CAST(&Tunnel::game_over_x),
+    Q_STATE_CAST(&game_over),
+    Q_ACTION_CAST(&game_over_e),
+    Q_ACTION_CAST(&game_over_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${AOs::Tunnel::SM::active::game_over}
@@ -934,8 +934,8 @@ QP::QState Tunnel::game_over(Tunnel * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &demo_s,
                 {
-                    Q_ACTION_CAST(&Tunnel::game_over_x), // exit
-                    Q_ACTION_CAST(&Tunnel::demo_e), // entry
+                    Q_ACTION_CAST(&game_over_x), // exit
+                    Q_ACTION_CAST(&demo_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -952,10 +952,10 @@ QP::QState Tunnel::game_over(Tunnel * const me, QP::QEvt const * const e) {
 //${AOs::Tunnel::SM::active::screen_saver} ...................................
 QP::QMState const Tunnel::screen_saver_s = {
     &Tunnel::active_s, // superstate
-    Q_STATE_CAST(&Tunnel::screen_saver),
+    Q_STATE_CAST(&screen_saver),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
-    Q_ACTION_CAST(&Tunnel::screen_saver_i)
+    Q_ACTION_CAST(&screen_saver_i)
 };
 // ${AOs::Tunnel::SM::active::screen_saver::initial}
 QP::QState Tunnel::screen_saver_i(Tunnel * const me) {
@@ -965,7 +965,7 @@ QP::QState Tunnel::screen_saver_i(Tunnel * const me) {
     } const tatbl_ = { // transition-action table
         &screen_saver_hide_s,
         {
-            Q_ACTION_CAST(&Tunnel::screen_saver_hide_e), // entry
+            Q_ACTION_CAST(&screen_saver_hide_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -984,7 +984,7 @@ QP::QState Tunnel::screen_saver(Tunnel * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &demo_s,
                 {
-                    Q_ACTION_CAST(&Tunnel::demo_e), // entry
+                    Q_ACTION_CAST(&demo_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -998,31 +998,31 @@ QP::QState Tunnel::screen_saver(Tunnel * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-//${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide} ................
+//${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~} ................
 QP::QMState const Tunnel::screen_saver_hide_s = {
     &Tunnel::screen_saver_s, // superstate
-    Q_STATE_CAST(&Tunnel::screen_saver_hide),
-    Q_ACTION_CAST(&Tunnel::screen_saver_hide_e),
-    Q_ACTION_CAST(&Tunnel::screen_saver_hide_x),
+    Q_STATE_CAST(&screen_saver_hide),
+    Q_ACTION_CAST(&screen_saver_hide_e),
+    Q_ACTION_CAST(&screen_saver_hide_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~}
 QP::QState Tunnel::screen_saver_hide_e(Tunnel * const me) {
     BSP_displayOff(); // power down the display
     me->m_screenTimeEvt.armX(BSP_TICKS_PER_SEC*3U, 0U); // in 3 sec
     return QM_ENTRY(&screen_saver_hide_s);
 }
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~}
 QP::QState Tunnel::screen_saver_hide_x(Tunnel * const me) {
     me->m_screenTimeEvt.disarm();
     BSP_displayOn(); // power up the display
     return QM_EXIT(&screen_saver_hide_s);
 }
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~}
 QP::QState Tunnel::screen_saver_hide(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide::SCREEN_TIMEOUT}
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~::SCREEN_TIMEOUT}
         case SCREEN_TIMEOUT_SIG: {
             static struct {
                 QP::QMState const *target;
@@ -1030,8 +1030,8 @@ QP::QState Tunnel::screen_saver_hide(Tunnel * const me, QP::QEvt const * const e
             } const tatbl_ = { // transition-action table
                 &screen_saver_show_s,
                 {
-                    Q_ACTION_CAST(&Tunnel::screen_saver_hide_x), // exit
-                    Q_ACTION_CAST(&Tunnel::screen_saver_show_e), // entry
+                    Q_ACTION_CAST(&screen_saver_hide_x), // exit
+                    Q_ACTION_CAST(&screen_saver_show_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -1045,15 +1045,15 @@ QP::QState Tunnel::screen_saver_hide(Tunnel * const me, QP::QEvt const * const e
     }
     return status_;
 }
-//${AOs::Tunnel::SM::active::screen_saver::screen_saver_show} ................
+//${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~} ................
 QP::QMState const Tunnel::screen_saver_show_s = {
     &Tunnel::screen_saver_s, // superstate
-    Q_STATE_CAST(&Tunnel::screen_saver_show),
-    Q_ACTION_CAST(&Tunnel::screen_saver_show_e),
-    Q_ACTION_CAST(&Tunnel::screen_saver_show_x),
+    Q_STATE_CAST(&screen_saver_show),
+    Q_ACTION_CAST(&screen_saver_show_e),
+    Q_ACTION_CAST(&screen_saver_show_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~}
 QP::QState Tunnel::screen_saver_show_e(Tunnel * const me) {
     uint32_t rnd = random();
     // clear the screen frame buffer
@@ -1066,7 +1066,7 @@ QP::QState Tunnel::screen_saver_show_e(Tunnel * const me) {
     me->m_screenTimeEvt.armX(BSP_TICKS_PER_SEC/3U, 0U); // in 1/3 sec
     return QM_ENTRY(&screen_saver_show_s);
 }
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~}
 QP::QState Tunnel::screen_saver_show_x(Tunnel * const me) {
     me->m_screenTimeEvt.disarm();
     // clear the screen frame buffer
@@ -1075,11 +1075,11 @@ QP::QState Tunnel::screen_saver_show_x(Tunnel * const me) {
     BSP_drawBitmap(l_frame);
     return QM_EXIT(&screen_saver_show_s);
 }
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~}
 QP::QState Tunnel::screen_saver_show(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show::SCREEN_TIMEOUT}
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~::SCREEN_TIMEOUT}
         case SCREEN_TIMEOUT_SIG: {
             static struct {
                 QP::QMState const *target;
@@ -1087,8 +1087,8 @@ QP::QState Tunnel::screen_saver_show(Tunnel * const me, QP::QEvt const * const e
             } const tatbl_ = { // transition-action table
                 &screen_saver_hide_s,
                 {
-                    Q_ACTION_CAST(&Tunnel::screen_saver_show_x), // exit
-                    Q_ACTION_CAST(&Tunnel::screen_saver_hide_e), // entry
+                    Q_ACTION_CAST(&screen_saver_show_x), // exit
+                    Q_ACTION_CAST(&screen_saver_hide_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -1105,8 +1105,8 @@ QP::QState Tunnel::screen_saver_show(Tunnel * const me, QP::QEvt const * const e
 //${AOs::Tunnel::SM::final} ..................................................
 QP::QMState const Tunnel::final_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Tunnel::final),
-    Q_ACTION_CAST(&Tunnel::final_e),
+    Q_STATE_CAST(&final),
+    Q_ACTION_CAST(&final_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };

@@ -78,9 +78,9 @@ QP::QState QMsmTst::initial(QMsmTst * const me, QP::QEvt const * const e) {
     } const tatbl_ = { // transition-action table
         &s2_s,
         {
-            Q_ACTION_CAST(&QMsmTst::s_e), // entry
-            Q_ACTION_CAST(&QMsmTst::s2_e), // entry
-            Q_ACTION_CAST(&QMsmTst::s2_i), // initial tran.
+            Q_ACTION_CAST(&s_e), // entry
+            Q_ACTION_CAST(&s2_e), // entry
+            Q_ACTION_CAST(&s2_i), // initial tran.
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -93,10 +93,10 @@ QP::QState QMsmTst::initial(QMsmTst * const me, QP::QEvt const * const e) {
 //${SMs::QMsmTst::SM::s} .....................................................
 QP::QMState const QMsmTst::s_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&QMsmTst::s),
-    Q_ACTION_CAST(&QMsmTst::s_e),
-    Q_ACTION_CAST(&QMsmTst::s_x),
-    Q_ACTION_CAST(&QMsmTst::s_i)
+    Q_STATE_CAST(&s),
+    Q_ACTION_CAST(&s_e),
+    Q_ACTION_CAST(&s_x),
+    Q_ACTION_CAST(&s_i)
 };
 // ${SMs::QMsmTst::SM::s}
 QP::QState QMsmTst::s_e(QMsmTst * const me) {
@@ -118,8 +118,8 @@ QP::QState QMsmTst::s_i(QMsmTst * const me) {
     } const tatbl_ = { // transition-action table
         &s11_s,
         {
-            Q_ACTION_CAST(&QMsmTst::s1_e), // entry
-            Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+            Q_ACTION_CAST(&s1_e), // entry
+            Q_ACTION_CAST(&s11_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -152,8 +152,8 @@ QP::QState QMsmTst::s(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s11_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+                    Q_ACTION_CAST(&s1_e), // entry
+                    Q_ACTION_CAST(&s11_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -178,10 +178,10 @@ QP::QState QMsmTst::s(QMsmTst * const me, QP::QEvt const * const e) {
 //${SMs::QMsmTst::SM::s::s1} .................................................
 QP::QMState const QMsmTst::s1_s = {
     &QMsmTst::s_s, // superstate
-    Q_STATE_CAST(&QMsmTst::s1),
-    Q_ACTION_CAST(&QMsmTst::s1_e),
-    Q_ACTION_CAST(&QMsmTst::s1_x),
-    Q_ACTION_CAST(&QMsmTst::s1_i)
+    Q_STATE_CAST(&s1),
+    Q_ACTION_CAST(&s1_e),
+    Q_ACTION_CAST(&s1_x),
+    Q_ACTION_CAST(&s1_i)
 };
 // ${SMs::QMsmTst::SM::s::s1}
 QP::QState QMsmTst::s1_e(QMsmTst * const me) {
@@ -203,7 +203,7 @@ QP::QState QMsmTst::s1_i(QMsmTst * const me) {
     } const tatbl_ = { // transition-action table
         &s11_s,
         {
-            Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+            Q_ACTION_CAST(&s11_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -231,8 +231,8 @@ QP::QState QMsmTst::s1(QMsmTst * const me, QP::QEvt const * const e) {
                 } const tatbl_ = { // transition-action table
                     &s_s,
                     {
-                        Q_ACTION_CAST(&QMsmTst::s1_x), // exit
-                        Q_ACTION_CAST(&QMsmTst::s_i), // initial tran.
+                        Q_ACTION_CAST(&s1_x), // exit
+                        Q_ACTION_CAST(&s_i), // initial tran.
                         Q_ACTION_CAST(0)  // zero terminator
                     }
                 };
@@ -253,9 +253,9 @@ QP::QState QMsmTst::s1(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s1_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s1_i), // initial tran.
+                    Q_ACTION_CAST(&s1_x), // exit
+                    Q_ACTION_CAST(&s1_e), // entry
+                    Q_ACTION_CAST(&s1_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -271,7 +271,7 @@ QP::QState QMsmTst::s1(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s11_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+                    Q_ACTION_CAST(&s11_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -287,10 +287,10 @@ QP::QState QMsmTst::s1(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s211_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s2_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s21_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+                    Q_ACTION_CAST(&s1_x), // exit
+                    Q_ACTION_CAST(&s2_e), // entry
+                    Q_ACTION_CAST(&s21_e), // entry
+                    Q_ACTION_CAST(&s211_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -306,9 +306,9 @@ QP::QState QMsmTst::s1(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s2_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s2_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s2_i), // initial tran.
+                    Q_ACTION_CAST(&s1_x), // exit
+                    Q_ACTION_CAST(&s2_e), // entry
+                    Q_ACTION_CAST(&s2_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -326,9 +326,9 @@ QP::QState QMsmTst::s1(QMsmTst * const me, QP::QEvt const * const e) {
 //${SMs::QMsmTst::SM::s::s1::s11} ............................................
 QP::QMState const QMsmTst::s11_s = {
     &QMsmTst::s1_s, // superstate
-    Q_STATE_CAST(&QMsmTst::s11),
-    Q_ACTION_CAST(&QMsmTst::s11_e),
-    Q_ACTION_CAST(&QMsmTst::s11_x),
+    Q_STATE_CAST(&s11),
+    Q_ACTION_CAST(&s11_e),
+    Q_ACTION_CAST(&s11_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${SMs::QMsmTst::SM::s::s1::s11}
@@ -355,9 +355,9 @@ QP::QState QMsmTst::s11(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s11_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s_i), // initial tran.
+                    Q_ACTION_CAST(&s11_x), // exit
+                    Q_ACTION_CAST(&s1_x), // exit
+                    Q_ACTION_CAST(&s_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -375,8 +375,8 @@ QP::QState QMsmTst::s11(QMsmTst * const me, QP::QEvt const * const e) {
                 } const tatbl_ = { // transition-action table
                     &s1_s,
                     {
-                        Q_ACTION_CAST(&QMsmTst::s11_x), // exit
-                        Q_ACTION_CAST(&QMsmTst::s1_i), // initial tran.
+                        Q_ACTION_CAST(&s11_x), // exit
+                        Q_ACTION_CAST(&s1_i), // initial tran.
                         Q_ACTION_CAST(0)  // zero terminator
                     }
                 };
@@ -397,11 +397,11 @@ QP::QState QMsmTst::s11(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s211_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s11_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s1_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s2_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s21_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+                    Q_ACTION_CAST(&s11_x), // exit
+                    Q_ACTION_CAST(&s1_x), // exit
+                    Q_ACTION_CAST(&s2_e), // entry
+                    Q_ACTION_CAST(&s21_e), // entry
+                    Q_ACTION_CAST(&s211_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -419,10 +419,10 @@ QP::QState QMsmTst::s11(QMsmTst * const me, QP::QEvt const * const e) {
 //${SMs::QMsmTst::SM::s::s2} .................................................
 QP::QMState const QMsmTst::s2_s = {
     &QMsmTst::s_s, // superstate
-    Q_STATE_CAST(&QMsmTst::s2),
-    Q_ACTION_CAST(&QMsmTst::s2_e),
-    Q_ACTION_CAST(&QMsmTst::s2_x),
-    Q_ACTION_CAST(&QMsmTst::s2_i)
+    Q_STATE_CAST(&s2),
+    Q_ACTION_CAST(&s2_e),
+    Q_ACTION_CAST(&s2_x),
+    Q_ACTION_CAST(&s2_i)
 };
 // ${SMs::QMsmTst::SM::s::s2}
 QP::QState QMsmTst::s2_e(QMsmTst * const me) {
@@ -444,8 +444,8 @@ QP::QState QMsmTst::s2_i(QMsmTst * const me) {
     } const tatbl_ = { // transition-action table
         &s211_s,
         {
-            Q_ACTION_CAST(&QMsmTst::s21_e), // entry
-            Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+            Q_ACTION_CAST(&s21_e), // entry
+            Q_ACTION_CAST(&s211_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -478,9 +478,9 @@ QP::QState QMsmTst::s2(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s11_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s2_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s11_e), // entry
+                    Q_ACTION_CAST(&s2_x), // exit
+                    Q_ACTION_CAST(&s1_e), // entry
+                    Q_ACTION_CAST(&s11_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -496,9 +496,9 @@ QP::QState QMsmTst::s2(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s1_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s2_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s1_i), // initial tran.
+                    Q_ACTION_CAST(&s2_x), // exit
+                    Q_ACTION_CAST(&s1_e), // entry
+                    Q_ACTION_CAST(&s1_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -516,10 +516,10 @@ QP::QState QMsmTst::s2(QMsmTst * const me, QP::QEvt const * const e) {
 //${SMs::QMsmTst::SM::s::s2::s21} ............................................
 QP::QMState const QMsmTst::s21_s = {
     &QMsmTst::s2_s, // superstate
-    Q_STATE_CAST(&QMsmTst::s21),
-    Q_ACTION_CAST(&QMsmTst::s21_e),
-    Q_ACTION_CAST(&QMsmTst::s21_x),
-    Q_ACTION_CAST(&QMsmTst::s21_i)
+    Q_STATE_CAST(&s21),
+    Q_ACTION_CAST(&s21_e),
+    Q_ACTION_CAST(&s21_x),
+    Q_ACTION_CAST(&s21_i)
 };
 // ${SMs::QMsmTst::SM::s::s2::s21}
 QP::QState QMsmTst::s21_e(QMsmTst * const me) {
@@ -541,7 +541,7 @@ QP::QState QMsmTst::s21_i(QMsmTst * const me) {
     } const tatbl_ = { // transition-action table
         &s211_s,
         {
-            Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+            Q_ACTION_CAST(&s211_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -561,10 +561,10 @@ QP::QState QMsmTst::s21(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s1_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s21_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s2_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s1_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s1_i), // initial tran.
+                    Q_ACTION_CAST(&s21_x), // exit
+                    Q_ACTION_CAST(&s2_x), // exit
+                    Q_ACTION_CAST(&s1_e), // entry
+                    Q_ACTION_CAST(&s1_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -580,9 +580,9 @@ QP::QState QMsmTst::s21(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s21_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s21_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s21_e), // entry
-                    Q_ACTION_CAST(&QMsmTst::s21_i), // initial tran.
+                    Q_ACTION_CAST(&s21_x), // exit
+                    Q_ACTION_CAST(&s21_e), // entry
+                    Q_ACTION_CAST(&s21_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -598,7 +598,7 @@ QP::QState QMsmTst::s21(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s211_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s211_e), // entry
+                    Q_ACTION_CAST(&s211_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -616,9 +616,9 @@ QP::QState QMsmTst::s21(QMsmTst * const me, QP::QEvt const * const e) {
 //${SMs::QMsmTst::SM::s::s2::s21::s211} ......................................
 QP::QMState const QMsmTst::s211_s = {
     &QMsmTst::s21_s, // superstate
-    Q_STATE_CAST(&QMsmTst::s211),
-    Q_ACTION_CAST(&QMsmTst::s211_e),
-    Q_ACTION_CAST(&QMsmTst::s211_x),
+    Q_STATE_CAST(&s211),
+    Q_ACTION_CAST(&s211_e),
+    Q_ACTION_CAST(&s211_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${SMs::QMsmTst::SM::s::s2::s21::s211}
@@ -645,10 +645,10 @@ QP::QState QMsmTst::s211(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s211_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s21_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s2_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s_i), // initial tran.
+                    Q_ACTION_CAST(&s211_x), // exit
+                    Q_ACTION_CAST(&s21_x), // exit
+                    Q_ACTION_CAST(&s2_x), // exit
+                    Q_ACTION_CAST(&s_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -664,8 +664,8 @@ QP::QState QMsmTst::s211(QMsmTst * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &s21_s,
                 {
-                    Q_ACTION_CAST(&QMsmTst::s211_x), // exit
-                    Q_ACTION_CAST(&QMsmTst::s21_i), // initial tran.
+                    Q_ACTION_CAST(&s211_x), // exit
+                    Q_ACTION_CAST(&s21_i), // initial tran.
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };

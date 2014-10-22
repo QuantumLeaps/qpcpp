@@ -5,7 +5,7 @@
 ///***************************************************************************
 /// Product: QS/C++
 /// Last updated for version 5.3.1
-/// Last updated on  2014-09-05
+/// Last updated on  2014-10-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -39,6 +39,7 @@
 
 #define QP_IMPL           // this is QF/QK implementation
 #include "qs_port.h"      // QS port
+#include "qs_pkg.h"       // QS package-scope internal interface
 
 namespace QP {
 

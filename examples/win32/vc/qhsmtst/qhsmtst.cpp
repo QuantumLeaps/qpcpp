@@ -54,7 +54,7 @@ QP::QState QHsmTst::initial(QHsmTst * const me, QP::QEvt const * const e) {
     (void)e; // avoid compiler warning
     me->m_foo = 0U;
     BSP_display("top-INIT;");
-    return Q_TRAN(&QHsmTst::s2);
+    return Q_TRAN(&s2);
 }
 //${HSMs::QHsmTst::SM::s} ....................................................
 QP::QState QHsmTst::s(QHsmTst * const me, QP::QEvt const * const e) {
@@ -75,7 +75,7 @@ QP::QState QHsmTst::s(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::initial}
         case Q_INIT_SIG: {
             BSP_display("s-INIT;");
-            status_ = Q_TRAN(&QHsmTst::s11);
+            status_ = Q_TRAN(&s11);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::I}
@@ -129,7 +129,7 @@ QP::QState QHsmTst::s1(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s1::initial}
         case Q_INIT_SIG: {
             BSP_display("s1-INIT;");
-            status_ = Q_TRAN(&QHsmTst::s11);
+            status_ = Q_TRAN(&s11);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s1::I}
@@ -144,7 +144,7 @@ QP::QState QHsmTst::s1(QHsmTst * const me, QP::QEvt const * const e) {
             if (!me->m_foo) {
                 me->m_foo = true;
                 BSP_display("s1-D;");
-                status_ = Q_TRAN(&QHsmTst::s);
+                status_ = Q_TRAN(&s);
             }
             else {
                 status_ = Q_UNHANDLED();
@@ -176,7 +176,7 @@ QP::QState QHsmTst::s1(QHsmTst * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsmTst::s);
+            status_ = Q_SUPER(&s);
             break;
         }
     }
@@ -210,7 +210,7 @@ QP::QState QHsmTst::s11(QHsmTst * const me, QP::QEvt const * const e) {
             if (me->m_foo) {
                 me->m_foo = false;
                 BSP_display("s11-D;");
-                status_ = Q_TRAN(&QHsmTst::s1);
+                status_ = Q_TRAN(&s1);
             }
             else {
                 status_ = Q_UNHANDLED();
@@ -224,7 +224,7 @@ QP::QState QHsmTst::s11(QHsmTst * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsmTst::s1);
+            status_ = Q_SUPER(&s1);
             break;
         }
     }
@@ -249,7 +249,7 @@ QP::QState QHsmTst::s2(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s2::initial}
         case Q_INIT_SIG: {
             BSP_display("s2-INIT;");
-            status_ = Q_TRAN(&QHsmTst::s211);
+            status_ = Q_TRAN(&s211);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s2::I}
@@ -278,7 +278,7 @@ QP::QState QHsmTst::s2(QHsmTst * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsmTst::s);
+            status_ = Q_SUPER(&s);
             break;
         }
     }
@@ -303,7 +303,7 @@ QP::QState QHsmTst::s21(QHsmTst * const me, QP::QEvt const * const e) {
         // ${HSMs::QHsmTst::SM::s::s2::s21::initial}
         case Q_INIT_SIG: {
             BSP_display("s21-INIT;");
-            status_ = Q_TRAN(&QHsmTst::s211);
+            status_ = Q_TRAN(&s211);
             break;
         }
         // ${HSMs::QHsmTst::SM::s::s2::s21::G}
@@ -325,7 +325,7 @@ QP::QState QHsmTst::s21(QHsmTst * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsmTst::s2);
+            status_ = Q_SUPER(&s2);
             break;
         }
     }
@@ -360,7 +360,7 @@ QP::QState QHsmTst::s211(QHsmTst * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsmTst::s21);
+            status_ = Q_SUPER(&s21);
             break;
         }
     }

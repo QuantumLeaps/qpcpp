@@ -97,7 +97,7 @@ QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
     } const tatbl_ = { // transition-action table
         &serving_s,
         {
-            Q_ACTION_CAST(&Table::serving_e), // entry
+            Q_ACTION_CAST(&serving_e), // entry
             Q_ACTION_CAST(0)  // zero terminator
         }
     };
@@ -132,7 +132,7 @@ QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
 //${AOs::Table::SM::active} ..................................................
 QP::QMState const Table::active_s = {
     static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&Table::active),
+    Q_STATE_CAST(&active),
     Q_ACTION_CAST(0), // no entry action
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
@@ -164,8 +164,8 @@ QP::QState Table::active(Table * const me, QP::QEvt const * const e) {
 //${AOs::Table::SM::active::serving} .........................................
 QP::QMState const Table::serving_s = {
     &Table::active_s, // superstate
-    Q_STATE_CAST(&Table::serving),
-    Q_ACTION_CAST(&Table::serving_e),
+    Q_STATE_CAST(&serving),
+    Q_ACTION_CAST(&serving_e),
     Q_ACTION_CAST(0), // no exit action
     Q_ACTION_CAST(0)  // no intitial tran.
 };
@@ -268,7 +268,7 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &paused_s,
                 {
-                    Q_ACTION_CAST(&Table::paused_e), // entry
+                    Q_ACTION_CAST(&paused_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };
@@ -285,9 +285,9 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
 //${AOs::Table::SM::active::paused} ..........................................
 QP::QMState const Table::paused_s = {
     &Table::active_s, // superstate
-    Q_STATE_CAST(&Table::paused),
-    Q_ACTION_CAST(&Table::paused_e),
-    Q_ACTION_CAST(&Table::paused_x),
+    Q_STATE_CAST(&paused),
+    Q_ACTION_CAST(&paused_e),
+    Q_ACTION_CAST(&paused_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
 // ${AOs::Table::SM::active::paused}
@@ -314,8 +314,8 @@ QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
             } const tatbl_ = { // transition-action table
                 &serving_s,
                 {
-                    Q_ACTION_CAST(&Table::paused_x), // exit
-                    Q_ACTION_CAST(&Table::serving_e), // entry
+                    Q_ACTION_CAST(&paused_x), // exit
+                    Q_ACTION_CAST(&serving_e), // entry
                     Q_ACTION_CAST(0)  // zero terminator
                 }
             };

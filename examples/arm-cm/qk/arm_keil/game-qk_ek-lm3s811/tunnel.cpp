@@ -465,7 +465,7 @@ void Tunnel::addImageAt(
         l_frame[x_pos + x + GAME_SCREEN_WIDTH] |= (uint8_t)(bmp1 >> 8);
     }
 }
-//${AOs::Tunnel::dispatchToAllMines} .........................................
+//${AOs::Tunnel::dispatchToAllMin~} ..........................................
 void Tunnel::dispatchToAllMines(QP::QEvt const * e) {
     for (uint8_t n = 0U; n < GAME_MINES_MAX; ++n) {
         if (m_mines[n] != static_cast<QMsm *>(0)) { // is the mine used?
@@ -633,7 +633,7 @@ QP::QState Tunnel::show_logo(Tunnel * const me, QP::QEvt const * const e) {
         // ${AOs::Tunnel::SM::active::show_logo::BLINK_TIMEOUT}
         case BLINK_TIMEOUT_SIG: {
             me->m_blink_ctr ^= 1U; // toggle the blink couner
-            // ${AOs::Tunnel::SM::active::show_logo::BLINK_TIMEOUT::[me->m_blink_c~]}
+            // ${AOs::Tunnel::SM::active::show_logo::BLINK_TIMEOUT::[me->m_blink_ctr~}
             if (me->m_blink_ctr == 0U) {
                 BSP_drawNString(6U*9U, 0U,         " LeAps");
                 BSP_drawNString(0U,    1U, "state-machine.co");
@@ -998,7 +998,7 @@ QP::QState Tunnel::screen_saver(Tunnel * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-//${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide} ................
+//${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~} ................
 QP::QMState const Tunnel::screen_saver_hide_s = {
     &Tunnel::screen_saver_s, // superstate
     Q_STATE_CAST(&screen_saver_hide),
@@ -1006,23 +1006,23 @@ QP::QMState const Tunnel::screen_saver_hide_s = {
     Q_ACTION_CAST(&screen_saver_hide_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~}
 QP::QState Tunnel::screen_saver_hide_e(Tunnel * const me) {
     BSP_displayOff(); // power down the display
     me->m_screenTimeEvt.armX(BSP_TICKS_PER_SEC*3U, 0U); // in 3 sec
     return QM_ENTRY(&screen_saver_hide_s);
 }
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~}
 QP::QState Tunnel::screen_saver_hide_x(Tunnel * const me) {
     me->m_screenTimeEvt.disarm();
     BSP_displayOn(); // power up the display
     return QM_EXIT(&screen_saver_hide_s);
 }
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~}
 QP::QState Tunnel::screen_saver_hide(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hide::SCREEN_TIMEOUT}
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_hid~::SCREEN_TIMEOUT}
         case SCREEN_TIMEOUT_SIG: {
             static struct {
                 QP::QMState const *target;
@@ -1045,7 +1045,7 @@ QP::QState Tunnel::screen_saver_hide(Tunnel * const me, QP::QEvt const * const e
     }
     return status_;
 }
-//${AOs::Tunnel::SM::active::screen_saver::screen_saver_show} ................
+//${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~} ................
 QP::QMState const Tunnel::screen_saver_show_s = {
     &Tunnel::screen_saver_s, // superstate
     Q_STATE_CAST(&screen_saver_show),
@@ -1053,7 +1053,7 @@ QP::QMState const Tunnel::screen_saver_show_s = {
     Q_ACTION_CAST(&screen_saver_show_x),
     Q_ACTION_CAST(0)  // no intitial tran.
 };
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~}
 QP::QState Tunnel::screen_saver_show_e(Tunnel * const me) {
     uint32_t rnd = random();
     // clear the screen frame buffer
@@ -1066,7 +1066,7 @@ QP::QState Tunnel::screen_saver_show_e(Tunnel * const me) {
     me->m_screenTimeEvt.armX(BSP_TICKS_PER_SEC/3U, 0U); // in 1/3 sec
     return QM_ENTRY(&screen_saver_show_s);
 }
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~}
 QP::QState Tunnel::screen_saver_show_x(Tunnel * const me) {
     me->m_screenTimeEvt.disarm();
     // clear the screen frame buffer
@@ -1075,11 +1075,11 @@ QP::QState Tunnel::screen_saver_show_x(Tunnel * const me) {
     BSP_drawBitmap(l_frame);
     return QM_EXIT(&screen_saver_show_s);
 }
-// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show}
+// ${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~}
 QP::QState Tunnel::screen_saver_show(Tunnel * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_show::SCREEN_TIMEOUT}
+        // ${AOs::Tunnel::SM::active::screen_saver::screen_saver_sho~::SCREEN_TIMEOUT}
         case SCREEN_TIMEOUT_SIG: {
             static struct {
                 QP::QMState const *target;
