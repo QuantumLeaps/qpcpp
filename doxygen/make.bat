@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QP/C++ script for generating Doxygen documentation
-:: Last Updated for Version: 5.3.1
-:: Date of the Last Update:  2014-09-18
+:: Last Updated for Version: 5.4.0
+:: Date of the Last Update:  2015-04.-03
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -34,45 +34,57 @@
 :: ==========================================================================
 setlocal
 
-@echo usage:
-@echo make
-@echo make -CHM
+echo usage:
+echo make
+echo make -CHM
 
-@echo Cleanup...
-@echo off
-rm help\*.*
-rmdir /S /Q  help\search
-@echo on
+set VERSION=5.4.0
 
-set VERSION=5.3.1
-
+:: Generate Resource Standard Metrics for QP/C++ ............................. 
 set DOXHOME="C:\tools\doxygen\bin"
 set RCMHOME="C:\tools\MSquared\M2 RSM"
 
-set RSM_OUTPUT=qpcpp_metrics.txt
-set RSM_INPUT=..\include\*.h ..\qep\source\*.h ..\qep\source\*.cpp ..\qf\source\*.h ..\qf\source\*.cpp ..\qk\source\*.h ..\qk\source\*.cpp ..\qs\source\*.h ..\qs\source\*.cpp
+set RSM_OUTPUT=metrics.dox
+set RSM_INPUT=..\include\*.h ..\source\*.h ..\source\*.cpp
 
 echo /** \page metrics Code Metrics > %RSM_OUTPUT%
 echo.>> %RSM_OUTPUT%
 echo \code >> %RSM_OUTPUT%
-echo                    Standard Code Metrics for QP/C++ %VERSION% >> %RSM_OUTPUT%
+echo                    Standard Code Metrics for QP/C %VERSION% >> %RSM_OUTPUT%
 
 %RCMHOME%\rsm.exe -fd -xNOCOMMAND -xNOCONFIG -u"File cfg rsm_qpcpp.cfg" %RSM_INPUT% >> %RSM_OUTPUT%
 
 echo \endcode >> %RSM_OUTPUT%
 echo */ >> %RSM_OUTPUT%
 
-@echo off
+:: Generate Doxygen Documentation ........................................... 
 if "%1"=="-CHM" (
-
+    echo Generating HTML...
     ::( type Doxyfile & echo GENERATE_HTMLHELP=YES ) | %DOXHOME%\doxygen.exe -
     %DOXHOME%\doxygen.exe Doxyfile-CHM
+    
+    echo Adding custom images...
+    xcopy preview.js tmp\
+    xcopy img tmp\img\
+    echo img\img.htm >> tmp\index.hhp
 
-    @echo off
-    @echo "C:\tools\HTML Help Workshop\hhw.exe"
-    @echo In HHW: you need to add all img\*.htm files to the project
-    @echo off
+    echo Generate CHM...
+    "C:\tools\HTML Help Workshop\hhc.exe" tmp\index.hhp
+    
+    echo Cleanup...
+    rmdir /S /Q  tmp
+    echo CHM file generated in ..\doc\
+
 ) else (
+    echo Cleanup...
+    rmdir /S /Q  ..\..\doc\qpcpp
+    
+    echo Adding custom images...
+    xcopy preview.js ..\..\doc\qpcpp\
+    xcopy img ..\..\doc\qpcpp\img\
+    copy images\favicon.ico ..\..\doc\qpcpp
+
+    echo Generating HTML...
     %DOXHOME%\doxygen.exe Doxyfile
 )
 

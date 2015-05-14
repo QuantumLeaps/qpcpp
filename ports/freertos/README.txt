@@ -1,4 +1,4 @@
-This directory contains a port of the QP/C++ framework to FreeRTOS.org.
+This directory contains a port of the QP/C framework to FreeRTOS.org.
 
 The port has been designed to use the FreeRTOS hardware abstraction
 layer, but this port does NOT eliminate all dependencies on the CPU

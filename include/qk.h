@@ -1,11 +1,10 @@
-/// \file
-/// \ingroup qk
-/// \brief QK/C++ platform-independent public interface.
-/// \cond
+/// @file
+/// @brief QK/C++ platform-independent public interface.
+/// @ingroup qk
+/// @cond
 ///***************************************************************************
-/// Product: QEP/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-03-05
+/// Last updated for version 5.4.0
+/// Last updated on  2014-05-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -35,75 +34,71 @@
 /// Web:   www.state-machine.com
 /// Email: info@state-machine.com
 ///***************************************************************************
-/// \endcond
+/// @endcond
 
 #ifndef qk_h
 #define qk_h
 
-#include "qequeue.h" // The QK kernel uses the native QF event queue
-#include "qmpool.h"  // The QK kernel uses the native QF memory pool
-#include "qpset.h"   // The QK kernel uses the native QF priority set
+#include "qequeue.h" // QK kernel uses the native QF event queue
+#include "qmpool.h"  // QK kernel uses the native QF memory pool
+#include "qpset.h"   // QK kernel uses the native QF priority set
 
 
 //****************************************************************************
 // QF configuration for QK
 
 //! This macro defines the type of the event queue used for active objects.
-/// \note
+/// @note
 /// This is just an example of the macro definition. Typically, you need
 /// to define it in the specific QF port file (qf_port.h). In case of QK,
 /// which always depends on the native QF queue, this macro is defined at the
 /// level of the platform-independent interface qk.h.
 #define QF_EQUEUE_TYPE             QEQueue
 
-#if defined(QK_TLS) || defined(QK_EXT_SAVE)
+#if defined(QK_TLS)
     #define QF_OS_OBJECT_TYPE      uint8_t
     #define QF_THREAD_TYPE         void *
-#endif  // QK_TLS || QK_EXT_SAVE
+#endif  // QK_TLS
 
 //****************************************************************************
 namespace QP {
 
 #ifndef QK_NO_MUTEX
     //! QK Mutex type.
-    /// \description
+    /// @description
     /// QMutex represents the priority-ceiling mutex available in QK.
-    /// \sa QP::QK::mutexLock() QP::QK::mutexUnlock()
+    /// @sa QP::QK::mutexLock() QP::QK::mutexUnlock()
     typedef uint_fast8_t QMutex;
 #endif  // QK_NO_MUTEX
 
 //****************************************************************************
 //! QK services.
-/// \description
+/// @description
 /// This class groups together QK services. It has only static members and
 /// should not be instantiated.
 ///
-// \note The QK scheduler, QK priority, QK ready set, etc. belong conceptually
+// @note The QK scheduler, QK priority, QK ready set, etc. belong conceptually
 /// to the QK class (as static class members). However, to avoid C++ potential
 /// name-mangling problems in assembly language, these elements are defined
 /// outside of the QK class and use the extern "C" linkage specification.
 class QK {
 public:
 
-    //! get the current QK version number string
-    /// \returns
-    /// version of QK as a constant 5-character string of the
-    /// form X.Y.Z, where X is a 1-digit major version number, Y is a
-    /// 1-digit minor version number, and Z is a 1-digit release number.
+    //! get the current QK version number string of the form X.Y.Z
     static char_t const Q_ROM *getVersion(void) {
-        return QP_VERSION_STR;
+        return versionStr;
     }
 
     //! QK idle callback (customized in BSPs for QK)
-    /// \description
+    /// @description
     /// QP::QK::onIdle() is called continously by the QK idle loop. This
     /// callback gives the application an opportunity to enter a power-saving
     /// CPU mode, or perform some other idle processing.
     ///
-    /// \note QP::QK::onIdle() is invoked with interrupts enabled and must
+    /// @note QP::QK::onIdle() is invoked with interrupts enabled and must
     /// also return with interrupts enabled.
     ///
-    /// \sa QP::QF::onIdle()
+    /// @sa QP::QF::onIdle()
     static void onIdle(void);
 
 #ifndef QK_NO_MUTEX
@@ -129,9 +124,6 @@ void QK_init(void);
 //! The QK scheduler
 void QK_sched_(uint_fast8_t p);
 
-//! The QK extended scheduler for interrupt context
-void QK_schedExt_(uint_fast8_t p);
-
 //! Find the highest-priority task ready to run
 uint_fast8_t QK_schedPrio_(void);
 
@@ -142,7 +134,7 @@ uint_fast8_t QK_schedPrio_(void);
 #endif
 
 extern uint_fast8_t volatile QK_currPrio_; //!< current task/ISR priority
-extern uint_fast8_t  volatile QK_intNest_; //!< interrupt nesting level
+extern uint_fast8_t volatile QK_intNest_;  //!< interrupt nesting level
 
 } // extern "C"
 
@@ -150,12 +142,21 @@ extern uint_fast8_t  volatile QK_intNest_; //!< interrupt nesting level
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
+    #ifndef QK_ISR_CONTEXT_
+        //! Internal port-specific macro that reports the execution context
+        // (ISR vs. thread).
+        /// @returns true if the code executes in the ISR context and false
+        /// otherwise
+        #define QK_ISR_CONTEXT_() (QK_intNest_ != static_cast<uint_fast8_t>(0))
+    #endif // QK_ISR_CONTEXT_
 
+    // native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
+        Q_ASSERT_ID(0, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
+
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
         QK_readySet_.insert((me_)->m_prio); \
-        if (QK_intNest_ == static_cast<uint_fast8_t>(0)) { \
+        if (!QK_ISR_CONTEXT_()) { \
             uint_fast8_t p = QK_schedPrio_(); \
             if (p != static_cast<uint_fast8_t>(0)) { \
                 QK_sched_(p); \
@@ -165,7 +166,7 @@ extern uint_fast8_t  volatile QK_intNest_; //!< interrupt nesting level
     #define QACTIVE_EQUEUE_ONEMPTY_(me_) \
         QK_readySet_.remove((me_)->m_prio)
 
-    // native QF event pool operations
+    // native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
@@ -175,6 +176,6 @@ extern uint_fast8_t  volatile QK_intNest_; //!< interrupt nesting level
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
     #define QF_EPOOL_PUT_(p_, e_) ((p_).put(e_))
 
-#endif  // QP_IMPL
+#endif // QP_IMPL
 
-#endif  // qk_h
+#endif // qk_h

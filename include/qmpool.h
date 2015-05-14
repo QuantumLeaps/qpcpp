@@ -1,11 +1,10 @@
-/// \file
-/// \brief platform-independent memory pool QP::QMPool interface.
-/// \ingroup qf
-/// \cond
+/// @file
+/// @brief platform-independent memory pool QP::QMPool interface.
+/// @ingroup qf
+/// @cond
 ///***************************************************************************
-/// Product: QF/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-04-08
+/// Last updated for version 5.4.0
+/// Last updated on  2015-04-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -35,7 +34,7 @@
 /// Web:   www.state-machine.com
 /// Email: info@state-machine.com
 ///***************************************************************************
-/// \endcond
+/// @endcond
 
 #ifndef qmpool_h
 #define qmpool_h
@@ -58,7 +57,7 @@ namespace QP {
 #elif (QF_MPOOL_SIZ_SIZE == 2)
     //! The data type to store the block-size based on the macro
     //! #QF_MPOOL_SIZ_SIZE.
-    /// \description
+    /// @description
     /// The dynamic range of this data type determines the maximum size
     /// of blocks that can be managed by the native QF event pool.
     typedef uint16_t QMPoolSize;
@@ -73,7 +72,7 @@ namespace QP {
 #elif (QF_MPOOL_CTR_SIZE == 2)
     //! The data type to store the block-counter based on the macro
     //! #QF_MPOOL_CTR_SIZE.
-    /// \description
+    /// @description
     /// The dynamic range of this data type determines the maximum number
     /// of blocks that can be stored in the pool.
     typedef uint16_t QMPoolCtr;
@@ -85,23 +84,23 @@ namespace QP {
 
 //****************************************************************************
 //! Native QF memory pool class
-/// \description
+/// @description
 /// A fixed block-size memory pool is a very fast and efficient data
 /// structure for dynamic allocation of fixed block-size chunks of memory.
 /// A memory pool offers fast and deterministic allocation and recycling of
-/// memory blocks and is not subject to fragmenation.\n
-/// \n
+/// memory blocks and is not subject to fragmenation.@n
+/// @n
 /// The QP::QMPool class describes the native QF memory pool, which can be
 /// used as the event pool for dynamic event allocation, or as a fast,
 /// deterministic fixed block-size heap for any other objects in your
 /// application.
 ///
-/// \note
+/// @note
 /// The QP::QMPool class contains only data members for managing a memory
 /// pool, but does not contain the pool storage, which must be provided
 /// externally during the pool initialization.
 ///
-/// \note
+/// @note
 /// The native QF event pool is configured by defining the macro
 /// #QF_EPOOL_TYPE_ as QP::QMPool in the specific QF port header file.
 class QMPool {
@@ -126,18 +125,18 @@ private:
     QMPoolCtr volatile m_nFree;
 
     //! minimum number of free blocks ever present in this pool
-    /// \note
+    /// @note
     /// This attribute remembers the low watermark of the pool,
     /// which provides a valuable information for sizing event pools.
     ///
-    /// \sa QP::QF::getPoolMin().
+    /// @sa QP::QF::getPoolMin().
     QMPoolCtr m_nMin;
 
 public:
     QMPool(void); //!< public default constructor
 
     //! Initializes the native QF event pool
-    void init(void * const poolSto, uint_fast16_t poolSize,
+    void init(void * const poolSto, uint_fast32_t poolSize,
               uint_fast16_t blockSize);
 
     //! Obtains a memory block from a memory pool.

@@ -16,7 +16,9 @@
 #ifndef stdint_h
 #define stdint_h
 
-/*lint -save -e1960    MISRA-C++:2008 Rule 17-0-2, Re-use of C++ identifier */
+/*lint -save */
+/*lint -e1960 */ /* MISRA-C++:2008 Rule 17-0-2, Re-use of C++ identifier */
+/*lint -e9141 */ /* MISRA-C++:2008 Rule 7-3-1, global declaration of symbol */
 
 /* Exact-width types. WG14/N843 C99 Standard, Section 7.18.1.1 */
 typedef signed char        int8_t;    /*!< exact-width  8-bit signed   int  */

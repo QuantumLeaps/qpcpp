@@ -1,10 +1,10 @@
-/// \file
-/// \brief Platform-specific QP/C++ interface.
-/// \cond
+/// @file
+/// @brief Platform-specific QP/C++ interface.
+/// @deprecated provided for backwards compatibility; instead use: qpcpp.h
+/// @cond
 ///***************************************************************************
-/// Product: QP/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-02-27
+/// Last updated for version 5.4.0
+/// Last updated on  2015-04-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -34,86 +34,11 @@
 /// Web:   www.state-machine.com
 /// Email: info@state-machine.com
 ///***************************************************************************
-/// \endcond
+/// @endcond
 
 #ifndef qp_port_h
 #define qp_port_h
 
-/// \description
-/// This header file must be included directly or indirectly
-/// in all application modules (*.cpp files) that use QP/C++.
+#include "qpcpp.h"
 
-#ifndef QP_API_VERSION
-
-//! Macro that specifies the backwards compatibility with the
-//! QP/C++ API version.
-/// \description
-/// For example, QP_API_VERSION=450 will cause generating the compatibility
-/// layer with QP/C++ version 4.5.0 and newer, but not older than 4.5.0.
-/// QP_API_VERSION=0 causes generation of the compatibility layer "from the
-/// begining of time", which is the maximum backwards compatibilty. This is
-/// the default.\n
-/// \n
-/// Conversely, QP_API_VERSION=9999 means that no compatibility layer should
-/// be generated. This setting is useful for checking if an application
-/// complies with the latest QP/C++ API.
-#define QP_API_VERSION 0
-
-#endif  // QP_API_VERSION
-
-#include "qf_port.h"  // QF/C++ port from the port directory
-#include "qassert.h"  // QP assertions
-
-#ifdef Q_SPY  // software tracing enabled?
-    #include "qs_port.h"  // QS/C++ port from the port directory
-#else
-    #include "qs_dummy.h" // QS/C++ dummy (inactive) interface
-#endif
-
-// QP API compatibility layer ************************************************
-#if (QP_API_VERSION < 500)
-
-//! \deprecated macro for odd 8-bit CPUs.
-#define Q_ROM_VAR
-
-#ifdef Q_SPY
-
-    //! \deprecated call to QActive post FIFO operation
-    #define postFIFO(e_, sender_) POST((e_), (sender_))
-
-    //! \deprecated call of QF system clock tick (for rate 0)
-    #define tick(sender_) TICK_X(static_cast<uint8_t>(0), (sender_))
-
-#else
-
-    #define postFIFO(e_)  POST((e_), dummy)
-    #define publish(e_)   PUBLISH((e_), dummy)
-    #define tick()        TICK_X(static_cast<uint8_t>(0), dummy)
-
-#endif  // Q_SPY
-
-//! \deprecated macro for generating QS-Reset trace record.
-#define QS_RESET() ((void)0)
-
-
-//****************************************************************************
-#if (QP_API_VERSION < 450)
-
-namespace QP {
-
-//! deprecated typedef for backwards compatibility
-typedef QEvt QEvent;
-
-} // namespace QP
-
-#ifdef Q_SPY
-    //! \deprecated call to QF publish operation
-    #define publish(e_, sender_)  PUBLISH((e_), (sender_))
-#else
-    #define publish(e_)   PUBLISH((e_), dummy)
-#endif  // Q_SPY
-
-#endif  // QP_API_VERSION < 450
-#endif  // QP_API_VERSION < 500
-
-#endif  // qp_port_h
+#endif // qp_port_h

@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last Updated for Version: 5.3.1
-// Date of the Last Update:  2014-09-05
+// Last updated for version 5.4.0
+// Last updated on  2015-05-01
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2014 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -38,8 +38,8 @@
 //-vf             // print names of all source files
 
 +fdi              // start #include search in directory of the including file
--i.               // QP/C port includes
--i../../include   // QP/C includes
+-i.               // QP/C++ port includes (see also qk/ and qv/)
+-i../../include   // QP/C++ includes
 
 -si4              // sizeof(int)
 -ss2              // sizeof(short)
@@ -48,9 +48,10 @@
 -sbo4             // sizeof(bool)
 
 
-au-misra-cpp.lnt  // MISRA-C++:2008 options
+au-misra-cpp.lnt  // MISRA-C++:2008 options 
+//au-misra-cpp-alt.lnt  // MISRA-C++:2008 options (alternate version) 
 au-ds.lnt         // Dan Saks recommendations
-lib-qpcpp.lnt     // QP/C++ options
+qpcpp.lnt         // QP/C++ options
 -strong(AXJ)      // Strong type checking
 
 
@@ -79,8 +80,10 @@ lib-qpcpp.lnt     // QP/C++ options
 
 // QF
 -emacro(1960, QF_EVT_CONST_CAST_) // 5-2-5 attempt to cast away const
--emacro(929, QF_EVT_CONST_CAST_)  // 5-2-7 cast from pointer to pointer
--emacro(925, QF_EPOOL_GET_)       // 5-2-8 5-2-9 cast from pointer to pointer
+-emacro(929,                // 5-2-7 cast from pointer to pointer
+ QF_EVT_CONST_CAST_,
+ QF_QACTIVE_TO_QHSM_CAST_)
+-emacro(925, QF_EPOOL_GET_) // 5-2-8 5-2-9 cast from pointer to pointer
 -estring(522,               // function lacks side-effects
  *QF_EVT_REF_CTR_INC_,
  *QF_EVT_REF_CTR_DEC_)
@@ -100,12 +103,15 @@ lib-qpcpp.lnt     // QP/C++ options
  QF_CRIT_EXIT_,
  QF_PTR_AT_,
  QF_PTR_RANGE_,
- QF_PTR_INC_)
+ QF_PTR_INC_,
+ QF_QACTIVE_TO_QHSM_CAST_)
+-emacro(740,                // 5-2-7 Unusual pointer cast (incompatible indirect types)
+ QF_QACTIVE_TO_QHSM_CAST_)
 -efunc(818,                 // 7-1-2 'stkSto' could be const
- *QActive::start,
- *QActive::stop)
+ *QMActive::start,
+ *QMActive::stop)
 -efunc(1762,                // 9-3-3 function could be made const
- *QActive::stop)
+ *QMActive::stop)
 -emacro(717, QACTIVE_EQUEUE_SIGNAL_) // do ... while(0);
 -efunc(529, *QF::tick)      // Symbol 'dummy' not accessed
 -efunc(438, *QF::tick)      // Value assigned to 'dummy' not used
@@ -117,17 +123,11 @@ lib-qpcpp.lnt     // QP/C++ options
 
 
 // QK
--emacro(929,                // 5-2-7 cast from pointer to pointer
- QK_EXT_SAVE,
- QK_EXT_RESTORE)
--emacro(740,                // 5-2-6 pointer cast, incompatible indirect types
- QK_EXT_SAVE,
- QK_EXT_RESTORE)
 -emacro(925,                // 5-2-8, 5-2-9 cast from pointer to pointer
- QK_EXT_SAVE,
- QK_EXT_RESTORE,
  QK_TLS)
--efunc(527, *QF::run)        // 0-1-1 Unreachable code
+-esym(1960,                 // 16-0-4 function-like macro
+ QK_ISR_CONTEXT_)
+-efunc(527, *QF::run)       // 0-1-1 Unreachable code
 
 
 // QS -- the following options are needed only when Q_SPY is defined

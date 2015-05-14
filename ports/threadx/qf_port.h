@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QF/C++ port to ThreadX
-// Last updated for version 5.3.0
-// Last updated on  2014-05-09
+// Last updated for version 5.4.0
+// Last updated on  2015-05-13
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,20 +35,20 @@
 #define qf_port_h
 
 // ThreadX event queue and thread types
-#define QF_EQUEUE_TYPE      TX_QUEUE
-#define QF_THREAD_TYPE      TX_THREAD
-#define QF_OS_OBJECT_TYPE   bool
+#define QF_EQUEUE_TYPE       TX_QUEUE
+#define QF_THREAD_TYPE       TX_THREAD
+#define QF_OS_OBJECT_TYPE    bool
 
 // QF priority offset within ThreadX priority numbering scheme, see NOTE1
-#define QF_TX_PRIO_OFFSET   8
+#define QF_TX_PRIO_OFFSET    8
 
 // The maximum number of active objects in the application, see NOTE2
-#define QF_MAX_ACTIVE       (31 - QF_TX_PRIO_OFFSET)
+#define QF_MAX_ACTIVE        (31 - QF_TX_PRIO_OFFSET)
 
 // QF critical section for ThreadX, see NOTE3
-#define QF_CRIT_STAT_TYPE     UINT
-#define QF_CRIT_ENTRY(stat_)  ((stat_) = tx_interrupt_control(TX_INT_DISABLE))
-#define QF_CRIT_EXIT(stat_)   ((void)tx_interrupt_control(stat_))
+#define QF_CRIT_STAT_TYPE    UINT
+#define QF_CRIT_ENTRY(stat_) ((stat_) = tx_interrupt_control(TX_INT_DISABLE))
+#define QF_CRIT_EXIT(stat_)  ((void)tx_interrupt_control(stat_))
 
 #include "tx_api.h"    // ThreadX API
 

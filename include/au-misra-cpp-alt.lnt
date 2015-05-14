@@ -1,0 +1,1699 @@
+/* Date Stamp */ -d"_lint_au_misra_cpp_alt_lnt=au-misra-cpp-alt.lnt modified 12-Jun-2014"
+/* To document usage use: -message( "Using " _lint_au_misra_cpp_alt_lnt ) */
+// ---------------------------------------------------------------------
+// This file is provided by Gimpel Software (www.gimpel.com) for use with
+// its products PC-lint and FlexeLint.
+//
+// Redistribution and use of this file, with or without modification, is
+// permitted provided that any such redistribution retains this notice.
+// ---------------------------------------------------------------------
+// au-misra-cpp-alt.lnt -- Author options - MISRA C++
+
+/*
+    This options file can be used to explicitly activate those
+    checks advocated by the Motor Industry Software Reliability
+    Association for C++ code.
+
+    In order to provide finer error message suppression, this "alt"
+    file enables diagnostics which correspond to the Note 1960 and
+    Note 1963 messages which the original au-misra-cpp.lnt file
+    references.
+
+    You can use this file directly when linting your programs as in:
+
+    lin  au-misra-cpp-alt  files
+
+    Gimpel Software relies on the document, "MISRA-C++:2008
+    Guidelines for the use of the C++ language in critical systems",
+    copyright 2008 by MIRA Limited, as the primary source for this
+    file.  Gimpel Software makes no warranty as to the completeness
+    or applicability of this options file and reserves the right to
+    amend or alter the official contents of such at any time.
+
+    "MISRA" is a registered trademark of MIRA Limited, held on
+    behalf of the MISRA Consortium.
+
+ */
+
+    -misra(C++)
+
+/* Rule 0-1-1    (req) *********************************/
+
+    +e527                       /* unreachable */
+    +elib(527)
+    -append(527,[MISRA C++ Rule 0-1-1])
+    +e506       /* constant value boolean */
+    +elib(506)
+    -append(506,[MISRA C++ Rule 0-1-1])
+    +e681       /* loop not entered */
+    +elib(681)
+    -append(681,[MISRA C++ Rule 0-1-1])
+    +e827       /* loop not reachable */
+    +elib(827)
+    -append(827,[MISRA C++ Rule 0-1-1])
+    +e685       /* relational operator always evaluates to true/false */
+    +elib(685)
+    -append(685,[MISRA C++ Rule 0-1-1])
+    +e774       /* boolean always evaluates to true/false */
+    +elib(774)
+    -append(774,[MISRA C++ Rule 0-1-1])
+    +e944       /* argument always evaluates to ... */
+    +elib(944)
+    -append(944,[MISRA C++ Rule 0-1-1])
+
+/* Rule 0-1-2    (req) *********************************/
+
+    +e685       /* relational operator always evaluates to true/false */
+    +elib(685)
+    -append(685,[MISRA C++ Rule 0-1-2])
+    +e774       /* boolean always evaluates to true/false */
+    +elib(774)
+    -append(774,[MISRA C++ Rule 0-1-2])
+    +e827       /* loop not reachable */
+    +elib(827)
+    -append(827,[MISRA C++ Rule 0-1-2])
+    +e944       /* argument always evaluates to ... */
+    +elib(944)
+    -append(944,[MISRA C++ Rule 0-1-2])
+
+/* Rule 0-1-3    (req) *********************************/
+
+    +e528       /* symbol not referenced */
+    +elib(528)
+    -append(528,[MISRA C++ Rule 0-1-3])
+    +e529       /* symbol not referenced */
+    +elib(529)
+    -append(529,[MISRA C++ Rule 0-1-3])
+    +e714       /* symbol not referenced */
+    +elib(714)
+    -append(714,[MISRA C++ Rule 0-1-3])
+    +e752       /* local declarator not referenced */
+    +elib(752)
+    -append(752,[MISRA C++ Rule 0-1-3])
+    +e757       /* global declarator not referenced */
+    +elib(757)
+    -append(757,[MISRA C++ Rule 0-1-3])
+
+/* Rule 0-1-4    (req) *********************************/
+
+    +e528       /* symbol not referenced */
+    +elib(528)
+    -append(528,[MISRA C++ Rule 0-1-4])
+    +e529       /* symbol not referenced */
+    +elib(529)
+    -append(529,[MISRA C++ Rule 0-1-4])
+    +e550       /* symbol not accessed */
+    +elib(550)
+    -append(550,[MISRA C++ Rule 0-1-4])
+    +e551       /* symbol not accessed */
+    +elib(551)
+    -append(551,[MISRA C++ Rule 0-1-4])
+    +e552       /* symbol not accessed */
+    +elib(552)
+    -append(552,[MISRA C++ Rule 0-1-4])
+
+/* Rule 0-1-5    (req) *********************************/
+
+    +e751       /* local typedef not referenced */
+    +elib(751)
+    -append(751,[MISRA C++ Rule 0-1-5])
+    +e753       /* local tag not referenced */
+    +elib(753)
+    -append(753,[MISRA C++ Rule 0-1-5])
+    +e756       /* global typedef not referenced */
+    +elib(756)
+    -append(756,[MISRA C++ Rule 0-1-5])
+    +e758       /* global tag not referenced */
+    +elib(758)
+    -append(758,[MISRA C++ Rule 0-1-5])
+
+/* Rule 0-1-6    (req) *********************************/
+
+    +e438       /* variable's last value not used */
+    +elib(438)
+    -append(438,[MISRA C++ Rule 0-1-6])
+
+/* Rule 0-1-7    (req) *********************************/
+
+    +e534       /* return value ignored */
+    +elib(534)
+    -append(534,[MISRA C++ Rule 0-1-7])
+
+/* Rule 0-1-8    (req) *********************************/
+
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 0-1-8,
+       Void return type for function without external side-effects
+     */
+    +estring(1960,0-1-8)
+
+/* Rule 0-1-9    (req) *********************************/
+
+    +e438       /* variable's last value not used */
+    +elib(438)
+    -append(438,[MISRA C++ Rule 0-1-9])
+    +e587       /* predicate always evaluates to ... */
+    +elib(587)
+    -append(587,[MISRA C++ Rule 0-1-9])
+    +e685       /* relational operator always evaluates to true/false */
+    +elib(685)
+    -append(685,[MISRA C++ Rule 0-1-9])
+    +e774       /* boolean always evaluates to true/false */
+    +elib(774)
+    -append(774,[MISRA C++ Rule 0-1-9])
+    +e838       /* previous value not used */
+    +elib(838)
+    -append(838,[MISRA C++ Rule 0-1-9])
+    +e944       /* argument always evaluates to ... */
+    +elib(944)
+    -append(944,[MISRA C++ Rule 0-1-9])
+    +e948       /* operator always evaluates to ... */
+    +elib(948)
+    -append(948,[MISRA C++ Rule 0-1-9])
+
+/* Rule 0-1-10    (req) *********************************/
+
+    +e528       /* symbol not referenced */
+    +elib(528)
+    -append(528,[MISRA C++ Rule 0-1-10])
+    +e714       /* symbol not referenced */
+    +elib(714)
+    -append(714,[MISRA C++ Rule 0-1-10])
+    +e1714       /* member function not referenced */
+    +elib(1714)
+    -append(1714,[MISRA C++ Rule 0-1-10])
+    +e1716       /* virtual member function not referenced */
+    +elib(1716)
+    -append(1716,[MISRA C++ Rule 0-1-10])
+    +e1914       /* default constructor not referenced */
+    +elib(1914)
+    -append(1914,[MISRA C++ Rule 0-1-10])
+
+/* Rule 0-1-11    (req) *********************************/
+
+    +e715       /* symbol not referenced */
+    +elib(715)
+    -append(715,[MISRA C++ Rule 0-1-11])
+
+/* Rule 0-1-12    (req) *********************************/
+
+    +e715       /* symbol not referenced */
+    +elib(715)
+    -append(715,[MISRA C++ Rule 0-1-12])
+
+/* Rule 0-2-1    (req) *********************************/
+
+    /*  See rule 9-5-1.  */
+
+/* Rule 0-3-1    (doc) *********************************/
+
+    /*  Static Analysis is provided by using PC-lint/FlexeLint  */
+
+/* Rule 0-3-2   (req) *********************************/
+
+    +e534       /* return value ignored */
+    +elib(534)
+    -append(534,[MISRA C++ Rule 0-3-2])
+
+/* Rule 0-4-1    (doc) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 0-4-2    (doc) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 0-4-3    (doc) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 1-0-1    (req) *********************************/
+
+    -A(C++2003) /* ensure ISO C++ 2003 compliance */
+
+/* Rule 1-0-2    (req) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 1-0-3    (doc) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 2-2-1    (doc) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 2-3-1    (req) *********************************/
+
+    -ftg
+    +e584       /* trigraph sequence detected */
+    +elib(584)
+    -append(584,[MISRA C++ Rule 2-3-1])
+    +e739       /* trigraph sequence in literal */
+    +elib(739)
+    -append(739,[MISRA C++ Rule 2-3-1])
+
+/* Rule 2-5-1    (adv) *********************************/
+
+    +e9102       /* possible digraph */
+    +elib(9102)
+    -append(9102,[MISRA C++ Rule 2-5-1])
+
+/* Rule 2-7-1    (req) *********************************/
+
+    -fnc
+    +e602       /* comment within comment */
+    +elib(602)
+    -append(602,[MISRA C++ Rule 2-7-1])
+
+/* Rule 2-7-2    (req) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 2-7-3    (adv) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 2-10-1   (req) *********************************/
+
+    +e620       /* suspicious constant */
+    +elib(620)
+    -append(620,[MISRA C++ Rule 2-10-1])
+
+/* Rule 2-10-2   (req) *********************************/
+
+    +e578       /* declaration hides symbol */
+    +elib(578)
+    -append(578,[MISRA C++ Rule 2-10-2])
+    +e1411       /* hidden virtual member */
+    +elib(1411)
+    -append(1411,[MISRA C++ Rule 2-10-2])
+    +e1511       /* hidden non-virtual member */
+    +elib(1511)
+    -append(1511,[MISRA C++ Rule 2-10-2])
+    +e1516       /* member hides member */
+    +elib(1516)
+    -append(1516,[MISRA C++ Rule 2-10-2])
+    +e1737       /* hidden operator new */
+    +elib(1737)
+    -append(1737,[MISRA C++ Rule 2-10-2])
+    +e1761       /* hidden overloaded function */
+    +elib(1761)
+    -append(1761,[MISRA C++ Rule 2-10-2])
+
+/* Rule 2-10-3   (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 2-10-4   (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 2-10-5   (adv) *********************************/
+
+    /* not currently supported */
+
+/* Rule 2-10-6   (req) *********************************/
+
+    +e18       /* redeclaration */
+    +elib(18)
+    -append(18,[MISRA C++ Rule 2-10-6])
+
+/* Rule 2-13-1   (req) *********************************/
+
+    +e606       /* non-ANSI escape sequence */
+    +elib(606)
+    -append(606,[MISRA C++ Rule 2-13-1])
+
+/* Rule 2-13-2   (req) *********************************/
+
+    +e9104      /* octal escape sequence used */
+    +elib(9104)
+    -append(9104,[MISRA C++ Rule 2-13-2])
+
+/* Rule 2-13-3   (req) *********************************/
+
+    +e9105      /* unsigned octal and hexadecimal literals
+                   require a 'U' suffix */
+    +elib(9105)
+    -append(9105,[MISRA C++ Rule 2-13-3])
+
+/* Rule 2-13-4   (req) *********************************/
+
+    +e620       /* suspicious constant */
+    +elib(620)
+    -append(620,[MISRA C++ Rule 2-13-4])
+    +e9106      /* lower case suffix */
+    +elib(9106)
+    -append(9106,[MISRA C++ Rule 2-13-4])
+
+/* Rule 2-13-5   (req) *********************************/
+
+    +e707   /* mixing narrow and wide string
+               literals in concatenation */
+    +elib(707)
+    -append(707,[MISRA C++ Rule 2-13-5])
+
+/* Rule 3-1-1    (req) *********************************/
+
+    +e9107  /* header includes definition of symbol */
+    +elib(9107)
+    -append(9107,[MISRA C++ Rule 3-1-1])
+
+/* Rule 3-1-2    (req) *********************************/
+
+    +e9108  /* function not declared at file scope */
+    +elib(9108)
+    -append(9108,[MISRA C++ Rule 3-1-2])
+
+/* Rule 3-1-3    (req) *********************************/
+
+    +e85       /* zero-dimensioned array */
+    +elib(85)
+    -append(85,[MISRA C++ Rule 3-1-3])
+    +e9067     /* no array size */
+    +elib(9067)
+    -append(9067,[MISRA C++ Rule 3-1-3])
+
+/* Rule 3-2-1    (req) *********************************/
+
+    +e18       /* redeclaration */
+    +elib(18)
+    -append(18,[MISRA C++ Rule 3-2-1])
+    +e31       /* redefinition */
+    +elib(31)
+    -append(31,[MISRA C++ Rule 3-2-1])
+
+/* Rule 3-2-2    (req) *********************************/
+
+    +e15       /* redeclaration */
+    +elib(15)
+    -append(15,[MISRA C++ Rule 3-2-2])
+    +e31       /* redefinition */
+    +elib(31)
+    -append(31,[MISRA C++ Rule 3-2-2])
+
+/* Rule 3-2-3    (req) *********************************/
+
+    +e9004       /* object/function previously declared */
+    +elib(9004)
+    -append(9004,[MISRA C++ Rule 3-2-3])
+    +e9109       /* type previously declared */
+    +elib(9109)
+    -append(9109,[MISRA C++ Rule 3-2-3])
+
+/* Rule 3-2-4    (req) *********************************/
+
+    +e15       /* redeclaration */
+    +elib(15)
+    -append(15,[MISRA C++ Rule 3-2-4])
+    +e31       /* redefinition */
+    +elib(31)
+    -append(31,[MISRA C++ Rule 3-2-4])
+
+/* Rule 3-3-1    (req) *********************************/
+
+    +e759       /* could move declaration to module */
+    +elib(759)
+    -append(759,[MISRA C++ Rule 3-3-1])
+    +e765       /* could be made static */
+    +elib(765)
+    -append(765,[MISRA C++ Rule 3-3-1])
+
+/* Rule 3-3-2    (req) *********************************/
+
+    +e401       /* not previously declared static */
+    +elib(401)
+    -append(401,[MISRA C++ Rule 3-3-2])
+    +e512       /* previously used as static */
+    +elib(512)
+    -append(512,[MISRA C++ Rule 3-3-2])
+
+/* Rule 3-4-1    (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 3-9-1    (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 3-9-2    (adv) *********************************/
+
+    +e970       /* type or modifier outside of typedef */
+    +elib(970)
+    -esym(970,wchar_t)
+    -append(970,[MISRA C++ Rule 3-9-2])
+    //  For the duration, we are presuming MISRA does not want
+    //  diagnostics for the bool type.
+    -esym(970,bool)
+
+/* Rule 3-9-3    (req) *********************************/
+
+    +e9110    /* floating point bit representation used */
+    +elib(9110)
+    -append(9110,[MISRA C++ Rule 3-9-3])
+
+/* Rule 4-5-1    (req) *********************************/
+
+    +e9111    /* impermissible boolean use */
+    +elib(9111)
+    -append(9111,[MISRA C++ Rule 4-5-1])
+
+/* Rule 4-5-2    (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 4-5-3    (req) *********************************/
+
+    +e9112    /* impermissible plain char use */
+    +elib(9112)
+    -append(9112,[MISRA C++ Rule 4-5-3])
+
+/* Rule 4-10-1  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 4-10-2  (req) *********************************/
+
+    +e910       /* conversion from 0 to pointer */
+    +elib(910)
+    -emacro((910), NULL)    /*  explicit exception  */
+    -append(910,[MISRA C++ Rule 4-10-2])
+
+/* Rule 5-0-1    (req) *********************************/
+
+    +e564                       /* order of evaluation */
+    +elib(564)
+    -append(564,[MISRA C++ Rule 5-0-1])
+    +e864                       /* order of evaluation */
+    +elib(864)
+    -append(864,[MISRA C++ Rule 5-0-1])
+
+/* Rule 5-0-2    (adv) *********************************/
+
+    +e834  /* confusing operator sequence (same precedence) */
+    +elib(834)
+    -append(834,[MISRA C++ Rule 5-0-2])
+    +e9113 /* dependence placed on operator precedence */
+    +elib(9113)
+    -append(9113,[MISRA C++ Rule 5-0-2])
+
+/* Rule 5-0-3    (req) *********************************/
+
+    +e9114 /* implicit cvalue conversion */
+    +elib(9114)
+    -append(9114,[MISRA C++ Rule 5-0-3])
+    +e9116 /* implicit cvalue conversion */
+    +elib(9116)
+    -append(9116,[MISRA C++ Rule 5-0-3])
+
+/* Rule 5-0-4    (req) *********************************/
+
+    +e9117 /* implicit conversion of floating point cvalue expression */
+    +elib(9117)
+    -append(9117,[MISRA C++ Rule 5-0-4])
+
+/* Rule 5-0-5    (req) *********************************/
+
+    +e9115  /* implicit conversion from integer to floating point type */
+    +elib(9115)
+    -append(9115,[MISRA C++ Rule 5-0-5])
+    +e9118  /* implicit conversion from floating point to integer type */
+    +elib(9118)
+    -append(9118,[MISRA C++ Rule 5-0-5])
+
+/* Rule 5-0-6    (req) *********************************/
+
+    +e9119  /* implicit conversion of integer to smaller type */
+    +elib(9119)
+    -append(9119,[MISRA C++ Rule 5-0-6])
+    +e9120  /* implicit conversion of floating point to smaller type */
+    +elib(9120)
+    -append(9120,[MISRA C++ Rule 5-0-6])
+
+/* Rule 5-0-7    (req) *********************************/
+
+    +e9121  /* cast of cvalue expression from integer to floating point type */
+    +elib(9121)
+    -append(9121,[MISRA C++ Rule 5-0-7])
+    +e9122  /* cast of cvalue expression from floating point to integer type */
+    +elib(9122)
+    -append(9122,[MISRA C++ Rule 5-0-7])
+
+/* Rule 5-0-8    (req) *********************************/
+
+    +e9123  /* cast of integer cvalue expression to larger type */
+    +elib(9123)
+    -append(9123,[MISRA C++ Rule 5-0-8])
+    +e9124  /* cast of floating point cvalue expression to larger type */
+    +elib(9124)
+    -append(9124,[MISRA C++ Rule 5-0-8])
+
+/* Rule 5-0-9    (req) *********************************/
+
+    +e9125  /* cast of cvalue expression changes signedness */
+    +elib(9125)
+    -append(9125,[MISRA C++ Rule 5-0-9])
+
+/* Rule 5-0-10    (req) *********************************/
+
+    +e9126  /* operators '~' and '<<' require recasting to underlying type for sub-integers */
+    +elib(9126)
+    -append(9126,[MISRA C++ Rule 5-0-10])
+
+/* Rule 5-0-11    (req) *********************************/
+
+    +e9127  /* disallowed use of non-character value */
+    +elib(9127)
+    -append(9127,[MISRA C++ Rule 5-0-11])
+    +e9128  /* plain char mixed with type other than plain char */
+    +elib(9128)
+    -append(9128,[MISRA C++ Rule 5-0-11])
+
+/* Rule 5-0-12    (req) *********************************/
+
+    +e9129  /* disallowed use of non-numeric value */
+    +elib(9129)
+    -append(9129,[MISRA C++ Rule 5-0-12])
+
+/* Rule 5-0-13    (req) *********************************/
+
+    +e909       /* conversion to bool */
+    +elib(909)
+    -append(909,[MISRA C++ Rule 5-0-13])
+
+/* Rule 5-0-14    (req) *********************************/
+
+    +e909       /* conversion to bool */
+    +elib(909)
+    -append(909,[MISRA C++ Rule 5-0-14])
+
+/* Rule 5-0-15    (req) *********************************/
+
+    +e946          /* relational or subtract operator applied to pointers */
+    +elib(946)
+    -append(946,[MISRA C++ Rule 5-0-15])
+    +e947          /* subtract operator applied to pointers */
+    +elib(947)
+    -append(947,[MISRA C++ Rule 5-0-15])
+    +e9016         /* pointer arithmetic other than array indexing used */
+    +elib(9016)
+    -append(9016,[MISRA C++ Rule 5-0-15])
+
+/* Rule 5-0-16    (req) *********************************/
+
+    +e415   /* out-of-bounds pointer */
+    +elib(415)
+    -append(415,[MISRA C++ Rule 5-0-16])
+    +e416   /* out-of-bounds pointer */
+    +elib(416)
+    -append(416,[MISRA C++ Rule 5-0-16])
+    +e661   /* out-of-bounds pointer */
+    +elib(661)
+    -append(661,[MISRA C++ Rule 5-0-16])
+    +e662   /* out-of-bounds pointer */
+    +elib(662)
+    -append(662,[MISRA C++ Rule 5-0-16])
+    +e796   /* out-of-bounds pointer */
+    +elib(796)
+    -append(796,[MISRA C++ Rule 5-0-16])
+    +e797   /* out-of-bounds pointer */
+    +elib(797)
+    -append(797,[MISRA C++ Rule 5-0-16])
+
+/* Rule 5-0-17    (req) *********************************/
+
+    +e946          /* relational or subtract operator applied to pointers */
+    +elib(946)
+    -append(946,[MISRA C++ Rule 5-0-17])
+    +e947          /* subtract operator applied to pointers */
+    +elib(947)
+    -append(947,[MISRA C++ Rule 5-0-17])
+
+/* Rule 5-0-18    (req) *********************************/
+
+    +e946          /* relational or subtract operator applied to pointers */
+    +elib(946)
+    -append(946,[MISRA C++ Rule 5-0-18])
+    +e947          /* subtract operator applied to pointers */
+    +elib(947)
+    -append(947,[MISRA C++ Rule 5-0-18])
+
+/* Rule 5-0-19    (req) *********************************/
+
+    +e9025         /* more than two indirection levels */
+    +elib(9025)
+    -append(9025,[MISRA C++ Rule 5-0-19])
+
+/* Rule 5-0-20  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 5-0-21  (req) *********************************/
+
+    +e9130         /* bitwise operator applied to signed
+                      underlying type */
+    +elib(9130)
+    -append(9130,[MISRA C++ Rule 5-0-21])
+
+/* Rule 5-2-1  (req) *********************************/
+
+    +e9131         /* non-postfix expression used with logical operator */
+    +elib(9131)
+    -append(9131,[MISRA C++ Rule 5-2-1])
+
+/* Rule 5-2-2  (req) *********************************/
+
+    +e1774  /* could use dynamic_cast */
+    +elib(1774)
+    -append(1774,[MISRA C++ Rule 5-2-2])
+    +e1939  /* down_cast used */
+    +elib(1939)
+    -append(1939,[MISRA C++ Rule 5-2-2])
+
+/* Rule 5-2-3  (adv) *********************************/
+
+    /* not currently supported */
+
+/* Rule 5-2-4  (req) *********************************/
+
+    +e1924  /* C-style cast */
+    +elib(1924)
+    -append(1924,[MISRA C++ Rule 5-2-4])
+
+/* Rule 5-2-5  (req) *********************************/
+
+    +e1773  /* casting away const/volatile */
+    +elib(1773)
+    -append(1773,[MISRA C++ Rule 5-2-5])
+    +e9005  /* casting away const/volatile */
+    +elib(9005)
+    -append(9005,[MISRA C++ Rule 5-2-5])
+
+/* Rule 5-2-6  (req) *********************************/
+
+    +e611   /* suspicious cast */
+    +elib(611)
+    -append(611,[MISRA C++ Rule 5-2-6])
+    +e740   /* unusual cast */
+    +elib(740)
+    -append(740,[MISRA C++ Rule 5-2-6])
+
+/* Rule 5-2-7  (req) *********************************/
+
+    +e740   /* unusual cast */
+    +elib(740)
+    -append(740,[MISRA C++ Rule 5-2-7])
+    +e916   /* pointer assignment conversion */
+    +elib(916)
+    -append(916,[MISRA C++ Rule 5-2-7])
+    +e918   /* prototype coercion */
+    +elib(918)
+    -append(918,[MISRA C++ Rule 5-2-7])
+    +esym(920,pointer)   /* implicit conversion */
+    +elib(920)
+    -append(920,[MISRA C++ Rule 5-2-7])
+    +e923   /* cast */
+    +elib(923)
+    -append(923,[MISRA C++ Rule 5-2-7])
+    +e926   /* pointer cast */
+    +elib(926)
+    -append(926,[MISRA C++ Rule 5-2-7])
+    +e927   /* pointer cast */
+    +elib(927)
+    -append(927,[MISRA C++ Rule 5-2-7])
+    +e928   /* pointer cast */
+    +elib(928)
+    -append(928,[MISRA C++ Rule 5-2-7])
+    +e929   /* pointer cast */
+    +elib(929)
+    -append(929,[MISRA C++ Rule 5-2-7])
+    +e930   /* cast */
+    +elib(930)
+    -append(930,[MISRA C++ Rule 5-2-7])
+
+/* Rule 5-2-8  (adv) *********************************/
+
+    +estring(64,ptrs to void/nonvoid)
+    +e923   /* cast */
+    +elib(923)
+    -append(923,[MISRA C++ Rule 5-2-8])
+    +e925               /* cast */
+    +elib(925)
+    -append(925,[MISRA C++ Rule 5-2-8])
+    +esym(930,pointer)   /* cast */
+    +elib(930)
+    -append(930,[MISRA C++ Rule 5-2-8])
+
+/* Rule 5-2-9  (adv) *********************************/
+
+    +e925               /* cast */
+    +elib(925)
+    -append(925,[MISRA C++ Rule 5-2-9])
+    +e9091              /* cast */
+    +elib(9091)
+    -append(9091,[MISRA C++ Rule 5-2-9])
+
+/* Rule 5-2-10  (adv) *********************************/
+
+    +e564   /* order of evaluation */
+    +elib(564)
+    -append(564,[MISRA C++ Rule 5-2-10])
+    +e591   /* order of evaluation */
+    +elib(591)
+    -append(591,[MISRA C++ Rule 5-2-10])
+    +e864   /* order of evaluation */
+    +elib(864)
+    -append(864,[MISRA C++ Rule 5-2-10])
+    +e9163   /* order of evaluation */
+    +elib(9163)
+    -append(9163,[MISRA C++ Rule 5-2-10])
+
+/* Rule 5-2-11  (req) *********************************/
+
+    +e1753  /* operator overloaded */
+    +elib(1753)
+    -append(1753,[MISRA C++ Rule 5-2-11])
+
+/* Rule 5-2-12  (req) *********************************/
+
+    +e9132  /* array passed when expecting pointer */
+    +elib(9132)
+    -append(9132,[MISRA C++ Rule 5-2-12])
+
+/* Rule 5-3-1  (req) *********************************/
+
+    +e909       /* conversion to bool */
+    +elib(909)
+    -append(909,[MISRA C++ Rule 5-3-1])
+    +e9133      /* boolean expression required */
+    +elib(9133)
+    -append(9133,[MISRA C++ Rule 5-3-1])
+
+/* Rule 5-3-2  (req) *********************************/
+
+    +e501                        /* expected signed type */
+    +elib(501)
+    -append(501,[MISRA C++ Rule 5-3-2])
+    +e9134                       /* prohibited operator */
+    +elib(9134)
+    -append(9134,[MISRA C++ Rule 5-3-2])
+
+/* Rule 5-3-3  (req) *********************************/
+
+    +e9135    /* unary operator overloaded */
+    +elib(9135)
+    -append(9135,[MISRA C++ Rule 5-3-3])
+
+/* Rule 5-3-4    (req) *********************************/
+
+    +e9006    /* sizeof used with side effects */
+    +elib(9006)
+    -append(9006,[MISRA C++ Rule 5-3-4])
+
+/* Rule 5-8-1  (req) *********************************/
+
+    +e572                        /* excessive shift value */
+    +elib(572)
+    -append(572,[MISRA C++ Rule 5-8-1])
+    +e9131                       /* non-postfix expression used with logical operator */
+    +elib(9131)
+    -append(9131,[MISRA C++ Rule 5-8-1])
+
+/* Rule 5-14-1   (req) *********************************/
+
+    +e9007    /* side effects on rhs of logical operator */
+    +elib(9007)
+    -append(9007,[MISRA C++ Rule 5-14-1])
+
+/* Rule 5-17-1  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 5-18-1  (req) *********************************/
+
+    +e9008    /* comma operator used */
+    +elib(9008)
+    -append(9008,[MISRA C++ Rule 5-18-1])
+
+/* Rule 5-19-1  (adv) *********************************/
+
+    +e648   /* overflow in computing constant */
+    +elib(648)
+    -append(648,[MISRA C++ Rule 5-19-1])
+
+/* Rule 6-2-1  (req) *********************************/
+
+    +e720                         /* Boolean test of assignment */
+    +elib(720)
+    -append(720,[MISRA C++ Rule 6-2-1])
+    +e820       /* boolean test of parenthesized assignment */
+    +elib(820)
+    -append(820,[MISRA C++ Rule 6-2-1])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 6-2-1,
+       assignment operator used in sub-expression
+     */
+    +estring(1960,6-2-1)
+
+/* Rule 6-2-2  (req) *********************************/
+
+    +e777       /* testing floats for equality */
+    +elib(777)
+    -append(777,[MISRA C++ Rule 6-2-2])
+    +e9137       /* testing floats for equality */
+    +elib(9137)
+    -append(9137,[MISRA C++ Rule 6-2-2])
+
+/* Rule 6-2-3  (req) *********************************/
+
+    +e9138       /* null statement not on line by itself */
+    +elib(9138)
+    -append(9138,[MISRA C++ Rule 6-2-3])
+
+/* Rule 6-3-1  (req) *********************************/
+
+    +e9012       /* compound statement expected */
+    +elib(9012)
+    -append(9012,[MISRA C++ Rule 6-3-1])
+
+/* Rule 6-4-1  (req) *********************************/
+
+    +e9012       /* compound statement expected */
+    +elib(9012)
+    -append(9012,[MISRA C++ Rule 6-4-1])
+
+/* Rule 6-4-2  (req) *********************************/
+
+    +e9013       /* no 'else' at end of 'if/else' chain */
+    +elib(9013)
+    -append(9013,[MISRA C++ Rule 6-4-2])
+
+/* Rule 6-4-3  (req) *********************************/
+
+    +e9042       /* departure from MISRA switch syntax */
+    +elib(9042)
+    -append(9042,[MISRA C++ Rule 6-4-3])
+
+/* Rule 6-4-4  (req) *********************************/
+
+    +e9055       /* enclosing compound statement is not a switch */
+    +elib(9055)
+    -append(9055,[MISRA C++ Rule 6-4-4])
+
+/* Rule 6-4-5  (req) *********************************/
+
+    +e616       /* control flows into case/default */
+    +elib(616)
+    -append(616,[MISRA C++ Rule 6-4-5])
+    +e825       /* control flows into case/default without -fallthrough */
+    +elib(825)
+    -append(825,[MISRA C++ Rule 6-4-5])
+    +e9090      /* missing unconditional break */
+    +elib(9090)
+    -append(9090,[MISRA C++ Rule 6-4-5])
+
+/* Rule 6-4-6  (req) *********************************/
+
+    +e744                         /* switch statement has no default */
+    +elib(744)
+    -append(744,[MISRA C++ Rule 6-4-6])
+    +e9139                        /* case follows default */
+    +elib(9139)
+    -append(9139,[MISRA C++ Rule 6-4-6])
+
+/* Rule 6-4-7  (req) *********************************/
+
+    +e483                         /* boolean switch expression */
+    +elib(483)
+    -append(483,[MISRA C++ Rule 6-4-7])
+
+/* Rule 6-4-8  (req) *********************************/
+
+    +e764       /* no case */
+    +elib(764)
+    -append(764,[MISRA C++ Rule 6-4-8])
+
+/* Rule 6-5-1  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 6-5-2  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 6-5-3  (req) *********************************/
+
+    +e850       /* loop variable modified in body */
+    +elib(850)
+    -append(850,[MISRA C++ Rule 6-5-3])
+
+/* Rule 6-5-4  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 6-5-5  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 6-5-6  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 6-6-1  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 6-6-2  (req) *********************************/
+
+    +e107   /* label not defined */
+    +elib(107)
+    -append(107,[MISRA C++ Rule 6-6-2])
+    +e9064   /* goto references earlier label */
+    +elib(9064)
+    -append(9064,[MISRA C++ Rule 6-6-2])
+
+/* Rule 6-6-3  (req) *********************************/
+
+    +e9140   /* continue statement detected */
+    +elib(9140)
+    -append(9140,[MISRA C++ Rule 6-6-3])
+
+/* Rule 6-6-4  (req) *********************************/
+
+    +estring(9011, break)   /* more than one 'break' terminates loop */
+    -append(9011,[MISRA C++ Rule 6-6-4])
+
+/* Rule 6-6-5  (req) *********************************/
+
+    +e904   /* return before function end */
+    +elib(904)
+    -append(904,[MISRA C++ Rule 6-6-5])
+
+/* Rule 7-1-1  (req) *********************************/
+
+    +e952                      /* use const on paramaters where appropriate */
+    +elib(952)
+    -append(952,[MISRA C++ Rule 7-1-1])
+
+/* Rule 7-1-2  (req) *********************************/
+
+    +e818                       /* use const on paramaters where appropriate */
+    +elib(818)
+    -append(818,[MISRA C++ Rule 7-1-2])
+
+/* Rule 7-2-1  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 7-3-1  (req) *********************************/
+
+    +e9141                      /* global declaration */
+    +elib(9141)
+    -append(9141,[MISRA C++ Rule 7-3-1])
+
+/* Rule 7-3-2  (req) *********************************/
+
+    +e9142      /* non-global 'main' */
+    +elib(9142)
+    -append(9142,[MISRA C++ Rule 7-3-2])
+
+/* Rule 7-3-3  (req) *********************************/
+
+    +e1751      /* unnamed namespace in header */
+    +elib(1751)
+    -append(1751,[MISRA C++ Rule 7-3-3])
+
+/* Rule 7-3-4  (req) *********************************/
+
+    +e9144      /* using-directive used */
+    +elib(9144)
+    -append(9144,[MISRA C++ Rule 7-3-4])
+
+/* Rule 7-3-5  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 7-3-6  (req) *********************************/
+
+    +e9145      /* using-directive/declaration in header */
+    +elib(9145)
+    -append(9145,[MISRA C++ Rule 7-3-6])
+
+/* Rule 7-4-1  (doc) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 7-4-2  (req) *********************************/
+
+    /*  only use the asm declaration to introduce assembly code  */
+    -rw(_asm)
+    -rw(__asm)
+    -pragma(asm)
+    -pragma(endasm)
+    -ppw(asm)
+    -ppw(endasm)
+
+/* Rule 7-4-3  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 7-5-1  (req) *********************************/
+
+    +e604   /* returning address of auto variable */
+    +elib(604)
+    -append(604,[MISRA C++ Rule 7-5-1)
+
+/* Rule 7-5-2  (req) *********************************/
+
+    +e789   /* assigning auto address to static */
+    +elib(789)
+    -append(789,[MISRA C++ Rule 7-5-2])
+    +e604   /* returning address of auto variable */
+    +elib(604)
+    -append(604,[MISRA C++ Rule 7-5-2])
+
+/* Rule 7-5-3  (req) *********************************/
+
+    +e1780  /*  returning address of reference
+                to a const parameter */
+    +elib(1780)
+    -append(1780,[MISRA C++ Rule 7-5-3])
+    +e1940  /*  address of reference parameter transferred outside of
+                function */
+    +elib(1940)
+    -append(1940,[MISRA C++ Rule 7-5-3])
+
+/* Rule 7-5-4  (req) *********************************/
+
+    +stack()
+    -e974
+    +estring(974,*recursive*)   /* worst case stack usage */
+    -append(974,[MISRA C++ Rule 7-5-4])
+
+/* Rule 8-0-1  (req) *********************************/
+
+    +e9146              /* multiple declarations */
+    +elib(9146)
+    -append(9146,[MISRA C++ Rule 8-0-1])
+
+/* Rule 8-3-1  (req) *********************************/
+
+    +e1735  /* virtual function has default parameter */
+    +elib(1735)
+    -append(1735,[Potentially Violates MISRA C++ Rule 8-3-1])
+
+/* Rule 8-4-1  (req) *********************************/
+
+    +e1916  /* ellipsis */
+    +elib(1916)
+    -append(1916,[MISRA C++ Rule 8-4-1])
+    +e9165  /* function has variable number of arguments */
+    +elib(9165)
+    -append(9165,[MISRA C++ Rule 8-4-1])
+
+
+/* Rule 8-4-2  (req) *********************************/
+
+    +e9166  /* function parameter list differs */
+    +elib(9166)
+    -append(9166,[MISRA C++ Rule 8-4-2])
+
+/* Rule 8-4-3  (req) *********************************/
+
+    +e533   /* missing/extraneous return value */
+    +elib(533)
+    -append(533,[MISRA C++ Rule 8-4-3])
+
+/* Rule 8-4-4  (req) *********************************/
+
+    +e9147   /* function identifier used without & or parenthesized parameter list */
+    +elib(9147)
+    -append(9147,[MISRA C++ Rule 8-4-4])
+
+/* Rule 8-5-1  (req) *********************************/
+
+    +e530   /* symbol not initialized */
+    +elib(530)
+    -append(530,[MISRA C++ Rule 8-5-1])
+    +e1744  /* possibly not initialized */
+    +elib(1744)
+    -append(1744,[MISRA C++ Rule 8-5-1])
+    +e1401  /* member not initialized */
+    +elib(1401)
+    -append(1401,[MISRA C++ Rule 8-5-1])
+
+/* Rule 8-5-2  (req) *********************************/
+
+    +e940   /* omitted braces */
+    +elib(940)
+    -append(940,[MISRA C++ Rule 8-5-2])
+
+/* Rule 8-5-3  (req) *********************************/
+
+    +e9148   /* should initialize either all enum members or only the first */
+    +elib(9148)
+    -append(9148,[MISRA C++ Rule 8-5-3])
+
+/* Rule 9-3-1  (req) *********************************/
+
+    +e605   /* increase in pointer capability */
+    +elib(605)
+    -append(605,[MISRA C++ Rule 9-3-1])
+    +e1536  /* exposing member */
+    +elib(1536)
+    -append(1536,[MISRA C++ Rule 9-3-1])
+    +e1763  /* const function modifies member */
+    +elib(1763)
+    -append(1763,[MISRA C++ Rule 9-3-1])
+
+/* Rule 9-3-2  (req) *********************************/
+
+    +e1536  /* exposing member */
+    +elib(1536)
+    -append(1536,[MISRA C++ Rule 9-3-2])
+
+/* Rule 9-3-3  (req) *********************************/
+
+    +e1762  /* member could be const */
+    +elib(1762)
+    -append(1762,[MISRA C++ Rule 9-3-3])
+
+/* Rule 9-5-1  (req) *********************************/
+
+    +e9018  /* declaration of symbol with union based type */
+    +elib(9018)
+    -append(9018,[MISRA C++ Rule 9-5-1])
+
+/* Rule 9-6-1  (doc) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 9-6-2  (req) *********************************/
+
+    +e46    /* bit field should be int */
+    +elib(46)
+    -append(46,[MISRA C++ Rule 9-6-2])
+    +e9149  /* bit field must be explicitly signed, unsigned, or bool */
+    +elib(9149)
+    -append(9149,[MISRA C++ Rule 9-6-2])
+
+/* Rule 9-6-3  (req) *********************************/
+
+    +e46    /* bit field should be int */
+    +elib(46)
+    -append(46,[MISRA C++ Rule 9-6-3])
+
+/* Rule 9-6-4  (req) *********************************/
+
+    +e9088    /* name signed single-bit bit-field */
+    +elib(9088)
+    -append(9088,[MISRA C++ Rule 9-6-4])
+
+/* Rule 10-1-1  (adv) *********************************/
+
+    +e1749  /* base class need not be virtual */
+    +elib(1749)
+    -append(1749,[MISRA C++ Rule 10-1-1])
+
+/* Rule 10-1-2  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 10-1-3  (req) *********************************/
+
+    +e1748  /* multiple inclusion of non-virtual base class */
+    +elib(1748)
+    -append(1748,[MISRA C++ Rule 10-1-3])
+
+/* Rule 10-2-1  (adv) *********************************/
+
+    /* not currently supported */
+
+/* Rule 10-3-1  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 10-3-2  (req) *********************************/
+
+    +e1909  /* 'virtual' assumed */
+    +elib(1909)
+    -append(1909,[MISRA C++ Rule 10-3-2])
+
+/* Rule 10-3-3  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 11-0-1  (req) *********************************/
+
+    +e9150  /* non-private data member within a non-POD structure */
+    +elib(9150)
+    -append(9150,[MISRA C++ Rule 11-0-1])
+
+/* Rule 12-1-1  (req) *********************************/
+
+    +e1506  /* virtual function called inside constructor */
+    +elib(1506)
+    -append(1506,[MISRA C++ Rule 12-1-1])
+
+/* Rule 12-1-2  (adv) *********************************/
+
+    +e1928  /* symbol not in constructor initializer list */
+    +elib(1928)
+    -append(1928,[MISRA C++ Rule 12-1-2])
+
+/* Rule 12-1-3  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 12-8-1  (req) *********************************/
+
+    +e1938  /* constructor access global data */
+    +elib(1938)
+    -append(1938,[MISRA C++ Rule 12-8-1])
+
+/* Rule 12-8-2  (req) *********************************/
+
+    +e9151  /* public copy assignment operator in abstract class */
+    +elib(9151)
+    -append(9151,[MISRA C++ Rule 12-8-2])
+
+/* Rule 14-5-1  (req) *********************************/
+
+    +e1573  /* generic function template declared in namespace
+               associated with type
+             */
+    +elib(1573)
+    -append(1573,[MISRA C++ Rule 14-5-1])
+
+/* Rule 14-5-2  (req) *********************************/
+
+    +e1789  /* template constructor cannot be copy constructor */
+    +elib(1789)
+    -append(1789,[MISRA C++ Rule 14-5-2])
+
+/* Rule 14-5-3  (req) *********************************/
+
+    +e1721  /* non-assignment operator=() */
+    +elib(1721)
+    -append(1721,[MISRA C++ Rule 14-5-3])
+
+/* Rule 14-6-1  (req) *********************************/
+
+    +e1942  /* possible misinterpretation of name */
+    +elib(1942)
+    -append(1942,[MISRA C++ Rule 14-6-1])
+
+/* Rule 14-6-2  (req) *********************************/
+
+    /* awaiting clarification from MISRA */
+
+/* Rule 14-7-1  (req) *********************************/
+
+    +e1795  /* template not instantiated */
+    +elib(1795)
+    -append(1795,[MISRA C++ Rule 14-7-1])
+
+/* Rule 14-7-2  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 14-7-3  (req) *********************************/
+
+    +e1576  /* specialization occurs in different file than template
+               definition
+             */
+    +elib(1576)
+    -append(1576,[MISRA C++ Rule 14-7-3])
+    +e1577  /* specialization occurs in different file than template
+               definition
+             */
+    +elib(1577)
+    -append(1577,[MISRA C++ Rule 14-7-3])
+
+/* Rule 14-8-1  (req) *********************************/
+
+    +e9152  /* explicit specialization of overloaded function templates */
+    +elib(9152)
+    -append(9152,[MISRA C++ Rule 14-8-1])
+
+/* Rule 14-8-2  (adv) *********************************/
+
+    +e9153  /* viable set contains both function and template */
+    +elib(9153)
+    -append(9153,[MISRA C++ Rule 14-8-2])
+
+/* Rule 15-0-1  (doc) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 15-0-2  (adv) *********************************/
+
+    +e9154  /* pointer expression thrown */
+    +elib(9154)
+    -append(9154,[MISRA C++ Rule 15-0-2])
+
+/* Rule 15-0-3  (req) *********************************/
+
+    +estring(646,try,catch) /* misplaced case? */
+    -append(646,[MISRA C++ Rule 15-0-3])
+
+/* Rule 15-1-1  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 15-1-2  (req) *********************************/
+
+    +e1419  /* explicit throw of the NULL macro */
+    +elib(1419)
+    -append(1419,[MISRA C++ Rule 15-1-2])
+
+/* Rule 15-1-3  (req) *********************************/
+
+    +e9156  /* empty throw outside of a catch block */
+    +elib(9156)
+    -append(9156,[MISRA C++ Rule 15-1-3])
+
+/* Rule 15-3-1  (req) *********************************/
+
+    +e1546  /* throw() inside destructor */
+    +elib(1546)
+    -append(1546,[MISRA C++ Rule 15-3-1])
+
+/* Rule 15-3-2  (adv) *********************************/
+
+    /* not currently supported */
+
+/* Rule 15-3-3  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 15-3-4  (req) *********************************/
+
+    +e1560  /* uncaught exception */
+    +elib(1560)
+    -append(1560,[MISRA C++ Rule 15-3-4])
+
+/* Rule 15-3-5  (req) *********************************/
+
+    +e1752  /* non-reference catch parameter */
+    +elib(1752)
+    -append(1752,[MISRA C++ Rule 15-3-5])
+
+/* Rule 15-3-6  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 15-3-7  (req) *********************************/
+
+    +e1127  /* catch handler after catch(...) */
+    +elib(1127)
+    -append(1127,[MISRA C++ Rule 15-3-7])
+
+/* Rule 15-4-1  (req) *********************************/
+
+    +e1548  /* conflicting exception specifications */
+    +elib(1548)
+    -append(1548,[MISRA C++ Rule 15-4-1])
+
+/* Rule 15-5-1  (req) *********************************/
+
+    +e1546  /* throw() inside destructor */
+    +elib(1546)
+    -append(1546,[MISRA C++ Rule 15-5-1])
+    +e1559  /* uncaught exception */
+    +elib(1559)
+    -append(1559,[MISRA C++ Rule 15-5-1])
+
+/* Rule 15-5-2  (req) *********************************/
+
+    +e1549  /* exception thrown in no-throw function */
+    +elib(1549)
+    -append(1549,[MISRA C++ Rule 15-5-2])
+
+/* Rule 15-5-3  (req) *********************************/
+
+    +e1546  /* throw() inside destructor */
+    +elib(1546)
+    -append(1546,[MISRA C++ Rule 15-5-3])
+    +e1560  /* uncaught exception */
+    +elib(1560)
+    -append(1560,[MISRA C++ Rule 15-5-3])
+    +e1559  /* uncaught exception */
+    +elib(1559)
+    -append(1559,[MISRA C++ Rule 15-5-3])
+
+/* Rule 16-0-1  (req) *********************************/
+
+    +e9019  /* declaration before #include */
+    +elib(9019)
+    -append(9019,[MISRA C++ Rule 16-0-1])
+
+/* Rule 16-0-2  (req) *********************************/
+
+    +e9158  /* '#define' used within a block */
+    +elib(9158)
+    -append(9158,[MISRA C++ Rule 16-0-2])
+    +e9159  /* '#undef' used within a block */
+    +elib(9159)
+    -append(9159,[MISRA C++ Rule 16-0-2])
+
+/* Rule 16-0-3  (req) *********************************/
+
+    +e9021  /* '#undef' is discouraged */
+    +elib(9021)
+    -append(9021,[MISRA C++ Rule 16-0-3])
+
+/* Rule 16-0-4  (req) *********************************/
+
+    +e9026  /* function-like macro defined */
+    +elib(9026)
+    -append(9026,[MISRA C++ Rule 16-0-4])
+
+/* Rule 16-0-5  (req) *********************************/
+
+    +e436   /* preprocessor directive in invocation of macro */
+    +elib(436)
+    -append(436,[MISRA C++ Rule 16-0-5])
+
+/* Rule 16-0-6  (req) *********************************/
+
+    +e665   /* unparenthesized macro parameter */
+    +elib(665)
+    -append(665,[MISRA C++ Rule 16-0-6])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 16-0-6,
+       assignment operator used in sub-expression
+     */
+    +estring(1960,16-0-6)
+
+/* Rule 16-0-7  (req) *********************************/
+
+    +e553              /* undefined preprocessor variable */
+    +elib(553)
+    -append(553,[MISRA C++ Rule 16-0-7])
+
+/* Rule 16-0-8  (req) *********************************/
+
+    +e16        /* # directive not followed by recognizable word */
+    +elib(16)
+    -append(16,[MISRA C++ Rule 16-0-8])
+    +e544       /* endif or else not followed by EOL */
+    +elib(544)
+    -append(544,[MISRA C++ Rule 16-0-8])
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 16-0-8,
+       assignment operator used in sub-expression
+     */
+    +estring(1960,16-0-8)
+
+/* Rule 16-1-1  (req) *********************************/
+
+    +e491       /* non-standard use of 'defined' */
+    +elib(491)
+    -append(491,[MISRA C++ Rule 16-1-1])
+
+/* Rule 16-1-2  (req) *********************************/
+
+    +e405       /* #if not closed off */
+    +elib(405)
+    -append(405,[MISRA C++ Rule 16-1-2])
+
+/* Rule 16-2-1  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 16-2-2  (req) *********************************/
+
+    +e1923  /* macro could be const variable */
+    +elib(1923)
+    -append(1923,[MISRA C++ Rule 16-2-2])
+
+/* Rule 16-2-3  (req) *********************************/
+
+    +e967   /* no standard include guard */
+    +elib(967)
+    -append(967,[MISRA C++ Rule 16-2-3])
+
+/* Rule 16-2-4  (req) *********************************/
+
+    +e9020    /* header file name with non-standard character */
+    -estring(9020,\)    /* not covered by this rule */
+    -append(9020,[MISRA C++ Rule 16-2-4])
+
+/* Rule 16-2-5  (adv) *********************************/
+
+    /*  Note: If your system requires the '\' be used as a directory
+        separator, comment out the following options.
+     */
+    +estring(9020,\) /* header file name with non-standard character */
+    -append(9020(\),[MISRA C++ Rule 16-2-5])
+
+/* Rule 16-2-6  (req) *********************************/
+
+    +e12                    /* Need < or " after #include */
+    +elib(12)
+    -append(12,[MISRA C++ Rule 16-2-6])
+
+/* Rule 16-3-1  (req) *********************************/
+
+    +e9023     /* Multiple use of '#/##' operators in definition of macro */
+    +elib(9023)
+    -append(9023,[MISRA C++ Rule 16-3-1])
+
+/* Rule 16-3-2  (adv) *********************************/
+
+    +e9024     /* '#/##' operators used in macro */
+    +elib(9024)
+    -append(9024,[MISRA C++ Rule 16-3-2])
+
+/* Rule 16-6-1  (doc) *********************************/
+
+    /* not statically checkable */
+
+/* Rule 17-0-1  (req) *********************************/
+
+    +e683       /* complain about #define standard functions */
+    +elib(683)
+    -append(683,[MISRA C++ Rule 17-0-1])
+
+/* Rule 17-0-2  (req) *********************************/
+
+    /* we generate note 1960 as follows
+       Note 1960: Violates MISRA C++ Required Rule 17-0-2,
+       Re-use of reserved identifier
+     */
+    +estring(1960,17-0-2)
+
+/* Rule 17-0-3  (req) *********************************/
+
+    /* not currently supported */
+
+/* Rule 17-0-4  (req) *********************************/
+
+    /* See various +elib options throughout this file. */
+
+/* Rule 17-0-5  (req) *********************************/
+
+    +e586       /* Symbol is deprecated */
+    +elib(586)
+    -deprecate( function, longjmp, [MISRA C++ Rule 17-0-5] )
+    -deprecate( macro, setjmp, [MISRA C++ Rule 17-0-5] )
+
+/* Rule 18-0-1  (req) *********************************/
+
+    +e829   /* header warning */
+    +elib(829)
+    +headerwarn(time.h)
+    +headerwarn(limits.h)
+    +headerwarn(float.h)
+    +headerwarn(stddef.h)
+    +headerwarn(errno.h)
+    +headerwarn(locale.h)
+    +headerwarn(stdio.h)
+    +headerwarn(ctype.h)
+    +headerwarn(string.h)
+    +headerwarn(math.h)
+    +headerwarn(stdlib.h)
+    +headerwarn(assert.h)
+    +headerwarn(stdarg.h)
+    +headerwarn(setjmp.h)
+    +headerwarn(signal.h)
+    -append(829,[MISRA C++ Rule 18-0-1])
+
+/* Rule 18-0-2  (req) *********************************/
+
+    +e586       /* Symbol is deprecated */
+    +elib(586)
+    -deprecate( function, atof, [MISRA C++ Rule 18-0-2] )
+    -deprecate( function, atoi, [MISRA C++ Rule 18-0-2] )
+    -deprecate( function, atol, [MISRA C++ Rule 18-0-2] )
+
+/* Rule 18-0-3  (req) *********************************/
+
+    +e586       /* Symbol is deprecated */
+    +elib(586)
+    -deprecate( function, abort, [MISRA C++ Rule 18-0-3] )
+    -deprecate( function, exit, [MISRA C++ Rule 18-0-3] )
+    -deprecate( function, getenv, [MISRA C++ Rule 18-0-3] )
+    -deprecate( function, system, [MISRA C++ Rule 18-0-3] )
+
+/* Rule 18-0-4  (req) *********************************/
+
+    +e829   /* header warning */
+    +elib(829)
+    +headerwarn(ctime)
+    -append(829,[MISRA C++ Rule 18-0-4])
+
+/* Rule 18-0-5  (req) *********************************/
+
+    +e586       /* Symbol is deprecated */
+    +elib(586)
+    -deprecate( function, strcpy, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strcmp, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strcat, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strchr, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strspn, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strcspn, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strpbrk, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strrchr, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strstr, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strtok, [MISRA C++ Rule 18-0-5] )
+    -deprecate( function, strlen, [MISRA C++ Rule 18-0-5] )
+
+/* Rule 18-2-1  (req) *********************************/
+
+    +e586       /* Symbol is deprecated */
+    +elib(586)
+    -deprecate( macro, offsetof, [MISRA C++ Rule 18-2-1] )
+
+/* Rule 18-4-1  (req) *********************************/
+
+    +e586       /* Symbol is deprecated */
+    +elib(586)
+    -deprecate( function, operator new, [MISRA C++ Rule 18-4-1] )
+    -deprecate( function, operator delete, [MISRA C++ Rule 18-4-1] )
+    -deprecate( function, calloc, [MISRA C++ Rule 18-4-1] )
+    -deprecate( function, malloc, [MISRA C++ Rule 18-4-1] )
+    -deprecate( function, realloc, [MISRA C++ Rule 18-4-1] )
+    -deprecate( function, free, [MISRA C++ Rule 18-4-1] )
+
+/* Rule 18-7-1  (req) *********************************/
+
+    +e829   /* header warning */
+    +elib(829)
+    +headerwarn(csignal)
+    -append(829,[MISRA C++ Rule 18-7-1])
+
+/* Rule 19-3-1  (req) *********************************/
+
+    +e586       /* Symbol is deprecated */
+    +elib(586)
+    -deprecate( variable, errno, [MISRA C++ Rule 19-3-1] )
+
+/* Rule 27-0-1  (req) *********************************/
+
+    +e829   /* header warning */
+    +elib(829)
+    +headerwarn(cstdio)
+    -append(829,[MISRA C++ Rule 27-0-1])

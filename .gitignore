@@ -4,6 +4,7 @@
 *.lib
 *.a
 *.elf
+*.err
 *.hex
 *.exe
 *.EXE
@@ -19,9 +20,23 @@
 *.tmp
 *.log
 *.chm
+*.zip
+*.ncb
+*.suo
+*.chw
+*.sfr
+*.user
 *.avrsuo
+*.Debug
+*.Release
+lint*.out
+*.Miro
+*.bak
 
+3rd_party/
+doc/
 test/
+test_ports/
 dbg/
 rel/
 spy/

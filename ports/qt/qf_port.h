@@ -1,61 +1,69 @@
-//****************************************************************************
-// Product: QF/C++ port to Qt
-// Last Updated for Version: QP 5.3.0/Qt 5.1.1
-// Last updated on  2014-04-21
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) Quantum Leaps, www.state-machine.com.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
-//****************************************************************************
+/// @file
+/// @brief QP/C++ port to Qt
+/// @cond
+///***************************************************************************
+/// Last Updated for Version: QP 5.4.0/Qt 5.x
+/// Last updated on  2015-05-03
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, www.state-machine.com.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// Web:   www.state-machine.com
+/// Email: info@state-machine.com
+///***************************************************************************
+/// @endcond
+
 #ifndef qf_port_h
 #define qf_port_h
 
 // event queue and thread types for the Qt port
-#define QF_EQUEUE_TYPE              QEQueue
-#define QF_OS_OBJECT_TYPE           QWaitCondition *
-#define QF_THREAD_TYPE              QThread *
+#define QF_EQUEUE_TYPE         QEQueue
+#define QF_OS_OBJECT_TYPE      QWaitCondition *
+#define QF_THREAD_TYPE         QThread *
 
 // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE               63
+#define QF_MAX_ACTIVE          63
 
 // The number of system clock tick rates
-#define QF_MAX_TICK_RATE            2
+#define QF_MAX_TICK_RATE       2
 
 // various QF object sizes configuration for this port
-#define QF_EVENT_SIZ_SIZE           4
-#define QF_EQUEUE_CTR_SIZE          4
-#define QF_MPOOL_SIZ_SIZE           4
-#define QF_MPOOL_CTR_SIZE           4
-#define QF_TIMEEVT_CTR_SIZE         4
+#define QF_EVENT_SIZ_SIZE      4
+#define QF_EQUEUE_CTR_SIZE     4
+#define QF_MPOOL_SIZ_SIZE      4
+#define QF_MPOOL_CTR_SIZE      4
+#define QF_TIMEEVT_CTR_SIZE    4
 
-// Qt critical section, see NOTE01
+// QF interrupt disable/enable, see NOTE1
+#define QF_INT_DISABLE()       (QP::QF_enterCriticalSection_())
+#define QF_INT_ENABLE()        (QP::QF_leaveCriticalSection_())
+
+// Qt critical section, see NOTE1
 // QF_CRIT_STAT_TYPE not defined
-#define QF_CRIT_ENTRY(dummy)        (QP::QF_enterCriticalSection())
-#define QF_CRIT_EXIT(dummy)         (QP::QF_leaveCriticalSection())
+#define QF_CRIT_ENTRY(dummy)   QF_INT_DISABLE()
+#define QF_CRIT_EXIT(dummy)    QF_INT_ENABLE()
 
 class QWaitCondition; // forward declaration
 class QThread;        // forward declaration
@@ -73,10 +81,19 @@ class QThread;        // forward declaration
 
 namespace QP {
 
-void QF_enterCriticalSection(void);
-void QF_leaveCriticalSection(void);
-void QF_setTickRate(unsigned ticksPerSec); // set clock tick rate
-void QF_onClockTick(void); // clock tick callback (provided in the app)
+void QF_enterCriticalSection_(void);
+void QF_leaveCriticalSection_(void);
+
+// set Qt thread priority;
+// can be called either before or after QMActive::START()
+//
+void QF_setQtPrio(QMActive *act, int_t qtPrio);
+
+// set clock tick rate
+void QF_setTickRate(uint32_t ticksPerSec);
+
+// clock tick callback (provided in the app)
+void QF_onClockTick(void);
 
 #ifdef Q_SPY
 void QS_onEvent(void);

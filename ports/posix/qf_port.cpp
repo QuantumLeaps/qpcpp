@@ -1,36 +1,39 @@
-//****************************************************************************
-// Product: QF/C++ port to POSIX/P-threads, GNU
-// Last updated for version 5.3.0
-// Last updated on  2014-04-14
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) Quantum Leaps, www.state-machine.com.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
-//****************************************************************************
+/// @file
+/// @brief QF/C++ port to POSIX/P-threads
+/// @cond
+///***************************************************************************
+/// Last updated for version 5.4.0
+/// Last updated on  2015-04-14
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, www.state-machine.com.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// Web:   www.state-machine.com
+/// Email: info@state-machine.com
+///***************************************************************************
+/// @endcond
 
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.h"      // QF port
@@ -50,12 +53,14 @@ namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
-// Global-scope objects -----------------------------------------------------
+// Global-scope objects ------------------------------------------------------
 pthread_mutex_t QF_pThreadMutex_ = PTHREAD_MUTEX_INITIALIZER;
 
 // Local-scope objects -------------------------------------------------------
 static long int l_tickUsec = 10000UL; // clock tick in usec (for tv_usec)
 static bool l_running;
+
+static void *ao_thread(void *arg); // thread routine for all AOs
 
 //............................................................................
 void QF::init(void) {
@@ -66,9 +71,8 @@ void QF::init(void) {
 int_t QF::run(void) {
     onStartup(); // invoke startup callback
 
-    struct sched_param sparam;
-
     // try to maximize the priority of this thread, see NOTE01
+    struct sched_param sparam;
     sparam.sched_priority = sched_get_priority_max(SCHED_FIFO);
     if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &sparam) == 0) {
         // success, this application has sufficient privileges
@@ -98,7 +102,7 @@ void QF::stop(void) {
     l_running = false; // stop the loop in QF::run()
 }
 //............................................................................
-void QF::thread_(QActive *act) {
+void QF::thread_(QMActive *act) {
     // loop until m_thread is cleared in QActive::stop()
     do {
         QEvt const *e = act->get_(); // wait for event
@@ -110,17 +114,13 @@ void QF::thread_(QActive *act) {
     pthread_cond_destroy(&act->m_osObject); // cleanup the condition variable
 }
 //............................................................................
-extern "C" void *thread_routine(void *arg) { // the expected POSIX signature
-    QF::thread_(static_cast<QActive *>(arg));
-    return (void *)0; // return success
-}
-//............................................................................
-void QActive::start(uint_fast8_t prio,
-                    QEvt const *qSto[], uint_fast16_t qLen,
-                    void *stkSto, uint_fast16_t stkSize,
-                    QEvt const *ie)
+void QMActive::start(uint_fast8_t prio,
+                     QEvt const *qSto[], uint_fast16_t qLen,
+                     void *stkSto, uint_fast16_t stkSize,
+                     QEvt const *ie)
 {
-    Q_REQUIRE(stkSto == (void *)0); // p-threads allocate stack internally
+    // p-threads allocate stack internally
+    Q_REQUIRE_ID(600, stkSto == static_cast<void *>(0));
 
     pthread_cond_init(&m_osObject, 0);
 
@@ -150,7 +150,7 @@ void QActive::start(uint_fast8_t prio,
         stkSize = (uint_fast16_t)PTHREAD_STACK_MIN; // the minimum
     }
     pthread_t thread;
-    if (pthread_create(&thread, &attr, &thread_routine, this) != 0) {
+    if (pthread_create(&thread, &attr, &ao_thread, this) != 0) {
 
         // Creating the p-thread with the SCHED_FIFO policy failed.
         // Most probably this application has no superuser privileges,
@@ -160,14 +160,20 @@ void QActive::start(uint_fast8_t prio,
         pthread_attr_setschedpolicy(&attr, SCHED_OTHER);
         param.sched_priority = 0;
         pthread_attr_setschedparam(&attr, &param);
-        Q_ALLEGE(pthread_create(&thread, &attr, &thread_routine, this)== 0);
+        Q_ALLEGE(pthread_create(&thread, &attr, &ao_thread, this)== 0);
     }
     pthread_attr_destroy(&attr);
     m_thread = static_cast<uint8_t>(1);
 }
 //............................................................................
-void QActive::stop(void) {
+void QMActive::stop(void) {
     m_thread = static_cast<uint8_t>(0); // stop the QF::thread_() loop
+}
+
+//............................................................................
+static void *ao_thread(void *arg) { // the expected POSIX signature
+    QF::thread_(static_cast<QMActive *>(arg));
+    return static_cast<void *>(0); // return success
 }
 
 } // namespace QP

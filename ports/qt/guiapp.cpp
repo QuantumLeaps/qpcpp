@@ -1,36 +1,40 @@
-//****************************************************************************
-// Product: QP/C++ port to Qt
-// Last Updated for Version: QP 5.3.0/Qt 5.1.1
-// Last updated on  2014-04-21
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) Quantum Leaps, www.state-machine.com.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
-//****************************************************************************
+/// @file
+/// @brief QP/C++ port to Qt
+/// @cond
+///***************************************************************************
+/// Last Updated for Version: QP 5.4.0/Qt 5.x
+/// Last updated on  2015-05-03
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, www.state-machine.com.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// Web:   www.state-machine.com
+/// Email: info@state-machine.com
+///***************************************************************************
+/// @endcond
+
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.h"      // QF port
 #include "qf_pkg.h"
@@ -90,10 +94,10 @@ void GuiQActive::start(uint_fast8_t const prio,
                        void * const stkSto, uint_fast16_t const /*stkSize*/,
                        QEvt const * const ie)
 {
-    Q_REQUIRE((uf8_0 < prio)
+    Q_REQUIRE((static_cast<uint_fast8_t>(0) < prio)
               && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
               && (qSto == (QEvt const **)0)/* does not need per-actor queue */
-              && (stkSto == null_void)); // does not need per-actor stack
+              && (stkSto == static_cast<void *>(0))); // AOs don't need stack
 
     setPrio(prio);  // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
@@ -124,7 +128,8 @@ bool GuiQActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
         QS_EQC_(0);                  // min number of free entries (not used)
     QS_END_NOCRIT_()
 
-    if (QF_EVT_POOL_ID_(e) != u8_0) { // is it a dynamic event?
+    // is it a dynamic event?
+    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
     QF_CRIT_EXIT_();
@@ -148,7 +153,8 @@ void GuiQActive::postLIFO(QEvt const * const e) {
         QS_EQC_(0);                  // min number of free entries (not used)
     QS_END_NOCRIT_()
 
-    if (QF_EVT_POOL_ID_(e) != u8_0) { // is it a dynamic event?
+    // is it a dynamic event?
+    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
     QF_CRIT_EXIT_();
@@ -164,10 +170,10 @@ void GuiQMActive::start(uint_fast8_t const prio,
                         void * const stkSto, uint_fast16_t const /*stkSize*/,
                         QEvt const * const ie)
 {
-    Q_REQUIRE((uf8_0 < prio)
+    Q_REQUIRE((static_cast<uint_fast8_t>(0) < prio)
               && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
               && (qSto == (QEvt const **)0)/* does not need per-actor queue */
-              && (stkSto == null_void)); // does not need per-actor stack
+              && (stkSto == static_cast<void *>(0))); // AOs don't need stack
 
     setPrio(prio);  // set the QF priority of this active object
     QF::add_(this); // make QF aware of this active object
@@ -198,7 +204,8 @@ bool GuiQMActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
         QS_EQC_(0);                  // min number of free entries (not used)
     QS_END_NOCRIT_()
 
-    if (QF_EVT_POOL_ID_(e) != u8_0) { // is it a dynamic event?
+    // is it a dynamic event?
+    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
     QF_CRIT_EXIT_();
@@ -222,7 +229,8 @@ void GuiQMActive::postLIFO(QEvt const * const e) {
         QS_EQC_(0);                  // min number of free entries (not used)
     QS_END_NOCRIT_()
 
-    if (QF_EVT_POOL_ID_(e) != u8_0) { // is it a dynamic event?
+    // is it a dynamic event?
+    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
     QF_CRIT_EXIT_();

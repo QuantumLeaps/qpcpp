@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QP/C++ port to Qt5
-# Last Updated for Version: 5.3.0
-# Date of the Last Update:  2014-04-13
+# Last Updated for Version: QP/C++ 5.4.0/Qt 5.x
+# Date of the Last Update:  2015-05-03
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -40,8 +40,7 @@ DEFINES += QT_NO_STATEMACHINE
 
 INCLUDEPATH += .. \
     ../../../include \
-    ../../../qep/source \
-    ../../../qf/source
+    ../../../source
 
 HEADERS +=  \
     ../qep_port.h \
@@ -56,58 +55,26 @@ SOURCES += \
     ../qf_port.cpp \
     ../guiapp.cpp \
     ../pixellabel.cpp \
-    ../../../qep/source/qep.cpp \
-    ../../../qep/source/qmsm_dis.cpp \
-    ../../../qep/source/qmsm_ini.cpp \
-    ../../../qep/source/qmsm_in.cpp \
-    ../../../qep/source/qhsm_dis.cpp \
-    ../../../qep/source/qhsm_ini.cpp \
-    ../../../qep/source/qhsm_in.cpp \
-    ../../../qep/source/qhsm_top.cpp \
-    ../../../qf/source/qa_defer.cpp \
-    ../../../qf/source/qa_fifo.cpp \
-    ../../../qf/source/qa_get_.cpp \
-    ../../../qf/source/qa_lifo.cpp \
-    ../../../qf/source/qa_sub.cpp \
-    ../../../qf/source/qa_usub.cpp \
-    ../../../qf/source/qa_usuba.cpp \
-    ../../../qf/source/qeq_fifo.cpp \
-    ../../../qf/source/qeq_get.cpp \
-    ../../../qf/source/qeq_init.cpp \
-    ../../../qf/source/qeq_lifo.cpp \
-    ../../../qf/source/qf_act.cpp \
-    ../../../qf/source/qf_gc.cpp \
-    ../../../qf/source/qf_log2.cpp \
-    ../../../qf/source/qf_new.cpp \
-    ../../../qf/source/qf_pool.cpp \
-    ../../../qf/source/qf_psini.cpp \
-    ../../../qf/source/qf_pspub.cpp \
-    ../../../qf/source/qf_pwr2.cpp \
-    ../../../qf/source/qf_tick.cpp \
-    ../../../qf/source/qmp_get.cpp \
-    ../../../qf/source/qmp_init.cpp \
-    ../../../qf/source/qmp_put.cpp \
-    ../../../qf/source/qte_arm.cpp \
-    ../../../qf/source/qte_ctor.cpp \
-    ../../../qf/source/qte_ctr.cpp \
-    ../../../qf/source/qte_darm.cpp \
-    ../../../qf/source/qte_rarm.cpp
+    ../../../source/qep_hsm.cpp \
+    ../../../source/qep_msm.cpp \
+    ../../../source/qf_act.cpp \
+    ../../../source/qf_actq.cpp \
+    ../../../source/qf_defer.cpp \
+    ../../../source/qf_dyn.cpp \
+    ../../../source/qf_mem.cpp \
+    ../../../source/qf_ps.cpp \
+    ../../../source/qf_qact.cpp \
+    ../../../source/qf_qeq.cpp \
+    ../../../source/qf_qmact.cpp \
+    ../../../source/qf_time.cpp
 
 CONFIG(debug, debug|release) {
     DEFINES += Q_SPY
 
     SOURCES += \
-        ../../../qs/source/qs.cpp \
-        ../../../qs/source/qs_.cpp \
-        ../../../qs/source/qs_blk.cpp \
-        ../../../qs/source/qs_byte.cpp \
-        ../../../qs/source/qs_dict.cpp \
-        ../../../qs/source/qs_f32.cpp \
-        ../../../qs/source/qs_f64.cpp \
-        ../../../qs/source/qs_mem.cpp \
-        ../../../qs/source/qs_str.cpp \
-        ../../../qs/source/qs_u64.cpp
-
+        ../../../source/qs.cpp \
+        ../../../source/qs_fp.cpp \
+        ../../../source/qs_64bit.cpp
 } else {
     DEFINES += NDEBUG
 }

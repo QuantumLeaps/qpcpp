@@ -1,11 +1,10 @@
-/// \file
-/// \ingroup qep
-/// \brief QEP/C++ platform-independent public interface.
-/// \cond
+/// @file
+/// @brief QEP/C++ platform-independent public interface.
+/// @ingroup qep
+/// @cond
 ///***************************************************************************
-/// Product: QEP/C++
-/// Last updated for version 5.3.1
-/// Last updated on  2014-09-18
+/// Last updated for version 5.4.0
+/// Last updated on  2015-05-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -35,36 +34,35 @@
 /// Web:   www.state-machine.com
 /// Email: info@state-machine.com
 ///***************************************************************************
-/// \endcond
+/// @endcond
 
 #ifndef qep_h
 #define qep_h
 
 //****************************************************************************
-//! The current QP version number
-///
-/// version of the QP as a decimal constant XYZ, where X is a 1-digit
-/// major version number, Y is a 1-digit minor version number, and Z is
-/// a 1-digit release number.
-///
-#define QP_VERSION      531
+//! The current QP version as a decimal constant XYZ, where X is a 1-digit
+// major version number, Y is a 1-digit minor version number, and Z is
+// a 1-digit release number.
+#define QP_VERSION      540
 
-//! The current QP version string
-#define QP_VERSION_STR  "5.3.1"
+//! The current QP version number string of the form X.Y.Z, where X is
+// a 1-digit major version number, Y is a 1-digit minor version number,
+// and Z is a 1-digit release number.
+#define QP_VERSION_STR  "5.4.0"
 
-//! Tamperproof current QP release (5.3.1) and date (14-09-18)
-#define QP_RELEASE      0xAC019C8CU
+//! Tamperproof current QP release (5.4.0) and date (15-05-14)
+#define QP_RELEASE      0xA64960C3U
 
 #ifndef Q_ROM
     //! Macro to specify compiler-specific directive for placing a
     //! constant object in ROM.
-    /// \description
+    /// @description
     /// Many compilers for Harvard-architecture MCUs provide non-standard
     /// extensions to support placement of objects in different memories.
     /// In order to conserve the precious RAM, QP uses the Q_ROM macro for
     /// all constant objects that can be allocated in ROM.
     ///
-    /// \note
+    /// @note
     /// To override the following empty definition, you need to define the
     /// Q_ROM macro in the qep_port.h header file. Some examples of valid
     /// Q_ROM macro definitions are: __code (IAR 8051 compiler), code (Keil
@@ -74,7 +72,7 @@
 
 #ifndef Q_ROM_BYTE
     //! Macro to access a byte allocated in ROM
-    /// \description
+    /// @description
     /// Some compilers for Harvard-architecture MCUs, such as gcc for AVR, do
     /// not generate correct code for accessing data allocated in the program
     /// space (ROM). The workaround for such compilers is to explictly add
@@ -82,7 +80,7 @@
     /// space. The macro Q_ROM_BYTE() retrieves a byte from the given ROM
     /// address.
     ///
-    /// \note
+    /// @note
     /// The Q_ROM_BYTE() macro should be defined for the compilers that
     /// cannot handle correctly data allocated in ROM (such as the gcc).
     /// If the macro is left undefined, the default definition simply returns
@@ -93,7 +91,7 @@
 #ifndef Q_SIGNAL_SIZE
     //! The size (in bytes) of the signal of an event. Valid values:
     //! 1, 2, or 4; default 1
-    /// \description
+    /// @description
     /// This macro can be defined in the QEP port file (qep_port.h) to
     /// configure the QP::QSignal type. When the macro is not defined, the
     /// default of 1 byte is chosen.
@@ -101,14 +99,14 @@
 #endif
 
 //****************************************************************************
-//! helper macro to calculate static dimension of a 1-dim array \a array_
+//! helper macro to calculate static dimension of a 1-dim array @p array_
 #define Q_DIM(array_) (sizeof(array_) / sizeof((array_)[0]))
 
 //****************************************************************************
 // typedefs for basic numerical types; MISRA-C++ 2008 rule 3-9-2(req).
 
 //! typedef for character strings.
-/// \description
+/// @description
 /// This typedef specifies character type for exclusive use in character
 /// strings. Use of this type, rather than plain 'char', is in compliance
 /// with the MISRA-C 2004 Rules 6.1(req), 6.3(adv).
@@ -121,7 +119,7 @@ typedef int int_t;
 typedef int enum_t;
 
 //! typedef for 32-bit IEEE 754 floating point numbers
-/// \note
+/// @note
 /// QP does not use floating-point types anywhere in the internal
 /// implementation, except in QS software tracing, where utilities for
 /// output of floating-point numbers are provided for application-level
@@ -130,7 +128,7 @@ typedef int enum_t;
 typedef float float32_t;
 
 //! typedef for 64-bit IEEE 754 floating point numbers
-/// \note
+/// @note
 /// QP does not use floating-point types anywhere in the internal
 /// implementation, except in QS software tracing, where utilities for
 /// output of floating-point numbers are provided for application-level
@@ -139,16 +137,16 @@ typedef float float32_t;
 typedef double float64_t;
 
 
-//! Perform downcast of an event onto a subclass of QEvt \a class_
-/// \description
+//! Perform downcast of an event onto a subclass of QEvt @p class_
+/// @description
 /// This macro encapsulates the downcast of QEvt pointers, which violates
 /// MISRA-C 2004 rule 11.4(advisory). This macro helps to localize this
 /// deviation.
 ///
 #define Q_EVT_CAST(class_)   (static_cast<class_ const *>(e))
 
-//! Perform cast from unsigned integer \a uint_ to pointer of type \a type_.
-/// \description
+//! Perform cast from unsigned integer @p uint_ to pointer of type @p type_.
+/// @description
 /// This macro encapsulates the cast to (type_ *), which QP ports or
 /// application might use to access embedded hardware registers.
 /// Such uses can trigger PC-Lint "Note 923: cast from int to pointer"
@@ -157,7 +155,7 @@ typedef double float64_t;
 #define Q_UINT2PTR_CAST(type_, uint_)  (reinterpret_cast<type_ *>(uint_))
 
 //! Initializer of static constant QEvt instances
-/// \description
+/// @description
 /// This macro encapsulates the ugly casting of enumerated signals
 /// to QSignal and constants for QEvt.poolID and QEvt.refCtr_.
 ///
@@ -172,7 +170,7 @@ namespace QP {
     typedef uint8_t QSignal;
 #elif (Q_SIGNAL_SIZE == 2)
     //! QSignal represents the signal of an event.
-    /// \description
+    /// @description
     /// The relationship between an event and a signal is as follows. A signal
     /// in UML is the specification of an asynchronous stimulus that triggers
     /// reactions, and as such is an essential part of an event. (The signal
@@ -207,6 +205,7 @@ namespace QP {
         uint8_t volatile refCtr_; //!< reference counter
 
         friend class QF;
+        friend class QMActive;
         friend class QActive;
         friend class QTimeEvt;
         friend class QEQueue;
@@ -220,14 +219,14 @@ namespace QP {
 
     //************************************************************************
     //! QEvt base class.
-    /// \description
+    /// @description
     /// QEvt represents events without parameters and serves as the
     /// base class for derivation of events with parameters.
     ///
-    /// \usage
+    /// @usage
     /// The following example illustrates how to add an event parameter by
     /// inheriting from the QEvt class.
-    /// \include qep_qevt.cpp
+    /// @include qep_qevt.cpp
     struct QEvt {
         QSignal sig;              //!< signal of the event instance
         uint8_t poolId_;          //!< pool ID (0 for static event)
@@ -247,13 +246,13 @@ typedef QState (*QStateHandler)(void * const me, QEvt const * const e);
 typedef QState (*QActionHandler)(void * const me);
 
 //! State object for the QMsm class (Meta State Machine).
-/// \description
+/// @description
 /// This class groups together the attributes of a QMsm state, such as the
 /// parent state (state nesting), the associated state handler function and
 /// the exit action handler function. These attributes are used inside the
 /// QP::QMsm::dispatch() and QP::QMsm::init() functions.
 ///
-/// \attention
+/// @attention
 /// The QMStateObj class is only intended for the QM code generator and
 /// should not be used in hand-crafted code.
 struct QMState {
@@ -271,7 +270,7 @@ struct QMTranActTable {
 };
 
 //! Attribute of for the QMsm class (Meta State Machine).
-/// \description
+/// @description
 /// This union represents possible values stored in the 'state' and 'temp'
 /// attributes of the QMsm class.
 union QMAttr {
@@ -325,25 +324,25 @@ QState const Q_RET_TRAN_XP   = static_cast<QState>(12);
 
 //****************************************************************************
 //! Meta State Machine
-/// \description
+/// @description
 /// QMsm represents the most fundamental State Machine in QP. The application-
 /// level state machines derived directly from QMsm typically require the use
 /// of the QM modeling tool, but are the fastest and need the least run-time
-/// support (the smallest event-processor taking up the least code space).\n
-/// \n
+/// support (the smallest event-processor taking up the least code space).@n
+/// @n
 /// QMsm is also the base class for the QFsm and QHsm state machines, which
 /// can be coded and maintained by hand (as well as by QM), but aren't as fast
 /// and requrie significantly more run-time code (0.5-1KB) to execute.
 ///
-/// \note
+/// @note
 /// QMsm is not intended to be instantiated directly, but rather serves as
 /// the base class for derivation of state machines in the application code.
 ///
-/// \usage
+/// @usage
 /// The following example illustrates how to derive a state machine class
 /// from QMsm. Please note that the QMsm member 'super' is defined as the
 /// _first_ member of the derived struct.
-/// \include qep_qmsm.cpp
+/// @include qep_qmsm.cpp
 class QMsm {
     QMAttr m_state;  //!< current active state (state-variable)
     QMAttr m_temp;   //!< temporary: transition chain, target state, etc.
@@ -371,6 +370,7 @@ protected:
     //! Protected constructor of QMsm.
     QMsm(QStateHandler const initial);
 
+// protected facilities for coding MSMs...
     //! internal helper function to record a regular state transition
     QState qm_tran_(QMTranActTable const * const tatbl) {
         m_temp.tatbl = tatbl;
@@ -446,73 +446,7 @@ protected:
         return Q_RET_SUPER;
     }
 
-private:
-    //! Internal helper function to execute a transition-action table
-    QState execTatbl_(QMTranActTable const * const tatbl);
-
-    //! Internal helper function to exit current state to transition source
-    void exitToTranSource_(QMState const *s, QMState const * const ts);
-
-    //! Internal helper function to enter state history
-    QState enterHistory_(QMState const * const hist);
-
-    //! maximum depth of implemented entry levels for transitions to history
-    static int_fast8_t const MAX_ENTRY_DEPTH_ = static_cast<int_fast8_t>(4);
-
-    //! the top state object for the QMsm
-    static QMState const msm_top_s;
-
-    friend class QFsm;
-    friend class QHsm;
-    friend class QMActive;
-};
-
-//! Top-most state of QMSM is NULL
-QMState * const QMsm_top = static_cast<QMState *>(0);
-
-//****************************************************************************
-//! Hierarchical State Machine base class
-///
-/// \description
-/// QHsm represents a Hierarchical State Machine (HSM) with full support for
-/// hierarchical nesting of states, entry/exit actions, and initial
-/// transitions in any composite state. QHsm inherits QMsm without adding
-/// new attributes, so it takes the same amount of RAM as QMsm.
-///
-/// \note
-/// QHsm is not intended to be instantiated directly, but rather serves as
-/// the base class for derivation of state machines in the application code.
-///
-/// \usage
-/// The following example illustrates how to derive a state machine class
-/// from QHsm.
-/// \include qep_qhsm.cpp
-class QHsm : public QMsm {
-public:
-    //! Performs the second step of FSM initialization by triggering
-    /// the top-most initial transition.
-    virtual void init(QEvt const * const e);
-    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
-
-    //! Dispatches an event to a HSM
-    virtual void dispatch(QEvt const * const e);
-
-    //! Tests if a given state is part of the current active state
-    //! configuration
-    bool isIn(QStateHandler const s);
-
-    //! Return the current active state (state handler function)
-    QStateHandler state(void) const {
-        return m_state.fun;
-    }
-
-protected:
-    //! Protected constructor of a HSM.
-    QHsm(QStateHandler const initial);
-
-    //! the top-state.
-    static QState top(void * const me, QEvt const * const e);
-
+public: // facilities for coding HSMs...
     //! internal helper function to specify the return of a state-handler
     //! when it handles the event.
     static QState Q_HANDLED(void) {
@@ -552,88 +486,95 @@ protected:
     };
 
 private:
-    //! maximum depth of state nesting (including the top level), must be >= 3
-    static int_fast8_t const MAX_NEST_DEPTH_ = static_cast<int_fast8_t>(6);
+    //! Internal helper function to execute a transition-action table
+    QState execTatbl_(QMTranActTable const * const tatbl);
+
+    //! Internal helper function to exit current state to transition source
+    void exitToTranSource_(QMState const *s, QMState const * const ts);
+
+    //! Internal helper function to enter state history
+    QState enterHistory_(QMState const * const hist);
+
+    //! maximum depth of implemented entry levels for transitions to history
+    static int_fast8_t const MAX_ENTRY_DEPTH_ = static_cast<int_fast8_t>(4);
+
+    //! the top state object for the QMsm
+    static QMState const msm_top_s;
+
+    friend class QFsm;
+    friend class QHsm;
+    friend class QMActive;
+    friend class QActive;
+};
+
+//! Top-most state of QMSM is NULL
+QMState * const QMsm_top = static_cast<QMState *>(0);
+
+//****************************************************************************
+//! Hierarchical State Machine base class
+///
+/// @description
+/// QHsm represents a Hierarchical State Machine (HSM) with full support for
+/// hierarchical nesting of states, entry/exit actions, and initial
+/// transitions in any composite state. QHsm inherits QMsm without adding
+/// new attributes, so it takes the same amount of RAM as QMsm.
+///
+/// @note
+/// QHsm is not intended to be instantiated directly, but rather serves as
+/// the base class for derivation of state machines in the application code.
+///
+/// @usage
+/// The following example illustrates how to derive a state machine class
+/// from QHsm.
+/// @include qep_qhsm.cpp
+class QHsm : public QMsm {
+public:
+    //! Performs the second step of FSM initialization by triggering
+    /// the top-most initial transition.
+    virtual void init(QEvt const * const e);
+    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
+
+    //! Dispatches an event to a HSM
+    virtual void dispatch(QEvt const * const e);
+
+    //! Tests if a given state is part of the current active state
+    //! configuration
+    bool isIn(QStateHandler const s);
+
+    //! the top-state.
+    static QState top(void * const me, QEvt const * const e);
+
+    //! Return the current active state (state handler function)
+    QStateHandler state(void) const {
+        return m_state.fun;
+    }
+
+protected:
+    //! Protected constructor of a HSM.
+    QHsm(QStateHandler const initial);
+
+private:
+    enum {
+        MAX_NEST_DEPTH_ = 6  //!< maximum nesting depth of states in HSM
+    };
 
     //! internal helper function to take a transition
     int_fast8_t hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]);
 
+    friend class QActive;
     friend class QMActive;
 };
 
-//****************************************************************************
-//! Finite State Machine base class
-///
-/// \description
-/// QFsm represents a traditional non-hierarchical Finite State Machine (FSM)
-/// without state hierarchy, but with entry/exit actions.
-///
-/// \note QFsm is not intended to be instantiated directly, but rather serves
-/// as the base class for derivation of state machines in the application
-/// code.
-///
-/// \usage
-/// The following example illustrates how to derive a state machine class
-/// from QFsm.
-/// \include qep_qfsm.cpp
-class QFsm : public QMsm {
-public:
-    //! Performs the second step of FSM initialization by triggering
-    //! the top-most initial transition.
-    virtual void init(QEvt const * const e);
-
-    //! Overloaded init operation (no initialization event)
-    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
-
-    //! Dispatches an event to a FSM
-    virtual void dispatch(QEvt const * const e);
-
-protected:
-    //! Protected constructor of a FSM.
-    QFsm(QStateHandler const initial);
-
-    //! Inline function to specify the return of a state-handler when it
-    //! handles the event.
-    static QState Q_HANDLED(void) {
-        return Q_RET_HANDLED;
-    }
-
-    //! Helper function to specify the return of a state-handler function
-    //! when it attempts to handle the event but a guard condition evaluates
-    //! to false and there is no other explicit way of handling the event.
-    static QState Q_UNHANDLED(void) {
-        return Q_RET_UNHANDLED;
-    }
-
-    //! Helper function to specify the return of a state-handler function
-    //! when it ignored the event (didn't attempt to handle it in any way).
-    static QState Q_IGNORED(void) {
-        return Q_RET_IGNORED;
-    }
-
-    //! internal helper function to record a state transition
-    QState tran_(QStateHandler const target) {
-        m_temp.fun = target;
-        return Q_RET_TRAN;
-    }
-
-    enum ReservedFsmSignals {
-        Q_ENTRY_SIG = 1,     //!< signal for entry actions
-        Q_EXIT_SIG           //!< signal for exit actions
-    };
-};
+//! the current QP version number string in ROM, based on QP_VERSION_STR
+extern char_t const Q_ROM versionStr[6];
 
 //****************************************************************************
 //! Provides miscellaneous QEP services.
 class QEP {
 public:
-    //! get the current QEP version number string
-    /// \returns
-    /// version of QEP as a constant 5-character string of the
-    /// form X.Y.Z, where X is a 1-digit major version number, Y is a
-    /// 1-digit minor version number, and Z is a 1-digit release number.
+    //! get the current QEP version number string of the form "X.Y.Z"
     static char_t const Q_ROM *getVersion(void) {
-        return QP_VERSION_STR;
+        return versionStr;
     }
 };
 
@@ -645,7 +586,7 @@ enum_t const Q_USER_SIG = static_cast<enum_t>(4);
 //****************************************************************************
 
 //! Perform cast to QStateHandler.
-/// \description
+/// @description
 /// This macro encapsulates the cast of a specific state handler function
 /// pointer to QStateHandler, which violates MISRA-C 2004 rule 11.4(advisory).
 /// This macro helps to localize this deviation.
@@ -653,7 +594,7 @@ enum_t const Q_USER_SIG = static_cast<enum_t>(4);
     (reinterpret_cast<QP::QStateHandler>(handler_))
 
 //! Perform cast to QActionHandler.
-/// \description
+/// @description
 /// This macro encapsulates the cast of a specific action handler function
 /// pointer to QActionHandler, which violates MISRA-C2004 rule 11.4(advisory).
 /// This macro helps to localize this deviation.
@@ -706,19 +647,19 @@ enum_t const Q_USER_SIG = static_cast<enum_t>(4);
 
 //! Designates a target for an initial or regular transition.
 //! Q_TRAN() can be used both in the FSMs and HSMs.
-/// \usage
-/// \include qep_qtran.cpp
+/// @usage
+/// @include qep_qtran.cpp
 #define Q_TRAN(target_)       (me->tran_(Q_STATE_CAST(target_)))
 
 //! Designates a target for an initial or regular transition.
 //! Q_TRAN() can be used both in the FSMs and HSMs.
-/// \usage
-/// \include qep_qtran.cpp
+/// @usage
+/// @include qep_qtran.cpp
 #define Q_TRAN_HIST(hist_)    (me->tran_hist_((hist_)))
 
 //! Designates the superstate of a given state in an HSM.
-/// \usage
-/// \include qep_qhsm.cpp
+/// @usage
+/// @include qep_qhsm.cpp
 #define Q_SUPER(state_)       (me->super_(Q_STATE_CAST(state_)))
 
 #endif // qep_h

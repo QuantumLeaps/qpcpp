@@ -1,95 +1,76 @@
-//****************************************************************************
-// Product: QF/C++  port to POSIX/P-threads, GNU compiler
-// Last updated for version 5.3.0
-// Last updated on  2014-04-14
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) Quantum Leaps, www.state-machine.com.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
-//****************************************************************************
+/// @file
+/// @brief QF/C++ port to POSIX/P-threads
+/// @cond
+///***************************************************************************
+/// Last updated for version 5.4.0
+/// Last updated on  2015-04-14
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, www.state-machine.com.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// Web:   www.state-machine.com
+/// Email: info@state-machine.com
+///***************************************************************************
+/// @endcond
+
 #ifndef qf_port_h
 #define qf_port_h
 
 // Linux event queue and thread types
-#define QF_EQUEUE_TYPE              QEQueue
-#define QF_OS_OBJECT_TYPE           pthread_cond_t
-#define QF_THREAD_TYPE              uint8_t
+#define QF_EQUEUE_TYPE       QEQueue
+#define QF_OS_OBJECT_TYPE    pthread_cond_t
+#define QF_THREAD_TYPE       uint8_t
 
 // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE               63
+#define QF_MAX_ACTIVE        63
 
 // The number of system clock tick rates
-#define QF_MAX_TICK_RATE            2
+#define QF_MAX_TICK_RATE     2
 
 // various QF object sizes configuration for this port
-#define QF_EVENT_SIZ_SIZE           4
-#define QF_EQUEUE_CTR_SIZE          4
-#define QF_MPOOL_SIZ_SIZE           4
-#define QF_MPOOL_CTR_SIZE           4
-#define QF_TIMEEVT_CTR_SIZE         4
+#define QF_EVENT_SIZ_SIZE    4
+#define QF_EQUEUE_CTR_SIZE   4
+#define QF_MPOOL_SIZ_SIZE    4
+#define QF_MPOOL_CTR_SIZE    4
+#define QF_TIMEEVT_CTR_SIZE  4
 
-// QF critical section entry/exit for POSIX, see NOTE01
+/* QF interrupt disable/enable, see NOTE1 */
+#define QF_INT_DISABLE()     pthread_mutex_lock(&QP::QF_pThreadMutex_)
+#define QF_INT_ENABLE()      pthread_mutex_unlock(&QP::QF_pThreadMutex_)
+
+// QF critical section entry/exit for POSIX, see NOTE1
 // QF_CRIT_STAT_TYPE not defined
-#define QF_CRIT_ENTRY(dummy)    pthread_mutex_lock(&(QP::QF_pThreadMutex_))
-#define QF_CRIT_EXIT(dummy)     pthread_mutex_unlock(&(QP::QF_pThreadMutex_))
+#define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
+#define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
-#include <pthread.h>
-#include <errno.h>
+#include <pthread.h>   // POSIX-thread API
 #include "qep_port.h"  // QEP port
 #include "qequeue.h"   // POSIX needs event-queue
 #include "qmpool.h"    // POSIX needs memory-pool
 #include "qpset.h"     // POSIX needs priority-set
 #include "qf.h"        // QF platform-independent public interface
-
-//****************************************************************************
-// interface used only inside QF, but not in applications
-//
-#ifdef QP_IMPL
-
-    // native QF event queue operations
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) \
-            pthread_cond_wait(&(me_)->m_osObject, &QF_pThreadMutex_)
-
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        pthread_cond_signal(&(me_)->m_osObject) \
-
-    #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
-
-    // native QF event pool operations
-    #define QF_EPOOL_TYPE_            QMPool
-    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-        (p_).init(poolSto_, poolSize_, evtSize_)
-    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_))))
-    #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
-
-#endif // QP_IMPL
 
 namespace QP {
 
@@ -100,9 +81,35 @@ extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
 
 } // namespace QP
 
+//****************************************************************************
+// interface used only inside QF, but not in applications
+//
+#ifdef QP_IMPL
+
+    // native QF event queue operations...
+    #define QACTIVE_EQUEUE_WAIT_(me_) \
+        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) \
+            pthread_cond_wait(&(me_)->m_osObject, &QF_pThreadMutex_)
+
+    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
+        pthread_cond_signal(&(me_)->m_osObject) \
+
+    #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
+
+    // native QF event pool operations...
+    #define QF_EPOOL_TYPE_            QMPool
+    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+        (p_).init(poolSto_, poolSize_, evtSize_)
+    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
+    #define QF_EPOOL_GET_(p_, e_, m_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_))))
+    #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
+
+#endif // QP_IMPL
+
 // NOTES: ////////////////////////////////////////////////////////////////////
 //
-// NOTE01:
+// NOTE1:
 // QF, like all real-time frameworks, needs to execute certain sections of
 // code indivisibly to avoid data corruption. The most straightforward way of
 // protecting such critical sections of code is disabling and enabling

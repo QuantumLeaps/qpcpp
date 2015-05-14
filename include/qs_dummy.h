@@ -1,9 +1,8 @@
-/// \file
-/// \brief QS/C++ platform-independent dummy public interface.
-/// \ingroup qs
-/// \cond
+/// @file
+/// @brief QS/C++ platform-independent dummy public interface.
+/// @ingroup qs
+/// @cond
 ///***************************************************************************
-/// Product: QEP/C++
 /// Last updated for version 5.3.0
 /// Last updated on  2014-04-10
 ///
@@ -35,12 +34,12 @@
 /// Web:   www.state-machine.com
 /// Email: info@state-machine.com
 ///***************************************************************************
-/// \endcond
+/// @endcond
 
 #ifndef qs_dummy_h
 #define qs_dummy_h
 
-/// \description
+/// @description
 /// Dummy definitions of the QS macros that avoid code generation from
 /// the QS instrumentation.
 

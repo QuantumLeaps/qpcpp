@@ -1,4 +1,4 @@
-/* Date Stamp */ -d"_lint_au_misra_cpp_lnt=au-misra-cpp.lnt modified 2-Oct-2013"
+/* Date Stamp */ -d"_lint_au_misra_cpp_lnt=au-misra-cpp.lnt modified 12-Jun-2014"
 /* To document usage use: -message( "Using " _lint_au_misra_cpp_lnt ) */
 // ---------------------------------------------------------------------
 // This file is provided by Gimpel Software (www.gimpel.com) for use with
@@ -136,7 +136,7 @@
 
     +e534       /* return value ignored */
     +elib(534)
-    -append(534,[MISRA C++ Rules 0-1-7])
+    -append(534,[MISRA C++ Rule 0-1-7])
 
 /* Rule 0-1-8    (req) *********************************/
 
@@ -149,7 +149,7 @@
 
     +e438       /* variable's last value not used */
     +elib(438)
-    -append(438,[MISRA C++ Rules 0-1-6 and 0-1-9])
+    -append(438,[MISRA C++ Rule 0-1-9])
     +e587       /* predicate always evaluates to ... */
     +elib(587)
     -append(587,[MISRA C++ Rule 0-1-9])
@@ -191,13 +191,13 @@
 
     +e715       /* symbol not referenced */
     +elib(715)
-    -append(715,[MISRA C++ Rules 0-1-11])
+    -append(715,[MISRA C++ Rule 0-1-11])
 
 /* Rule 0-1-12    (req) *********************************/
 
     +e715       /* symbol not referenced */
     +elib(715)
-    -append(715,[MISRA C++ Rules 0-1-12])
+    -append(715,[MISRA C++ Rule 0-1-12])
 
 /* Rule 0-2-1    (req) *********************************/
 
@@ -211,7 +211,7 @@
 
     +e534       /* return value ignored */
     +elib(534)
-    -append(534,[MISRA C++ Rules 0-3-2])
+    -append(534,[MISRA C++ Rule 0-3-2])
 
 /* Rule 0-4-1    (doc) *********************************/
 
@@ -498,7 +498,7 @@
 
     +e564                       /* order of evaluation */
     +elib(564)
-    -append(564,[MISRA C++ Rules 5-0-1])
+    -append(564,[MISRA C++ Rule 5-0-1])
     +e864                       /* order of evaluation */
     +elib(864)
     -append(864,[MISRA C++ Rule 5-0-1])
@@ -587,13 +587,13 @@
 
     +e909       /* conversion to bool */
     +elib(909)
-    -append(909,[MISRA C++ Rules 5-0-13])
+    -append(909,[MISRA C++ Rule 5-0-13])
 
 /* Rule 5-0-14    (req) *********************************/
 
     +e909       /* conversion to bool */
     +elib(909)
-    -append(909,[MISRA C++ Rules 5-0-14])
+    -append(909,[MISRA C++ Rule 5-0-14])
 
 /* Rule 5-0-15    (req) *********************************/
 
@@ -740,6 +740,9 @@
     +e929   /* pointer cast */
     +elib(929)
     -append(929,[MISRA C++ Rule 5-2-7])
+    +e930   /* cast */
+    +elib(930)
+    -append(930,[MISRA C++ Rule 5-2-7])
 
 /* Rule 5-2-8  (adv) *********************************/
 
@@ -759,9 +762,9 @@
     +e925               /* cast */
     +elib(925)
     -append(925,[MISRA C++ Rule 5-2-9])
-    +esym(930,pointer)   /* cast */
-    +elib(930)
-    -append(930,[MISRA C++ Rule 5-2-9])
+    +e9091               /* cast */
+    +elib(9091)
+    -append(9091,[MISRA C++ Rule 5-2-9])
 
 /* Rule 5-2-10  (adv) *********************************/
 
@@ -774,8 +777,6 @@
     +e864   /* order of evaluation */
     +elib(864)
     -append(864,[MISRA C++ Rule 5-2-10])
-    +e564   /* order of evaluation */
-    +elib(564)
     /* we generate note 1963 as follows
        Note 1963: Violates MISRA C++ Advisory Rule 5-2-10,
        Increment or decrement combined with another operator
@@ -1102,7 +1103,7 @@
 
     +e604   /* returning address of auto variable */
     +elib(604)
-    -append(604,[MISRA C++ Rules 7-5-1)
+    -append(604,[MISRA C++ Rule 7-5-1)
 
 /* Rule 7-5-2  (req) *********************************/
 
@@ -1111,7 +1112,7 @@
     -append(789,[MISRA C++ Rule 7-5-2])
     +e604   /* returning address of auto variable */
     +elib(604)
-    -append(604,[MISRA C++ Rules 7-5-2])
+    -append(604,[MISRA C++ Rule 7-5-2])
 
 /* Rule 7-5-3  (req) *********************************/
 
@@ -1207,7 +1208,7 @@
     -append(605,[MISRA C++ Rule 9-3-1])
     +e1536  /* exposing member */
     +elib(1536)
-    -append(1536,[MISRA C++ Rules 9-3-1])
+    -append(1536,[MISRA C++ Rule 9-3-1])
     +e1763  /* const function modifies member */
     +elib(1763)
     -append(1763,[MISRA C++ Rule 9-3-1])
@@ -1216,7 +1217,7 @@
 
     +e1536  /* exposing member */
     +elib(1536)
-    -append(1536,[MISRA C++ Rules 9-3-2])
+    -append(1536,[MISRA C++ Rule 9-3-2])
 
 /* Rule 9-3-3  (req) *********************************/
 
@@ -1239,7 +1240,7 @@
 
     +e46    /* bit field should be int */
     +elib(46)
-    -append(46,[MISRA C++ Rules 9-6-2])
+    -append(46,[MISRA C++ Rule 9-6-2])
     /* we generate note 1960 as follows
        Note 1960: Violates MISRA C++ Required Rule 9-6-2,
        Bit field must be explicitly signed int, unsigned int, or bool
@@ -1249,7 +1250,7 @@
 
     +e46    /* bit field should be int */
     +elib(46)
-    -append(46,[MISRA C++ Rules 9-6-3])
+    -append(46,[MISRA C++ Rule 9-6-3])
 
 /* Rule 9-6-4  (req) *********************************/
 
@@ -1436,7 +1437,7 @@
 
     +e1546  /* throw() inside destructor */
     +elib(1546)
-    -append(1546,[MISRA C++ Rules 15-3-1])
+    -append(1546,[MISRA C++ Rule 15-3-1])
 
 /* Rule 15-3-2  (adv) *********************************/
 
@@ -1450,7 +1451,7 @@
 
     +e1560  /* uncaught exception */
     +elib(1560)
-    -append(1560,[MISRA C++ Rules 15-3-4])
+    -append(1560,[MISRA C++ Rule 15-3-4])
 
 /* Rule 15-3-5  (req) *********************************/
 
@@ -1482,7 +1483,7 @@
     -append(1546,[MISRA C++ Rule 15-5-1])
     +e1559  /* uncaught exception */
     +elib(1559)
-    -append(1559,[MISRA C++ Rules 15-5-1])
+    -append(1559,[MISRA C++ Rule 15-5-1])
 
 /* Rule 15-5-2  (req) *********************************/
 

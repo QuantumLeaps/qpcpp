@@ -35,13 +35,11 @@
 ::  ==========================================================================
 setlocal
 
-set VERSION=5.2.0
-
 set RCMHOME="C:\tools\MSquared\M2 RSM"
 
-set RSM_OUTPUT=qpcpp_metrics.txt
-set RSM_INPUT=..\include\*.h ..\qep\source\*.h ..\qep\source\*.cpp ..\qf\source\*.h ..\qf\source\*.cpp ..\qk\source\*.h ..\qk\source\*.cpp ..\qs\source\*.h ..\qs\source\*.cpp
+set RSM_OUTPUT=qpc_metrics.txt
+set RSM_INPUT=..\include\*.h ..\qep\source\*.h ..\qep\source\*.c ..\qf\source\*.h ..\qf\source\*.c ..\qk\source\*.h ..\qk\source\*.c ..\qs\source\*.h ..\qs\source\*.c
 
-%RCMHOME%\rsm.exe -fd -n -xNOCOMMAND -xNOCONFIG -u"File cfg rsm_qpcpp.cfg" %RSM_INPUT% > %RSM_OUTPUT%
+%RCMHOME%\rsm.exe -fd -n -xNOCOMMAND -xNOCONFIG -u"File cfg rsm_qpc.cfg" %RSM_INPUT% > %RSM_OUTPUT%
 
 endlocal

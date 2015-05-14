@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: QF/C++ port to ThreadX
-// Last updated for version 5.3.0
-// Last updated on  2014-05-09
+// Last updated for version 5.4.0
+// Last updated on  2015-05-13
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -41,11 +41,13 @@
 #endif // Q_SPY
 #include "qassert.h"
 
+// namespace QP ==============================================================
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
 // Local objects -------------------------------------------------------------
+static void thread_function(ULONG thread_input); // prototype
 
 //............................................................................
 void QF::init(void) {
@@ -60,7 +62,7 @@ void QF::stop(void) {
     onCleanup(); // the cleanup callback
 }
 //............................................................................
-void QF::thread_(QActive *act) {
+void QF::thread_(QMActive *act) {
     // event loop of the active object thread
     act->m_osObject = true; // enable the thread event-loop
     while (act->m_osObject) {
@@ -68,62 +70,68 @@ void QF::thread_(QActive *act) {
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
-    remove_(act);
+    act->unsubscribeAll();
     Q_ALLEGE(tx_queue_delete(&act->m_eQueue) == TX_SUCCESS); // cleanup queue
-    Q_ALLEGE(tx_thread_delete(&act->m_thread) == TX_SUCCESS);// cleanup thread
 }
 //............................................................................
-extern "C" void thread_function(ULONG thread_input) { // ThreadX signature
-    QF::thread_(reinterpret_cast<QActive *>(thread_input));
-}
-//............................................................................
-void QActive::start(uint_fast8_t prio,
-                    QEvt const *qSto[], uint_fast16_t qLen,
-                    void *stkSto, uint_fast16_t stkSize,
-                    QEvt const *ie)
+void QMActive::start(uint_fast8_t prio,
+                     QEvt const *qSto[], uint_fast16_t qLen,
+                     void *stkSto, uint_fast16_t stkSize,
+                     QEvt const *ie)
 {
 
     // allege that the ThreadX queue is created successfully
-    Q_ALLEGE(tx_queue_create(&m_eQueue,
-                 "Q",
-                 TX_1_ULONG,
-                 static_cast<VOID *>(qSto),
-                 static_cast<ULONG>(qLen * sizeof(ULONG)))
-             == TX_SUCCESS);
+    Q_ALLEGE_ID(210,
+        tx_queue_create(&m_eQueue,
+            "Q",
+            TX_1_ULONG,
+            static_cast<VOID *>(qSto),
+            static_cast<ULONG>(qLen * sizeof(ULONG)))
+        == TX_SUCCESS);
 
     m_prio = prio;  // save the QF priority
     QF::add_(this); // make QF aware of this active object
     init(ie);       // execute initial transition
-
     QS_FLUSH();     // flush the trace buffer to the host
 
     // convert QF priority to the ThreadX priority
     UINT tx_prio = QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - prio;
 
-    Q_ALLEGE(tx_thread_create(&m_thread,    // ThreadX thread control block
-                 "AO",                      // thread name
-                 &thread_function,          // thread function
-                 reinterpret_cast<ULONG>(this), // thread input
-                 stkSto,                    // stack start
-                 stkSize,                   // stack size in bytes
-                 tx_prio,                   // ThreadX priority
-                 tx_prio,   //preemption threshold disabled (same as priority)
-                 TX_NO_TIME_SLICE,
-                 TX_AUTO_START)
-             == TX_SUCCESS);
+    Q_ALLEGE_ID(220,
+        tx_thread_create(
+            &m_thread,    // ThreadX thread control block
+            "AO",      // thread name
+            &thread_function,          // thread function
+            reinterpret_cast<ULONG>(this), // thread input
+            stkSto,    // stack start
+            stkSize,   // stack size in bytes
+            tx_prio,   // ThreadX priority
+            tx_prio,   // preemption threshold disabled (same as priority)
+            TX_NO_TIME_SLICE,
+            TX_AUTO_START)
+        == TX_SUCCESS);
 
     m_osObject = true; // indicate that the thread is running
 }
 //............................................................................
-void QActive::stop(void) {
+static void thread_function(ULONG thread_input) { // ThreadX signature
+    QMActive *act = reinterpret_cast<QMActive *>(thread_input);
+
+    QF::thread_(act);
+    QF::remove_(act);
+    Q_ALLEGE_ID(310,
+         tx_thread_delete(&act->getThread()) == TX_SUCCESS); // cleanup thread
+}
+//............................................................................
+void QMActive::stop(void) {
     m_osObject = false; // stop the thread loop
 }
 //............................................................................
 #ifndef Q_SPY
-bool QActive::post_(QEvt const * const e, uint_fast16_t const margin)
+bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin)
 #else
-bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
-                    void const * const sender)
+bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
+                     void const * const sender)
 #endif
 {
     bool status;
@@ -140,8 +148,8 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
             QS_SIG_(e->sig);         // the signal of the event
             QS_OBJ_(this);           // this active object (recipient)
             QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-            QS_EQC_(static_cast<QEQueueCtr>(nFree)); // # free entries available
-            QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free entries (unknown)
+            QS_EQC_(static_cast<QEQueueCtr>(nFree)); // # free entries
+            QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free (unknown)
         QS_END_NOCRIT_()
 
         // is it a pool event?
@@ -150,22 +158,25 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         }
 
         QEvt const *ep = const_cast<QEvt const *>(e);
-        Q_ALLEGE(tx_queue_send(&m_eQueue, static_cast<VOID *>(&ep), TX_NO_WAIT)
-                 == TX_SUCCESS);
+        Q_ALLEGE_ID(510,
+            tx_queue_send(&m_eQueue, static_cast<VOID *>(&ep), TX_NO_WAIT)
+            == TX_SUCCESS);
         status = true;
     }
     else {
         // can tolerate dropping evts?
-        Q_ASSERT(margin != static_cast<uint_fast16_t>(0));
+        Q_ASSERT_ID(520,
+            margin != static_cast<uint_fast16_t>(0));
 
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT, QS::priv_.aoObjFilter, this)
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
+            QS::priv_.aoObjFilter, this)
             QS_TIME_();              // timestamp
             QS_OBJ_(sender);         // the sender object
             QS_SIG_(e->sig);         // the signal of the event
             QS_OBJ_(this);           // this active object (recipient)
             QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-            QS_EQC_(static_cast<QEQueueCtr>(nFree)); // # free entries available
-            QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free entries (unknown)
+            QS_EQC_(static_cast<QEQueueCtr>(nFree)); // # free entries
+            QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free (unknown)
         QS_END_NOCRIT_()
 
         status = false; // return failure
@@ -175,7 +186,7 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     return status;
 }
 //............................................................................
-void QActive::postLIFO(QEvt const * const e) {
+void QMActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
@@ -196,17 +207,19 @@ void QActive::postLIFO(QEvt const * const e) {
 
     // LIFO posting must succeed, see NOTE1
     QEvt const *ep = const_cast<QEvt const *>(e);
-    Q_ALLEGE(tx_queue_front_send(&m_eQueue, static_cast<VOID *>(&ep),
-                                 TX_NO_WAIT) == TX_SUCCESS);
-
+    Q_ALLEGE_ID(610,
+        tx_queue_front_send(&m_eQueue, static_cast<VOID *>(&ep), TX_NO_WAIT)
+        == TX_SUCCESS);
     QF_CRIT_EXIT_();
 }
 //............................................................................
-QEvt const *QActive::get_(void) {
+QEvt const *QMActive::get_(void) {
     QEvt const *e;
-    Q_ALLEGE(tx_queue_receive(&m_eQueue, (VOID *)&e, TX_WAIT_FOREVER)
-             == TX_SUCCESS);
     QS_CRIT_STAT_
+
+    Q_ALLEGE_ID(710,
+        tx_queue_receive(&m_eQueue, (VOID *)&e, TX_WAIT_FOREVER)
+        == TX_SUCCESS);
 
     QS_BEGIN_(QS_QF_ACTIVE_GET, QS::priv_.aoObjFilter, this)
         QS_TIME_();                  // timestamp
