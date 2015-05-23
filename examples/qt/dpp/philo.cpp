@@ -175,7 +175,7 @@ QP::QState Philo::thinking(Philo * const me, QP::QEvt const * const e) {
             break;
         }
         // ${AOs::Philo::SM::thinking::EAT, DONE}
-        case EAT_SIG: /* intentionally fall through */
+        case EAT_SIG: // intentionally fall through
         case DONE_SIG: {
             /* EAT or DONE must be for other Philos than this one */
             Q_ASSERT(Q_EVT_CAST(TableEvt)->philoNum != PHILO_ID(me));
@@ -208,7 +208,7 @@ QP::QState Philo::hungry(Philo * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${AOs::Philo::SM::hungry::EAT}
         case EAT_SIG: {
-            // ${AOs::Philo::SM::hungry::EAT::[Q_EVT_CAST(Tabl~}
+            // ${AOs::Philo::SM::hungry::EAT::[Q_EVT_CAST(TableEvt)->philoNum=~}
             if (Q_EVT_CAST(TableEvt)->philoNum == PHILO_ID(me)) {
                 static struct {
                     QP::QMState const *target;
@@ -281,7 +281,7 @@ QP::QState Philo::eating(Philo * const me, QP::QEvt const * const e) {
             break;
         }
         // ${AOs::Philo::SM::eating::EAT, DONE}
-        case EAT_SIG: /* intentionally fall through */
+        case EAT_SIG: // intentionally fall through
         case DONE_SIG: {
             /* EAT or DONE must be for other Philos than this one */
             Q_ASSERT(Q_EVT_CAST(TableEvt)->philoNum != PHILO_ID(me));

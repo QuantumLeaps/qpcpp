@@ -1,7 +1,7 @@
-///
+namespace QP {
+
 /// \file
 /// command-line macros and macros for porting QP
-
 
 /// \brief The preprocessor switch to disable checking assertions
 ///
@@ -16,7 +16,6 @@
 /// failures when the switch Q_NASSERT is defined.
 #define Q_NASSERT
 
-
 /// \brief The preprocessor switch to activate the QS software tracing
 /// instrumentation in the code
 ///
@@ -24,15 +23,6 @@
 /// When Q_SPY is not defined, the QS instrumentation in the code does
 /// not generate any code.
 #define Q_SPY
-
-
-/// \brief The preprocessor switch to disable the use of the QP::
-/// namespace in the QP/C++ code
-///
-/// \note The use of namespaces is required by the required MISRA:C++-2008
-/// rule 7-3-1 and also many other rules concerned with scope.
-///
-#define Q_NNAMESPACE
 
 /// \brief This macro defines the type of the OS-Object used for blocking
 /// the native QF event queue when the queue is empty
@@ -141,3 +131,5 @@
 /// In other QF ports you need to define the macro appropriately for
 /// the underlying kernel/OS you're using.
 #define QF_EPOOL_PUT_(p_, e_)   ((p_).put(e_))
+
+} // namespace QP

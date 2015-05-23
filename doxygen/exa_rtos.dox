@@ -1,4 +1,5 @@
-/*##########################################################################*/
+namespace QP {
+
 /*! @page exa_rtos Examples for Third-Party RTOS
 
 The main purpose of integrating QP/C with conventional RTOSes is to enable you to incorporate various communication stacks (TCP/IP, USB, CAN, etc.) as well as other middleware, which requires the ability to **block** the task code.   
@@ -210,5 +211,6 @@ DPP example for Texas Instruments TivaC123GXL MCU (Cortex-M4F) and IAR EWARM too
 DPP example for Texas Instruments STM32 L152RET6 MCU (Cortex-M3) and IAR EWARM toolsets.
 
 @image html under_construction.jpg
-
 */
+
+} // namespace QP

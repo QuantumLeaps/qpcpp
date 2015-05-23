@@ -172,7 +172,7 @@ QP::QState QMsmTst::s(QMsmTst * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::QMsmTst::SM::s::s1} .................................................

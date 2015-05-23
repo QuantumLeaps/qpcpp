@@ -211,7 +211,7 @@ QP::QState Pelican::operational(Pelican * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${components::Pelican::SM::operational::carsEnabled} .......................
@@ -253,7 +253,7 @@ QP::QState Pelican::carsEnabled(Pelican * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${components::Pelican::SM::operational::carsEnabled::carsGreen} ............
@@ -299,7 +299,7 @@ QP::QState Pelican::carsGreen(Pelican * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenNoPed} 
@@ -525,7 +525,7 @@ QP::QState Pelican::pedsEnabled(Pelican * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${components::Pelican::SM::operational::pedsEnabled::pedsWalk} .............
@@ -601,10 +601,10 @@ QP::QState Pelican::pedsFlash(Pelican * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT}
         case TIMEOUT_SIG: {
-            // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCtr!~}
+            // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCtr!=0U]}
             if (me->m_flashCtr != 0U) {
                 --me->m_flashCtr;
-                // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCtr!~::[(me->m_flashCtr~}
+                // ${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[me->m_flashCtr!~::[(me->m_flashCtr&1U)==0U]}
                 if ((me->m_flashCtr & 1U) == 0U) {
                     BSP_signalPeds(PEDS_DONT_WALK);
                     status_ = QM_HANDLED();
@@ -667,7 +667,7 @@ QP::QState Pelican::offline(Pelican * const me, QP::QEvt const * const e) {
         // ${components::Pelican::SM::offline::TIMEOUT}
         case TIMEOUT_SIG: {
             me->m_flashCtr ^= 1U;
-            // ${components::Pelican::SM::offline::TIMEOUT::[(me->m_flashCtr~}
+            // ${components::Pelican::SM::offline::TIMEOUT::[(me->m_flashCtr&1U)==0U]}
             if ((me->m_flashCtr & 1U) == 0U) {
                 BSP_signalCars(CARS_RED);
                 BSP_signalPeds(PEDS_DONT_WALK);
@@ -709,7 +709,7 @@ QP::QState Pelican::offline(Pelican * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 

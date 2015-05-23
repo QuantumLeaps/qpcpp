@@ -47,14 +47,14 @@ set RCMHOME="C:\tools\MSquared\M2 RSM"
 set RSM_OUTPUT=metrics.dox
 set RSM_INPUT=..\include\*.h ..\source\*.h ..\source\*.cpp
 
-echo /** \page metrics Code Metrics > %RSM_OUTPUT%
+echo /** @page metrics Code Metrics > %RSM_OUTPUT%
 echo.>> %RSM_OUTPUT%
-echo \code >> %RSM_OUTPUT%
-echo                    Standard Code Metrics for QP/C %VERSION% >> %RSM_OUTPUT%
+echo @code >> %RSM_OUTPUT%
+echo                    Standard Code Metrics for QP/C++ %VERSION% >> %RSM_OUTPUT%
 
 %RCMHOME%\rsm.exe -fd -xNOCOMMAND -xNOCONFIG -u"File cfg rsm_qpcpp.cfg" %RSM_INPUT% >> %RSM_OUTPUT%
 
-echo \endcode >> %RSM_OUTPUT%
+echo @endcode >> %RSM_OUTPUT%
 echo */ >> %RSM_OUTPUT%
 
 :: Generate Doxygen Documentation ........................................... 

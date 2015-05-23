@@ -33,7 +33,6 @@ lint*.out
 *.Miro
 *.bak
 
-3rd_party/
 doc/
 test/
 test_ports/

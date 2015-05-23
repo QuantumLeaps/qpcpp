@@ -241,7 +241,7 @@ QP::QState Calc2::error(Calc2 * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::Calc2::SM::on::negated1} ............................................
@@ -530,7 +530,7 @@ QP::QState Calc2::result(Calc2 * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::Calc2::SM::on::ready::begin} ........................................
@@ -586,7 +586,7 @@ QP::QState Calc2::begin(Calc2 * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::Calc2::SM::on::operand1} ............................................
@@ -786,8 +786,8 @@ QP::QState Calc2::int1(Calc2 * const me, QP::QEvt const * const e) {
             status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // ${SMs::Calc2::SM::on::operand1::int1::DIGIT_0, DIGIT_1~}
-        case DIGIT_0_SIG: /* intentionally fall through */
+        // ${SMs::Calc2::SM::on::operand1::int1::DIGIT_0, DIGIT_1_9}
+        case DIGIT_0_SIG: // intentionally fall through
         case DIGIT_1_9_SIG: {
             BSP_insert(Q_EVT_CAST(CalcEvt)->key_code);
             status_ = QM_HANDLED();
@@ -798,7 +798,7 @@ QP::QState Calc2::int1(Calc2 * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::Calc2::SM::on::operand1::frac1} .....................................
@@ -831,8 +831,8 @@ QP::QState Calc2::frac1(Calc2 * const me, QP::QEvt const * const e) {
             status_ = QM_HANDLED();
             break;
         }
-        // ${SMs::Calc2::SM::on::operand1::frac1::DIGIT_0, DIGIT_1~}
-        case DIGIT_0_SIG: /* intentionally fall through */
+        // ${SMs::Calc2::SM::on::operand1::frac1::DIGIT_0, DIGIT_1_9}
+        case DIGIT_0_SIG: // intentionally fall through
         case DIGIT_1_9_SIG: {
             BSP_insert(Q_EVT_CAST(CalcEvt)->key_code);
             status_ = QM_HANDLED();
@@ -843,7 +843,7 @@ QP::QState Calc2::frac1(Calc2 * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::Calc2::SM::on::opEntered} ...........................................
@@ -955,7 +955,7 @@ QP::QState Calc2::opEntered(Calc2 * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::Calc2::SM::on::negated2} ............................................
@@ -1339,8 +1339,8 @@ QP::QState Calc2::int2(Calc2 * const me, QP::QEvt const * const e) {
             status_ = QM_TRAN(&tatbl_);
             break;
         }
-        // ${SMs::Calc2::SM::on::operand2::int2::DIGIT_0, DIGIT_1~}
-        case DIGIT_0_SIG: /* intentionally fall through */
+        // ${SMs::Calc2::SM::on::operand2::int2::DIGIT_0, DIGIT_1_9}
+        case DIGIT_0_SIG: // intentionally fall through
         case DIGIT_1_9_SIG: {
             BSP_insert(Q_EVT_CAST(CalcEvt)->key_code);
             status_ = QM_HANDLED();
@@ -1351,7 +1351,7 @@ QP::QState Calc2::int2(Calc2 * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::Calc2::SM::on::operand2::frac2} .....................................
@@ -1384,8 +1384,8 @@ QP::QState Calc2::frac2(Calc2 * const me, QP::QEvt const * const e) {
             status_ = QM_HANDLED();
             break;
         }
-        // ${SMs::Calc2::SM::on::operand2::frac2::DIGIT_0, DIGIT_1~}
-        case DIGIT_0_SIG: /* intentionally fall through */
+        // ${SMs::Calc2::SM::on::operand2::frac2::DIGIT_0, DIGIT_1_9}
+        case DIGIT_0_SIG: // intentionally fall through
         case DIGIT_1_9_SIG: {
             BSP_insert(Q_EVT_CAST(CalcEvt)->key_code);
             status_ = QM_HANDLED();
@@ -1396,7 +1396,7 @@ QP::QState Calc2::frac2(Calc2 * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::Calc2::SM::final} ...................................................
@@ -1423,7 +1423,7 @@ QP::QState Calc2::final(Calc2 * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 

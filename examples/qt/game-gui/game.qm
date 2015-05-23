@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.2.2">
- <documentation>&quot;Fly 'n' Shoot&quot; game model from Chapters 1 &amp; 9 of PSiCC2 for Qt with GUI</documentation>
+<model version="3.3.0">
+ <documentation>&quot;Fly 'n' Shoot&quot; game model from Chapters 1 &amp; 9 of PSiCC2 for Qt with GUI
+NOTE: Adapted for QP-Qt integartion</documentation>
  <framework name="qpcpp"/>
  <package name="Qt-port" stereotype="0x00" namespace="QP::">
   <class name="GuiQActive" superclass="qpcpp::QActive">

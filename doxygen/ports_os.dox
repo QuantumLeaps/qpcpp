@@ -1,4 +1,5 @@
-/*##########################################################################*/
+namespace QP {
+
 /*! @page ports_os Ports to Third-Party OS
 
 - @subpage posix (Linux, embedded-Linux, BSD, etc.)
@@ -33,3 +34,6 @@
 @image html under_construction.jpg
 
 */
+
+} // namespace QP
+

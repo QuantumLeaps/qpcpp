@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.2.2">
- <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
+<model version="3.3.0">
+ <documentation>Dining Philosopher Problem example with MSM state machines
+NOTE: adapted for the ThreadX demo</documentation>
  <framework name="qpcpp"/>
  <package name="Events" stereotype="0x01" namespace="DPP::">
   <class name="TableEvt" superclass="qpcpp::QEvt">

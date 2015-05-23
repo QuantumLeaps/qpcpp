@@ -154,7 +154,7 @@ QP::QState Alarm::on(Alarm * const me, QP::QEvt const * const e) {
         }
         // ${Components::Alarm::SM::on::TIME}
         case TIME_SIG: {
-            // ${Components::Alarm::SM::on::TIME::[Q_EVT_CAST(Time~}
+            // ${Components::Alarm::SM::on::TIME::[Q_EVT_CAST(TimeEvt)->current_ti~}
             if (Q_EVT_CAST(TimeEvt)->current_time == me->m_alarm_time) {
                 BSP_showMsg("ALARM!!!");
 
@@ -172,7 +172,7 @@ QP::QState Alarm::on(Alarm * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++, DPP on Arduino-UNO, QK kernel, GNU-ARM
-# Last Updated for Version: 5.4.0
-# Date of the Last Update:  2015-04-03
+# Last Updated for Version: 5.4.1
+# Date of the Last Update:  2015-05-21
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -123,13 +123,6 @@ QS_SRCS := \
 LIB_DIRS  :=
 LIBS      :=
 
-# combine all the necessary soruces
-#
-VPATH    += $(QPCPP)/3rd_party/gnu_cpp
-CPP_SRCS += $(QP_SRCS) mini_cpp.cpp
-ASM_SRCS += $(QP_ASMS)
-
-
 # defines
 DEFINES   :=
 
@@ -168,19 +161,26 @@ RM    := rm
 # build options for various configurations for ARM Cortex-M4F
 #
 
-ifeq (rel, $(CONF))       # Release configuration ............................
+# combine all the necessary soruces
+VPATH    += $(QPCPP)/3rd_party/gnu_cpp
+CPP_SRCS += $(QP_SRCS) $(QP_PORT) mini_cpp.cpp
+ASM_SRCS += $(QP_ASMS)
+
+
+
+ifeq (rel, $(CONF)) # Release configuration ..................................
 
 BIN_DIR := rel
 
-CFLAGS = -c -Os -mmcu=$(AVR_MCU) -fdata-sections -ffunction-sections \
-    $(INCLUDES) $(DEFINES) -std=gnu99 -fshort-enums -Wall -DNDEBUG
+ASFLAGS =
 
-CPPFLAGS = -c -Os -mmcu=$(AVR_MCU) -DNDEBUG \
-	-fno-rtti -fno-exceptions -fdata-sections -ffunction-sections \
-	$(INCLUDES) $(DEFINES) -fshort-enums -Wall
+CFLAGS = -mmcu=$(AVR_MCU) -std=gnu99 -fshort-enums -Wall \
+	-ffunction-sections -fdata-sections \
+    -Os $(INCLUDES) $(DEFINES) -DNDEBUG
 
-LINKFLAGS = -Os -mmcu=$(AVR_MCU) \
-	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
+CPPFLAGS = -mmcu=$(AVR_MCU) -fshort-enums -Wall \
+	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+    -Os $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
@@ -188,38 +188,43 @@ BIN_DIR := spy
 
 CPP_SRCS += $(QS_SRCS)
 
-CFLAGS = -c -g3 -O -mmcu=$(AVR_MCU) -fdata-sections -ffunction-sections \
-    $(INCLUDES) $(DEFINES) -std=gnu99 -fshort-enums -Wall -DQ_SPY
+ASFLAGS =
 
-CPPFLAGS = -c -g3 -O -mmcu=$(AVR_MCU) -DQ_SPY \
-	-fno-rtti -fno-exceptions -fdata-sections -ffunction-sections \
-	$(INCLUDES) $(DEFINES) -fshort-enums -Wall
+CFLAGS = -mmcu=$(AVR_MCU) -std=gnu99 -fshort-enums -Wall \
+	-ffunction-sections -fdata-sections \
+    -O $(INCLUDES) $(DEFINES) -DQ_SPY
 
-
-LINKFLAGS = -O1 -mmcu=$(AVR_MCU) \
-	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
+CPPFLAGS = -mmcu=$(AVR_MCU) -fshort-enums -Wall \
+	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+    -O $(INCLUDES) $(DEFINES) -DQ_SPY
 
 else                     # default Debug configuration .......................
 
 BIN_DIR := dbg
 
-CFLAGS = -c -g3 -O -mmcu=$(AVR_MCU) -fdata-sections -ffunction-sections \
-    $(INCLUDES) $(DEFINES) -std=gnu99 -fshort-enums -Wall
+ASFLAGS =
 
-CPPFLAGS = -c -g3 -O -mmcu=$(AVR_MCU) \
-	-fno-rtti -fno-exceptions -fdata-sections -ffunction-sections \
-	$(INCLUDES) $(DEFINES) -fshort-enums -Wall
+CFLAGS = -mmcu=$(AVR_MCU) -std=gnu99 -fshort-enums -Wall \
+	-ffunction-sections -fdata-sections \
+    -O $(INCLUDES) $(DEFINES)
 
-LINKFLAGS = -O1 -mmcu=$(AVR_MCU) \
-	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
+CPPFLAGS = -mmcu=$(AVR_MCU) -fshort-enums -Wall \
+	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+    -O $(INCLUDES) $(DEFINES)
 
 endif
 
+LINKFLAGS = -mmcu=$(AVR_MCU) \
+	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
+
+
+ASM_OBJS     := $(patsubst %.s,%.o,  $(notdir $(ASM_SRCS)))
 C_OBJS       := $(patsubst %.c,%.o,  $(notdir $(C_SRCS)))
 CPP_OBJS     := $(patsubst %.cpp,%.o,$(notdir $(CPP_SRCS)))
 
 TARGET_HEX   := $(BIN_DIR)/$(OUTPUT).hex
 TARGET_ELF   := $(BIN_DIR)/$(OUTPUT).elf
+ASM_OBJS_EXT := $(addprefix $(BIN_DIR)/, $(ASM_OBJS))
 C_OBJS_EXT   := $(addprefix $(BIN_DIR)/, $(C_OBJS))
 C_DEPS_EXT   := $(patsubst %.o, %.d, $(C_OBJS_EXT))
 CPP_OBJS_EXT := $(addprefix $(BIN_DIR)/, $(CPP_OBJS))
@@ -249,6 +254,9 @@ $(BIN_DIR)/%.d : %.c
 $(BIN_DIR)/%.d : %.cpp
 	$(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@
 
+$(BIN_DIR)/%.o : %.s
+	$(AS) $(ASFLAGS) $< -o $@
+
 $(BIN_DIR)/%.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -274,8 +282,12 @@ clean:
 show:
 	@echo PROJECT = $(PROJECT)
 	@echo CONF = $(CONF)
+	@echo DEFINES = $(DEFINES)
+	@echo ASM_FPU = $(ASM_FPU)
+	@echo ASM_SRCS = $(ASM_SRCS)
 	@echo C_SRCS = $(C_SRCS)
 	@echo CPP_SRCS = $(CPP_SRCS)
+	@echo ASM_OBJS_EXT = $(ASM_OBJS_EXT)
 	@echo C_OBJS_EXT = $(C_OBJS_EXT)
 	@echo C_DEPS_EXT = $(C_DEPS_EXT)
 	@echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)

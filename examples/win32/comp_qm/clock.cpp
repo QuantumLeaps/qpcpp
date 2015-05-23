@@ -166,9 +166,9 @@ QP::QState AlarmClock::timekeeping(AlarmClock * const me, QP::QEvt const * const
             status_ = QM_HANDLED();
             break;
         }
-        // ${Components::AlarmClock::SM::timekeeping::ALARM_SET, ALARM~}
-        case ALARM_SET_SIG: /* intentionally fall through */
-        case ALARM_ON_SIG: /* intentionally fall through */
+        // ${Components::AlarmClock::SM::timekeeping::ALARM_SET, ALARM_ON, ALARM_OFF}
+        case ALARM_SET_SIG: // intentionally fall through
+        case ALARM_ON_SIG: // intentionally fall through
         case ALARM_OFF_SIG: {
             // (!) synchronously dispatch to the orthogonal component
             me->m_alarm.dispatch(e);
@@ -307,7 +307,7 @@ QP::QState AlarmClock::final(AlarmClock * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 

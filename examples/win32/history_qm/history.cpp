@@ -88,7 +88,7 @@ QP::QState ToastOven::initial(ToastOven * const me, QP::QEvt const * const e) {
     };
     // ${SMs::ToastOven::SM::initial}
     (void)e; /* avoid compiler warning */
-    /* state history attributes */
+    // state history attributes
     me->his_doorClosed = &off_s;
     return QM_TRAN_INIT(&tatbl_);
 }
@@ -245,7 +245,7 @@ QP::QState ToastOven::heating(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::ToastOven::SM::doorClosed::heating::toasting} .......................
@@ -271,7 +271,7 @@ QP::QState ToastOven::toasting(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::ToastOven::SM::doorClosed::heating::baking} .........................
@@ -297,7 +297,7 @@ QP::QState ToastOven::baking(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::ToastOven::SM::doorClosed::off} .....................................
@@ -323,7 +323,7 @@ QP::QState ToastOven::off(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${SMs::ToastOven::SM::doorOpen} ............................................
@@ -397,7 +397,7 @@ QP::QState ToastOven::final(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
     }
-    (void)me; /* avoid compiler warning in case 'me' is not used */
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 

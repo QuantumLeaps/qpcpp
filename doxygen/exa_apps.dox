@@ -1,4 +1,5 @@
-/*##########################################################################*/
+namespace QP {
+
 /*! @page exa_apps Example Applications
 
 <p>To demonstrate QP/C features, you need to create an application that does "something interesting". Instead of inventing this "something interesting" for each and every example, most of the example projects implement one of the three example applications, which are described on the separate pages:
@@ -80,4 +81,5 @@ The very simple state machine of the Blinky AO is shown in the figure below:
 
 */
 
+} // namespace QP
 

@@ -1,4 +1,5 @@
-/*##########################################################################*/
+namespace QP {
+
 /*! @page ports_rtos Ports to Third-Party RTOS
 
 The main purpose of integrating QP/C with conventional RTOSes is to enable you to incorporate various communication stacks (TCP/IP, USB, CAN, etc.) as well as other middleware, which requires the ability to **block** the task code.   
@@ -98,3 +99,5 @@ Specifically, the QP source files qf_actq.c and qf_mem.c must **NOT** be include
 @image html under_construction.jpg
 
 */
+
+} // namespace QP

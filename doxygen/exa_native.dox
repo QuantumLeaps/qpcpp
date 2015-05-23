@@ -1,4 +1,5 @@
-/*##########################################################################*/
+namespace QP {
+
 /*! @page exa_native Native Examples (Bare-Metal)
 
 @htmlonly
@@ -235,5 +236,6 @@ where `COM_PORT` denotes the Virtual COM port, which you can find out in the Dev
 To receive the QS data over the Virtual COM Port, you need to make sure that the jumper J3 on the MSP-EXP430G2 board is configured for the "Hardware UART" (the first two jumpers should be in the horizontal setting, as shown in the picture of the MSP-EXP430G2 board on top of this page. 
 
 @image html under_construction.jpg
-
 */
+
+} // namespace QP

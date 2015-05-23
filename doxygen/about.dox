@@ -1,4 +1,6 @@
-/*! @mainpage About QP/C++
+namespace QP {
+
+/** @mainpage About QP/C++
 
 @tableofcontents
 
@@ -42,9 +44,9 @@ If you are developing and distributing traditional closed source applications, y
 
 ------------------------------------------------------------------------------
 @section getting_started Getting Started with QP/C++
-The Quantum Leaps Application Note <a class="extern" target="_blank" href="http://www.state-machine.com/quickstart/Getting_Started_with_QPCpp.pdf"><strong>Getting Started with QP/C++</strong></a> provides step-by-step instructions on how to get started with QP/C quickly.
+The Quantum Leaps Application Note <a class="extern" target="_blank" href="http://www.state-machine.com/doc/AN_Getting_Started_with_QPCpp.pdf"><strong>Getting Started with QP/C++</strong></a> provides step-by-step instructions on how to get started with QP/C++ quickly.
 
-@image html AN_Getting_Started_with_QPC.jpg
+@image html AN_Getting_Started_with_QPCpp.jpg "App Note: Getting Started with QP/C++"
 
 The standard QP/C++ distribution contains also many @ref exa "Example Projects", which are specifically designed to help you learn to use QP/C++ and to serve you as starting points for your own projects.
 
@@ -81,20 +83,27 @@ The following annotated directory tree lists the top-level directories provided 
 </ul>  
 
 
+------------------------------------------------------------------------------
+@section coding Coding Standard
+The QP/C++ framework has been developed in strict adherence to the documented <a class="extern" target="_blank" href="http://www.state-machine.com/doc/AN_QL_Coding_Standard.pdf"><strong>Quantum Leaps Coding Standard</strong></a>.
+
+@image html AN_Coding_Standard.jpg "Quantum Leaps C/C++ Coding Standard"
+
+
 ------------------------------------------------------------------------------
 @section misra MISRA Compliance
 
 <p>The QP/C++ framework comply with most of the Motor Industry Software Reliability Association (MISRA) MISRA-C++:2008 rules.
 </p>
 
-@image html AN_MISRA.jpg "QP/C++ MISRA-C++:2008 Compliance Matrix"
+@image html AN_MISRA-QPCpp.jpg "QP/C++ MISRA-C++:2008 Compliance Matrix"
 
-All deviations are carefully limited into very specific contexts and are documented with the Application Note: <a class="extern" target="_blank" href="http://www.state-machine.com/resources/AN_QP-Cpp_MISRA.pdf"><strong>QP/C++ MISRA-C++:2008 Compliance Matrix</strong></a>.
+All deviations are carefully limited into very specific contexts and are documented with the Application Note: <a class="extern" target="_blank" href="http://www.state-machine.com/doc/AN_QP-Cpp_MISRA.pdf"><strong>QP/C++ MISRA-C++:2008 Compliance Matrix</strong></a>.
 
 @note
 MISRA and MISRA C are registered trademarks of MIRA Ltd, held on behalf of the MISRA Consortium.
 
-The MISRA guidelines place great emphasis on the use of static code analysts tools to check compliance with the MISRA-C++ language subset. To this end, QP/C++ comes with an extensive support for automatic rule checking with @ref misra_lint "PC-Lint". The QP frameworks go even beyond MISRA, by complying with the <strong>strict type checking</strong> of PC-Lint and a very consistent, documented <a class="extern" target="_blank" href="http://www.state-machine.com/resources/AN_QL_Coding_Standard.pdf" >Quantum Leaps Coding Standard</a>.
+The MISRA guidelines place great emphasis on the use of static code analysts tools to check compliance with the MISRA-C++ language subset. To this end, QP/C++ comes with an extensive support for automatic rule checking with @ref misra_lint "PC-Lint". The QP frameworks go even beyond MISRA, by complying with the <strong>strict type checking</strong> of PC-Lint and a very consistent, documented <a class="extern" target="_blank" href="http://www.state-machine.com/doc/AN_QL_Coding_Standard.pdf" >Quantum Leaps Coding Standard</a>.
 
 
 ------------------------------------------------------------------------------
@@ -120,6 +129,7 @@ The QP/C++ framework comes with extensive support for automatic rule checking by
 Copyright &copy; 2002-2015 Quantum Leaps, LLC. All Rights Reserved.
 
 
-@next{exa}
+@next{design}
 */
 
+} // namespace QP

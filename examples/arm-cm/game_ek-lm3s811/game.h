@@ -155,7 +155,7 @@ extern QP::QMActive * const AO_Missile;
 // helper function for all AOs
 namespace GAME {
 
-//${AOs::do_bitmaps_overl~} ..................................................
+//${AOs::do_bitmaps_overlap} .................................................
 bool do_bitmaps_overlap(
     uint8_t bmp_id1,
     uint8_t x1,

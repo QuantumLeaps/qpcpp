@@ -291,7 +291,7 @@ QP::QState Ship::exploding(Ship * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${AOs::Ship::SM::active::exploding::TIME_TICK}
         case TIME_TICK_SIG: {
-            // ${AOs::Ship::SM::active::exploding::TIME_TICK::[me->m_exp_ctr<1~}
+            // ${AOs::Ship::SM::active::exploding::TIME_TICK::[me->m_exp_ctr<15U]}
             if (me->m_exp_ctr < 15U) {
                 ++me->m_exp_ctr;
                 // tell the Tunnel to draw the current stage of Explosion

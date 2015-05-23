@@ -1,3 +1,5 @@
+namespace QP {
+
 /*! @page exa_mware Third-Party Middleware
 
 - @subpage exa_qt
@@ -75,5 +77,6 @@ lwIP example for Texas Instruments EK-LM3S6965 (Cortex-M3) with GNU-ARM and IAR-
 /*! @page exa_emwin emWin Embedded GUI
 
 coming soon...
+*/
 
- */
+} // namespace QP

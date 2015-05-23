@@ -1,4 +1,5 @@
-/*##########################################################################*/
+namespace QP {
+
 /*! @page ports_native Native (Bare-Metal) Ports
 
 - @subpage lint (generic C compiler)
@@ -62,5 +63,6 @@
 @section msp430_qk Preemptive QK Kernel 
 
 @section msp430_qv Cooperative QV Kernel
-
 */
+
+} // namespace QP

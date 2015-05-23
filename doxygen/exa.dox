@@ -1,3 +1,5 @@
+namespace QP {
+
 /*! @page exa Examples
 
 @htmlonly
@@ -387,3 +389,5 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 
 @next{exa_native}
 */
+
+} // namespace QP

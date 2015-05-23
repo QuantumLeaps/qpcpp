@@ -1,3 +1,5 @@
+namespace QP {
+
 /*! @page exa_os Examples for Third-Party OS
 
 - @subpage exa_posix
@@ -54,3 +56,5 @@ All examples for @ref exa_win32 will also work with the @ref win32-qv "Win32-QV 
 - @ref exa_win32
 - @ref win32-qv
 */
+
+} // namespace QP
