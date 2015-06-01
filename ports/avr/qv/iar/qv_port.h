@@ -2,8 +2,8 @@
 /// @brief QV/C++ port to AVRmega, IAR-AVR toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-07
+/// Last updated for version 5.4.1
+/// Last updated on  2015-05-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -40,7 +40,7 @@
 
 // QV sleep mode, see NOTE1...
 #define QV_CPU_SLEEP() do { \
-    __disable_interrupt(); \
+    __enable_interrupt(); \
     __sleep(); \
     SMCR = 0U; \
 } while (false)

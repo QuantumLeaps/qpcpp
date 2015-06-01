@@ -10,19 +10,19 @@ namespace QP {
 
 
 @section exa_gen General Comments
-The QP/C distribution contains many @subpage exa_ref "example projects" to demonstrate various QP/C features. Each example project is described on its own dedicated page that you can find using several criteria (see @ref exa_ref). The example projects have the following main goals:
+The QP/C++ distribution contains many @subpage exa_ref "example projects" to demonstrate various QP/C++ features. Each example project is described on its own dedicated page that you can find using several criteria (see @ref exa_ref). The example projects have the following main goals:
 
-- **to help you learn how to use QP/C** &mdash; the examples show the intended way of using QP/C features and structuring QP/C applications.
+- <strong>to help you learn how to use QP/C++</strong> &mdash; the examples show the intended way of using QP/C++ features and structuring QP/C++ applications.
 
-- **to provide you with a starting point for your own projects** &mdash; the examples are complete working projects, with correctly pre-configured tools, such as compiler options, linker script, debugger setup, etc.
+- <strong>to provide you with a starting point for your own projects</strong> &mdash; the examples are complete working projects, with correctly pre-configured tools, such as compiler options, linker script, debugger setup, etc.
 
 @note
-It is highly recommended that you create your own projects by **copying and modifying** existing example projects rather than starting your QP/C projects from scratch. 
+It is highly recommended that you create your own projects by **copying and modifying** existing example projects rather than starting your QP/C++ projects from scratch. 
 
 
 ------------------------------------------------------------------------------
 @subsection exa_code Example Code Structure
-Starting with QP/C release 5.4.0, **all** examples are bundled into the QP/C download, as opposed to being distributed as separate QP Development Kits (QDKs). The main benefit is of this approach is that it greatly reduces chances of mistakes in combining the mainline QP/C code with various QDKs. The downside is that the QP/C distribution becomes quite large and that examples can't be added or updated independently from the QP/C baseline code.
+Starting with QP/C++ release 5.4.0, **all** examples are bundled into the QP/C++ download, as opposed to being distributed as separate QP Development Kits (QDKs). The main benefit is of this approach is that it greatly reduces chances of mistakes in combining the mainline QP/C++ code with various QDKs. The downside is that the QP/C++ distribution becomes quite large and that examples can't be added or updated independently from the QP/C++ baseline code.
 
 All examples are located in sub-directories of the <span class="img folder">examples</span> @ref qpc_files "top-level folder", with the hierarchical organization outlined below:
 
@@ -158,7 +158,7 @@ Because the QP distribution contains *all* examples, the number of sub-directori
 
 ------------------------------------------------------------------------------
 @subsection exa_sec_apps Example Applications
-To demonstrate QP/C features on an embedded board, you need to create an application that does "something interesting". Instead of inventing this "something interesting" for each and every example, the example projects implement one of the three @subpage exa_apps "example applications", which are described on the separate pages:
+To demonstrate QP/C++ features on an embedded board, you need to create an application that does "something interesting". Instead of inventing this "something interesting" for each and every example, the example projects implement one of the three @subpage exa_apps "example applications", which are described on the separate pages:
 
 - @ref blinky
 - @ref dpp
@@ -166,7 +166,10 @@ To demonstrate QP/C features on an embedded board, you need to create an applica
 
 With the exception of the game application, all other example applications can be implemented on a board with just a couple of LEDs. The @ref game application is a bit more involved and requires a small graphic display on the board.
 
-Beyond these basic applications for demonstrating and testing the various @ref ports "QP/C ports", the QP/C distribution contains all examples described in the book <a class="extern" target="_blank" href="http://www.state-machine.com/psicc2" >Practical UML Statecharts in C/C++, 2nd Edition</a> (@sa exa_win32).
+Beyond these basic applications for demonstrating and testing the various @ref ports "QP/C++ ports", the QP/C++ distribution contains all examples described in the book <a class="extern" target="_blank" href="http://www.state-machine.com/psicc2" >Practical UML Statecharts in C/C++, 2nd Edition</a>
+
+@sa
+- @ref exa_win32
 
 
 ------------------------------------------------------------------------------
@@ -176,7 +179,7 @@ While some provided examples can run on your @ref exa_os "desktop computer", mos
 
 ------------------------------------------------------------------------------
 @subsection exa_sec_tools Development Tools
-Most provided examples require special embedded cross-development tools, such as embedded compilers, linkers, debuggers and IDEs, which you need to acquire independently from the QP/C distribution. Generally, the examples work with the free (size limited) evaluation versions of the commercial tools. The examples list the versions of tools they were developed and tested with. Please refer to the @ref exa_ref "cross-reference section" @ref exa_sec_tools to see which embedded toolsets are used.  
+Most provided examples require special embedded cross-development tools, such as embedded compilers, linkers, debuggers and IDEs, which you need to acquire independently from the QP/C++ distribution. Generally, the examples work with the free (size limited) evaluation versions of the commercial tools. The examples list the versions of tools they were developed and tested with. Please refer to the @ref exa_ref "cross-reference section" @ref exa_sec_tools to see which embedded toolsets are used.  
 
 
 ------------------------------------------------------------------------------
@@ -205,7 +208,7 @@ The auto-generated files are saved as **read-only**. This protects them from ina
 
 ------------------------------------------------------------------------------
 @subsection exa_sec_3rd Third-Party Code
-The QP/C example projects often need to use various additional code, such as MCU register definition files, startup code, device drivers, etc., which are provided by Third-Party vendors. All such code is located in the <span class="img folder">3rd_party</span> @ref qpc_files "top-level folder".
+The QP/C++ example projects often need to use various additional code, such as MCU register definition files, startup code, device drivers, etc., which are provided by Third-Party vendors. All such code is located in the <span class="img folder">3rd_party</span> @ref qpc_files "top-level folder".
 
 @note
 As far as possible, the code in the <span class="img folder">3rd_party</span> folder has been left unchanged from the original source. (Any modified code is clearly identified by top-level comments that detail the applied changes.) For that reason, the Third-Party code might produce **compilation warnings** in your builds. 

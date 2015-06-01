@@ -1,8 +1,8 @@
-About AP/C
-==========
-QP/C (Quantum Platform in C) is a lightweight, open source software framework
-for building responsive and modular real-time embedded applications as
-systems of cooperating, event-driven active objects (actors). The QP/C
+About QP/C++
+============
+QP/C++ (Quantum Platform in C++) is a lightweight, open source software
+framework for building responsive and modular real-time embedded applications
+as systems of cooperating, event-driven active objects (actors). The QP/C++
 framework is a member of a larger family consisting of QP/C, QP/C++, and
 QP-nano frameworks, which are all strictly quality controlled, thoroughly
 documented, and commercially licensable.
@@ -11,7 +11,7 @@ All QP frameworks can run on bare-metal single-chip microcontrollers,
 completely replacing a traditional Real-Time Operating System (RTOS).
 Ports and ready-to-use examples are provided for major CPU families.
 
-QP/C can also work with many traditional RTOSes and desktop OSes (such as
+QP/C++ can also work with many traditional RTOSes and desktop OSes (such as
 Windows, Linux including embedded Linux).
 
 The behavior of active objects is specified in QP by means of hierarchical
@@ -28,21 +28,22 @@ The book, Practical UML Statecharts in C/C++, 2nd Edition provides a detailed
 design study of the QP frameworks and explains all the related concepts.
 
 ***
-NOTE: For more information about QP/C, please visit:
-http://www.state-machine.com/qp/qpc
+NOTE: For more information about QP/C++, please visit:
+http://www.state-machine.com/qpcpp
 ****
 
 
-Licensing QP/C
-==============
-QP/C is licensed under the increasingly popular dual licensing model, in
+Licensing QP/C++
+================
+QP/C++ is licensed under the increasingly popular dual licensing model, in
 which both the open source software distribution mechanism and traditional
 closed source software distribution models are combined.
 
-Note
-If your company has a policy forbidding open source in your product, all
-QP frameworks can be licensed commercially, in which case you don't use any
-open source license and you do not violate your policy.
+****
+NOTE: If your company has a policy forbidding open source in your product,
+all QP frameworks can be licensed commercially, in which case you don't use
+any open source license and you do not violate your policy.
+****
 
 Open Source Projects:
 --------------------
