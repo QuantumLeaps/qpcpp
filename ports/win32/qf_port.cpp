@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-03-14
+/// Last updated for version 5.4.2
+/// Last updated on  2015-06-05
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -55,8 +55,7 @@ Q_DEFINE_THIS_MODULE("qf_port")
 // Local objects *************************************************************
 static CRITICAL_SECTION l_win32CritSect;
 static DWORD l_tickMsec = 10U; // clock tick in msec (argument for Sleep())
-static bool l_running;
-
+static bool  l_isRunning;      // flag indicating when QF is running
 
 //****************************************************************************
 void QF::init(void) {
@@ -72,7 +71,7 @@ void QF_leaveCriticalSection_(void) {
 }
 //****************************************************************************
 void QF::stop(void) {
-    l_running = false;   // terminate the main (ticker) thread
+    l_isRunning = false;   // terminate the main (ticker) thread
 }
 //****************************************************************************
 void QF::thread_(QMActive *act) {
@@ -98,7 +97,7 @@ static DWORD WINAPI ao_thread(LPVOID me) {
 int_t QF::run(void) {
     onStartup();  // startup callback
 
-    l_running = true; // QF is running
+    l_isRunning = true; // QF is running
 
     // set the ticker thread priority below normal to prevent
     // flooding other threads with time events when the machine
@@ -109,7 +108,7 @@ int_t QF::run(void) {
     do {
         Sleep(l_tickMsec);  // wait for the tick interval
         QF_onClockTick();   // clock tick callback (must call QF_TICK_X())
-    } while (l_running);
+    } while (l_isRunning);
 
     onCleanup();            // cleanup callback
     QS_EXIT();              // cleanup the QSPY connection

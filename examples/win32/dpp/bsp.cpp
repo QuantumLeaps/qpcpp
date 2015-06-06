@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 5.4.2
+// Date of the Last Update:  2015-06-06
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -56,12 +56,11 @@ static uint32_t l_rnd; // random seed
 //............................................................................
 void BSP_init(void) {
     printf("Dining Philosopher Problem example"
-           "\nQEP %s\nQF  %s\n"
+           "\nQP %s\n"
            "Press 'p' to pause\n"
            "Press 's' to serve\n"
            "Press ESC to quit...\n",
-           QP::QEP::getVersion(),
-           QP::QF::getVersion());
+           QP::versionStr);
 
     BSP_randomSeed(1234U);
     Q_ALLEGE(QS_INIT((void *)0));

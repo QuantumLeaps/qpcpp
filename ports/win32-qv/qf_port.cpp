@@ -1,5 +1,5 @@
 /// \file
-/// \brief QF/C++ port to Win32 API with cooperative QV kernel (win32-qv)
+/// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
 /// \cond
 ///***************************************************************************
 /// Last updated for version 5.4.0
@@ -78,6 +78,7 @@ void QF_leaveCriticalSection_(void) {
 //****************************************************************************
 void QF::stop(void) {
     l_isRunning = false; // terminate the main event-loop thread
+    SetEvent(QV_win32Event_); // unblock the event-loop so it can terminate
 }
 //****************************************************************************
 int_t QF::run(void) {

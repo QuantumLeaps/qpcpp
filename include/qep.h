@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.1
-/// Last updated on  2015-05-21
+/// Last updated for version 5.4.2
+/// Last updated on  2015-06-06
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      541
+#define QP_VERSION      542
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "5.4.1"
+#define QP_VERSION_STR  "5.4.2"
 
-//! Tamperproof current QP release (5.4.1) and date (15-05-21)
-#define QP_RELEASE      0xA6484F52U
+//! Tamperproof current QP release (5.4.2) and date (15-06-06)
+#define QP_RELEASE      0xA63B5701U
 
 #ifndef Q_ROM
     //! Macro to specify compiler-specific directive for placing a

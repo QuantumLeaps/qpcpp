@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Orthogonal Component state pattern example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 5.4.2
+// Date of the Last Update:  2015-06-06
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -50,7 +50,7 @@ private:
 public:
     AlarmClock() // default ctor
       : QActive((QStateHandler)&AlarmClock::initial),
-        m_timeEvt(TIME_SIG) {}
+        m_timeEvt(this, TIME_SIG, 0U) {}
 
 private:
     // hierarchical state machine ...
@@ -85,8 +85,8 @@ QState AlarmClock::final(AlarmClock *me, QEvt const *e) {
 QState AlarmClock::timekeeping(AlarmClock *me, QEvt const *e) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            // periodic timeout every second
-            me->m_timeEvt.postEvery(me, BSP_TICKS_PER_SEC);
+            // periodic timeout in a second and every second
+            me->m_timeEvt.armX(BSP_TICKS_PER_SEC, BSP_TICKS_PER_SEC);
             return Q_HANDLED();
         }
         case Q_EXIT_SIG: {

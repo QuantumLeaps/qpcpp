@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.4.0
-// Last updated on  2015-05-02
+// Last updated for version 5.4.2
+// Last updated on  2015-06-05
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -32,52 +32,57 @@
 // Email: info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 
-// general
--esym(1960,                   // Rule 7-3-1, Global declaration of symbol
+// General
+-estring(793,6)       // ANSI/ISO limit of 6 significant chars exceeded
+-esym(1960,           // Rule 7-3-1, Global declaration of symbol
  char_t,
  int_t,
  enum_t,
  float32_t,
  float64_t)
--estring(1960,                // 11-0-1(req) non-private data member
+-estring(1960,        // 11-0-1(req) non-private data member
  sig,
  poolId_,
  refCtr_)
--estring(1927,                // 8-5-1(req) not in the ctor initializer
+-estring(1927,        // 8-5-1(req) not in the ctor initializer
  QP::QEvt::poolId_,
  QP::QEvt::refCtr_)
--estring(1923,                // 16-2-2(req) could become const variable
+-estring(1923,        // 16-2-2(req) could become const variable
  QP_API_VERSION,
  QP_VERSION_STR,
  QP_RELEASE,
  Q_EVT_CTOR,
  Q_SIGNAL_SIZE,
  QP_VERSION)
--emacro(923, Q_UINT2PTR_CAST) // 5-2-7, 5-2-8 cast from int to pointer
--emacro(930, QEVT_INITIALIZER)// 5-2-7, 5-2-8 cast from enum to unsigned
--estring(1960,                // 16-0-4(req) function-like macro
+-emacro(923,          // 5-2-7, 5-2-8 cast from int to pointer
+ Q_UINT2PTR_CAST)
+-emacro(930,          // 5-2-7, 5-2-8 cast from enum to unsigned
+ QEVT_INITIALIZER)
+-estring(1960,        // 16-0-4(req) function-like macro
  Q_DIM,
  Q_UINT2PTR_CAST,
  QEVT_INITIALIZER)
--esym(1790,                   // Base class has no virtual functions
+-esym(1790,           // Base class has no virtual functions
  QP::QEvt)
--estring(1712, QEvt)          // default constructor not defined
--estring(1401,                // member not initialized in the ctor
+-estring(1712, QEvt)  // default constructor not defined
+-estring(1401,        // member not initialized in the ctor
  QP::QEvt::poolId_,
  QP::QEvt::refCtr_)
--emacro(866, Q_DIM)           // Unusual use of 'SYM' in argument to sizeof
--estring(970,bool)            // Use of 'bool' outside of a typedef
+-emacro(866, Q_DIM)   // Unusual use of 'SYM' in argument to sizeof
+-estring(970,bool)    // Use of 'bool' outside of a typedef
 
 
 // Assertions
--esym(1960,                   // Rule 7-3-1, Global declaration of symbol
+-esym(1960,           // Rule 7-3-1, Global declaration of symbol
  Q_onAssert,
  Q_onTestAssert)
--emacro(944, Q_ASSERT_COMPILE) // 0-1-1/2/9 operator ? always evaluates to True 
--emacro(948, Q_ASSERT_COMPILE) // 0-1-9  Operator '==' always evaluates to True
--esym(752, Q_assert_compile)  // 0-1-3 local declarator not referenced   
--esym(1960, QP::QEQueue)      // 3-2-3, type previously declared
--estring(1960,                // 16-0-4 function-like macro
+-emacro(944,          // 0-1-1/2/9 operator ? always evaluates to True 
+ Q_ASSERT_COMPILE)
+-emacro(948,          // 0-1-9  Operator '==' always evaluates to True
+ Q_ASSERT_COMPILE)
+-esym(752,            // 0-1-3 local declarator not referenced   
+ Q_assert_compile)
+-estring(1960,        // 16-0-4 function-like macro
  Q_ASSERT,
  Q_ASSERT_ID,
  Q_ALLEGE,
@@ -93,36 +98,37 @@
  Q_ASSERT_COMPILE,
  Q_TEST_ASSERT,
  Q_DEFINE_THIS_MODULE)
--emacro(1924,                 // 5-2-4 C-style cast
+-emacro(522,          // Highest operation lacks side-effects
  Q_ASSERT,
  Q_ASSERT_ID,
  Q_ALLEGE,
  Q_ALLEGE_ID,
  Q_ERROR,
  Q_ERROR_ID)
--emacro(522,                  // Highest operation lacks side-effects
+-emacro(1924,         // 5-2-4 C-style cast
  Q_ASSERT,
  Q_ASSERT_ID,
  Q_ALLEGE,
  Q_ALLEGE_ID,
  Q_ERROR,
  Q_ERROR_ID)
--function(exit,               // give these functions the semantics of "exit"
+-function(exit,       // give these functions the semantics of "exit"
  Q_onAssert,
  Q_onTestAssert)
 
 
 // QEP
--emacro(929,                  // 5-2-7(req) cast pointer to pointer
+-emacro(929,          // 5-2-7(req) cast pointer to pointer
  Q_STATE_CAST,
  Q_ACTION_CAST,
  Q_EVT_CAST)
--emacro(1939,                 // 5-2-2, Down cast detected
+-emacro(1939,         // 5-2-2, Down cast detected
  Q_EVT_CAST,
  Q_NEW,
  Q_NEW_X)
--estring(1960,QP::QMAttr)     // 9-5-1 declaration of union
--esym(1960,                   // 16-0-4 function-like macro
+-estring(1960,        // 9-5-1 declaration of union
+ QP::QMAttr)
+-esym(1960,           // 16-0-4 function-like macro
  Q_ROM_BYTE,
  Q_TRAN,
  Q_TRAN_HIST,
@@ -130,7 +136,7 @@
  Q_STATE_CAST,
  Q_ACTION_CAST,
  Q_EVT_CAST)
--esym(1960,                   // 16-0-4 function-like macro
+-esym(1960,           // 16-0-4 function-like macro
  QM_ENTRY,
  QM_EXIT,
  QM_TRAN,
@@ -142,28 +148,29 @@
  QM_UNHANDLED,
  QM_SUPER,
  QM_SUPER_SUB)
--esym(1712,                   // default constructor not defined
+-esym(1712,           // default constructor not defined
  QMsm,
  QHsm,
  QFsm)
 
 
 // QF
--emacro(929,                  // 5-2-7 cast from pointer to pointer
+-emacro(929,          // 5-2-7 cast from pointer to pointer
  Q_NEW,
  Q_NEW_X)
--efunc(925,                   // 5-2-8, 5-2-9 cast from pointer to pointer
+-efunc(925,           // 5-2-8, 5-2-9 cast from pointer to pointer
  *toActive,
  *toTimeEvt)
--esym(1927,                   // 8-5-1 Symbol not in the ctor initializer list
+
+-esym(1927,           // 8-5-1 Symbol not in the ctor initializer list
  QP::QMActive::m_prio,
  QP::QMActive::m_eQueue,
  QP::QMActive::m_osObject,
  QP::QMActive::m_thread)
--esym(1536,                   // 9-3-1, 9-3-2 Exposing low access member
+-esym(1536,           // 9-3-1, 9-3-2 Exposing low access member
  QP::QMActive::m_osObject,
  QP::QMActive::m_thread)
--estring(1923,                // 16-2-2 could become const variable
+-estring(1923,        // 16-2-2 could become const variable
  QF_MAX_ACTIVE,
  QF_MAX_EPOOL,
  QF_MAX_TICK_RATE,
@@ -172,7 +179,7 @@
  QF_MPOOL_SIZ_SIZE,
  QF_MPOOL_CTR_SIZE,
  QF_TIMEEVT_CTR_SIZE)
--estring(1923,                // 16-2-2 could become const variable
+-estring(1923,        // 16-2-2 could become const variable
  QF_INT_DISABLE,
  QF_INT_ENABLE,
  QF_CRIT_ENTRY,
@@ -184,12 +191,12 @@
  QF_QS_ISR_ENTRY,
  QF_QS_ISR_EXIT,
  QF_QS_ACTION)
--esym(1960,                   // 16-0-2, '#define' used within a block
+-esym(1960,           // 16-0-2, '#define' used within a block
  QF_EVENT_SIZ_SIZE,
  QF_TIMEEVT_CTR_SIZE,
  QF_ACTIVE_SUPER_,
  QF_ACTIVE_STATE_)
--esym(1960,                   // 16-0-4 function-like macro
+-esym(1960,           // 16-0-4 function-like macro
  QF_INT_DISABLE,
  QF_INT_ENABLE,
  QF_CRIT_ENTRY,
@@ -205,7 +212,7 @@
  TICK_X,
  tick,
  postFIFO)
--esym(1960,                   // 16-0-4 function-like macro
+-esym(1960,           // 16-0-4 function-like macro
  QF_QS_CRIT_EXIT,
  QF_QS_CRIT_ENTRY,
  QF_QS_CRIT_EXIT,
@@ -214,7 +221,7 @@
  QF_QS_ACTION,
  QF_MPOOL_EL,
  QF_LOG2)
--esym(1960,                   // 16-0-4 function-like macro
+-esym(1960,           // 16-0-4 function-like macro
  QACTIVE_EQUEUE_WAIT_,
  QACTIVE_EQUEUE_SIGNAL_,
  QACTIVE_EQUEUE_ONEMPTY_,
@@ -222,40 +229,40 @@
  QF_EPOOL_EVENT_SIZE_,
  QF_EPOOL_GET_,
  QF_EPOOL_PUT_)
--estring(1963, Q_NEW)         // 16-3-2(adv) '#/##' used in macro
--esym(1960, remove)           // 17-0-2, Re-use of C++ identifier
--esym(1790,                   // Base class has no virtual functions
+-estring(1963, Q_NEW) // 16-3-2(adv) '#/##' used in macro
+-esym(1960, remove)   // 17-0-2, Re-use of C++ identifier
+-esym(1790,           // Base class has no virtual functions
  QP::QHsm,
  QP::QFsm,
  QP::QMActive)
--esym(1401,                   // member not initialized by constructor
+-esym(1401,           // member not initialized by constructor
  QP::QMActive::m_prio,
  QP::QMActive::m_eQueue,
  QP::QMActive::m_osObject,
  QP::QMActive::m_thread)
--esym(1704,                   // constructor has private access specification
+-esym(1704,           // constructor has private access specification
  QP::QTimeEvt::QTimeEvt,
  QP::QEQueue::QEQueue,           
  QP::QMPool::QMPool)           
--esym(1712,                   // default constructor not defined for class
+-esym(1712,           // default constructor not defined for class
  QMActive,
  QActive,
  QTimeEvt)
--esym(641, *Signals)          // Converting enum '*Signals' to 'int'
--esym(754, sto_)              // local structure member 'sto' not referenced
+-esym(641, *Signals)  // Converting enum '*Signals' to 'int'
+-esym(754, sto_)      // local structure member 'sto' not referenced
 -efunc(1960, QP::QPSet*::isEmpty)    // incorrect reporting int->bool
 -efunc(1960, QP::QPSet*::notEmpty)   // incorrect reporting int->bool
 -efunc(1960, QP::QPSet*::hasElement) // incorrect reporting int->bool
 
 
 // QK
--esym(1960,                   // 16-0-4 function-like macro
+-esym(1960,           // 16-0-4 function-like macro
  QK_ISR_ENTRY,
  QK_ISR_EXIT,
  QK_EXT_SAVE,
  QK_EXT_RESTORE,
  QK_TLS)
--esym(1960,                   // 7-3-1, Global declaration of symbol
+-esym(1960,           // 7-3-1, Global declaration of symbol
  QK_readySet_,
  QK_currPrio_,
  QK_intNest_,
@@ -267,13 +274,13 @@
 
 
 // QS
--emacro(506, QS_*)            // 0-1-1 constant value boolean
--emacro(774, QS_*)            // 0-1-1 'if' always True
--emacro(930, QS_*)            // 5-2-7 cast from enum to unsigned char
--emacro(9091,                 // 5-2-7, 5-2-8 cast from pointer to int
+-emacro(506, QS_*)    // 0-1-1 constant value boolean
+-emacro(774, QS_*)    // 0-1-1 'if' always True
+-emacro(930, QS_*)    // 5-2-7 cast from enum to unsigned char
+-emacro(9091,         // 5-2-7, 5-2-8 cast from pointer to int
  QS_OBJ_,
  QS_FUN_)
--estring(1923,                // 16-2-2 macro could become const variable
+-estring(1923,        // 16-2-2 macro could become const variable
  QS_RESET,
  QS_TIME_SIZE,
  QS_OBJ_PTR_SIZE,
@@ -282,7 +289,7 @@
  QS_FUN_,
  QS_TEST,
  QS_TEST_ASSERTION)
--esym(1960,                   // 16-0-4 function-like macro
+-esym(1960,           // 16-0-4 function-like macro
  QS_INIT,
  QS_EXIT,
  QS_DUMP,
@@ -301,7 +308,7 @@
  QS_END,
  QS_BEGIN_NOCRIT,
  QS_END_NOCRIT)
--esym(1960,                   // 16-0-4 function-like macro
+-esym(1960,           // 16-0-4 function-like macro
  QS_I8,
  QS_U8,
  QS_I16,
@@ -327,7 +334,7 @@
  QS_STR_ROM,
  QS_MEM,
  QS_SIG)
--esym(1960,                   // 16-0-4 function-like macro
+-esym(1960,           // 16-0-4 function-like macro
  QS_CRIT_ENTRY_,
  QS_CRIT_EXIT_,
  QS_BEGIN_,
@@ -351,7 +358,7 @@
  QS_MPC_,
  QS_MPS_,
  QS_TEC_)
--esym(1923,                   // 16-2-2 could become const variable
+-esym(1923,           // 16-2-2 could become const variable
  QS_INIT,
  QS_EXIT,
  QS_DUMP,
@@ -369,7 +376,7 @@
  QS_END,
  QS_BEGIN_NOCRIT,
  QS_END_NOCRIT)
--esym(1923,                   // 16-2-2 could become const variable
+-esym(1923,           // 16-2-2 could become const variable
  QS_I8,
  QS_U8,
  QS_I16,
@@ -393,7 +400,7 @@
  QS_STR_ROM,
  QS_MEM,
  QS_SIG)
--esym(1923,                   // 16-2-2 could become const variable
+-esym(1923,           // 16-2-2 could become const variable
  QS_CRIT_ENTRY_,
  QS_CRIT_EXIT_,
  QS_BEGIN_,
@@ -416,18 +423,12 @@
  QS_MPC_,
  QS_MPS_,
  QS_TEC_)
--esym(1963,                   // 16-3-2, '#/##' operator used in macro
+-esym(1963,           // 16-3-2, '#/##' operator used in macro
  QS_SIG_DICTIONARY,
  QS_OBJ_DICTIONARY,
  QS_FUN_DICTIONARY,
  QS_USR_DICTIONARY)
--emacro(717, QS_*)            // do ... while(0);
--emacro(725, QS_END*)         // Expected positive indentation
--esym(641, QP::QSType)        // Converting enum '*QSType' to 'int'
-
-
-// Miscallaneous
--estring(793,6)   // ANSI/ISO limit of 6 significant chars exceeded
--e546             // Suspicious use of &
-
-
+-esym(1960, QP::QEQueue) // 3-2-3, type previously declared
+-emacro(717, QS_*)       // do ... while(0);
+-emacro(725, QS_END*)    // Expected positive indentation
+-esym(641, QP::QSType)   // Converting enum '*QSType' to 'int'

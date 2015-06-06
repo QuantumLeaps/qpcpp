@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Console-based BSP, MinGW
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Oct 09, 2013
+// Last Updated for Version: 5.4.2
+// Date of the Last Update:  2015-06-05
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,16 +28,15 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// Web  : http://www.state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
 #ifndef bsp_h
 #define bsp_h
 
+#define BSP_TICKS_PER_SEC    100U
+
 void BSP_init(int argc, char *argv[]);
-void BSP_onKeyboardInput(uint8_t ch);        // process the keyboard character
+void BSP_onKeyboardInput(uint8_t ch); // process the keyboard character
 
-#define BSP_TICKS_PER_SEC    50U
-
-#endif                                                                // bsp_h
+#endif // bsp_h

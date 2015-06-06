@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Deferred Event state pattern example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 5.4.2
+// Date of the Last Update:  2015-06-06
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -63,8 +63,8 @@ private:
 public:
     TServer() // the default ctor
       : QActive((QStateHandler)&TServer::initial),
-        m_receivedEvt(RECEIVED_SIG),
-        m_authorizedEvt(AUTHORIZED_SIG)
+        m_receivedEvt(this, RECEIVED_SIG, 0U),
+        m_authorizedEvt(this, AUTHORIZED_SIG, 0U)
     {
         m_requestQueue.init(m_requestQSto, Q_DIM(m_requestQSto));
     }
@@ -146,7 +146,7 @@ QState TServer::receiving(TServer *me, QEvt const *e) {
         case Q_ENTRY_SIG: {
             printf("receiving-ENTRY;\n");
             // one-shot timeout in 1 second
-            me->m_receivedEvt.postIn(me, BSP_TICKS_PER_SEC);
+            me->m_receivedEvt.armX(BSP_TICKS_PER_SEC, 0U);
             return Q_HANDLED();
         }
         case Q_EXIT_SIG: {
@@ -165,7 +165,7 @@ QState TServer::authorizing(TServer *me, QEvt const *e) {
         case Q_ENTRY_SIG: {
             printf("authorizing-ENTRY;\n");
             // one-shot timeout in 2 seconds
-            me->m_authorizedEvt.postIn(me, 2*BSP_TICKS_PER_SEC);
+            me->m_authorizedEvt.armX(2*BSP_TICKS_PER_SEC, 0U);
             return Q_HANDLED();
         }
         case Q_EXIT_SIG: {
@@ -188,10 +188,10 @@ static RequestEvt    l_smlPoolSto[10]; // small event pool
 
 //............................................................................
 int main(int argc, char *argv[]) {
-    printf("Reminder state pattern\nQEP version: %s\nQF  version: %s\n"
+    printf("Reminder state pattern\nQP version: %s\n"
            "Press n to generate a new request\n"
            "Press ESC to quit...\n",
-           QEP::getVersion(), QF::getVersion());
+           QP::versionStr);
 
     BSP_init(argc, argv); // initialize the BSP
 

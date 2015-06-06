@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product:  Calculator2 Example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 5.4.2
+// Date of the Last Update:  2015-06-06
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -53,6 +53,7 @@ int main() {
             "Press '-'            to subtract or negate a number\n"
             "Press '*'            to multiply\n"
             "Press '/'            to divide\n"
+            "Press '%'            to calculate percentage\n"
             "Press '=' or <Enter> to get the result\n"
             "Press 'c' or 'C'     to Cancel\n"
             "Press 'e' or 'E'     to Cancel Entry\n"

@@ -79,7 +79,7 @@ double BSP_get_value(void) {
 //............................................................................
 int BSP_eval(double operand1, int oper, double operand2) {
     int ok = 1;
-    double result;
+    double result = 0.0;
     switch (oper) {
         case KEY_PLUS: {
             result = operand1 + operand2;
