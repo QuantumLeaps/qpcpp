@@ -15,7 +15,7 @@
 // for more details.
 //****************************************************************************
 //${.::table.cpp} ............................................................
-#include "qp_port.h"
+#include "qpcpp.h"
 #include "dpp.h"
 #include "bsp.h"
 
@@ -25,7 +25,7 @@ Q_DEFINE_THIS_FILE
 namespace DPP {
 
 //${AOs::Table} ..............................................................
-class Table : public QP::QMActive {
+class Table : public QP::GuiQMActive {
 private:
     uint8_t m_fork[N_PHILO];
     bool m_isHungry[N_PHILO];
@@ -81,7 +81,7 @@ namespace DPP {
 //${AOs::Table} ..............................................................
 //${AOs::Table::Table} .......................................................
 Table::Table()
-: QMActive(Q_STATE_CAST(&Table::initial))
+ : GuiQMActive(Q_STATE_CAST(&Table::initial))
 {
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         m_fork[n] = FREE;
@@ -114,14 +114,12 @@ QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
     QS_SIG_DICTIONARY(DONE_SIG,      (void *)0); // global signals
     QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
     QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(SERVE_SIG,     (void *)0);
     QS_SIG_DICTIONARY(TERMINATE_SIG, (void *)0);
 
     QS_SIG_DICTIONARY(HUNGRY_SIG,    me); // signal just for Table
 
     me->subscribe(DONE_SIG);
     me->subscribe(PAUSE_SIG);
-    me->subscribe(SERVE_SIG);
     me->subscribe(TERMINATE_SIG);
 
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
@@ -300,8 +298,8 @@ QP::QState Table::paused_x(Table * const me) {
 QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // ${AOs::Table::SM::active::paused::SERVE}
-        case SERVE_SIG: {
+        // ${AOs::Table::SM::active::paused::PAUSE}
+        case PAUSE_SIG: {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];

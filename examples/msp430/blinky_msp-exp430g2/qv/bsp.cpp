@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Blinky" example on MSP-EXP430G2 board, cooperative QV kernel
-// Last updated for version 5.4.0
-// Last updated on  2015-05-13
+// Last updated for version 5.5.0
+// Last updated on  2015-09-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "blinky.h"
@@ -124,9 +124,10 @@ void QV::onIdle(void) { // NOTE: called with interrutps DISABLED, see NOTE1
 }
 
 //............................................................................
-void Q_onAssert(char const Q_ROM * const file, int line) {
+extern "C" void Q_onAssert(char const *module, int loc) {
     // implement the error-handling policy for your application!!!
     QF_INT_DISABLE(); // disable all interrupts
+    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
 
     // cause the reset of the CPU...
     WDTCTL = WDTPW | WDTHOLD;

@@ -112,6 +112,9 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\Debug/dpp.bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>cmd /c "del $(OutDir)qstamp.obj"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -154,6 +157,9 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\Release/dpp.bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>cmd /c "del $(OutDir)qstamp.obj"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Spy|Win32'">
     <Midl>
@@ -195,8 +201,12 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\Spy/dpp.bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>cmd /c "del $(OutDir)qstamp.obj"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\include\qstamp.cpp" />
     <ClCompile Include="..\..\..\ports\threadx\qf_port.cpp" />
     <ClCompile Include="..\..\..\source\qep_hsm.cpp" />
     <ClCompile Include="..\..\..\source\qep_msm.cpp" />
@@ -218,6 +228,11 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\qs_fp.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\qs_rx.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Spy|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="bsp.cpp" />

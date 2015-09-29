@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to FreeRTOS.org kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-11
+/// Last updated for version 5.4.3
+/// Last updated on  2015-06-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -78,6 +78,18 @@ void QF::thread_(QMActive *act) {
     act->unsubscribeAll();
 }
 //............................................................................
+void QF_setTaskName(QMActive *act, char_t const *taskName) {
+    // this function must be called before QMActive::start(),
+    // which implies that m_thread must not be used yet;
+    //
+    Q_REQUIRE_ID(400, act->getThread() == static_cast<TaskHandle_t>(0));
+
+    // store the name in m_thread until QMActive::start is called
+    act->getThread() = reinterpret_cast<TaskHandle_t>(
+                           const_cast<char_t *>(taskName));
+}
+
+//............................................................................
 static void task_function(void *pvParameters) { // FreeRTOS signature
     QMActive *act = reinterpret_cast<QMActive *>(pvParameters);
 
@@ -106,9 +118,13 @@ void QMActive::start(uint_fast8_t prio,
     QS_FLUSH();     // flush the trace buffer to the host
 
     // create the FreeRTOS.org task for the AO
+    // task name provided by the user in QF_setTaskName() or default name
+    char_t const *taskName = (m_thread != static_cast<TaskHandle_t>(0))
+                             ? reinterpret_cast<char_t const *>(m_thread)
+                             : static_cast<char_t const *>("AO");
     portBASE_TYPE err = xTaskCreate(
-        &task_function,   // the task function
-        (const char *)"AO",  // the name of the task
+        &task_function,      // the task function
+        taskName ,           // the name of the task
         (uint16_t)stkSize/sizeof(portSTACK_TYPE), // stack size
         this,                // the 'pvParameters' parameter
         (UBaseType_t)(prio + tskIDLE_PRIORITY),  // FreeRTOS priority

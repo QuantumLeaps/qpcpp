@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-25
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -46,6 +46,9 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qs")
 
 //****************************************************************************
+extern char_t const Q_ROM BUILD_DATE[12];
+extern char_t const Q_ROM BUILD_TIME[9];
+
 QS QS::priv_; // QS private data
 
 //****************************************************************************
@@ -68,19 +71,39 @@ QS QS::priv_; // QS private data
 /// any data loss.
 ///
 void QS::initBuf(uint8_t sto[], uint_fast16_t const stoSize) {
-    uint8_t *buf_ = &sto[0];
-
-    // at least 8 bytes in buf
+    // the provided buffer must be at least 8 bytes long
     Q_REQUIRE_ID(100, stoSize > static_cast<uint_fast16_t>(8));
 
-    QF::bzero(&priv_, static_cast<uint_fast16_t>(sizeof(priv_)));
-    priv_.buf  = buf_;
-    priv_.end  = static_cast<QSCtr>(stoSize);
+    // This function initializes all the internal QS variables, so that the
+    // tracing can start correctly even if the startup code fails to clear
+    // any uninitialized data (as is required by the C Standard).
+    //
+    filterOff(QS_ALL_RECORDS); // disable all maskable filters
 
+    priv_.smObjFilter = static_cast<void *>(0);
+    priv_.aoObjFilter = static_cast<void *>(0);
+    priv_.mpObjFilter = static_cast<void *>(0);
+    priv_.eqObjFilter = static_cast<void *>(0);
+    priv_.teObjFilter = static_cast<void *>(0);
+    priv_.apObjFilter = static_cast<void *>(0);
+
+    priv_.buf      = &sto[0];
+    priv_.end      = static_cast<QSCtr>(stoSize);
+    priv_.head     = static_cast<QSCtr>(0);
+    priv_.tail     = static_cast<QSCtr>(0);
+    priv_.used     = static_cast<QSCtr>(0);
+    priv_.seq      = static_cast<uint8_t>(0);
+    priv_.chksum   = static_cast<uint8_t>(0);
+    priv_.critNest = static_cast<uint_fast8_t>(0);
+
+    // produce an empty record to "flush" the QS trace buffer
     beginRec(QS_REC_NUM_(QS_EMPTY));
     endRec();
-    beginRec(QS_REC_NUM_(QS_QP_RESET));
-    endRec();
+
+    // produce the Target info QS record
+    QS_target_info_(static_cast<uint8_t>(0xFF));
+
+    // wait with flushing after successfull initialization (see QS_INIT())
 }
 
 //****************************************************************************
@@ -128,38 +151,29 @@ void QS::filterOn(uint_fast8_t const rec) {
 /// layers must be enabled for the QS record to be inserted in the QS buffer.
 ///
 void QS::filterOff(uint_fast8_t const rec) {
+    uint8_t tmp;
 
     if (rec == QS_ALL_RECORDS) {
-        // the following unrolled loop is designed to stop collecting trace
-        // very fast in order to prevent overwriting the interesting data.
-        // The code assumes that the size of priv_.glbFilter[] is 16.
+        // first clear all global filters
+        for (tmp = static_cast<uint8_t>(
+                        static_cast<uint8_t>(sizeof(priv_.glbFilter))
+                                            - static_cast<uint8_t>(1));
+             tmp > static_cast<uint8_t>(0);
+             --tmp)
+        {
+            priv_.glbFilter[tmp] = static_cast<uint8_t>(0);
+        }
 
-        uint8_t *glbFilter_ = &priv_.glbFilter[0];
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);  QS_PTR_INC_(glbFilter_);
-        *glbFilter_ = static_cast<uint8_t>(0);
+        // next leave the specific filters enabled
+        priv_.glbFilter[0] = static_cast<uint8_t>(0x01);
+        priv_.glbFilter[7] = static_cast<uint8_t>(0xF0);
+        priv_.glbFilter[8] = static_cast<uint8_t>(0x3F);
     }
     else {
         // record numbers can't exceed QS_ESC, so they don't need escaping
         Q_ASSERT_ID(310, rec < static_cast<uint_fast8_t>(QS_ESC));
-        uint8_t tmp = static_cast<uint8_t>(
-                          1U << (rec & static_cast<uint_fast8_t>(7)));
+        tmp = static_cast<uint8_t>(
+                  1U << (rec & static_cast<uint_fast8_t>(7)));
         tmp ^= static_cast<uint8_t>(0xFF);
         priv_.glbFilter[rec >> 3] &= tmp;
     }
@@ -224,6 +238,170 @@ void QS::endRec(void) {
         priv_.used = end_;   // the whole buffer is used
         priv_.tail = head_;  // shift the tail to the old data
     }
+}
+
+//****************************************************************************
+void QS_target_info_(uint8_t const isReset) {
+
+    QS::beginRec(static_cast<uint_fast8_t>(QS_TARGET_INFO));
+        QS_U8_(isReset);
+
+        QS_U16_(QP_VERSION); // two-byte version number
+
+        // send the object sizes...
+        QS_U8_(static_cast<uint8_t>(Q_SIGNAL_SIZE)
+               | static_cast<uint8_t>(
+                     static_cast<uint8_t>(QF_EVENT_SIZ_SIZE) << 4));
+
+#ifdef QF_EQUEUE_CTR_SIZE
+        QS_U8_(static_cast<uint8_t>(QF_EQUEUE_CTR_SIZE)
+               | static_cast<uint8_t>(
+                     static_cast<uint8_t>(QF_TIMEEVT_CTR_SIZE) << 4));
+#else
+        QS_U8_(static_cast<uint8_t>(
+                   static_cast<uint8_t>(QF_TIMEEVT_CTR_SIZE) << 4));
+#endif // ifdef QF_EQUEUE_CTR_SIZE
+
+#ifdef QF_MPOOL_CTR_SIZE
+        QS_U8_(static_cast<uint8_t>(QF_MPOOL_SIZ_SIZE)
+               | static_cast<uint8_t>(
+                     static_cast<uint8_t>(QF_MPOOL_CTR_SIZE) << 4));
+#else
+        QS_U8_((uint8_t)0);
+#endif // ifdef QF_MPOOL_CTR_SIZE
+
+        QS_U8_(static_cast<uint8_t>(QS_OBJ_PTR_SIZE)
+               | static_cast<uint8_t>(
+                     static_cast<uint8_t>(QS_FUN_PTR_SIZE) << 4));
+        QS_U8_(static_cast<uint8_t>(QS_TIME_SIZE));
+
+        // send the limits...
+        QS_U8_(static_cast<uint8_t>(QF_MAX_ACTIVE));
+        QS_U8_(static_cast<uint8_t>(QF_MAX_EPOOL)
+               | static_cast<uint8_t>(
+                     static_cast<uint8_t>(QF_MAX_TICK_RATE) << 4));
+
+        // send the build time in three bytes (sec, min, hour)...
+        QS_U8_(static_cast<uint8_t>(
+                   static_cast<uint8_t>(10)
+                   *(static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[6]))
+                         - static_cast<uint8_t>('0')))
+                + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[7]))
+                         - static_cast<uint8_t>('0')));
+        QS_U8_(static_cast<uint8_t>(
+                   static_cast<uint8_t>(10)
+                   *(static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[3]))
+                         - static_cast<uint8_t>('0')))
+                + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[4]))
+                         - static_cast<uint8_t>('0')));
+        if (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[0]))
+            == static_cast<uint8_t>(' '))
+        {
+            QS_U8_(static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[1]))
+                   - static_cast<uint8_t>('0'));
+        }
+        else {
+            QS_U8_(static_cast<uint8_t>(
+                static_cast<uint8_t>(10)*(
+                    static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[0]))
+                        - static_cast<uint8_t>('0')))
+                    + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[1]))
+                        - static_cast<uint8_t>('0')));
+        }
+
+        // send the build date in three bytes (day, month, year) ...
+        if (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[4]))
+            == static_cast<uint8_t>(' '))
+        {
+            QS_U8_(static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[5]))
+                   - static_cast<uint8_t>('0'));
+        }
+        else {
+            QS_U8_(static_cast<uint8_t>(
+                       static_cast<uint8_t>(10)*(
+                           static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[4]))
+                               - static_cast<uint8_t>('0')))
+                       + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[5]))
+                               - static_cast<uint8_t>('0')));
+        }
+        // convert the 3-letter month to a number 1-12 ...
+        uint8_t b;
+        switch (static_cast<int_t>(Q_ROM_BYTE(BUILD_DATE[0]))
+                + static_cast<int_t>(Q_ROM_BYTE(BUILD_DATE[1]))
+                + static_cast<int_t>(Q_ROM_BYTE(BUILD_DATE[2])))
+        {
+            case static_cast<int_t>('J')
+                 + static_cast<int_t>('a')
+                 + static_cast<int_t>('n'):
+                b = static_cast<uint8_t>(1);
+                break;
+            case static_cast<int_t>('F')
+                 + static_cast<int_t>('e')
+                 + static_cast<int_t>('b'):
+                b = static_cast<uint8_t>(2);
+                break;
+            case static_cast<int_t>('M')
+                 + static_cast<int_t>('a')
+                 + static_cast<int_t>('r'):
+                b = static_cast<uint8_t>(3);
+                break;
+            case static_cast<int_t>('A')
+                 + static_cast<int_t>('p')
+                 + static_cast<int_t>('r'):
+                b = static_cast<uint8_t>(4);
+                break;
+            case static_cast<int_t>('M')
+                 + static_cast<int_t>('a')
+                 + static_cast<int_t>('y'):
+                b = static_cast<uint8_t>(5);
+                break;
+            case static_cast<int_t>('J')
+                 + static_cast<int_t>('u')
+                 + static_cast<int_t>('n'):
+                b = static_cast<uint8_t>(6);
+                break;
+            case static_cast<int_t>('J')
+                 + static_cast<int_t>('u')
+                 + static_cast<int_t>('l'):
+                b = static_cast<uint8_t>(7);
+                break;
+            case static_cast<int_t>('A')
+                 + static_cast<int_t>('u')
+                 + static_cast<int_t>('g'):
+                b = static_cast<uint8_t>(8);
+                break;
+            case static_cast<int_t>('S')
+                 + static_cast<int_t>('e')
+                 + static_cast<int_t>('p'):
+                b = static_cast<uint8_t>(9);
+                break;
+            case static_cast<int_t>('O')
+                 + static_cast<int_t>('c')
+                 + static_cast<int_t>('t'):
+                b = static_cast<uint8_t>(10);
+                break;
+            case static_cast<int_t>('N')
+                 + static_cast<int_t>('o')
+                 + static_cast<int_t>('v'):
+                b = static_cast<uint8_t>(11);
+                break;
+            case static_cast<int_t>('D')
+                 + static_cast<int_t>('e')
+                 + static_cast<int_t>('c'):
+                b = static_cast<uint8_t>(12);
+                break;
+            default:
+                b = static_cast<uint8_t>(0);
+                break;
+        }
+        QS_U8_(b); // store the month
+        QS_U8_(static_cast<uint8_t>(
+                   static_cast<uint8_t>(10)*(
+                       static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[9]))
+                           - static_cast<uint8_t>('0')))
+                   + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[10]))
+                           - static_cast<uint8_t>('0')));
+    QS::endRec();
 }
 
 //****************************************************************************
@@ -446,7 +624,10 @@ uint16_t QS::getByte(void) {
     else {
         uint8_t *buf_ = priv_.buf;  // put in a temporary (register)
         QSCtr tail_   = priv_.tail; // put in a temporary (register)
-        ret = static_cast<uint16_t>(*QS_PTR_AT_(tail_)); // the byte to return
+
+        // the byte to return
+        ret = static_cast<uint16_t>(QS_PTR_AT_(buf_, tail_));
+
         ++tail_;  // advance the tail
         if (tail_ == priv_.end) {  // tail wrap around?
             tail_ = static_cast<QSCtr>(0);
@@ -483,6 +664,8 @@ uint16_t QS::getByte(void) {
 uint8_t const *QS::getBlock(uint16_t * const pNbytes) {
     QSCtr used_ = priv_.used;  // put in a temporary (register)
     uint8_t *buf_;
+
+    // any bytes used in the ring buffer?
     if (used_ == static_cast<QSCtr>(0)) {
         *pNbytes = static_cast<uint16_t>(0);  // no bytes available right now
         buf_     = static_cast<uint8_t *>(0); // no bytes available right now
@@ -499,7 +682,7 @@ uint8_t const *QS::getBlock(uint16_t * const pNbytes) {
         }
         *pNbytes = static_cast<uint16_t>(n); // n-bytes available
         buf_ = priv_.buf;
-        buf_ = QS_PTR_AT_(tail_); // the bytes are at the tail
+        buf_ = &QS_PTR_AT_(buf_, tail_); // the bytes are at the tail
 
         priv_.used -= n;
         tail_      += n;
@@ -515,9 +698,13 @@ uint8_t const *QS::getBlock(uint16_t * const pNbytes) {
 /// @note This function is only to be used through macro QS_SIG_DICTIONARY()
 ///
 void QS::sig_dict(enum_t const sig, void const * const obj,
-                  char_t const Q_ROM * const name)
+                  char_t const Q_ROM *name)
 {
     QS_CRIT_STAT_
+
+    if (*name == static_cast<char_t>('&')) {
+        QS_PTR_INC_(name);
+    }
     QS_CRIT_ENTRY_();
     beginRec(static_cast<uint_fast8_t>(QS_SIG_DICT));
     QS_SIG_(static_cast<QSignal>(sig));
@@ -532,9 +719,13 @@ void QS::sig_dict(enum_t const sig, void const * const obj,
 /// @note This function is only to be used through macro QS_OBJ_DICTIONARY()
 ///
 void QS::obj_dict(void const * const obj,
-                  char_t const Q_ROM * const name)
+                  char_t const Q_ROM *name)
 {
     QS_CRIT_STAT_
+
+    if (*name == static_cast<char_t>('&')) {
+        QS_PTR_INC_(name);
+    }
     QS_CRIT_ENTRY_();
     beginRec(static_cast<uint_fast8_t>(QS_OBJ_DICT));
     QS_OBJ_(obj);
@@ -547,10 +738,12 @@ void QS::obj_dict(void const * const obj,
 //****************************************************************************
 /// @note This function is only to be used through macro QS_FUN_DICTIONARY()
 ///
-void QS::fun_dict(void (* const fun)(void),
-                  char_t const Q_ROM * const name)
-{
+void QS::fun_dict(void (* const fun)(void), char_t const Q_ROM *name) {
     QS_CRIT_STAT_
+
+    if (*name == static_cast<char_t>('&')) {
+        QS_PTR_INC_(name);
+    }
     QS_CRIT_ENTRY_();
     beginRec(static_cast<uint_fast8_t>(QS_FUN_DICT));
     QS_FUN_(fun);
@@ -592,6 +785,8 @@ void QS::mem(uint8_t const *blk, uint8_t size) {
 
     QS_INSERT_BYTE(b)
     QS_INSERT_ESC_BYTE(size)
+
+    // output the 'size' number of bytes
     while (size != static_cast<uint8_t>(0)) {
         b = *blk;
         QS_INSERT_ESC_BYTE(b)

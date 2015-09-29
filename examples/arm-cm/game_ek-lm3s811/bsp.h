@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Fly 'n' Shoot" game example
 // Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Date of the Last Update:  2015-09-25
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #ifndef bsp_h
 #define bsp_h
@@ -41,6 +41,7 @@ uint32_t const BSP_SCREEN_WIDTH  = static_cast<uint32_t>(96);
 uint32_t const BSP_SCREEN_HEIGHT = static_cast<uint32_t>(16);
 
 void BSP_init(void);
+void BSP_terminate(int result);
 void BSP_drawBitmap(uint8_t const *bitmap);
 void BSP_drawNString(uint8_t x, // x in pixels
                      uint8_t y, // y position in chars
@@ -53,8 +54,6 @@ void BSP_displayOff(void);
 void BSP_playerTrigger(void);
 void BSP_moveShipUp(void);
 void BSP_moveShipDown(void);
-
-void BSP_terminate(int result);
 
 } // namespace GAME
 

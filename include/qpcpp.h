@@ -4,8 +4,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QP/C++
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-27
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -32,8 +32,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -69,6 +69,7 @@
 #else
     #include "qs_dummy.h" // QS/C++ dummy (inactive) interface
 #endif
+
 
 /****************************************************************************/
 #if (QP_API_VERSION < 540)
@@ -107,7 +108,6 @@
 #else
 
     #define postFIFO(e_)  POST((e_), dummy)
-    #define publish(e_)   PUBLISH((e_), dummy)
     #define tick()        TICK_X(static_cast<uint8_t>(0), dummy)
 
 #endif  // Q_SPY

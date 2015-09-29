@@ -10,6 +10,7 @@
       <TargetName>blinky-dbg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pCCUsed>5060020::V5.06 (build 20)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>TM4C123GH6PM</Device>
@@ -68,9 +69,9 @@
             <nStopU2X>0</nStopU2X>
           </BeforeCompile>
           <BeforeMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>cmd /c "if exist .\dbg\qstamp.o del .\dbg\qstamp.o"</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -84,6 +85,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>1</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -227,6 +230,7 @@
             <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
+            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>3</RwSelD>
             <CodeSel>0</CodeSel>
@@ -361,6 +365,10 @@
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
             <useXO>0</useXO>
+            <v6Lang>0</v6Lang>
+            <v6LangP>0</v6LangP>
+            <vShortEn>0</vShortEn>
+            <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>__FPU_PRESENT</Define>
@@ -427,6 +435,11 @@
               <FileName>blinky.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\blinky.h</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -579,6 +592,10 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>0</vShortEn>
+                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -621,6 +638,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\source\qs_fp.cpp</FilePath>
             </File>
+            <File>
+              <FileName>qs_rx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\source\qs_rx.cpp</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -629,6 +651,7 @@
       <TargetName>blinky-rel</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pCCUsed>5060020::V5.06 (build 20)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>TM4C123GH6PM</Device>
@@ -687,9 +710,9 @@
             <nStopU2X>0</nStopU2X>
           </BeforeCompile>
           <BeforeMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>cmd /c "if exist .\rel\qstamp.o del .\rel\qstamp.o"</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -703,6 +726,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>1</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -846,6 +871,7 @@
             <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
+            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>3</RwSelD>
             <CodeSel>0</CodeSel>
@@ -980,6 +1006,10 @@
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
             <useXO>0</useXO>
+            <v6Lang>0</v6Lang>
+            <v6LangP>0</v6LangP>
+            <vShortEn>0</vShortEn>
+            <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>NDEBUG __FPU_PRESENT</Define>
@@ -1046,6 +1076,11 @@
               <FileName>blinky.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\blinky.h</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1198,6 +1233,10 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>0</vShortEn>
+                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1240,6 +1279,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\source\qs_fp.cpp</FilePath>
             </File>
+            <File>
+              <FileName>qs_rx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\source\qs_rx.cpp</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1248,6 +1292,7 @@
       <TargetName>blinky-spy</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pCCUsed>5060020::V5.06 (build 20)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>TM4C123GH6PM</Device>
@@ -1306,9 +1351,9 @@
             <nStopU2X>0</nStopU2X>
           </BeforeCompile>
           <BeforeMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>cmd /c "if exist .\spy\qstamp.o del .\spy\qstamp.o"</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1318,10 +1363,12 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>fromelf --bin --output .\dbg\blinky-qv.bin .\dbg\blinky-qv.axf</UserProg1Name>
+            <UserProg1Name>fromelf --bin --output .\spy\blinky-qv.bin .\spy\blinky-qv.axf</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>1</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -1465,6 +1512,7 @@
             <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
+            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>3</RwSelD>
             <CodeSel>0</CodeSel>
@@ -1599,6 +1647,10 @@
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
             <useXO>0</useXO>
+            <v6Lang>0</v6Lang>
+            <v6LangP>0</v6LangP>
+            <vShortEn>0</vShortEn>
+            <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>Q_SPY __FPU_PRESENT</Define>
@@ -1665,6 +1717,11 @@
               <FileName>blinky.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\blinky.h</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1798,6 +1855,11 @@
               <FileName>qs_fp.cpp</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\source\qs_fp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qs_rx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\source\qs_rx.cpp</FilePath>
             </File>
           </Files>
         </Group>

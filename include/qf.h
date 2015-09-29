@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-08
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-23
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -177,6 +177,10 @@ class QMActive : public QMsm {
     //! QF priority associated with the active object.
     uint_fast8_t m_prio;
 
+protected:
+    //! protected constructor (abstract class)
+    QMActive(QStateHandler const initial);
+
 public:
     //! Starts execution of an active object and registers the object
     //! with the framework.
@@ -210,10 +214,6 @@ public:
     //! Un-subscribes from the delivery of all signals to the active object.
     void unsubscribeAll(void) const;
 
-protected:
-    //! protected constructor
-    QMActive(QStateHandler const initial);
-
     //! Stops execution of an active object and removes it from the
     //! framework's supervision.
     void stop(void);
@@ -240,7 +240,6 @@ protected:
         m_prio = prio;
     }
 
-public:
 #ifdef QF_OS_OBJECT_TYPE
     //! accessor to the OS-object for extern "C" functions, such as
     //! the QK scheduler
@@ -296,7 +295,7 @@ public:
     bool isIn(QStateHandler const s);
 
 protected:
-    //! protected constructor
+    //! protected constructor (abstract class)
     QActive(QStateHandler const initial);
 };
 
@@ -492,6 +491,10 @@ public:
     static void poolInit(void * const poolSto, uint_fast32_t const poolSize,
                          uint_fast16_t const evtSize);
 
+    //! Obtain the block size of any registered event pools
+    static uint_fast16_t poolGetMaxBlockSize(void);
+
+
     //! Transfers control to QF to run the application.
     static int_t run(void);
 
@@ -537,6 +540,10 @@ public:
 
     //! Recycle a dynamic event.
     static void gc(QEvt const *e);
+
+    //! Internal QF implementation of the event reference creator
+    static QEvt const *newRef_(QEvt const * const e,
+                               QEvt const * const evtRef);
 
     //! Remove the active object from the framework.
     static void remove_(QMActive const * const a);
@@ -650,6 +657,48 @@ private:
                       (margin_), (sig_))))
 
 #endif
+
+//! Create a new reference of the current event `e` */
+/// @description
+/// The current event processed by an active object is available only for
+/// the duration of the run-to-completion (RTC) step. After that step, the
+/// current event is no longer available and the framework might recycle
+/// (garbage-collect) the event. The macro Q_NEW_REF() explicitly creates
+/// a new reference to the current event that can be stored and used beyond
+/// the current RTC step, until the reference is explicitly recycled by
+/// means of the macro Q_DELETE_REF().
+///
+/// @param[in,out] evtRef_  event reference to create
+/// @param[in]     evtT_    event type (class name) of the event refrence
+///
+/// @usage
+/// The example **defer** in the directory `examples/win32/defer` illustrates
+/// the use of Q_NEW_REF()
+///
+/// @sa Q_DELETE_REF()
+///
+#define Q_NEW_REF(evtRef_, evtT_)  \
+    ((evtRef_) = static_cast<evtT_ const *>(QP::QF::newRef_(e, (evtRef_))))
+
+//! Delete the event reference */
+/// @description
+/// Every event reference created with the macro Q_NEW_REF() needs to be
+/// eventually deleted by means of the macro Q_DELETE_REF() to avoid leaking
+/// the event.
+///
+/// @param[in,out] evtRef_  event reference to delete
+///
+/// @usage
+/// The example **defer** in the directory `examples/win32/defer` illustrates
+/// the use of Q_DELETE_REF()
+///
+/// @sa Q_NEW_REF()
+///
+#define Q_DELETE_REF(evtRef_) do { \
+    QP::QF::gc((evtRef_)); \
+    (evtRef_) = 0; \
+} while (false)
+
 
 //****************************************************************************
 // QS software tracing integration, only if enabled

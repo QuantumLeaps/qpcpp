@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example on MSP-EXP430G2 board, preemptive QK kernel
-// Last updated for version 5.4.0
-// Last updated on  2015-05-13
+// Last updated for version 5.5.0
+// Last updated on  2015-09-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
@@ -190,6 +190,17 @@ void BSP_terminate(int16_t result) {
 
 } // namespace DPP
 
+//............................................................................
+extern "C" void Q_onAssert(char const Q_ROM *module, int loc) {
+    // implement the error-handling policy for your application!!!
+    QF_INT_DISABLE(); // disable all interrupts
+    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
+
+    // cause the reset of the CPU...
+    WDTCTL = WDTPW | WDTHOLD;
+    __asm("    push &0xFFFE");
+    // return from function does the reset
+}
 
 // namespace QP **************************************************************
 namespace QP {
@@ -233,18 +244,6 @@ void QK::onIdle(void) {
 #endif
 }
 
-//............................................................................
-extern "C"
-void Q_onAssert(char const Q_ROM * const file, int line) {
-    // implement the error-handling policy for your application!!!
-    QF_INT_DISABLE(); // disable all interrupts
-
-    // cause the reset of the CPU...
-    WDTCTL = WDTPW | WDTHOLD;
-    __asm("    push &0xFFFE");
-    // return from function does the reset
-}
-
 // QS callbacks ==============================================================
 #ifdef Q_SPY
 
@@ -278,72 +277,10 @@ bool QS::onStartup(void const *arg) {
     QS_FILTER_ON(QS_QEP_INTERN_TRAN);
     QS_FILTER_ON(QS_QEP_TRAN);
     QS_FILTER_ON(QS_QEP_IGNORED);
-//    QS_FILTER_ON(QS_QEP_DISPATCH);
+    QS_FILTER_ON(QS_QEP_DISPATCH);
     QS_FILTER_ON(QS_QEP_UNHANDLED);
 
-//    QS_FILTER_ON(QS_QF_ACTIVE_ADD);
-//    QS_FILTER_ON(QS_QF_ACTIVE_REMOVE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_SUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_UNSUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_EQUEUE_INIT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_MPOOL_INIT);
-//    QS_FILTER_ON(QS_QF_MPOOL_GET);
-//    QS_FILTER_ON(QS_QF_MPOOL_PUT);
-//    QS_FILTER_ON(QS_QF_PUBLISH);
-//    QS_FILTER_ON(QS_QF_RESERVED8);
-//    QS_FILTER_ON(QS_QF_NEW);
-//    QS_FILTER_ON(QS_QF_GC_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_GC);
-    QS_FILTER_ON(QS_QF_TICK);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_ARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_AUTO_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_REARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_POST);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_CTR);
-//    QS_FILTER_ON(QS_QF_CRIT_ENTRY);
-//    QS_FILTER_ON(QS_QF_CRIT_EXIT);
-//    QS_FILTER_ON(QS_QF_ISR_ENTRY);
-//    QS_FILTER_ON(QS_QF_ISR_EXIT);
-//    QS_FILTER_ON(QS_QF_INT_DISABLE);
-//    QS_FILTER_ON(QS_QF_INT_ENABLE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_MPOOL_GET_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_RESERVED1);
-//    QS_FILTER_ON(QS_QF_RESERVED0);
-
-//    QS_FILTER_ON(QS_QK_MUTEX_LOCK);
-//    QS_FILTER_ON(QS_QK_MUTEX_UNLOCK);
-//    QS_FILTER_ON(QS_QK_SCHEDULE);
-//    QS_FILTER_ON(QS_QK_RESERVED1);
-//    QS_FILTER_ON(QS_QK_RESERVED0);
-
-//    QS_FILTER_ON(QS_QEP_TRAN_HIST);
-//    QS_FILTER_ON(QS_QEP_TRAN_EP);
-//    QS_FILTER_ON(QS_QEP_TRAN_XP);
-//    QS_FILTER_ON(QS_QEP_RESERVED1);
-//    QS_FILTER_ON(QS_QEP_RESERVED0);
-
-    QS_FILTER_ON(QS_SIG_DICT);
-    QS_FILTER_ON(QS_OBJ_DICT);
-    QS_FILTER_ON(QS_FUN_DICT);
-    QS_FILTER_ON(QS_USR_DICT);
-    QS_FILTER_ON(QS_EMPTY);
-    QS_FILTER_ON(QS_RESERVED3);
-    QS_FILTER_ON(QS_RESERVED2);
-    QS_FILTER_ON(QS_TEST_RUN);
-    QS_FILTER_ON(QS_TEST_FAIL);
-    QS_FILTER_ON(QS_ASSERT_FAIL);
+    QS_FILTER_ON(DPP::PHILO_STAT);
 
     return true; // return success
 }
@@ -373,6 +310,18 @@ void QS::onFlush(void) {
         QF_INT_DISABLE();
     }
     QF_INT_ENABLE();
+}
+//............................................................................
+//! callback function to reset the target (to be implemented in the BSP)
+void QS::onReset(void) {
+    //TBD
+}
+//............................................................................
+//! callback function to execute a uesr command (to be implemented in BSP)
+void QS::onCommand(uint8_t cmdId, uint32_t param) {
+    (void)cmdId;
+    (void)param;
+    //TBD
 }
 
 #endif // Q_SPY

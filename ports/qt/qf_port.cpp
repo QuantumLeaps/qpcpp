@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.4.0/Qt 5.x
-/// Last updated on  2015-05-03
+/// Last Updated for Version: QP 5.5.0/Qt 5.x
+/// Last updated on  2015-09-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -35,14 +35,14 @@
 ///***************************************************************************
 /// @endcond
 
-#include <QtWidgets>
+#include <QCoreApplication>
+#include "aothread.h"
+#include "tickerthread.h"
 //-----------------
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.h"      // QF port
 #include "qf_pkg.h"       // QF package-scope interface
 #include "qassert.h"      // QP embedded systems-friendly assertions
-#include "aothread.h"
-#include "tickerthread.h"
 #ifdef Q_SPY              // QS software tracing enabled?
     #include "qs_port.h"  // include QS port
 #else
@@ -97,7 +97,7 @@ void QF::init(void) {
 int_t QF::run(void) {
     onStartup(); // invoke the startup callback
 
-    l_tickerThread.setStackSize(1024U*4U); // 4KB of stack
+    //l_tickerThread.setStackSize(1024U*4U); // 4KB of stack
     l_tickerThread.start();
 
     // run the Qt event loop (console or GUI)

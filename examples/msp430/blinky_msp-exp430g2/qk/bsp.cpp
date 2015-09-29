@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Blinky" example on MSP-EXP430G2 board, preemptive QK kernel
-// Last updated for version 5.4.0
-// Last updated on  2015-05-13
+// Last updated for version 5.5.0
+// Last updated on  2015-09-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "blinky.h"
@@ -96,6 +96,17 @@ void BSP_ledOn(void) {
     P1OUT |= LED1;  // turn LED1 on
 }
 
+//............................................................................
+extern "C" void Q_onAssert(char const Q_ROM *module, int loc) {
+    // implement the error-handling policy for your application!!!
+    QF_INT_DISABLE(); // disable all interrupts
+    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
+
+    // cause the reset of the CPU...
+    WDTCTL = WDTPW | WDTHOLD;
+    __asm("    push &0xFFFE");
+    // return from function does the reset
+}
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
@@ -123,16 +134,8 @@ void QK::onIdle(void) {
 #endif
 }
 
-//............................................................................
-void Q_onAssert(char const Q_ROM * const file, int line) {
-    // implement the error-handling policy for your application!!!
-    QF_INT_DISABLE(); // disable all interrupts
 
-    // cause the reset of the CPU...
-    WDTCTL = WDTPW | WDTHOLD;
-    __asm("    push &0xFFFE");
-    // return from function does the reset
-}
+
 
 //****************************************************************************
 // NOTE1:

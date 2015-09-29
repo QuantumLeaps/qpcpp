@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Blinky example, Arduino-UNO board, cooperative QV kernel, GNU-AVR
-// Last updated for version 5.4.0
-// Last updated on  2015-05-08
+// Last Updated for Version: 5.5.0
+// Date of the Last Update:  2015-09-28
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "blinky.h"
@@ -78,6 +78,16 @@ void BSP_terminate(int16_t result) {
     (void)result;
 }
 
+//............................................................................
+extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
+    // implement the error-handling policy for your application!!!
+    QF_INT_DISABLE(); // disable all interrupts
+    QS_ASSERTION(module, loc, 1000U); // report assertion to QS
+    QF_RESET();  // reset the CPU
+}
+//............................................................................
+extern "C" void assert_failed(char const Q_ROM * const module, int loc)
+__attribute__ ((alias("Q_onAssert")));
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
@@ -109,16 +119,6 @@ void QV::onIdle(void) { // called with interrupts DISABLED, see NOTE1
     QF_INT_ENABLE(); // just enable interrupts
 #endif
 }
-//............................................................................
-extern "C" void assert_failed(char const Q_ROM * const file, int line) {
-    // implement the error-handling policy for your application!!!
-    QF_INT_DISABLE(); // disable all interrupts
-    QF_RESET();  // reset the CPU
-}
-//............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const file, int line)
-__attribute__ ((alias("assert_failed")));
-
 
 //****************************************************************************
 // NOTE01:

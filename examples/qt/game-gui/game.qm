@@ -173,6 +173,7 @@ me-&gt;postLIFO(pe); // &lt;==</code>
    <attribute name="x" type="uint8_t" visibility="0x00" properties="0x00"/>
    <attribute name="y" type="int8_t" visibility="0x00" properties="0x00"/>
    <attribute name="bmp" type="uint8_t" visibility="0x00" properties="0x00"/>
+   <attribute name="pad? defined __LP64__" type="uint32_t" visibility="0x00" properties="0x00"/>
    <operation name="ObjectImageEvt" type="QEvt(sig), x(x_p), y(y_p), bmp(bmp_p)" visibility="0x00" properties="0x02">
     <parameter name="sig" type="QP::QSignal"/>
     <parameter name="x_p" type="uint8_t"/>
@@ -1355,7 +1356,7 @@ $declare(AOs::do_bitmaps_overlap)
 #endif  // game_h</text>
   </file>
   <file name="missile.cpp">
-   <text>#include &quot;qp_port.h&quot;
+   <text>#include &quot;qpcpp.h&quot;
 #include &quot;bsp.h&quot;
 #include &quot;game.h&quot;
 
@@ -1377,7 +1378,7 @@ QP::QMActive * const AO_Missile = &amp;l_missile; // opaque pointer
 $define(AOs::Missile)</text>
   </file>
   <file name="ship.cpp">
-   <text>#include &quot;qp_port.h&quot;
+   <text>#include &quot;qpcpp.h&quot;
 #include &quot;bsp.h&quot;
 #include &quot;game.h&quot;
 
@@ -1402,7 +1403,7 @@ QP::QMActive * const AO_Ship = &amp;l_ship; // opaque pointer
 $define(AOs::Ship)</text>
   </file>
   <file name="tunnel.cpp">
-   <text>#include &quot;qp_port.h&quot;
+   <text>#include &quot;qpcpp.h&quot;
 #include &quot;bsp.h&quot;
 #include &quot;game.h&quot;
 #include &lt;string.h&gt; // for memmove() and memcpy()
@@ -1647,7 +1648,7 @@ $define(AOs::Tunnel)
 </text>
   </file>
   <file name="mine1.cpp">
-   <text>#include &quot;qp_port.h&quot;
+   <text>#include &quot;qpcpp.h&quot;
 #include &quot;bsp.h&quot;
 #include &quot;game.h&quot;
 
@@ -1678,7 +1679,7 @@ static inline uint8_t MINE_ID(Mine1 const * const me) {
 $define(AOs::Mine1)</text>
   </file>
   <file name="mine2.cpp">
-   <text>#include &quot;qp_port.h&quot;
+   <text>#include &quot;qpcpp.h&quot;
 #include &quot;bsp.h&quot;
 #include &quot;game.h&quot;
 

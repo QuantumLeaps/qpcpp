@@ -3,14 +3,14 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.2
-/// Last updated on  2015-06-06
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      542
+#define QP_VERSION      550
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "5.4.2"
+#define QP_VERSION_STR  "5.5.0"
 
-//! Tamperproof current QP release (5.4.2) and date (15-06-06)
-#define QP_RELEASE      0xA63B5701U
+//! Tamperproof current QP release (5.5.0) and date (15-09-28)
+#define QP_RELEASE      0xA60A34D9U
 
 #ifndef Q_ROM
     //! Macro to specify compiler-specific directive for placing a
@@ -361,10 +361,13 @@ public:
     //! Tests if a given state is part of the active state configuration
     bool isInState(QMState const *state) const;
 
-    //! Return the current active state (state object)
+    //! Return the current active state object (read only)
     QMState const *stateObj(void) const {
         return m_state.obj;
     }
+
+    //! Obtain the current active child state of a given parent (read only)
+    QMState const *childStateObj(QMState const * const parent) const;
 
 protected:
     //! Protected constructor of QMsm.
@@ -544,13 +547,16 @@ public:
     //! the top-state.
     static QState top(void * const me, QEvt const * const e);
 
-    //! Return the current active state (state handler function)
+    //! Obtain the current active state (state handler function)
     QStateHandler state(void) const {
         return m_state.fun;
     }
 
+    //! Obtain the current active child state of a given parent
+    QStateHandler childState(QStateHandler const parent);
+
 protected:
-    //! Protected constructor of a HSM.
+    //! Protected constructor of a HSM
     QHsm(QStateHandler const initial);
 
 private:

@@ -4,14 +4,14 @@
 /// @cond
 ///***************************************************************************
 /// Product: QEP/C++
-/// Last updated for version 5.3.0
-/// Last updated on  2014-02-27
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-23
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -32,8 +32,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -42,7 +42,7 @@
 
 //! Internal QS macro to insert an un-escaped byte into the QS buffer
 #define QS_INSERT_BYTE(b_) \
-    *QS_PTR_AT_(head_) = (b_); \
+    QS_PTR_AT_(buf_, head_) = (b_); \
     ++head_; \
     if (head_ == end_) { \
         head_ = static_cast<QSCtr>(0); \
@@ -59,14 +59,6 @@
         QS_INSERT_BYTE(static_cast<uint8_t>((b_) ^ QS_ESC_XOR)) \
         ++priv_.used; \
     }
-
-//! Internal QS macro to access the QS ring buffer
-///
-/// @note The QS buffer is allocated by the user and is accessed through the
-/// pointer QS_ring_, which violates the MISRA-C 2004 Rule 17.4(req), pointer
-/// arithmetic other than array indexing. Encapsulating this violation in a
-/// macro allows to selectively suppress this specific deviation.
-#define QS_PTR_AT_(i_) (buf_ + (i_))
 
 //! Internal QS macro to increment the given pointer argument @a ptr_
 ///
@@ -113,6 +105,12 @@ uint8_t const QS_ESC   = static_cast<uint8_t>(0x7D);
 /// into the QS buffer.
 uint8_t const QS_ESC_XOR = static_cast<uint8_t>(0x20);
 
+/// @brief Escape character of the QS output protocol
+uint8_t const QS_GOOD_CHKSUM = static_cast<uint8_t>(0xFF);
+
+//! send the Target info (object sizes, build time-stamp, QP version)
+void QS_target_info_(uint8_t const isReset);
+
 } // namespace QP
 
-#endif  // qs_pkg_h
+#endif // qs_pkg_h

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Blinky example, Arduino-UNO board, preemptive QK kernel, IAR-AVR
-// Last updated for version 5.4.0
-// Last updated on  2015-05-06
+// Last Updated for Version: 5.5.0
+// Date of the Last Update:  2015-09-28
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "blinky.h"
@@ -44,6 +44,9 @@
 #ifdef Q_SPY
     #error Blinky example does not support the Spy build configuration
 #endif
+
+
+//Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
 // Arduino-UNO runs off the 16MHz oscillator
@@ -78,6 +81,13 @@ void BSP_terminate(int16_t result) {
     (void)result;
 }
 
+//............................................................................
+extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
+    // implement the error-handling policy for your application!!!
+    QF_INT_DISABLE(); // disable all interrupts
+    QS_ASSERTION(module, loc, 1000U); // report assertion to QS
+    QF_RESET();  // reset the CPU
+}
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
@@ -108,12 +118,6 @@ void QK::onIdle(void) {
     SMCR = (0 << SM0) | (1 << SE); // idle mode, adjust to your project
     QK_CPU_SLEEP(); // put CPU to sleep
 #endif
-}
-//............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const file, int line) {
-    // implement the error-handling policy for your application!!!
-    QF_INT_DISABLE(); // disable all interrupts
-    QF_RESET();  // reset the CPU
 }
 
 //****************************************************************************

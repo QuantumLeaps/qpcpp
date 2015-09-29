@@ -17,7 +17,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROGRAM.TI MSP430 USB1/MSP430" value="${build_artifact:blinky-qk_msp-exp430f5529lp}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.TI MSP430 USB1/MSP430" value="blinky-qk_msp-exp430f5529lp"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:blinky-qk_msp-exp430f5529lp}"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.TI MSP430 USB1/MSP430" value="D:/qp\qpcpp\examples\msp430\blinky_msp-exp430f5529lp\qk\ccs\Debug\blinky-qk_msp-exp430f5529lp.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.TI MSP430 USB1/MSP430" value="C:/qp\qpcpp\examples\msp430\blinky_msp-exp430f5529lp\qk\ccs\Debug\blinky-qk_msp-exp430f5529lp.out"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/blinky-qk_msp-exp430f5529lp"/>
 </listAttribute>

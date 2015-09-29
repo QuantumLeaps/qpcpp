@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++ example for DPP-console example with Qt5
-// Last Updated for Version: QP/C++ 5.4.0/Qt 5.x
-// Last updated on  2015-05-03
+// Last Updated for Version: QP/C++ 5.5.0/Qt 5.x
+// Last updated on  2015-09-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -33,7 +33,7 @@
 //****************************************************************************
 #include <QCoreApplication>
 //-----------------
-#include "qp_port.h"
+#include "qpcpp.h"
 #include "dpp.h"
 #include "bsp.h"
 
@@ -65,11 +65,11 @@ int main(int argc, char *argv[]) {
     for (uint_fast8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1),
                                 l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
-                                (void *)0, 1024U*4U);
+                                (void *)0, 0U); // default stack size
     }
     DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 1),
                          l_tableQueueSto, Q_DIM(l_tableQueueSto),
-                         (void *)0, 1024U*4U);
+                         (void *)0, 0U); // default stack size
 
     return QP::QF::run(); // calls qApp->exec()
 }

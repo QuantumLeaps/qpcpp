@@ -150,7 +150,7 @@
     <rect>
      <x>20</x>
      <y>320</y>
-     <width>51</width>
+     <width>71</width>
      <height>16</height>
     </rect>
    </property>
@@ -161,7 +161,7 @@
   <widget class="QLabel" name="m_epoolLabel">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>90</x>
      <y>320</y>
      <width>51</width>
      <height>16</height>

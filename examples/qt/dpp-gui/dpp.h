@@ -22,14 +22,14 @@ namespace DPP {
 
 enum DPPSignals {
     EAT_SIG = QP::Q_USER_SIG, // published by Table to let a philosopher eat
-    DONE_SIG,       // published by Philosopher when done eating
-    PAUSE_SIG,      // published by BSP to pause serving the forks
-    SERVE_SIG,      // published by BSP to resume serving the forks
-    TERMINATE_SIG,  // published by BSP to terminate the application
-    MAX_PUB_SIG,    // the last published signal
+    DONE_SIG,                 // published by Philosopher when done eating
+    PAUSE_SIG,                // published by BSP to pause serving the forks
+    SERVE_SIG,                // published by BSP to re-start serving the forks
+    TERMINATE_SIG,            // published by BSP to terminate the application
+    MAX_PUB_SIG,              // the last published signal
 
-    HUNGRY_SIG,     // posted direclty to Table from hungry Philo
-    MAX_SIG         // the last signal
+    HUNGRY_SIG,               // posted direclty to Table from hungry Philo
+    MAX_SIG                   // the last signal
 };
 
 } // namespace DPP

@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example, POSIX
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 5.5.0
+// Date of the Last Update:  2015-09-25
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
@@ -64,11 +64,11 @@ void BSP_init(void) {
            "Press p to pause the forks\n"
            "Press s to serve the forks\n"
            "Press ESC to quit...\n",
-           QP::QF::getVersion());
+           QP::versionStr);
 
     BSP_randomSeed(1234U);
     Q_ALLEGE(QS_INIT((void *)0));
-    QS_OBJ_DICTIONARY(&l_clock_tick); // must be called *after* QF_init()
+    QS_OBJ_DICTIONARY(&l_clock_tick); // must be called *after* QF::init()
     QS_USR_DICTIONARY(PHILO_STAT);
 }
 //............................................................................
@@ -103,6 +103,7 @@ void BSP_randomSeed(uint32_t seed) {
 }
 
 } // namespace DPP
+
 
 //****************************************************************************
 
@@ -152,8 +153,9 @@ void QF_onClockTick(void) {
     }
 }
 //............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const file, int line) {
-    fprintf(stderr, "Assertion failed in %s, line %d", file, line);
+extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
+    QS_ASSERTION(module, loc, 10000U); // report assertion to QS
+    fprintf(stderr, "Assertion failed in %s, location %d", module, loc);
     DPP::BSP_terminate(-1);
 }
 
@@ -205,50 +207,22 @@ bool QS::onStartup(void const *arg) {
                 (void *)0,
                 (QSPY_CustParseFun)0); // customized parser function
 
-    QS_FILTER_ON(QS_ALL_RECORDS);
+    // set up the QS filters...
+    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
+    QS_FILTER_ON(QS_QEP_STATE_EXIT);
+    QS_FILTER_ON(QS_QEP_STATE_INIT);
+    QS_FILTER_ON(QS_QEP_INIT_TRAN);
+    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
+    QS_FILTER_ON(QS_QEP_TRAN);
+    QS_FILTER_ON(QS_QEP_IGNORED);
+    QS_FILTER_ON(QS_QEP_DISPATCH);
+    QS_FILTER_ON(QS_QEP_UNHANDLED);
 
-//    QS_FILTER_OFF(QS_QEP_STATE_EMPTY);
-//    QS_FILTER_OFF(QS_QEP_STATE_ENTRY);
-//    QS_FILTER_OFF(QS_QEP_STATE_EXIT);
-//    QS_FILTER_OFF(QS_QEP_STATE_INIT);
-//    QS_FILTER_OFF(QS_QEP_INIT_TRAN);
-//    QS_FILTER_OFF(QS_QEP_INTERN_TRAN);
-//    QS_FILTER_OFF(QS_QEP_TRAN);
-//    QS_FILTER_OFF(QS_QEP_IGNORED);
-//    QS_FILTER_OFF(QS_QEP_DISPATCH);
-//    QS_FILTER_OFF(QS_QEP_UNHANDLED);
+    QS_FILTER_ON(QS_QF_ACTIVE_POST_FIFO);
+    QS_FILTER_ON(QS_QF_ACTIVE_POST_LIFO);
+    QS_FILTER_ON(QS_QF_PUBLISH);
 
-    QS_FILTER_OFF(QS_QF_ACTIVE_ADD);
-    QS_FILTER_OFF(QS_QF_ACTIVE_REMOVE);
-    QS_FILTER_OFF(QS_QF_ACTIVE_SUBSCRIBE);
-//    QS_FILTER_OFF(QS_QF_ACTIVE_UNSUBSCRIBE);
-    QS_FILTER_OFF(QS_QF_ACTIVE_POST_FIFO);
-//    QS_FILTER_OFF(QS_QF_ACTIVE_POST_LIFO);
-    QS_FILTER_OFF(QS_QF_ACTIVE_GET);
-    QS_FILTER_OFF(QS_QF_ACTIVE_GET_LAST);
-    QS_FILTER_OFF(QS_QF_EQUEUE_INIT);
-    QS_FILTER_OFF(QS_QF_EQUEUE_POST_FIFO);
-    QS_FILTER_OFF(QS_QF_EQUEUE_POST_LIFO);
-    QS_FILTER_OFF(QS_QF_EQUEUE_GET);
-    QS_FILTER_OFF(QS_QF_EQUEUE_GET_LAST);
-    QS_FILTER_OFF(QS_QF_MPOOL_INIT);
-    QS_FILTER_OFF(QS_QF_MPOOL_GET);
-    QS_FILTER_OFF(QS_QF_MPOOL_PUT);
-    QS_FILTER_OFF(QS_QF_PUBLISH);
-    QS_FILTER_OFF(QS_QF_NEW);
-    QS_FILTER_OFF(QS_QF_GC_ATTEMPT);
-    QS_FILTER_OFF(QS_QF_GC);
-    QS_FILTER_OFF(QS_QF_TICK);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_ARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_AUTO_DISARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM_ATTEMPT);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_DISARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_REARM);
-    QS_FILTER_OFF(QS_QF_TIMEEVT_POST);
-    QS_FILTER_OFF(QS_QF_CRIT_ENTRY);
-    QS_FILTER_OFF(QS_QF_CRIT_EXIT);
-    QS_FILTER_OFF(QS_QF_ISR_ENTRY);
-    QS_FILTER_OFF(QS_QF_ISR_EXIT);
+    QS_FILTER_ON(DPP::PHILO_STAT);
 
     pthread_attr_t attr;
     struct sched_param param;
@@ -298,6 +272,18 @@ void QS::onFlush(void) {
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {
     return (QSTimeCtr)clock(); // see NOTE01
+}
+//............................................................................
+//! callback function to reset the target (to be implemented in the BSP)
+void QS::onReset(void) {
+    //TBD
+}
+//............................................................................
+//! callback function to execute a uesr command (to be implemented in BSP)
+void QS::onCommand(uint8_t cmdId, uint32_t param) {
+    (void)cmdId;
+    (void)param;
+    //TBD
 }
 //............................................................................
 void QSPY_onPrintLn(void) {

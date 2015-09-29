@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Generic Makefile for QP/C++ application, POSIX, GNU compiler
-# Last updated for version 5.4.0
-# Last updated on  2015-04-07
+# Last updated for version 5.5.0
+# Last updated on  2015-09-25
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,8 +28,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# Web:   www.state-machine.com
-# Email: info@state-machine.com
+# http://www.state-machine.com
+# mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
@@ -176,7 +176,8 @@ $(TARGET_BIN): $(TARGET_EXE)
 	$(BIN) -O binary $< $@
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(LINK) $(LINKFLAGS) -o $@ $^ -lqp
+	$(CPP) $(CPPFLAGS) -c $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o -lqp
 
 $(BIN_DIR)/%.d : %.cpp
 	$(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@

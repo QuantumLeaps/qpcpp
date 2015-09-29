@@ -15,7 +15,7 @@
 // for more details.
 //****************************************************************************
 //${.::philo.cpp} ............................................................
-#include "qp_port.h"
+#include "qpcpp.h"
 #include "dpp.h"
 #include "bsp.h"
 
@@ -146,7 +146,7 @@ QP::QMState const Philo::thinking_s = {
 };
 // ${AOs::Philo::SM::thinking}
 QP::QState Philo::thinking_e(Philo * const me) {
-    me->m_timeEvt.armX(think_time());
+    me->m_timeEvt.postIn(me, think_time());
     return QM_ENTRY(&thinking_s);
 }
 // ${AOs::Philo::SM::thinking}
@@ -251,7 +251,7 @@ QP::QMState const Philo::eating_s = {
 };
 // ${AOs::Philo::SM::eating}
 QP::QState Philo::eating_e(Philo * const me) {
-    me->m_timeEvt.armX(think_time());
+    me->m_timeEvt.postIn(me, think_time());
     return QM_ENTRY(&eating_s);
 }
 // ${AOs::Philo::SM::eating}

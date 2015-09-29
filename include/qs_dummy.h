@@ -1,16 +1,17 @@
 /// @file
-/// @brief QS/C++ platform-independent dummy public interface.
+/// @brief Dummy definitions of the QS macros that avoid code generation from
+/// the QS instrumentation.
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.3.0
-/// Last updated on  2014-04-10
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-24
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +32,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -88,12 +89,11 @@
 #define QS_OBJ_DICTIONARY(obj_)         ((void)0)
 #define QS_FUN_DICTIONARY(fun_)         ((void)0)
 #define QS_USR_DICTIONARY(rec_)         ((void)0)
-#define QS_ASSERTION(module_, loc_)     ((void)0)
-#define QS_TEST_ASSERTION(file_, loc_)  ((void)0)
-#define QS_TEST(file_, test_)           ((void)0)
+#define QS_ASSERTION(module_, loc_, delay_) ((void)0)
 #define QS_FLUSH()                      ((void)0)
 
-// internal QS macros used only in the QP components .........................
+//****************************************************************************
+// internal QS macros used only in the QP components
 #define QS_CRIT_STAT_
 #define QS_BEGIN_(rec_, refObj_, obj_)  if (false) {
 #define QS_END_()                       }
@@ -120,4 +120,4 @@
 #define QF_QS_ISR_EXIT(isrnest_, prio_) ((void)0)
 #define QF_QS_ACTION(act_)              ((void)0)
 
-#endif                                                           // qs_dummy_h
+#endif // qs_dummy_h

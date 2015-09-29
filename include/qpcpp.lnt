@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.4.2
-// Last updated on  2015-06-05
+// Last updated for version 5.4.3
+// Last updated on  2015-06-11
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -125,7 +125,8 @@
 -emacro(1939,         // 5-2-2, Down cast detected
  Q_EVT_CAST,
  Q_NEW,
- Q_NEW_X)
+ Q_NEW_X,
+ Q_NEW_REF)
 -estring(1960,        // 9-5-1 declaration of union
  QP::QMAttr)
 -esym(1960,           // 16-0-4 function-like macro
@@ -157,7 +158,8 @@
 // QF
 -emacro(929,          // 5-2-7 cast from pointer to pointer
  Q_NEW,
- Q_NEW_X)
+ Q_NEW_X,
+ Q_NEW_REF)
 -efunc(925,           // 5-2-8, 5-2-9 cast from pointer to pointer
  *toActive,
  *toTimeEvt)
@@ -205,6 +207,8 @@
  QF_CPU_SLEEP,
  Q_NEW,
  Q_NEW_X,
+ Q_NEW_REF,
+ Q_DELETE_REF,
  PUBLISH,
  POST,
  POST_X,
@@ -280,6 +284,7 @@
 -emacro(9091,         // 5-2-7, 5-2-8 cast from pointer to int
  QS_OBJ_,
  QS_FUN_)
+-emacro(1960, QS_PTR_AT_)   // 5-0-15 pointer arithmetic
 -estring(1923,        // 16-2-2 macro could become const variable
  QS_RESET,
  QS_TIME_SIZE,

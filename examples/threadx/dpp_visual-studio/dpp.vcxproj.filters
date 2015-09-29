@@ -47,6 +47,10 @@
     <ClCompile Include="..\..\..\source\qs_fp.cpp">
       <Filter>QS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\qs_rx.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\include\qstamp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bsp.h" />

@@ -1,9 +1,10 @@
 namespace QP {
 
-/** @mainpage About QP/C++
+/** @mainpage Getting Started
 
 @tableofcontents
 
+@section about About QP/C++
 <p><a class="extern" target="_blank" href="http://www.state-machine.com/qp"><strong>QP/C++&trade; (Quantum Platform in C++)</strong></a> is a lightweight, open source software framework for building responsive and modular real-time embedded applications as systems of cooperating, event-driven <a class="extern" target="_blank" href="http://www.state-machine.com/qp/index.php#Active">active objects</a> (<a href="http://en.wikipedia.org/wiki/Actor_model">actors</a>). The QP/C++&trade; framework is a member of a larger family consisting of QP/C++, QP/C, and QP-nano frameworks, which are all strictly quality controlled, thoroughly documented, and commercially licensable.
 </p>
 
@@ -46,7 +47,14 @@ If you are developing and distributing traditional closed source applications, y
 @section getting_started Getting Started with QP/C++
 The Quantum Leaps Application Note <a class="extern" target="_blank" href="http://www.state-machine.com/doc/AN_Getting_Started_with_QPCpp.pdf"><strong>Getting Started with QP/C++</strong></a> provides step-by-step instructions on how to get started with QP/C++ quickly.
 
-@image html AN_Getting_Started_with_QPCpp.jpg "App Note: Getting Started with QP/C++"
+@htmlonly
+<div class="image">
+<a target="_blank" href="http://www.state-machine.com/doc/AN_Getting_Started_with_QPCpp.pdf"><img border="0" src="img/AN_Getting_Started_with_QPCpp.jpg" title="Download PDF"></a>
+<div class="caption">
+Application Note: Getting Started with QP/C++
+</div>
+</div>
+@endhtmlonly
 
 The standard QP/C++ distribution contains also many @ref exa "Example Projects", which are specifically designed to help you learn to use QP/C++ and to serve you as starting points for your own projects.
 
@@ -87,7 +95,14 @@ The following annotated directory tree lists the top-level directories provided 
 @section coding Coding Standard
 The QP/C++ framework has been developed in strict adherence to the documented <a class="extern" target="_blank" href="http://www.state-machine.com/doc/AN_QL_Coding_Standard.pdf"><strong>Quantum Leaps Coding Standard</strong></a>.
 
-@image html AN_Coding_Standard.jpg "Quantum Leaps C/C++ Coding Standard"
+@htmlonly
+<div class="image">
+<a target="_blank" href="http://www.state-machine.com/doc/AN_QL_Coding_Standard.pdf"><img border="0" src="img/AN_Coding_Standard.jpg " title="Download PDF"></a>
+<div class="caption">
+Application Note: Quantum Leaps C/C++ Coding Standard
+</div>
+</div>
+@endhtmlonly
 
 
 ------------------------------------------------------------------------------
@@ -96,7 +111,14 @@ The QP/C++ framework has been developed in strict adherence to the documented <a
 <p>The QP/C++ framework comply with most of the Motor Industry Software Reliability Association (MISRA) MISRA-C++:2008 rules.
 </p>
 
-@image html AN_MISRA-QPCpp.jpg "QP/C++ MISRA-C++:2008 Compliance Matrix"
+@htmlonly
+<div class="image">
+<a target="_blank" href="http://www.state-machine.com/doc/AN_QP-Cpp_MISRA.pdf"><img border="0" src="img/AN_MISRA-QPCpp.jpg" title="Download PDF"></a>
+<div class="caption">
+Application Note: QP/C++ MISRA-C++:2008 Compliance Matrix
+</div>
+</div>
+@endhtmlonly
 
 All deviations are carefully limited into very specific contexts and are documented with the Application Note: <a class="extern" target="_blank" href="http://www.state-machine.com/doc/AN_QP-Cpp_MISRA.pdf"><strong>QP/C++ MISRA-C++:2008 Compliance Matrix</strong></a>.
 
@@ -129,7 +151,7 @@ The QP/C++ framework comes with extensive support for automatic rule checking by
 Copyright &copy; 2002-2015 Quantum Leaps, LLC. All Rights Reserved.
 
 
-@next{design}
+@next{concepts}
 */
 
 } // namespace QP

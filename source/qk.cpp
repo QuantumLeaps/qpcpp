@@ -4,8 +4,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-30
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-24
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -32,20 +32,20 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
 #define QP_IMPL           // this is QF/QK implementation
 #include "qf_port.h"      // QF port
 #include "qk_pkg.h"       // QK package-scope internal interface
+#include "qassert.h"      // QP assertions
 #ifdef Q_SPY              // QS software tracing enabled?
     #include "qs_port.h"  // include QS port
 #else
     #include "qs_dummy.h" // disable the QS software tracing
 #endif // Q_SPY
-#include "qassert.h"      // QP assertions
 
 // Public-scope objects ******************************************************
 extern "C" {
@@ -79,12 +79,20 @@ Q_DEFINE_THIS_MODULE("qk")
 void QF::init(void) {
     extern uint_fast8_t QF_maxPool_;
 
-    QK_intNest_  = static_cast<uint_fast8_t>(0); // no nesting level
     // scheduler locked
     QK_currPrio_ = static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1);
+
+#ifndef QK_ISR_CONTEXT_
+    QK_intNest_  = static_cast<uint_fast8_t>(0); // no nesting level
+#endif // QK_ISR_CONTEXT_
+
 #ifndef QK_NO_MUTEX
     QK_ceilingPrio_ = static_cast<uint_fast8_t>(0);
 #endif
+
+    // clear the internal QF variables, so that the framework can start
+    // correctly even if the startup code fails to clear the uninitialized
+    // data (as is required by the C++ Standard).
     QF_maxPool_  = static_cast<uint_fast8_t>(0);
     bzero(&QK_readySet_,  static_cast<uint_fast16_t>(sizeof(QK_readySet_)));
     bzero(&QF::timeEvtHead_[0],
@@ -112,7 +120,8 @@ void QF::stop(void) {
 
 //****************************************************************************
 //! process all events posted during initialization */
-static void initialize(void) {
+static void initial_events(void); // prototype
+static void initial_events(void) {
     // set priority for the QK idle loop
     QK_currPrio_ = static_cast<uint_fast8_t>(0);
     uint_fast8_t p = QK_schedPrio_();
@@ -141,8 +150,8 @@ static void initialize(void) {
 //
 int_t QF::run(void) {
     QF_INT_DISABLE();
-    initialize();  // process all events posted during initialization
-    onStartup();   // application-specific startup callback
+    initial_events(); // process all events posted during initialization
+    onStartup();      // application-specific startup callback
     QF_INT_ENABLE();
 
     // the QK idle loop...
@@ -181,18 +190,18 @@ void QMActive::start(uint_fast8_t const prio,
     m_prio = prio;             // set the QF priority of this AO
     QF::add_(this);            // make QF aware of this AO
 
-#if defined(QK_TLS)
+#ifdef QK_TLS
     // in the QK port the parameter stkSize is used as the thread flags
     m_osObject = static_cast<uint8_t>(stkSize); // m_osObject contains flags
 
     // in the QK port the parameter stkSto is used as the thread-local-storage
     m_thread = stkSto; // contains the pointer to the thread-local-storage
 #else
-    Q_ASSERT((stkSto == static_cast<void *>(0))
-             && (stkSize == static_cast<uint_fast16_t>(0)));
-#endif // defined(QK_TLS)
+    Q_ASSERT_ID(510, (stkSto == static_cast<void *>(0))
+                     && (stkSize == static_cast<uint_fast16_t>(0)));
+#endif // ifdef QK_TLS
 
-    this->init(ie); // execute initial transition (virtual call)
+    this->init(ie); // take the top-most initial tran. (virtual)
     QS_FLUSH();     // flush the trace buffer to the host
 }
 
@@ -238,9 +247,9 @@ uint_fast8_t QK_schedPrio_(void) {
         p = static_cast<uint_fast8_t>(0);
     }
 #ifndef QK_NO_MUTEX
-    // is the priority below the mutex ceiling??
+    // is the priority below the mutex ceiling?
     else if (p <= QK_ceilingPrio_) {
-        p = static_cast<uint_fast8_t>(0);
+        p = static_cast<uint_fast8_t>(0); // active object not eligible
     }
     else {
         // empty
@@ -262,31 +271,36 @@ uint_fast8_t QK_schedPrio_(void) {
 /// returns with interrupts **disabled**.
 ///
 void QK_sched_(uint_fast8_t p) {
-
     uint_fast8_t pin = QK_currPrio_; // save the initial priority
     QP::QMActive *a;
-#ifdef QK_TLS // thread-local storage used?
+
+    // QS tracing or thread-local storage?
+#if (defined Q_SPY) || (defined QK_TLS)
     uint_fast8_t pprev = pin;
-#endif
+#endif // Q_SPY || QK_TLS
+
+    // loop until have ready-to-run AOs of higher priority than the initial
     do {
         a = QP::QF::active_[p]; // obtain the pointer to the AO
         QK_currPrio_ = p; // this becomes the current task priority
 
-#ifdef QK_TLS // thread-local storage used?
-        // are we changing threads?
-        if (p != pprev) {
-            QK_TLS(a); // switch new thread-local storage
-            pprev = p;
-        }
-#endif // QK_TLS
-
-        QS_BEGIN_NOCRIT_(QP::QS_QK_SCHEDULE, QP::QS::priv_.aoObjFilter, a)
-            QS_TIME_();  // timestamp
-            QS_U8_(p);   // the priority of the active object
-            QS_U8_(pin); // the preempted priority
+        QS_BEGIN_NOCRIT_(QP::QS_QVK_SCHEDULE, QP::QS::priv_.aoObjFilter, a)
+            QS_TIME_();   // timestamp
+            QS_2U8_(static_cast<uint8_t>(p), // prio of the scheduled AO
+                    static_cast<uint8_t>(pprev)); // previous priority
         QS_END_NOCRIT_()
 
-        QF_INT_ENABLE();    // unconditionally enable interrupts
+        // QS tracing or thread-local storage?
+#if (defined Q_SPY) || (defined QK_TLS)
+        if (p != pprev) { // changing priorities?
+            pprev = p;    // update previous priority
+#ifdef QK_TLS // thread-local storage used?
+            QK_TLS(a);    // switch new thread-local storage
+#endif // QK_TLS
+        }
+#endif // Q_SPY || QK_TLS
+
+        QF_INT_ENABLE();  // unconditionally enable interrupts
 
         // perform the run-to-completion (RTS) step...
         // 1. retrieve the event from the AO's event queue, which by this
@@ -300,14 +314,16 @@ void QK_sched_(uint_fast8_t p) {
 
         // determine the next highest-priority AO ready to run...
         QF_INT_DISABLE();
-        p = QK_readySet_.findMax(); // new highest-prio AO ready to run
 
-        // below the current preemption threshold?
+        p = QK_readySet_.findMax(); // find new highest-prio AO ready to run
+
+        // is the new priority below the current preemption threshold?
         if (p <= pin) {
             p = static_cast<uint_fast8_t>(0);
         }
+
 #ifndef QK_NO_MUTEX
-        // below the mutex ceiling?
+        // is the new priority below the mutex ceiling?
         else if (p <= QK_ceilingPrio_) {
             p = static_cast<uint_fast8_t>(0);
         }
@@ -320,13 +336,29 @@ void QK_sched_(uint_fast8_t p) {
 
     QK_currPrio_ = pin; // restore the initial priority
 
-#ifdef QK_TLS // thread-local storage used?
-    // no extended context for idle loop
-    if (pin != static_cast<uint_fast8_t>(0)) {
+    // QS tracing or thread-local storage?
+#if (defined Q_SPY) || (defined QK_TLS)
+    if (pin != static_cast<uint_fast8_t>(0)) { // resuming an active object?
         a = QP::QF::active_[pin]; // the pointer to the preempted AO
+
+#ifdef QK_TLS // thread-local storage used?
         QK_TLS(a); // restore the original TLS
-    }
 #endif // QK_TLS
+
+        QS_BEGIN_NOCRIT_(QP::QS_QK_RESUME, QP::QS::priv_.aoObjFilter, a)
+            QS_TIME_();  // timestamp
+            QS_2U8_(static_cast<uint8_t>(pin), // prio of the resumed AO
+                    static_cast<uint8_t>(pprev)); // previous priority
+        QS_END_NOCRIT_()
+    }
+    else {  // resuming priority==0 --> idle
+        QS_BEGIN_NOCRIT_(QP::QS_QVK_IDLE,
+                         static_cast<void *>(0), static_cast<void *>(0))
+            QS_TIME_();  // timestamp
+            QS_U8_(static_cast<uint8_t>(pprev)); // previous priority
+        QS_END_NOCRIT_()
+    }
+#endif // Q_SPY || QK_TLS
 }
 
 } // extern "C"

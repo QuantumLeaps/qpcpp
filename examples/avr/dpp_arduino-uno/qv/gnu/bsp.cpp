@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, Arduino-UNO board, cooperative QV kernel, GNU-AVR
-// Last updated for version 5.4.0
-// Last updated on  2015-05-06
+// Last Updated for Version: 5.5.0
+// Date of the Last Update:  2015-09-28
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
@@ -59,7 +59,7 @@ static unsigned  l_rnd;  // random seed
 #ifdef Q_SPY
 
     QP::QSTimeCtr BSP_tickTime;
-    static uint8_t l_ISR_TIMER2_COMPA;
+    static uint8_t const l_ISR_TIMER2_COMPA = static_cast<uint8_t>(0);
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER
@@ -164,6 +164,16 @@ void BSP_terminate(int16_t result) {
 
 } // namespace DPP
 
+//............................................................................
+extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
+    // implement the error-handling policy for your application!!!
+    QF_INT_DISABLE(); // disable all interrupts
+    QS_ASSERTION(module, loc, 1000U); // report assertion to QS
+    QF_RESET();  // reset the CPU
+}
+//............................................................................
+extern "C" void assert_failed(char const Q_ROM * const module, int loc)
+__attribute__ ((alias("Q_onAssert")));
 
 // namespace QP **************************************************************
 namespace QP {
@@ -200,7 +210,7 @@ void QV::onIdle(void) { // called with interrupts DISABLED, see NOTE1
             UDR0 = (uint8_t)b; // stick the byte to the TX UDR0
         }
     }
-#elif  NDEBUG
+#elif defined NDEBUG
     // Put the CPU and peripherals to the low-power mode.
     // you might need to customize the clock management for your application,
     // see the datasheet for your particular AVR MCU.
@@ -211,15 +221,6 @@ void QV::onIdle(void) { // called with interrupts DISABLED, see NOTE1
     QF_INT_ENABLE(); // just enable interrupts
 #endif
 }
-//............................................................................
-extern "C" void assert_failed(char const Q_ROM * const file, int line) {
-    // implement the error-handling policy for your application!!!
-    QF_INT_DISABLE(); // disable all interrupts
-    QF_RESET();  // reset the CPU
-}
-//............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const file, int line)
-__attribute__ ((alias("assert_failed")));
 
 /* QS callbacks ============================================================*/
 #ifdef Q_SPY
@@ -259,69 +260,7 @@ bool QS::onStartup(void const *arg) {
     QS_FILTER_ON(QS_QEP_DISPATCH);
     QS_FILTER_ON(QS_QEP_UNHANDLED);
 
-//    QS_FILTER_ON(QS_QF_ACTIVE_ADD);
-//    QS_FILTER_ON(QS_QF_ACTIVE_REMOVE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_SUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_UNSUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_EQUEUE_INIT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_MPOOL_INIT);
-//    QS_FILTER_ON(QS_QF_MPOOL_GET);
-//    QS_FILTER_ON(QS_QF_MPOOL_PUT);
-//    QS_FILTER_ON(QS_QF_PUBLISH);
-//    QS_FILTER_ON(QS_QF_RESERVED8);
-//    QS_FILTER_ON(QS_QF_NEW);
-//    QS_FILTER_ON(QS_QF_GC_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_GC);
-    QS_FILTER_ON(QS_QF_TICK);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_ARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_AUTO_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_REARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_POST);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_CTR);
-//    QS_FILTER_ON(QS_QF_CRIT_ENTRY);
-//    QS_FILTER_ON(QS_QF_CRIT_EXIT);
-//    QS_FILTER_ON(QS_QF_ISR_ENTRY);
-//    QS_FILTER_ON(QS_QF_ISR_EXIT);
-//    QS_FILTER_ON(QS_QF_INT_DISABLE);
-//    QS_FILTER_ON(QS_QF_INT_ENABLE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_MPOOL_GET_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_RESERVED1);
-//    QS_FILTER_ON(QS_QF_RESERVED0);
-
-//    QS_FILTER_ON(QS_QK_MUTEX_LOCK);
-//    QS_FILTER_ON(QS_QK_MUTEX_UNLOCK);
-//    QS_FILTER_ON(QS_QK_SCHEDULE);
-//    QS_FILTER_ON(QS_QK_RESERVED1);
-//    QS_FILTER_ON(QS_QK_RESERVED0);
-
-//    QS_FILTER_ON(QS_QEP_TRAN_HIST);
-//    QS_FILTER_ON(QS_QEP_TRAN_EP);
-//    QS_FILTER_ON(QS_QEP_TRAN_XP);
-//    QS_FILTER_ON(QS_QEP_RESERVED1);
-//    QS_FILTER_ON(QS_QEP_RESERVED0);
-
-    QS_FILTER_ON(QS_SIG_DICT);
-    QS_FILTER_ON(QS_OBJ_DICT);
-    QS_FILTER_ON(QS_FUN_DICT);
-    QS_FILTER_ON(QS_USR_DICT);
-    QS_FILTER_ON(QS_EMPTY);
-    QS_FILTER_ON(QS_RESERVED3);
-    QS_FILTER_ON(QS_RESERVED2);
-    QS_FILTER_ON(QS_TEST_RUN);
-    QS_FILTER_ON(QS_TEST_FAIL);
-    QS_FILTER_ON(QS_ASSERT_FAIL);
+    QS_FILTER_ON(DPP::PHILO_STAT);
 
     return true; // return success
 }
@@ -349,6 +288,18 @@ void QS::onFlush(void) {
         UDR0 = (uint8_t)b; // stick the byte to the TX UDR
     }
     QF_INT_ENABLE();
+}
+//............................................................................
+//! callback function to reset the target (to be implemented in the BSP)
+void QS::onReset(void) {
+    //TBD
+}
+//............................................................................
+//! callback function to execute a uesr command (to be implemented in BSP)
+void QS::onCommand(uint8_t cmdId, uint32_t param) {
+    (void)cmdId;
+    (void)param;
+    //TBD
 }
 
 #endif // Q_SPY

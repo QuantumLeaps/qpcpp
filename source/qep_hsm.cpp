@@ -3,14 +3,14 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -547,10 +547,53 @@ bool QHsm::isIn(QStateHandler const s) {
         else {
             r = QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
         }
-    } while (r != Q_RET_IGNORED); // QHsm_top state not reached
+    } while (r != Q_RET_IGNORED); // QHsm::top() state not reached
     m_temp.fun = m_state.fun; // restore the stable state configuration
 
     return inState; // return the status
+}
+
+//****************************************************************************
+///
+/// @description
+/// Finds the child state of the given @c parent, such that this child state
+/// is an ancestor of the currently active state. The main purpose of this
+/// function is to support **shallow history** transitions in state machines
+/// derived from QHsm.
+///
+/// @param[in] parent pointer to the state-handler function
+///
+/// @returns the child of a given @c parent state, which is an ancestor of
+/// the currently active state
+///
+/// @note this function is designed to be called during state transitions,
+/// so it does not necessarily start in a stable state configuration.
+/// However, the function establishes stable state configuration upon exit.
+///
+QStateHandler QHsm::childState(QStateHandler const parent) {
+    QStateHandler child = m_state.fun; // start with the current state
+    bool isConfirmed = false; // start with the child not confirmed
+    QState r;
+
+    // establish stable state configuration
+    m_temp.fun = m_state.fun;
+    do {
+        // is this the parent of the current child?
+        if (m_temp.fun == parent) {
+            isConfirmed = true; // child is confirmed
+            r = Q_RET_IGNORED;  // cause breaking out of the loop
+        }
+        else {
+            child = m_temp.fun;
+            r = QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+        }
+    } while (r != Q_RET_IGNORED); // QHsm::top() state not reached
+    m_temp.fun = m_state.fun; // establish stable state configuration
+
+    /// @post the child must be confirmed
+    Q_ENSURE_ID(710, isConfirmed);
+
+    return child; // return the child
 }
 
 } // namespace QP

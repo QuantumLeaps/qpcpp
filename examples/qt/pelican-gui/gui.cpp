@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QP/C++ GUI example
-// Last Updated for Version: 5.0.0
-// Date of the Last Update:  Aug 12, 2013
+// Last Updated for Version: QP/C++ 5.5.0/Qt 5.x
+// Last updated on  2015-09-25
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,14 +28,13 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include <QtWidgets>
 #include "gui.h"
 //-----------------
-#include "qp_port.h"
+#include "qpcpp.h"
 #include "pelican.h"
 #include "bsp.h"
 
@@ -48,42 +47,42 @@ static Gui *l_instance;
 Gui::Gui(QWidget *parent)
     : QDialog(parent)
 {
-    l_instance = this;   // initialize the instance (Singleton)
+    l_instance = this; // initialize the instance (Singleton)
     setupUi(this);
     setWindowTitle(tr("PELICAN crossing"));
 }
 //............................................................................
-Gui *Gui::instance() {                                               // static
+Gui *Gui::instance() { // static
     return l_instance;
 }
 //............................................................................
-void Gui::onPedsPressed() {                                            // slot
+void Gui::onPedsPressed() { // slot
     static QP::QEvt const e(PELICAN::PEDS_WAITING_SIG);
     PELICAN::AO_Pelican->POST(&e, (void *)0);
     m_pedsButton1->setIcon(QPixmap(":/res/BTN_DWN.png"));
     m_pedsButton2->setIcon(QPixmap(":/res/BTN_DWN.png"));
 }
 //............................................................................
-void Gui::onPedsReleased() {                                           // slot
+void Gui::onPedsReleased() { // slot
     m_pedsButton1->setIcon(QPixmap(":/res/BTN_UP.png"));
     m_pedsButton2->setIcon(QPixmap(":/res/BTN_UP.png"));
 }
 //............................................................................
-void Gui::onOnPressed() {                                              // slot
+void Gui::onOnPressed() { // slot
     static QP::QEvt const e(PELICAN::OFF_SIG);
     m_onOffButton->setText("OFF");
     PELICAN::AO_Pelican->POST(&e, (void *)0);
     qDebug("onOnPressed");
 }
 //............................................................................
-void Gui::onOnReleased() {                                             // slot
+void Gui::onOnReleased() { // slot
     static QP::QEvt const e(PELICAN::ON_SIG);
     m_onOffButton->setText("ON");
     PELICAN::AO_Pelican->POST(&e, (void *)0);
     qDebug("onOnReleased");
 }
 //............................................................................
-void Gui::onQuit() {                                                   // slot
+void Gui::onQuit() { // slot
     static QP::QEvt const e(PELICAN::TERMINATE_SIG);
     QP::QF::PUBLISH(&e, (void *)0);
     qDebug("onQuit");

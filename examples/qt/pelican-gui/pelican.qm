@@ -445,7 +445,7 @@ $declare(components::AO_Pelican)  // opaque pointer to Pelican AO
 #endif // pelican_h</text>
   </file>
   <file name="pelican.cpp">
-   <text>#include &quot;qp_port.h&quot;
+   <text>#include &quot;qpcpp.h&quot;
 #include &quot;bsp.h&quot;
 #include &quot;pelican.h&quot;
 

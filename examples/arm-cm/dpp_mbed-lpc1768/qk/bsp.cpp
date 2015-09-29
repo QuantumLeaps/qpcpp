@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, NXP mbed-LPC1768 board, preemptive QK kernel
-// Last updated for version 5.4.0
-// Last updated on  2015-05-06
+// Last updated for version 5.5.0
+// Last updated on  2015-09-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
@@ -303,7 +303,15 @@ void QK::onIdle(void) {
 }
 
 //............................................................................
-// NOTE Q_onAssert() defined in assembly in startup_TM4C123GH6PM.s
+extern "C" void Q_onAssert(char const *module, int loc) {
+    //
+    // NOTE: add here your application-specific error handling
+    //
+    (void)module;
+    (void)loc;
+    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
+    NVIC_SystemReset();
+}
 
 // QS callbacks ==============================================================
 #ifdef Q_SPY
@@ -366,69 +374,7 @@ bool QS::onStartup(void const *arg) {
     QS_FILTER_ON(QS_QEP_DISPATCH);
     QS_FILTER_ON(QS_QEP_UNHANDLED);
 
-//    QS_FILTER_ON(QS_QF_ACTIVE_ADD);
-//    QS_FILTER_ON(QS_QF_ACTIVE_REMOVE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_SUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_UNSUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_EQUEUE_INIT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_MPOOL_INIT);
-//    QS_FILTER_ON(QS_QF_MPOOL_GET);
-//    QS_FILTER_ON(QS_QF_MPOOL_PUT);
-//    QS_FILTER_ON(QS_QF_PUBLISH);
-//    QS_FILTER_ON(QS_QF_RESERVED8);
-//    QS_FILTER_ON(QS_QF_NEW);
-//    QS_FILTER_ON(QS_QF_GC_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_GC);
-    QS_FILTER_ON(QS_QF_TICK);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_ARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_AUTO_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_REARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_POST);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_CTR);
-//    QS_FILTER_ON(QS_QF_CRIT_ENTRY);
-//    QS_FILTER_ON(QS_QF_CRIT_EXIT);
-//    QS_FILTER_ON(QS_QF_ISR_ENTRY);
-//    QS_FILTER_ON(QS_QF_ISR_EXIT);
-//    QS_FILTER_ON(QS_QF_INT_DISABLE);
-//    QS_FILTER_ON(QS_QF_INT_ENABLE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_MPOOL_GET_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_RESERVED1);
-//    QS_FILTER_ON(QS_QF_RESERVED0);
-
-//    QS_FILTER_ON(QS_QK_MUTEX_LOCK);
-//    QS_FILTER_ON(QS_QK_MUTEX_UNLOCK);
-//    QS_FILTER_ON(QS_QK_SCHEDULE);
-//    QS_FILTER_ON(QS_QK_RESERVED1);
-//    QS_FILTER_ON(QS_QK_RESERVED0);
-
-//    QS_FILTER_ON(QS_QEP_TRAN_HIST);
-//    QS_FILTER_ON(QS_QEP_TRAN_EP);
-//    QS_FILTER_ON(QS_QEP_TRAN_XP);
-//    QS_FILTER_ON(QS_QEP_RESERVED1);
-//    QS_FILTER_ON(QS_QEP_RESERVED0);
-
-    QS_FILTER_ON(QS_SIG_DICT);
-    QS_FILTER_ON(QS_OBJ_DICT);
-    QS_FILTER_ON(QS_FUN_DICT);
-    QS_FILTER_ON(QS_USR_DICT);
-    QS_FILTER_ON(QS_EMPTY);
-    QS_FILTER_ON(QS_RESERVED3);
-    QS_FILTER_ON(QS_RESERVED2);
-    QS_FILTER_ON(QS_TEST_RUN);
-    QS_FILTER_ON(QS_TEST_FAIL);
-    QS_FILTER_ON(QS_ASSERT_FAIL);
+    QS_FILTER_ON(DPP::PHILO_STAT);
 
     return true; // return success
 }
@@ -457,6 +403,18 @@ void QS::onFlush(void) {
         LPC_UART0->THR = (b & 0xFFU);  // put into the DR register
     }
     QF_INT_ENABLE();
+}
+//............................................................................
+//! callback function to reset the target (to be implemented in the BSP)
+void QS::onReset(void) {
+    //TBD
+}
+//............................................................................
+//! callback function to execute a uesr command (to be implemented in BSP)
+void QS::onCommand(uint8_t cmdId, uint32_t param) {
+    (void)cmdId;
+    (void)param;
+    //TBD
 }
 
 //............................................................................

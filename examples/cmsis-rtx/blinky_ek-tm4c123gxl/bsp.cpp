@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: Blinky example, EK-TM4C123GXL board, CMSIS-RTOS RTX kernel
-// Last updated for version 5.4.0
-// Last updated on  2015-05-09
+// Last updated for version 5.5.0
+// Last updated on  2015-09-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "blinky.h"
@@ -110,11 +110,8 @@ void BSP_init(void) {
     //
     SystemCoreClockUpdate();
 
-    // enable clock to the peripherals used by the application
-    SYSCTL->RCGC2 |= (1U << 5); // enable clock to GPIOF
-    __NOP();                    // wait after enabling clocks
-    __NOP();
-    __NOP();
+    // enable clock for to the peripherals used by this application...
+    SYSCTL->RCGCGPIO |= (1U << 5); // enable Run mode for GPIOF
 
     // configure the LEDs and push buttons
     GPIOF->DIR |= (LED_RED | LED_GREEN | LED_BLUE); // set direction: output
@@ -168,8 +165,15 @@ void QP::QF_onRtxTicker() {
 }
 
 //............................................................................
-// NOTE Q_onAssert() defined in assembly in startup_TM4C123GH6PM.s
-
+extern "C" void Q_onAssert(char const *module, int loc) {
+    //
+    // NOTE: add here your application-specific error handling
+    //
+    (void)module;
+    (void)loc;
+    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
+    NVIC_SystemReset();
+}
 
 //****************************************************************************
 // NOTE01:

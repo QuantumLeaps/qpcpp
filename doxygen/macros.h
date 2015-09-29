@@ -132,4 +132,9 @@ namespace QP {
 /// the underlying kernel/OS you're using.
 #define QF_EPOOL_PUT_(p_, e_)   ((p_).put(e_))
 
+/// Macro that should be defined (typically on the compiler's command line)
+/// in the Win32-GUI applications that use the @ref win32 or @ref win32-qv
+/// ports.
+#define WIN32_GUI
+
 } // namespace QP

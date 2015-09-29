@@ -3,14 +3,14 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-08
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -135,6 +135,34 @@ void QMsm::init(QEvt const * const e) {
         QS_OBJ_(this);                      // this state machine object
         QS_FUN_(m_state.obj->stateHandler); // the new current state
     QS_END_()
+}
+
+//****************************************************************************
+/// \description
+/// Tests if a state machine derived from QMsm is-in a given state.
+///
+/// \note For a MSM, to "be-in" a state means also to "be-in" a superstate of
+/// of the state.
+///
+/// \arguments
+/// \arg[in] \c state pointer to the QMState object that corresponds to the
+///                   tested state.
+///
+/// \returns 'true' if the MSM is in the \c state and 'false' otherwise
+///
+bool QMsm::isInState(QMState const * const state) const {
+    bool inState = false; // assume that this MSM is not in 'state'
+
+    for (QMState const *s = m_state.obj;
+         s != static_cast<QMState const *>(0);
+         s = s->superstate)
+    {
+        if (s == state) {
+            inState = true; // match found, return 'true'
+            break;
+        }
+    }
+    return inState;
 }
 
 //****************************************************************************
@@ -469,6 +497,43 @@ QState QMsm::enterHistory_(QMState const * const hist) {
         r = Q_RET_NULL;
     }
     return r;
+}
+
+//****************************************************************************
+///
+/// @description
+/// Finds the child state of the given @c parent, such that this child state
+/// is an ancestor of the currently active state. The main purpose of this
+/// function is to support **shallow history** transitions in state machines
+/// derived from QMsm.
+///
+/// @param[in] parent pointer to the state-handler object
+///
+/// @returns the child of a given @c parent state, which is an ancestor of
+/// the currently active state
+///
+QMState const *QMsm::childStateObj(QMState const * const parent) const {
+    QMState const *child = m_state.obj;
+    bool isConfirmed = false; // start with the child not confirmed
+    QMState const *s;
+
+    for (s = m_state.obj->superstate;
+         s != static_cast<QMState const *>(0);
+         s = s->superstate)
+    {
+        if (s == parent) {
+            isConfirmed = true; // child is confirmed
+            break;
+        }
+        else {
+            child = s;
+        }
+    }
+
+    /// @post the child must be confirmed
+    Q_ENSURE_ID(710, isConfirmed != false);
+
+    return child; // return the child
 }
 
 } // namespace QP

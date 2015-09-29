@@ -2,15 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="bsp.cpp" />
-    <ClCompile Include="$(QTOOLS)\qspy\source\qspy.c">
-      <Filter>Q_SPY</Filter>
-    </ClCompile>
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\mine1.cpp" />
     <ClCompile Include="..\mine2.cpp" />
     <ClCompile Include="..\missile.cpp" />
     <ClCompile Include="..\ship.cpp" />
     <ClCompile Include="..\tunnel.cpp" />
+    <ClCompile Include="..\..\..\..\include\qstamp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -41,9 +39,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Q_SPY">
-      <UniqueIdentifier>{9329cf7b-e791-415b-8458-a26ea9bf414f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Res">
       <UniqueIdentifier>{c8d4d732-dcf8-4466-ad8e-3f15ab6fe204}</UniqueIdentifier>
     </Filter>

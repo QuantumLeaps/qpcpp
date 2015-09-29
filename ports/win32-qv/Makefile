@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ port to Win32-QV API, MinGW toolset
-# Last Updated for Version: 5.4.2
-# Date of the Last Update:  2015-06-03
+# Last Updated for Version: 5.5.0
+# Date of the Last Update:  2015-09-24
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,8 +28,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# Web:   http://www.state-machine.com
-# Email: info@state-machine.com
+# http://www.state-machine.com
+# mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
@@ -102,6 +102,7 @@ CPP_SRCS := \
 # C++ QS source files
 CPP_QS_SRCS := \
 	qs.cpp \
+	qs_rx.cpp \
 	qs_fp.cpp \
 	qs_64bit.cpp
 

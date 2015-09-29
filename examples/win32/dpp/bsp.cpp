@@ -1,13 +1,13 @@
 //****************************************************************************
-// Product: DPP example
-// Last Updated for Version: 5.4.2
-// Date of the Last Update:  2015-06-06
+// Product: DPP example (console)
+// Last Updated for Version: 5.5.0
+// Date of the Last Update:  2015-09-25
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
@@ -37,6 +37,15 @@
 
 #include <conio.h>
 #include <stdio.h>
+
+#ifdef Q_SPY
+    #include <time.h>
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h> // Win32 API
+
+    #include "qspy.h"    // QSPY interface
+#endif
+
 
 //****************************************************************************
 namespace DPP {
@@ -50,6 +59,7 @@ static uint32_t l_rnd; // random seed
     enum {
         PHILO_STAT = QP::QS_USER
     };
+    static bool l_isRunning;
     static uint8_t const l_clock_tick = 0U;
 #endif
 
@@ -70,6 +80,9 @@ void BSP_init(void) {
 //............................................................................
 void BSP_terminate(int16_t result) {
     (void)result;
+#ifdef Q_SPY
+    l_isRunning = false; // stop the QS output thread
+#endif
     QP::QF::stop(); // stop the main "ticker thread"
 }
 //............................................................................
@@ -98,11 +111,10 @@ void BSP_randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 
-
 } // namespace DPP
 
-//****************************************************************************
 
+//****************************************************************************
 namespace QP {
 
 //............................................................................
@@ -130,29 +142,22 @@ void QF_onClockTick(void) {
     }
 }
 //............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const file, int line) {
-    fprintf(stderr, "Assertion failed in %s, line %d", file, line);
-    QF::stop();
+extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
+    QS_ASSERTION(module, loc, 10000U); // report assertion to QS
+    fprintf(stderr, "Assertion failed in %s, location %d", module, loc);
+    QP::QF::stop();
 }
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY // define QS callbacks
-
-#include <time.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h> // Win32 API
-
-#include "qspy.h"    // QSPY interface
-
-static bool l_running;
 
 //............................................................................
 static DWORD WINAPI idleThread(LPVOID par) { // signature for CreateThread()
     (void)par;
 
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_IDLE);
-    l_running = true;
-    while (l_running) {
+    DPP::l_isRunning = true;
+    while (DPP::l_isRunning) {
         uint16_t nBytes = 256;
         uint8_t const *block;
         QF_CRIT_ENTRY(dummy);
@@ -196,76 +201,18 @@ bool QS::onStartup(void const *arg) {
     QS_FILTER_ON(QS_QEP_DISPATCH);
     QS_FILTER_ON(QS_QEP_UNHANDLED);
 
-//    QS_FILTER_ON(QS_QF_ACTIVE_ADD);
-//    QS_FILTER_ON(QS_QF_ACTIVE_REMOVE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_SUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_UNSUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_EQUEUE_INIT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_MPOOL_INIT);
-//    QS_FILTER_ON(QS_QF_MPOOL_GET);
-//    QS_FILTER_ON(QS_QF_MPOOL_PUT);
-//    QS_FILTER_ON(QS_QF_PUBLISH);
-//    QS_FILTER_ON(QS_QF_RESERVED8);
-//    QS_FILTER_ON(QS_QF_NEW);
-//    QS_FILTER_ON(QS_QF_GC_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_GC);
-    QS_FILTER_ON(QS_QF_TICK);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_ARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_AUTO_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_REARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_POST);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_CTR);
-//    QS_FILTER_ON(QS_QF_CRIT_ENTRY);
-//    QS_FILTER_ON(QS_QF_CRIT_EXIT);
-//    QS_FILTER_ON(QS_QF_ISR_ENTRY);
-//    QS_FILTER_ON(QS_QF_ISR_EXIT);
-//    QS_FILTER_ON(QS_QF_INT_DISABLE);
-//    QS_FILTER_ON(QS_QF_INT_ENABLE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_MPOOL_GET_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_RESERVED1);
-//    QS_FILTER_ON(QS_QF_RESERVED0);
+    QS_FILTER_ON(QS_QF_ACTIVE_POST_FIFO);
+    QS_FILTER_ON(QS_QF_ACTIVE_POST_LIFO);
+    QS_FILTER_ON(QS_QF_PUBLISH);
 
-//    QS_FILTER_ON(QS_QK_MUTEX_LOCK);
-//    QS_FILTER_ON(QS_QK_MUTEX_UNLOCK);
-//    QS_FILTER_ON(QS_QK_SCHEDULE);
-//    QS_FILTER_ON(QS_QK_RESERVED1);
-//    QS_FILTER_ON(QS_QK_RESERVED0);
-
-//    QS_FILTER_ON(QS_QEP_TRAN_HIST);
-//    QS_FILTER_ON(QS_QEP_TRAN_EP);
-//    QS_FILTER_ON(QS_QEP_TRAN_XP);
-//    QS_FILTER_ON(QS_QEP_RESERVED1);
-//    QS_FILTER_ON(QS_QEP_RESERVED0);
-
-    QS_FILTER_ON(QS_SIG_DICT);
-    QS_FILTER_ON(QS_OBJ_DICT);
-    QS_FILTER_ON(QS_FUN_DICT);
-    QS_FILTER_ON(QS_USR_DICT);
-    QS_FILTER_ON(QS_EMPTY);
-    QS_FILTER_ON(QS_RESERVED3);
-    QS_FILTER_ON(QS_RESERVED2);
-    QS_FILTER_ON(QS_TEST_RUN);
-    QS_FILTER_ON(QS_TEST_FAIL);
-    QS_FILTER_ON(QS_ASSERT_FAIL);
+    QS_FILTER_ON(DPP::PHILO_STAT);
 
     return CreateThread(NULL, 1024, &idleThread, (void *)0, 0, NULL)
              != (HANDLE)0; // return the status of creating the idle thread
 }
 //............................................................................
 void QS::onCleanup(void) {
-    l_running = false;
+    DPP::l_isRunning = false;
     QSPY_stop();
 }
 //............................................................................
@@ -292,7 +239,7 @@ QSTimeCtr QS::onGetTime(void) {
     return (QSTimeCtr)clock();
 }
 //............................................................................
-void QSPY_onPrintLn(void) {
+extern "C" void QSPY_onPrintLn(void) {
     fputs(QSPY_line, stdout);
     fputc('\n', stdout);
 }

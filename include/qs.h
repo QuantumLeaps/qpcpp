@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-03-14
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-24
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -62,8 +62,16 @@
     #define QS_TIME_SIZE 4
 #endif
 
+//! access element at index @p i_ from the base pointer @p base_
+///
+/// @note This macro encapsulates MISRA-C++ 2008 Rule 5-0-15 (pointer
+/// arithmetic other than array indexing).
+#define QS_PTR_AT_(base_, i_) (base_[i_])
+
+
 //****************************************************************************
 namespace QP {
+
 //! Quantum Spy record types.
 /// @description
 /// This enumeration specifies the record types used in the QP components.
@@ -71,9 +79,9 @@ namespace QP {
 /// Currently, the maximum of all records cannot exceed 256.
 /// @sa QP::QS::filterOn() / QS_FILTER_ON() and QP::QS::filterOff() /
 /// QS_FILTER_OFF()
-
 enum QSpyRecords {
-    QS_QP_RESET,          //!< reset the QP (start of a new QS session)
+    // [0] QS session (not maskable)
+    QS_EMPTY,             //!< QS record for cleanly starting a session
 
     // [1] QEP records
     QS_QEP_STATE_ENTRY,   //!< a state was entered
@@ -111,7 +119,7 @@ enum QSpyRecords {
     QS_QF_TICK,           //!< QP::QF::tickX() was called
     QS_QF_TIMEEVT_ARM,    //!< a time event was armed
     QS_QF_TIMEEVT_AUTO_DISARM, //!< a time event expired and was disarmed
-    QS_QF_TIMEEVT_DISARM_ATTEMPT,//!< an attempt to disarm a disarmed QTimeEvt
+    QS_QF_TIMEEVT_DISARM_ATTEMPT,//!< attempt to disarm a disarmed QTimeEvt
     QS_QF_TIMEEVT_DISARM, //!< true disarming of an armed time event
     QS_QF_TIMEEVT_REARM,  //!< rearming of a time event
     QS_QF_TIMEEVT_POST,   //!< a time event posted itself directly to an AO
@@ -128,12 +136,12 @@ enum QSpyRecords {
     QS_QF_RESERVED1,
     QS_QF_RESERVED0,
 
-    // [50] QK records
-    QS_QK_MUTEX_LOCK,     //!< the QK mutex was locked
-    QS_QK_MUTEX_UNLOCK,   //!< the QK mutex was unlocked
-    QS_QK_SCHEDULE,       //!< QK scheduled a new task to execute
-    QS_QK_RESERVED1,
-    QS_QK_RESERVED0,
+    // [50] QK/QV records
+    QS_QK_MUTEX_LOCK,     //!< QK mutex was locked
+    QS_QK_MUTEX_UNLOCK,   //!< QK mutex was unlocked
+    QS_QVK_SCHEDULE,      //!< QK/QV scheduled a new task to execute
+    QS_QVK_IDLE,          //!< QK/QV became idle
+    QS_QK_RESUME,         //!< QK resumed previous task (not idle)
 
     // [55] Additional QEP records
     QS_QEP_TRAN_HIST,     //!< a transition to history was taken
@@ -147,15 +155,15 @@ enum QSpyRecords {
     QS_OBJ_DICT,          //!< object dictionary entry
     QS_FUN_DICT,          //!< function dictionary entry
     QS_USR_DICT,          //!< user QS record dictionary entry
-    QS_EMPTY,             //!< empty QS record for cleanly starting a session
-    QS_RESERVED3,
-    QS_RESERVED2,
-    QS_TEST_RUN,          //!< a given test is beening run
-    QS_TEST_FAIL,         //!< a test assertion failed
-    QS_ASSERT_FAIL,       //!< assertion faled in the code
+    QS_TARGET_INFO,       //!< reports the Target information
+    QS_RESERVED0,
+    QS_RX_STATUS,         //!< reports QS data receive status
+    QS_TEST_STATUS,       //!< reports test status
+    QS_PEEK_DATA,         //!< reports the data from the PEEK query
+    QS_ASSERT_FAIL,       //!< assertion failed in the code
 
-    // [70] User records
-    QS_USER               //!< the first record available for user QS records
+    // [70] Application-specific (User) QS records
+    QS_USER               //!< the first record available to QS users
 };
 
 //! Specification of all QS records for the QP::QS::filterOn() and
@@ -280,19 +288,44 @@ public:
 
     //! Output signal dictionary record
     static void sig_dict(enum_t const sig, void const * const obj,
-                         char_t const Q_ROM * const name);
+                         char_t const Q_ROM *name);
 
     //! Output object dictionary record
     static void obj_dict(void const * const obj,
-                         char_t const Q_ROM * const name);
+                         char_t const Q_ROM *name);
 
     //! Output function dictionary record
     static void fun_dict(void (* const fun)(void),
-                        char_t const Q_ROM *const name);
+                         char_t const Q_ROM *name);
 
     //! Output user dictionary record
     static void usr_dict(enum_t const rec,
-                         char_t const Q_ROM * const name);
+                         char_t const Q_ROM *name);
+
+    //! Initialize the QS RX data buffer
+    static void rxInitBuf(uint8_t sto[], uint16_t const stoSize);
+
+    //! Parse all bytes present in the QS RX data buffer
+    static void rxParse(void);
+
+    //! Obtain the number of free bytes in the QS RX data buffer
+    static uint16_t rxGetNfree(void);
+
+    //! put one byte into the QS RX lock-free buffer
+    static void rxPut(uint8_t const b) {
+        if (rxPriv_.head != static_cast<QSCtr>(0)) {
+            if ((rxPriv_.head - rxPriv_.tail) != static_cast<QSCtr>(1)) {
+                QS_PTR_AT_(rxPriv_.buf, rxPriv_.head) = b;
+                --rxPriv_.head;
+            }
+        }
+        else {
+            if (rxPriv_.tail != rxPriv_.end) {
+                QS_PTR_AT_(rxPriv_.buf, 0) = b;
+                rxPriv_.head = rxPriv_.end;
+            }
+        }
+    }
 
     // QS buffer access ......................................................
 
@@ -316,28 +349,34 @@ public:
     //! Callback to obtain a timestamp for a QS record.
     static QSTimeCtr onGetTime(void);
 
+    //! Callback function to reset the target (to be implemented in the BSP)
+    static void onReset(void);
+
+    //! Callback function to execute user commands (to be implemented in BSP)
+    static void onCommand(uint8_t cmdId, uint32_t param);
+
 
     //! Enumerates data formats recognized by QS
     /// @description
     /// QS uses this enumeration is used only internally for the formatted
     /// user data elements.
     enum QSType {
-        I8_T,             //!< signed 8-bit integer format
-        U8_T,             //!< unsigned 8-bit integer format
-        I16_T,            //!< signed 16-bit integer format
-        U16_T,            //!< unsigned 16-bit integer format
-        I32_T,            //!< signed 32-bit integer format
-        U32_T,            //!< unsigned 32-bit integer format
-        F32_T,            //!< 32-bit floating point format
-        F64_T,            //!< 64-bit floating point format
-        STR_T,            //!< zero-terminated ASCII string format
-        MEM_T,            //!< up to 255-bytes memory block format
-        SIG_T,            //!< event signal format
-        OBJ_T,            //!< object pointer format
-        FUN_T,            //!< function pointer format
-        I64_T,            //!< signed 64-bit integer format
-        U64_T,            //!< unsigned 64-bit integer format
-        U32_HEX_T         //!< unsigned 32-bit integer in hex format
+        I8_T,         //!< signed 8-bit integer format
+        U8_T,         //!< unsigned 8-bit integer format
+        I16_T,        //!< signed 16-bit integer format
+        U16_T,        //!< unsigned 16-bit integer format
+        I32_T,        //!< signed 32-bit integer format
+        U32_T,        //!< unsigned 32-bit integer format
+        F32_T,        //!< 32-bit floating point format
+        F64_T,        //!< 64-bit floating point format
+        STR_T,        //!< zero-terminated ASCII string format
+        MEM_T,        //!< up to 255-bytes memory block format
+        SIG_T,        //!< event signal format
+        OBJ_T,        //!< object pointer format
+        FUN_T,        //!< function pointer format
+        I64_T,        //!< signed 64-bit integer format
+        U64_T,        //!< unsigned 64-bit integer format
+        U32_HEX_T     //!< unsigned 32-bit integer in hex format
     };
 
     // private QS attributes .................................................
@@ -362,6 +401,36 @@ public:
     uint_fast8_t critNest; //!< critical section nesting level
 
     static QS priv_;
+
+    static struct QSrxPriv {
+        uint8_t *buf; //!< pointer to the start of the ring buffer
+        QSCtr end;    //!< offset of the end of the ring buffer
+        QSCtr head;   //!< offset to where next byte will be inserted
+        QSCtr tail;   //!< offset of where next byte will be extracted
+    } rxPriv_;
+};
+
+//! Quantum Spy Receive (RX) record types
+/// @description
+/// This enumeration specifies the record types for the QS receive channel
+enum QSpyRxRecords {
+    QS_RX_INFO,       //!< query Target info (ver, config, tstamp)
+    QS_RX_COMMAND,    //!< execute a user-defined command in the Target
+    QS_RX_RESET,      //!< reset the Target
+    QS_RX_TICK,       //!< call QF_tick()
+    QS_RX_PEEK,       //!< peek Target memory
+    QS_RX_POKE,       //!< poke Target memory
+    QS_RX_RESERVED7,  //!< reserved for future use
+    QS_RX_RESERVED6,  //!< reserved for future use
+    QS_RX_RESERVED5,  //!< reserved for future use
+    QS_RX_RESERVED4,  //!< reserved for future use
+    QS_RX_GLB_FILTER, //!< set global filters in the Target
+    QS_RX_LOC_FILTER, //!< set local  filters in the Target
+    QS_RX_AO_FILTER,  //!< set local AO filter in the Target
+    QS_RX_RESERVED3,  //!< reserved for future use
+    QS_RX_RESERVED2,  //!< reserved for future use
+    QS_RX_RESERVED1,  //!< reserved for future use
+    QS_RX_EVENT       //!< inject an event to the Target (post/publish)
 };
 
 } // namespace QP
@@ -927,7 +996,7 @@ public:
 } while (false)
 
 //! Output the assertion failure trace record
-#define QS_ASSERTION(module_, loc_) do { \
+#define QS_ASSERTION(module_, loc_, delay_) do { \
     QS_BEGIN_NOCRIT_(QP::QS_ASSERT_FAIL, \
         static_cast<void *>(0), static_cast<void *>(0)) \
         QS_TIME_(); \
@@ -935,6 +1004,9 @@ public:
         QS_STR_ROM_(module_); \
     QS_END_NOCRIT_() \
     QP::QS::onFlush(); \
+    for (uint32_t volatile delay_ctr_ = (delay_);  \
+         delay_ctr_ > static_cast<uint32_t>(0); --delay_ctr_) \
+    {} \
 } while (false)
 
 //! Flush the QS trace data to the host

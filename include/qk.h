@@ -3,14 +3,14 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2014-05-08
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-24
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -134,7 +134,10 @@ uint_fast8_t QK_schedPrio_(void);
 #endif
 
 extern uint_fast8_t volatile QK_currPrio_; //!< current task/ISR priority
-extern uint_fast8_t volatile QK_intNest_;  //!< interrupt nesting level
+
+#ifndef QK_ISR_CONTEXT_
+    extern uint_fast8_t volatile QK_intNest_;  //!< interrupt nesting level
+#endif // QK_ISR_CONTEXT_
 
 } // extern "C"
 
@@ -147,12 +150,13 @@ extern uint_fast8_t volatile QK_intNest_;  //!< interrupt nesting level
         // (ISR vs. thread).
         /// @returns true if the code executes in the ISR context and false
         /// otherwise
-        #define QK_ISR_CONTEXT_() (QK_intNest_ != static_cast<uint_fast8_t>(0))
+        #define QK_ISR_CONTEXT_() \
+            (QK_intNest_ != static_cast<uint_fast8_t>(0))
     #endif // QK_ISR_CONTEXT_
 
     // native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(0, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
+        Q_ASSERT_ID(0, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
         QK_readySet_.insert((me_)->m_prio); \

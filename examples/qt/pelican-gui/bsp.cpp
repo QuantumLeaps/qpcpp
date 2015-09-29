@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: BSP for PELICAN crossing example for Qt5
-// Last updated for version 5.4.0
-// Last updated on  2015-04-30
+// Last Updated for Version: QP/C++ 5.5.0/Qt 5.x
+// Last updated on  2015-09-25
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,13 +28,13 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include <QtWidgets>
 #include "gui.h"
 //-----------------
-#include "qp_port.h"
+#include "qpcpp.h"
 #include "pelican.h"
 #include "bsp.h"
 
@@ -53,14 +53,14 @@ void QP::QF::onStartup(void) {
     QS_OBJ_DICTIONARY(&l_time_tick);
 }
 //............................................................................
-void Q_onAssert(char const * const file, int line) {
+void Q_onAssert(char_t const * const module, int_t loc) {
     QMessageBox::critical(0, "PROBLEM",
         QString("<p>Assertion failed in module <b>%1</b>,"
-                "line <b>%2</b></p>")
-            .arg(file)
-            .arg(line));
-    QS_ASSERTION(file, line); // send the assertion info to the QS trace
-    qFatal("Assertion failed in module %s, line %d", file, line);
+                "location <b>%2</b></p>")
+            .arg(module)
+            .arg(loc));
+    QS_ASSERTION(module, loc, 10000); // send assertion info to the QS trace
+    qFatal("Assertion failed in module %s, location %d", module, loc);
 }
 
 //............................................................................
@@ -168,79 +168,7 @@ bool QP::QS::onStartup(void const * /*arg*/) {
     l_time.start();                 // start the time stamp
 
     // set up the QS filters...
-//    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-//    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-//    QS_FILTER_ON(QS_QEP_STATE_INIT);
-//    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-//    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-//    QS_FILTER_ON(QS_QEP_TRAN);
-//    QS_FILTER_ON(QS_QEP_IGNORED);
-//    QS_FILTER_ON(QS_QEP_DISPATCH);
-//    QS_FILTER_ON(QS_QEP_UNHANDLED);
-
-//    QS_FILTER_ON(QS_QF_ACTIVE_ADD);
-//    QS_FILTER_ON(QS_QF_ACTIVE_REMOVE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_SUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_UNSUBSCRIBE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET);
-//    QS_FILTER_ON(QS_QF_ACTIVE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_EQUEUE_INIT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_FIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_LIFO);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET);
-//    QS_FILTER_ON(QS_QF_EQUEUE_GET_LAST);
-//    QS_FILTER_ON(QS_QF_MPOOL_INIT);
     QS_FILTER_ON(QS_QF_MPOOL_GET);
-//    QS_FILTER_ON(QS_QF_MPOOL_PUT);
-//    QS_FILTER_ON(QS_QF_PUBLISH);
-//    QS_FILTER_ON(QS_QF_RESERVED8);
-//    QS_FILTER_ON(QS_QF_NEW);
-//    QS_FILTER_ON(QS_QF_GC_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_GC);
-//    QS_FILTER_ON(QS_QF_TICK);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_ARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_AUTO_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_DISARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_REARM);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_POST);
-//    QS_FILTER_ON(QS_QF_TIMEEVT_CTR);
-//    QS_FILTER_ON(QS_QF_CRIT_ENTRY);
-//    QS_FILTER_ON(QS_QF_CRIT_EXIT);
-//    QS_FILTER_ON(QS_QF_ISR_ENTRY);
-//    QS_FILTER_ON(QS_QF_ISR_EXIT);
-//    QS_FILTER_ON(QS_QF_INT_DISABLE);
-//    QS_FILTER_ON(QS_QF_INT_ENABLE);
-//    QS_FILTER_ON(QS_QF_ACTIVE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_EQUEUE_POST_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_MPOOL_GET_ATTEMPT);
-//    QS_FILTER_ON(QS_QF_RESERVED1);
-//    QS_FILTER_ON(QS_QF_RESERVED0);
-
-//    QS_FILTER_ON(QS_QK_MUTEX_LOCK);
-//    QS_FILTER_ON(QS_QK_MUTEX_UNLOCK);
-//    QS_FILTER_ON(QS_QK_SCHEDULE);
-//    QS_FILTER_ON(QS_QK_RESERVED1);
-//    QS_FILTER_ON(QS_QK_RESERVED0);
-
-//    QS_FILTER_ON(QS_QEP_TRAN_HIST);
-//    QS_FILTER_ON(QS_QEP_TRAN_EP);
-//    QS_FILTER_ON(QS_QEP_TRAN_XP);
-//    QS_FILTER_ON(QS_QEP_RESERVED1);
-//    QS_FILTER_ON(QS_QEP_RESERVED0);
-
-    QS_FILTER_ON(QS_SIG_DICT);
-    QS_FILTER_ON(QS_OBJ_DICT);
-    QS_FILTER_ON(QS_FUN_DICT);
-    QS_FILTER_ON(QS_USR_DICT);
-    QS_FILTER_ON(QS_EMPTY);
-    QS_FILTER_ON(QS_RESERVED3);
-    QS_FILTER_ON(QS_RESERVED2);
-    QS_FILTER_ON(QS_TEST_RUN);
-    QS_FILTER_ON(QS_TEST_FAIL);
-    QS_FILTER_ON(QS_ASSERT_FAIL);
 
     return true; // success
 }

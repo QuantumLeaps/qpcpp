@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ port to POSIX, GNU toolset
-# Last Updated for Version: 5.4.0
-# Date of the Last Update:  2015-04-07
+# Last Updated for Version: 5.5.0
+# Date of the Last Update:  2015-09-24
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,8 +28,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# Web:   http://www.state-machine.com
-# Email: info@state-machine.com
+# http://www.state-machine.com
+# mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
@@ -64,7 +64,6 @@ VPATH = \
 	$(QPCPP)/source \
 	$(QP_PORT_DIR)
 
-
 # list of all include directories needed by this project
 INCLUDES  = \
 	-I$(QPCPP)/include \
@@ -94,6 +93,7 @@ CPP_SRCS := \
 # C++ QS source files
 CPP_QS_SRCS := \
 	qs.cpp \
+	qs_rx.cpp \
 	qs_fp.cpp \
 	qs_64bit.cpp
 
@@ -119,16 +119,16 @@ RM    := rm
 
 LIBFLAGS := rs
 
-ifeq (rel, $(CONF))       # Release configuration ............................
+ifeq (rel, $(CONF))  # Release configuration .................................
 
-BIN_DIR = rel
+BIN_DIR := rel
 
 CPPFLAGS = -c -O2 -fno-rtti -fno-exceptions -DNDEBUG \
 	-ffunction-sections -fdata-sections	$(INCLUDES) $(DEFINES) -Wall -pthread
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
-BIN_DIR = spy
+BIN_DIR := spy
 
 CPPFLAGS = -c -g -O -fno-rtti -fno-exceptions -DQ_SPY \
 	-ffunction-sections -fdata-sections	$(INCLUDES) $(DEFINES) -Wall -pthread
@@ -136,9 +136,9 @@ CPPFLAGS = -c -g -O -fno-rtti -fno-exceptions -DQ_SPY \
 # add the QS sources...
 CPP_SRCS += $(CPP_QS_SRCS)
 
-else                     # default Debug configuration .......................
+else   # default Debug configuration .........................................
 
-BIN_DIR = dbg
+BIN_DIR := dbg
 
 CPPFLAGS = -c -g -O -fno-rtti -fno-exceptions \
 	-ffunction-sections -fdata-sections	$(INCLUDES) $(DEFINES) -Wall -pthread

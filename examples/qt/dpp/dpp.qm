@@ -499,7 +499,7 @@ $declare(AOs::AO_Table)
 #endif // dpp_h</text>
   </file>
   <file name="philo.cpp">
-   <text>#include &quot;qp_port.h&quot;
+   <text>#include &quot;qpcpp.h&quot;
 #include &quot;dpp.h&quot;
 #include &quot;bsp.h&quot;
 
@@ -549,7 +549,7 @@ QP::QMActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Phi
 $define(AOs::Philo)</text>
   </file>
   <file name="table.cpp">
-   <text>#include &quot;qp_port.h&quot;
+   <text>#include &quot;qpcpp.h&quot;
 #include &quot;dpp.h&quot;
 #include &quot;bsp.h&quot;
 

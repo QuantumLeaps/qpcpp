@@ -4,15 +4,14 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Product: QF/C++
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-30
+/// Last updated for version 5.5.0
+/// Last updated on  2015-09-24
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -33,8 +32,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -105,7 +104,7 @@ void QF::stop(void) {
 /// @description
 /// QP::QF::run() is typically called from your startup code after you
 /// initialize the QF and start at least one active object with
-/// QP::QActive::start().
+/// QP::QMActive::start().
 ///
 /// @returns QP::QF::run() typically does not return in embedded applications.
 /// However, when QP runs on top of an operating system, QP::QF::run() might
@@ -118,14 +117,29 @@ void QF::stop(void) {
 /// for the given application. All QF ports must implement QP::QF::run().
 ///
 int_t QF::run(void) {
+#ifdef Q_SPY
+    uint_fast8_t pprev = static_cast<uint_fast8_t>(0); // previous priority
+#endif
+
     onStartup(); // startup callback
 
-    // the combined event-loop and background-loop of the QV kernel
+    // the combined event-loop and background-loop of the QV kernel...
     for (;;) {
         QF_INT_DISABLE();
         if (QV_readySet_.notEmpty()) {
             uint_fast8_t p = QV_readySet_.findMax();
             QMActive *a = active_[p];
+
+#ifdef Q_SPY
+            QS_BEGIN_NOCRIT_(QS_QVK_SCHEDULE, QS::priv_.aoObjFilter, a)
+                QS_TIME_(); // timestamp
+                QS_2U8_(static_cast<uint8_t>(p), // prio of the scheduled AO
+                        static_cast<uint8_t>(pprev)); // previous priority
+            QS_END_NOCRIT_()
+
+            pprev = p; /* update previous priority */
+#endif // Q_SPY
+
             QF_INT_ENABLE();
 
             // perform the run-to-completion (RTS) step...
@@ -139,6 +153,18 @@ int_t QF::run(void) {
             gc(e);
         }
         else {
+#ifdef Q_SPY
+            if (pprev != static_cast<uint_fast8_t>(0)) {
+                QS_BEGIN_NOCRIT_(QS_QVK_IDLE,
+                    static_cast<void *>(0), static_cast<void *>(0))
+                    QS_TIME_(); // timestamp
+                    QS_U8_(static_cast<uint8_t>(pprev)); // previous priority
+                QS_END_NOCRIT_()
+
+                pprev = static_cast<uint_fast8_t>(0); // update previous prio
+            }
+#endif // Q_SPY
+
             // QV::onIdle() must be called with interrupts DISABLED because
             // the determination of the idle condition (no events in the
             // queues) can change at any time by an interrupt posting events
@@ -189,8 +215,8 @@ void QMActive::start(uint_fast8_t const prio,
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
     m_prio = prio;  // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
-
     this->init(ie); // execute initial transition (virtual call)
+
     QS_FLUSH();     // flush the trace buffer to the host
 }
 

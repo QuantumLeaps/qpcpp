@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last updated for version 5.4.0
-// Last updated on  2015-05-01
+// Last updated for version 5.5.0
+// Last updated on  2015-09-25
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 
 // library headers
@@ -80,6 +80,7 @@ qpcpp.lnt         // QP/C++ options
 
 // QF
 -emacro(1960, QF_EVT_CONST_CAST_) // 5-2-5 attempt to cast away const
+-emacro(1960, QF_PTR_AT_)   // 5-0-15 pointer arithmetic
 -emacro(929,                // 5-2-7 cast from pointer to pointer
  QF_EVT_CONST_CAST_,
  QF_QACTIVE_TO_QHSM_CAST_)
@@ -87,7 +88,6 @@ qpcpp.lnt         // QP/C++ options
 -estring(522,               // function lacks side-effects
  *QF_EVT_REF_CTR_INC_,
  *QF_EVT_REF_CTR_DEC_)
--emacro(1960, QF_PTR_AT_)   // 5-0-15 pointer arithmetic
 -efunc(925,                 // 5-2-8, 5-2-9 cast from pointer to pointer
  *QF::bzero,
  *QMPool::init,
@@ -122,7 +122,7 @@ qpcpp.lnt         // QP/C++ options
                             // reported incorrectly for qf_pkg.h
 
 
-// QK
+// QV/QK
 -emacro(925,                // 5-2-8, 5-2-9 cast from pointer to pointer
  QK_TLS)
 -esym(1960,                 // 16-0-4 function-like macro
@@ -132,11 +132,11 @@ qpcpp.lnt         // QP/C++ options
 
 // QS -- the following options are needed only when Q_SPY is defined
 -emacro(1960,               // 5-0-15, pointer arithmetic
- QS_PTR_AT_,
  QS_PTR_INC_)
 -estring(1960,              // 9-5-1 declaration of union
  *F32Rep,
- *F64Rep)
+ *F64Rep,
+ *Variant)
 -estring(1960,              // 16-0-4 function-like macro
  QS_INSERT_BYTE,
  QS_INSERT_ESC_BYTE,
@@ -160,7 +160,8 @@ qpcpp.lnt         // QP/C++ options
  *QS::sig_dict,
  *QS::obj_dict,
  *QS::fun_dict,
- *QS::usr_dict)
+ *QS::usr_dict,
+ *QS_target_info_)
 -emacro(930,                // 5-2-7 cast from enum to unsigned char
  QS_BEGIN_,
  QS_BEGIN_NOCRIT_)

@@ -15,7 +15,7 @@
 // for more details.
 //****************************************************************************
 //${.::tunnel.cpp} ...........................................................
-#include "qp_port.h"
+#include "qpcpp.h"
 #include "bsp.h"
 #include "game.h"
 #include <string.h> // for memmove() and memcpy()

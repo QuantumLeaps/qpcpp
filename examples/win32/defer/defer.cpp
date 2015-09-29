@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Deferred Event state pattern example
-// Last Updated for Version: 5.4.2
-// Date of the Last Update:  2015-06-06
+// Last Updated for Version: 5.4.3
+// Date of the Last Update:  2015-06-11
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -56,6 +56,7 @@ class TServer : public QActive { // Transaction Server active object
 private:
     QEQueue m_requestQueue; // native QF queue for deferred request events
     QEvt const *m_requestQSto[3]; // storage for the deferred queue buffer
+    RequestEvt const *m_activeRequest; // request event being processed
 
     QTimeEvt m_receivedEvt;    // private time event generator
     QTimeEvt m_authorizedEvt;  // private time event generator
@@ -81,6 +82,8 @@ private:
 
 // HSM definition ------------------------------------------------------------
 QState TServer::initial(TServer *me, QEvt const *) {
+    // no active request yet
+    me->m_activeRequest= static_cast<RequestEvt const *>(0);
     return Q_TRAN(&TServer::idle);
 }
 //............................................................................
@@ -109,8 +112,13 @@ QState TServer::idle(TServer *me, QEvt const *e) {
             return Q_HANDLED();
         }
         case NEW_REQUEST_SIG: {
+            // create and save a new reference to the request event so that
+            // this event will be available beyond this RTC step and won't be
+            // recycled.
+            Q_NEW_REF(me->m_activeRequest, RequestEvt);
+
             printf("Processing request #%d\n",
-                   (int)((RequestEvt const *)e)->ref_num);
+                   (int)me->m_activeRequest->ref_num);
             return Q_TRAN(&TServer::receiving);
         }
         case TERMINATE_SIG: {
@@ -121,7 +129,19 @@ QState TServer::idle(TServer *me, QEvt const *e) {
 }
 //............................................................................
 QState TServer::busy(TServer *me, QEvt const *e) {
+    QState status;
     switch (e->sig) {
+        case Q_EXIT_SIG: {
+            printf("busy-EXIT; done processing request #%d\n",
+                   (int)me->m_activeRequest->ref_num);
+
+            // delete the reference to the active request, because
+            // it is now processed.
+            Q_DELETE_REF(me->m_activeRequest);
+
+            status = Q_HANDLED();
+            break;
+        }
         case NEW_REQUEST_SIG: {
             if (me->defer(&me->m_requestQueue, e)) { // could defer?
                 printf("Request #%d deferred;\n",
@@ -132,38 +152,58 @@ QState TServer::busy(TServer *me, QEvt const *e) {
                        (int)((RequestEvt const *)e)->ref_num);
                 // notify the request sender that his request was denied...
             }
-            return Q_HANDLED();
+            status = Q_HANDLED();
+            break;
         }
         case TERMINATE_SIG: {
-            return Q_TRAN(&TServer::final);
+            status = Q_TRAN(&TServer::final);
+            break;
+        }
+        default: {
+            status =  Q_SUPER(&QHsm::top);
+            break;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }
 //............................................................................
 QState TServer::receiving(TServer *me, QEvt const *e) {
+    QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            printf("receiving-ENTRY;\n");
+            // inform about the first stage of processing of the request...
+            printf("receiving-ENTRY; active request: #%d\n",
+                   (int)me->m_activeRequest->ref_num);
+
             // one-shot timeout in 1 second
             me->m_receivedEvt.armX(BSP_TICKS_PER_SEC, 0U);
-            return Q_HANDLED();
+            status = Q_HANDLED();
+            break;
         }
         case Q_EXIT_SIG: {
             me->m_receivedEvt.disarm();
-            return Q_HANDLED();
+            status = Q_HANDLED();
+            break;
         }
         case RECEIVED_SIG: {
-            return Q_TRAN(&TServer::authorizing);
+            status = Q_TRAN(&TServer::authorizing);
+            break;
+        }
+        default: {
+            status =  Q_SUPER(&TServer::busy);
+            break;
         }
     }
-    return Q_SUPER(&TServer::busy);
+    return status;
 }
 //............................................................................
 QState TServer::authorizing(TServer *me, QEvt const *e) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            printf("authorizing-ENTRY;\n");
+            // inform about the second stage of processing of the request..
+            printf("authorizing-ENTRY; active request: #%d\n",
+                   (int)me->m_activeRequest->ref_num);
+
             // one-shot timeout in 2 seconds
             me->m_authorizedEvt.armX(2*BSP_TICKS_PER_SEC, 0U);
             return Q_HANDLED();
@@ -221,7 +261,7 @@ void BSP_onKeyboardInput(uint8_t key) {
             break;
         }
         case '\33': { // ESC pressed?
-            static QEvt const terminateEvt = { TERMINATE_SIG, 0};
+            static QEvt const terminateEvt = { TERMINATE_SIG, 0U, 0U };
             l_tserver.POST(&terminateEvt, (void *)0);
             break;
         }

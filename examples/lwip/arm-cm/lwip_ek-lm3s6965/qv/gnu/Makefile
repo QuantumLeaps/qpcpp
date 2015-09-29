@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++, lwIP on EK-LM3S6965, QV kernel, GNU-ARM
-# Last Updated for Version: 5.4.0
-# Date of the Last Update:  2015-05-12
+# Last Updated for Version: 5.5.0
+# Date of the Last Update:  2015-09-24
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,8 +28,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# Web:   http://www.state-machine.com
-# Email: info@state-machine.com
+# http://www.state-machine.com
+# mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
@@ -137,17 +137,11 @@ QP_ASMS :=
 
 QS_SRCS := \
 	qs.cpp \
+	qs_rx.cpp \
 	qs_fp.cpp
 
 LIB_DIRS  :=
 LIBS      :=
-
-# combine all the necessary soruces
-#
-VPATH    += $(QPCPP)/3rd_party/gnu_cpp
-CPP_SRCS += $(QP_SRCS) mini_cpp.cpp
-ASM_SRCS += $(QP_ASMS)
-
 
 # defines
 DEFINES   :=
@@ -189,22 +183,30 @@ RM    := rm
 # build options for various configurations for ARM Cortex-M4F
 #
 
-ifeq (rel, $(CONF))       # Release configuration ............................
+# combine all the soruces...
+VPATH    += $(QPCPP)/3rd_party/gnu_cpp
+CPP_SRCS += $(QP_SRCS) mini_cpp.cpp
+ASM_SRCS += $(QP_ASMS)
+
+# add the pre-defined symbol __FPU_PRESENT if needed...
+ifneq (,$(ARM_FPU))
+DEFINES += -D__FPU_PRESENT
+ASM_FPU += -defsym=__FPU_PRESENT=1
+endif
+
+ifeq (rel, $(CONF)) # Release configuration ..................................
 
 BIN_DIR := rel
 
-ASFLAGS = $(ARM_CPU) -defsym=FPU_VFP_V4_SP_D16=1
+ASFLAGS = $(ARM_CPU) $(ASM_FPU)
 
 CFLAGS = $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-ffunction-sections -fdata-sections -Os $(INCLUDES) $(DEFINES) -DNDEBUG
-
-CPPFLAGS = $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb \
-	-ffunction-sections -fdata-sections -Wall -fno-rtti -fno-exceptions \
+	-ffunction-sections -fdata-sections \
 	-Os $(INCLUDES) $(DEFINES) -DNDEBUG
 
-LINKFLAGS = -T$(LD_SCRIPT) $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) \
-	-mthumb -nostdlib \
-	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
+CPPFLAGS = $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+	-Os $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
@@ -212,37 +214,37 @@ BIN_DIR := spy
 
 CPP_SRCS += $(QS_SRCS)
 
-ASFLAGS = -g $(ARM_CPU) -defsym=FPU_VFP_V4_SP_D16=1
+ASFLAGS = -g $(ARM_CPU) $(ASM_FPU)
 
 CFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-ffunction-sections -fdata-sections -O $(INCLUDES) $(DEFINES) -DQ_SPY
-
-CPPFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb \
-	-ffunction-sections -fdata-sections -Wall -fno-rtti -fno-exceptions \
+	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
-LINKFLAGS = -T$(LD_SCRIPT) $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) \
-	-mthumb -nostdlib \
-	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
+CPPFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
-else                     # default Debug configuration .......................
+else # default Debug configuration ..........................................
 
 BIN_DIR := dbg
 
-ASFLAGS = -g $(ARM_CPU) -defsym=FPU_VFP_V4_SP_D16=1
+ASFLAGS = -g $(ARM_CPU) $(ASM_FPU)
 
 CFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-ffunction-sections -fdata-sections -O $(INCLUDES) $(DEFINES)
-
-CPPFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb \
-	-ffunction-sections -fdata-sections -Wall -fno-rtti -fno-exceptions \
+	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES)
+
+CPPFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+	-O $(INCLUDES) $(DEFINES)
+
+endif # ......................................................................
+
 
 LINKFLAGS = -T$(LD_SCRIPT) $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) \
 	-mthumb -nostdlib \
 	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
 
-endif
 
 ASM_OBJS     := $(patsubst %.s,%.o,  $(notdir $(ASM_SRCS)))
 C_OBJS       := $(patsubst %.c,%.o,  $(notdir $(C_SRCS)))
@@ -272,7 +274,8 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(LINK) $(LINKFLAGS) -o $@ $^ $(LIBS)
+	$(CPP) $(CPPFLAGS) -c $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.c
 	$(CC) -MM -MT $(@:.d=.o) $(CFLAGS) $< > $@
@@ -308,6 +311,8 @@ clean:
 show:
 	@echo PROJECT = $(PROJECT)
 	@echo CONF = $(CONF)
+	@echo DEFINES = $(DEFINES)
+	@echo ASM_FPU = $(ASM_FPU)
 	@echo ASM_SRCS = $(ASM_SRCS)
 	@echo C_SRCS = $(C_SRCS)
 	@echo CPP_SRCS = $(CPP_SRCS)

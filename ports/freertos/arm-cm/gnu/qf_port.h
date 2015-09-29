@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to FreeRTOS.org (v8.2.x), ARM Cortex-M, GNU-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-11
+/// Last updated for version 5.4.3
+/// Last updated on  2015-06-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -102,6 +102,9 @@ extern FreeRTOSExtras FreeRTOS_extras;
 #if (configCHECK_FOR_STACK_OVERFLOW > 0)
     void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
 #endif
+
+// set FreeRTOS taks name; must be be called before QMActive::start()
+void QF_setTaskName(QMActive *act, char_t const *taskName);
 
 } // namespace QP
 

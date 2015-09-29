@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 4.5.02
+// Date of the Last Update:  Jun 30, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,9 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// Quantum Leaps Web sites: http://www.quantum-leaps.com
+//                          http://www.state-machine.com
+// e-mail:                  info@quantum-leaps.com
 //****************************************************************************
 #ifndef bsp_h
 #define bsp_h
@@ -43,9 +44,9 @@ void BSP_displayPaused(uint8_t const paused);
 void BSP_displayPhilStat(uint8_t const n, char_t const *stat);
 void BSP_terminate(int16_t const result);
 
-void BSP_randomSeed(uint32_t const seed); // random seed
-uint32_t BSP_random(void);                // pseudo-random generator
+void BSP_randomSeed(uint32_t const seed);                       // random seed
+uint32_t BSP_random(void);                          // pseudo-random generator
 
-} // namespace DPP
+}                                                             // namespace DPP
 
-#endif // bsp_h
+#endif                                                                // bsp_h

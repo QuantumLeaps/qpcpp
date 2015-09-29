@@ -725,7 +725,7 @@
       <name>BUILDACTION</name>
       <archiveVersion>1</archiveVersion>
       <data>
-        <prebuild></prebuild>
+        <prebuild>cmd /c "if exist $OBJ_DIR$\qstamp.r43 del $OBJ_DIR$\qstamp.r43"</prebuild>
         <postbuild></postbuild>
       </data>
     </settings>
@@ -1851,7 +1851,7 @@
       <name>BUILDACTION</name>
       <archiveVersion>1</archiveVersion>
       <data>
-        <prebuild></prebuild>
+        <prebuild>cmd /c "if exist $OBJ_DIR$\qstamp.r43 del $OBJ_DIR$\qstamp.r43"</prebuild>
         <postbuild></postbuild>
       </data>
     </settings>
@@ -2977,7 +2977,7 @@
       <name>BUILDACTION</name>
       <archiveVersion>1</archiveVersion>
       <data>
-        <prebuild></prebuild>
+        <prebuild>cmd /c "if exist $OBJ_DIR$\qstamp.r43 del $OBJ_DIR$\qstamp.r43"</prebuild>
         <postbuild></postbuild>
       </data>
     </settings>
@@ -3398,6 +3398,9 @@
       <name>$PROJ_DIR$\..\..\philo.cpp</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\include\qstamp.cpp</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\table.cpp</name>
     </file>
   </group>
@@ -3478,6 +3481,9 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\source\qs_pkg.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\source\qs_rx.cpp</name>
     </file>
   </group>
 </project>

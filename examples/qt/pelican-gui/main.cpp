@@ -1,13 +1,13 @@
 //****************************************************************************
-// Product: QP/C++ example
-// Last Updated for Version: QP 5.3.0/Qt 5.1.1
-// Last updated on  2014-04-21
+// Product: QP/C++ example with Qt5
+// Last Updated for Version: QP/C++ 5.5.0/Qt 5.x
+// Last updated on  2015-09-25
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,12 +28,12 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "gui.h"
 //-----------------
-#include "qp_port.h"
+#include "qpcpp.h"
 #include "pelican.h"
 #include "bsp.h"
 
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     // start the active objects...
     PELICAN::AO_Pelican->start(1U,
                  (QP::QEvt const **)0, 0U, // no queue
-                 (void *)0, 0U);           // no stack
+                 (void *)0, 0U); // default stack size
 
     return QP::QF::run(); // calls qApp->exec()
 }

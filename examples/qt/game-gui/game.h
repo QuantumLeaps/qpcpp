@@ -102,6 +102,11 @@ public:
     int8_t y;
     uint8_t bmp;
 
+#if defined __LP64__
+    uint32_t pad;
+#endif //  defined __LP64__
+
+
 public:
     ObjectImageEvt(
         QP::QSignal sig,

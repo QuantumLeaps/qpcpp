@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++, Blinky console, Win32, MinGW
-# Last updated for version 5.4.2
-# Last updated on  2015-06-05
+# Last updated for version 5.5.0
+# Last updated on  2015-09-25
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,8 +28,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# Web:   www.state-machine.com
-# Email: info@state-machine.com
+# http://www.state-machine.com
+# mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
@@ -143,15 +143,6 @@ CPPFLAGS = -ffunction-sections -fdata-sections \
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
-# make sure that QTOOLS exists...
-ifeq ("$(wildcard $(QTOOLS))","")
-$(error QTOOLS not found. Please install Qtools and define QTOOLS env. variable)
-endif
-
-INCLUDES +=	-I$(QTOOLS)/qspy/include
-VPATH    += $(QTOOLS)/qspy/source
-C_SRCS   += qspy.c
-
 BIN_DIR := spy
 
 CFLAGS = -g -ffunction-sections -fdata-sections \
@@ -215,7 +206,8 @@ $(TARGET_BIN): $(TARGET_EXE)
 	$(BIN) -O binary $< $@
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
-	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(LIBS)
+	$(CPP) $(CPPFLAGS) -c $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.cpp
 	$(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@

@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------------
 # Product: PELICAN-GUI exampe for Qt5
-# Last Updated for Version: QP 5.1.1/Qt 5.1.1
-# Date of the Last Update:  Nov 05, 2013
+# Last Updated for Version: QP 5.5.0/Qt5.x
+# Date of the Last Update:  2015-09-26
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -28,19 +28,21 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# Quantum Leaps Web sites: http://www.quantum-leaps.com
-#                          http://www.state-machine.com
-# e-mail:                  info@quantum-leaps.com
+# http://www.state-machine.com
+# mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
+
 TEMPLATE = app
 
 QT      += core gui widgets
 TARGET   = pelican-gui
 DEFINES += QT_NO_STATEMACHINE
 
+QPCPP = ../../..
+
 INCLUDEPATH = . \
-    $(QPCPP)/include \
-    $(QPCPP)/ports/qt \
+    $$QPCPP/include \
+    $$QPCPP/ports/qt \
 
 SOURCES += \
     main.cpp \
@@ -49,24 +51,83 @@ SOURCES += \
     pelican.cpp
 
 HEADERS += \
-    gui.h \
     bsp.h \
+    gui.h \
     pelican.h
 
 FORMS += gui.ui
 
-CONFIG(debug, debug|release) {
-    DEFINES += Q_SPY
-    INCLUDEPATH += $(QTOOLS)/qspy/include
-    SOURCES += $(QTOOLS)/qspy/source/qspy.c
-    HEADERS += qs_port.h
-    LIBS += -L$(QPCPP)/ports/qt/mingw/debug
-} else {
-    LIBS += -L$(QPCPP)/ports/qt/mingw/release
-}
-
-LIBS += -lqp
-    
 RESOURCES = gui.qrc
 
 win32:RC_FILE = gui.rc
+
+
+##############################################################################
+# NOTE:
+# This project demonstrats how to build the QP/C++ framework from sources,
+# as opposed to linking the QP/C++ library. The following headers and sources
+# are included from QP/C++.
+
+# QP-Qt port headers/sources
+HEADERS +=  \
+    $$QPCPP/ports/qt/tickerthread.h \
+    $$QPCPP/ports/qt/aothread.h \
+    $$QPCPP/ports/qt/guiapp.h \
+    $$QPCPP/ports/qt/guiactive.h \
+    $$QPCPP/ports/qt/pixellabel.h
+
+SOURCES += \
+    $$QPCPP/ports/qt/qf_port.cpp \
+    $$QPCPP/ports/qt/guiapp.cpp \
+    $$QPCPP/ports/qt/pixellabel.cpp
+
+
+# QP/C++ headers/sources
+SOURCES += \
+    $$QPCPP/source/qep_hsm.cpp \
+    $$QPCPP/source/qep_msm.cpp \
+    $$QPCPP/source/qf_act.cpp \
+    $$QPCPP/source/qf_actq.cpp \
+    $$QPCPP/source/qf_defer.cpp \
+    $$QPCPP/source/qf_dyn.cpp \
+    $$QPCPP/source/qf_mem.cpp \
+    $$QPCPP/source/qf_ps.cpp \
+    $$QPCPP/source/qf_qact.cpp \
+    $$QPCPP/source/qf_qeq.cpp \
+    $$QPCPP/source/qf_qmact.cpp \
+    $$QPCPP/source/qf_time.cpp
+
+INCLUDEPATH += $$QPCPP/source
+
+
+CONFIG(debug, debug|release) {
+
+    # NOTE:
+    # To include Q-SPY software tracing in the Debug configuration,
+    # please un-comment the following lines of code.
+
+#    DEFINES += Q_SPY
+
+    # QS software tracing sources
+#    SOURCES += \
+#        $$QPCPP/source/qs.cpp \
+#        $$QPCPP/source/qs_rx.cpp \
+#        $$QPCPP/source/qs_fp.cpp \
+#        $$QPCPP/source/qs_64bit.cpp
+
+#    HEADERS += $$QPCPP/ports/qt/qs_port.h
+
+    # NOTE:
+    # The "qspy.c" component is needed only when you perform the formatted
+    # output directly in the Target. The following declarations assume that
+    # the Qtools collection is installed and that the QTOOLS environment
+    # variable is set to point to this Qtools installation directory.
+
+#    INCLUDEPATH += $(QTOOLS)/qspy/include
+#    SOURCES += $(QTOOLS)/qspy/source/qspy.c
+
+} else {
+    # Release build configuartion
+    DEFINES += NDEBUG
+}
+

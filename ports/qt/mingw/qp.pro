@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QP/C++ port to Qt5
-# Last Updated for Version: QP/C++ 5.4.0/Qt 5.x
-# Date of the Last Update:  2015-05-03
+# Last Updated for Version: QP/C++ 5.5.0/Qt 5.x
+# Date of the Last Update:  2015-09-26
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,9 +28,20 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# Web:   www.state-machine.com
-# Email: info@state-machine.com
+# http://www.state-machine.com
+# mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
+
+# NOTE:
+# This project builds QP/C++ library (for Qt5). This libary is needed
+# only in projects that link this library. (The example projects in
+# the qpcpp/examples/qt/ directory build QP/C++ from sources and actually
+# don't need the QP/C++ library).
+
+# NOTE:
+# After you build the QP/C++ library (libqp.a), you should copy the Debug
+# version to the debug/ sub-directory and the Release version to the
+# release/ sub-directory.
 
 QT      += core gui widgets
 TARGET   = qp
@@ -38,9 +49,11 @@ TEMPLATE = lib
 CONFIG  += staticlib
 DEFINES += QT_NO_STATEMACHINE
 
+QPCPP = ../../..
+
 INCLUDEPATH += .. \
-    ../../../include \
-    ../../../source
+    $$QPCPP/include \
+    $$QPCPP/source
 
 HEADERS +=  \
     ../qep_port.h \
@@ -55,26 +68,37 @@ SOURCES += \
     ../qf_port.cpp \
     ../guiapp.cpp \
     ../pixellabel.cpp \
-    ../../../source/qep_hsm.cpp \
-    ../../../source/qep_msm.cpp \
-    ../../../source/qf_act.cpp \
-    ../../../source/qf_actq.cpp \
-    ../../../source/qf_defer.cpp \
-    ../../../source/qf_dyn.cpp \
-    ../../../source/qf_mem.cpp \
-    ../../../source/qf_ps.cpp \
-    ../../../source/qf_qact.cpp \
-    ../../../source/qf_qeq.cpp \
-    ../../../source/qf_qmact.cpp \
-    ../../../source/qf_time.cpp
+    $$QPCPP/source/qep_hsm.cpp \
+    $$QPCPP/source/qep_msm.cpp \
+    $$QPCPP/source/qf_act.cpp \
+    $$QPCPP/source/qf_actq.cpp \
+    $$QPCPP/source/qf_defer.cpp \
+    $$QPCPP/source/qf_dyn.cpp \
+    $$QPCPP/source/qf_mem.cpp \
+    $$QPCPP/source/qf_ps.cpp \
+    $$QPCPP/source/qf_qact.cpp \
+    $$QPCPP/source/qf_qeq.cpp \
+    $$QPCPP/source/qf_qmact.cpp \
+    $$QPCPP/source/qf_time.cpp
+
 
 CONFIG(debug, debug|release) {
+
+    # NOTE:
+    # The Debug configuration also uses Q-SPY software tracing.
+    # The following defines, headers, and sources are needed only for
+    # the QS target-resident component.
+
     DEFINES += Q_SPY
 
     SOURCES += \
-        ../../../source/qs.cpp \
-        ../../../source/qs_fp.cpp \
-        ../../../source/qs_64bit.cpp
+        $$QPCPP/source/qs.cpp \
+        $$QPCPP/source/qs_rx.cpp \
+        $$QPCPP/source/qs_fp.cpp \
+        $$QPCPP/source/qs_64bit.cpp
+
 } else {
+
+    # Release build configuartion
     DEFINES += NDEBUG
 }

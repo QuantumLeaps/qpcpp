@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: Simple Blinky example, POSIX
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last updated for version 5.5.0
+// Last updated on  2015-09-25
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,12 +28,12 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
-#include "blinky.h"
 #include "bsp.h"
+#include "blinky.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -101,9 +101,9 @@ void QP::QF_onClockTick(void) {
     }
 }
 //............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const file, int line) {
-    cout << "Assertion failed in " << file
-              << "line " << line << endl;
-    QF::onCleanup();
+extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
+    cout << "Assertion failed in " << module
+              << "location " << loc << endl;
+    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
     exit(-1);
 }

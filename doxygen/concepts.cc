@@ -1,12 +1,51 @@
 namespace QP {
 
-/*! @page design Design
+/*! @page concepts Concepts and Structure
 
 @tableofcontents
 
 @section oop Object-Orientation
 
-As most C++ frameworks, QP/C++ uses classes, inheritance, and polymorphism as the main mechanisms for customizing the framework into applications. The framewok is also layered and consists of components with well defined responsibilities.
+As most C++ frameworks, QP/C++ uses classes, inheritance, and polymorphism as the main mechanisms for customizing the framework into applications. The framework is also layered and consists of components with well defined responsibilities.
+
+
+------------------------------------------------------------------------------
+@section ao Active Objects
+
+<strong>Active Objects</strong> (a.k.a. actors) are encapsulated @ref sm "state machines" that run in their own thread of execution and process events asynchronously using an event-driven receive loop. They inherently support and automatically enforce the best practices of concurrent programming, such as: keeping the thread's data local and bound to the thread itself, asynchronous inter-thread communication without blocking, and using state machines instead of convoluted `IF-ELSE` logic (a.k.a. "spaghetti" code). In contrast, raw RTOS-based threading lets you do anything and offers no help or automation for the best practices.
+
+@htmlonly
+<div class="image">
+<a target="_blank" href="http://www.state-machine.com/doc/AN_Active_Objects_for_Embedded.pdf"><img border="0" src="img/AN_Active_Objects_for_Embedded.jpg" title="Download PDF"></a>
+<div class="caption">
+Application Note: Active Objects for Embedded Systems
+</div>
+</div>
+@endhtmlonly
+
+The Quantum Leaps Application Note <a class="extern" target="_blank" href="http://www.state-machine.com/doc/AN_Active_Objects_for_Embedded.pdf"><strong>Active Objects for Embedded Systems</strong></a> describes the Active Object design pattern in the context of real-time embedded systems.
+<div class="clear"></div>
+
+
+------------------------------------------------------------------------------
+@section sm State Machines
+
+The behavior of each active object in QP/C++ is specified by means of a **hierarchical state machine** (UML statechart), which is the most effective and elegant technique of decomposing event-driven behavior. The most important innovation of UML state machines over classical finite state machines (FSMs) is the hierarchical state nesting. The value of state nesting lies in avoiding repetitions, which are inevitable in the traditional "flat" FSM formalism and are the main reason for the "state-transition explosion" in FSMs. The semantics of state nesting allow substates to define only the differences of behavior from the superstates, thus promoting sharing and reusing behavior.
+
+@htmlonly
+<div class="image">
+<a target="_blank" href="http://www.state-machine.com/doc/AN_Crash_Course_in_UML_State_Machines.pdf"><img border="0" src="img/AN_Crash_Course_in_UML_State_Machines.jpg" title="Download PDF"></a>
+<div class="caption">
+Application Note: A Crash Course in UML State Machines
+</div>
+</div>
+@endhtmlonly
+
+The Quantum Leaps Application Note <a class="extern" target="_blank" href="http://www.state-machine.com/doc/AN_Crash_Course_in_UML_State_Machines.pdf"><strong>A Crash Course in UML State Machines</strong></a> introduces the main state machine concepts backed up by examples.
+<div class="clear"></div>
+
+@note
+The hallmark of the QP/C++ implementation of UML state machines is **traceability**, which is direct, precise, and unambiguous mapping of every state machine element to human-readable, portable, MISRA-compliant C++ code. Preserving the traceability from requirements through design to code is essential for mission-critical systems, such as medical devices or avionic systems.
 
 
 ------------------------------------------------------------------------------
