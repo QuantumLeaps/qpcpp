@@ -2,6 +2,12 @@ namespace QP {
 
 /** @page history Revision History
 
+@section qpcpp_5_5_1 Version 5.5.1, 2015-10-05
+
+The purpose of this release is to improve the AAPCS compliance of the ARM Cortex-M port to the QK preemptive kernel. Specifically, the PendSV handler in assembly did not always maintain the 8-byte stack alignment, which is required by AAPCS. This version corrects the stack misalignment in the qk_port.s files for all supported ARM compilers (ARM-Keil, GNU, and IAR). All these ports should also be ready for ARM Cortex-M7.
+
+
+------------------------------------------------------------------------------
 @section qpcpp_5_5_0 Version 5.5.0, 2015-09-28
 
 The main purpose of this release is the extension of the QS software

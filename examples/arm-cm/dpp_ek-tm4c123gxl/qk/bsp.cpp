@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, preemptive QK kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 5.5.1
+// Last updated on  2015-10-05
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -157,13 +157,13 @@ void GPIOPortA_IRQHandler(void) {
 }
 
 //............................................................................
+void UART0_IRQHandler(void); // prototype
 #ifdef Q_SPY
 // ISR for receiving bytes from the QSPY Back-End
 // NOTE: This ISR is "QF-unaware" meaning that it does not interact with
 // the QF/QK and is not disabled. Such ISRs don't need to call QK_ISR_ENTRY/
 // QK_ISR_EXIT and they cannot post or publish events.
 //
-void UART0_IRQHandler(void); // prototype
 void UART0_IRQHandler(void) {
     uint32_t status = UART0->RIS; // get the raw interrupt status
     UART0->ICR = status;          // clear the asserted interrupts
@@ -173,6 +173,8 @@ void UART0_IRQHandler(void) {
         QP::QS::rxPut(b);
     }
 }
+#else
+void UART0_IRQHandler(void) {}
 #endif // Q_SPY
 
 } // extern "C"
