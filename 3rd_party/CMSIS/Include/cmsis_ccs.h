@@ -37,40 +37,6 @@
 #ifndef CMSIS_CCS_H_
 #define CMSIS_CCS_H_
 
-//*****************************************************************************
-// CMSIS-compatible instruction calls
-//*****************************************************************************
-
-// No Operation
-__attribute__( ( always_inline ) ) static inline void __nop(void)
-{
-    __asm("  nop");
-}
-
-// Wait For Interrupt
-__attribute__( ( always_inline ) ) static inline void __wfi(void)
-{
-    __asm("  wfi");
-}
-
-// Wait For Event
-__attribute__( ( always_inline ) ) static inline void __wfe(void)
-{
-    __asm("  wfe");
-}
-
-// Enable Interrupts
-__attribute__( ( always_inline ) ) static inline void __enable_irq(void)
-{
-    __asm("  cpsie i");
-}
-
-// Disable Interrupts
-__attribute__( ( always_inline ) ) static inline void __disable_irq(void)
-{
-    __asm("  cpsid i");
-}
-
 // Data Synchronization Barrier
 __attribute__( ( always_inline ) ) static inline void __DSB(void)
 {

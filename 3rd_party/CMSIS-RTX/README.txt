@@ -1,5 +1,5 @@
 This folder contains the API, source, and libraries of
-CMSIS-RTOS RTX V4.78.
+CMSIS-RTOS RTX V4.79.
 
 The code in this folder has been taken from the CMSIS distribution:
 
