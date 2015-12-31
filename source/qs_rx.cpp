@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-24
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -193,7 +193,7 @@ static uint8_t const l_QS_RX = static_cast<uint8_t>(0);
 /// QS_RX_DATA_ERROR trace record.
 ///
 void QS::rxInitBuf(uint8_t sto[], uint16_t const stoSize) {
-    static char_t const Q_ROM s_rxObjDic[] = "QS_RX";
+    static char_t const s_rxObjDic[] = "QS_RX";
     QS_CRIT_STAT_
 
     rxPriv_.buf   = &sto[0];
@@ -209,7 +209,7 @@ void QS::rxInitBuf(uint8_t sto[], uint16_t const stoSize) {
     QS_CRIT_ENTRY_();
     beginRec(static_cast<uint_fast8_t>(QS_OBJ_DICT));
     QS_OBJ_(&l_QS_RX);
-    QS_STR_ROM_(&s_rxObjDic[0]);
+    QS_STR_(&s_rxObjDic[0]);
     endRec();
     QS_CRIT_EXIT_();
 }

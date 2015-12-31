@@ -1,18 +1,18 @@
-#include "qep.h"      // QEP public interface
-#include "qcalc.h"    // QCalc HSM derived from QHsm
+#include "qep.h"    // QEP public interface
+#include "calc.h"   // Calc HSM derived from QHsm
 
-static QCalc l_qcalc; // an instance of QCalc HSM
+static Calc l_calc; // an instance of Calc HSM
 
 int main() {
 
-    l_qcalc.init();   // trigger initial transition
+    l_calc.init();   // trigger initial transition
 
-    for (;;) {        // event loop
+    for (;;) {       // event loop
         QEvt e;
         . . .
         // wait for the next event and assign it to the event object e
         . . .
-        l_qcalc.dispatch(&e); // dispatch the event
+        l_calc.dispatch(&e); // dispatch the event
     }
     return 0;
 }

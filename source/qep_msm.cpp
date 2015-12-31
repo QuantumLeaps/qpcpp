@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-04
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -57,7 +57,7 @@ Q_DEFINE_THIS_MODULE("qep_msm")
 
 
 //****************************************************************************
-char_t const Q_ROM versionStr[6] = QP_VERSION_STR;
+char_t const versionStr[6] = QP_VERSION_STR;
 
 //****************************************************************************
 QMState const QMsm::msm_top_s = {

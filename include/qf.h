@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-23
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -257,6 +257,11 @@ public:
 
     friend class QF;
     friend class QTimeEvt;
+    friend class QMutex;
+    friend class QXK;
+    friend class QXThread;
+    friend class QXMutex;
+    friend class QXSemaphore;
 };
 
 //****************************************************************************
@@ -430,6 +435,7 @@ private:
     QTimeEvt *toTimeEvt(void) { return static_cast<QTimeEvt *>(m_act); }
 
     friend class QF;
+    friend class QXThread;
 };
 
 
@@ -476,7 +482,7 @@ class QF {
 public:
 
     //! get the current QF version number string of the form X.Y.Z
-    static char_t const Q_ROM *getVersion(void) {
+    static char_t const *getVersion(void) {
         return versionStr;
     }
 
@@ -568,6 +574,7 @@ private:
 
     friend class QMActive;
     friend class QTimeEvt;
+    friend class QXThread;
 };
 
 } // namespace QP

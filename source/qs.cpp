@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-25
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -46,8 +46,8 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qs")
 
 //****************************************************************************
-extern char_t const Q_ROM BUILD_DATE[12];
-extern char_t const Q_ROM BUILD_TIME[9];
+extern char_t const BUILD_DATE[12];
+extern char_t const BUILD_TIME[9];
 
 QS QS::priv_; // QS private data
 
@@ -284,51 +284,51 @@ void QS_target_info_(uint8_t const isReset) {
         // send the build time in three bytes (sec, min, hour)...
         QS_U8_(static_cast<uint8_t>(
                    static_cast<uint8_t>(10)
-                   *(static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[6]))
+                   *(static_cast<uint8_t>(BUILD_TIME[6])
                          - static_cast<uint8_t>('0')))
-                + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[7]))
+                + (static_cast<uint8_t>(BUILD_TIME[7])
                          - static_cast<uint8_t>('0')));
         QS_U8_(static_cast<uint8_t>(
                    static_cast<uint8_t>(10)
-                   *(static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[3]))
+                   *(static_cast<uint8_t>(BUILD_TIME[3])
                          - static_cast<uint8_t>('0')))
-                + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[4]))
+                + (static_cast<uint8_t>(BUILD_TIME[4])
                          - static_cast<uint8_t>('0')));
-        if (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[0]))
+        if (static_cast<uint8_t>(BUILD_TIME[0])
             == static_cast<uint8_t>(' '))
         {
-            QS_U8_(static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[1]))
+            QS_U8_(static_cast<uint8_t>(BUILD_TIME[1])
                    - static_cast<uint8_t>('0'));
         }
         else {
             QS_U8_(static_cast<uint8_t>(
                 static_cast<uint8_t>(10)*(
-                    static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[0]))
+                    static_cast<uint8_t>(BUILD_TIME[0])
                         - static_cast<uint8_t>('0')))
-                    + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_TIME[1]))
+                    + (static_cast<uint8_t>(BUILD_TIME[1])
                         - static_cast<uint8_t>('0')));
         }
 
         // send the build date in three bytes (day, month, year) ...
-        if (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[4]))
+        if (static_cast<uint8_t>(BUILD_DATE[4])
             == static_cast<uint8_t>(' '))
         {
-            QS_U8_(static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[5]))
+            QS_U8_(static_cast<uint8_t>(BUILD_DATE[5])
                    - static_cast<uint8_t>('0'));
         }
         else {
             QS_U8_(static_cast<uint8_t>(
                        static_cast<uint8_t>(10)*(
-                           static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[4]))
+                           static_cast<uint8_t>(BUILD_DATE[4])
                                - static_cast<uint8_t>('0')))
-                       + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[5]))
+                       + (static_cast<uint8_t>(BUILD_DATE[5])
                                - static_cast<uint8_t>('0')));
         }
         // convert the 3-letter month to a number 1-12 ...
         uint8_t b;
-        switch (static_cast<int_t>(Q_ROM_BYTE(BUILD_DATE[0]))
-                + static_cast<int_t>(Q_ROM_BYTE(BUILD_DATE[1]))
-                + static_cast<int_t>(Q_ROM_BYTE(BUILD_DATE[2])))
+        switch (static_cast<int_t>(BUILD_DATE[0])
+                + static_cast<int_t>(BUILD_DATE[1])
+                + static_cast<int_t>(BUILD_DATE[2]))
         {
             case static_cast<int_t>('J')
                  + static_cast<int_t>('a')
@@ -397,9 +397,9 @@ void QS_target_info_(uint8_t const isReset) {
         QS_U8_(b); // store the month
         QS_U8_(static_cast<uint8_t>(
                    static_cast<uint8_t>(10)*(
-                       static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[9]))
+                       static_cast<uint8_t>(BUILD_DATE[9])
                            - static_cast<uint8_t>('0')))
-                   + (static_cast<uint8_t>(Q_ROM_BYTE(BUILD_DATE[10]))
+                   + (static_cast<uint8_t>(BUILD_DATE[10])
                            - static_cast<uint8_t>('0')));
     QS::endRec();
 }
@@ -580,33 +580,6 @@ void QS::str_(char_t const *s) {
 }
 
 //****************************************************************************
-/// @note This function is only to be used through macros, never in the
-/// client code directly.
-///
-void QS::str_ROM_(char_t const Q_ROM *s) {
-    uint8_t b = static_cast<uint8_t>(Q_ROM_BYTE(*s));
-    uint8_t chksum_ = priv_.chksum; // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;    // put in a temporary (register)
-    QSCtr   head_   = priv_.head;   // put in a temporary (register)
-    QSCtr   end_    = priv_.end;    // put in a temporary (register)
-    QSCtr   used_   = priv_.used;   // put in a temporary (register)
-
-    while (b != static_cast<uint8_t>(0)) {
-        chksum_ += b;               // update checksum
-        QS_INSERT_BYTE(b)           // ASCII characters don't need escaping
-        QS_PTR_INC_(s);
-        b = static_cast<uint8_t>(Q_ROM_BYTE(*s));
-        ++used_;
-    }
-    QS_INSERT_BYTE(static_cast<uint8_t>(0)) // zero-terminate the string
-    ++used_;
-
-    priv_.head   = head_;    // save the head
-    priv_.chksum = chksum_;  // save the checksum
-    priv_.used   = used_;    // save # of used buffer space
-}
-
-//****************************************************************************
 /// @description
 /// This function delivers one byte at a time from the QS data buffer.
 ///
@@ -698,7 +671,7 @@ uint8_t const *QS::getBlock(uint16_t * const pNbytes) {
 /// @note This function is only to be used through macro QS_SIG_DICTIONARY()
 ///
 void QS::sig_dict(enum_t const sig, void const * const obj,
-                  char_t const Q_ROM *name)
+                  char_t const *name)
 {
     QS_CRIT_STAT_
 
@@ -709,7 +682,7 @@ void QS::sig_dict(enum_t const sig, void const * const obj,
     beginRec(static_cast<uint_fast8_t>(QS_SIG_DICT));
     QS_SIG_(static_cast<QSignal>(sig));
     QS_OBJ_(obj);
-    QS_STR_ROM_(name);
+    QS_STR_(name);
     endRec();
     QS_CRIT_EXIT_();
     onFlush();
@@ -719,7 +692,7 @@ void QS::sig_dict(enum_t const sig, void const * const obj,
 /// @note This function is only to be used through macro QS_OBJ_DICTIONARY()
 ///
 void QS::obj_dict(void const * const obj,
-                  char_t const Q_ROM *name)
+                  char_t const *name)
 {
     QS_CRIT_STAT_
 
@@ -729,7 +702,7 @@ void QS::obj_dict(void const * const obj,
     QS_CRIT_ENTRY_();
     beginRec(static_cast<uint_fast8_t>(QS_OBJ_DICT));
     QS_OBJ_(obj);
-    QS_STR_ROM_(name);
+    QS_STR_(name);
     endRec();
     QS_CRIT_EXIT_();
     onFlush();
@@ -738,7 +711,7 @@ void QS::obj_dict(void const * const obj,
 //****************************************************************************
 /// @note This function is only to be used through macro QS_FUN_DICTIONARY()
 ///
-void QS::fun_dict(void (* const fun)(void), char_t const Q_ROM *name) {
+void QS::fun_dict(void (* const fun)(void), char_t const *name) {
     QS_CRIT_STAT_
 
     if (*name == static_cast<char_t>('&')) {
@@ -747,7 +720,7 @@ void QS::fun_dict(void (* const fun)(void), char_t const Q_ROM *name) {
     QS_CRIT_ENTRY_();
     beginRec(static_cast<uint_fast8_t>(QS_FUN_DICT));
     QS_FUN_(fun);
-    QS_STR_ROM_(name);
+    QS_STR_(name);
     endRec();
     QS_CRIT_EXIT_();
     onFlush();
@@ -757,13 +730,13 @@ void QS::fun_dict(void (* const fun)(void), char_t const Q_ROM *name) {
 /// @note This function is only to be used through macro QS_USR_DICTIONARY()
 ///
 void QS::usr_dict(enum_t const rec,
-                  char_t const Q_ROM * const name)
+                  char_t const * const name)
 {
     QS_CRIT_STAT_
     QS_CRIT_ENTRY_();
     beginRec(static_cast<uint_fast8_t>(QS_USR_DICT));
     QS_U8_(static_cast<uint8_t>(rec));
-    QS_STR_ROM_(name);
+    QS_STR_(name);
     endRec();
     QS_CRIT_EXIT_();
     onFlush();
@@ -820,37 +793,6 @@ void QS::str(char_t const *s) {
         QS_INSERT_BYTE(b)
         QS_PTR_INC_(s);
         b = static_cast<uint8_t>(*s);
-        ++used_;
-    }
-    QS_INSERT_BYTE(static_cast<uint8_t>(0)) // zero-terminate the string
-
-    priv_.head   = head_;   // save the head
-    priv_.chksum = chksum_; // save the checksum
-    priv_.used   = used_;   // save # of used buffer space
-}
-
-//****************************************************************************
-/// @note This function is only to be used through macros, never in the
-/// client code directly.
-///
-void QS::str_ROM(char_t const Q_ROM *s) {
-    uint8_t b       = static_cast<uint8_t>(Q_ROM_BYTE(*s));
-    uint8_t chksum_ = static_cast<uint8_t>(
-                          priv_.chksum + static_cast<uint8_t>(STR_T));
-    uint8_t *buf_   = priv_.buf;  // put in a temporary (register)
-    QSCtr   head_   = priv_.head; // put in a temporary (register)
-    QSCtr   end_    = priv_.end;  // put in a temporary (register)
-    QSCtr   used_   = priv_.used; // put in a temporary (register)
-
-    used_ += static_cast<QSCtr>(2); // the format byte and the terminating-0
-
-    QS_INSERT_BYTE(static_cast<uint8_t>(STR_T))
-    while (b != static_cast<uint8_t>(0)) {
-        // ASCII characters don't need escaping
-        chksum_ += b;     // update checksum
-        QS_INSERT_BYTE(b)
-        QS_PTR_INC_(s);
-        b = static_cast<uint8_t>(Q_ROM_BYTE(*s));
         ++used_;
     }
     QS_INSERT_BYTE(static_cast<uint8_t>(0)) // zero-terminate the string

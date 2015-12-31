@@ -59,4 +59,12 @@ extern QP::QMActive * const AO_Table;
 
 } // namespace DPP
 
+#ifdef qxk_h
+namespace DPP {
+
+extern QP::QXThread * const XT_Test;
+
+} // namespace DPP
+#endif // qxk_h
+
 #endif // dpp_h

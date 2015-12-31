@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-03-14
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -55,13 +55,13 @@ namespace QP {
     /// @n
     /// If the macro is not defined in the port, the default implementation
     /// uses a lookup table.
-    #define QF_LOG2(n_) (Q_ROM_BYTE(QF_log2Lkup[(n_)]))
+    #define QF_LOG2(n_) (QF_log2Lkup[(n_)])
 
     //! Lookup table for (log2(n) + 1), where n is the index into the table.
     /// @description
     /// This lookup delivers the 1-based number of the most significant 1-bit
     /// of a byte.
-    extern uint8_t const Q_ROM QF_log2Lkup[256];
+    extern uint8_t const QF_log2Lkup[256];
 
     #define QF_LOG2LKUP 1
 #endif  // QF_LOG2
@@ -69,17 +69,17 @@ namespace QP {
 //! Lookup table for (1 << ((n-1) % 8)), where n is the index into the table.
 /// @note Index range n = 0..64. The first index (n == 0) should never
 /// be used.
-extern uint8_t const Q_ROM QF_pwr2Lkup[65];
+extern uint8_t const QF_pwr2Lkup[65];
 
 //! Lookup table for ~(1 << ((n-1) % 8)), where n is the index into the table.
 /// @note
 /// Index range n = 0..64. The first index (n == 0) should never be used.
-extern uint8_t const Q_ROM QF_invPwr2Lkup[65];
+extern uint8_t const QF_invPwr2Lkup[65];
 
 //! Lookup table for (n-1)/8
 /// @note
 /// Index range n = 0..64. The first index (n == 0) should never be used.
-extern uint8_t const Q_ROM QF_div8Lkup[65];
+extern uint8_t const QF_div8Lkup[65];
 
 //****************************************************************************
 //! Priority Set of up to 8 elements for building various schedulers,
@@ -109,18 +109,18 @@ public:
     //! the function evaluates to TRUE if the priority set has the element n.
     bool hasElement(uint_fast8_t const n) const {
         return
-            ((m_bits & static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_pwr2Lkup[n])))
+            ((m_bits & static_cast<uint_fast8_t>(QF_pwr2Lkup[n]))
              != static_cast<uint_fast8_t>(0));
     }
 
     //! insert element @p n into the set, n = 1..8
     void insert(uint_fast8_t const n) {
-        m_bits |= static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_pwr2Lkup[n]));
+        m_bits |= static_cast<uint_fast8_t>(QF_pwr2Lkup[n]);
     }
 
     //! remove element @p n from the set, n = 1..8
     void remove(uint_fast8_t const n) {
-        m_bits &= static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_invPwr2Lkup[n]));
+        m_bits &= static_cast<uint_fast8_t>(QF_invPwr2Lkup[n]);
     }
 
     //! find the maximum element in the set, returns zero if the set is empty
@@ -185,30 +185,30 @@ public:
     //! the function evaluates to TRUE if the priority set has the element n.
     bool hasElement(uint_fast8_t const n) const {
         uint_fast8_t const m =
-            static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_div8Lkup[n]));
+            static_cast<uint_fast8_t>(QF_div8Lkup[n]);
         return ((m_bits[m]
-                  & static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_pwr2Lkup[n])))
+                  & static_cast<uint_fast8_t>(QF_pwr2Lkup[n]))
                != static_cast<uint_fast8_t>(0));
     }
 
     //! insert element @p n into the set, n = 1..64
     void insert(uint_fast8_t const n) {
         uint_fast8_t m =
-            static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_div8Lkup[n]));
-        m_bits[m] |= static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_pwr2Lkup[n]));
+            static_cast<uint_fast8_t>(QF_div8Lkup[n]);
+        m_bits[m] |= static_cast<uint_fast8_t>(QF_pwr2Lkup[n]);
         m_bytes   |=
-            static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_pwr2Lkup[m
-                                          + static_cast<uint_fast8_t>(1)]));
+            static_cast<uint_fast8_t>(QF_pwr2Lkup[m
+                                          + static_cast<uint_fast8_t>(1)]);
     }
 
     //! remove element @p n from the set, n = 1..64
     void remove(uint_fast8_t const n) {
         uint_fast8_t m =
-            static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_div8Lkup[n]));
-        m_bits[m] &= static_cast<uint_fast8_t>(Q_ROM_BYTE(QF_invPwr2Lkup[n]));
+            static_cast<uint_fast8_t>(QF_div8Lkup[n]);
+        m_bits[m] &= static_cast<uint_fast8_t>(QF_invPwr2Lkup[n]);
         if (m_bits[m] == static_cast<uint_fast8_t>(0)) {
             m_bytes   &= static_cast<uint_fast8_t>(
-               Q_ROM_BYTE(QF_invPwr2Lkup[m + static_cast<uint_fast8_t>(1)]));
+               QF_invPwr2Lkup[m + static_cast<uint_fast8_t>(1)]);
         }
     }
 

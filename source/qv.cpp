@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-24
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-30
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -45,6 +45,11 @@
 #else
     #include "qs_dummy.h" // disable the QS software tracing
 #endif // Q_SPY
+
+// protection against including this source file in a wrong project
+#ifndef qv_h
+    #error "Source file included in a project NOT based on the QV kernel"
+#endif // qv_h
 
 namespace QP {
 

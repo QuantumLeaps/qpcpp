@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -153,7 +153,7 @@ void QF::bzero(void * const start, uint_fast16_t len) {
 }
 
 // power-of-two lookup tables ************************************************
-uint8_t const Q_ROM QF_pwr2Lkup[65] = {
+uint8_t const QF_pwr2Lkup[65] = {
     static_cast<uint8_t>(0x00), // unused location
     static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
     static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
@@ -189,7 +189,7 @@ uint8_t const Q_ROM QF_pwr2Lkup[65] = {
     static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80)
 };
 
-uint8_t const Q_ROM QF_invPwr2Lkup[65] = {
+uint8_t const QF_invPwr2Lkup[65] = {
     static_cast<uint8_t>(0xFF), // unused location
     static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
     static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
@@ -225,7 +225,7 @@ uint8_t const Q_ROM QF_invPwr2Lkup[65] = {
     static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F)
 };
 
-uint8_t const Q_ROM QF_div8Lkup[65] = {
+uint8_t const QF_div8Lkup[65] = {
     static_cast<uint8_t>(0), // unused location
     static_cast<uint8_t>(0), static_cast<uint8_t>(0), static_cast<uint8_t>(0),
     static_cast<uint8_t>(0), static_cast<uint8_t>(0), static_cast<uint8_t>(0),
@@ -256,7 +256,7 @@ uint8_t const Q_ROM QF_div8Lkup[65] = {
 /* log-base-2 lookup table **************************************************/
 #ifdef QF_LOG2LKUP
 
-uint8_t const Q_ROM QF_log2Lkup[256] = {
+uint8_t const QF_log2Lkup[256] = {
     static_cast<uint8_t>(0),
     static_cast<uint8_t>(1),
     static_cast<uint8_t>(2), static_cast<uint8_t>(2),

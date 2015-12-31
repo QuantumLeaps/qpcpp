@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QHsmTst Example, POSIX
-// Last updated for version 5.4.0
-// Last updated on  2015-04-29
+// Last updated for version 5.6.0
+// Last updated on  2015-12-26
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -128,7 +128,7 @@ extern "C" int main(int argc, char *argv[ ]) {
     return 0;
 }
 //............................................................................
-extern "C" void Q_onAssert(char_t const Q_ROM * const file, int_t line) {
+extern "C" void Q_onAssert(char_t const * const file, int_t line) {
     fprintf(stderr, "Assertion failed in %s, line %d", file, line);
     exit(-1);
 }

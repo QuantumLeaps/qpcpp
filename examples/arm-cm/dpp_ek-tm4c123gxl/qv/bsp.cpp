@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, cooperative QV kernel
-// Last updated for version 5.5.1
-// Last updated on  2015-10-05
+// Last updated for version 5.6.0
+// Last updated on  2015-12-26
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -75,7 +75,7 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 #define BTN_SW1     (1U << 4)
 #define BTN_SW2     (1U << 0)
 
-static uint32_t l_rnd;  // random seed
+static uint32_t l_rnd; // random seed
 
 #ifdef Q_SPY
 
@@ -172,7 +172,7 @@ void UART0_IRQHandler(void) {}
 } // extern "C"
 
 // BSP functions =============================================================
-void BSP_init(void) {
+void BSP::init(void) {
     // NOTE: SystemInit() already called from the startup code
     //  but SystemCoreClock needs to be updated
     //
@@ -218,7 +218,7 @@ void BSP_init(void) {
     ROM_GPIOPadConfigSet(GPIOF_BASE, (BTN_SW1 | BTN_SW2),
                          GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
-    BSP_randomSeed(1234U);
+    BSP::randomSeed(1234U);
 
     if (!QS_INIT((void *)0)) { // initialize the QS software tracing
         Q_ERROR();
@@ -229,7 +229,7 @@ void BSP_init(void) {
     QS_USR_DICTIONARY(COMMAND_STAT);
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     GPIOF->DATA_Bits[LED_RED]   = ((stat[0] == 'h') ? 0xFFU : 0U);
     GPIOF->DATA_Bits[LED_GREEN] = ((stat[0] == 'e') ? 0xFFU : 0U);
 
@@ -239,11 +239,11 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     GPIOF->DATA_Bits[LED_RED] = ((paused != 0U) ? 0xFFU : 0U);
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     // The flating point code is to exercise the FPU
     float volatile x = 3.1415926F;
     x = x + 2.7182818F;
@@ -251,16 +251,25 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
-    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
+    l_rnd = rnd; // set for the next time
 
-    return l_rnd >> 8;
+    return (rnd >> 8);
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::ledOn(void) {
+    GPIOF->DATA_Bits[LED_RED] = 0xFFU;
+}
+//............................................................................
+void BSP::ledOff(void) {
+    GPIOF->DATA_Bits[LED_RED] = 0x00U;
+}
+//............................................................................
+void BSP::terminate(int16_t result) {
     (void)result;
 }
 
@@ -272,8 +281,8 @@ namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / DPP::BSP_TICKS_PER_SEC);
+    // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
+    SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
 
     // assing all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
@@ -386,7 +395,7 @@ bool QS::onStartup(void const *arg) {
     UART0->IFLS |= (0x2U << 2);    // interrupt on RX FIFO half-full
     // NOTE: do not enable the UART0 interrupt yet. Wait till QF_onStartup()
 
-    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP_TICKS_PER_SEC;
+    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...

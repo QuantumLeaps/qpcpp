@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example with Win32-GUI
-// Last updated for version 5.5.0
-// Last updated on  2015-09-25
+// Last updated for version 5.6.0
+// Last updated on  2015-12-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -149,7 +149,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
         }
 
         case WM_DESTROY: {
-            BSP_terminate(0);
+            BSP::terminate(0);
             return 0;
         }
 
@@ -161,7 +161,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
                 case IDCANCEL: {
                     //QP::QF::PUBLISH(Q_NEW(QP::QEvt, TERMINATE_SIG),
                     //                static_cast<void *>(0));
-                    BSP_terminate(0);
+                    BSP::terminate(0);
                     break;
                 }
             }
@@ -208,7 +208,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
     return DefWindowProc(hWnd, iMsg, wParam, lParam) ;
 }
 //............................................................................
-void BSP_init(void) {
+void BSP::init(void) {
     if (!QS_INIT(l_cmdLine)) { // QS initialization failed?
         MessageBox(l_hWnd,
                    "Cannot connect to QSPY via TCP/IP\n"
@@ -221,7 +221,7 @@ void BSP_init(void) {
     QS_USR_DICTIONARY(COMMAND_STAT);
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
 #ifdef Q_SPY
     if (l_sock != INVALID_SOCKET) {
         closesocket(l_sock);
@@ -232,7 +232,7 @@ void BSP_terminate(int16_t result) {
     PostQuitMessage(result);
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     UINT bitmapNum = 0;
 
     Q_REQUIRE(n < N_PHILO);
@@ -252,14 +252,14 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     char buf[16];
     LoadString(l_hInst,
         (paused != 0U) ? IDS_PAUSED : IDS_RUNNING, buf, Q_DIM(buf));
     SetDlgItemText(l_hWnd, IDC_PAUSED, buf);
 }
 //............................................................................
-uint32_t BSP_random(void) {  // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) {  // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
@@ -267,7 +267,7 @@ uint32_t BSP_random(void) {  // a very cheap pseudo-random-number generator
     return l_rnd >> 8;
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 
@@ -279,7 +279,7 @@ namespace QP {
 
 //............................................................................
 void QF::onStartup(void) {
-    QF_setTickRate(DPP::BSP_TICKS_PER_SEC); // set the desired tick rate
+    QF_setTickRate(DPP::BSP::TICKS_PER_SEC); // set the desired tick rate
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -289,7 +289,7 @@ void QF_onClockTick(void) {
     QF::TICK(&DPP::l_clock_tick); // perform the QF clock tick processing
 }
 //............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
+extern "C" void Q_onAssert(char const * const module, int loc) {
     QF::stop();  // stop ticking
     QS_ASSERTION(module, loc, 10000U); // report assertion to QS
 
@@ -298,7 +298,7 @@ extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
                "Assertion failed in module %s location %d", module, loc);
     MessageBox(DPP::l_hWnd, message, "!!! ASSERTION !!!",
                MB_OK | MB_ICONEXCLAMATION | MB_APPLMODAL);
-    DPP::BSP_terminate(-1); // terminate the app
+    DPP::BSP::terminate(-1); // terminate the app
 }
 
 //----------------------------------------------------------------------------

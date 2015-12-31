@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QK kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 5.6.0
+// Last updated on  2015-12-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -70,7 +70,8 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 // Button pins available on the board (just one user Button B1 on PC.13)
 #define BTN_B1   (1U << 13)
 
-static unsigned  l_rnd;  // random seed
+static unsigned  l_rnd; // random seed
+static QP::QMutex l_rndMutex; // to protect the random number generator
 
 #ifdef Q_SPY
 
@@ -150,7 +151,7 @@ void EXTI0_1_IRQHandler(void) {
 } // extern "C"
 
 // BSP functions =============================================================
-void BSP_init(void) {
+void BSP::init(void) {
     // NOTE: SystemInit() already called from the startup code
     //  but SystemCoreClock needs to be updated
     //
@@ -176,7 +177,7 @@ void BSP_init(void) {
     GPIOC->OSPEEDR |=  (1U << 2*13);
     GPIOC->PUPDR   &= ~(3U << 2*13);
 
-    BSP_randomSeed(1234U);
+    BSP::randomSeed(1234U);
 
     if (QS_INIT((void *)0) == 0U) { // initialize the QS software tracing
         Q_ERROR();
@@ -186,7 +187,7 @@ void BSP_init(void) {
     QS_USR_DICTIONARY(PHILO_STAT);
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'h') {
         GPIOA->BSRR |= LED_LD2;  // turn LED on
     }
@@ -200,7 +201,7 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     // not enough LEDs to implement this feature
     if (paused != (uint8_t)0) {
         //GPIOA->BSRR |= (LED_LD2);  // turn LED[n] on
@@ -210,20 +211,24 @@ void BSP_displayPaused(uint8_t paused) {
     }
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
+    l_rndMutex.lock(); // lock the shared random seed
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
-    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
+    l_rnd = rnd; // set for the next time
+    l_rndMutex.unlock(); // unlock the shared random seed
 
-    return l_rnd >> 8;
+    return (rnd >> 8);
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
+    l_rndMutex.init(N_PHILO + 1U);
     l_rnd = seed;
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
 }
 
@@ -235,8 +240,8 @@ namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / DPP::BSP_TICKS_PER_SEC);
+    // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
+    SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
 
     // set priorities of ALL ISRs used in the system, see NOTE00
     //
@@ -338,7 +343,7 @@ bool QS::onStartup(void const *arg) {
                     (0ul << 28) |  // 8 data bits
                     (1ul <<  0) ); // enable USART
 
-    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP_TICKS_PER_SEC;
+    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...

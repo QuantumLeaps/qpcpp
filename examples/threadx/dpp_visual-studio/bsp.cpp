@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example for ThreadX
-// Last Updated for Version: 5.5.0
-// Date of the Last Update:  2015-09-25
+// Last Updated for Version: 5.6.0
+// Date of the Last Update:  2015-12-26
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -152,7 +152,7 @@ void QP::QF::onCleanup(void) {
     exit(0);
 }
 //............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
+extern "C" void Q_onAssert(char const * const module, int loc) {
     QS_ASSERTION(module, loc, 10000U); // report assertion to QS
     fprintf(stderr, "Assertion failed in %s, location %d", module, loc);
     QP::QF::stop();

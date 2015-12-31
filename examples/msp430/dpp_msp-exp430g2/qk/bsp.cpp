@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example on MSP-EXP430G2 board, preemptive QK kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 5.6.0
+// Last updated on  2015-12-26
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -191,7 +191,7 @@ void BSP_terminate(int16_t result) {
 } // namespace DPP
 
 //............................................................................
-extern "C" void Q_onAssert(char const Q_ROM *module, int loc) {
+extern "C" void Q_onAssert(char const *module, int loc) {
     // implement the error-handling policy for your application!!!
     QF_INT_DISABLE(); // disable all interrupts
     QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));

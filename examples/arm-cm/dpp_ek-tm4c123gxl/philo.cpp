@@ -56,14 +56,14 @@ static Philo l_philo[N_PHILO];   // storage for all Philos
 
 // helper function to provide a randomized think time for Philos
 inline QP::QTimeEvtCtr think_time() {
-    return static_cast<QP::QTimeEvtCtr>((BSP_random() % BSP_TICKS_PER_SEC)
-                                        + (BSP_TICKS_PER_SEC/2U));
+    return static_cast<QP::QTimeEvtCtr>((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + (BSP::TICKS_PER_SEC/2U));
 }
 
 // helper function to provide a randomized eat time for Philos
 inline QP::QTimeEvtCtr eat_time() {
-    return static_cast<QP::QTimeEvtCtr>((BSP_random() % BSP_TICKS_PER_SEC)
-                                        + BSP_TICKS_PER_SEC);
+    return static_cast<QP::QTimeEvtCtr>((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + BSP::TICKS_PER_SEC);
 }
 
 // helper function to provide the ID of Philo "me"

@@ -2912,7 +2912,7 @@
       <name>$PROJ_DIR$\..\..\dpp.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\main.cpp</name>
+      <name>$PROJ_DIR$\..\main.cpp</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\philo.cpp</name>

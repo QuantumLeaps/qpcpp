@@ -155,7 +155,7 @@ me-&gt;subscribe(TERMINATE_SIG);
 for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     me-&gt;m_fork[n] = FREE;
     me-&gt;m_isHungry[n] = false;
-    BSP_displayPhilStat(n, THINKING);
+    BSP::displayPhilStat(n, THINKING);
 }</action>
      <initial_glyph conn="3,3,5,1,44,18,-9">
       <action box="0,-2,6,2"/>
@@ -163,7 +163,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     </initial>
     <state name="active">
      <tran trig="TERMINATE">
-      <action>BSP_terminate(0);</action>
+      <action>BSP::terminate(0);</action>
       <tran_glyph conn="2,11,3,-1,14">
        <action box="0,-2,11,4"/>
       </tran_glyph>
@@ -186,7 +186,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
         te-&gt;philoNum = n;
         QP::QF::PUBLISH(te, me);
         me-&gt;m_isHungry[n] = false;
-        BSP_displayPhilStat(n, EATING);
+        BSP::displayPhilStat(n, EATING);
     }
 }</entry>
       <tran trig="HUNGRY">
@@ -194,7 +194,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
 // phil ID must be in range and he must be not hungry
 Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!me-&gt;m_isHungry[n]));
 
-BSP_displayPhilStat(n, HUNGRY);
+BSP::displayPhilStat(n, HUNGRY);
 uint8_t m = LEFT(n);</action>
        <choice>
         <guard brief="both free">(me-&gt;m_fork[m] == FREE) &amp;&amp; (me-&gt;m_fork[n] == FREE)</guard>
@@ -203,7 +203,7 @@ me-&gt;m_fork[n] = USED;
 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
 pe-&gt;philoNum = n;
 QP::QF::PUBLISH(pe, me);
-BSP_displayPhilStat(n, EATING);</action>
+BSP::displayPhilStat(n, EATING);</action>
         <choice_glyph conn="19,26,5,-1,10">
          <action box="1,0,10,2"/>
         </choice_glyph>
@@ -224,7 +224,7 @@ BSP_displayPhilStat(n, EATING);</action>
 // phil ID must be in range and he must be not hungry
 Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!me-&gt;m_isHungry[n]));
 
-BSP_displayPhilStat(n, THINKING);
+BSP::displayPhilStat(n, THINKING);
 uint8_t m = LEFT(n);
 // both forks of Phil[n] must be used
 Q_ASSERT((me-&gt;m_fork[n] == USED) &amp;&amp; (me-&gt;m_fork[m] == USED));
@@ -240,7 +240,7 @@ if (me-&gt;m_isHungry[m] &amp;&amp; (me-&gt;m_fork[m] == FREE)) {
     TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
     pe-&gt;philoNum = m;
     QP::QF::PUBLISH(pe, me);
-    BSP_displayPhilStat(m, EATING);
+    BSP::displayPhilStat(m, EATING);
 }
 m = LEFT(n); // check the left neighbor
 n = LEFT(m); // left fork of the left neighbor
@@ -251,7 +251,7 @@ if (me-&gt;m_isHungry[m] &amp;&amp; (me-&gt;m_fork[n] == FREE)) {
     TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
     pe-&gt;philoNum = m;
     QP::QF::PUBLISH(pe, me);
-    BSP_displayPhilStat(m, EATING);
+    BSP::displayPhilStat(m, EATING);
 }</action>
        <tran_glyph conn="4,34,3,-1,15">
         <action box="0,-2,6,2"/>
@@ -273,8 +273,8 @@ if (me-&gt;m_isHungry[m] &amp;&amp; (me-&gt;m_fork[n] == FREE)) {
       </state_glyph>
      </state>
      <state name="paused">
-      <entry>BSP_displayPaused(1U);</entry>
-      <exit>BSP_displayPaused(0U);</exit>
+      <entry>BSP::displayPaused(1U);</entry>
+      <exit>BSP::displayPaused(0U);</exit>
       <tran trig="SERVE" target="../../2">
        <tran_glyph conn="4,57,3,1,39,-29,-5">
         <action box="0,-2,7,2"/>
@@ -285,7 +285,7 @@ if (me-&gt;m_isHungry[m] &amp;&amp; (me-&gt;m_fork[n] == FREE)) {
 // philo ID must be in range and he must be not hungry
 Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!me-&gt;m_isHungry[n]));
 me-&gt;m_isHungry[n] = true;
-BSP_displayPhilStat(n, HUNGRY);</action>
+BSP::displayPhilStat(n, HUNGRY);</action>
        <tran_glyph conn="4,60,3,-1,15">
         <action box="0,-2,6,2"/>
        </tran_glyph>
@@ -295,7 +295,7 @@ BSP_displayPhilStat(n, HUNGRY);</action>
 // phil ID must be in range and he must be not hungry
 Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!me-&gt;m_isHungry[n]));
 
-BSP_displayPhilStat(n, THINKING);
+BSP::displayPhilStat(n, THINKING);
 uint8_t m = LEFT(n);
 /* both forks of Phil[n] must be used */
 Q_ASSERT((me-&gt;m_fork[n] == USED) &amp;&amp; (me-&gt;m_fork[m] == USED));
@@ -318,6 +318,7 @@ me-&gt;m_fork[n] = FREE;</action>
   </class>
   <attribute name="AO_Philo[N_PHILO]" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
   <attribute name="AO_Table" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="XT_Test" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
  </package>
  <directory name=".">
   <file name="dpp.h">
@@ -349,6 +350,10 @@ $declare(AOs::AO_Philo[N_PHILO])
 
 $declare(AOs::AO_Table)
 
+#ifdef qxk_h
+$declare(AOs::XT_Test)
+#endif // qxk_h
+
 #endif // dpp_h</text>
   </file>
   <file name="philo.cpp">
@@ -368,14 +373,14 @@ static Philo l_philo[N_PHILO];   // storage for all Philos
 
 // helper function to provide a randomized think time for Philos
 inline QP::QTimeEvtCtr think_time() {
-    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP_random() % BSP_TICKS_PER_SEC)
-                                        + (BSP_TICKS_PER_SEC/2U));
+    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + (BSP::TICKS_PER_SEC/2U));
 }
 
 // helper function to provide a randomized eat time for Philos
 inline QP::QTimeEvtCtr eat_time() {
-    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP_random() % BSP_TICKS_PER_SEC)
-                                        + BSP_TICKS_PER_SEC);
+    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + BSP::TICKS_PER_SEC);
 }
 
 // helper function to provide the ID of Philo &quot;me&quot;

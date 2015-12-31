@@ -432,11 +432,6 @@
               <FilePath>..\..\dpp.h</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -450,6 +445,11 @@
               <FileName>qstamp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1120,11 +1120,6 @@
               <FilePath>..\..\dpp.h</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1138,6 +1133,11 @@
               <FileName>qstamp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1808,11 +1808,6 @@
               <FilePath>..\..\dpp.h</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1826,6 +1821,11 @@
               <FileName>qstamp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>

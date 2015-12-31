@@ -1,25 +1,25 @@
-// state handler function for the QBomb FSM ..................................
-QState QBomb::setting(QBomb * const me, QEvt const *e) {
+// state handler function for the Bomb FSM ..................................
+QState Bomb::setting(Bomb * const me, QEvt const *e) {
     switch (e->sig) {
         . . .
         case ARM_SIG: {
-            return Q_TRAN(&QBomb::timing);
+            return Q_TRAN(&Bomb::timing);
         }
     }
     return Q_IGNORED();
 }
 
-// state handler function for the QCalc HSM ..................................
-QState QCalc::begin(QCalc * const me, QEvt const *e) {
+// state handler function for the Calc HSM ..................................
+QState Calc::begin(Calc * const me, QEvt const *e) {
     switch (e->sig) {
         . . .
         case OPER_SIG: {
-            if (((QCalcEvt *)e)->keyId == KEY_MINUS) {
-                return Q_TRAN(&QCalc::negated1);
+            if (((CalcEvt *)e)->keyId == KEY_MINUS) {
+                return Q_TRAN(&Calc::negated1);
             }
             return Q_HANDLED();
         }
     }
-    return Q_SUPER(&QCalc::ready);
+    return Q_SUPER(&Calc::ready);
 }
 

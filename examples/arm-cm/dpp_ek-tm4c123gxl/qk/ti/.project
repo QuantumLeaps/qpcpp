@@ -63,7 +63,7 @@
 		<link>
 			<name>main.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/main.cpp</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/main.cpp</locationURI>
 		</link>
 		<link>
 			<name>philo.cpp</name>

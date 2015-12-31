@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-23
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -48,9 +48,9 @@ namespace QP {
 /// the qstamp object file.)
 
 //! the calendar date of the last translation of the form: "Mmm dd yyyy"
-char_t const Q_ROM BUILD_DATE[12] = __DATE__;
+char_t const BUILD_DATE[12] = __DATE__;
 
 //! the time of the last translation of the form: "hh:mm:ss"
-char_t const Q_ROM BUILD_TIME[9] = __TIME__;
+char_t const BUILD_TIME[9] = __TIME__;
 
 } // namespace QP

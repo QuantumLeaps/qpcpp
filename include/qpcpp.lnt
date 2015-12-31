@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.4.3
-// Last updated on  2015-06-11
+// Last updated for version 5.6.0
+// Last updated on  2015-12-26
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 
 // General
@@ -130,7 +130,6 @@
 -estring(1960,        // 9-5-1 declaration of union
  QP::QMAttr)
 -esym(1960,           // 16-0-4 function-like macro
- Q_ROM_BYTE,
  Q_TRAN,
  Q_TRAN_HIST,
  Q_SUPER,
@@ -437,3 +436,8 @@
 -emacro(717, QS_*)       // do ... while(0);
 -emacro(725, QS_END*)    // Expected positive indentation
 -esym(641, QP::QSType)   // Converting enum '*QSType' to 'int'
+
+
+// Deprecated features--provided in the backwards compatibility API of QP/C
+-estring(961,         // MISRA04-19.7(adv) function-like macro
+ Q_ROM_BYTE)

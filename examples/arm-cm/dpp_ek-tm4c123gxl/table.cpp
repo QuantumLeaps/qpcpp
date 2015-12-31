@@ -127,7 +127,7 @@ QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         me->m_fork[n] = FREE;
         me->m_isHungry[n] = false;
-        BSP_displayPhilStat(n, THINKING);
+        BSP::displayPhilStat(n, THINKING);
     }
     return QM_TRAN_INIT(&tatbl_);
 }
@@ -145,7 +145,7 @@ QP::QState Table::active(Table * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${AOs::Table::SM::active::TERMINATE}
         case TERMINATE_SIG: {
-            BSP_terminate(0);
+            BSP::terminate(0);
             status_ = QM_HANDLED();
             break;
         }
@@ -184,7 +184,7 @@ QP::QState Table::serving_e(Table * const me) {
             te->philoNum = n;
             QP::QF::PUBLISH(te, me);
             me->m_isHungry[n] = false;
-            BSP_displayPhilStat(n, EATING);
+            BSP::displayPhilStat(n, EATING);
         }
     }
     return QM_ENTRY(&serving_s);
@@ -199,7 +199,7 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
             // phil ID must be in range and he must be not hungry
             Q_ASSERT((n < N_PHILO) && (!me->m_isHungry[n]));
 
-            BSP_displayPhilStat(n, HUNGRY);
+            BSP::displayPhilStat(n, HUNGRY);
             uint8_t m = LEFT(n);
             // ${AOs::Table::SM::active::serving::HUNGRY::[bothfree]}
             if ((me->m_fork[m] == FREE) && (me->m_fork[n] == FREE)) {
@@ -208,7 +208,7 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
                 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = n;
                 QP::QF::PUBLISH(pe, me);
-                BSP_displayPhilStat(n, EATING);
+                BSP::displayPhilStat(n, EATING);
                 status_ = QM_HANDLED();
             }
             // ${AOs::Table::SM::active::serving::HUNGRY::[else]}
@@ -224,7 +224,7 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
             // phil ID must be in range and he must be not hungry
             Q_ASSERT((n < N_PHILO) && (!me->m_isHungry[n]));
 
-            BSP_displayPhilStat(n, THINKING);
+            BSP::displayPhilStat(n, THINKING);
             uint8_t m = LEFT(n);
             // both forks of Phil[n] must be used
             Q_ASSERT((me->m_fork[n] == USED) && (me->m_fork[m] == USED));
@@ -240,7 +240,7 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
                 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
                 QP::QF::PUBLISH(pe, me);
-                BSP_displayPhilStat(m, EATING);
+                BSP::displayPhilStat(m, EATING);
             }
             m = LEFT(n); // check the left neighbor
             n = LEFT(m); // left fork of the left neighbor
@@ -251,7 +251,7 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
                 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
                 QP::QF::PUBLISH(pe, me);
-                BSP_displayPhilStat(m, EATING);
+                BSP::displayPhilStat(m, EATING);
             }
             status_ = QM_HANDLED();
             break;
@@ -294,13 +294,13 @@ QP::QMState const Table::paused_s = {
 };
 // ${AOs::Table::SM::active::paused}
 QP::QState Table::paused_e(Table * const me) {
-    BSP_displayPaused(1U);
+    BSP::displayPaused(1U);
     (void)me; // avoid compiler warning in case 'me' is not used
     return QM_ENTRY(&paused_s);
 }
 // ${AOs::Table::SM::active::paused}
 QP::QState Table::paused_x(Table * const me) {
-    BSP_displayPaused(0U);
+    BSP::displayPaused(0U);
     (void)me; // avoid compiler warning in case 'me' is not used
     return QM_EXIT(&paused_s);
 }
@@ -330,7 +330,7 @@ QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
             // philo ID must be in range and he must be not hungry
             Q_ASSERT((n < N_PHILO) && (!me->m_isHungry[n]));
             me->m_isHungry[n] = true;
-            BSP_displayPhilStat(n, HUNGRY);
+            BSP::displayPhilStat(n, HUNGRY);
             status_ = QM_HANDLED();
             break;
         }
@@ -340,7 +340,7 @@ QP::QState Table::paused(Table * const me, QP::QEvt const * const e) {
             // phil ID must be in range and he must be not hungry
             Q_ASSERT((n < N_PHILO) && (!me->m_isHungry[n]));
 
-            BSP_displayPhilStat(n, THINKING);
+            BSP::displayPhilStat(n, THINKING);
             uint8_t m = LEFT(n);
             /* both forks of Phil[n] must be used */
             Q_ASSERT((me->m_fork[n] == USED) && (me->m_fork[m] == USED));

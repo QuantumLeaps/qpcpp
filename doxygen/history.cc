@@ -2,6 +2,53 @@ namespace QP {
 
 /** @page history Revision History
 
+@section qpcpp_5_6_1 Version 5.6.1, 2016-01-01
+
+This release is the first official (production) release of the new blocking @ref qxk "QXK kernel" ("eXtended Quantum Kernel"). QXK is a small, preemptive, priority-based, **blocking** kernel that provides most features you might expect of a traditional blocking RTOS kernel.
+
+QXK has been designed specifically for applications that need to mix event-driven active objects with traditional blocking code, such as commercial middleware (TCP/IP stacks, UDP stacks, embedded file systems, etc.) or legacy software. The QXK kernel is integrated tightly and optimally with the rest of the QP. It reuses all mechanisms already provided in QP, thus avoiding any code duplication, inefficient layers of indirection, and additional licensing costs, which are inevitable when using 3rd-party RTOS kernels to run QP/C++ applications.
+
+@note
+The QXK documentation is available in the QP/C Reference Manual at @ref qxk
+
+Additionally, this release removes the macros Q_ROM, Q_ROM_BYTE, and Q_ROM_VAR from the QP/C++ code. These macros have been necessary for odd Harvard-architecture 8-bit CPUs (such as AVR, 8051) to place constant data in ROM. As QP/C++ stopped supporting those CPUs, the non-standard extensions could be removed from the QP/C++ code base.
+
+Additionally, this release re-designs the priority-ceiling mutex in the QK kernel, which now works the same as the mutex of the new QXK kernel. Also, the QK ports to ARM Cortex-M no longer need or use the SVC_Handler (Supervisor Call). This is done to make the QK ports compatible with various "hypervisors" (such as mbed uVisor or Nordic SoftDevice), which use the SVC exception.
+
+Finally, this release modifies the GNU-ARM ports of QK for ARM Cortex-M, to use the __ARM_ARCH macro to distinguish among different architectures (ARCHv6 vs ARCHv7).
+
+Changes in detail:
+
+1. Added new header files for QXK: qxk.h, and qxthread.h.
+
+2. Added new source files for QXK: qxk.cpp, qxk_mutex.cpp, qxk_pkg.h, qxk_sema.cpp, qxk_xthr.cpp.
+
+3. Added QXK ports to ARM Cortex-M for ARM-KEIL, GNU-ARM, IAR, and TI-ARM toolsets (see qpcpp/ports/arm-cm/qxk)
+
+4. Added QXK examples for ARM Cortex-M (in qpcpp/examples/arm-cm/dpp_ek-tm4c123gxl/qxk and qpcpp/examples/arm-cm/dpp_nucleo-l053r8/qxk) for all supported toolsets.
+
+5. Removed Q_ROM, Q_ROM_BYTE, and Q_ROM_VAR from the QP/C++ code.
+
+6. Added Q_ROM, Q_ROM_BYTE to the compatibility-layer in qpcpp.h.
+
+7. Removed ports and examples for the following 3rd-party RTOSes: CMSIS-RTX and FreeRTOS, as QXK provided all the features found in those kernels and is recommended over those kernels.
+
+8. Removed AVR ports and examples.
+
+9. Re-designed the QK priority-mutex in files qk.h and qk_mutex.cpp.
+
+10. Provided QK mutex examples in qpcpp/examples/arm-cm/dpp_ek-tm4c123gxl/qk and qpcpp/examples/arm-cm/dpp_nucleo-l053r8/qk.
+
+11. Updated Makefiles for GNU-ARM to use the __ARM_ARCH macro for defining the ARM architecture.
+
+12. Updated CMSIS from 4.2 to 4.3 in qpcpp/3rd-party/CMSIS
+
+13. Added error directives to source files from different built-in kernels (QV, QK, and QXK) to generate meaningful error messages when these files are mixed in one project. For example, a project based on QK will report errors when source files for QV or QXK are included in it.
+
+14. Corrected example projects for the ARM Cortex-M with TI/CCS toolset
+
+
+------------------------------------------------------------------------------
 @section qpcpp_5_5_1 Version 5.5.1, 2015-10-05
 
 The purpose of this release is to improve the AAPCS compliance of the ARM Cortex-M port to the QK preemptive kernel. Specifically, the PendSV handler in assembly did not always maintain the 8-byte stack alignment, which is required by AAPCS. This version corrects the stack misalignment in the qk_port.s files for all supported ARM compilers (ARM-Keil, GNU, and IAR). All these ports should also be ready for ARM Cortex-M7.

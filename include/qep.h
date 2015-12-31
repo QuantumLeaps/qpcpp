@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.1
-/// Last updated on  2015-10-05
+/// Last updated for version 5.6.1
+/// Last updated on  2015-12-30
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -43,50 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      551
+#define QP_VERSION      561
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "5.5.1"
+#define QP_VERSION_STR  "5.6.1"
 
-//! Tamperproof current QP release (5.5.1) and date (15-10-05)
-#define QP_RELEASE      0xA5FE7508U
-
-#ifndef Q_ROM
-    //! Macro to specify compiler-specific directive for placing a
-    //! constant object in ROM.
-    /// @description
-    /// Many compilers for Harvard-architecture MCUs provide non-standard
-    /// extensions to support placement of objects in different memories.
-    /// In order to conserve the precious RAM, QP uses the Q_ROM macro for
-    /// all constant objects that can be allocated in ROM.
-    ///
-    /// @note
-    /// To override the following empty definition, you need to define the
-    /// Q_ROM macro in the qep_port.h header file. Some examples of valid
-    /// Q_ROM macro definitions are: __code (IAR 8051 compiler), code (Keil
-    /// Cx51 compiler), PROGMEM (gcc for AVR), __flash (IAR for AVR).
-    #define Q_ROM
-#endif
-
-#ifndef Q_ROM_BYTE
-    //! Macro to access a byte allocated in ROM
-    /// @description
-    /// Some compilers for Harvard-architecture MCUs, such as gcc for AVR, do
-    /// not generate correct code for accessing data allocated in the program
-    /// space (ROM). The workaround for such compilers is to explictly add
-    /// assembly code to access each data element allocated in the program
-    /// space. The macro Q_ROM_BYTE() retrieves a byte from the given ROM
-    /// address.
-    ///
-    /// @note
-    /// The Q_ROM_BYTE() macro should be defined for the compilers that
-    /// cannot handle correctly data allocated in ROM (such as the gcc).
-    /// If the macro is left undefined, the default definition simply returns
-    /// the argument and lets the compiler generate the correct code.
-    #define Q_ROM_BYTE(rom_var_)   (rom_var_)
-#endif
+//! Tamperproof current QP release (5.6.1) and date (16-01-01)
+#define QP_RELEASE      0xA092847EU
 
 #ifndef Q_SIGNAL_SIZE
     //! The size (in bytes) of the signal of an event. Valid values:
@@ -508,6 +473,10 @@ private:
     friend class QHsm;
     friend class QMActive;
     friend class QActive;
+    friend class QXK;
+    friend class QXThread;
+    friend class QXMutex;
+    friend class QXSemaphore;
 };
 
 //! Top-most state of QMSM is NULL
@@ -571,15 +540,15 @@ private:
     friend class QMActive;
 };
 
-//! the current QP version number string in ROM, based on QP_VERSION_STR
-extern char_t const Q_ROM versionStr[6];
+//! the current QP version number string based on QP_VERSION_STR
+extern char_t const versionStr[6];
 
 //****************************************************************************
 //! Provides miscellaneous QEP services.
 class QEP {
 public:
     //! get the current QEP version number string of the form "X.Y.Z"
-    static char_t const Q_ROM *getVersion(void) {
+    static char_t const *getVersion(void) {
         return versionStr;
     }
 };

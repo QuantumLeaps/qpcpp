@@ -1,4 +1,4 @@
-class QCalc : public QHsm {  // derived from QHsm
+class Calc : public QHsm {  // derived from QHsm
 private:
     double  m_operand1;
     double  m_operand2;
@@ -7,15 +7,15 @@ private:
     uint8_t m_opKey;
 
 public:
-    QCalc() : QHsm(Q_STATE_CAST(&QCalc::initial)) {  // ctor
+    Calc() : QHsm(Q_STATE_CAST(&QCalc::initial)) {  // ctor
     }
 
 protected:
-    static QState initial  (QCalc * const me, QEvt const *e);
-    static QState on       (QCalc * const me, QEvt const *e);
-    static QState error    (QCalc * const me, QEvt const *e);
-    static QState ready    (QCalc * const me, QEvt const *e);
-    static QState result   (QCalc * const me, QEvt const *e);
-    static QState begin    (QCalc * const me, QEvt const *e);
+    static QState initial  (Calc * const me, QEvt const *e);
+    static QState on       (Calc * const me, QEvt const *e);
+    static QState error    (Calc * const me, QEvt const *e);
+    static QState ready    (Calc * const me, QEvt const *e);
+    static QState result   (Calc * const me, QEvt const *e);
+    static QState begin    (Calc * const me, QEvt const *e);
     . . .
 };

@@ -1,17 +1,16 @@
 /// @file
-/// @brief Platform-specific QP/C++ interface.
-/// @ingroup qep qf qk qv qs
+/// @brief QP/C++ public interface including backwards-compatibility layer
+/// @ingroup qep qf qv qk qxk qs
 /// @cond
 ///***************************************************************************
-/// Product: QP/C++
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-27
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -93,6 +92,12 @@
 
 // QP API compatibility layer ************************************************
 #if (QP_API_VERSION < 500)
+
+//! @deprecated macro for odd 8-bit CPUs.
+#define Q_ROM
+
+//! @deprecated macro for odd 8-bit CPUs.
+#define Q_ROM_BYTE(rom_var_)   (rom_var_)
 
 //! @deprecated macro for odd 8-bit CPUs.
 #define Q_ROM_VAR

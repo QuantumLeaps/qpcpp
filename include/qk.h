@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-24
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -53,23 +53,23 @@
 /// to define it in the specific QF port file (qf_port.h). In case of QK,
 /// which always depends on the native QF queue, this macro is defined at the
 /// level of the platform-independent interface qk.h.
-#define QF_EQUEUE_TYPE             QEQueue
+#define QF_EQUEUE_TYPE         QEQueue
 
-#if defined(QK_TLS)
-    #define QF_OS_OBJECT_TYPE      uint8_t
-    #define QF_THREAD_TYPE         void *
-#endif  // QK_TLS
+//! OS-dependent per-thread operating-system object
+/// @description
+/// The use of this member depends on the CPU. For example, in port to
+/// ARM Cortex-M with FPU this member is used to store the LR.
+#define QF_OS_OBJECT_TYPE      void*
+
+//! OS-dependent representation of the private thread */
+/// @description
+/// QK uses this member to store the start priority of the AO,
+/// which is needed when the QK priority-ceiling mutex is used.
+#define QF_THREAD_TYPE         uint_fast8_t
+
 
 //****************************************************************************
 namespace QP {
-
-#ifndef QK_NO_MUTEX
-    //! QK Mutex type.
-    /// @description
-    /// QMutex represents the priority-ceiling mutex available in QK.
-    /// @sa QP::QK::mutexLock() QP::QK::mutexUnlock()
-    typedef uint_fast8_t QMutex;
-#endif  // QK_NO_MUTEX
 
 //****************************************************************************
 //! QK services.
@@ -85,7 +85,7 @@ class QK {
 public:
 
     //! get the current QK version number string of the form X.Y.Z
-    static char_t const Q_ROM *getVersion(void) {
+    static char_t const *getVersion(void) {
         return versionStr;
     }
 
@@ -100,17 +100,18 @@ public:
     ///
     /// @sa QP::QF::onIdle()
     static void onIdle(void);
+};
 
-#ifndef QK_NO_MUTEX
+/*! Priority Ceiling Mutex the QK preemptive kernel */
+class QMutex {
+public:
+    void init(uint_fast8_t const prioCeiling);
+    void lock(void);
+    void unlock(void);
 
-    //! QK priority-ceiling mutex lock
-    static QMutex mutexLock(uint_fast8_t const prioCeiling);
-
-    //! QK priority-ceiling mutex unlock
-    static void mutexUnlock(QMutex const mutex);
-
-#endif // QK_NO_MUTEX
-
+private:
+    uint_fast8_t m_prioCeiling;
+    uint_fast8_t m_lockNest;
 };
 
 } // namespace QP

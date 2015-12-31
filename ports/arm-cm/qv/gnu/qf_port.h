@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ARM Cortex-M, cooperative QV kernel, GNU-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-04
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-30
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -45,7 +45,7 @@
 #define QF_MAX_TICK_RATE        2
 
 // QF interrupt disable/enable and log2()...
-#ifdef ARM_ARCH_V6M // Cortex-M0/M0+/M1 ?, see NOTE02
+#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 ?, see NOTE02 */
 
     #define QF_INT_DISABLE()    __asm volatile ("cpsid i")
     #define QF_INT_ENABLE()     __asm volatile ("cpsie i")
@@ -76,7 +76,7 @@
 // QF_CRIT_STAT_TYPE not defined: unconditional interrupt disabling" policy
 #define QF_CRIT_ENTRY(dummy)    QF_INT_DISABLE()
 #define QF_CRIT_EXIT(dummy)     QF_INT_ENABLE()
-#define QF_CRIT_EXIT_NOP()      __asm volatile ("nop")
+#define QF_CRIT_EXIT_NOP()      __asm volatile ("isb")
 
 #include "qep_port.h" // QEP port
 #include "qv_port.h"  // QV port
@@ -94,7 +94,7 @@
 // "kernel-aware".
 //
 // NOTE3:
-// On Cortex-M3/M4/M4F, the interrupt disable/enable policy uses the BASEPRI
+// On Cortex-M3/M4/M7, the interrupt disable/enable policy uses the BASEPRI
 // register (which is not implemented in Cortex-M0/M0+/M1) to disable
 // interrupts only with priority lower than the level specified by the
 // QF_BASEPRI macro. The interrupts with priorities above QF_BASEPRI (i.e.,
@@ -105,7 +105,7 @@
 // higher than QF_BASEPRI, can call QF services.
 //
 // NOTE4:
-// For Cortex-M3/M4/M4F, the macro QF_BASEPRI leaves the top 2 priority bits
+// For Cortex-M3/M4/M7, the macro QF_BASEPRI leaves the top 2 priority bits
 // empty for QF-aware interrupts. This is the highest-possible priority
 // (lowest possible numerical value) for the guaranteed 3 priority bits
 // implemented in the NVIC.

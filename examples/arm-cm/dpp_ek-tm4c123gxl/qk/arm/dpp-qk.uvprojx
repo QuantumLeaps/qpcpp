@@ -424,7 +424,7 @@
             <File>
               <FileName>main.cpp</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\main.cpp</FilePath>
+              <FilePath>..\main.cpp</FilePath>
             </File>
             <File>
               <FileName>dpp.h</FileName>
@@ -1087,7 +1087,7 @@
             <File>
               <FileName>main.cpp</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\main.cpp</FilePath>
+              <FilePath>..\main.cpp</FilePath>
             </File>
             <File>
               <FileName>dpp.h</FileName>
@@ -1750,7 +1750,7 @@
             <File>
               <FileName>main.cpp</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\main.cpp</FilePath>
+              <FilePath>..\main.cpp</FilePath>
             </File>
             <File>
               <FileName>dpp.h</FileName>

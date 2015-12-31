@@ -3,15 +3,14 @@
 /// @brief Internal (package scope) QS/C++ interface.
 /// @cond
 ///***************************************************************************
-/// Product: QEP/C++
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-23
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -73,23 +72,6 @@
 /// 5-2-7, 5-2-8 and 5-2-9. Encapsulating this violation in a macro allows to
 /// selectively suppress this specific deviation.
 #define QS_REC_NUM_(enum_) (static_cast<uint_fast8_t>(enum_))
-
-#ifndef Q_ROM_BYTE
-    //! Macro to access a byte allocated in ROM
-    ///
-    /// Some compilers for Harvard-architecture MCUs, such as gcc for AVR, do
-    /// not generate correct code for accessing data allocated in the program
-    /// space (ROM). The workaround for such compilers is to explictly add
-    /// assembly code to access each data element allocated in the program
-    /// space. The macro Q_ROM_BYTE() retrieves a byte from the given ROM
-    /// address.
-    ///
-    /// The Q_ROM_BYTE() macro should be defined for the compilers that
-    /// cannot handle correctly data allocated in ROM (such as the gcc).
-    /// If the macro is left undefined, the default definition simply returns
-    /// the argument and lets the compiler generate the correct code.
-    #define Q_ROM_BYTE(x_)   (x_)
-#endif
 
 namespace QP {
 

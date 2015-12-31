@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Simple Blinky example, POSIX
-// Last updated for version 5.5.0
-// Last updated on  2015-09-25
+// Last updated for version 5.6.0
+// Last updated on  2015-12-26
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -101,7 +101,7 @@ void QP::QF_onClockTick(void) {
     }
 }
 //............................................................................
-extern "C" void Q_onAssert(char const Q_ROM * const module, int loc) {
+extern "C" void Q_onAssert(char const * const module, int loc) {
     cout << "Assertion failed in " << module
               << "location " << loc << endl;
     QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));

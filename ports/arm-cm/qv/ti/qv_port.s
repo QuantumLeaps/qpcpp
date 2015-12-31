@@ -1,7 +1,7 @@
 ;*****************************************************************************
 ; Product: QV port to ARM Cortex-M (M0,M0+,M1,M3,M4,M7), TI-ARM assembler
-; Last Updated for Version: 5.5.1
-; Date of the Last Update:  2015-09-30
+; Last Updated for Version: 5.6.1
+; Date of the Last Update:  2015-12-30
 ;
 ;                    Q u a n t u m     L e a P s
 ;                    ---------------------------
@@ -32,16 +32,13 @@
 ; mailto:info@state-machine.com
 ;*****************************************************************************
 
-    .text
-    .thumb
-
     .global QF_set_BASEPRI    ; set BASEPRI register
     .global assert_failed     ; low-level assert handler
 
     .ref    Q_onAssert        ; external reference
-    .ref    __STACK_TOP       ; external reference
 
-
+    .text
+    .thumb
 ;*****************************************************************************
 ; The QF_set_BASEPRI function sets the BASEPRI register to the value
 ; passed in r0.
@@ -58,8 +55,15 @@ QF_set_BASEPRI: .asmfunc
 ; C prototype: void assert_failed(char const *module, int loc);
 ;*****************************************************************************
 assert_failed: .asmfunc
-    LDR     sp,STACK_TOP_addr
-    B.w     Q_onAssert
-
-STACK_TOP_addr .word __STACK_TOP
+    LDR     r0,VTOR_addr      ; r0 := address of Vector Table Offset register
+    LDR     r0,[r0,#0]        ; r0 := contents of VTOR
+    LDR     r0,[r0]           ; r0 := VT[0] (first entry is the top of stack)
+    MSR     MSP,r0            ; main SP := initial top of stack
+    ISB                       ; flush the instruction pipeline
+    BL      Q_onAssert
     .endasmfunc
+
+;*****************************************************************************
+; Addresses for PC-relative LDR
+;*****************************************************************************
+VTOR_addr:        .word 0xE000ED08

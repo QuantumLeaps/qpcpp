@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-24
+/// Last updated for version 5.6.0
+/// Last updated on  2015-12-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -42,14 +42,6 @@
 #ifndef Q_SPY
     #error "Q_SPY must be defined to include qs.h"
 #endif
-
-#ifndef Q_ROM  // provide the default if Q_ROM NOT defined
-    #define Q_ROM
-#endif // Q_ROM
-
-#ifndef Q_ROM_BYTE // provide the default if Q_ROM_BYTE NOT defined
-    #define Q_ROM_BYTE(rom_var_)   (rom_var_)
-#endif // Q_ROM_BYTE
 
 #ifndef QS_TIME_SIZE
 
@@ -193,13 +185,6 @@ uint16_t const QS_EOD  = static_cast<uint16_t>(0xFFFF);
     #error "QS_TIME_SIZE defined incorrectly, expected 1, 2, or 4"
 #endif
 
-#ifndef Q_ROM      // provide the default if Q_ROM NOT defined
-    #define Q_ROM
-#endif
-#ifndef Q_ROM_BYTE // provide the default if Q_ROM_BYTE NOT defined
-    #define Q_ROM_BYTE(rom_var_)   (rom_var_)
-#endif
-
 //! QS ring buffer counter and offset type
 typedef unsigned int QSCtr;
 
@@ -211,7 +196,7 @@ class QS {
 public:
 
     //! get the current QS version number string of the form X.Y.Z
-    static char_t const Q_ROM *getVersion(void) {
+    static char_t const *getVersion(void) {
         return versionStr;
     }
 
@@ -247,9 +232,6 @@ public:
     //! Output zero-terminated ASCII string element without format information
     static void str_(char_t const *s);
 
-    //! Output zero-terminated ASCII string element  allocated in ROM
-    //! without format information
-    static void str_ROM_(char_t const Q_ROM *s);
 
     // formatted data elements output ........................................
 
@@ -271,10 +253,6 @@ public:
     //! Output zero-terminated ASCII string element with format information
     static void str(char_t const *s);
 
-    //! Output zero-terminated ASCII string element allocated in ROM
-    /// with format information
-    static void str_ROM(char_t const Q_ROM *s);
-
     //! Output memory block of up to 255-bytes with format information
     static void mem(uint8_t const *blk, uint8_t size);
 
@@ -288,19 +266,19 @@ public:
 
     //! Output signal dictionary record
     static void sig_dict(enum_t const sig, void const * const obj,
-                         char_t const Q_ROM *name);
+                         char_t const *name);
 
     //! Output object dictionary record
     static void obj_dict(void const * const obj,
-                         char_t const Q_ROM *name);
+                         char_t const *name);
 
     //! Output function dictionary record
     static void fun_dict(void (* const fun)(void),
-                         char_t const Q_ROM *name);
+                         char_t const *name);
 
     //! Output user dictionary record
     static void usr_dict(enum_t const rec,
-                         char_t const Q_ROM *name);
+                         char_t const *name);
 
     //! Initialize the QS RX data buffer
     static void rxInitBuf(uint8_t sto[], uint16_t const stoSize);
@@ -801,9 +779,6 @@ enum QSpyRxRecords {
 /// data element
 #define QS_STR_(msg_)        (QP::QS::str_(msg_))
 
-//! Internal QS macro to output a zero-terminated ASCII string
-/// allocated in ROM data element
-#define QS_STR_ROM_(msg_)    (QP::QS::str_ROM_(msg_))
 
 //****************************************************************************
 // Macros for use in the client code
@@ -865,9 +840,6 @@ enum QSpyRxRecords {
 
 //! Output formatted zero-terminated ASCII string to the QS record
 #define QS_STR(str_)            (QP::QS::str(str_))
-
-//! Output formatted zero-terminated ASCII string from ROM to the QS record
-#define QS_STR_ROM(str_)        (QP::QS::str_ROM(str_))
 
 //! Output formatted memory block of up to 255 bytes to the QS record
 #define QS_MEM(mem_, size_)     (QP::QS::mem((mem_), (size_)))
@@ -942,7 +914,7 @@ enum QSpyRxRecords {
 /// @include qs_sigLog0.txt
 #define QS_SIG_DICTIONARY(sig_, obj_) do { \
     if (QS_GLB_FILTER_(QP::QS_SIG_DICT)) { \
-        static char_t const Q_ROM sig_name_[] = #sig_; \
+        static char_t const sig_name_[] = #sig_; \
         QP::QS::sig_dict((sig_), (obj_), &sig_name_[0]); \
     } \
 } while (false)
@@ -961,7 +933,7 @@ enum QSpyRxRecords {
 /// @include qs_objDic.cpp
 #define QS_OBJ_DICTIONARY(obj_) do { \
     if (QS_GLB_FILTER_(QP::QS_OBJ_DICT)) { \
-        static char_t const Q_ROM obj_name_[] = #obj_; \
+        static char_t const obj_name_[] = #obj_; \
         QP::QS::obj_dict((obj_), &obj_name_[0]); \
     } \
 } while (false)
@@ -979,7 +951,7 @@ enum QSpyRxRecords {
 /// dictionary.
 #define QS_FUN_DICTIONARY(fun_) do { \
     if (QS_GLB_FILTER_(QP::QS_FUN_DICT)) { \
-        static char_t const Q_ROM fun_name_[] = #fun_; \
+        static char_t const fun_name_[] = #fun_; \
         QP::QS::fun_dict((void (*)(void))(fun_), &fun_name_[0]); \
     } \
 } while (false)
@@ -990,7 +962,7 @@ enum QSpyRxRecords {
 /// user record with the human-readable identifier.
 #define QS_USR_DICTIONARY(rec_) do { \
     if (QS_GLB_FILTER_(QP::QS_USR_DICT)) { \
-        static char_t const Q_ROM usr_name_[] = #rec_; \
+        static char_t const usr_name_[] = #rec_; \
         QP::QS::usr_dict((rec_), &usr_name_[0]); \
     } \
 } while (false)
@@ -1001,7 +973,7 @@ enum QSpyRxRecords {
         static_cast<void *>(0), static_cast<void *>(0)) \
         QS_TIME_(); \
         QS_U16_(static_cast<uint16_t>(loc_)); \
-        QS_STR_ROM_(module_); \
+        QS_STR_(module_); \
     QS_END_NOCRIT_() \
     QP::QS::onFlush(); \
     for (uint32_t volatile delay_ctr_ = (delay_);  \
