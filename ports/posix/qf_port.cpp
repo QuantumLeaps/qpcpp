@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-14
+/// Last updated for version 5.6.2
+/// Last updated on  2016-01-22
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -66,6 +66,15 @@ static void *ao_thread(void *arg); // thread routine for all AOs
 void QF::init(void) {
     // lock memory so we're never swapped out to disk
     //mlockall(MCL_CURRENT | MCL_FUTURE); // uncomment when supported
+
+    // clear the internal QF variables, so that the framework can (re)start
+    // correctly even if the startup code is not called to clear the
+    // uninitialized data (as is required by the C++ Standard).
+    extern uint_fast8_t QF_maxPool_;
+    QF_maxPool_ = static_cast<uint_fast8_t>(0);
+    bzero(&QF::timeEvtHead_[0],
+          static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
+    bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
 }
 //............................................................................
 int_t QF::run(void) {

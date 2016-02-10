@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.6.2
+/// Last updated on  2016-01-27
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http:www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -92,8 +92,12 @@ void QF::tickX_(uint8_t const tickRate, void const * const sender)
 
         // end of the list?
         if (t == static_cast<QTimeEvt *>(0)) {
+
+            // any new time events armed since the last run of QF::tickX_()?
             if (timeEvtHead_[tickRate].m_act != static_cast<void *>(0)) {
-                Q_ASSERT(prev != static_cast<QTimeEvt *>(0)); // sanity check
+
+                // sanity check
+                Q_ASSERT_ID(110, prev != static_cast<QTimeEvt *>(0));
                 prev->m_next = QF::timeEvtHead_[tickRate].toTimeEvt();
                 timeEvtHead_[tickRate].m_act = static_cast<void *>(0);
                 t = prev->m_next; // switch to the new list
@@ -103,7 +107,7 @@ void QF::tickX_(uint8_t const tickRate, void const * const sender)
             }
         }
 
-        // time evt. scheduled for removal?
+        // time event scheduled for removal?
         if (t->m_ctr == static_cast<QTimeEvtCtr>(0)) {
             prev->m_next = t->m_next;
             t->refCtr_ &= static_cast<uint8_t>(0x7F); // mark as unlinked
@@ -190,7 +194,9 @@ void QF::tickX_(uint8_t const tickRate, void const * const sender)
 /// @note This function should be called in critical section.
 ///
 bool QF::noTimeEvtsActiveX(uint8_t const tickRate) {
-    Q_REQUIRE(tickRate < static_cast<uint8_t>(QF_MAX_TICK_RATE));
+    /// @pre the tick rate must be in range
+    Q_REQUIRE_ID(200, tickRate < static_cast<uint8_t>(QF_MAX_TICK_RATE));
+
     bool inactive;
     if (timeEvtHead_[tickRate].m_next == static_cast<QTimeEvt *>(0)) {
         inactive = false;
@@ -227,7 +233,7 @@ QTimeEvt::QTimeEvt(QMActive * const act,
     m_interval(static_cast<QTimeEvtCtr>(0))
 {
     /// @pre The signal must be valid and the tick rate in range
-    Q_REQUIRE_ID(100, (sgnl >= Q_USER_SIG)
+    Q_REQUIRE_ID(300, (sgnl >= Q_USER_SIG)
         && (tickRate < static_cast<uint8_t>(QF_MAX_TICK_RATE)));
 
 #ifndef Q_EVT_CTOR
@@ -306,19 +312,19 @@ QTimeEvt::QTimeEvt()
 /// @include qf_state.cpp
 ///
 void QTimeEvt::armX(QTimeEvtCtr const nTicks, QTimeEvtCtr const interval) {
-    uint8_t tickRate = static_cast<uint8_t>(
-                       refCtr_ & static_cast<uint8_t>(0x7F));
+    uint_fast8_t tickRate = static_cast<uint_fast8_t>(refCtr_)
+                            & static_cast<uint_fast8_t>(0x7F);
     QTimeEvtCtr cntr = m_ctr;  // temporary to hold volatile
     QF_CRIT_STAT_
 
     /// @pre the host AO must be valid, time evnet must be disarmed,
     /// number of clock ticks cannot be zero, and the signal must be valid.
     ///
-    Q_REQUIRE_ID(100, (m_act != static_cast<void *>(0))
-                      && (cntr == static_cast<QTimeEvtCtr>(0))
-                      && (nTicks != static_cast<QTimeEvtCtr>(0))
-                      && (tickRate < static_cast<uint8_t>(QF_MAX_TICK_RATE))
-                      && (static_cast<enum_t>(sig) >= Q_USER_SIG));
+    Q_REQUIRE_ID(400, (m_act != static_cast<void *>(0))
+                 && (cntr == static_cast<QTimeEvtCtr>(0))
+                 && (nTicks != static_cast<QTimeEvtCtr>(0))
+                 && (tickRate < static_cast<uint_fast8_t>(QF_MAX_TICK_RATE))
+                 && (static_cast<enum_t>(sig) >= Q_USER_SIG));
 
     QF_CRIT_ENTRY_();
     m_ctr = nTicks;
@@ -350,7 +356,7 @@ void QTimeEvt::armX(QTimeEvtCtr const nTicks, QTimeEvtCtr const interval) {
         QS_OBJ_(m_act);    // the active object
         QS_TEC_(nTicks);   // the number of ticks
         QS_TEC_(interval); // the interval
-        QS_U8_(tickRate);  // tick rate
+        QS_U8_(static_cast<uint8_t>(tickRate));  // tick rate
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();
@@ -385,12 +391,13 @@ bool QTimeEvt::disarm(void) {
             QS_OBJ_(m_act);            // the target AO
             QS_TEC_(m_ctr);            // the number of ticks
             QS_TEC_(m_interval);       // the interval
-            QS_U8_(refCtr_ & static_cast<uint8_t>(0x7F)); // tick rate
+            // tick rate
+            QS_U8_(static_cast<uint8_t>(refCtr_ & static_cast<uint8_t>(0x7F)));
         QS_END_NOCRIT_()
 
         m_ctr = static_cast<QTimeEvtCtr>(0); // schedule removal from the list
     }
-    // the time event was not armed
+    // the time event was already not running
     else {
         wasArmed = false;
 
@@ -399,7 +406,8 @@ bool QTimeEvt::disarm(void) {
             QS_TIME_();                // timestamp
             QS_OBJ_(this);             // this time event object
             QS_OBJ_(m_act);            // the target AO
-            QS_U8_(refCtr_ & static_cast<uint8_t>(0x7F)); // tick rate
+            // tick rate
+            QS_U8_(static_cast<uint8_t>(refCtr_ & static_cast<uint8_t>(0x7F)));
         QS_END_NOCRIT_()
     }
     QF_CRIT_EXIT_();
@@ -427,17 +435,17 @@ bool QTimeEvt::disarm(void) {
 * active object's state machine.
 */
 bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
-    uint8_t tickRate = static_cast<uint8_t>(
-                       refCtr_ & static_cast<uint8_t>(0x7F));
+    uint_fast8_t tickRate = static_cast<uint_fast8_t>(refCtr_)
+                            & static_cast<uint_fast8_t>(0x7F);
     QF_CRIT_STAT_
 
     /// @pre AO must be valid, tick rate must be in range, nTicks must not
     /// be zero, and the signal of this time event must be valid
     ///
-    Q_REQUIRE_ID(100, (m_act != static_cast<void *>(0))
-                      && (tickRate < static_cast<uint8_t>(QF_MAX_TICK_RATE))
-                      && (nTicks != static_cast<QTimeEvtCtr>(0))
-                      && (static_cast<enum_t>(sig) >= Q_USER_SIG));
+    Q_REQUIRE_ID(600, (m_act != static_cast<void *>(0))
+                 && (tickRate < static_cast<uint_fast8_t>(QF_MAX_TICK_RATE))
+                 && (nTicks != static_cast<QTimeEvtCtr>(0))
+                 && (static_cast<enum_t>(sig) >= Q_USER_SIG));
 
     QF_CRIT_ENTRY_();
     bool isArmed;
@@ -481,10 +489,13 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
         QS_OBJ_(m_act);      // the target AO
         QS_TEC_(m_ctr);      // the number of ticks
         QS_TEC_(m_interval); // the interval
-        // tick rate & armed status
-        QS_2U8_(tickRate, (isArmed
-                           ? static_cast<uint8_t>(1)
-                           : static_cast<uint8_t>(0)));
+        QS_U8_(static_cast<uint8_t>(tickRate)); // the tick rate
+        if (isArmed) {
+            QS_U8_(static_cast<uint8_t>(1)); // status: armed
+        }
+        else {
+            QS_U8_(static_cast<uint8_t>(0)); // status: disarmed
+        }
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();

@@ -9,7 +9,7 @@
   License Type: Windows Single User License
   Licensed To : Quantum Leaps, LLC
   License No. : WS2975                          License Date: Dec 15, 2013
-  Build Date  : Sep  2 2009                         Run Date: Dec 31, 2015
+  Build Date  : Sep  2 2009                         Run Date: Feb 10, 2016
   (C)1996-2009 M Squared Technologies LLC
   ________________________________________________________________________
 
@@ -1489,7 +1489,7 @@
       Loops for / foreach     : 1     
       Conditional if / else if: 5     
   Complexity   Param 1       Return 1      Cyclo Vg 7       Total        9
-  LOC 65       eLOC 53       lLOC 36       Comment 51       Lines       90
+  LOC 65       eLOC 53       lLOC 36       Comment 52       Lines       94
 
   Function: QP::QF::noTimeEvtsActiveX
   Parameters: (uint8_t const tickRate)
@@ -1497,7 +1497,7 @@
       Function Base           : 1
       Conditional if / else if: 2     
   Complexity   Param 1       Return 1      Cyclo Vg 3       Total        5
-  LOC 14       eLOC 10       lLOC 6        Comment 11       Lines       14
+  LOC 14       eLOC 10       lLOC 6        Comment 12       Lines       16
 
   Function: QP::QTimeEvt::QTimeEvt
   Parameters: (QMActive * const act, enum_t const sgnl, uint8_t const tick
@@ -1528,17 +1528,16 @@
       Function Base           : 1
       Conditional if / else if: 1     
   Complexity   Param 0       Return 1      Cyclo Vg 2       Total        3
-  LOC 29       eLOC 26       lLOC 17       Comment 27       Lines       35
+  LOC 29       eLOC 26       lLOC 17       Comment 27       Lines       37
 
   Function: QP::QTimeEvt::rearm
   Parameters: (QTimeEvtCtr const nTicks)
     Cyclomatic Complexity Vg Detail
       Function Base           : 1
-      Conditional if / else if: 2     
-      Inlined if-else ( ? : ) : 1     
+      Conditional if / else if: 3     
       Logical and ( && )      : 3     
   Complexity   Param 1       Return 1      Cyclo Vg 7       Total        9
-  LOC 37       eLOC 32       lLOC 18       Comment 47       Lines       64
+  LOC 41       eLOC 34       lLOC 20       Comment 49       Lines       67
 
   Function: QP::QTimeEvt::ctr
   Parameters: (void)
@@ -1549,21 +1548,21 @@
 
                           ~~ Total File Summary ~~
 
-  LOC 241      eLOC 209      lLOC 111      Comment 297      Lines      523
+  LOC 245      eLOC 211      lLOC 113      Comment 301      Lines      534
   ------------------------------------------------------------------------
 
                         ~~ File Functional Summary ~~
 
   File Function Count....:          8
-  Total Function LOC.....:        204  Total Function Pts LOC :        4.5
-  Total Function eLOC....:        173  Total Function Pts eLOC:        3.9
-  Total Function lLOC....:        110  Total Function Pts lLOC:        2.1
+  Total Function LOC.....:        208  Total Function Pts LOC :        4.6
+  Total Function eLOC....:        175  Total Function Pts eLOC:        4.0
+  Total Function lLOC....:        112  Total Function Pts lLOC:        2.1
   Total Function Params .:          9  Total Function Return .:          8
   Total Cyclo Complexity :         29  Total Function Complex.:         46
          ------     -----     -----     ------     ------     -----       
-  Max Function LOC ......:         65  Average Function LOC ..:      25.50
-  Max Function eLOC .....:         53  Average Function eLOC .:      21.63
-  Max Function lLOC .....:         36  Average Function lLOC .:      13.75
+  Max Function LOC ......:         65  Average Function LOC ..:      26.00
+  Max Function eLOC .....:         53  Average Function eLOC .:      21.88
+  Max Function lLOC .....:         36  Average Function lLOC .:      14.00
          ------     -----     -----     ------     ------     -----       
   Max Function Parameters:          3  Avg Function Parameters:       1.13
   Max Function Returns ..:          1  Avg Function Returns ..:       1.00
@@ -2511,7 +2510,7 @@
 
                          ~~ Total Project Summary ~~
 
-  LOC 5588     eLOC 4910     lLOC 2272     Comment 6403     Lines    12364
+  LOC 5592     eLOC 4912     lLOC 2274     Comment 6407     Lines    12375
   Average per File, metric/41 files
   LOC 136      eLOC 119      lLOC 55       Comment 156      Lines      301
 
@@ -3072,12 +3071,12 @@
   Function: QP::QF::tickX_
   Parameters: (uint8_t const tickRate)
   Complexity   Param 1       Return 1      Cyclo Vg 7       Total        9
-  LOC 65       eLOC 53       lLOC 36       Comment 51       Lines       90
+  LOC 65       eLOC 53       lLOC 36       Comment 52       Lines       94
 
   Function: QP::QF::noTimeEvtsActiveX
   Parameters: (uint8_t const tickRate)
   Complexity   Param 1       Return 1      Cyclo Vg 3       Total        5
-  LOC 14       eLOC 10       lLOC 6        Comment 11       Lines       14
+  LOC 14       eLOC 10       lLOC 6        Comment 12       Lines       16
 
   Function: QP::QTimeEvt::QTimeEvt
   Parameters: (QMActive * const act, enum_t const sgnl, uint8_t const tick
@@ -3098,12 +3097,12 @@
   Function: QP::QTimeEvt::disarm
   Parameters: (void)
   Complexity   Param 0       Return 1      Cyclo Vg 2       Total        3
-  LOC 29       eLOC 26       lLOC 17       Comment 27       Lines       35
+  LOC 29       eLOC 26       lLOC 17       Comment 27       Lines       37
 
   Function: QP::QTimeEvt::rearm
   Parameters: (QTimeEvtCtr const nTicks)
   Complexity   Param 1       Return 1      Cyclo Vg 7       Total        9
-  LOC 37       eLOC 32       lLOC 18       Comment 47       Lines       64
+  LOC 41       eLOC 34       lLOC 20       Comment 49       Lines       67
 
   Function: QP::QTimeEvt::ctr
   Parameters: (void)
@@ -3521,26 +3520,26 @@
   LOC 56       eLOC 48       lLOC 32       Comment 24       Lines       74
 
   Total: Functions  
-  LOC 3374     eLOC 2803     lLOC 1725     InCmp 401      CycloCmp     558
-  Function Points         FP(LOC) 59.5    FP(eLOC) 49.9   FP(lLOC)    30.9
+  LOC 3378     eLOC 2805     lLOC 1727     InCmp 401      CycloCmp     558
+  Function Points         FP(LOC) 59.6    FP(eLOC) 49.9   FP(lLOC)    30.9
 
   ------------------------------------------------------------------------
 
                       ~~ Project Functional Analysis ~~
 
-  Total Functions .......:        196  Total Physical Lines ..:       4393
-  Total LOC .............:       3374  Total Function Pts LOC :       59.5
-  Total eLOC ............:       2803  Total Function Pts eLOC:       49.9
-  Total lLOC.............:       1725  Total Function Pts lLOC:       30.9
+  Total Functions .......:        196  Total Physical Lines ..:       4404
+  Total LOC .............:       3378  Total Function Pts LOC :       59.6
+  Total eLOC ............:       2805  Total Function Pts eLOC:       49.9
+  Total lLOC.............:       1727  Total Function Pts lLOC:       30.9
   Total Cyclomatic Comp. :        558  Total Interface Comp. .:        401
   Total Parameters ......:        205  Total Return Points ...:        196
-  Total Comment Lines ...:       2541  Total Blank Lines .....:        516
+  Total Comment Lines ...:       2545  Total Blank Lines .....:        519
          ------     -----     -----     ------     ------     -----       
-  Avg Physical Lines ....:      22.41
-  Avg LOC ...............:      17.21  Avg eLOC ..............:      14.30
-  Avg lLOC ..............:       8.80  Avg Cyclomatic Comp. ..:       2.85
+  Avg Physical Lines ....:      22.47
+  Avg LOC ...............:      17.23  Avg eLOC ..............:      14.31
+  Avg lLOC ..............:       8.81  Avg Cyclomatic Comp. ..:       2.85
   Avg Interface Comp. ...:       2.05  Avg Parameters ........:       1.05
-  Avg Return Points .....:       1.00  Avg Comment Lines .....:      12.96
+  Avg Return Points .....:       1.00  Avg Comment Lines .....:      12.98
          ------     -----     -----     ------     ------     -----       
   Max LOC ...............:        260
   Max eLOC ..............:        202  Max lLOC ..............:        125

@@ -13,6 +13,13 @@ div.toc {
     margin: 0 10px 10px 10px;
 }
 
+hr {
+    height: 0px;
+    border: none;
+    border-top: 2px solid #4A6AAA;
+    margin-top: 25px;
+}
+
 /* QL additions ---------------------------------------------- */
 /*
 #titlearea {
@@ -38,6 +45,11 @@ h1, h2, h3, h4, h5, h6 {
 a.extern {
     background:url(img/extern.png) no-repeat right;
     padding-right: 14px;
+    text-decoration:none;
+}
+a.pdf {
+    background:url(img/pdf.gif) no-repeat right;
+    padding-right: 18px;
     text-decoration:none;
 }
 .extern:hover {
@@ -78,7 +90,7 @@ table.indextable ul {
 }
 table.indextable ul {padding-left:8px;}
 
-.highlight    {background-color:#ffff33; }
+.highlight    {background-color:#EEEE77; }
 .menu         {background-color:#dddddd; }
 .underline    {text-decoration:underline; }
 .strong       {background-color:#ffff33; font-weight:bold; }
@@ -88,8 +100,11 @@ table.indextable ul {padding-left:8px;}
 .separate {
     border: none;
     border-top: 1px #bfbfbf solid;
-    width: 300px;
+    margin-top: 20px;
+    /*width: 300px;*/
 }
+.vmargin10    {margin-top: 10px;}
+.vmargin20    {margin-top: 20px;}
 .button {
     border-style: solid;
     border-color: white #625f5d #625f5d #eeeeee;
@@ -162,22 +177,22 @@ dl.note {
     padding: 5px 15px 10px 15px;
     background-color: #FFFFEE;
     border: 1px solid #EEEE77;
-    border-radius: 7px 7px 7px 7px;
+    /*border-radius: 7px 7px 7px 7px;*/
+    border-radius: 0;
 }
-
 dl.attention {
     margin: 0px 10px 0px 0px;
     padding: 5px 15px 10px 15px;
     background-color: #FFCC00;
     border: 1px solid #CCA300;
-    border-radius: 7px 7px 7px 7px;
+    border-radius: 0;
 }
 dl.remark {
     margin: 0px 10px 0px 0px;
     padding: 10px 15px 10px 15px;
-    background-color: #E6E6E6;
-    border: 1px solid #B2B2B2;
-    border-radius: 7px 7px 7px 7px;
+    background-color: #EEEEFF;
+    border: 1px solid #CCCCFF;
+    border-radius: 0;
 }
 
 ul.tag {list-style-type:none;}

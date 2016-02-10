@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-26
+/// Last updated for version 5.6.2
+/// Last updated on  2016-02-10
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -229,6 +229,9 @@ public:
 
     //! Recall a deferred event from a given event queue.
     bool recall(QEQueue * const eq);
+
+    //! Flush the specified deferred queue 'eq'.
+    uint_fast16_t flushDeferred(QEQueue * const eq) const;
 
     //! Get the priority of the active object.
     uint_fast8_t getPrio(void) const {

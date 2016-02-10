@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.6.2
+/// Last updated on  2016-02-10
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -113,6 +113,30 @@ bool QMActive::recall(QEQueue * const eq) {
         QF_CRIT_EXIT_();
     }
     return recalled; // event not recalled
+}
+
+//****************************************************************************
+/// @description
+/// This function is part of the event deferral support. An active object
+/// can use this function to flush a given QF event queue. The function makes
+/// sure that the events are not leaked.
+///
+/// @param[in]  eq  pointer to a "raw" thread-safe queue to flush.
+///
+/// @returns the number of events actually flushed from the queue.
+///
+///
+/// @sa QP::QMActive::defer(), QP::QMActive::recall(), QP::QEQueue
+uint_fast16_t QMActive::flushDeferred(QEQueue * const eq) const {
+    uint_fast16_t n = static_cast<uint_fast16_t>(0);
+    for (QEvt const *e = eq->get();
+         e != static_cast<QEvt const *>(0);
+         e = eq->get())
+    {
+        QF::gc(e); // garbage collect
+        ++n; // count the flushed event
+    }
+    return n;
 }
 
 } // namespace QP
