@@ -1,36 +1,40 @@
-//////////////////////////////////////////////////////////////////////////////
-// Product: QF/C++ port to ThreadX
-// Last updated for version 5.4.0
-// Last updated on  2015-05-13
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) Quantum Leaps, www.state-machine.com.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
-//////////////////////////////////////////////////////////////////////////////
+/// @file
+/// @brief QF/C++ port to ThreadX kernel, all supported compilers
+/// @cond
+///***************************************************************************
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
+///***************************************************************************
+/// @endcond
+
 #ifndef qf_port_h
 #define qf_port_h
 
@@ -62,6 +66,32 @@
 // interface used only inside QF, but not in applications
 //
 #ifdef QP_IMPL
+
+    // ThreadX-specific scheduler locking (implemented in qf_port.cpp)
+    #define QF_SCHED_STAT_TYPE_ QFSchedLock
+    #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \
+        if (_tx_thread_system_state != static_cast<UINT>(0)) { \
+            (pLockStat_)->m_lockPrio = \
+                static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1); \
+        } else { \
+            (pLockStat_)->lock((prio_)); \
+        } \
+    } while (false)
+    #define QF_SCHED_UNLOCK_(pLockStat_) (pLockStat_)->unlock()
+
+    namespace QP {
+        struct QFSchedLock {
+            uint_fast8_t m_lockPrio; //!< lock prio [QF numbering scheme]
+            UINT m_prevThre;         //!< previoius preemption threshold
+            TX_THREAD *m_lockHolder; //!< the thread holding the lock
+
+            void lock(uint_fast8_t prio);
+            void unlock(void) const;
+        };
+    } // namespace QP
+    extern "C" {
+        extern UINT _tx_thread_system_state; // internal TX interrupt counter
+    }
 
     // TreadX block pool operations
     #define QF_EPOOL_TYPE_   TX_BLOCK_POOL

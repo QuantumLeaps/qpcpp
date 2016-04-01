@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-30
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -136,7 +136,7 @@ int_t QF::run(void) {
             QMActive *a = active_[p];
 
 #ifdef Q_SPY
-            QS_BEGIN_NOCRIT_(QS_QVK_SCHEDULE, QS::priv_.aoObjFilter, a)
+            QS_BEGIN_NOCRIT_(QS_SCHED_NEXT, QS::priv_.aoObjFilter, a)
                 QS_TIME_(); // timestamp
                 QS_2U8_(static_cast<uint8_t>(p), // prio of the scheduled AO
                         static_cast<uint8_t>(pprev)); // previous priority
@@ -160,10 +160,10 @@ int_t QF::run(void) {
         else {
 #ifdef Q_SPY
             if (pprev != static_cast<uint_fast8_t>(0)) {
-                QS_BEGIN_NOCRIT_(QS_QVK_IDLE,
+                QS_BEGIN_NOCRIT_(QS_SCHED_IDLE,
                     static_cast<void *>(0), static_cast<void *>(0))
                     QS_TIME_(); // timestamp
-                    QS_U8_(static_cast<uint8_t>(pprev)); // previous priority
+                    QS_U8_(static_cast<uint8_t>(pprev)); // previous prio
                 QS_END_NOCRIT_()
 
                 pprev = static_cast<uint_fast8_t>(0); // update previous prio

@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.6.0
-// Last updated on  2015-12-26
+// Last updated for version 5.6.2
+// Last updated on  2016-03-31
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
@@ -83,10 +83,8 @@ int main() {
             static_cast<QP::QEvt *>(0));   // initialization event
     }
 
-    // leave the priority level (N_PHILO + 1) free for the mutex in BSP
-
     DPP::AO_Table->start(
-            static_cast<uint_fast8_t>(N_PHILO + 2), // QP priority of the AO
+            static_cast<uint_fast8_t>(N_PHILO + 1), // QP priority of the AO
             tableQueueSto,           // event queue storage
             Q_DIM(tableQueueSto),    // queue length [events]
             tableStackSto,           // stack storage

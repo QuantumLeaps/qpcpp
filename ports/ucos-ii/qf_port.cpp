@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-11
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ////**************************************************************************
 /// @endcond
 
@@ -105,7 +105,7 @@ void QMActive::start(uint_fast8_t prio,
         p_ucos,                 // uC/OS-II task priority
         static_cast<INT16U>(prio), // the unique QP priority is the task id
         static_cast<OS_STK *>(stkSto),  // pbos
-        static_cast<INT32U>(stkSize/sizeof(OS_STK)),// stack size in OS_STK units
+        static_cast<INT32U>(stkSize/sizeof(OS_STK)),// size in OS_STK units
         static_cast<void *>(0),         // pext
         static_cast<INT16U>(m_thread)); // task options, see NOTE1
 
@@ -144,7 +144,7 @@ void QMActive::stop() {
 bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin)
 #else
 bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
-                    void const * const sender)
+                     void const * const sender)
 #endif
 {
     bool status;
@@ -171,11 +171,13 @@ bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
             QF_EVT_REF_CTR_INC_(e); // increment the reference counter
         }
 
+        QF_CRIT_EXIT_();
+
         // posting the event to uC/OS-II message queue must succeed, NOTE3
         Q_ALLEGE_ID(710,
             OSQPost(m_eQueue, const_cast<QEvt *>(e)) == OS_ERR_NONE);
 
-        status = true;   // report event posted
+        status = true; // report success
     }
     else {
         // can tolerate dropping evts?
@@ -192,9 +194,10 @@ bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
             QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free (unknown)
         QS_END_NOCRIT_()
 
-        status = false; // return failure
+        QF_CRIT_EXIT_();
+
+        status = false; // report failure
     }
-    QF_CRIT_EXIT_();
 
     return status;
 }
@@ -219,11 +222,11 @@ void QMActive::postLIFO(QEvt const * const e) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
+    QF_CRIT_EXIT_();
+
     // posting the event to uC/OS-II message queue must succeed, NOTE3
     Q_ALLEGE_ID(810,
         OSQPostFront(m_eQueue, const_cast<QEvt *>(e)) == OS_ERR_NONE);
-
-    QF_CRIT_EXIT_();
 }
 //............................................................................
 QEvt const *QMActive::get_(void) {

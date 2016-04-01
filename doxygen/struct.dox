@@ -1,29 +1,7 @@
-/*! @page struct Structure and Concepts
+/*! @page struct Structure and Features
 
 @tableofcontents
 
-@section event_driven Event-Driven Programming
-Virtually all embedded systems are **event-driven** by nature, which means that they continuously wait for the occurrence of some internal or external event such as a time tick, an arrival of some data, a button press, or a touch on a touch-screen. After recognizing the event, such systems *react* by performing the appropriate computation that may include manipulating the hardware or generating "soft" events that trigger other internal software components. Once the event-handling is complete, the software goes back to waiting for the next event.
-
-However, most embedded systems are traditionally programmed in a **sequential** manner, where a program waits for *specific* events in various places in its execution path by either busy-polling or blocking on semaphore or other such mechanism of a traditional Real-Time Operating System (RTOS). Example of the basic sequential code is the traditional "Blinky" implementation:
-
-@code{.c}
-while (1) { /* RTOS task or a "superloop" */
-    BSP_ledOn();     /* turn the LED on  */
-    RTOS_delay(400); /* wait for 400 ms  */
-    BSP_ledOff();    /* turn the LED off */
-    RTOS_delay(600); /* wait for 600 ms  */
-}
-@endcode
-
-Although this approach is functional in many situations, it does not work very well when there are multiple possible events whose arrival times and order you cannot predict and where it is important to handle the events in a timely manner. The fundamental problem is that while a sequential program is waiting for one kind of event (e.g., elapsing of a time interval) it is not doing anything else and is **not responsive** to other events (e.g., a button press).
-
-For this and other reasons experienced developers turn to the long-known design strategy called **event-driven programming**, which requires a distinctly different way of thinking than conventional sequential programs. All event-driven programs are naturally divided into the application, which actually handles the events, and the supervisory event-driven infrastructure (**framework**), which waits for events and dispatches them to the application. The control resides in the event-driven framework, so from the application standpoint, the control is *inverted* compared to a traditional sequential program.
-
-The **QP/C++ framework** brings together two most effective techniques of structuring event-driven embedded systems: <a href="http://www.state-machine.com/doc/concepts.html#Active" target="_blank" class="extern">active objects</a> and <a href="http://www.state-machine.com/doc/concepts.html#HSM" target="_blank" class="extern">hierarchical state machines</a> (UML statecharts). The following sections describe the main components and structure of the framework.
-
-
-------------------------------------------------------------------------------
 @section comp Components of QP/C++
 <p>As shown in the diagram below, the QP/C++ framework has a layered structure. The Target hardware sits at the bottom. The Board Support Package (BSP) above it provides access to the board-specific features, such as the peripherals. The real-time kernel (QV, QK, QXK, or a conventional 3rd-party RTOS) provides the foundation for multitasking, such as task scheduling, context-switching, and inter-task communication. Based on these services, the event-driven framework (QF) supplies the event-driven infrastructure for executing <a href="http://www.state-machine.com/doc/concepts.html#Active" target="_blank" class="extern">active objects</a> and ensuring thread-safe event-driven exchanges among them. Finally, the event-processor (QEP) implements the hierarchical state machine semantics (based on UML statecharts). The top layer is the application-level code consisting of loosely-coupled active objects.
 </p>

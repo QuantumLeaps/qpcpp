@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.5.0/Qt 5.x
-/// Last updated on  2015-09-27
+/// Last Updated for Version: QP 5.6.2/Qt 5.x
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -105,6 +105,14 @@ void QS_onEvent(void);
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
+
+    // Qt-specific scheduler locking (not used at this point)
+    #define QF_SCHED_STAT_TYPE_ struct { uint_fast8_t m_lockPrio; }
+    #define QF_SCHED_LOCK_(pLockStat_, dummy) \
+        ((pLockStat_)->m_lockPrio = \
+            static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1))
+    #define QF_SCHED_UNLOCK_(dummy) ((void)0)
+
     // Qt-specific event queue customization
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) \

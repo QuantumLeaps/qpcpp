@@ -41,6 +41,9 @@
 
 namespace QP {
 
+//! Thread handler pointer-to-function
+typedef void (*QXThreadHandler)(void * const par);
+
 //****************************************************************************
 //! Extended (blocking) thread of the QXK preemptive kernel
 /// @description
@@ -62,8 +65,6 @@ namespace QP {
 ///
 class QXThread : public QMActive {
 public:
-    //! Thread handler pointer-to-function
-    typedef void (*QXThreadHandler)(void *par);
 
     //! public constructor
     QXThread(QXThreadHandler const handler, uint_fast8_t const tickRate);

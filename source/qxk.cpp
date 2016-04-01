@@ -4,14 +4,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-30
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -62,13 +62,13 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qxk")
 
 // Local-scope objects *******************************************************
-static void thread_ao(void *par);
-static void thread_idle(void *par);
+static void thread_ao(void * const par);
+static void thread_idle(void * const /* par */);
 
 static QXThread l_idleThread(&thread_idle, static_cast<uint_fast8_t>(0));
 
 //****************************************************************************
-static void thread_ao(void *par) { // signature of QXThreadHandler
+static void thread_ao(void * const par) { // thread handler for all AOs
     // event-loop of an AO's thread...
     for (;;) {
         QEvt const *e = static_cast<QMActive *>(par)->get_();
@@ -78,9 +78,7 @@ static void thread_ao(void *par) { // signature of QXThreadHandler
 }
 
 //****************************************************************************
-static void thread_idle(void *par) { // signature of QXThreadHandler
-    (void)par;
-
+static void thread_idle(void * const /* par */) { // idle thread handler
     QF_INT_DISABLE();
     QF::onStartup(); // application-specific startup callback
     QF_INT_ENABLE();
@@ -154,7 +152,7 @@ int_t QF::run(void) {
     /* the QXK start should not return, but just in case... */
     Q_ERROR_ID(110);
 
-    return (int_t)0;
+    return static_cast<int_t>(0);
 }
 
 //****************************************************************************
@@ -186,10 +184,11 @@ void QMActive::start(uint_fast8_t const prio,
     m_eQueue.init(qSto, qLen);   // initialize QEQueue of this AO
 
     // initialize the stack of the private thread
-    QXK_stackInit_(this, &thread_ao, stkSto, stkSize);
+    QXK_stackInit_(this,
+                   static_cast<QXThreadHandler>(&thread_ao),
+                   stkSto, stkSize);
 
     m_prio = prio;               // set the QF priority of this AO
-    m_thread.m_startPrio = prio; // set the start priority of the AO
     QF::add_(this);              // make QF aware of this AO
 
     this->init(ie); // take the top-most initial tran. (virtual)
@@ -241,10 +240,10 @@ void QMActive::stop(void) {
 ///
 /// @note QP::QXK::init() must be called once before QP::QF::run().
 ///
-void QXK::init(void *idleStkSto, uint_fast16_t idleStkSize) {
+void QXK::init(void * const idleStkSto, uint_fast16_t const idleStkSize) {
     // initialize the stack of the idle thread
     QXK_stackInit_(&l_idleThread,
-        reinterpret_cast<QXThread::QXThreadHandler>(l_idleThread.m_temp.act),
+        reinterpret_cast<QXThreadHandler>(l_idleThread.m_temp.act),
         idleStkSto, idleStkSize);
 
     // idle thread priority is zero
@@ -281,7 +280,7 @@ void QXK_sched_(void) {
 
         QXK_attr_.next = QP::QF::active_[p];
 
-        QS_BEGIN_NOCRIT_(QP::QS_QVK_SCHEDULE, QP::QS::priv_.aoObjFilter,
+        QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT, QP::QS::priv_.aoObjFilter,
                          QXK_attr_.next)
             QS_TIME_();                            // timestamp
             QS_2U8_(static_cast<uint8_t>(p),       // prio of the next AO

@@ -5,8 +5,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-30
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -57,166 +57,112 @@ namespace QP {
 
 Q_DEFINE_THIS_MODULE("qk_mutex")
 
+enum {
+    MUTEX_UNUSED = 0xFF
+};
+
 //****************************************************************************
 /// @description
-/// Initialize the QK priority ceiling mutex.
+/// Initializes QK priority-ceiling mutex to the specified ceiling priority.
 ///
-/// @param[in]     prioCeiling ceiling priotity of the mutex
+/// @param[in] prio        ceiling priority of the mutex
 ///
-/// @note The ceiling priority must be unused by any AO. The ceiling
-/// priority must be higher than priority of any AO that uses the
-/// protected resource.
+/// @note
+/// A mutex must be initialized before it can be locked or unlocked.
+///
+/// @sa QP::QMutex::lock(), QP::QMutex::unlock()
 ///
 /// @usage
+/// The following example shows how to initialize, lock and unlock QK mutex:
 /// @include qk_mux.cpp
 ///
-void QMutex::init(uint_fast8_t const prioCeiling) {
-    QF_CRIT_STAT_
-
-    QF_CRIT_ENTRY_();
-    /// @pre the celiling priority of the mutex must not be zero and cannot
-    /// exceed the maximum #QF_MAX_ACTIVE. Also, the ceiling priority must
-    /// not be already in use. QF requires priority to be __unique__.
-    ///
-    Q_REQUIRE_ID(100, (static_cast<uint_fast8_t>(0) < prioCeiling)
-                       && (prioCeiling <= (uint_fast8_t)QF_MAX_ACTIVE)
-              && (QF::active_[prioCeiling] == static_cast<QMActive *>(0)));
-
-    m_prioCeiling = prioCeiling;
-    m_lockNest = static_cast<uint_fast8_t>(0);
-
-    // reserve the ceiling priority level for this mutex
-    QF::active_[prioCeiling] = reinterpret_cast<QMActive *>(this);
-
-    QF_CRIT_EXIT_();
+void QMutex::init(uint_fast8_t const prio) {
+    m_lockPrio = prio;
+    m_prevPrio = static_cast<uint_fast8_t>(MUTEX_UNUSED);
 }
 
 //****************************************************************************
 /// @description
-/// Lock the QK priority ceiling mutex.
+/// This function locks the QK mutex.
 ///
-/// @note This function should be always paired with QXK_mutexUnlock(). The
-/// code between QK_mutexLock() and QK_mutexUnlock() should be kept to the
-/// minimum.
+/// @note
+/// A mutex must be initialized before it can be locked or unlocked.
+///
+/// @note
+/// QP::QMutex::lock() must be always followed by the corresponding
+/// QP::QMutex::unlock().
+///
+/// @sa QP::QMutex::init(), QP::QMutex::unlock()
 ///
 /// @usage
+/// The following example shows how to initialize, lock and unlock QK mutex:
 /// @include qk_mux.cpp
 ///
 void QMutex::lock(void) {
     QF_CRIT_STAT_
-
     QF_CRIT_ENTRY_();
-    // is the scheduler unloacked?
-    if (QK_currPrio_ <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) {
-        QMActive *act = QF::active_[QK_currPrio_];
 
-        /// @pre QMutex_lock() must not be called from ISR level,
-        /// the thread priority must not exceed the mutex priority ceiling
-        /// and the mutex must be initialized.
-        ///
-        Q_REQUIRE_ID(200, (!QK_ISR_CONTEXT_()) /* don't call from an ISR! */
-            && (act->m_thread <= m_prioCeiling)
-            && (QF::active_[m_prioCeiling] != static_cast<QMActive *>(0)));
+    /// @pre scheduler cannot be locked from the ISR context
+    /// and the mutex must be unused
+    Q_REQUIRE_ID(700, (!QK_ISR_CONTEXT_())
+                 && (m_prevPrio == static_cast<uint_fast8_t>(MUTEX_UNUSED)));
 
-        // is the mutex available?
-        if (m_lockNest == static_cast<uint_fast8_t>(0)) {
-            m_lockNest = static_cast<uint_fast8_t>(1);
-
-            // the priority slot must be set to this mutex
-            Q_ASSERT_ID(210, QF::active_[m_prioCeiling]
-                             == reinterpret_cast<QMActive *>(this));
-
-            // switch the priority of this thread to the ceiling priority
-            QF::active_[m_prioCeiling] = act;
-            // set to the ceiling
-            act->m_prio = m_prioCeiling;
-
-            if (QK_readySet_.hasElement(act->m_thread)) {
-                QK_readySet_.remove(act->m_thread);
-                QK_readySet_.insert(act->m_prio);
-            }
-            QK_currPrio_ = act->m_prio;
-
-            QS_BEGIN_NOCRIT_(QS_QK_MUTEX_LOCK,
-                             static_cast<void *>(0), static_cast<void *>(0))
-                QS_TIME_(); // timestamp
-                QS_2U8_(static_cast<uint8_t>(act->m_thread), // the start prio
-                        static_cast<uint8_t>(act->m_prio)); // current ceiling
-            QS_END_NOCRIT_()
-        }
-        // is the mutex locked by this thread already (nested locking)?
-        else if (QF::active_[m_prioCeiling] == act) {
-            ++m_lockNest;
-        }
-        // the mutex can't be locked by a different AO -- error
-        else {
-            Q_ERROR_ID(220);
-        }
+    m_prevPrio = QK_lockPrio_;   // save the previous prio
+    if (QK_lockPrio_ < m_lockPrio) { // raising the lock prio?
+        QK_lockPrio_ = m_lockPrio;
     }
+
+    QS_BEGIN_NOCRIT_(QS_SCHED_LOCK,
+                     static_cast<void *>(0), static_cast<void *>(0))
+        QS_TIME_(); // timestamp
+        QS_2U8_(static_cast<uint8_t>(m_prevPrio), /* the previous lock prio */
+                static_cast<uint8_t>(QK_lockPrio_)); // the new lock prio
+    QS_END_NOCRIT_()
+
     QF_CRIT_EXIT_();
 }
 
 //****************************************************************************
 /// @description
-/// Unlock the QK priority ceiling mutex.
+/// This function unlocks the QK mutex.
 ///
-/// @param[in,out] me      pointer (see @ref oop)
+/// @note
+/// A mutex must be initialized before it can be locked or unlocked.
 ///
-/// @note This function should be always paired with QK_mutexLock(). The
-/// code between QK_mutexLock() and QK_mutexUnlock() should be kept to the
-/// minimum.
+/// @note
+/// QP::QMutex::unlock() must always follow the corresponding
+/// QP::QMutex::lock().
+///
+/// @sa QP::QMutex::init(), QP::QMutex::lock()
 ///
 /// @usage
+/// The following example shows how to initialize, lock and unlock QK mutex:
 /// @include qk_mux.cpp
 ///
 void QMutex::unlock(void) {
     QF_CRIT_STAT_
-
     QF_CRIT_ENTRY_();
-    // is the scheduler unloacked?
-    if (QK_currPrio_ <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) {
-        QMActive *act = QF::active_[QK_currPrio_];
 
-        /// @pre QMutex_unlock() must not be called from ISR level
-        /// and the mutex must be owned by this thread.
-        ///
-        Q_REQUIRE_ID(300, (!QK_ISR_CONTEXT_()) /* don't call from an ISR! */
-                          && (m_lockNest > static_cast<uint_fast8_t>(0))
-                          && (QF::active_[m_prioCeiling] == act));
+    /// @pre scheduler cannot be unlocked from the ISR context
+    /// and the mutex must not be unused
+    Q_REQUIRE_ID(800, (!QK_ISR_CONTEXT_())
+                 && (m_prevPrio != static_cast<uint_fast8_t>(MUTEX_UNUSED)));
 
-        // Unlocking the first nesting level?
-        if (m_lockNest == static_cast<uint_fast8_t>(1)) {
-            uint_fast8_t p;
+    QS_BEGIN_NOCRIT_(QS_SCHED_UNLOCK,
+                     static_cast<void *>(0), static_cast<void *>(0))
+        QS_TIME_(); // timestamp
+        QS_2U8_(static_cast<uint8_t>(m_prevPrio),/* the previouis lock prio */
+                static_cast<uint8_t>(QK_lockPrio_)); // the new lock prio
+    QS_END_NOCRIT_()
 
-            m_lockNest = static_cast<uint_fast8_t>(0);
+    uint_fast8_t p = m_prevPrio;
+    m_prevPrio = static_cast<uint_fast8_t>(MUTEX_UNUSED);
 
-            // reclaim the ceiling priority for this mutex
-            QF::active_[m_prioCeiling] = reinterpret_cast<QMActive *>(this);
-
-            // restore the start priority for this AO...
-            act->m_prio  = act->m_thread;
-            QK_currPrio_ = act->m_thread;
-            if (QK_readySet_.hasElement(m_prioCeiling)) {
-                QK_readySet_.remove(m_prioCeiling);
-                QK_readySet_.insert(act->m_thread);
-            }
-
-            QS_BEGIN_NOCRIT_(QS_QK_MUTEX_UNLOCK,
-                             static_cast<void *>(0), static_cast<void *>(0))
-                QS_TIME_();                      // timestamp
-                QS_2U8_(static_cast<uint8_t>(act->m_thread), // the start prio
-                        static_cast<uint8_t>(m_prioCeiling));// curr ceiling
-            QS_END_NOCRIT_()
-
-            // find if some other AO has higher priority than the current
-            p = QK_schedPrio_();
-            if (p != static_cast<uint_fast8_t>(0)) {
-                QK_sched_(p);
-            }
-        }
-        // this AO is releasing a nested mutex lock
-        else {
-            --m_lockNest;
+    if (QK_lockPrio_ > p) {
+        QK_lockPrio_ = p; // restore the previous lock prio
+        p = QK_schedPrio_(); // find the highest-prio AO ready to run
+        if (p != static_cast<uint_fast8_t>(0)) { // priority found?
+            QK_sched_(p); // schedule any unlocked AOs
         }
     }
     QF_CRIT_EXIT_();

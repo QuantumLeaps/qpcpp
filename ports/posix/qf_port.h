@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-14
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -85,6 +85,13 @@ extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
 // interface used only inside QF, but not in applications
 //
 #ifdef QP_IMPL
+
+    // POSIX-specific scheduler locking (not used at this point)
+    #define QF_SCHED_STAT_TYPE_ struct { uint_fast8_t m_lockPrio; }
+    #define QF_SCHED_LOCK_(pLockStat_, dummy) \
+        ((pLockStat_)->m_lockPrio = \
+            static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1))
+    #define QF_SCHED_UNLOCK_(dummy) ((void)0)
 
     // native QF event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \

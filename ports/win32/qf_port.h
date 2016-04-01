@@ -2,14 +2,14 @@
 /// \brief QF/C++ port to Win32 API
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.4.2
-/// Last updated on  2015-06-05
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// \endcond
 
@@ -139,6 +139,16 @@ void QF_onClockTick(void);
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
+
+    // Win32-specific scheduler locking, see NOTE2
+    #define QF_SCHED_STAT_TYPE_ struct { uint_fast8_t m_lockPrio; }
+    #define QF_SCHED_LOCK_(pLockStat_, dummy) do { \
+        QF_enterCriticalSection_(); \
+        ((pLockStat_)->m_lockPrio = \
+            static_cast<uint_fast8_t>(QF_MAX_ACTIVE)); \
+    } while (false)
+    #define QF_SCHED_UNLOCK_(dummy) QF_leaveCriticalSection_()
+
     // Win32-specific event queue customization
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) { \
@@ -211,6 +221,12 @@ void QF_onClockTick(void);
 // information.
 //
 // NOTE2:
+// Scheduler locking (used inside QF_publish_()) is implemented in this
+// port with the main critical section. This means that event multicasting
+// will appear atomic, in the sense that no thread will be able to post
+// events during multicasting.
+//
+// NOTE3:
 // Windows is not a deterministic real-time system, which means that the
 // system can occasionally and unexpectedly "choke and freeze" for a number
 // of seconds. The designers of Windows have dealt with these sort of issues

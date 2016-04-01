@@ -3,14 +3,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-28
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -59,7 +59,8 @@ Q_DEFINE_THIS_MODULE("qxk_xthr")
 //! constructor of a "naked" thread
 QXThread::QXThread(QXThreadHandler const handler, uint_fast8_t const tickRate)
   : QMActive(Q_STATE_CAST(handler)),
-    m_timeEvt(this, static_cast<enum_t>(QXK_DELAY_SIG), static_cast<uint8_t>(tickRate))
+    m_timeEvt(this, static_cast<enum_t>(QXK_DELAY_SIG),
+                    static_cast<uint8_t>(tickRate))
 {
     m_state.act = Q_ACTION_CAST(0); // mark as naked thread
 }
@@ -100,7 +101,6 @@ void QXThread::start(uint_fast8_t const prio,
                    stkSto, stkSize);
 
     m_prio = prio;
-    m_thread.m_startPrio = prio;
     QF::add_(this); // make QF aware of this naked thread
 
     QF_CRIT_ENTRY_();
@@ -161,6 +161,8 @@ void QXThread::postLIFO(QEvt const * const /*e*/) {
 //****************************************************************************
 // must be called from within a critical section
 void QXThread::block_(void) const {
+    /// @pre the thread holding the lock cannot block!
+    Q_REQUIRE_ID(100,  m_prio != QXK_attr_.lockPrio);
     QXK_attr_.readySet.remove(m_prio);
     QXK_sched_();
 }
@@ -170,10 +172,9 @@ void QXThread::block_(void) const {
 void QXThread::unblock_(void) const {
     QXK_attr_.readySet.insert(m_prio);
 
-    // not inside ISR? Multitasking started?
-    if ((!QXK_ISR_CONTEXT_())
-        && (QXK_attr_.curr != static_cast<QMActive *>(0)))
-     {
+    if ((!QXK_ISR_CONTEXT_()) // not inside ISR?
+        && (QXK_attr_.curr != static_cast<void *>(0))) // kernel started?
+    {
         QXK_sched_();
     }
 }
@@ -191,7 +192,7 @@ void QXThread::teArm_(enum_t const sig,
 
         // is the time event unlinked?
         // NOTE: For the duration of a single clock tick of the specified tick
-        // rate a time event can be disarmed and yet still linked into the list,
+        // rate a time event can be disarmed and yet still linked in the list,
         // because un-linking is performed exclusively in QF_tickX().
         //
         if ((m_timeEvt.refCtr_ & static_cast<uint8_t>(0x80))
@@ -200,8 +201,8 @@ void QXThread::teArm_(enum_t const sig,
             m_timeEvt.refCtr_ |= static_cast<uint8_t>(0x80); // mark as linked
 
             // The time event is initially inserted into the separate
-            // "freshly armed" link list based on QF::timeEvtHead_[tickRate].act.
-            // Only later, inside the QF::tickX() function, the "freshly armed"
+            // "freshly armed" list based on QF::timeEvtHead_[tickRate].act.
+            // Only later, inside QF::tickX() function, the "freshly armed"
             // list is appended to the main list of armed time events based on
             // QF_timeEvtHead_[tickRate].next. Again, this is to keep any
             // changes to the main list exclusively inside QF::tickX().

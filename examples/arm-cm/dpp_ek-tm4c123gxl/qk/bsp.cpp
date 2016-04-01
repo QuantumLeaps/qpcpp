@@ -269,7 +269,7 @@ uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
 }
 //............................................................................
 void BSP::randomSeed(uint32_t seed) {
-    l_rndMutex.init(N_PHILO + 1U);
+    l_rndMutex.init(N_PHILO); // ceiling <== maximum Philo priority
     l_rnd = seed;
 }
 //............................................................................

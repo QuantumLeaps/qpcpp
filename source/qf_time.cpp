@@ -81,7 +81,7 @@ void QF::tickX_(uint8_t const tickRate, void const * const sender)
 
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_TICK, static_cast<void *>(0), static_cast<void *>(0))
+    QS_BEGIN_NOCRIT_(QS_QF_TICK, static_cast<void*>(0), static_cast<void*>(0))
         QS_TEC_(static_cast<QTimeEvtCtr>(++prev->m_ctr)); // tick ctr
         QS_U8_(tickRate);                                 // tick rate
     QS_END_NOCRIT_()

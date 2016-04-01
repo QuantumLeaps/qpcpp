@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 5.6.2
-/// Last updated on  2016-02-10
+/// Last updated on  2016-02-11
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -65,7 +65,8 @@ Q_DEFINE_THIS_MODULE("qf_defer")
 /// An active object can use multiple event queues to defer events of
 /// different kinds.
 ///
-/// @sa QP::QMActive::recall(), QP::QEQueue
+/// @sa QP::QMActive::recall(), QP::QEQueue, QP::QMActive::flushDeferred()
+///
 bool QMActive::defer(QEQueue * const eq, QEvt const * const e) const {
     return eq->post(e, static_cast<uint_fast16_t>(1)); // non-asserting post
 }
@@ -87,6 +88,7 @@ bool QMActive::defer(QEQueue * const eq, QEvt const * const e) const {
 /// different kinds.
 ///
 /// @sa QP::QMActive::recall(), QP::QEQueue, QP::QMActive::postLIFO_()
+///
 bool QMActive::recall(QEQueue * const eq) {
     QEvt const * const e = eq->get(); // try to get evt from deferred queue
     bool const recalled = (e != static_cast<QEvt const *>(0));//evt available?
@@ -127,6 +129,7 @@ bool QMActive::recall(QEQueue * const eq) {
 ///
 ///
 /// @sa QP::QMActive::defer(), QP::QMActive::recall(), QP::QEQueue
+///
 uint_fast16_t QMActive::flushDeferred(QEQueue * const eq) const {
     uint_fast16_t n = static_cast<uint_fast16_t>(0);
     for (QEvt const *e = eq->get();

@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.6.0
-// Last updated on  2015-12-26
+// Last updated for version 5.6.2
+// Last updated on  2016-04-01
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -274,6 +274,18 @@
  QK_schedExt_,
  QK_schedPrio_,
  QK_ceilingPrio_)
+
+
+// QXK
+-estring(1960,        // 11-0-1(req) non-private data member
+ curr,
+ next,
+ lockPrio,
+ lockHolder,
+ readySet)
+-esym(1712,           // default constructor not defined
+ QXThread) 
+-esym(1960, signal)   // 17-0-2, Re-use of C++ identifier
 
 
 // QS

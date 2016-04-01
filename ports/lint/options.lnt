@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last updated for version 5.5.0
-// Last updated on  2015-09-25
+// Last updated for version 5.6.2
+// Last updated on  2016-03-31
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -101,10 +101,16 @@ qpcpp.lnt         // QP/C++ options
  QF_EVT_REF_CTR_,
  QF_CRIT_ENTRY_,
  QF_CRIT_EXIT_,
+ QF_SCHED_LOCK_,
+ QF_SCHED_UNLOCK_,
  QF_PTR_AT_,
  QF_PTR_RANGE_,
  QF_PTR_INC_,
  QF_QACTIVE_TO_QHSM_CAST_)
+-esym(1923,
+ QF_SCHED_STAT_TYPE_,       // 16-2-2 Macro could become const variable 
+ QF_SCHED_LOCK_,
+ QF_SCHED_UNLOCK_)
 -emacro(740,                // 5-2-7 Unusual pointer cast (incompatible indirect types)
  QF_QACTIVE_TO_QHSM_CAST_)
 -efunc(818,                 // 7-1-2 'stkSto' could be const
@@ -121,13 +127,14 @@ qpcpp.lnt         // QP/C++ options
 -esym(1960, QP::QF_*)       // 3-2-3, object/function previously declared
                             // reported incorrectly for qf_pkg.h
 
-
-// QV/QK
+// QV/QK/QXK
 -emacro(925,                // 5-2-8, 5-2-9 cast from pointer to pointer
  QK_TLS)
 -esym(1960,                 // 16-0-4 function-like macro
  QK_ISR_CONTEXT_)
 -efunc(527, *QF::run)       // 0-1-1 Unreachable code
+-esym(1923,
+ QACTIVE_EQUEUE_ONEMPTY_)   // 16-2-2 Macro could become const variable 
 
 
 // QS -- the following options are needed only when Q_SPY is defined

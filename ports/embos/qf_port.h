@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to embOS (v4.00) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-11
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -79,6 +79,19 @@ void QF_setEmbOsTaskAttr(QMActive *act, uint32_t attr);
 //
 #ifdef QP_IMPL
 
+    // embOS-specific scheduler locking, see NOTE3
+    #define QF_SCHED_STAT_TYPE_ struct { uint_fast8_t m_lockPrio; }
+    #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \
+        if (OS_InInt != (OS_U8)0) { \
+            (pLockStat_)->m_lockPrio = \
+                static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1); \
+        } else { \
+            (pLockStat_)->m_lockPrio = (prio_); \
+            OS_EnterRegion(); \
+        } \
+    } while (0)
+    #define QF_SCHED_UNLOCK_(dummy) OS_LeaveRegion()
+
     // native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
@@ -103,6 +116,11 @@ void QF_setEmbOsTaskAttr(QMActive *act, uint32_t attr);
 // implementation uses a global up-down counter, which allows the embOS
 // critical section to nest. Nesting of critical sections is needed in this
 // QP-embOS port.
+//
+// NOTE3:
+// embOS provides only global scheduler locking for all thread priorities
+// by means of OS_EnterRegion() and OS_LeaveRegion(). Therefore, locking the
+// scheduler only up to the specified lock priority is not supported.
 //
 
 #endif // qf_port_h

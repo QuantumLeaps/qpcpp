@@ -3,14 +3,14 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-26
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -102,16 +102,18 @@ public:
     static void onIdle(void);
 };
 
-/*! Priority Ceiling Mutex the QK preemptive kernel */
+/*! Priority-ceiling Mutex the QK preemptive kernel */
 class QMutex {
 public:
-    void init(uint_fast8_t const prioCeiling);
+    void init(uint_fast8_t const prio);
     void lock(void);
     void unlock(void);
 
 private:
-    uint_fast8_t m_prioCeiling;
-    uint_fast8_t m_lockNest;
+    uint_fast8_t m_lockPrio; //!< lock prio (priority ceiling)
+    uint_fast8_t m_prevPrio; //!< previoius lock prio
+
+    friend class QF;
 };
 
 } // namespace QP
@@ -135,6 +137,7 @@ uint_fast8_t QK_schedPrio_(void);
 #endif
 
 extern uint_fast8_t volatile QK_currPrio_; //!< current task/ISR priority
+extern uint_fast8_t volatile QK_lockPrio_; //!< lock prio (0 == no-lock)
 
 #ifndef QK_ISR_CONTEXT_
     extern uint_fast8_t volatile QK_intNest_;  //!< interrupt nesting level
@@ -154,6 +157,25 @@ extern uint_fast8_t volatile QK_currPrio_; //!< current task/ISR priority
         #define QK_ISR_CONTEXT_() \
             (QK_intNest_ != static_cast<uint_fast8_t>(0))
     #endif // QK_ISR_CONTEXT_
+
+    // QF-specific scheduler locking
+    //! Internal port-specific macro to represent the scheduler lock status
+    // that needs to be preserved to allow nesting of locks.
+    #define QF_SCHED_STAT_TYPE_ QMutex
+
+    //! Internal port-specific macro for selective scheduler locking.
+    #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \
+        if (QK_ISR_CONTEXT_()) { \
+            (pLockStat_)->m_lockPrio = \
+                static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1); \
+        } else { \
+            (pLockStat_)->init((prio_)); \
+            (pLockStat_)->lock(); \
+        } \
+    } while (false)
+
+    //! Internal port-specific macro for selective scheduler unlocking.
+    #define QF_SCHED_UNLOCK_(pLockStat_) (pLockStat_)->unlock()
 
     // native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \

@@ -4,14 +4,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-29
+/// Last updated for version 5.6.2
+/// Last updated on  2016-03-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -73,6 +73,8 @@ extern "C" {
 struct QXK_Attr {
     void *curr;  //!< currently executing thread
     void *next;  //!< next thread to execute
+    uint_fast8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
+    uint_fast8_t volatile lockHolder; //!< prio of the lock holder
 #ifndef QXK_ISR_CONTEXT_
     uint_fast8_t volatile intNest; //!< ISR nesting level
 #endif // QXK_ISR_CONTEXT_
@@ -95,7 +97,7 @@ namespace QP {
 //! Type of the QMActive.m_thread member for the QXK kernel
 struct QXK_ThreadType {
     void *m_stack;            //!< top of the per-thread stack
-    uint_fast8_t m_startPrio; //!< start priority of the thread
+    // ... possibly other thread attributes in the future
 };
 
 //****************************************************************************
@@ -116,7 +118,8 @@ public:
     /// @description
     /// QP::QXK::init() must be called from the application before
     /// QP::QF::run() to initialize the stack for the QXK idle thread.
-    static void init(void *idleStkSto, uint_fast16_t idleStkSize);
+    static void init(void * const idleStkSto,
+                     uint_fast16_t const idleStkSize);
 
     //! QXK idle callback (customized in BSPs for QXK)
     /// @description
@@ -142,7 +145,7 @@ class QXMutex {
 public:
 
     //! initialize the QXK priority-ceiling mutex
-    void init(uint_fast8_t const prioCeiling);
+    void init(uint_fast8_t const prio);
 
     //! lock the QXK priority-ceiling mutex
     void lock(void);
@@ -151,13 +154,11 @@ public:
     void unlock(void);
 
 private:
-    uint_fast8_t m_prioCeiling;
-    uint_fast8_t m_lockNest;
-#if (QF_MAX_ACTIVE <= 8)
-    QP::QPSet8  m_waitSet; //!< set of "naked" threads waiting on this mutex
-#else
-    QP::QPSet64 m_waitSet; //!< set of "naked" threads waiting on this mutex
-#endif
+    uint_fast8_t m_lockPrio;   //!< lock prio (priority ceiling)
+    uint_fast8_t m_prevPrio;   //!< previoius lock prio
+    uint_fast8_t m_prevHolder; //!< priority of the thread holding the lock
+
+    friend class QF;
 };
 
 } // namespace QP
@@ -184,6 +185,19 @@ void QXK_sched_(void);
         #define QXK_ISR_CONTEXT_() \
             (QXK_attr_.intNest != static_cast<uint_fast8_t>(0))
     #endif // QXK_ISR_CONTEXT_
+
+    // QF-specific scheduler locking
+    #define QF_SCHED_STAT_TYPE_ QXMutex
+    #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \
+        if (QXK_ISR_CONTEXT_()) { \
+            (pLockStat_)->m_lockPrio = \
+                static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1); \
+        } else { \
+            (pLockStat_)->init((prio_)); \
+            (pLockStat_)->lock(); \
+        } \
+    } while (0)
+    #define QF_SCHED_UNLOCK_(pLockStat_) (pLockStat_)->unlock()
 
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         if ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt *>(0)) { \

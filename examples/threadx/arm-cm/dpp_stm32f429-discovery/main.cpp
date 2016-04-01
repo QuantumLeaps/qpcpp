@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-// Product: DPP example
-// Last updated for version 5.4.0
-// Last updated on  2015-05-13
+// Product: DPP example for ThreadX
+// Last updated for version 5.6.2
+// Last updated on  2016-03-10
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,18 +28,18 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
 
 //............................................................................
-int main(int argc, char *argv[]) {
-    BSP_init(argc, argv);  // initialize the Board Support Package
-    tx_kernel_enter();     // transfet control to the ThreadX RTOS
-    return 0;              // tx_kernel_enter() does not return
+int main() {
+    DPP::BSP_init();    // initialize the Board Support Package
+    tx_kernel_enter();  // transfet control to the ThreadX RTOS
+    return 0;           // tx_kernel_enter() does not return
 }
 //............................................................................
 void tx_application_define(void *first_unused_memory) {
