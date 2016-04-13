@@ -4,8 +4,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.6.3
+/// Last updated on  2016-04-12
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -304,8 +304,18 @@ void QK_sched_(uint_fast8_t p) {
         QF_INT_DISABLE();
 
         // find new highest-prio AO ready to run...
-        p = QK_schedPrio_();
+        p = QK_readySet_.findMax();
 
+        // is the new priority below the current preemption threshold?
+        if (p <= pin) {
+            p = static_cast<uint_fast8_t>(0); // active object not eligible
+        }
+        else if (p <= QK_lockPrio_) { // is it below the lock prio?
+            p = static_cast<uint_fast8_t>(0); // active object not eligible
+        }
+        else {
+            Q_ASSERT_ID(710, p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE));
+        }
     } while (p != static_cast<uint_fast8_t>(0));
 
     QK_currPrio_ = pin; // restore the initial priority

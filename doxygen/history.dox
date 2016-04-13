@@ -3,8 +3,12 @@ namespace QP {
 /** @page history Revision History
 
 
-@section qpcpp_5_6_2 Version 5.6.2, 2016-03-31
+@section qpcpp_5_6_3 Version 5.6.3, 2016-04-12
+This release fixes a serious Bug #127 (https://sourceforge.net/p/qpc/bugs/127 ) in the QK preemptive scheduler introduced in QP 5.6.2.
 
+
+------------------------------------------------------------------------------
+@section qpcpp_5_6_2 Version 5.6.2, 2016-03-31
 The main purpose of this release is to introduce _atomic event multicasting_, meaning that event publishing to all subscribers is now protected from preemption. This eliminates potential for re-ordering of events under preemptive kernels (such as QK, QXK, or 3rd-party RTOSes), when events are published from low-priority AOs and some higher-priority subscribers can preempt multicasting and post/publish events of their own (before the original event is posted to all subscribers).
 
 The atomic event multicasting is implemented by means of selective scheduler locking--very much like a priory-ceiling mutex. During event multicasting the scheduler gets locked, but only up to the highest-priority subscriber to a given event. The whole point here is that active objects with priorities above such "priority ceiling" are _not_ affected. Please see the discussion thread:
