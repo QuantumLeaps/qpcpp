@@ -2,8 +2,8 @@
 /// @brief QK/C++ port to ARM Cortex-M, preemptive QK kernel, IAR-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-28
+/// Last updated for version 5.6.4
+/// Last updated on  2016-04-25
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -43,19 +43,9 @@
 
 /* QK interrupt entry and exit */
 #define QK_ISR_ENTRY() ((void)0)
-
-#define QK_ISR_EXIT()  do { \
-    QF_INT_DISABLE(); \
-    uint_fast8_t nextPrio_ = QK_schedPrio_(); \
-    if (nextPrio_ != static_cast<uint_fast8_t>(0)) { \
-        QK_nextPrio_ = nextPrio_; \
-        (*Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) \
-            = static_cast<uint32_t>(1U << 28)); \
-    } \
-    QF_INT_ENABLE(); \
-} while (false)
-
-extern uint_fast8_t QK_nextPrio_; // priority of the next task to execute
+#define QK_ISR_EXIT()  \
+    ((*Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = \
+        static_cast<uint32_t>(1U << 28)))
 
 #include "qk.h" // QK platform-independent public interface
 

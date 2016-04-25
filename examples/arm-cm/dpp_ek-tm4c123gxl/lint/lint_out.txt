@@ -8,7 +8,6 @@
 "C:\qp\qpcpp\ports\arm-cm\qk\gnu\qk_port.h" 48 19 Warning 530: Symbol 'regIPSR' (line 46) not initialized [MISRA C++ Rule 8-5-1]
 "C:\qp\qpcpp\ports\arm-cm\qk\gnu\qk_port.h" 46 1 Info 830: Location cited in prior message
 "C:\qp\qpcpp\ports\arm-cm\qk\gnu\qk_port.h" 52 32 Note 1923: macro 'QK_ISR_ENTRY' could become const variable [MISRA C++ Rule 16-2-2]
-"C:\qp\qpcpp\ports\arm-cm\qk\gnu\qk_port.h" 65 33 Note 1960: Violates MISRA C++ 2008 Required Rule 7-3-1, Global declaration of symbol 'QK_nextPrio_' 
 "C:\qp\qpcpp\include\qpset.h" 128 58 Note 1960: Violates MISRA C++ 2008 Required Rule 5-0-8, Cast of integer cvalue expression to larger type
 "C:\qp\qpcpp\include\qpset.h" 221 21 Note 1960: Violates MISRA C++ 2008 Required Rule 5-0-8, Cast of integer cvalue expression to larger type
 "C:\qp\qpcpp\include\qpset.h" 224 21 Note 1960: Violates MISRA C++ 2008 Required Rule 5-0-8, Cast of integer cvalue expression to larger type
@@ -57,7 +56,6 @@
 "C:\qp\qpcpp\ports\arm-cm\qk\gnu\qk_port.h" 48 19 Warning 530: Symbol 'regIPSR' (line 46) not initialized [MISRA C++ Rule 8-5-1]
 "C:\qp\qpcpp\ports\arm-cm\qk\gnu\qk_port.h" 46 1 Info 830: Location cited in prior message
 "C:\qp\qpcpp\ports\arm-cm\qk\gnu\qk_port.h" 52 32 Note 1923: macro 'QK_ISR_ENTRY' could become const variable [MISRA C++ Rule 16-2-2]
-"C:\qp\qpcpp\ports\arm-cm\qk\gnu\qk_port.h" 65 33 Note 1960: Violates MISRA C++ 2008 Required Rule 7-3-1, Global declaration of symbol 'QK_nextPrio_' 
 "C:\qp\qpcpp\ports\arm-cm\qk\gnu\qs_port.h" 51 10 Warning 537: Repeated include file 'C:\qp\qpcpp\ports\arm-cm\qk\gnu\qf_port.h'
 "C:\qp\qpcpp\include\qs.h" 61 9 Note 1960: Violates MISRA C++ 2008 Required Rule 16-0-4, Function-like macro defined: 'QS_PTR_AT_' 
 "C:\qp\qpcpp\include\qs.h" 61 37 Note 1960: Violates MISRA C++ 2008 Required Rule 16-0-6, unparenthesized macro parameter in definition of macro: 'QS_PTR_AT_'
@@ -476,4 +474,4 @@ Count   Type    Number  Text
 2       Note    963     Qualifier const or volatile ___ a type; use ___ to reverse the test
 1       Note    1914    Default constructor '___' (___) not referenced
 2       Note    1923    macro '___' could become const variable
-27      Note    1960    Violates MISRA C++ 2008 Required Rule ___, ___
+25      Note    1960    Violates MISRA C++ 2008 Required Rule ___, ___

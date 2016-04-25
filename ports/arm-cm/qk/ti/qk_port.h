@@ -2,8 +2,8 @@
 /// @brief QK/C++ port to ARM Cortex-M, preemptive QK kernel, TI-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-30
+/// Last updated for version 5.6.4
+/// Last updated on  2016-04-25
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -38,11 +38,19 @@
 #ifndef qk_port_h
 #define qk_port_h
 
-// QK interrupt entry and exit (defined in assembly)
+// determination if the code executes in the ISR context
+#define QK_ISR_CONTEXT_() (QK_get_IPSR() != static_cast<uint32_t>(0))
+
+// QK interrupt entry and exit
+#define QK_ISR_ENTRY() ((void)0)
+#define QK_ISR_EXIT()  \
+    ((*Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = \
+        static_cast<uint32_t>(1U << 28)))
+
 extern "C" {
-    void QK_ISR_ENTRY(void);
-    void QK_ISR_EXIT(void);
-} // extern "C"
+    // get the IPSR defined in assembly
+    uint32_t QK_get_IPSR(void);
+}
 
 #include "qk.h" // QK platform-independent public interface
 
