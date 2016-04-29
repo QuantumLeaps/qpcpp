@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-01-22
+/// Last updated for version 5.6.4
+/// Last updated on  2016-04-25
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -47,7 +47,6 @@
 
 #include <limits.h>      // for PTHREAD_STACK_MIN
 #include <sys/mman.h>    // for mlockall()
-#include <sys/select.h>
 
 namespace QP {
 
@@ -57,8 +56,9 @@ Q_DEFINE_THIS_MODULE("qf_port")
 pthread_mutex_t QF_pThreadMutex_ = PTHREAD_MUTEX_INITIALIZER;
 
 // Local-scope objects -------------------------------------------------------
-static long int l_tickUsec = 10000UL; // clock tick in usec (for tv_usec)
 static bool l_running;
+static struct timespec l_tick;
+enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 
 static void *ao_thread(void *arg); // thread routine for all AOs
 
@@ -75,6 +75,9 @@ void QF::init(void) {
     bzero(&QF::timeEvtHead_[0],
           static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
     bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
+
+    l_tick.tv_sec = 0;
+    l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC/100L; // default clock tick
 }
 //............................................................................
 int_t QF::run(void) {
@@ -90,13 +93,11 @@ int_t QF::run(void) {
         // setting priority failed, probably due to insufficient privieges
     }
 
-    struct timeval timeout = { 0 }; // timeout for select()
     l_running = true;
-    while (l_running) {
+    while (l_running) { // the clock tick loop...
         QF_onClockTick(); // clock tick callback (must call QF_TICK_X())
 
-        timeout.tv_usec = l_tickUsec;
-        select(0, 0, 0, 0, &timeout); // sleep for the full tick , NOTE05
+        nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
     }
     onCleanup(); // invoke cleanup callback
     pthread_mutex_destroy(&QF_pThreadMutex_);
@@ -104,7 +105,7 @@ int_t QF::run(void) {
 }
 //............................................................................
 void QF_setTickRate(uint32_t ticksPerSec) {
-    l_tickUsec = 1000000UL / ticksPerSec;
+    l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
 }
 //............................................................................
 void QF::stop(void) {
@@ -225,22 +226,7 @@ static void *ao_thread(void *arg) { // the expected POSIX signature
 // I/O), and the rest highest-priorities for the active objects.
 //
 // NOTE05:
-// The select() system call seems to deliver the finest time granularity of
-// 1 clock tick. The timeout value passed to select() is rounded up to the
-// nearest tick (10 ms on desktop Linux). The timeout cannot be too short,
-// because the system might choose to busy-wait for very short timeouts.
-// An alternative, POSIX nanosleep() system call seems to deliver only 20ms
-// granularity.
-//
-// Here the select() call is used not just as a fairly portable way to sleep
-// with subsecond precision. The select() call is also used to detect any
-// characters typed on the console.
-//
-// Also according to man pages, on Linux, the function select() modifies
-// timeout to reflect the amount of time not slept; most other implementations
-// do not do this. This causes problems both when Linux code which reads
-// timeout is ported to other operating systems, and when code is ported to
-// Linux that reuses a struct timeval for multiple selects in a loop without
-// reinitializing it. Here the microsecond part of the structure is re-
-// initialized before each select() call.
+// In some (older) Linux kernels, the POSIX nanosleep() system call might
+// deliver only 2*actual-system-tick granularity. To compensate for this,
+// you would need to reduce (by 2) the constant NANOSLEEP_NSEC_PER_SEC.
 //
