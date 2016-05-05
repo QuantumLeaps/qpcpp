@@ -1,7 +1,7 @@
 ##############################################################################
-# Product: Makefile for QP/C++ port to Win32-QV API, MinGW toolset
-# Last Updated for Version: 5.5.0
-# Date of the Last Update:  2015-09-24
+# Product: Makefile for QP/C++ port to Win32 API, MinGW toolset
+# Last Updated for Version: 5.6.4
+# Date of the Last Update:  2016-05-04
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -96,8 +96,8 @@ CPP_SRCS := \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
 	qf_time.cpp \
-	win32_gui.cpp \
-	qf_port.cpp
+	qf_port.cpp \
+	qwin_gui.cpp
 
 # C++ QS source files
 CPP_QS_SRCS := \
@@ -107,7 +107,7 @@ CPP_QS_SRCS := \
 	qs_64bit.cpp
 
 # defines
-DEFINES  := -DWIN32_GUI
+DEFINES  := -DQWIN_GUI
 
 #-----------------------------------------------------------------------------
 # MinGW toolset (NOTE: assumed to be on your PATH)

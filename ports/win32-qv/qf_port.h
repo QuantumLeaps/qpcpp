@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.6.4
+/// Last updated on  2016-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -85,8 +85,8 @@ void QF_onClockTick(void);
 } // namespace QP
 
 
-// special adaptations for Win32 GUI applications
-#ifdef WIN32_GUI
+// special adaptations for QWIN GUI applications
+#ifdef QWIN_GUI
     // replace main() with main_gui() as the entry point to a GUI app.
     #define main() main_gui()
     int_t main_gui(); // prototype of the GUI application entry point

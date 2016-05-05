@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-30
+/// Last updated for version 5.6.4
+/// Last updated on  2016-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -260,7 +260,7 @@ public:
 
     friend class QF;
     friend class QTimeEvt;
-    friend class QMutex;
+    friend class QKMutex;
     friend class QXK;
     friend class QXThread;
     friend class QXMutex;

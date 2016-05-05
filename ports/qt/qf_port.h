@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.6.2/Qt 5.x
-/// Last updated on  2016-03-31
+/// Last Updated for Version: QP 5.6.4/Qt 5.x
+/// Last updated on  2016-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -67,6 +67,7 @@
 
 class QWaitCondition; // forward declaration
 class QThread;        // forward declaration
+class QMutex;         // forward declaration
 
 #include "qep_port.h" // QEP port
 #include "qequeue.h"  // Qt port uses event-queue
@@ -94,6 +95,10 @@ void QF_setTickRate(uint32_t ticksPerSec);
 
 // clock tick callback (provided in the app)
 void QF_onClockTick(void);
+
+#ifdef QP_IMPL
+extern QMutex QF_qtMutex_;
+#endif
 
 #ifdef Q_SPY
 void QS_onEvent(void);
@@ -134,10 +139,6 @@ void QS_onEvent(void);
 
     #include <QMutex>
     #include <QWaitCondition>
-
-namespace QP {
-    extern QMutex QF_qtMutex_;
-} // namespace QP
 
 #endif // QP_IMPL
 

@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, preemptive QK kernel
-// Last updated for version 5.6.0
-// Last updated on  2015-12-26
+// Last updated for version 5.6.4
+// Last updated on  2016-05-04
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -76,7 +76,7 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 #define BTN_SW2     (1U << 0)
 
 static uint32_t l_rnd; // random seed
-static QP::QMutex l_rndMutex; // to protect the random number generator
+static QP::QKMutex l_rndMutex; // to protect the random number generator
 
 #ifdef Q_SPY
 

@@ -1,4 +1,4 @@
-QMutex l_rndMutex;  // mutex to protect the random number generator
+QKMutex l_rndMutex;  // mutex to protect the random number generator
 
 
 void BSP::randomSeed(uint32_t seed) {

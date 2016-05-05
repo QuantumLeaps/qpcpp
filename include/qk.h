@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.6.4
+/// Last updated on  2016-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -103,7 +103,7 @@ public:
 };
 
 /*! Priority-ceiling Mutex the QK preemptive kernel */
-class QMutex {
+class QKMutex {
 public:
     void init(uint_fast8_t const prio);
     void lock(void);
@@ -161,7 +161,7 @@ extern uint_fast8_t volatile QK_lockPrio_; //!< lock prio (0 == no-lock)
     // QF-specific scheduler locking
     //! Internal port-specific macro to represent the scheduler lock status
     // that needs to be preserved to allow nesting of locks.
-    #define QF_SCHED_STAT_TYPE_ QMutex
+    #define QF_SCHED_STAT_TYPE_ QKMutex
 
     //! Internal port-specific macro for selective scheduler locking.
     #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \

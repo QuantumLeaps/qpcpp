@@ -99,7 +99,7 @@ The Quantum Leaps Application Note <a class="extern" target="_blank" href="http:
 <div class="clear"></div>
 
 @note
-The hallmark of the QP/C implementation of UML state machines is **traceability**, which is direct, precise, and unambiguous mapping of every state machine element to human-readable, portable, MISRA-compliant C code. Preserving the traceability from requirements through design to code is essential for mission-critical systems, such as medical devices or avionic systems.
+The hallmark of the QP/C++ implementation of UML state machines is **traceability**, which is direct, precise, and unambiguous mapping of every state machine element to human readable, portable, MISRA compliant C++ code. Preserving the traceability from requirements through design to code is essential for mission-critical systems, such as medical devices or avionic systems.
 
 
 ------------------------------------------------------------------------------

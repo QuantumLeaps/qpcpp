@@ -94,48 +94,48 @@
 --- Global Wrap-up
 
 "C:\qp\qpcpp\include\qassert.h" 223 1 Warning 526: Symbol 'Q_onAssert(const char *, int)' (line 223, file C:\qp\qpcpp\include\qassert.h, module C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp) not defined
-"C:\qp\qpcpp\include\qep.h" 450 1 Info 758: global enum 'QP::QMsm::ReservedHsmSignals' (line 450, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-5]
+"C:\qp\qpcpp\include\qep.h" 451 1 Info 758: global enum 'QP::QMsm::ReservedHsmSignals' (line 451, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-5]
 "C:\qp\qpcpp\include\qs.h" 341 1 Info 758: global enum 'QP::QS::QSType' (line 341, file C:\qp\qpcpp\include\qs.h) not referenced [MISRA C++ Rule 0-1-5]
 "C:\qp\qpcpp\include\qs.h" 394 1 Info 758: global enum 'QP::QSpyRxRecords' (line 394, file C:\qp\qpcpp\include\qs.h) not referenced [MISRA C++ Rule 0-1-5]
-"C:\qp\qpcpp\include\qep.h" 320 1 Warning 1526: Member function 'QP::QMsm::init(const struct QP::QEvt *)' (line 320, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 321 1 Info 1716: Virtual member function 'QP::QMsm::init(void)' (line 321, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 324 1 Info 1716: Virtual member function 'QP::QMsm::dispatch(const struct QP::QEvt *)' (line 324, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 324 1 Warning 1526: Member function 'QP::QMsm::dispatch(const struct QP::QEvt *)' (line 324, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 327 1 Info 1714: Member function 'QP::QMsm::isInState(const struct QP::QMState *) const' (line 327, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 327 1 Warning 1526: Member function 'QP::QMsm::isInState(const struct QP::QMState *) const' (line 327, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 330 1 Info 1714: Member function 'QP::QMsm::stateObj(void) const' (line 330, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 335 1 Info 1714: Member function 'QP::QMsm::childStateObj(const struct QP::QMState *) const' (line 335, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 335 1 Warning 1526: Member function 'QP::QMsm::childStateObj(const struct QP::QMState *) const' (line 335, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 339 1 Info 1714: Member function 'QP::QMsm::QMsm(unsigned int (*)(void *, const struct QP::QEvt *))' (line 339, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 339 1 Warning 1526: Member function 'QP::QMsm::QMsm(unsigned int (*)(void *, const struct QP::QEvt *))' (line 339, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 349 1 Info 1714: Member function 'QP::QMsm::qm_tran_hist_(const struct QP::QMState *, const struct QP::QMTranActTable *)' (line 349, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 365 1 Info 1714: Member function 'QP::QMsm::qm_tran_ep_(const struct QP::QMTranActTable *)' (line 365, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 372 1 Info 1714: Member function 'QP::QMsm::qm_tran_xp_(unsigned int (*)(void *), const struct QP::QMTranActTable *)' (line 372, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 394 1 Info 1714: Member function 'QP::QMsm::qm_super_sub_(const struct QP::QMState *)' (line 394, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 420 1 Info 1714: Member function 'QP::QMsm::Q_HANDLED(void)' (line 420, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 428 1 Info 1714: Member function 'QP::QMsm::Q_UNHANDLED(void)' (line 428, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 433 1 Info 1714: Member function 'QP::QMsm::tran_(unsigned int (*)(void *, const struct QP::QEvt *))' (line 433, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 439 1 Info 1714: Member function 'QP::QMsm::tran_hist_(unsigned int (*)(void *, const struct QP::QEvt *))' (line 439, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 445 1 Info 1714: Member function 'QP::QMsm::super_(unsigned int (*)(void *, const struct QP::QEvt *))' (line 445, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 451 1 Info 769: global enumeration constant 'QP::QMsm::ReservedHsmSignals::Q_ENTRY_SIG' (line 451, file C:\qp\qpcpp\include\qep.h) not referenced
-"C:\qp\qpcpp\include\qep.h" 452 1 Info 769: global enumeration constant 'QP::QMsm::ReservedHsmSignals::Q_EXIT_SIG' (line 452, file C:\qp\qpcpp\include\qep.h) not referenced
-"C:\qp\qpcpp\include\qep.h" 453 1 Info 769: global enumeration constant 'QP::QMsm::ReservedHsmSignals::Q_INIT_SIG' (line 453, file C:\qp\qpcpp\include\qep.h) not referenced
-"C:\qp\qpcpp\include\qep.h" 467 1 Info 1715: static member 'QP::QMsm::MAX_ENTRY_DEPTH_' (line 467, file C:\qp\qpcpp\include\qep.h) not referenced
-"C:\qp\qpcpp\include\qep.h" 470 1 Info 1715: static member 'QP::QMsm::msm_top_s' (line 470, file C:\qp\qpcpp\include\qep.h) not referenced
-"C:\qp\qpcpp\include\qep.h" 470 1 Warning 1527: static member 'QP::QMsm::msm_top_s' (line 470, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 506 1 Warning 1526: Member function 'QP::QHsm::init(const struct QP::QEvt *)' (line 506, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 510 1 Info 1716: Virtual member function 'QP::QHsm::dispatch(const struct QP::QEvt *)' (line 510, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 510 1 Warning 1526: Member function 'QP::QHsm::dispatch(const struct QP::QEvt *)' (line 510, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 514 1 Info 1714: Member function 'QP::QHsm::isIn(unsigned int (*)(void *, const struct QP::QEvt *))' (line 514, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 514 1 Warning 1526: Member function 'QP::QHsm::isIn(unsigned int (*)(void *, const struct QP::QEvt *))' (line 514, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 517 1 Warning 1526: Member function 'QP::QHsm::top(void *, const struct QP::QEvt *)' (line 517, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 520 1 Info 1714: Member function 'QP::QHsm::state(void) const' (line 520, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 525 1 Info 1714: Member function 'QP::QHsm::childState(unsigned int (*)(void *, const struct QP::QEvt *))' (line 525, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 525 1 Warning 1526: Member function 'QP::QHsm::childState(unsigned int (*)(void *, const struct QP::QEvt *))' (line 525, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 529 1 Info 1714: Member function 'QP::QHsm::QHsm(unsigned int (*)(void *, const struct QP::QEvt *))' (line 529, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qep.h" 529 1 Warning 1526: Member function 'QP::QHsm::QHsm(unsigned int (*)(void *, const struct QP::QEvt *))' (line 529, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 544 1 Warning 526: Symbol 'QP::versionStr' (line 544, file C:\qp\qpcpp\include\qep.h) not defined
-"C:\qp\qpcpp\include\qep.h" 551 1 Info 1714: Member function 'QP::QEP::getVersion(void)' (line 551, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 321 1 Warning 1526: Member function 'QP::QMsm::init(const struct QP::QEvt *)' (line 321, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 322 1 Info 1716: Virtual member function 'QP::QMsm::init(void)' (line 322, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 325 1 Info 1716: Virtual member function 'QP::QMsm::dispatch(const struct QP::QEvt *)' (line 325, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 325 1 Warning 1526: Member function 'QP::QMsm::dispatch(const struct QP::QEvt *)' (line 325, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 328 1 Info 1714: Member function 'QP::QMsm::isInState(const struct QP::QMState *) const' (line 328, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 328 1 Warning 1526: Member function 'QP::QMsm::isInState(const struct QP::QMState *) const' (line 328, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 331 1 Info 1714: Member function 'QP::QMsm::stateObj(void) const' (line 331, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 336 1 Info 1714: Member function 'QP::QMsm::childStateObj(const struct QP::QMState *) const' (line 336, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 336 1 Warning 1526: Member function 'QP::QMsm::childStateObj(const struct QP::QMState *) const' (line 336, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 340 1 Info 1714: Member function 'QP::QMsm::QMsm(unsigned int (*)(void *, const struct QP::QEvt *))' (line 340, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 340 1 Warning 1526: Member function 'QP::QMsm::QMsm(unsigned int (*)(void *, const struct QP::QEvt *))' (line 340, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 350 1 Info 1714: Member function 'QP::QMsm::qm_tran_hist_(const struct QP::QMState *, const struct QP::QMTranActTable *)' (line 350, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 366 1 Info 1714: Member function 'QP::QMsm::qm_tran_ep_(const struct QP::QMTranActTable *)' (line 366, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 373 1 Info 1714: Member function 'QP::QMsm::qm_tran_xp_(unsigned int (*)(void *), const struct QP::QMTranActTable *)' (line 373, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 395 1 Info 1714: Member function 'QP::QMsm::qm_super_sub_(const struct QP::QMState *)' (line 395, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 421 1 Info 1714: Member function 'QP::QMsm::Q_HANDLED(void)' (line 421, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 429 1 Info 1714: Member function 'QP::QMsm::Q_UNHANDLED(void)' (line 429, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 434 1 Info 1714: Member function 'QP::QMsm::tran_(unsigned int (*)(void *, const struct QP::QEvt *))' (line 434, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 440 1 Info 1714: Member function 'QP::QMsm::tran_hist_(unsigned int (*)(void *, const struct QP::QEvt *))' (line 440, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 446 1 Info 1714: Member function 'QP::QMsm::super_(unsigned int (*)(void *, const struct QP::QEvt *))' (line 446, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 452 1 Info 769: global enumeration constant 'QP::QMsm::ReservedHsmSignals::Q_ENTRY_SIG' (line 452, file C:\qp\qpcpp\include\qep.h) not referenced
+"C:\qp\qpcpp\include\qep.h" 453 1 Info 769: global enumeration constant 'QP::QMsm::ReservedHsmSignals::Q_EXIT_SIG' (line 453, file C:\qp\qpcpp\include\qep.h) not referenced
+"C:\qp\qpcpp\include\qep.h" 454 1 Info 769: global enumeration constant 'QP::QMsm::ReservedHsmSignals::Q_INIT_SIG' (line 454, file C:\qp\qpcpp\include\qep.h) not referenced
+"C:\qp\qpcpp\include\qep.h" 468 1 Info 1715: static member 'QP::QMsm::MAX_ENTRY_DEPTH_' (line 468, file C:\qp\qpcpp\include\qep.h) not referenced
+"C:\qp\qpcpp\include\qep.h" 471 1 Info 1715: static member 'QP::QMsm::msm_top_s' (line 471, file C:\qp\qpcpp\include\qep.h) not referenced
+"C:\qp\qpcpp\include\qep.h" 471 1 Warning 1527: static member 'QP::QMsm::msm_top_s' (line 471, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 507 1 Warning 1526: Member function 'QP::QHsm::init(const struct QP::QEvt *)' (line 507, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 511 1 Info 1716: Virtual member function 'QP::QHsm::dispatch(const struct QP::QEvt *)' (line 511, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 511 1 Warning 1526: Member function 'QP::QHsm::dispatch(const struct QP::QEvt *)' (line 511, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 515 1 Info 1714: Member function 'QP::QHsm::isIn(unsigned int (*)(void *, const struct QP::QEvt *))' (line 515, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 515 1 Warning 1526: Member function 'QP::QHsm::isIn(unsigned int (*)(void *, const struct QP::QEvt *))' (line 515, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 518 1 Warning 1526: Member function 'QP::QHsm::top(void *, const struct QP::QEvt *)' (line 518, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 521 1 Info 1714: Member function 'QP::QHsm::state(void) const' (line 521, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 526 1 Info 1714: Member function 'QP::QHsm::childState(unsigned int (*)(void *, const struct QP::QEvt *))' (line 526, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 526 1 Warning 1526: Member function 'QP::QHsm::childState(unsigned int (*)(void *, const struct QP::QEvt *))' (line 526, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 530 1 Info 1714: Member function 'QP::QHsm::QHsm(unsigned int (*)(void *, const struct QP::QEvt *))' (line 530, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qep.h" 530 1 Warning 1526: Member function 'QP::QHsm::QHsm(unsigned int (*)(void *, const struct QP::QEvt *))' (line 530, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 545 1 Warning 526: Symbol 'QP::versionStr' (line 545, file C:\qp\qpcpp\include\qep.h) not defined
+"C:\qp\qpcpp\include\qep.h" 552 1 Info 1714: Member function 'QP::QEP::getVersion(void)' (line 552, file C:\qp\qpcpp\include\qep.h) not referenced [MISRA C++ Rule 0-1-10]
 "C:\qp\qpcpp\include\qequeue.h" 161 1 Warning 1526: Member function 'QP::QEQueue::QEQueue(void)' (line 161, file C:\qp\qpcpp\include\qequeue.h) not defined
 "C:\qp\qpcpp\include\qequeue.h" 171 1 Info 1714: Member function 'QP::QEQueue::init(const struct QP::QEvt **, unsigned int)' (line 171, file C:\qp\qpcpp\include\qequeue.h) not referenced [MISRA C++ Rule 0-1-10]
 "C:\qp\qpcpp\include\qequeue.h" 171 1 Warning 1526: Member function 'QP::QEQueue::init(const struct QP::QEvt **, unsigned int)' (line 171, file C:\qp\qpcpp\include\qequeue.h) not defined
@@ -174,12 +174,12 @@
 "C:\qp\qpcpp\include\qk.h" 88 1 Info 1714: Member function 'QP::QK::getVersion(void)' (line 88, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
 "C:\qp\qpcpp\include\qk.h" 102 1 Info 1714: Member function 'QP::QK::onIdle(void)' (line 102, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
 "C:\qp\qpcpp\include\qk.h" 102 1 Warning 1526: Member function 'QP::QK::onIdle(void)' (line 102, file C:\qp\qpcpp\include\qk.h) not defined
-"C:\qp\qpcpp\include\qk.h" 108 1 Info 1714: Member function 'QP::QMutex::init(unsigned int)' (line 108, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qk.h" 108 1 Warning 1526: Member function 'QP::QMutex::init(unsigned int)' (line 108, file C:\qp\qpcpp\include\qk.h) not defined
-"C:\qp\qpcpp\include\qk.h" 109 1 Info 1714: Member function 'QP::QMutex::lock(void)' (line 109, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qk.h" 109 1 Warning 1526: Member function 'QP::QMutex::lock(void)' (line 109, file C:\qp\qpcpp\include\qk.h) not defined
-"C:\qp\qpcpp\include\qk.h" 110 1 Info 1714: Member function 'QP::QMutex::unlock(void)' (line 110, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qk.h" 110 1 Warning 1526: Member function 'QP::QMutex::unlock(void)' (line 110, file C:\qp\qpcpp\include\qk.h) not defined
+"C:\qp\qpcpp\include\qk.h" 108 1 Info 1714: Member function 'QP::QKMutex::init(unsigned int)' (line 108, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qk.h" 108 1 Warning 1526: Member function 'QP::QKMutex::init(unsigned int)' (line 108, file C:\qp\qpcpp\include\qk.h) not defined
+"C:\qp\qpcpp\include\qk.h" 109 1 Info 1714: Member function 'QP::QKMutex::lock(void)' (line 109, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qk.h" 109 1 Warning 1526: Member function 'QP::QKMutex::lock(void)' (line 109, file C:\qp\qpcpp\include\qk.h) not defined
+"C:\qp\qpcpp\include\qk.h" 110 1 Info 1714: Member function 'QP::QKMutex::unlock(void)' (line 110, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qk.h" 110 1 Warning 1526: Member function 'QP::QKMutex::unlock(void)' (line 110, file C:\qp\qpcpp\include\qk.h) not defined
 "C:\qp\qpcpp\include\qf.h" 182 1 Warning 1526: Member function 'QP::QMActive::QMActive(unsigned int (*)(void *, const struct QP::QEvt *))' (line 182, file C:\qp\qpcpp\include\qf.h) not defined
 "C:\qp\qpcpp\include\qf.h" 187 1 Warning 1526: Member function 'QP::QMActive::start(unsigned int, const struct QP::QEvt **, unsigned int, void *, unsigned int, const struct QP::QEvt *)' (line 187, file C:\qp\qpcpp\include\qf.h) not defined
 "C:\qp\qpcpp\include\qf.h" 193 1 Info 1716: Virtual member function 'QP::QMActive::start(unsigned int, const struct QP::QEvt **, unsigned int, void *, unsigned int)' (line 193, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
