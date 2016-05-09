@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 5.6.4
-/// Last updated on  2016-05-04
+/// Last updated on  2016-05-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -260,11 +260,15 @@ public:
 
     friend class QF;
     friend class QTimeEvt;
-    friend class QKMutex;
+#ifdef qk_h
+    friend class QMutex;
+#endif // qk_h
+#ifdef qxk_h
     friend class QXK;
     friend class QXThread;
     friend class QXMutex;
     friend class QXSemaphore;
+#endif // qxk_h
 };
 
 //****************************************************************************
@@ -438,7 +442,9 @@ private:
     QTimeEvt *toTimeEvt(void) { return static_cast<QTimeEvt *>(m_act); }
 
     friend class QF;
+#ifdef qxk_h
     friend class QXThread;
+#endif // qxk_h
 };
 
 
@@ -577,7 +583,9 @@ private:
 
     friend class QMActive;
     friend class QTimeEvt;
+#ifdef qxk_h
     friend class QXThread;
+#endif // qxk_h
 };
 
 } // namespace QP

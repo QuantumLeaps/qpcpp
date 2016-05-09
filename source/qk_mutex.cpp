@@ -1,12 +1,12 @@
 /// @file
-/// @brief QP::QKMutex::init(), QP::QKMutex::lock(), and QP::QKMutex::unlock()
+/// @brief QP::QMutex::init(), QP::QMutex::lock(), and QP::QMutex::unlock()
 /// definitions.
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
 /// Last updated for version 5.6.4
-/// Last updated on  2016-05-04
+/// Last updated on  2016-05-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -70,13 +70,13 @@ enum {
 /// @note
 /// A mutex must be initialized before it can be locked or unlocked.
 ///
-/// @sa QP::QKMutex::lock(), QP::QKMutex::unlock()
+/// @sa QP::QMutex::lock(), QP::QMutex::unlock()
 ///
 /// @usage
 /// The following example shows how to initialize, lock and unlock QK mutex:
 /// @include qk_mux.cpp
 ///
-void QKMutex::init(uint_fast8_t const prio) {
+void QMutex::init(uint_fast8_t const prio) {
     m_lockPrio = prio;
     m_prevPrio = static_cast<uint_fast8_t>(MUTEX_UNUSED);
 }
@@ -89,16 +89,16 @@ void QKMutex::init(uint_fast8_t const prio) {
 /// A mutex must be initialized before it can be locked or unlocked.
 ///
 /// @note
-/// QP::QKMutex::lock() must be always followed by the corresponding
-/// QP::QKMutex::unlock().
+/// QP::QMutex::lock() must be always followed by the corresponding
+/// QP::QMutex::unlock().
 ///
-/// @sa QP::QKMutex::init(), QP::QKMutex::unlock()
+/// @sa QP::QMutex::init(), QP::QMutex::unlock()
 ///
 /// @usage
 /// The following example shows how to initialize, lock and unlock QK mutex:
 /// @include qk_mux.cpp
 ///
-void QKMutex::lock(void) {
+void QMutex::lock(void) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
@@ -130,16 +130,16 @@ void QKMutex::lock(void) {
 /// A mutex must be initialized before it can be locked or unlocked.
 ///
 /// @note
-/// QP::QKMutex::unlock() must always follow the corresponding
-/// QP::QKMutex::lock().
+/// QP::QMutex::unlock() must always follow the corresponding
+/// QP::QMutex::lock().
 ///
-/// @sa QP::QKMutex::init(), QP::QKMutex::lock()
+/// @sa QP::QMutex::init(), QP::QMutex::lock()
 ///
 /// @usage
 /// The following example shows how to initialize, lock and unlock QK mutex:
 /// @include qk_mux.cpp
 ///
-void QKMutex::unlock(void) {
+void QMutex::unlock(void) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 

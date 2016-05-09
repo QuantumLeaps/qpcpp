@@ -9,7 +9,7 @@
   License Type: Windows Single User License
   Licensed To : Quantum Leaps, LLC
   License No. : WS2975                          License Date: Dec 15, 2013
-  Build Date  : Sep  2 2009                         Run Date: May 04, 2016
+  Build Date  : Sep  2 2009                         Run Date: May 09, 2016
   (C)1996-2009 M Squared Technologies LLC
   ________________________________________________________________________
 
@@ -282,7 +282,7 @@
 
                           ~~ Total File Summary ~~
 
-  LOC 252      eLOC 237      lLOC 105      Comment 478      Lines      835
+  LOC 260      eLOC 245      lLOC 105      Comment 482      Lines      843
   ------------------------------------------------------------------------
 
                         ~~ File Functional Summary ~~
@@ -1666,12 +1666,12 @@
   File: ..\source\qk_mutex.cpp
   ________________________________________________________________________
 
-  Function: QP::QKMutex::init
+  Function: QP::QMutex::init
   Parameters: (uint_fast8_t const prio)
   Complexity   Param 1       Return 1      Cyclo Vg 1       Total        3
   LOC 4        eLOC 3        lLOC 2        Comment 15       Lines        4
 
-  Function: QP::QKMutex::lock
+  Function: QP::QMutex::lock
   Parameters: (void)
     Cyclomatic Complexity Vg Detail
       Function Base           : 1
@@ -1680,7 +1680,7 @@
   Complexity   Param 0       Return 1      Cyclo Vg 3       Total        4
   LOC 17       eLOC 15       lLOC 7        Comment 24       Lines       23
 
-  Function: QP::QKMutex::unlock
+  Function: QP::QMutex::unlock
   Parameters: (void)
     Cyclomatic Complexity Vg Detail
       Function Base           : 1
@@ -2513,7 +2513,7 @@
 
                          ~~ Total Project Summary ~~
 
-  LOC 5576     eLOC 4898     lLOC 2256     Comment 6448     Lines    12367
+  LOC 5584     eLOC 4906     lLOC 2256     Comment 6452     Lines    12375
   Average per File, metric/41 files
   LOC 136      eLOC 119      lLOC 55       Comment 157      Lines      301
 
@@ -3154,17 +3154,17 @@
   Complexity   Param 1       Return 1      Cyclo Vg 6       Total        8
   LOC 54       eLOC 47       lLOC 24       Comment 46       Lines       77
 
-  Function: QP::QKMutex::init
+  Function: QP::QMutex::init
   Parameters: (uint_fast8_t const prio)
   Complexity   Param 1       Return 1      Cyclo Vg 1       Total        3
   LOC 4        eLOC 3        lLOC 2        Comment 15       Lines        4
 
-  Function: QP::QKMutex::lock
+  Function: QP::QMutex::lock
   Parameters: (void)
   Complexity   Param 0       Return 1      Cyclo Vg 3       Total        4
   LOC 17       eLOC 15       lLOC 7        Comment 24       Lines       23
 
-  Function: QP::QKMutex::unlock
+  Function: QP::QMutex::unlock
   Parameters: (void)
   Complexity   Param 0       Return 1      Cyclo Vg 4       Total        5
   LOC 22       eLOC 19       lLOC 10       Comment 26       Lines       28

@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QK kernel
 // Last updated for version 5.6.4
-// Last updated on  2016-05-04
+// Last updated on  2016-05-09
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -71,7 +71,7 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 #define BTN_B1   (1U << 13)
 
 static unsigned  l_rnd; // random seed
-static QP::QKMutex l_rndMutex; // to protect the random number generator
+static QP::QMutex l_rndMutex; // to protect the random number generator
 
 #ifdef Q_SPY
 
