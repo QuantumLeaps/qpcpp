@@ -1,3 +1,5 @@
+namespace QP {
+
 /*##########################################################################*/
 /*! @page exa_rtos Examples for Third-Party RTOS
 
@@ -122,3 +124,5 @@ DPP example for Texas Instruments STM32 L152RET6 MCU (Cortex-M3) and IAR EWARM t
 @image html under_construction.jpg
 
 */
+
+} // namespace QP

@@ -1,40 +1,41 @@
-/// \file
-/// \brief QWIN GUI facilities for building realistic embedded front panels
-/// \cond
-///***************************************************************************
-/// Last updated for version 5.6.4
-/// Last updated on  2016-05-04
-///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
-///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
-///
-/// Contact information:
-/// http://www.state-machine.com
-/// mailto:info@state-machine.com
-///***************************************************************************
-/// \endcond
-
+/**
+* @file
+* @brief QWIN GUI facilities for building realistic embedded front panels
+* @cond
+******************************************************************************
+* Last Updated for Version: 5.6.5
+* Date of the Last Update:  2016-05-13
+*
+*                    Q u a n t u m     L e a P s
+*                    ---------------------------
+*                    innovating embedded systems
+*
+* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+*
+* This program is open source software: you can redistribute it and/or
+* modify it under the terms of the GNU General Public License as published
+* by the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Alternatively, this program may be distributed and modified under the
+* terms of Quantum Leaps commercial licenses, which expressly supersede
+* the GNU General Public License and are specifically designed for
+* licensees interested in retaining the proprietary status of their code.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
+* Contact information:
+* http://www.state-machine.com
+* mailto:info@state-machine.com
+******************************************************************************
+* @endcond
+*/
 #ifndef qwin_gui_h
 #define qwin_gui_h
 
@@ -43,72 +44,105 @@
 #endif
 
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h> // Win32 API
+#include <windows.h>  /* Win32 API */
 
-// create the custom dialog hosting the embedded front panel .................
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* create the custom dialog hosting the embedded front panel ...............*/
 HWND CreateCustDialog(HINSTANCE hInst, int iDlg, HWND hParent,
                       WNDPROC lpfnWndProc, LPCTSTR lpWndClass);
 
-// OwnerDrawnButton "class" ..................................................
-class OwnerDrawnButton {
-    HBITMAP m_hBitmapUp;
-    HBITMAP m_hBitmapDown;
-    HCURSOR m_hCursor;
+/* OwnerDrawnButton "class" ................................................*/
+typedef struct {
+    UINT    itemID;
+    HBITMAP hBitmapUp;
+    HBITMAP hBitmapDown;
+    HCURSOR hCursor;
+    int     isDepressed;
+} OwnerDrawnButton;
 
-public:
-    enum OwnerDrawnButtonAction {
-        BTN_NOACTION,
-        BTN_PAINTED,
-        BTN_DEPRESSED,
-        BTN_RELEASED
-    };
-
-    void init(HBITMAP hBitmapUp, HBITMAP hBitmapDwn,
-              HCURSOR hCursor);
-    virtual ~OwnerDrawnButton();
-    OwnerDrawnButtonAction draw(LPDRAWITEMSTRUCT lpdis);
+enum OwnerDrawnButtonAction {
+    BTN_NOACTION,
+    BTN_PAINTED,
+    BTN_DEPRESSED,
+    BTN_RELEASED
 };
 
-// GraphicDisplay "class" for drawing graphic displays with up to 24-bit color
-class GraphicDisplay {
-    UINT    m_width;
-    UINT    m_xScale;
-    UINT    m_height;
-    UINT    m_yScale;
-    HBITMAP m_hBitmap;
-    HWND    m_hItem;
-    BYTE   *m_bits;
-    BYTE    m_bgColor[3];
+void OwnerDrawnButton_init(OwnerDrawnButton * const me,
+                           UINT itemID,
+                           HBITMAP hBitmapUp, HBITMAP hBitmapDwn,
+                           HCURSOR hCursor);
+void OwnerDrawnButton_xtor(OwnerDrawnButton * const me);
+enum OwnerDrawnButtonAction OwnerDrawnButton_draw(
+                                OwnerDrawnButton * const me,
+                                LPDRAWITEMSTRUCT lpdis);
+void OwnerDrawnButton_set(OwnerDrawnButton * const me,
+                          int isDepressed);
+BOOL OwnerDrawnButton_isDepressed(OwnerDrawnButton const * const me);
 
-public:
-    void init(UINT width,  UINT xScale,
-              UINT height, UINT yScale,
-              HWND hItem,  BYTE const bgColor[3]);
-    virtual ~GraphicDisplay();
-    void clear(void);
-    void setPixel(UINT x, UINT y, BYTE const color[3]);
-    void clearPixel(UINT x, UINT y) {
-        setPixel(x, y, m_bgColor);
-    }
-    void redraw(void);
-};
+/* GraphicDisplay "class" for drawing graphic displays
+* with up to 24-bit color...
+*/
+typedef struct {
+    HDC     src_hDC;
+    int     src_width;
+    int     src_height;
+    HDC     dst_hDC;
+    int     dst_width;
+    int     dst_height;
+    HWND    hItem;
+    HBITMAP hBitmap;
+    BYTE   *bits;
+    BYTE    bgColor[3];
+} GraphicDisplay;
 
-// SegmentDisplay "class" for drawing segment displays, LEDs, etc.............
-class SegmentDisplay {
-    HWND    *m_hSegment;   // array of segment controls
-    UINT     m_segmentNum; // number of segments
-    HBITMAP *m_hBitmap;    // array of bitmap handles
-    UINT     m_bitmapNum;  // number of bitmaps
+void GraphicDisplay_init(GraphicDisplay * const me,
+                UINT width,  UINT height,
+                UINT itemID, BYTE const bgColor[3]);
+void GraphicDisplay_xtor(GraphicDisplay * const me);
+void GraphicDisplay_clear(GraphicDisplay * const me);
+void GraphicDisplay_redraw(GraphicDisplay * const me);
+#define GraphicDisplay_setPixel(me_, x_, y_, color_) do { \
+    BYTE *pixelRGB = &(me_)->bits[3*((x_) \
+          + (me_)->src_width * ((me_)->src_height - 1U - (y_)))]; \
+    pixelRGB[0] = (color_)[0]; \
+    pixelRGB[1] = (color_)[1]; \
+    pixelRGB[2] = (color_)[2]; \
+} while (0)
 
-public:
-    void init(UINT segNum, UINT bitmapNum);
-    virtual ~SegmentDisplay();
-    bool initSegment(UINT segmentNum, HWND hSegment);
-    bool initBitmap(UINT bitmapNum, HBITMAP hBitmap);
-    bool setSegment(UINT segmentNum, UINT bitmapNum);
-};
+#define GraphicDisplay_clearPixel(me_, x_, y_) do { \
+    BYTE *pixelRGB = &(me_)->bits[3*((x_) \
+          + (me_)->src_width * ((me_)->src_height - 1U - (y_)))]; \
+    pixelRGB[0] = (me_)->bgColor[0]; \
+    pixelRGB[1] = (me_)->bgColor[1]; \
+    pixelRGB[2] = (me_)->bgColor[2]; \
+} while (0)
 
-// useful helper functions ...................................................
+/* SegmentDisplay "class" for drawing segment displays, LEDs, etc...........*/
+typedef struct {
+    HWND    *hSegment;    /* array of segment controls */
+    UINT     segmentNum;  /* number of segments */
+    HBITMAP *hBitmap;     /* array of bitmap handles */
+    UINT     bitmapNum;   /* number of bitmaps */
+} SegmentDisplay;
+
+void SegmentDisplay_init(SegmentDisplay * const me,
+                         UINT segNum, UINT bitmapNum);
+void SegmentDisplay_xtor(SegmentDisplay * const me);
+BOOL SegmentDisplay_initSegment(SegmentDisplay * const me,
+                         UINT segmentNum, UINT segmentID);
+BOOL SegmentDisplay_initBitmap(SegmentDisplay * const me,
+                         UINT bitmapNum, HBITMAP hBitmap);
+BOOL SegmentDisplay_setSegment(SegmentDisplay * const me,
+                         UINT segmentNum, UINT bitmapNum);
+
+/* useful helper functions .................................................*/
 void DrawBitmap(HDC hdc, HBITMAP hBitmap, int xStart, int yStart);
 
-#endif // qwin_gui_h
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* qwin_gui_h */

@@ -37,7 +37,7 @@
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp" 225 42 Info 740: Unusual pointer cast (incompatible indirect types) [MISRA C++ Rule 5-2-6], [MISRA C++ Rule 5-2-7]
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp" 284 38 Note 929: cast from pointer to pointer [MISRA C++ Rule 5-2-7]
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp" 284 38 Info 740: Unusual pointer cast (incompatible indirect types) [MISRA C++ Rule 5-2-6], [MISRA C++ Rule 5-2-7]
-"C:\qp\qpcpp\include\qf.h" 450 1 Warning 551: Symbol 'QP::QF_SUBSCR_LIST_SIZE' (line 450, file C:\qp\qpcpp\include\qf.h) not accessed [MISRA C++ Rule 0-1-4]
+"C:\qp\qpcpp\include\qf.h" 456 1 Warning 551: Symbol 'QP::QF_SUBSCR_LIST_SIZE' (line 456, file C:\qp\qpcpp\include\qf.h) not accessed [MISRA C++ Rule 0-1-4]
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp" 102 1 Info 754: local struct member 'target' (line 102, file C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp) not referenced
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp" 103 1 Info 754: local struct member 'act' (line 103, file C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp) not referenced
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp" 164 1 Info 754: local struct member 'target' (line 164, file C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\philo.cpp) not referenced
@@ -77,7 +77,7 @@
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\table.cpp" 277 38 Info 740: Unusual pointer cast (incompatible indirect types) [MISRA C++ Rule 5-2-6], [MISRA C++ Rule 5-2-7]
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\table.cpp" 324 38 Note 929: cast from pointer to pointer [MISRA C++ Rule 5-2-7]
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\table.cpp" 324 38 Info 740: Unusual pointer cast (incompatible indirect types) [MISRA C++ Rule 5-2-6], [MISRA C++ Rule 5-2-7]
-"C:\qp\qpcpp\include\qf.h" 450 1 Warning 551: Symbol 'QP::QF_SUBSCR_LIST_SIZE' (line 450, file C:\qp\qpcpp\include\qf.h) not accessed [MISRA C++ Rule 0-1-4]
+"C:\qp\qpcpp\include\qf.h" 456 1 Warning 551: Symbol 'QP::QF_SUBSCR_LIST_SIZE' (line 456, file C:\qp\qpcpp\include\qf.h) not accessed [MISRA C++ Rule 0-1-4]
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\table.cpp" 95 1 Info 754: local struct member 'target' (line 95, file C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\table.cpp) not referenced
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\table.cpp" 96 1 Info 754: local struct member 'act' (line 96, file C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\table.cpp) not referenced
 "C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\table.cpp" 268 1 Info 754: local struct member 'target' (line 268, file C:\qp\qpcpp\examples\arm-cm\dpp_ek-tm4c123gxl\table.cpp) not referenced
@@ -174,12 +174,12 @@
 "C:\qp\qpcpp\include\qk.h" 88 1 Info 1714: Member function 'QP::QK::getVersion(void)' (line 88, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
 "C:\qp\qpcpp\include\qk.h" 102 1 Info 1714: Member function 'QP::QK::onIdle(void)' (line 102, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
 "C:\qp\qpcpp\include\qk.h" 102 1 Warning 1526: Member function 'QP::QK::onIdle(void)' (line 102, file C:\qp\qpcpp\include\qk.h) not defined
-"C:\qp\qpcpp\include\qk.h" 108 1 Info 1714: Member function 'QP::QKMutex::init(unsigned int)' (line 108, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qk.h" 108 1 Warning 1526: Member function 'QP::QKMutex::init(unsigned int)' (line 108, file C:\qp\qpcpp\include\qk.h) not defined
-"C:\qp\qpcpp\include\qk.h" 109 1 Info 1714: Member function 'QP::QKMutex::lock(void)' (line 109, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qk.h" 109 1 Warning 1526: Member function 'QP::QKMutex::lock(void)' (line 109, file C:\qp\qpcpp\include\qk.h) not defined
-"C:\qp\qpcpp\include\qk.h" 110 1 Info 1714: Member function 'QP::QKMutex::unlock(void)' (line 110, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qk.h" 110 1 Warning 1526: Member function 'QP::QKMutex::unlock(void)' (line 110, file C:\qp\qpcpp\include\qk.h) not defined
+"C:\qp\qpcpp\include\qk.h" 108 1 Info 1714: Member function 'QP::QMutex::init(unsigned int)' (line 108, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qk.h" 108 1 Warning 1526: Member function 'QP::QMutex::init(unsigned int)' (line 108, file C:\qp\qpcpp\include\qk.h) not defined
+"C:\qp\qpcpp\include\qk.h" 109 1 Info 1714: Member function 'QP::QMutex::lock(void)' (line 109, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qk.h" 109 1 Warning 1526: Member function 'QP::QMutex::lock(void)' (line 109, file C:\qp\qpcpp\include\qk.h) not defined
+"C:\qp\qpcpp\include\qk.h" 110 1 Info 1714: Member function 'QP::QMutex::unlock(void)' (line 110, file C:\qp\qpcpp\include\qk.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qk.h" 110 1 Warning 1526: Member function 'QP::QMutex::unlock(void)' (line 110, file C:\qp\qpcpp\include\qk.h) not defined
 "C:\qp\qpcpp\include\qf.h" 182 1 Warning 1526: Member function 'QP::QMActive::QMActive(unsigned int (*)(void *, const struct QP::QEvt *))' (line 182, file C:\qp\qpcpp\include\qf.h) not defined
 "C:\qp\qpcpp\include\qf.h" 187 1 Warning 1526: Member function 'QP::QMActive::start(unsigned int, const struct QP::QEvt **, unsigned int, void *, unsigned int, const struct QP::QEvt *)' (line 187, file C:\qp\qpcpp\include\qf.h) not defined
 "C:\qp\qpcpp\include\qf.h" 193 1 Info 1716: Virtual member function 'QP::QMActive::start(unsigned int, const struct QP::QEvt **, unsigned int, void *, unsigned int)' (line 193, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
@@ -205,70 +205,70 @@
 "C:\qp\qpcpp\include\qf.h" 255 1 Info 1714: Member function 'QP::QMActive::getThread(void)' (line 255, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
 "C:\qp\qpcpp\include\qf.h" 259 1 Info 1714: Member function 'QP::QMActive::get_(void)' (line 259, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
 "C:\qp\qpcpp\include\qf.h" 259 1 Warning 1526: Member function 'QP::QMActive::get_(void)' (line 259, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 299 1 Warning 1526: Member function 'QP::QActive::init(const struct QP::QEvt *)' (line 299, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 300 1 Warning 1526: Member function 'QP::QActive::init(void)' (line 300, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 301 1 Info 1716: Virtual member function 'QP::QActive::dispatch(const struct QP::QEvt *)' (line 301, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 301 1 Warning 1526: Member function 'QP::QActive::dispatch(const struct QP::QEvt *)' (line 301, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 303 1 Info 1714: Member function 'QP::QActive::isIn(unsigned int (*)(void *, const struct QP::QEvt *))' (line 303, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 303 1 Warning 1526: Member function 'QP::QActive::isIn(unsigned int (*)(void *, const struct QP::QEvt *))' (line 303, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 307 1 Info 1714: Member function 'QP::QActive::QActive(unsigned int (*)(void *, const struct QP::QEvt *))' (line 307, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 307 1 Warning 1526: Member function 'QP::QActive::QActive(unsigned int (*)(void *, const struct QP::QEvt *))' (line 307, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 375 1 Warning 1526: Member function 'QP::QTimeEvt::QTimeEvt(QP::QMActive *, int, unsigned char)' (line 375, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 379 1 Warning 1526: Member function 'QP::QTimeEvt::armX(unsigned short, unsigned short)' (line 379, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 383 1 Warning 1526: Member function 'QP::QTimeEvt::disarm(void)' (line 383, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 386 1 Info 1714: Member function 'QP::QTimeEvt::rearm(unsigned short)' (line 386, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 386 1 Warning 1526: Member function 'QP::QTimeEvt::rearm(unsigned short)' (line 386, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 389 1 Info 1714: Member function 'QP::QTimeEvt::ctr(void) const' (line 389, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 389 1 Warning 1526: Member function 'QP::QTimeEvt::ctr(void) const' (line 389, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 394 1 Info 1714: Member function 'QP::QTimeEvt::QTimeEvt(int)' (line 394, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 412 1 Info 1714: Member function 'QP::QTimeEvt::postIn(QP::QMActive *, unsigned short)' (line 412, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 418 1 Info 1714: Member function 'QP::QTimeEvt::postEvery(QP::QMActive *, unsigned short)' (line 418, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 426 1 Warning 1526: Member function 'QP::QTimeEvt::QTimeEvt(void)' (line 426, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 435 1 Info 1714: Member function 'QP::QTimeEvt::toActive(void)' (line 435, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 438 1 Info 1714: Member function 'QP::QTimeEvt::toTimeEvt(void)' (line 438, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 488 1 Info 1714: Member function 'QP::QF::getVersion(void)' (line 488, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 493 1 Info 1714: Member function 'QP::QF::init(void)' (line 493, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 493 1 Warning 1526: Member function 'QP::QF::init(void)' (line 493, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 496 1 Info 1714: Member function 'QP::QF::psInit(QP::QSubscrList *, int)' (line 496, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 496 1 Warning 1526: Member function 'QP::QF::psInit(QP::QSubscrList *, int)' (line 496, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 500 1 Info 1714: Member function 'QP::QF::poolInit(void *, unsigned int, unsigned int)' (line 500, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 500 1 Warning 1526: Member function 'QP::QF::poolInit(void *, unsigned int, unsigned int)' (line 500, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 504 1 Info 1714: Member function 'QP::QF::poolGetMaxBlockSize(void)' (line 504, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 504 1 Warning 1526: Member function 'QP::QF::poolGetMaxBlockSize(void)' (line 504, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 508 1 Info 1714: Member function 'QP::QF::run(void)' (line 508, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 508 1 Warning 1526: Member function 'QP::QF::run(void)' (line 508, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 511 1 Info 1714: Member function 'QP::QF::onStartup(void)' (line 511, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 511 1 Warning 1526: Member function 'QP::QF::onStartup(void)' (line 511, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 514 1 Info 1714: Member function 'QP::QF::onCleanup(void)' (line 514, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 514 1 Warning 1526: Member function 'QP::QF::onCleanup(void)' (line 514, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 518 1 Info 1714: Member function 'QP::QF::stop(void)' (line 518, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 518 1 Warning 1526: Member function 'QP::QF::stop(void)' (line 518, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 526 1 Warning 1526: Member function 'QP::QF::publish_(const struct QP::QEvt *, const void *)' (line 526, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 529 1 Info 1714: Member function 'QP::QF::tickX_(unsigned char, const void *)' (line 529, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 529 1 Warning 1526: Member function 'QP::QF::tickX_(unsigned char, const void *)' (line 529, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 535 1 Info 1714: Member function 'QP::QF::noTimeEvtsActiveX(unsigned char)' (line 535, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 535 1 Warning 1526: Member function 'QP::QF::noTimeEvtsActiveX(unsigned char)' (line 535, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 540 1 Info 1714: Member function 'QP::QF::getPoolMin(unsigned int)' (line 540, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 540 1 Warning 1526: Member function 'QP::QF::getPoolMin(unsigned int)' (line 540, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 544 1 Info 1714: Member function 'QP::QF::getQueueMin(unsigned int)' (line 544, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 544 1 Warning 1526: Member function 'QP::QF::getQueueMin(unsigned int)' (line 544, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 547 1 Warning 1526: Member function 'QP::QF::newX_(unsigned int, unsigned int, int)' (line 547, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 551 1 Info 1714: Member function 'QP::QF::gc(const struct QP::QEvt *)' (line 551, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 551 1 Warning 1526: Member function 'QP::QF::gc(const struct QP::QEvt *)' (line 551, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 554 1 Info 1714: Member function 'QP::QF::newRef_(const struct QP::QEvt *, const struct QP::QEvt *)' (line 554, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 554 1 Warning 1526: Member function 'QP::QF::newRef_(const struct QP::QEvt *, const struct QP::QEvt *)' (line 554, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 558 1 Info 1714: Member function 'QP::QF::remove_(const QP::QMActive *)' (line 558, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 558 1 Warning 1526: Member function 'QP::QF::remove_(const QP::QMActive *)' (line 558, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 561 1 Info 1715: static member 'QP::QF::active_' (line 561, file C:\qp\qpcpp\include\qf.h) not referenced
-"C:\qp\qpcpp\include\qf.h" 561 1 Warning 1527: static member 'QP::QF::active_' (line 561, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 564 1 Info 1714: Member function 'QP::QF::thread_(QP::QMActive *)' (line 564, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 564 1 Warning 1526: Member function 'QP::QF::thread_(QP::QMActive *)' (line 564, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 567 1 Info 1714: Member function 'QP::QF::add_(QP::QMActive *)' (line 567, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 567 1 Warning 1526: Member function 'QP::QF::add_(QP::QMActive *)' (line 567, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 570 1 Info 1714: Member function 'QP::QF::bzero(void *, unsigned int)' (line 570, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
-"C:\qp\qpcpp\include\qf.h" 570 1 Warning 1526: Member function 'QP::QF::bzero(void *, unsigned int)' (line 570, file C:\qp\qpcpp\include\qf.h) not defined
-"C:\qp\qpcpp\include\qf.h" 576 1 Info 1715: static member 'QP::QF::timeEvtHead_' (line 576, file C:\qp\qpcpp\include\qf.h) not referenced
-"C:\qp\qpcpp\include\qf.h" 576 1 Warning 1527: static member 'QP::QF::timeEvtHead_' (line 576, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 303 1 Warning 1526: Member function 'QP::QActive::init(const struct QP::QEvt *)' (line 303, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 304 1 Warning 1526: Member function 'QP::QActive::init(void)' (line 304, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 305 1 Info 1716: Virtual member function 'QP::QActive::dispatch(const struct QP::QEvt *)' (line 305, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 305 1 Warning 1526: Member function 'QP::QActive::dispatch(const struct QP::QEvt *)' (line 305, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 307 1 Info 1714: Member function 'QP::QActive::isIn(unsigned int (*)(void *, const struct QP::QEvt *))' (line 307, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 307 1 Warning 1526: Member function 'QP::QActive::isIn(unsigned int (*)(void *, const struct QP::QEvt *))' (line 307, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 311 1 Info 1714: Member function 'QP::QActive::QActive(unsigned int (*)(void *, const struct QP::QEvt *))' (line 311, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 311 1 Warning 1526: Member function 'QP::QActive::QActive(unsigned int (*)(void *, const struct QP::QEvt *))' (line 311, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 379 1 Warning 1526: Member function 'QP::QTimeEvt::QTimeEvt(QP::QMActive *, int, unsigned char)' (line 379, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 383 1 Warning 1526: Member function 'QP::QTimeEvt::armX(unsigned short, unsigned short)' (line 383, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 387 1 Warning 1526: Member function 'QP::QTimeEvt::disarm(void)' (line 387, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 390 1 Info 1714: Member function 'QP::QTimeEvt::rearm(unsigned short)' (line 390, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 390 1 Warning 1526: Member function 'QP::QTimeEvt::rearm(unsigned short)' (line 390, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 393 1 Info 1714: Member function 'QP::QTimeEvt::ctr(void) const' (line 393, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 393 1 Warning 1526: Member function 'QP::QTimeEvt::ctr(void) const' (line 393, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 398 1 Info 1714: Member function 'QP::QTimeEvt::QTimeEvt(int)' (line 398, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 416 1 Info 1714: Member function 'QP::QTimeEvt::postIn(QP::QMActive *, unsigned short)' (line 416, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 422 1 Info 1714: Member function 'QP::QTimeEvt::postEvery(QP::QMActive *, unsigned short)' (line 422, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 430 1 Warning 1526: Member function 'QP::QTimeEvt::QTimeEvt(void)' (line 430, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 439 1 Info 1714: Member function 'QP::QTimeEvt::toActive(void)' (line 439, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 442 1 Info 1714: Member function 'QP::QTimeEvt::toTimeEvt(void)' (line 442, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 494 1 Info 1714: Member function 'QP::QF::getVersion(void)' (line 494, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 499 1 Info 1714: Member function 'QP::QF::init(void)' (line 499, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 499 1 Warning 1526: Member function 'QP::QF::init(void)' (line 499, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 502 1 Info 1714: Member function 'QP::QF::psInit(QP::QSubscrList *, int)' (line 502, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 502 1 Warning 1526: Member function 'QP::QF::psInit(QP::QSubscrList *, int)' (line 502, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 506 1 Info 1714: Member function 'QP::QF::poolInit(void *, unsigned int, unsigned int)' (line 506, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 506 1 Warning 1526: Member function 'QP::QF::poolInit(void *, unsigned int, unsigned int)' (line 506, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 510 1 Info 1714: Member function 'QP::QF::poolGetMaxBlockSize(void)' (line 510, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 510 1 Warning 1526: Member function 'QP::QF::poolGetMaxBlockSize(void)' (line 510, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 514 1 Info 1714: Member function 'QP::QF::run(void)' (line 514, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 514 1 Warning 1526: Member function 'QP::QF::run(void)' (line 514, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 517 1 Info 1714: Member function 'QP::QF::onStartup(void)' (line 517, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 517 1 Warning 1526: Member function 'QP::QF::onStartup(void)' (line 517, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 520 1 Info 1714: Member function 'QP::QF::onCleanup(void)' (line 520, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 520 1 Warning 1526: Member function 'QP::QF::onCleanup(void)' (line 520, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 524 1 Info 1714: Member function 'QP::QF::stop(void)' (line 524, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 524 1 Warning 1526: Member function 'QP::QF::stop(void)' (line 524, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 532 1 Warning 1526: Member function 'QP::QF::publish_(const struct QP::QEvt *, const void *)' (line 532, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 535 1 Info 1714: Member function 'QP::QF::tickX_(unsigned char, const void *)' (line 535, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 535 1 Warning 1526: Member function 'QP::QF::tickX_(unsigned char, const void *)' (line 535, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 541 1 Info 1714: Member function 'QP::QF::noTimeEvtsActiveX(unsigned char)' (line 541, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 541 1 Warning 1526: Member function 'QP::QF::noTimeEvtsActiveX(unsigned char)' (line 541, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 546 1 Info 1714: Member function 'QP::QF::getPoolMin(unsigned int)' (line 546, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 546 1 Warning 1526: Member function 'QP::QF::getPoolMin(unsigned int)' (line 546, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 550 1 Info 1714: Member function 'QP::QF::getQueueMin(unsigned int)' (line 550, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 550 1 Warning 1526: Member function 'QP::QF::getQueueMin(unsigned int)' (line 550, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 553 1 Warning 1526: Member function 'QP::QF::newX_(unsigned int, unsigned int, int)' (line 553, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 557 1 Info 1714: Member function 'QP::QF::gc(const struct QP::QEvt *)' (line 557, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 557 1 Warning 1526: Member function 'QP::QF::gc(const struct QP::QEvt *)' (line 557, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 560 1 Info 1714: Member function 'QP::QF::newRef_(const struct QP::QEvt *, const struct QP::QEvt *)' (line 560, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 560 1 Warning 1526: Member function 'QP::QF::newRef_(const struct QP::QEvt *, const struct QP::QEvt *)' (line 560, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 564 1 Info 1714: Member function 'QP::QF::remove_(const QP::QMActive *)' (line 564, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 564 1 Warning 1526: Member function 'QP::QF::remove_(const QP::QMActive *)' (line 564, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 567 1 Info 1715: static member 'QP::QF::active_' (line 567, file C:\qp\qpcpp\include\qf.h) not referenced
+"C:\qp\qpcpp\include\qf.h" 567 1 Warning 1527: static member 'QP::QF::active_' (line 567, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 570 1 Info 1714: Member function 'QP::QF::thread_(QP::QMActive *)' (line 570, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 570 1 Warning 1526: Member function 'QP::QF::thread_(QP::QMActive *)' (line 570, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 573 1 Info 1714: Member function 'QP::QF::add_(QP::QMActive *)' (line 573, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 573 1 Warning 1526: Member function 'QP::QF::add_(QP::QMActive *)' (line 573, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 576 1 Info 1714: Member function 'QP::QF::bzero(void *, unsigned int)' (line 576, file C:\qp\qpcpp\include\qf.h) not referenced [MISRA C++ Rule 0-1-10]
+"C:\qp\qpcpp\include\qf.h" 576 1 Warning 1526: Member function 'QP::QF::bzero(void *, unsigned int)' (line 576, file C:\qp\qpcpp\include\qf.h) not defined
+"C:\qp\qpcpp\include\qf.h" 582 1 Info 1715: static member 'QP::QF::timeEvtHead_' (line 582, file C:\qp\qpcpp\include\qf.h) not referenced
+"C:\qp\qpcpp\include\qf.h" 582 1 Warning 1527: static member 'QP::QF::timeEvtHead_' (line 582, file C:\qp\qpcpp\include\qf.h) not defined
 "C:\qp\qpcpp\include\qs.h" 76 1 Info 769: global enumeration constant 'QP::QSpyRecords::QS_EMPTY' (line 76, file C:\qp\qpcpp\include\qs.h) not referenced
 "C:\qp\qpcpp\include\qs.h" 79 1 Info 769: global enumeration constant 'QP::QSpyRecords::QS_QEP_STATE_ENTRY' (line 79, file C:\qp\qpcpp\include\qs.h) not referenced
 "C:\qp\qpcpp\include\qs.h" 80 1 Info 769: global enumeration constant 'QP::QSpyRecords::QS_QEP_STATE_EXIT' (line 80, file C:\qp\qpcpp\include\qs.h) not referenced

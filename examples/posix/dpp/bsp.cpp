@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, POSIX
-// Last Updated for Version: 5.6.0
-// Date of the Last Update:  2015-12-26
+// Last Updated for Version: 5.6.5
+// Date of the Last Update:  2016-06-08
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -133,7 +133,7 @@ void QF_onClockTick(void) {
 
     QF::TICK_X(0U, &DPP::l_clock_tick); // process time events at rate 0
 
-    struct timeval timeout = { 0 }; // timeout for select()
+    struct timeval timeout = { 0, 0 }; // timeout for select()
     fd_set con; // FD set representing the console
     FD_ZERO(&con);
     FD_SET(0, &con);
@@ -174,7 +174,7 @@ static void *idleThread(void *par) { // the expected P-Thread signature
     while (l_running) {
         uint16_t nBytes = 256U;
         uint8_t const *block;
-        struct timeval timeout = { 0 }; // timeout for select()
+        struct timeval timeout = { 0, 10000 }; // timeout for select()
 
         QF_CRIT_ENTRY(dummy);
         block = QS::getBlock(&nBytes);
@@ -183,13 +183,12 @@ static void *idleThread(void *par) { // the expected P-Thread signature
         if (block != (uint8_t *)0) {
             QSPY_parse(block, nBytes);
         }
-        timeout.tv_usec = 10000;
         select(0, 0, 0, 0, &timeout);   // sleep for a while
     }
     return 0; // return success
 }
 //............................................................................
-bool QS::onStartup(void const *arg) {
+bool QS::onStartup(void const */*arg*/) {
     static uint8_t qsBuf[4*1024]; // 4K buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 

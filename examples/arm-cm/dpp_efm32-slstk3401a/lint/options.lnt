@@ -1,0 +1,90 @@
+//////////////////////////////////////////////////////////////////////////////
+// Product: PC-Lint 9.x options for linting QP/C++ applications, GNU-ARM
+// Last Updated for Version: 5.4.0
+// Date of the Last Update:  2015-03-19
+//
+//                    Q u a n t u m     L e a P s
+//                    ---------------------------
+//                    innovating embedded systems
+//
+// Copyright (C) Quantum Leaps, www.state-machine.com.
+//
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Alternatively, this program may be distributed and modified under the
+// terms of Quantum Leaps commercial licenses, which expressly supersede
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Contact information:
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
+//////////////////////////////////////////////////////////////////////////////
+
+// the location of the GNU-ARM includes (need to adjust!!!)
+-iC:\tools\gnu_arm-eabi\arm-eabi\include
+
+// the location of the QTools lint directory (need to adjust!!!)
+-iC:\tools\qtools\lint
+
+// the location of the QPC framework (need to adjust!!!)
+-i..\..\..\..\include                // QP/C++ includes
+-i..\..\..\..\ports\arm-cm\qk\gnu    // QP/C++ port includes
+-i..\..\..\..\3rd_partyCMSIS\Include // CMSIS directory
+
+-D__ARM7M__=1                 // define for Cortex-M3/M4
+-D__ARM6M__=0                 // define for Cortex-M0/M0+
+//co-iar-arm.lnt                // IAR ARM compiler
+co-gnu-arm.lnt                // GNU-ARM compiler
+au-misra-cpp.lnt              // MISRA-C++:2008 rules
+au-ds.lnt                     // Dan Saks recommendations
+qpcpp.lnt                     // QP/C++ options
+//-strong(AXJ)                  // Strong type checking
+
+// library headers
+-wlib(1)                      // ignore warnings from library headers
++libclass(angle)              // consider only <...> headers as library
+//-vf                           // print names of all header & source files
+
+
+-esym(1960, philoNum)         // Non-private data member in a non-POD struct
+-efunc(946, *PHILO_ID)        // 5-0-15,5-0-17,5-0-18 subtraction of pointers
+-efunc(947, *PHILO_ID)        // 5-0-15,5-0-17,5-0-18 subtraction of pointers
+-efunc(1960,*PHILO_ID)        // 5-0-6, conversion of integer to smaller type
+-efile(1924, *bsp.cpp)        // 5-2-4, C-style cast
+
+-esym(1960,                   // 16-0-4, Function-like macro defined
+ QF_SET_BASEPRI,
+ QK_ISR_CONTEXT_)
+-esym(1923,                   // 16-2-2, could become const variable 
+ QF_BASEPRI)
+-emacro(717,                  // do ... while(0);
+ QK_ISR_ENTRY,
+ QK_ISR_EXIT)
+-estring(435,                  // int constant '0xE000ED04U' has precision 32
+ 0xE000ED04U)
+-estring(435,                  // int constant '0x10000000U' has precision 29
+ 0x10000000U)
+
+// CMSIS-induced problems
+-e923                         // 5-2-7, 5-2-8 cast from int to pointer
+-e1924                        // C-style cast (for CMSIS)
+
+// not referenced symbols
+-e714                         // symbol '...' not referenced
+-e755                         // global macro '...' not referenced
+-e756                         // global typedef '...' not referenced
+-e757                         // global declarator '...' not referenced
+-e768                         // struct member '...' not referenced
+

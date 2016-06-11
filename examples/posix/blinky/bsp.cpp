@@ -61,11 +61,11 @@ void BSP_init(void) {
 }
 //............................................................................
 void BSP_ledOff(void) {
-    cout << "OFF" << endl;
+    cout << "LED OFF" << endl;
 }
 //............................................................................
 void BSP_ledOn(void) {
-    cout << "ON" << endl;
+    cout << "LED ON" << endl;
 }
 
 //............................................................................
@@ -88,7 +88,7 @@ void QF::onCleanup(void) {
 void QP::QF_onClockTick(void) {
     QF::TICK_X(0U, (void *)0);  // perform the QF clock tick processing
 
-    struct timeval timeout = { 0U }; // timeout for select()
+    struct timeval timeout = { 0, 0 }; // timeout for select()
     fd_set con; // FD set representing the console    FD_ZERO(&con);
     FD_SET(0, &con);
     // check if a console input is available, returns immediately

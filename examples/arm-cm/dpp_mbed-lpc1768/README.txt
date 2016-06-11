@@ -1,27 +1,15 @@
 About this Example
 ==================
 This directory contains the "Dining Philosophers Problem" (DPP) example
-running on the NXT mbed-LPC1768 board (ARM Cortex-M3). The following
-versions of the example are provided:
+for the preemptive QK kernel running on the NXP mbed-LPC1768 board
+(ARM Cortex-M3). This directory contains portable code that should
+compile with any C compiler for ARM Cortex-M.
 
-dpp_mbed-lpc1768/
- |
- +-qk/      - preemptive QK kernel
- | +-arm/   - ARM-KEIL toolset
- | +-gnu/   - GNU-ARM toolset
- | +-iar/   - IAR-ARM toolset
- |
- +-qv/      - cooperative QV kernel
- | +-arm/   - ARM-KEIL toolset
- | +-gnu/   - GNU-ARM toolset
- | +-iar/   - IAR-ARM toolset
-
-***
-NOTE: The sub-directory "gnu" contains the Makefile for a generic GNU-ARM
+The sub-directory "gnu" contains the Makefile for a generic GNU-ARM
 toolset (e.g., see http://gnutoolchains.com/arm-eabi/). Thus, this
 project provides a way of building mbed applications locally with
 free and unrestricted tools.
-***
+
 ***
 NOTE: To build the code on Windows, you need to download and install
 the GNU make utility. The Qtools collection from Quantum Leaps contains
@@ -29,9 +17,7 @@ GNU make and other UNIX-style utilites for Windows (native Windows,
 without the need to install CygWin).
 ***
 
-Downloading the Code to mbed-LPC1768 Board
-==========================================
-After building the code with any of the supported toosets, you can simply
+After building the code with the provided Makefile, you can simply
 copy the binary image to the mbed folder for execution.
 
 The whole build process and loading the image to the mbed board can
@@ -40,14 +26,14 @@ The provided QM model (dpp.qm) comes pre-configured with tools
 setup to build (via make) and copy the code to the mbed board. 
 
 
-Support Code for NXT mbed-LPC1768 Board 
+Support Code for NXP mbed-LPC1768 Board 
 =======================================
-The directory qpc\3rd_party\mbed-lpc1768 contains the CMSIS-compliant
-device code for the NXT LPC176xx MCUs (ARM Cortex-M3). Please see the
+The directory 3rd_party\mbed-lpc1768 contains the CMSIS-compliant
+device code for the NXP LPC176xx MCUs (ARM Cortex-M3). Please see the
 README.txt file in this folder for more details.
 
 
-Note About the Board Support Package for NXT mbed-LPC1768 
+Note About the Board Support Package for NXP mbed-LPC1768 
 =========================================================
 The provided Board Support Package (see bsp.c) is minimal for the
 application at hand and is completely **standalone**, meaning that

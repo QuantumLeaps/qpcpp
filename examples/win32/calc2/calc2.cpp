@@ -127,6 +127,7 @@ QP::QState Calc2::initial(Calc2 * const me, QP::QEvt const * const e) {
         }
     };
     // ${SMs::Calc2::SM::initial}
+    (void)e; // unused parameter
     BSP_clear();
     return QM_TRAN_INIT(&tatbl_);
 }

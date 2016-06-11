@@ -1,7 +1,7 @@
 ##############################################################################
-# Product: Generic Makefile for QP/C++ application, POSIX, GNU compiler
-# Last updated for version 5.5.0
-# Last updated on  2015-09-25
+# Product: Makefile for QP/C++, QHsmTst console, POSIX, GNU compiler
+# Last updated for version 5.6.5
+# Last updated on  2016-06-07
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -41,61 +41,65 @@
 # make clean
 # make CONF=rel clean
 # make CONF=spy clean
-##############################################################################
-#
-# NOTE: Typically, you should have no need to change anything in this Makefile
-#
-##############################################################################
-
 
 #-----------------------------------------------------------------------------
+# project name
+#
+PROJECT     := qhsmtst
+
+#-----------------------------------------------------------------------------
+# project directories
+#
+
 # location of the QP/C++ framework (if not provided in an environemnt var.)
 ifeq ($(QPCPP),)
 QPCPP := ../../..
 endif
+
+# QP port used in this project
+QP_PORT_DIR := $(QPCPP)/ports/posix
+
+# list of all source directories used by this project
+VPATH = \
+	.
+
+# list of all include directories needed by this project
+INCLUDES  = \
+	-I. \
+	-I$(QPCPP)/include
+
+
+
+#-----------------------------------------------------------------------------
+# files
+#
+
+# C source files...
+C_SRCS := \
+
+# C++ source files...
+CPP_SRCS :=	\
+	main.cpp \
+	qhsmtst.cpp
+
+LIB_DIRS  :=
+LIBS      :=
+
+# defines...
+# QP_API_VERSION controls the QP API compatibility; 9999 means the latest API
+DEFINES   := -DQP_API_VERSION=9999
+
 
 #-----------------------------------------------------------------------------
 # GNU toolset
 #
 CC    := gcc
 CPP   := g++
-#LINK  := gcc   # for C programs
-LINK  := g++  # for C++ programs
+#LINK  := gcc    # for C programs
+LINK  := g++   # for C++ programs
 
-MKDIR := mkdir
-RM    := rm
-
-
-#-----------------------------------------------------------------------------
-# directories
-#
-# Project name is derived from the directory name
-PROJECT := $(notdir $(CURDIR))
-
-QP_PORT_DIR := $(QPCPP)/ports/posix
-APP_DIR     := .
-
-VPATH = $(APP_DIR)
-
-# include directories
-INCLUDES  = -I. \
-	-I$(QPCPP)/include \
-	-I$(QP_PORT_DIR)
-
-# defines
-DEFINES =
-
-#-----------------------------------------------------------------------------
-# files
-#
-
-# C source files
-C_SRCS := $(wildcard *.c)
-
-# C++ source files
-CPP_SRCS := $(wildcard *.cpp)
-
-LD_SCRIPT :=
+MKDIR := mkdir -p
+RM    := rm -f
 
 #-----------------------------------------------------------------------------
 # build options for various configurations
@@ -105,16 +109,13 @@ ifeq (rel, $(CONF)) # Release configuration ..................................
 
 BIN_DIR := rel
 
-CFLAGS = -c -Wall -W -O2 -ffunction-sections -fdata-sections -DNDEBUG \
-	$(INCLUDES) $(DEFINES) -pthread
+CFLAGS = -ffunction-sections -fdata-sections \
+	-Os -Wall -W $(INCLUDES) $(DEFINES) -pthread -DNDEBUG
 
-CPPFLAGS = -c -O2 -fno-rtti -fno-exceptions -DNDEBUG \
-	-ffunction-sections -fdata-sections	$(INCLUDES) $(DEFINES) -Wall -pthread
-
+CPPFLAGS =  -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
+	-Os -Wall -W $(INCLUDES) $(DEFINES) -pthread -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
-
-BIN_DIR := spy
 
 # make sure that QTOOLS exists...
 ifeq ("$(wildcard $(QTOOLS))","")
@@ -125,30 +126,34 @@ INCLUDES +=	-I$(QTOOLS)/qspy/include
 VPATH    += $(QTOOLS)/qspy/source
 C_SRCS   += qspy.c
 
-CFLAGS = -c -Wall -W -g -ffunction-sections -fdata-sections -DQ_SPY \
-	$(INCLUDES) $(DEFINES) -pthread
+BIN_DIR := spy
 
-CPPFLAGS = -c -O -fno-rtti -fno-exceptions -DQ_SPY \
-	-ffunction-sections -fdata-sections	$(INCLUDES) $(DEFINES) -Wall -pthread
+CFLAGS = -g -ffunction-sections -fdata-sections \
+	-O -Wall -W $(INCLUDES) $(DEFINES) -pthread -DQ_SPY
 
+CPPFLAGS = -g -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
+	-O -Wall -W $(INCLUDES) $(DEFINES) -pthread -DQ_SPY
 
 else  # default Debug configuration ..........................................
 
 BIN_DIR := dbg
 
-CFLAGS = -c -Wall -W -g -ffunction-sections -fdata-sections \
-	$(INCLUDES) $(DEFINES) -pthread
+CFLAGS = -g -ffunction-sections -fdata-sections \
+	-O -Wall -W $(INCLUDES) $(DEFINES) -pthread
 
-CPPFLAGS = -c -O -fno-rtti -fno-exceptions \
-	-ffunction-sections -fdata-sections	$(INCLUDES) $(DEFINES) -Wall -pthread
+CPPFLAGS = -g -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
+	-O -Wall -W $(INCLUDES) $(DEFINES) -pthread
 
-endif
+endif  # .....................................................................
 
-
-LINKFLAGS = -L$(QP_PORT_DIR)/$(BIN_DIR) -pthread \
-	-Wl,-Map,$(BIN_DIR)/$(PROJECT).map,--cref,--gc-sections
+LINKFLAGS := -Wl,-Map,$(BIN_DIR)/$(PROJECT).map,--cref,--gc-sections
 
 #-----------------------------------------------------------------------------
+
+# combine all the soruces...
+INCLUDES  += -I$(QP_PORT_DIR)
+LIB_DIRS  += -L$(QP_PORT_DIR)/$(BIN_DIR)
+LIBS      += -lpthread -lqp
 
 C_OBJS       := $(patsubst %.c,   %.o, $(C_SRCS))
 CPP_OBJS     := $(patsubst %.cpp, %.o, $(CPP_SRCS))
@@ -175,9 +180,9 @@ all: $(TARGET_EXE)
 $(TARGET_BIN): $(TARGET_EXE)
 	$(BIN) -O binary $< $@
 
-$(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT)
+$(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
 	$(CPP) $(CPPFLAGS) -c $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
-	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o -lqp
+	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.cpp
 	$(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@
@@ -200,10 +205,7 @@ endif
 
 .PHONY : clean
 clean:
-	-$(RM) $(BIN_DIR)/*.o \
-	$(BIN_DIR)/*.d \
-	$(BIN_DIR)/*. \
-	$(BIN_DIR)/*.map
+	-$(RM) $(BIN_DIR)/*
 	
 show:
 	@echo PROJECT  = $(PROJECT)
@@ -214,3 +216,6 @@ show:
 	@echo C_OBJS_EXT   = $(C_OBJS_EXT)
 	@echo C_DEPS_EXT   = $(C_DEPS_EXT)
 	@echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)
+	@echo CPP_OBJS_EXT = $(CPP_OBJS_EXT)
+	@echo LIB_DIRS = $(LIB_DIRS)
+	@echo LIBS     = $(LIBS)

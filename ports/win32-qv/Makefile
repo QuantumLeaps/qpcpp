@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ port to Win32 API, MinGW toolset
-# Last Updated for Version: 5.6.4
-# Date of the Last Update:  2016-05-04
+# Last Updated for Version: 5.6.5
+# Date of the Last Update:  2016-05-13
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -80,7 +80,8 @@ INCLUDES  = \
 #
 
 # C source files
-C_SRCS :=
+C_SRCS := \
+	qwin_gui.c
 
 # C++ source files
 CPP_SRCS := \
@@ -96,8 +97,7 @@ CPP_SRCS := \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
 	qf_time.cpp \
-	qf_port.cpp \
-	qwin_gui.cpp
+	qf_port.cpp
 
 # C++ QS source files
 CPP_QS_SRCS := \
@@ -116,6 +116,7 @@ DEFINES  := -DQWIN_GUI
 # MinGW toolset is included in the Qtools collection for Windows, see:
 #    http://sourceforge.net/projects/qpc/files/Qtools/
 
+CC    := gcc
 CPP   := g++
 LIB   := ar
 

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.4
-/// Last updated on  2016-04-25
+/// Last updated for version 5.6.5
+/// Last updated on  2016-06-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -53,7 +53,7 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qf_port")
 
 // Global-scope objects ------------------------------------------------------
-pthread_mutex_t QF_pThreadMutex_ = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t QF_pThreadMutex_;
 
 // Local-scope objects -------------------------------------------------------
 static bool l_running;
@@ -66,6 +66,9 @@ static void *ao_thread(void *arg); // thread routine for all AOs
 void QF::init(void) {
     // lock memory so we're never swapped out to disk
     //mlockall(MCL_CURRENT | MCL_FUTURE); // uncomment when supported
+
+    // init the global mutex with the default non-recursive initializer
+    pthread_mutex_init(&QF_pThreadMutex_, NULL);
 
     // clear the internal QF variables, so that the framework can (re)start
     // correctly even if the startup code is not called to clear the
