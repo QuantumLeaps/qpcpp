@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.6.5
+/// Last updated on  2016-06-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -142,7 +142,11 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
         (void)teDisarm_();
         QF_CRIT_EXIT_();
 
-        stat = POST_X(e, margin, sender);
+#ifndef Q_SPY
+        stat = QMActive::post_(e, margin);
+#else
+        stat = QMActive::post_(e, margin, sender);
+#endif
     }
     else { // the queue is not available
          QF::gc(e); // make sure the event is not leaked

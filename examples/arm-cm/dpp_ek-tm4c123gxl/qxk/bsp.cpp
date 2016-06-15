@@ -92,6 +92,7 @@ static QP::QXMutex l_rndMutex; // to protect the random number generator
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,
+        PAUSED_STAT,
         COMMAND_STAT
     };
 
@@ -213,6 +214,7 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_GPIOPortA_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
+    QS_USR_DICTIONARY(PAUSED_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
 }
 //............................................................................
@@ -227,7 +229,16 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
 }
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
-    GPIOF->DATA_Bits[LED_RED] = ((paused != 0U) ? 0xFFU : 0U);
+    //GPIOF->DATA_Bits[LED_RED] = ((paused != 0U) ? 0xFFU : 0U);
+    static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
+    XT_Test->POST_X(&pauseEvt, 1U, (void *)0);
+    //XT_Test->unblock(); //??? unblock the Test thread
+
+    // application-specific trace record
+    QS_BEGIN(PAUSED_STAT, AO_Table)
+        QS_U8(1, paused);  // Paused status
+    QS_END()
+
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
@@ -407,6 +418,7 @@ bool QS::onStartup(void const *arg) {
     QS_FILTER_ON(QS_QEP_UNHANDLED);
 
     QS_FILTER_ON(DPP::PHILO_STAT);
+    QS_FILTER_ON(DPP::PAUSED_STAT);
     QS_FILTER_ON(DPP::COMMAND_STAT);
 
     return true; // return success
