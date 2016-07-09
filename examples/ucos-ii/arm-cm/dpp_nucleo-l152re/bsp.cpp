@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, STM32 NUCLEO-L152RE board, uC/OS-II kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 5.6.5
+// Last updated on  2016-06-29
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -50,7 +50,8 @@ Q_DEFINE_THIS_FILE
 // Button pins available on the board (just one Button)
 #define BTN_B1     (1U << 13)
 
-static unsigned  l_rnd;  // random seed
+static uint32_t l_rnd; // random seed
+OS_EVENT *l_rndMutex;  // to protect the random number generator
 
 #ifdef Q_SPY
 
@@ -241,16 +242,24 @@ void BSP_displayPaused(uint8_t paused) {
 }
 //............................................................................
 uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+    INT8U err;
+
+    OSMutexPend(l_rndMutex, 0, &err); // lock the random-seed mutex
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
-    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
+    l_rnd = rnd; // set for the next time
+    OSMutexPost(l_rndMutex);           // unlock the random-seed mutex
 
-    return l_rnd >> 8;
+    return (rnd >> 8);
 }
 //............................................................................
 void BSP_randomSeed(uint32_t seed) {
+      INT8U err;
+
     l_rnd = seed;
+      l_rndMutex = OSMutexCreate(N_PHILO, &err);
 }
 //............................................................................
 void BSP_terminate(int16_t result) {
@@ -265,9 +274,6 @@ namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    QF_CRIT_STAT_TYPE cpu_sr;
-    QF_CRIT_ENTRY(cpu_sr); // DISABLED interrupts
-
     // initialize the system clock tick...
     OS_CPU_SysTickInit(SystemCoreClock / OS_TICKS_PER_SEC);
 
@@ -277,9 +283,6 @@ void QF::onStartup(void) {
 
     // enable IRQs in the NVIC...
     NVIC_EnableIRQ(EXTI0_IRQn);
-
-    // NOTE: do not exit the critical section and leave interrupts DISABLED
-    (void)cpu_sr; // avoid compiler warning about unused variable
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -374,6 +377,7 @@ void QS::onFlush(void) {
         while ((USART2->SR & 0x0080U) == 0U) { // while TXE not empty
         }
         USART2->DR  = (b & 0xFFU);  // put into the DR register
+        OS_ENTER_CRITICAL();
     }
     OS_EXIT_CRITICAL();
 }

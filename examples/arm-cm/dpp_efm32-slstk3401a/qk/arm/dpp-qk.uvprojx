@@ -423,24 +423,19 @@
               <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\arm\startup_efm32pg1b.s</FilePath>
             </File>
             <File>
-              <FileName>efm32pg1b200f256gm48.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\efm32pg1b200f256gm48.h</FilePath>
-            </File>
-            <File>
-              <FileName>em_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_gpio.c</FilePath>
-            </File>
-            <File>
               <FileName>system_efm32pg1b.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\system_efm32pg1b.c</FilePath>
             </File>
             <File>
-              <FileName>em_system.c</FileName>
+              <FileName>efm32pg1b200f256gm48.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\efm32pg1b200f256gm48.h</FilePath>
+            </File>
+            <File>
+              <FileName>em_cmu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_system.c</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_cmu.c</FilePath>
             </File>
             <File>
               <FileName>em_emu.c</FileName>
@@ -448,9 +443,14 @@
               <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_emu.c</FilePath>
             </File>
             <File>
-              <FileName>em_cmu.c</FileName>
+              <FileName>em_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_cmu.c</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>em_system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_system.c</FilePath>
             </File>
             <File>
               <FileName>em_usart.c</FileName>
@@ -1054,24 +1054,19 @@
               <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\arm\startup_efm32pg1b.s</FilePath>
             </File>
             <File>
-              <FileName>efm32pg1b200f256gm48.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\efm32pg1b200f256gm48.h</FilePath>
-            </File>
-            <File>
-              <FileName>em_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_gpio.c</FilePath>
-            </File>
-            <File>
               <FileName>system_efm32pg1b.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\system_efm32pg1b.c</FilePath>
             </File>
             <File>
-              <FileName>em_system.c</FileName>
+              <FileName>efm32pg1b200f256gm48.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\efm32pg1b200f256gm48.h</FilePath>
+            </File>
+            <File>
+              <FileName>em_cmu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_system.c</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_cmu.c</FilePath>
             </File>
             <File>
               <FileName>em_emu.c</FileName>
@@ -1079,9 +1074,14 @@
               <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_emu.c</FilePath>
             </File>
             <File>
-              <FileName>em_cmu.c</FileName>
+              <FileName>em_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_cmu.c</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>em_system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_system.c</FilePath>
             </File>
             <File>
               <FileName>em_usart.c</FileName>
@@ -1685,24 +1685,19 @@
               <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\arm\startup_efm32pg1b.s</FilePath>
             </File>
             <File>
-              <FileName>efm32pg1b200f256gm48.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\efm32pg1b200f256gm48.h</FilePath>
-            </File>
-            <File>
-              <FileName>em_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_gpio.c</FilePath>
-            </File>
-            <File>
               <FileName>system_efm32pg1b.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\system_efm32pg1b.c</FilePath>
             </File>
             <File>
-              <FileName>em_system.c</FileName>
+              <FileName>efm32pg1b200f256gm48.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\efm32pg1b200f256gm48.h</FilePath>
+            </File>
+            <File>
+              <FileName>em_cmu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_system.c</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_cmu.c</FilePath>
             </File>
             <File>
               <FileName>em_emu.c</FileName>
@@ -1710,9 +1705,14 @@
               <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_emu.c</FilePath>
             </File>
             <File>
-              <FileName>em_cmu.c</FileName>
+              <FileName>em_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_cmu.c</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>em_system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\em_system.c</FilePath>
             </File>
             <File>
               <FileName>em_usart.c</FileName>

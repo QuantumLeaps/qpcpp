@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L152RE board, preemptive QK kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 5.6.5
+// Last updated on  2016-07-05
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -378,6 +378,7 @@ void QS::onFlush(void) {
         while ((USART2->SR & 0x0080U) == 0U) { // while TXE not empty
         }
         USART2->DR  = (b & 0xFFU);  // put into the DR register
+        QF_INT_DISABLE();
     }
     QF_INT_ENABLE();
 }

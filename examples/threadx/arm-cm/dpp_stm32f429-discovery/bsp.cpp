@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, STM32F4-Discovery board, ThreadX kernel
-// Last updated for version 5.6.2
-// Last updated on  2016-03-12
+// Last updated for version 5.6.5
+// Last updated on  2016-07-05
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -349,11 +349,17 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
 //............................................................................
 void QS::onFlush(void) {
     uint16_t b;
+    QF_CRIT_STAT_TYPE intStat;
+
+    QF_CRIT_ENTRY(intStat);
     while ((b = getByte()) != QS_EOD) {  // while not End-Of-Data...
+        QF_CRIT_EXIT(intStat);
         while ((USART2->SR & USART_FLAG_TXE) == 0U) { // while TXE not empty
         }
         USART2->DR = (b & 0xFFU); // put into the DR register
+        QF_CRIT_ENTRY(intStat);
     }
+    QF_CRIT_EXIT(intStat);
 }
 //............................................................................
 //! callback function to reset the target (to be implemented in the BSP)

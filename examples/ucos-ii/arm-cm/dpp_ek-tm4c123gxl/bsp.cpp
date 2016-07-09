@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, uC/OS-II kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 5.6.5
+// Last updated on  2016-06-29
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -54,7 +54,8 @@ Q_DEFINE_THIS_FILE
 #define BTN_SW1     (1U << 4)
 #define BTN_SW2     (1U << 0)
 
-static uint32_t l_rnd;  // random seed
+static uint32_t l_rnd; // random seed
+OS_EVENT *l_rndMutex;  // to protect the random number generator
 
 #ifdef Q_SPY
 
@@ -82,7 +83,7 @@ extern "C" {
 void GPIOPortA_IRQHandler(void);
 void GPIOPortA_IRQHandler(void) {
 #if OS_CRITICAL_METHOD == 3u  // Allocate storage for CPU status register
-    OS_CPU_SR  cpu_sr = 0u;
+    OS_CPU_SR cpu_sr;
 #endif
 
     OS_ENTER_CRITICAL();
@@ -96,13 +97,14 @@ void GPIOPortA_IRQHandler(void) {
     OSIntExit();   // Tell uC/OS-II that we are leaving the ISR
 }
 
+
 // uCOS-II application hooks --===============================================
 void App_TaskCreateHook (OS_TCB *ptcb) { (void)ptcb; }
 void App_TaskDelHook    (OS_TCB *ptcb) { (void)ptcb; }
 //............................................................................
 void App_TaskIdleHook(void) {
 #if OS_CRITICAL_METHOD == 3u  // Allocate storage for CPU status register
-    OS_CPU_SR cpu_sr = 0u;
+    OS_CPU_SR cpu_sr;
 #endif
 
     // toggle LED2 on and then off, see NOTE01
@@ -190,9 +192,7 @@ void BSP_init(void) {
     // configure the LEDs and push buttons
     GPIOF->DIR |= (LED_RED | LED_GREEN | LED_BLUE); // set direction: output
     GPIOF->DEN |= (LED_RED | LED_GREEN | LED_BLUE); // digital enable
-    GPIOF->DATA_Bits[LED_RED]   = 0U;  // turn the LED off
-    GPIOF->DATA_Bits[LED_GREEN] = 0U;  // turn the LED off
-    GPIOF->DATA_Bits[LED_BLUE]  = 0U;  // turn the LED off
+    GPIOF->DATA_Bits[LED_RED | LED_GREEN | LED_BLUE] = 0U;  // turn the LEDs off
 
     // configure the Buttons
     GPIOF->DIR &= ~(BTN_SW1 | BTN_SW2); //  set direction: input
@@ -233,16 +233,24 @@ void BSP_displayPaused(uint8_t paused) {
 }
 //............................................................................
 uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+    INT8U err;
+
+    OSMutexPend(l_rndMutex, 0, &err); // lock the random-seed mutex
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
-    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
+    l_rnd = rnd; // set for the next time
+    OSMutexPost(l_rndMutex);           // unlock the random-seed mutex
 
-    return l_rnd >> 8;
+    return (rnd >> 8);
 }
 //............................................................................
 void BSP_randomSeed(uint32_t seed) {
+      INT8U err;
+
     l_rnd = seed;
+      l_rndMutex = OSMutexCreate(N_PHILO, &err);
 }
 //............................................................................
 void BSP_terminate(int16_t result) {
@@ -257,9 +265,6 @@ namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    QF_CRIT_STAT_TYPE cpu_sr;
-    QF_CRIT_ENTRY(cpu_sr); // DISABLED interrupts
-
     // initialize the system clock tick...
     OS_CPU_SysTickInit(SystemCoreClock / OS_TICKS_PER_SEC);
 
@@ -269,9 +274,6 @@ void QF::onStartup(void) {
 
     // enable IRQs in the NVIC...
     NVIC_EnableIRQ(GPIOA_IRQn);
-
-    // NOTE: do not exit the critical section and leave interrupts DISABLED
-    (void)cpu_sr; // avoid compiler warning about unused variable
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -285,6 +287,15 @@ extern "C" void Q_onAssert(char const *module, int loc) {
     (void)module;
     (void)loc;
     QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
+
+#ifndef NDEBUG
+    // light all both LEDs
+    GPIOF->DATA_Bits[LED_RED | LED_GREEN | LED_BLUE] = 0xFFU;
+    // for debugging, hang on in an endless loop until SW1 is pressed...
+    while (GPIOF->DATA_Bits[BTN_SW1] != 0) {
+    }
+#endif
+
     NVIC_SystemReset();
 }
 
@@ -379,7 +390,7 @@ void QS::onReset(void) {
     //TBD
 }
 //............................................................................
-//! callback function to execute a uesr command (to be implemented in BSP)
+//! callback function to execute a user command (to be implemented in BSP)
 void QS::onCommand(uint8_t cmdId, uint32_t param) {
     (void)cmdId;
     (void)param;
@@ -391,7 +402,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param) {
 } // namespace QP
 
 //****************************************************************************
-// NOTE00:
+// NOTE01:
 // The User LED is used to visualize the idle loop activity. The brightness
 // of the LED is proportional to the frequency of invcations of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt

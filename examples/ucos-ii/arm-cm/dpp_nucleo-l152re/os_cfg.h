@@ -10,7 +10,7 @@
 * by the application.
 *
 * Quantum Leaps, LLC. www.state-machine.com
-* 2016-03-31
+* 2016-06-29
 *===========================================================================*/
 /*
 *********************************************************************************************************
@@ -113,10 +113,10 @@
 
 
                                        /* ---------------- MUTUAL EXCLUSION SEMAPHORES --------------- */
-#define OS_MUTEX_EN               0u   /* Enable (1) or Disable (0) code generation for MUTEX          */
-#define OS_MUTEX_ACCEPT_EN        1u   /*     Include code for OSMutexAccept()                         */
-#define OS_MUTEX_DEL_EN           1u   /*     Include code for OSMutexDel()                            */
-#define OS_MUTEX_QUERY_EN         1u   /*     Include code for OSMutexQuery()                          */
+#define OS_MUTEX_EN               1u   /* Enable (1) or Disable (0) code generation for MUTEX          */
+#define OS_MUTEX_ACCEPT_EN        0u   /*     Include code for OSMutexAccept()                         */
+#define OS_MUTEX_DEL_EN           0u   /*     Include code for OSMutexDel()                            */
+#define OS_MUTEX_QUERY_EN         0u   /*     Include code for OSMutexQuery()                          */
 
 
 //SAR Modification, was on.            /* ---------------------- MESSAGE QUEUES ---------------------- */

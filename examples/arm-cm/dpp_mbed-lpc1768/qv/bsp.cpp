@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, NXP mbed-LPC1768 board, coopearative QV kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 5.6.5
+// Last updated on  2016-07-05
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -394,6 +394,7 @@ void QS::onFlush(void) {
         while ((LPC_UART0->LSR & 0x20U) == 0U) { // while THR empty...
         }
         LPC_UART0->THR = (b & 0xFFU);  // put into the DR register
+        QF_INT_DISABLE();
     }
     QF_INT_ENABLE();
 }
