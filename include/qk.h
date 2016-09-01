@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.4
-/// Last updated on  2016-05-09
+/// Last updated for version 5.7.0
+/// Last updated on  2016-08-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -48,24 +48,44 @@
 // QF configuration for QK
 
 //! This macro defines the type of the event queue used for active objects.
-/// @note
-/// This is just an example of the macro definition. Typically, you need
-/// to define it in the specific QF port file (qf_port.h). In case of QK,
-/// which always depends on the native QF queue, this macro is defined at the
-/// level of the platform-independent interface qk.h.
+/// @description
+///QK uses the native QF event queue QEQueue.
 #define QF_EQUEUE_TYPE         QEQueue
 
-//! OS-dependent per-thread operating-system object
-/// @description
-/// The use of this member depends on the CPU. For example, in port to
-/// ARM Cortex-M with FPU this member is used to store the LR.
-#define QF_OS_OBJECT_TYPE      void*
+//****************************************************************************
+//! attributes of the QK kernel (in C for easy access in assembly)
+extern "C" {
 
-//! OS-dependent representation of the private thread */
-/// @description
-/// QK uses this member to store the start priority of the AO,
-/// which is needed when the QK priority-ceiling mutex is used.
-#define QF_THREAD_TYPE         uint_fast8_t
+struct QK_Attr {
+    uint_fast8_t volatile curr;  //!< priority of the current executing AO
+    uint_fast8_t volatile next;  //!< priority of the next AO to execute
+    void volatile        *aux;   //!< auxiliary attribute used in the port
+    uint_fast8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
+    uint_fast8_t volatile lockHolder; //!< prio of the lock holder
+#ifndef QK_ISR_CONTEXT_
+    uint_fast8_t volatile intNest;    //!< ISR nesting level
+#endif // QK_ISR_CONTEXT_
+#if (QF_MAX_ACTIVE <= 8)
+    QP::QPSet8  readySet;     //!< QK ready-set of AOs and "naked" threads
+#else
+    QP::QPSet64 readySet;     //!< QK ready-set of AOs and "naked" threads
+#endif
+};
+
+//! global attributes of the QK kernel
+extern QK_Attr QK_attr_;
+
+//! QK initialization
+void QK_init(void);
+
+//! QK scheduler
+void QK_sched_(uint_fast8_t p);
+
+//! Find the highest-priority task ready to run
+uint_fast8_t QK_schedPrio_(void);
+
+} // extern "C"
+
 
 
 //****************************************************************************
@@ -118,32 +138,6 @@ private:
 
 } // namespace QP
 
-//****************************************************************************
-extern "C" {
-
-//! QK initialization
-void QK_init(void);
-
-//! The QK scheduler
-void QK_sched_(uint_fast8_t p);
-
-//! Find the highest-priority task ready to run
-uint_fast8_t QK_schedPrio_(void);
-
-#if (QF_MAX_ACTIVE <= 8)
-    extern QP::QPSet8  QK_readySet_;  //!< ready set of AOs
-#else
-    extern QP::QPSet64 QK_readySet_;  //!< ready set of AOs
-#endif
-
-extern uint_fast8_t volatile QK_currPrio_; //!< current task/ISR priority
-extern uint_fast8_t volatile QK_lockPrio_; //!< lock prio (0 == no-lock)
-
-#ifndef QK_ISR_CONTEXT_
-    extern uint_fast8_t volatile QK_intNest_;  //!< interrupt nesting level
-#endif // QK_ISR_CONTEXT_
-
-} // extern "C"
 
 //****************************************************************************
 // interface used only inside QF, but not in applications
@@ -155,7 +149,7 @@ extern uint_fast8_t volatile QK_lockPrio_; //!< lock prio (0 == no-lock)
         /// @returns true if the code executes in the ISR context and false
         /// otherwise
         #define QK_ISR_CONTEXT_() \
-            (QK_intNest_ != static_cast<uint_fast8_t>(0))
+            (QK_attr_.intNest != static_cast<uint_fast8_t>(0))
     #endif // QK_ISR_CONTEXT_
 
     // QF-specific scheduler locking
@@ -182,7 +176,7 @@ extern uint_fast8_t volatile QK_lockPrio_; //!< lock prio (0 == no-lock)
         Q_ASSERT_ID(0, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
-        QK_readySet_.insert((me_)->m_prio); \
+        QK_attr_.readySet.insert((me_)->m_prio); \
         if (!QK_ISR_CONTEXT_()) { \
             uint_fast8_t p = QK_schedPrio_(); \
             if (p != static_cast<uint_fast8_t>(0)) { \
@@ -191,7 +185,7 @@ extern uint_fast8_t volatile QK_lockPrio_; //!< lock prio (0 == no-lock)
         } \
     } while (false)
     #define QACTIVE_EQUEUE_ONEMPTY_(me_) \
-        QK_readySet_.remove((me_)->m_prio)
+        QK_attr_.readySet.remove((me_)->m_prio)
 
     // native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool

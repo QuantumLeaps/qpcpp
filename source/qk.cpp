@@ -4,8 +4,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.6.4
-/// Last updated on  2016-04-25
+/// Last updated for version 5.7.0
+/// Last updated on  2016-08-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -57,15 +57,8 @@ extern "C" {
 
 Q_DEFINE_THIS_MODULE("qk")
 
-#if (QF_MAX_ACTIVE <= 8)
-    QP::QPSet8  QK_readySet_;  // ready set of AOs
-#else
-    QP::QPSet64 QK_readySet_;  // ready set of AOs
-#endif
+QK_Attr QK_attr_; // global attributes of the QK kernel
 
-uint_fast8_t volatile QK_currPrio_; // priority of the current task
-uint_fast8_t volatile QK_lockPrio_; // scheduler lock ceiling
-uint_fast8_t volatile QK_intNest_;  // ISR nesting level
 
 } // extern "C"
 
@@ -85,23 +78,21 @@ namespace QP {
 void QF::init(void) {
     extern uint_fast8_t QF_maxPool_;
 
-    QK_currPrio_ = static_cast<uint_fast8_t>(0); // prio of the QK idle loop
-    QK_lockPrio_ = static_cast<uint_fast8_t>(QF_MAX_ACTIVE);//scheduler locked
 
-#ifndef QK_ISR_CONTEXT_
-    QK_intNest_  = static_cast<uint_fast8_t>(0); // no nesting level
-#endif // QK_ISR_CONTEXT_
 
     // clear the internal QF variables, so that the framework can start
     // correctly even if the startup code fails to clear the uninitialized
     // data (as is required by the C++ Standard).
     QF_maxPool_  = static_cast<uint_fast8_t>(0);
-    bzero(&QK_readySet_,  static_cast<uint_fast16_t>(sizeof(QK_readySet_)));
     bzero(&QF::timeEvtHead_[0],
           static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
     bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
+    bzero(&QK_attr_,   static_cast<uint_fast16_t>(sizeof(QK_attr_)));
 
-    QK_init(); // QK initialization ("C" linkage, might be assembly)
+    QK_attr_.curr = static_cast<uint_fast8_t>(0); // prio of QK idle loop
+    QK_attr_.lockPrio = static_cast<uint_fast8_t>(QF_MAX_ACTIVE); // locked
+
+    QK_init(); // QK initialization ("C" linkage, might be in assembly)
 }
 
 //****************************************************************************
@@ -125,7 +116,7 @@ void QF::stop(void) {
 static void initial_events(void); // prototype
 static void initial_events(void) {
 
-    QK_lockPrio_ = static_cast<uint_fast8_t>(0); // scheduler unlocked
+    QK_attr_.lockPrio = static_cast<uint_fast8_t>(0); // scheduler unlocked
     uint_fast8_t p = QK_schedPrio_();
 
     // any active objects need to be scheduled before starting event loop?
@@ -236,13 +227,13 @@ extern "C" {
 ///
 uint_fast8_t QK_schedPrio_(void) {
     // find the highest-prio AO with non-empty event queue
-    uint_fast8_t p = QK_readySet_.findMax();
+    uint_fast8_t p = QK_attr_.readySet.findMax();
 
     // is the highest-prio below the current-prio?
-    if (p <= QK_currPrio_) {
+    if (p <= QK_attr_.curr) {
         p = static_cast<uint_fast8_t>(0); // active object not eligible
     }
-    else if (p <= QK_lockPrio_) { // is it below the lock prio?
+    else if (p <= QK_attr_.lockPrio) { // is it below the lock prio?
         p = static_cast<uint_fast8_t>(0); // active object not eligible
     }
     else {
@@ -263,7 +254,7 @@ uint_fast8_t QK_schedPrio_(void) {
 /// returns with interrupts **disabled**.
 ///
 void QK_sched_(uint_fast8_t p) {
-    uint_fast8_t pin = QK_currPrio_; // save the initial priority
+    uint_fast8_t pin = QK_attr_.curr; // save the initial priority
     QP::QMActive *a;
 
     // QS tracing or thread-local storage?
@@ -274,7 +265,7 @@ void QK_sched_(uint_fast8_t p) {
     // loop until have ready-to-run AOs of higher priority than the initial
     do {
         a = QP::QF::active_[p]; // obtain the pointer to the AO
-        QK_currPrio_ = p; // this becomes the current task priority
+        QK_attr_.curr = p; // this becomes the current task priority
 
         QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT, QP::QS::priv_.aoObjFilter, a)
             QS_TIME_();   // timestamp
@@ -304,13 +295,13 @@ void QK_sched_(uint_fast8_t p) {
         QF_INT_DISABLE();
 
         // find new highest-prio AO ready to run...
-        p = QK_readySet_.findMax();
+        p = QK_attr_.readySet.findMax();
 
         // is the new priority below the initial preemption threshold?
         if (p <= pin) {
             p = static_cast<uint_fast8_t>(0); // active object not eligible
         }
-        else if (p <= QK_lockPrio_) { // is it below the lock prio?
+        else if (p <= QK_attr_.lockPrio) { // is it below the lock prio?
             p = static_cast<uint_fast8_t>(0); // active object not eligible
         }
         else {
@@ -318,7 +309,7 @@ void QK_sched_(uint_fast8_t p) {
         }
     } while (p != static_cast<uint_fast8_t>(0));
 
-    QK_currPrio_ = pin; // restore the initial priority
+    QK_attr_.curr = pin; // restore the initial priority
 
 #ifdef Q_SPY
     if (pin != static_cast<uint_fast8_t>(0)) { // resuming an active object?

@@ -5,8 +5,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.6.4
-/// Last updated on  2016-05-09
+/// Last updated for version 5.7.0
+/// Last updated on  2016-08-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -107,16 +107,16 @@ void QMutex::lock(void) {
     Q_REQUIRE_ID(700, (!QK_ISR_CONTEXT_())
                  && (m_prevPrio == static_cast<uint_fast8_t>(MUTEX_UNUSED)));
 
-    m_prevPrio = QK_lockPrio_;   // save the previous prio
-    if (QK_lockPrio_ < m_lockPrio) { // raising the lock prio?
-        QK_lockPrio_ = m_lockPrio;
+    m_prevPrio = QK_attr_.lockPrio;   // save the previous prio
+    if (QK_attr_.lockPrio < m_lockPrio) { // raising the lock prio?
+        QK_attr_.lockPrio = m_lockPrio;
     }
 
     QS_BEGIN_NOCRIT_(QS_SCHED_LOCK,
                      static_cast<void *>(0), static_cast<void *>(0))
         QS_TIME_(); // timestamp
         QS_2U8_(static_cast<uint8_t>(m_prevPrio), /* the previous lock prio */
-                static_cast<uint8_t>(QK_lockPrio_)); // the new lock prio
+                static_cast<uint8_t>(QK_attr_.lockPrio)); // the new lock prio
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();
@@ -152,14 +152,14 @@ void QMutex::unlock(void) {
                      static_cast<void *>(0), static_cast<void *>(0))
         QS_TIME_(); // timestamp
         QS_2U8_(static_cast<uint8_t>(m_prevPrio),/* the previouis lock prio */
-                static_cast<uint8_t>(QK_lockPrio_)); // the new lock prio
+                static_cast<uint8_t>(QK_attr_.lockPrio)); // the new lock prio
     QS_END_NOCRIT_()
 
     uint_fast8_t p = m_prevPrio;
     m_prevPrio = static_cast<uint_fast8_t>(MUTEX_UNUSED);
 
-    if (QK_lockPrio_ > p) {
-        QK_lockPrio_ = p; // restore the previous lock prio
+    if (QK_attr_.lockPrio > p) {
+        QK_attr_.lockPrio = p; // restore the previous lock prio
         p = QK_schedPrio_(); // find the highest-prio AO ready to run
         if (p != static_cast<uint_fast8_t>(0)) { // priority found?
             QK_sched_(p); // schedule any unlocked AOs

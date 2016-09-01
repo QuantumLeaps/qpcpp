@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.6.2
-// Last updated on  2016-04-01
+// Last updated for version 5.7.0
+// Last updated on  2016-08-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -259,6 +259,14 @@
 
 
 // QK
+-estring(1960,        // 11-0-1(req) non-private data member
+ curr,
+ next,
+ aux,
+ lockPrio,
+ lockHolder,
+ intNest,
+ readySet)
 -esym(1960,           // 16-0-4 function-like macro
  QK_ISR_ENTRY,
  QK_ISR_EXIT,
@@ -282,6 +290,7 @@
  next,
  lockPrio,
  lockHolder,
+ intNest,
  readySet)
 -esym(1712,           // default constructor not defined
  QXThread) 

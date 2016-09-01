@@ -28,17 +28,17 @@
 		<link>
 			<name>QP</name>
 			<type>2</type>
-			<location>C:/qp/qpcpp/source</location>
+			<location>PARENT-5-PROJECT_LOC/source</location>
 		</link>
 		<link>
 			<name>QP_include</name>
 			<type>2</type>
-			<location>C:/qp/qpcpp/include</location>
+			<location>PARENT-5-PROJECT_LOC/include</location>
 		</link>
 		<link>
 			<name>QP_port</name>
 			<type>2</type>
-			<location>C:/qp/qpcpp/ports/msp430/qv/ccs</location>
+			<location>PARENT-5-PROJECT_LOC/ports/msp430/qv/ccs</location>
 		</link>
 		<link>
 			<name>blinky.cpp</name>
@@ -63,7 +63,7 @@
 		<link>
 			<name>ccs</name>
 			<type>2</type>
-			<location>D:/qp/qpcpp/ports/msp430/qv/ccs</location>
+			<location>PARENT-5-PROJECT_LOC/ports/msp430/qv/ccs</location>
 		</link>
 		<link>
 			<name>main.cpp</name>

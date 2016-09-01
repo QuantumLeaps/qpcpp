@@ -2,8 +2,8 @@
 /// @brief QK/C++ port to  MSP430, CCS-430 compiler
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-04
+/// Last updated for version 5.7.0
+/// Last updated on  2015-07-11
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -39,11 +39,11 @@
 #define qk_port_h
 
 // QK interrupt entry and exit...
-#define QK_ISR_ENTRY()    (++QK_intNest_)
+#define QK_ISR_ENTRY()    (++QK_attr_.intNest)
 
 #define QK_ISR_EXIT()     do { \
-    --QK_intNest_; \
-    if (QK_intNest_ == static_cast<uint_fast8_t>(0)) { \
+    --QK_attr_.intNest; \
+    if (QK_attr_.intNest == static_cast<uint_fast8_t>(0)) { \
         uint_fast8_t p = QK_schedPrio_(); \
         if (p != static_cast<uint_fast8_t>(0)) { \
             QK_sched_(p); \

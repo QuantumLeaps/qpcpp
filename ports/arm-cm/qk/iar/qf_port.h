@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 5.6.0
-/// Last updated on  2015-12-28
+/// Last updated on  2015-12-31
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -64,7 +64,7 @@
     // QF-aware ISR priority for CMSIS function NVIC_SetPriority(), NOTE5
     #define QF_AWARE_ISR_CMSIS_PRI (QF_BASEPRI >> (8 - __NVIC_PRIO_BITS))
 
-    // Cortex-M3/M4/M4F provide the CLZ instruction for fast LOG2
+    // Cortex-R provide the CLZ instruction for fast LOG2
     #define QF_LOG2(n_) ((uint8_t)(32U - __CLZ(n_)))
 #endif
 
