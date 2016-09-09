@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last updated for version 5.6.2
-// Last updated on  2016-03-31
+// Last updated for version 5.7.0
+// Last updated on  2016-09-08
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -143,6 +143,7 @@ qpcpp.lnt         // QP/C++ options
 -estring(1960,              // 9-5-1 declaration of union
  *F32Rep,
  *F64Rep,
+ *U32Rep,
  *Variant)
 -estring(1960,              // 16-0-4 function-like macro
  QS_INSERT_BYTE,
@@ -187,6 +188,8 @@ qpcpp.lnt         // QP/C++ options
  QS_END_NOCRIT_)
 -esym(1960, QP::QS_*)       // 3-2-3, object/function previously declared
                             // reported incorrectly for qs_pkg.h
+-esym(754,                  // local union member not referenced
+ U32Rep::u32)
 
 // Warning 537 "Repeated include file" is generated only in the Q_SPY
 // configuration. This warning is redundant, because all QP header files

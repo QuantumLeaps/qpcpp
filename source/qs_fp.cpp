@@ -4,8 +4,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QS/C++
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.7.0
+/// Last updated on  2016-09-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -88,19 +88,35 @@ void QS::f64(uint8_t format, float64_t const d) {
     uint8_t *buf_   = priv_.buf;
     QSCtr   head_   = priv_.head;
     QSCtr   end_    = priv_.end;
-    int_t   i;
+    uint32_t i;
+    // static constant untion to detect endianness of the machine
+    static union U32Rep {
+        uint32_t u32;
+        uint8_t  u8;
+    } const endian = { static_cast<uint32_t>(1) };
 
     fu64.d = d;  // assign the binary representation
 
     priv_.used += static_cast<QSCtr>(9); // 9 bytes about to be added
     QS_INSERT_ESC_BYTE(format)  // insert the format byte
 
-    for (i = static_cast<int_t>(4); i != static_cast<int_t>(0); --i) {
+    // is this a big-endian machine?
+    if (endian.u8 == static_cast<uint8_t>(0)) {
+        // swap fu64.i.u1 <-> fu64.i.u2...
+        i = fu64.i.u1;
+        fu64.i.u1 = fu64.i.u2;
+        fu64.i.u2 = i;
+    }
+
+    // output 4 bytes from fu64.i.u1 ...
+    for (i = static_cast<uint32_t>(4); i != static_cast<uint32_t>(0); --i) {
         format = static_cast<uint8_t>(fu64.i.u1);
         QS_INSERT_ESC_BYTE(format)
         fu64.i.u1 >>= 8;
     }
-    for (i = static_cast<int_t>(4); i != static_cast<int_t>(0); --i) {
+
+    // output 4 bytes from fu64.i.u2 ...
+    for (i = static_cast<uint32_t>(4); i != static_cast<uint32_t>(0); --i) {
         format = static_cast<uint8_t>(fu64.i.u2);
         QS_INSERT_ESC_BYTE(format)
         fu64.i.u2 >>= 8;
