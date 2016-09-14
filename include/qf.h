@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.4
-/// Last updated on  2016-05-09
+/// Last updated for version 5.7.0
+/// Last updated on  2016-09-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -305,6 +305,10 @@ public:
     virtual void dispatch(QEvt const * const e);
 
     bool isIn(QStateHandler const s);
+    QStateHandler state(void) const {
+        return m_state.fun;
+    }
+    QStateHandler childState(QStateHandler const parent);
 
 protected:
     //! protected constructor (abstract class)

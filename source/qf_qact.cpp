@@ -2,8 +2,8 @@
 /// @brief QP::QActive::QActive() definition
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.7.0
+/// Last updated on  2016-09-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -71,6 +71,10 @@ void QActive::dispatch(QEvt const * const e) {
 //****************************************************************************
 bool QActive::isIn(QStateHandler const s) {
     return QF_QACTIVE_TO_QHSM_CAST_(this)->QHsm::isIn(s);
+}
+//****************************************************************************
+QStateHandler QActive::childState(QStateHandler const parent) {
+    return QF_QACTIVE_TO_QHSM_CAST_(this)->QHsm::childState(parent);
 }
 
 } // namespace QP
