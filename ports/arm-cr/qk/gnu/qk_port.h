@@ -2,8 +2,8 @@
 /// @brief QK/C++ port to ARM Cortex-R, preemptive QK kernel, GNU-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.0
-/// Last updated on  2016-08-21
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -77,9 +77,8 @@
 #define QK_IRQ_END() \
     } --QK_attr_.intNest; \
     if (QK_attr_.intNest == (uint_fast8_t)0) { \
-        uint_fast8_t p = QK_schedPrio_(); \
-        if (p != (uint_fast8_t)0) { \
-            QK_sched_(p); \
+        if (QK_sched_() != (uint_fast8_t)0) { \
+            QK_activate_(); \
         } \
     } \
     __asm volatile (" POP {R3, LR}\n" \
@@ -96,9 +95,8 @@
 #define QK_IRQ_END() \
     } --QK_attr_.intNest; \
     if (QK_attr_.intNest == (uint_fast8_t)0) { \
-        uint_fast8_t p = QK_schedPrio_(); \
-        if (p != (uint_fast8_t)0) { \
-            QK_sched_(p); \
+        if (QK_sched_() != (uint_fast8_t)0) { \
+            QK_activate_(); \
         } \
     } \
     __asm volatile (" POP {R3, LR}\n" \

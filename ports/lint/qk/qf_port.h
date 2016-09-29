@@ -54,7 +54,7 @@
 /// and your own application code. The consistency is guaranteed if you define
 /// this macro only once in the qf_port.h header file and henceforth include
 /// this header file in all builds.
-#define QF_MAX_ACTIVE               63
+#define QF_MAX_ACTIVE               32
 
 //! The maximum number of event pools in the application.
 ///

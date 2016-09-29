@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -74,19 +74,20 @@ void QF_setUCosTaskAttr(QMActive *act, uint32_t attr);
 #ifdef QP_IMPL
 
     // uC/OS-II-specific scheduler locking, see NOTE2
-    #define QF_SCHED_STAT_TYPE_ struct { uint_fast8_t m_lockPrio; }
-    #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \
-        if (OSIntNesting != (INT8U)0) { \
-            (pLockStat_)->m_lockPrio = \
-                static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1); \
-        } else { \
-            (pLockStat_)->m_lockPrio = (prio_); \
+    #define QF_SCHED_STAT_
+    #define QF_SCHED_LOCK_(dummy) do { \
+        if (OSIntNesting == static_cast<INT8U>(0)) { \
             OSSchedLock(); \
         } \
-    } while (0)
-    #define QF_SCHED_UNLOCK_(dummy) OSSchedUnlock()
+    } while (false)
+    #define QF_SCHED_UNLOCK_() do { \
+        if (OSIntNesting == static_cast<INT8U>(0)) { \
+            OSSchedUnlock(); \
+        } \
+    } while (false)
 
-    // uC/OS-II event pool operations
+
+    // uC/OS-II event pool operations...
     #define QF_EPOOL_TYPE_ OS_MEM*
     #define QF_EPOOL_INIT_(pool_, poolSto_, poolSize_, evtSize_) do { \
         INT8U err; \

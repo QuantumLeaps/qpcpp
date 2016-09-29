@@ -80,17 +80,17 @@ void QF_setEmbOsTaskAttr(QMActive *act, uint32_t attr);
 #ifdef QP_IMPL
 
     // embOS-specific scheduler locking, see NOTE3
-    #define QF_SCHED_STAT_TYPE_ struct { uint_fast8_t m_lockPrio; }
-    #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \
-        if (OS_InInt != (OS_U8)0) { \
-            (pLockStat_)->m_lockPrio = \
-                static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1); \
-        } else { \
-            (pLockStat_)->m_lockPrio = (prio_); \
+    #define QF_SCHED_STAT_
+    #define QF_SCHED_LOCK_(dummy) do { \
+        if (OS_InInt == static_cast<OS_U8>(0)) { \
             OS_EnterRegion(); \
         } \
-    } while (0)
-    #define QF_SCHED_UNLOCK_(dummy) OS_LeaveRegion()
+    } while (false)
+    #define QF_SCHED_UNLOCK_() do { \
+        if (OS_InInt == static_cast<OS_U8>(0)) { \
+            OS_LeaveRegion(); \
+        } \
+    } while (false)
 
     // native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool

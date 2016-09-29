@@ -134,6 +134,7 @@ QP::QState Philo::initial(Philo * const me, QP::QEvt const * const e) {
     QS_SIG_DICTIONARY(TIMEOUT_SIG, me); // signal for each Philos
 
     me->subscribe(EAT_SIG);
+    me->subscribe(TEST_SIG);
     return QM_TRAN_INIT(&tatbl_);
 }
 //${AOs::Philo::SM::thinking} ................................................
@@ -182,11 +183,17 @@ QP::QState Philo::thinking(Philo * const me, QP::QEvt const * const e) {
             status_ = QM_HANDLED();
             break;
         }
+        // ${AOs::Philo::SM::thinking::TEST}
+        case TEST_SIG: {
+            status_ = QM_HANDLED();
+            break;
+        }
         default: {
             status_ = QM_SUPER();
             break;
         }
     }
+    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 //${AOs::Philo::SM::hungry} ..................................................

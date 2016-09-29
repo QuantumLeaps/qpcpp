@@ -5,8 +5,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -159,6 +159,7 @@ void QXMutex::unlock(void) {
 
     uint_fast8_t p = m_prevPrio; // the previouis lock prio
     m_prevPrio = static_cast<uint_fast8_t>(MUTEX_UNUSED);
+    QXK_attr_.lockHolder = m_prevHolder; // restore previous lock holder
 
     QS_BEGIN_NOCRIT_(QS_SCHED_UNLOCK,
         static_cast<void *>(0), static_cast<void *>(0))
@@ -167,11 +168,11 @@ void QXMutex::unlock(void) {
                 static_cast<uint8_t>(QXK_attr_.lockPrio)); // new lock prio
     QS_END_NOCRIT_()
 
-    QXK_attr_.lockHolder = m_prevHolder; // restore previous lock holder
     if (QXK_attr_.lockPrio > p) {
         QXK_attr_.lockPrio = p; // restore the previous lock prio
-        if (QXK_attr_.curr != static_cast<void *>(0)) { // is QXK running?
-            QXK_sched_(); // schedule any unlocked thread
+        // find the highest-prio thread ready to run
+        if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { // priority found?
+            QXK_activate_(); // activate any unlocked basic threads
         }
     }
     QF_CRIT_EXIT_();

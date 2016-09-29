@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last updated for version 5.7.0
-// Last updated on  2016-09-08
+// Last updated for version 5.7.2
+// Last updated on  2016-09-28
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -77,6 +77,10 @@ qpcpp.lnt         // QP/C++ options
  act)
 -efunc(661, *execTatbl_)    // Possible access of out-of-bounds pointer
 -efunc(644, *enterHistory_) // Variable 'entry' may not be initialized
+-esym(1511,                 // Member hides non-virtual member
+ QP::QMsm::isInState,
+ QP::QMsm::stateObj,
+ QP::QMsm::childStateObj)
 
 // QF
 -emacro(1960, QF_EVT_CONST_CAST_) // 5-2-5 attempt to cast away const
@@ -107,8 +111,7 @@ qpcpp.lnt         // QP/C++ options
  QF_PTR_RANGE_,
  QF_PTR_INC_,
  QF_QACTIVE_TO_QHSM_CAST_)
--esym(1923,
- QF_SCHED_STAT_TYPE_,       // 16-2-2 Macro could become const variable 
+-esym(1923,                 // 16-2-2 Macro could become const variable 
  QF_SCHED_LOCK_,
  QF_SCHED_UNLOCK_)
 -emacro(740,                // 5-2-7 Unusual pointer cast (incompatible indirect types)

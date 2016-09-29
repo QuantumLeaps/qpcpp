@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-29
+/// Last updated for version 5.7.2
+/// Last updated on  2019-09-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -60,9 +60,8 @@
 /// the macro appropriately for the CPU/compiler you're using. Also, some
 /// QK ports will not define this macro, but instead will provide ISR
 /// skeleton code in assembly.
-#define QK_ISR_ENTRY() do { \
-    ++QK_intNest_; \
-    QF_QS_ISR_ENTRY(QK_intNest_, QK_currPrio_); \
+#define QXK_ISR_ENTRY() do { \
+    ++QXK_attr_.intNest; \
 } while (false)
 
 
@@ -72,12 +71,11 @@
 /// the macro appropriately for the CPU/compiler you're using. Also, some
 /// QK ports will not define this macro, but instead will provide ISR
 /// skeleton code in assembly.
-#define QK_ISR_EXIT() do { \
-    --QK_intNest_; \
-    if (QK_intNest_ == static_cast<uint_fast8_t>(0)) { \
-        uint_fast8_t p = QK_schedPrio_(); \
-        if (p != static_cast<uint_fast8_t>(0)) { \
-            QK_sched_(p); \
+#define QXK_ISR_EXIT() do { \
+    --QXK_attr_.intNest; \
+    if (QXK_attr_.intNest == static_cast<uint_fast8_t>(0)) { \
+        if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { \
+            QXK_activate_(); \
         } \
     } \
     else { \

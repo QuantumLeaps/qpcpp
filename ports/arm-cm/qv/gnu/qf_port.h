@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ARM Cortex-M, cooperative QV kernel, GNU-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-30
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -68,7 +68,7 @@
     #define QF_AWARE_ISR_CMSIS_PRI (QF_BASEPRI >> (8 - __NVIC_PRIO_BITS))
 
     // Cortex-M3/M4/M4F provide the CLZ instruction for fast LOG2
-    #define QF_LOG2(n_) ((uint8_t)(32U - __builtin_clz(n_)))
+    #define QF_LOG2(n_) (static_cast<uint_fast8_t>(32U - __builtin_clz(n_)))
 
 #endif
 

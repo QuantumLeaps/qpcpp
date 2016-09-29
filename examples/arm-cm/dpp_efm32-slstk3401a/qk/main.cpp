@@ -40,9 +40,7 @@ int main() {
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
-
     static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO];
-
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
 

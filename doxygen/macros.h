@@ -16,6 +16,17 @@ namespace QP {
 /// failures when the switch Q_NASSERT is defined.
 #define Q_NASSERT
 
+/// \brief The preprocessor switch to activate the event-constructors
+/// and destructors
+///
+/// When Q_EVT_CTOR is defined (typically in the qep_port.h header file),
+/// QP::QEvt becomes a class with constructor and virtual destructor.
+/// More importantly, the subclasses of QEvt (your custom events) can have
+/// non-default constructors and destructors. These constructors are then
+/// called when events are created (e.g., with Q_NEW()) and the destrucor
+/// is invoked before recycling the event with QP::QF::gc().
+#define Q_EVT_CTOR
+
 /// \brief The preprocessor switch to activate the QS software tracing
 /// instrumentation in the code
 ///

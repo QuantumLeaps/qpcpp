@@ -1,10 +1,10 @@
 /// @file
-/// @brief QXK/C++ naked (blocking) thread
+/// @brief QXK/C++ extended (blocking) thread
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-27
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -41,13 +41,15 @@
 
 namespace QP {
 
+class QXThread; // forward declaration
+
 //! Thread handler pointer-to-function
-typedef void (*QXThreadHandler)(void * const par);
+typedef void (*QXThreadHandler)(QXThread * const me);
 
 //****************************************************************************
 //! Extended (blocking) thread of the QXK preemptive kernel
 /// @description
-/// QP::QXThread represents the "naked" (blocking) thread of the QXK kernel.
+/// QP::QXThread represents the extended (blocking) thread of the QXK kernel.
 /// Each blocking thread in the application must be represented by the
 /// corresponding QP::QXThread instance
 ///
@@ -69,13 +71,7 @@ public:
     //! public constructor
     QXThread(QXThreadHandler const handler, uint_fast8_t const tickRate);
 
-    //! block (suspend) the current "naked" thread
-    static void block(void);
-
-    //! unblock (resume) a given thread
-    void unblock(void) const;
-
-    //! delay (block) the current "naked" thread for a specified # ticks
+    //! delay (block) the current extended thread for a specified # ticks
     static bool delay(uint_fast16_t const nTicks,
                       uint_fast8_t const tickRate);
 
@@ -83,7 +79,7 @@ public:
     bool delayCancel(void);
 
     //! obtain a message from the private message queue (block if no messages)
-    static void const *queueGet(uint_fast16_t const nTicks,
+    static QEvt const *queueGet(uint_fast16_t const nTicks,
                                 uint_fast8_t const tickRate);
 
     // virtual function overrides...
@@ -94,7 +90,7 @@ public:
     //! Dispatches an event to QMsm
     virtual void dispatch(QEvt const * const e);
 
-    //! Starts execution of a "naked" thread and registers the thread
+    //! Starts execution of an extended thread and registers the thread
     //! with the framework.
     virtual void start(uint_fast8_t const prio,
                        QEvt const *qSto[], uint_fast16_t const qLen,
@@ -111,7 +107,7 @@ public:
     }
 
 #ifndef Q_SPY
-    //! Posts an event @p e directly to the event queue of the "naked"
+    //! Posts an event @p e directly to the event queue of the extended
     //! thread @p me using the First-In-First-Out (FIFO) policy.
     virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
 #else
@@ -156,11 +152,7 @@ public:
 
 private:
     uint_fast16_t m_count;
-#if (QF_MAX_ACTIVE <= 8)
-    QPSet8  m_waitSet; //!< set of "naked" threads waiting on this semaphore
-#else
-    QPSet64 m_waitSet; //!< set of "naked" threads waiting on this semaphore
-#endif
+    QPSet m_waitSet; //!< set of extended threads waiting on this semaphore
 };
 
 } // namespace QP

@@ -8,8 +8,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -149,6 +149,8 @@ bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
             }
             --m_eQueue.m_head;
         }
+        QF_CRIT_EXIT_();
+
         status = true; // event posted successfully
     }
     else {
@@ -167,10 +169,11 @@ bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
             QS_EQC_(static_cast<QEQueueCtr>(margin)); // margin requested
         QS_END_NOCRIT_()
 
+        QF_CRIT_EXIT_();
+
         QF::gc(e); // recycle the evnet to avoid a leak
         status = false; // event not posted
     }
-    QF_CRIT_EXIT_();
 
     return status;
 }

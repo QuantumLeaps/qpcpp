@@ -230,15 +230,14 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
     //GPIOF->DATA_Bits[LED_RED] = ((paused != 0U) ? 0xFFU : 0U);
+
     static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
-    XT_Test->POST_X(&pauseEvt, 1U, (void *)0);
-    //XT_Test->unblock(); //??? unblock the Test thread
+    XT_Test2->POST_X(&pauseEvt, 1U, (void *)0);
 
     // application-specific trace record
     QS_BEGIN(PAUSED_STAT, AO_Table)
         QS_U8(1, paused);  // Paused status
     QS_END()
-
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator

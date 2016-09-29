@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.7.0
-// Last updated on  2016-08-21
+// Last updated for version 5.7.2
+// Last updated on  2016-09-26
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -171,6 +171,9 @@
 -esym(1536,           // 9-3-1, 9-3-2 Exposing low access member
  QP::QMActive::m_osObject,
  QP::QMActive::m_thread)
+-estring(1960,        // 11-0-1(req) non-private data member
+ m_thread,
+ m_prio)
 -estring(1923,        // 16-2-2 could become const variable
  QF_MAX_ACTIVE,
  QF_MAX_EPOOL,
@@ -260,9 +263,8 @@
 
 // QK
 -estring(1960,        // 11-0-1(req) non-private data member
- curr,
- next,
- aux,
+ actPrio,
+ nextPrio,
  lockPrio,
  lockHolder,
  intNest,

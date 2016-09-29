@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last Updated for Version: 5.6.5
-// Date of the Last Update:  2016-06-02
+// Last Updated for Version: 5.7.2
+// Date of the Last Update:  2016-09-29
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -96,6 +96,7 @@ static QP::QXMutex l_rndMutex; // to protect the random number generator
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,
+        PAUSED_STAT,
         COMMAND_STAT
     };
 
@@ -155,8 +156,10 @@ void GPIO_EVEN_IRQHandler(void) {
     QXK_ISR_ENTRY(); // inform QXK about entering an ISR
 
     // for testing...
-    DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),
-                        &l_GPIO_EVEN_IRQHandler);
+    //DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),
+    //                    &l_GPIO_EVEN_IRQHandler);
+    QP::QF::PUBLISH(Q_NEW(QP::QEvt, TEST_SIG), // for testing...
+                         &l_GPIO_EVEN_IRQHandler);
 
     QXK_ISR_EXIT();  // inform QXK about exiting an ISR
 }
@@ -217,6 +220,7 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_GPIO_EVEN_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
+    QS_USR_DICTIONARY(PAUSED_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
 }
 //............................................................................
@@ -237,10 +241,19 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
 void BSP::displayPaused(uint8_t paused) {
     if (paused != 0U) {
         GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+
+        // for testing the extended threads...
+        static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
+        XT_Test2->delayCancel(); // make sure Test2 is not delayed
+        XT_Test2->POST_X(&pauseEvt, 1U, (void *)0); // post to Test2's queue
     }
     else {
         GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
     }
+
+    QS_BEGIN(PAUSED_STAT, (void *)0) // application-specific record begin
+        QS_U8(1, paused);  // Paused status
+    QS_END()
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
@@ -260,16 +273,16 @@ uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
 }
 //............................................................................
 void BSP::randomSeed(uint32_t seed) {
-    l_rnd = seed;
     l_rndMutex.init(N_PHILO); // ceiling <== maximum Philo priority
+    l_rnd = seed;
 }
 //............................................................................
 void BSP::ledOn(void) {
-    GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
 }
 //............................................................................
 void BSP::ledOff(void) {
-    GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
+    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
 }
 //............................................................................
 void BSP::terminate(int16_t result) {
@@ -313,10 +326,14 @@ void QF::onCleanup(void) {
 //............................................................................
 void QXK::onIdle(void) {
     // toggle the User LED on and then off, see NOTE01
-    QF_INT_DISABLE();
-    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
-    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
-    QF_INT_ENABLE();
+//    QF_INT_DISABLE();
+//    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
+//    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
+//    QF_INT_ENABLE();
+
+    // Some flating point code is to exercise the VFP...
+    float volatile x = 1.73205F;
+    x = x * 1.73205F;
 
 #ifdef Q_SPY
     QS::rxParse();  // parse all the received bytes

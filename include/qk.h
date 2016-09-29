@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.0
-/// Last updated on  2016-08-21
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -57,32 +57,31 @@
 extern "C" {
 
 struct QK_Attr {
-    uint_fast8_t volatile curr;  //!< priority of the current executing AO
-    uint_fast8_t volatile next;  //!< priority of the next AO to execute
-    void volatile        *aux;   //!< auxiliary attribute used in the port
+    uint_fast8_t volatile actPrio;  //!< prio of the active AO
+    uint_fast8_t volatile nextPrio; //!< prio of the next AO to execute
     uint_fast8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
     uint_fast8_t volatile lockHolder; //!< prio of the lock holder
 #ifndef QK_ISR_CONTEXT_
     uint_fast8_t volatile intNest;    //!< ISR nesting level
 #endif // QK_ISR_CONTEXT_
-#if (QF_MAX_ACTIVE <= 8)
-    QP::QPSet8  readySet;     //!< QK ready-set of AOs and "naked" threads
-#else
-    QP::QPSet64 readySet;     //!< QK ready-set of AOs and "naked" threads
-#endif
+    QP::QPSet readySet;          //!< QK ready-set of AOs and "naked" threads
 };
 
 //! global attributes of the QK kernel
 extern QK_Attr QK_attr_;
 
 //! QK initialization
+/// @descritption
+/// QK_init() is called from QF_init() in qk.c. This function is
+/// defined in the QK ports.
 void QK_init(void);
 
-//! QK scheduler
-void QK_sched_(uint_fast8_t p);
+//! QK scheduler finds the highest-priority thread ready to run
+uint_fast8_t QK_sched_(void);
 
-//! Find the highest-priority task ready to run
-uint_fast8_t QK_schedPrio_(void);
+//! QK activator activates the next active object. The activated AO preempts
+// the currently executing AOs.
+void QK_activate_(void);
 
 } // extern "C"
 
@@ -152,24 +151,28 @@ private:
             (QK_attr_.intNest != static_cast<uint_fast8_t>(0))
     #endif // QK_ISR_CONTEXT_
 
-    // QF-specific scheduler locking
-    //! Internal port-specific macro to represent the scheduler lock status
+    // QK-specific scheduler locking
+    //! Internal macro to represent the scheduler lock status
     // that needs to be preserved to allow nesting of locks.
-    #define QF_SCHED_STAT_TYPE_ QMutex
+    //
+    #define QF_SCHED_STAT_ QMutex schedLock_;
 
-    //! Internal port-specific macro for selective scheduler locking.
-    #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \
+    //! Internal macro for selective scheduler locking.
+    #define QF_SCHED_LOCK_(prio_) do { \
         if (QK_ISR_CONTEXT_()) { \
-            (pLockStat_)->m_lockPrio = \
-                static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1); \
+            schedLock_.m_lockPrio = static_cast<uint_fast8_t>(0); \
         } else { \
-            (pLockStat_)->init((prio_)); \
-            (pLockStat_)->lock(); \
+            schedLock_.init((prio_)); \
+            schedLock_.lock(); \
         } \
     } while (false)
 
-    //! Internal port-specific macro for selective scheduler unlocking.
-    #define QF_SCHED_UNLOCK_(pLockStat_) (pLockStat_)->unlock()
+    //! Internal macro for selective scheduler unlocking.
+    #define QF_SCHED_UNLOCK_() do { \
+        if (schedLock_.m_lockPrio != static_cast<uint_fast8_t>(0)) { \
+            schedLock_.unlock(); \
+        } \
+    } while (false)
 
     // native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
@@ -178,9 +181,8 @@ private:
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
         QK_attr_.readySet.insert((me_)->m_prio); \
         if (!QK_ISR_CONTEXT_()) { \
-            uint_fast8_t p = QK_schedPrio_(); \
-            if (p != static_cast<uint_fast8_t>(0)) { \
-                QK_sched_(p); \
+            if (QK_sched_() != static_cast<uint_fast8_t>(0)) { \
+                QK_activate_(); \
             } \
         } \
     } while (false)

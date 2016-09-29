@@ -2,8 +2,8 @@
 /// @brief QXK/C++ port to ARM Cortex-M, QXK kernel, ARM-KEIL toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-30
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -52,14 +52,17 @@ static __inline uint32_t QK_get_IPSR(void) {
     (*Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = \
         static_cast<uint32_t>(1U << 28))
 
-// QXK interrupt entry and exit
+// QXK ISR entry and exit
 #define QXK_ISR_ENTRY() ((void)0)
 
 #define QXK_ISR_EXIT()  do { \
     QF_INT_DISABLE(); \
-    QXK_sched_(); \
+    if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { \
+        QXK_CONTEXT_SWITCH_(); \
+    } \
     QF_INT_ENABLE(); \
 } while (false)
+
 
 #include "qxk.h" // QXK platform-independent public interface
 

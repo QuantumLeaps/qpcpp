@@ -2,6 +2,35 @@ namespace QP {
 
 /** @page history Revision History
 
+@section qpcpp_5_7_2 Version 5.7.2, 2016-10-07
+This is the first production release of the "dual-mode" QXK kernel.
+"Dual-mode" QXK means that QXK supports both basic-threads (BC1 class
+from the OSEK/VDX RTOS specification) as well as extended-threads
+(EC1 class from the OSEK/VDX RTOS specification. In other words,
+QXK executes active objects (basic threads) like the QK kernel using the
+single stack (Main Stack on ARM Cortex-M), but can also execute
+traditional *blocking* threads (extended threads).
+
+Only the extended threads (QP::QXThread class) need their private stack
+spaces and the overhead of the full context switch. The basic threads
+(QP::QMActive and QP::QActive classes) run efficiently using the main stack with
+much lower context switch overhead.
+
+The QXK examples have been updated for more thorough demonstration of
+the QXK features. The QXK examples are available in the following
+directories: dpp_efm32-slstk3401a, dpp_ek-tm4c123gxl, and dpp_nucleo-l053r8.
+
+This release also changes the internal QK implementation to match the
+terminology applied in the QXK kernel (e.g., QK_sched_() has been renamed
+to QK_activate_() and QK_schedPrio_() to QK_sched_()). These changes fall
+into the category of refactoring and have no impact on the API or
+performance.
+
+Finally, this release improves the implementation of scheduler locking
+in publish-subscribe event delivery.
+
+
+------------------------------------------------------------------------------
 @section qpcpp_5_7_0 Version 5.7.0, 2016-08-31
 This release adds support for sub-machines and sub-machine states for reusing pieces of state machines (an advanced UML concept) to the QMsm-state machine implementation strategy. This feature is to match the upcoming QM 4.0.0.
 

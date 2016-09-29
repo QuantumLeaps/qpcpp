@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.6.2
-// Last updated on  2016-03-31
+// Last updated for version 5.7.2
+// Last updated on  2016-09-28
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -38,23 +38,18 @@
 //............................................................................
 int main() {
     static QP::QEvt const *tableQueueSto[N_PHILO];
-    static uint64_t tableStackSto[64];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
-    static uint64_t philoStackSto[N_PHILO][64];
 
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
     static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO]; // small pool
 
-    // stack for the "naked" test thread
-    static QP::QEvt const *testQueueSto[5];
-    static uint64_t testStackSto[64];
-
-    // stack for the QXK's idle thread
-    static uint64_t idleStackSto[32];
-
+    // stacks and queues for the extended test threads
+    static QP::QEvt const *test1QueueSto[5];
+    static uint64_t test1StackSto[64];
+    static QP::QEvt const *test2QueueSto[5];
+    static uint64_t test2StackSto[64];
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-    QP::QXK::init(idleStackSto, sizeof(idleStackSto)); // initialize QXK
     DPP::BSP::init(); // initialize the BSP
 
     // object dictionaries...
@@ -72,33 +67,42 @@ int main() {
     QP::QF::poolInit(smlPoolSto,
                      sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
-    // start the active objects...
+    // start the extended Test1 thread
+    DPP::XT_Test1->start(
+            static_cast<uint_fast8_t>(1), // QP prio of the thread
+            test1QueueSto,           // event queue storage
+            Q_DIM(test1QueueSto),    // queue length [events]
+            test1StackSto,           // stack storage
+            sizeof(test1StackSto),   // stack size [bytes]
+            static_cast<QP::QEvt *>(0)); // initialization event
+
+    // start the Philo active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start(
-            static_cast<uint_fast8_t>(n + 1), // QP priority of the AO
+            static_cast<uint_fast8_t>(n + 2), // QP priority of the AO
             philoQueueSto[n],          // event queue storage
             Q_DIM(philoQueueSto[n]),   // queue length [events]
-            philoStackSto[n],          // stack storage
-            sizeof(philoStackSto[n]),  // stack size [bytes]
+            static_cast<void *>(0),    // no stack storage
+            static_cast<uint_fast16_t>(0), // stack size [bytes]
             static_cast<QP::QEvt *>(0));   // initialization event
     }
 
-    DPP::AO_Table->start(
-            static_cast<uint_fast8_t>(N_PHILO + 1), // QP priority of the AO
-            tableQueueSto,           // event queue storage
-            Q_DIM(tableQueueSto),    // queue length [events]
-            tableStackSto,           // stack storage
-            sizeof(tableStackSto),   // stack size [bytes]
+    // start the extended Test2 thread
+    DPP::XT_Test2->start(
+            static_cast<uint_fast8_t>(N_PHILO + 2), // QP prio of the thread
+            test2QueueSto,           // event queue storage
+            Q_DIM(test2QueueSto),    // queue length [events]
+            test2StackSto,           // stack storage
+            sizeof(test2StackSto),   // stack size [bytes]
             static_cast<QP::QEvt *>(0)); // initialization event
 
-    // start the "naked" test thread
-    DPP::XT_Test->start(
-            static_cast<uint_fast8_t>(10), // QP priority of the AO
-            testQueueSto,            // event queue storage
-            Q_DIM(testQueueSto),     // queue length [events]
-            testStackSto,            // stack storage
-            sizeof(testStackSto),    // stack size [bytes]
-            static_cast<QP::QEvt *>(0)); // initialization event
+    DPP::AO_Table->start(
+            static_cast<uint_fast8_t>(N_PHILO + 3), // QP priority of the AO
+            tableQueueSto,           // event queue storage
+            Q_DIM(tableQueueSto),    // queue length [events]
+            static_cast<void *>(0),  // no stack storage
+            static_cast<uint_fast16_t>(0), // stack size [bytes]
+            static_cast<QP::QEvt *>(0));   // initialization event
 
     return QP::QF::run(); // run the QF application
 }

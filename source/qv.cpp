@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.7.1
+/// Last updated on  2016-09-23
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -61,12 +61,7 @@ Q_DEFINE_THIS_MODULE("qv")
 
 // Package-scope objects *****************************************************
 extern "C" {
-#if (QF_MAX_ACTIVE <= 8)
-    QPSet8  QV_readySet_;  // ready set of AOs
-#else
-    QPSet64 QV_readySet_;  // ready set of AOs
-#endif
-
+    QPSet  QV_readySet_;  // ready set of AOs
 } // extern "C"
 
 //****************************************************************************

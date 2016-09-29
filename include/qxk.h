@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -53,18 +53,12 @@
 ///
 #define QF_EQUEUE_TYPE      QEQueue
 
-//! OS-dependent per-thread operating-system object
-/// @description
-/// The use of this member depends on the CPU. For example, in port to
-/// ARM Cortex-M with FPU this member is used to store the LR.
-///
-#define QF_OS_OBJECT_TYPE   void*
-
 //! OS-dependent representation of the private thread
 /// @description
-/// QXK uses this member to store thread attributes.
+/// QXK uses this member to store the private stack poiner for the thread.
+/// (The private stack pointer is NULL for AO-threads).///
 ///
-#define QF_THREAD_TYPE      QXK_ThreadType
+#define QF_THREAD_TYPE      void*
 
 //****************************************************************************
 extern "C" {
@@ -73,32 +67,37 @@ extern "C" {
 struct QXK_Attr {
     void *curr;  //!< currently executing thread
     void *next;  //!< next thread to execute
+    uint_fast8_t volatile actPrio;    //!< prio of the active basic thread
     uint_fast8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
     uint_fast8_t volatile lockHolder; //!< prio of the lock holder
 #ifndef QXK_ISR_CONTEXT_
-    uint_fast8_t volatile intNest; //!< ISR nesting level
+    uint_fast8_t volatile intNest;    //!< ISR nesting level
 #endif // QXK_ISR_CONTEXT_
-#if (QF_MAX_ACTIVE <= 8)
-    QP::QPSet8  readySet; //!< QXK ready-set of AOs and "naked" threads
-#else
-    QP::QPSet64 readySet; //!< QXK ready-set of AOs and "naked" threads
-#endif
+    QP::QPSet readySet; //!< ready-set of basic- and extended-threads
 };
 
 //! global attributes of the QXK kernel
 extern QXK_Attr QXK_attr_;
 
+//! QXK initialization
+///
+/// QXK_init() is called from QF_init() in qxk.c. This function is
+/// defined in the QXK ports.
+///
+void QXK_init(void);
+
+//! QXK scheduler finds the highest-priority thread ready to run
+uint_fast8_t QXK_sched_(void);
+
+//! QXK activator activates the next active object. The activated AO preempts
+// the currently executing AOs.
+//
+void QXK_activate_(void);
+
 } // extern "C"
 
 //****************************************************************************
 namespace QP {
-
-//****************************************************************************
-//! Type of the QMActive.m_thread member for the QXK kernel
-struct QXK_ThreadType {
-    void *m_stack;            //!< top of the per-thread stack
-    // ... possibly other thread attributes in the future
-};
 
 //****************************************************************************
 //! QXK services.
@@ -165,14 +164,6 @@ private:
 
 
 //****************************************************************************
-extern "C" {
-
-//! The QXK scheduler for internal use only (might be in assembly)
-void QXK_sched_(void);
-
-} // extern "C"
-
-//****************************************************************************
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
@@ -186,36 +177,44 @@ void QXK_sched_(void);
             (QXK_attr_.intNest != static_cast<uint_fast8_t>(0))
     #endif // QXK_ISR_CONTEXT_
 
-    // QF-specific scheduler locking
-    #define QF_SCHED_STAT_TYPE_ QXMutex
-    #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \
-        if (QXK_ISR_CONTEXT_()) { \
-            (pLockStat_)->m_lockPrio = \
-                static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1); \
-        } else { \
-            (pLockStat_)->init((prio_)); \
-            (pLockStat_)->lock(); \
-        } \
-    } while (0)
-    #define QF_SCHED_UNLOCK_(pLockStat_) (pLockStat_)->unlock()
+    // QXK-specific scheduler locking
+    //! Internal macro to represent the scheduler lock status
+    // that needs to be preserved to allow nesting of locks.
+    //
+    #define QF_SCHED_STAT_ QXMutex schedLock_;
 
+    //! Internal macro for selective scheduler locking.
+    #define QF_SCHED_LOCK_(prio_) do { \
+        if (QXK_ISR_CONTEXT_()) { \
+            schedLock_.m_lockPrio = static_cast<uint_fast8_t>(0); \
+        } else { \
+            schedLock_.init((prio_)); \
+            schedLock_.lock(); \
+        } \
+    } while (false)
+
+    //! Internal macro for selective scheduler unlocking.
+    #define QF_SCHED_UNLOCK_() do { \
+        if (schedLock_.m_lockPrio != static_cast<uint_fast8_t>(0)) { \
+            schedLock_.unlock(); \
+        } \
+    } while (false)
+
+    // native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        if ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt *>(0)) { \
-            QXK_attr_.readySet.remove((me_)->m_prio); \
-            QXK_sched_(); \
-            QF_CRIT_EXIT_(); \
-            QF_CRIT_EXIT_NOP(); \
-            QF_CRIT_ENTRY_(); \
-        }
+        Q_ASSERT_ID(0, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
         QXK_attr_.readySet.insert((me_)->m_prio); \
         if (!QXK_ISR_CONTEXT_()) { \
-            QXK_sched_(); \
+            if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { \
+                QXK_activate_(); \
+            } \
         } \
     } while (false)
 
-    #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
+    #define QACTIVE_EQUEUE_ONEMPTY_(me_) \
+        QXK_attr_.readySet.remove((me_)->m_prio)
 
     // native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -87,11 +87,9 @@ extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
 #ifdef QP_IMPL
 
     // POSIX-specific scheduler locking (not used at this point)
-    #define QF_SCHED_STAT_TYPE_ struct { uint_fast8_t m_lockPrio; }
-    #define QF_SCHED_LOCK_(pLockStat_, dummy) \
-        ((pLockStat_)->m_lockPrio = \
-            static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1))
-    #define QF_SCHED_UNLOCK_(dummy) ((void)0)
+    #define QF_SCHED_STAT_
+    #define QF_SCHED_LOCK_(dummy) ((void)0)
+    #define QF_SCHED_UNLOCK_()    ((void)0)
 
     // native QF event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \

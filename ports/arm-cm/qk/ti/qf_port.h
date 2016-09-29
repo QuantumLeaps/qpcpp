@@ -60,8 +60,8 @@
     #define QF_INT_DISABLE()    QF_set_BASEPRI(QF_BASEPRI)
     #define QF_INT_ENABLE()     QF_set_BASEPRI(0U)
 
-    // the intrinsic function _norm() generates the CLZ instruction
-    #define QF_LOG2(n_) ((uint8_t)(32U - _norm(n_)))
+    // Cortex-M3/M4/M7 provide the CLZ instruction for fast LOG2
+    #define QF_LOG2(x_) (static_cast<uint_fast8_t>(32U - __clz(x_)))
 
     // assembly function for setting the BASEPRI register
     extern "C" void QF_set_BASEPRI(unsigned basePri);

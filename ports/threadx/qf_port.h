@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -68,16 +68,19 @@
 #ifdef QP_IMPL
 
     // ThreadX-specific scheduler locking (implemented in qf_port.cpp)
-    #define QF_SCHED_STAT_TYPE_ QFSchedLock
-    #define QF_SCHED_LOCK_(pLockStat_, prio_) do { \
-        if (_tx_thread_system_state != static_cast<UINT>(0)) { \
-            (pLockStat_)->m_lockPrio = \
-                static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1); \
+    #define QF_SCHED_STAT_ QFSchedLock lockStat_;
+    #define QF_SCHED_LOCK_(prio_) do { \
+        if (_tx_thread_system_state != (UINT)0) { \
+            lockStat_.m_lockPrio = static_cast<uint_fast8_t>(0); \
         } else { \
-            (pLockStat_)->lock((prio_)); \
+            lockStat_.lock((prio_)); \
         } \
     } while (false)
-    #define QF_SCHED_UNLOCK_(pLockStat_) (pLockStat_)->unlock()
+    #define QF_SCHED_UNLOCK_() do { \
+        if (lockStat_.m_lockPrio != static_cast<uint_fast8_t>(0)) { \
+            lockStat_.unlock(); \
+        } \
+    } while (false)
 
     namespace QP {
         struct QFSchedLock {
@@ -93,7 +96,7 @@
         extern UINT _tx_thread_system_state; // internal TX interrupt counter
     }
 
-    // TreadX block pool operations
+    // TreadX block pool operations...
     #define QF_EPOOL_TYPE_   TX_BLOCK_POOL
     #define QF_EPOOL_INIT_(pool_, poolSto_, poolSize_, evtSize_) \
         Q_ALLEGE(tx_block_pool_create(&(pool_), "P", (evtSize_), \

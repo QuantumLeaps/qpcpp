@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.0
-/// Last updated on  2016-08-09
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-25
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      570
+#define QP_VERSION      572
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "5.7.0"
+#define QP_VERSION_STR  "5.7.2"
 
-//! Tamperproof current QP release (5.7.0) and date (16-08-31)
-#define QP_RELEASE      0xA02320D5U
+//! Tamperproof current QP release (5.7.2) and date (16-10-07)
+#define QP_RELEASE      0xA00845D3U
 
 //****************************************************************************
 #ifndef Q_SIGNAL_SIZE
@@ -524,6 +524,16 @@ public:
 
     //! Obtain the current active child state of a given parent
     QStateHandler childState(QStateHandler const parent);
+
+private:
+    //! operation inherited from QMsm, but disallowed in QHsm
+    bool isInState(QMState const *state) const;
+
+    //! operation inherited from QMsm, but disallowed in QHsm
+    QMState const *stateObj(void) const;
+
+    //! operation inherited from QMsm, but disallowed in QHsm
+    QMState const *childStateObj(QMState const * const parent) const;
 
 protected:
     //! Protected constructor of a HSM

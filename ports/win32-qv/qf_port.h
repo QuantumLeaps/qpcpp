@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.6.4
-/// Last updated on  2016-05-04
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -44,7 +44,7 @@
 #define QF_THREAD_TYPE       void*
 
 // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE        63
+#define QF_MAX_ACTIVE        64
 
 // The number of system clock tick rates
 #define QF_MAX_TICK_RATE     2
@@ -64,6 +64,17 @@
 // QF_CRIT_STAT_TYPE -- not defined
 #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
 #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
+
+#ifdef _MSC_VER // Microsoft C/C++ compiler?
+    // use built-in intrinsic function for fast LOG2
+    #define QF_LOG2(x_) ((uint_fast8_t)(32U - __lzcnt(x_)))
+    #include <intrin.h>    /* VC++ intrinsic functions */
+#elif __GNUC__  // GNU C/C++ compiler?
+    // use built-in intrinsic function for fast LOG2
+    #define QF_LOG2(x_) ((uint_fast8_t)(32U - __builtin_clz(x_)))
+#else
+    // use the internal LOG2() implementation
+#endif
 
 #include "qep_port.h"  // QEP port
 #include "qequeue.h"   // Win32-QV needs event-queue
@@ -136,11 +147,9 @@ void QF_onClockTick(void);
 #ifdef QP_IMPL
 
     // Win32-QV specific scheduler locking, see NOTE2
-    #define QF_SCHED_STAT_TYPE_ struct { uint_fast8_t m_lockPrio; }
-    #define QF_SCHED_LOCK_(pLockStat_, dummy) \
-        ((pLockStat_)->m_lockPrio = \
-            static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1))
-    #define QF_SCHED_UNLOCK_(dummy) ((void)0)
+    #define QF_SCHED_STAT_
+    #define QF_SCHED_LOCK_(dummy) ((void)0)
+    #define QF_SCHED_UNLOCK_()    ((void)0)
 
     // native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
@@ -171,8 +180,8 @@ void QF_onClockTick(void);
     #include <windows.h>  // Win32 API
 
     namespace QP {
-        extern QPSet64 QV_readySet_;   // QV-ready set of active objects
-        extern HANDLE  QV_win32Event_; // Win32 event to signal events
+        extern QPSet  QV_readySet_;   // QV-ready set of active objects
+        extern HANDLE QV_win32Event_; // Win32 event to signal events
 
         // Windows "fudge factor" for oversizing the resources, see NOTE2
         enum {

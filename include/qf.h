@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.0
-/// Last updated on  2016-09-14
+/// Last updated for version 5.7.1
+/// Last updated on  2016-09-23
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -40,14 +40,13 @@
 #define qf_h
 
 //****************************************************************************
+#ifndef qpset_h
+#include "qpset.h"
+#endif
+
 #ifdef Q_EVT_CTOR
 #include <new>  // for placement new
 #endif // Q_EVT_CTOR
-
-//****************************************************************************
-#if (QF_MAX_ACTIVE < 1) || (63 < QF_MAX_ACTIVE)
-    #error "QF_MAX_ACTIVE not defined or out of range. Valid range is 1..63"
-#endif
 
 //****************************************************************************
 // apply defaults for all undefined configuration parameters
@@ -155,6 +154,7 @@ class QMActive : public QMsm {
     QF_EQUEUE_TYPE m_eQueue;
 #endif
 
+public: // for access from extern "C" functions
 #ifdef QF_OS_OBJECT_TYPE
     //! OS-dependent per-thread object.
     /// @description
@@ -313,6 +313,16 @@ public:
 protected:
     //! protected constructor (abstract class)
     QActive(QStateHandler const initial);
+
+private:
+    //! operation inherited from QMsm, but disallowed in QActive
+    bool isInState(QMState const *state) const;
+
+    //! operation inherited from QMsm, but disallowed in QActive
+    QMState const *stateObj(void) const;
+
+    //! operation inherited from QMsm, but disallowed in QActive
+    QMState const *childStateObj(QMState const * const parent) const;
 };
 
 
@@ -448,43 +458,19 @@ private:
     friend class QF;
 #ifdef qxk_h
     friend class QXThread;
+    friend void QXK_activate_(void);
 #endif // qxk_h
 };
 
 
 //****************************************************************************
-//! The size of the Subscriber list bit array
-/// @description
-/// The size is determined of the maximum number of active objects in the
-/// application configured by the #QF_MAX_ACTIVE macro.
-uint8_t const QF_SUBSCR_LIST_SIZE =
-    static_cast<uint8_t>(((QF_MAX_ACTIVE - 1) / 8) + 1);
-
-//! Subscriber List class
+//! Subscriber List
 /// @description
 /// This data type represents a set of active objects that subscribe to
-/// a given signal. The set is represented as an array of bits, where each
+/// a given signal. The set is represented as priority-set, where each
 /// bit corresponds to the unique priority of an active object.
-class QSubscrList {
-private:
+typedef QPSet QSubscrList;
 
-    //! An array of bits representing subscriber active objects.
-    /// @description
-    /// Each bit in the array corresponds to the unique priority of the
-    /// active object. The size of the array is determined of the maximum
-    /// number of active objects in the application configured by the
-    /// #QF_MAX_ACTIVE macro.@n
-    /// @n
-    /// For example, an active object of priority p is a subscriber if the
-    /// following is true: ((m_bits[QF_div8Lkup[p]] & QF::pwr2Lkup[p]) != 0)
-    ///
-    /// @sa QP::QF::psInit(), QP::QF::div8Lkup, QP::QF::pwr2Lkup,
-    /// and #QF_MAX_ACTIVE
-    uint8_t m_bits[QF_SUBSCR_LIST_SIZE];
-
-    friend class QF;
-    friend class QMActive;
-};
 
 //****************************************************************************
 //! QF services.

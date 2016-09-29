@@ -1,9 +1,9 @@
 /// @file
-/// @brief QF/C++ port to ARM Cortex-M, QXK kernel, TI-ARM toolset
+/// @brief QF/C++ port to ARM Cortex-M, dual-mode QXK kernel, TI-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-30
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-26
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -58,8 +58,8 @@
     #define QF_INT_DISABLE()    QF_set_BASEPRI(QF_BASEPRI)
     #define QF_INT_ENABLE()     QF_set_BASEPRI(0U)
 
-    // the intrinsic function _norm() generates the CLZ instruction
-    #define QF_LOG2(n_) ((uint8_t)(32U - _norm(n_)))
+    // Cortex-M3/M4/M7 provide the CLZ instruction for fast LOG2
+    #define QF_LOG2(x_) (static_cast<uint_fast8_t>(32U - __clz(x_)))
 
     // assembly function for setting the BASEPRI register
     extern "C" void QF_set_BASEPRI(unsigned basePri);

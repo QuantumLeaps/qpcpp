@@ -4,8 +4,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.7.2
+/// Last updated on  2016-09-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -131,82 +131,50 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
         QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
     QS_END_NOCRIT_()
 
-    // is it a dynamic event?
-    if (e->poolId_ != static_cast<uint8_t>(0)) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter, NOTE01
-    }
-    QF_CRIT_EXIT_();
+    if (QF_PTR_AT_(QF_subscrList_, e->sig).notEmpty()) {
 
-    QF_SCHED_STAT_TYPE_ lockStat;
-    lockStat.m_lockPrio = static_cast<uint_fast8_t>(0xFF); // uninitialized
-
-#if (QF_MAX_ACTIVE <= 8)
-    uint_fast8_t tmp = static_cast<uint_fast8_t>(
-                           QF_PTR_AT_(QF_subscrList_, e->sig).m_bits[0]);
-
-    while (tmp != static_cast<uint8_t>(0)) {
-        uint_fast8_t p = static_cast<uint_fast8_t>(QF_LOG2(tmp));
-
-        // clear the subscriber bit
-        tmp &= static_cast<uint_fast8_t>(QF_invPwr2Lkup[p]);
-
-        // has the scheduler been locked yet?
-        if (lockStat.m_lockPrio == static_cast<uint_fast8_t>(0xFF)) {
-            QF_SCHED_LOCK_(&lockStat, p);
+        // is it a dynamic event?
+        if (e->poolId_ != static_cast<uint8_t>(0)) {
+            // NOTE: QF::publish_() increments the reference counter to prevent
+            // premature recycling of the event while the multicasting is still
+            // in progress. At the end of the function, the garbage collector
+            // step decrements the reference counter and recycles the event if
+            // the counter drops to zero. This covers the case when the event
+            // was published without any subscribers.
+            //
+            QF_EVT_REF_CTR_INC_(e); // increment the reference counter, NOTE01
         }
+        QF_CRIT_EXIT_();
 
-        // the priority of the AO must be registered with the framework
-        Q_ASSERT_ID(110, active_[p] != static_cast<QMActive *>(0));
+        QPSet tmp = QF_PTR_AT_(QF_subscrList_, e->sig);
+        uint_fast8_t p = tmp.findMax(); // find highest-prio subscriber
+        QF_SCHED_STAT_
 
-        // POST() asserts internally if the queue overflows
-        (void)active_[p]->POST(e, sender);
-    }
-#else
-    uint_fast8_t i = static_cast<uint_fast8_t>(QF_SUBSCR_LIST_SIZE);
-
-    // go through all bytes in the subscription list
-    do {
-        --i;
-        uint_fast8_t tmp = static_cast<uint_fast8_t>(
-                              QF_PTR_AT_(QF_subscrList_, e->sig).m_bits[i]);
-        while (tmp != static_cast<uint_fast8_t>(0)) {
-            uint_fast8_t p = static_cast<uint_fast8_t>(QF_LOG2(tmp));
-
-            // clear the subscriber bit
-            tmp &= static_cast<uint_fast8_t>(QF_invPwr2Lkup[p]);
-
-            // adjust the priority
-            p += static_cast<uint_fast8_t>(i << 3);
-
-            // has the scheduler been locked yet?
-            if (lockStat.m_lockPrio == static_cast<uint_fast8_t>(0xFF)) {
-                QF_SCHED_LOCK_(&lockStat, p);
-            }
-
-            // the priority level be registered with the framework
-            Q_ASSERT(active_[p] != static_cast<QMActive *>(0));
+        QF_SCHED_LOCK_(p); // lock the scheduler upto prio 'p'
+        do { // loop over all subscribers */
+            // the prio of the AO must be registered with the framework
+            Q_ASSERT_ID(210, active_[p] != static_cast<QMActive *>(0));
 
             // POST() asserts internally if the queue overflows
             (void)active_[p]->POST(e, sender);
-        }
-    } while (i != static_cast<uint_fast8_t>(0));
-#endif
 
-    // was the scheduler locked?
-    if (lockStat.m_lockPrio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) {
-        QF_SCHED_UNLOCK_(&lockStat); // unlock the scheduler
+            tmp.remove(p);
+            if (tmp.notEmpty()) {
+                p = tmp.findMax();
+            }
+            else {
+                p = static_cast<uint_fast8_t>(0);
+            }
+        } while (p != static_cast<uint_fast8_t>(0));
+        QF_SCHED_UNLOCK_(); // unlock the scheduler
+
+        gc(e); // run the garbage collector
     }
-
-    // run the garbage collector
-    gc(e);
-
-    // NOTE: QP::QF::publish_() increments the reference counter to prevent
-    // premature recycling of the event while the multicasting is still
-    // in progress. At the end of the function, the garbage collector step
-    // decrements the reference counter and recycles the event if the
-    // counter drops to zero. This covers the case when the event was
-    // published without any subscribers.
+    else {
+        QF_CRIT_EXIT_();
+    }
 }
+
 
 //****************************************************************************/
 /// @description
@@ -232,9 +200,6 @@ void QMActive::subscribe(enum_t const sig) const {
               && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
               && (QF::active_[p] == this));
 
-    uint_fast8_t const i =
-         static_cast<uint_fast8_t>(QF_div8Lkup[p]);
-
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
@@ -244,8 +209,7 @@ void QMActive::subscribe(enum_t const sig) const {
         QS_OBJ_(this); // this active object
     QS_END_NOCRIT_()
 
-    // set the priority bit
-    QF_PTR_AT_(QF_subscrList_, sig).m_bits[i] |= QF_pwr2Lkup[p];
+    QF_PTR_AT_(QF_subscrList_, sig).insert(p); // insert into subscriber-list
     QF_CRIT_EXIT_();
 }
 
@@ -277,9 +241,6 @@ void QMActive::unsubscribe(enum_t const sig) const {
                       && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
                       && (QF::active_[p] == this));
 
-    uint_fast8_t const i =
-        static_cast<uint_fast8_t>(QF_div8Lkup[p]);
-
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
@@ -289,8 +250,8 @@ void QMActive::unsubscribe(enum_t const sig) const {
         QS_OBJ_(this);      // this active object
     QS_END_NOCRIT_()
 
-    // clear the priority bit
-    QF_PTR_AT_(QF_subscrList_,sig).m_bits[i] &= QF_invPwr2Lkup[p];
+    QF_PTR_AT_(QF_subscrList_,sig).remove(p);  // remove from subscriber-list
+
     QF_CRIT_EXIT_();
 }
 
@@ -320,16 +281,11 @@ void QMActive::unsubscribeAll(void) const {
                       && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
                       && (QF::active_[p] == this));
 
-    uint_fast8_t const i =
-        static_cast<uint_fast8_t>(QF_div8Lkup[p]);
-
-    enum_t sig;
-    for (sig = Q_USER_SIG; sig < QF_maxSignal_; ++sig) {
+    for (enum_t sig = Q_USER_SIG; sig < QF_maxSignal_; ++sig) {
         QF_CRIT_STAT_
         QF_CRIT_ENTRY_();
-        if ((QF_PTR_AT_(QF_subscrList_, sig).m_bits[i]
-             & QF_pwr2Lkup[p]) != static_cast<uint8_t>(0))
-        {
+        if (QF_PTR_AT_(QF_subscrList_, sig).hasElement(p)) {
+            QF_PTR_AT_(QF_subscrList_, sig).remove(p);
 
             QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_UNSUBSCRIBE,
                              QS::priv_.aoObjFilter, this)
@@ -338,8 +294,6 @@ void QMActive::unsubscribeAll(void) const {
                 QS_OBJ_(this);  // this active object
             QS_END_NOCRIT_()
 
-            // clear the priority bit
-            QF_PTR_AT_(QF_subscrList_, sig).m_bits[i] &= QF_invPwr2Lkup[p];
         }
         QF_CRIT_EXIT_();
     }

@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.6.0
-// Last updated on  2015-12-28
+// Last updated for version 5.7.2
+// Last updated on  2016-09-28
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
@@ -37,26 +37,74 @@
 
 namespace DPP {
 
+// local extended-thread objects .............................................
+static void Thread1_run(QP::QXThread * const me);
+static void Thread2_run(QP::QXThread * const me);
+
+
+static QP::QXThread l_test1(&Thread1_run, 0U);
+static QP::QXThread l_test2(&Thread2_run, 0U);
+static QP::QXMutex l_mutex;
+static QP::QXSemaphore l_sema;
+
+// global pointer to the test thread .........................................
+QP::QXThread * const XT_Test1 = &l_test1;
+QP::QXThread * const XT_Test2 = &l_test2;
+
 //............................................................................
-static void thread_function(void *par) {
-    (void)par;
+static void Thread1_run(QP::QXThread * const /*me*/) {
+
+    l_mutex.init(3U);
 
     for (;;) {
 
-        (void)QP::QXThread::queueGet(BSP::TICKS_PER_SEC*2U, 0U);
+        // wait on a semaphore (BLOCK with timeout)
+        (void)l_sema.wait(BSP::TICKS_PER_SEC, 0U);
         BSP::ledOn();
 
-        QP::QXThread::delay(BSP::TICKS_PER_SEC/4U, 0U);
-        BSP::ledOff();
 
-        QP::QXThread::delay(BSP::TICKS_PER_SEC*3U/4U, 0U);
+        l_mutex.lock(); // exercise the mutex
+        // some flating point code to exercise the VFP...
+        float volatile x = 1.4142135F;
+        x = x * 1.4142135F;
+        l_mutex.unlock();
+
+        QP::QXThread::delay(BSP::TICKS_PER_SEC/7, 0U);  // BLOCK
+
+        // publish to Thread2
+        QP::QF::PUBLISH(Q_NEW(QP::QEvt, TEST_SIG), &l_test1);
     }
 }
 
-// local "naked" thread object ...............................................
-static QP::QXThread l_test(&thread_function, 0U);
+//............................................................................
+static void Thread2_run(QP::QXThread * const me) {
 
-// global pointer to the test thread .........................................
-QP::QXThread * const XT_Test = &l_test;
+    // subscribe to the test signal */
+    me->subscribe(TEST_SIG);
+
+    // initialize the semaphore before using it
+    // NOTE: the semaphore is initialized in the highest-priority thread
+    // that uses it. Alternatively, the semaphore can be initialized
+    // before any thread runs.
+    l_sema.init(0U); // start with zero count
+
+    for (;;) {
+        // some flating point code to exercise the VFP...
+        float volatile x = 1.4142135F;
+        x = x * 1.4142135F;
+
+        // wait on the internal event queue (BLOCK) with timeout
+        QP::QEvt const *e = me->queueGet(BSP::TICKS_PER_SEC/2, 0U);
+        BSP::ledOff();
+
+        if (e != static_cast<QP::QEvt *>(0)) { // event actually delivered?
+            QP::QF::gc(e); // recycle the event manually!
+        }
+        else {
+            me->delay(BSP::TICKS_PER_SEC/2, 0U);  // wait some more (BLOCK)
+            l_sema.signal(); // signal Thread1
+        }
+    }
+}
 
 } // namespace DPP

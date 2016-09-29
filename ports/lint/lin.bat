@@ -2,7 +2,7 @@
 :: ===========================================================================
 :: Product: QP/C++ build script for PC-Lint(TM), Standard C++ compiler
 : Last Updated for Version: 5.6.0
-:: Date of the Last Update:  2015-12-14
+:: Date of the Last Update: 2015-12-14
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------

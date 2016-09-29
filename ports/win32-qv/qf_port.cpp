@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-01-22
+/// Last updated for version 5.7.1
+/// Last updated on  2016-09-23
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -47,14 +47,13 @@
 
 #include <limits.h>       // limits of dynamic range for integers
 
-
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
 /* Global objects ==========================================================*/
-QPSet64 QV_readySet_;     // QV-ready set of active objects
-HANDLE  QV_win32Event_;   // Win32 event to signal events
+QPSet  QV_readySet_;   // QV-ready set of active objects
+HANDLE QV_win32Event_; // Win32 event to signal events
 
 // Local objects *************************************************************
 static CRITICAL_SECTION l_win32CritSect;

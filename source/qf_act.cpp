@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-26
+/// Last updated for version 5.7.1
+/// Last updated on  2016-09-23
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -152,109 +152,8 @@ void QF::bzero(void * const start, uint_fast16_t len) {
     }
 }
 
-// power-of-two lookup tables ************************************************
-uint8_t const QF_pwr2Lkup[65] = {
-    static_cast<uint8_t>(0x00), // unused location
-    static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
-    static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
-    static_cast<uint8_t>(0x10), static_cast<uint8_t>(0x20),
-    static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80),
-    static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
-    static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
-    static_cast<uint8_t>(0x10), static_cast<uint8_t>(0x20),
-    static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80),
-    static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
-    static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
-    static_cast<uint8_t>(0x10), static_cast<uint8_t>(0x20),
-    static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80),
-    static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
-    static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
-    static_cast<uint8_t>(0x10), static_cast<uint8_t>(0x20),
-    static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80),
-    static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
-    static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
-    static_cast<uint8_t>(0x10), static_cast<uint8_t>(0x20),
-    static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80),
-    static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
-    static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
-    static_cast<uint8_t>(0x10), static_cast<uint8_t>(0x20),
-    static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80),
-    static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
-    static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
-    static_cast<uint8_t>(0x10), static_cast<uint8_t>(0x20),
-    static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80),
-    static_cast<uint8_t>(0x01), static_cast<uint8_t>(0x02),
-    static_cast<uint8_t>(0x04), static_cast<uint8_t>(0x08),
-    static_cast<uint8_t>(0x10), static_cast<uint8_t>(0x20),
-    static_cast<uint8_t>(0x40), static_cast<uint8_t>(0x80)
-};
-
-uint8_t const QF_invPwr2Lkup[65] = {
-    static_cast<uint8_t>(0xFF), // unused location
-    static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
-    static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
-    static_cast<uint8_t>(0xEF), static_cast<uint8_t>(0xDF),
-    static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F),
-    static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
-    static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
-    static_cast<uint8_t>(0xEF), static_cast<uint8_t>(0xDF),
-    static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F),
-    static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
-    static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
-    static_cast<uint8_t>(0xEF), static_cast<uint8_t>(0xDF),
-    static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F),
-    static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
-    static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
-    static_cast<uint8_t>(0xEF), static_cast<uint8_t>(0xDF),
-    static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F),
-    static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
-    static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
-    static_cast<uint8_t>(0xEF), static_cast<uint8_t>(0xDF),
-    static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F),
-    static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
-    static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
-    static_cast<uint8_t>(0xEF), static_cast<uint8_t>(0xDF),
-    static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F),
-    static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
-    static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
-    static_cast<uint8_t>(0xEF), static_cast<uint8_t>(0xDF),
-    static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F),
-    static_cast<uint8_t>(0xFE), static_cast<uint8_t>(0xFD),
-    static_cast<uint8_t>(0xFB), static_cast<uint8_t>(0xF7),
-    static_cast<uint8_t>(0xEF), static_cast<uint8_t>(0xDF),
-    static_cast<uint8_t>(0xBF), static_cast<uint8_t>(0x7F)
-};
-
-uint8_t const QF_div8Lkup[65] = {
-    static_cast<uint8_t>(0), // unused location
-    static_cast<uint8_t>(0), static_cast<uint8_t>(0), static_cast<uint8_t>(0),
-    static_cast<uint8_t>(0), static_cast<uint8_t>(0), static_cast<uint8_t>(0),
-    static_cast<uint8_t>(0), static_cast<uint8_t>(0),
-    static_cast<uint8_t>(1), static_cast<uint8_t>(1), static_cast<uint8_t>(1),
-    static_cast<uint8_t>(1), static_cast<uint8_t>(1), static_cast<uint8_t>(1),
-    static_cast<uint8_t>(1), static_cast<uint8_t>(1),
-    static_cast<uint8_t>(2), static_cast<uint8_t>(2), static_cast<uint8_t>(2),
-    static_cast<uint8_t>(2), static_cast<uint8_t>(2), static_cast<uint8_t>(2),
-    static_cast<uint8_t>(2), static_cast<uint8_t>(2),
-    static_cast<uint8_t>(3), static_cast<uint8_t>(3), static_cast<uint8_t>(3),
-    static_cast<uint8_t>(3), static_cast<uint8_t>(3), static_cast<uint8_t>(3),
-    static_cast<uint8_t>(3), static_cast<uint8_t>(3),
-    static_cast<uint8_t>(4), static_cast<uint8_t>(4), static_cast<uint8_t>(4),
-    static_cast<uint8_t>(4), static_cast<uint8_t>(4), static_cast<uint8_t>(4),
-    static_cast<uint8_t>(4), static_cast<uint8_t>(4),
-    static_cast<uint8_t>(5), static_cast<uint8_t>(5), static_cast<uint8_t>(5),
-    static_cast<uint8_t>(5), static_cast<uint8_t>(5), static_cast<uint8_t>(5),
-    static_cast<uint8_t>(5), static_cast<uint8_t>(5),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7)
-};
-
 /* log-base-2 lookup table **************************************************/
-#ifdef QF_LOG2LKUP
+#ifndef QF_LOG2
 
 uint8_t const QF_log2Lkup[256] = {
     static_cast<uint8_t>(0),
@@ -349,7 +248,7 @@ uint8_t const QF_log2Lkup[256] = {
     static_cast<uint8_t>(8), static_cast<uint8_t>(8)
 };
 
-#endif // #ifdef QF_LOG2LKUP
+#endif // QF_LOG2
 
 
 } // namespace QP
