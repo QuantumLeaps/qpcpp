@@ -8,8 +8,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-29
+/// Last updated for version 5.7.3
+/// Last updated on  2016-10-06
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -156,7 +156,7 @@ bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
     else {
         /// @note assert if event cannot be posted and dropping events is
         /// not acceptable
-        Q_ASSERT_ID(110, margin != static_cast<uint_fast16_t>(0));
+        Q_ASSERT_ID(120, margin != static_cast<uint_fast16_t>(0));
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT, QS::priv_.aoObjFilter,
                          this)

@@ -3,8 +3,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated for version 5.7.3
+/// Last updated on  2016-10-06
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -105,16 +105,15 @@ extern "C" {
     #define QF_SCHED_LOCK_(dummy) ((void)0)
     #define QF_SCHED_UNLOCK_()    ((void)0)
 
-    // native event queue operations...
+    // QV-specific native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
+        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
         (QV_readySet_.insert((me_)->m_prio))
-
     #define QACTIVE_EQUEUE_ONEMPTY_(me_) \
         (QV_readySet_.remove((me_)->m_prio))
 
-    // native QF event pool operations...
+    // QV-specific native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))

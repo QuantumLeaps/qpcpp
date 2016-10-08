@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.1
-/// Last updated on  2016-09-23
+/// Last updated for version 5.7.3
+/// Last updated on  2016-10-06
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -140,6 +140,7 @@ class QEQueue; // forward declaration
 /// @include qf_qmactive.cpp
 ///
 class QMActive : public QMsm {
+public: // for access from extern "C" functions
 #ifdef QF_EQUEUE_TYPE
     //! OS-dependent event-queue type.
     /// @description
@@ -154,7 +155,6 @@ class QMActive : public QMsm {
     QF_EQUEUE_TYPE m_eQueue;
 #endif
 
-public: // for access from extern "C" functions
 #ifdef QF_OS_OBJECT_TYPE
     //! OS-dependent per-thread object.
     /// @description

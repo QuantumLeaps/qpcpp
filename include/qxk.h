@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated for version 5.7.3
+/// Last updated on  2016-10-06
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -200,9 +200,9 @@ private:
         } \
     } while (false)
 
-    // native event queue operations...
+    // QXK-specific native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(0, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
+        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
         QXK_attr_.readySet.insert((me_)->m_prio); \
@@ -216,7 +216,7 @@ private:
     #define QACTIVE_EQUEUE_ONEMPTY_(me_) \
         QXK_attr_.readySet.remove((me_)->m_prio)
 
-    // native QF event pool operations...
+    // QXK-specific native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))

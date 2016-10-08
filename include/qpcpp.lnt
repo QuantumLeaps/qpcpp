@@ -172,6 +172,7 @@
  QP::QMActive::m_osObject,
  QP::QMActive::m_thread)
 -estring(1960,        // 11-0-1(req) non-private data member
+ m_eQueue,
  m_thread,
  m_prio)
 -estring(1923,        // 16-2-2 could become const variable

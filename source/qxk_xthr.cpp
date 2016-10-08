@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated on  2016-09-30
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -206,11 +206,6 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
 
         QF_CRIT_ENTRY_();
 
-        // is the owner thread blocked on its internal event queue?
-        if (m_temp.obj == reinterpret_cast<QMState const *>(&m_eQueue)) {
-            (void)teDisarm_();
-        }
-
         QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into temporary
 
         // margin available?
@@ -246,6 +241,7 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
                 if (m_temp.obj
                     == reinterpret_cast<QMState const *>(&m_eQueue))
                 {
+                    (void)teDisarm_();
                     QXK_attr_.readySet.insert(m_prio);
                     if (!QXK_ISR_CONTEXT_()) {
                         (void)QXK_sched_();
