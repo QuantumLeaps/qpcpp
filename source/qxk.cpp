@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 5.7.4
+/// Last updated on  2016-11-01
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -91,11 +91,12 @@ void QF::init(void) {
     bzero(&QXK_attr_,       static_cast<uint_fast16_t>(sizeof(QXK_attr_)));
     bzero(&l_idleThread,    static_cast<uint_fast16_t>(sizeof(l_idleThread)));
 
-    // prio of the QXK idle loop
-    QXK_attr_.actPrio  = static_cast<uint_fast8_t>(0);
-
-    // scheduler locked
+    // setup the QXK scheduler as initially locked and not running
     QXK_attr_.lockPrio = static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1);
+
+    // setup the QXK idle loop...
+    active_[0] = &l_idleThread; // register the idle thread with QF
+    QXK_attr_.actPrio = static_cast<uint_fast8_t>(0); // set the idle thread priority
 
     QXK_init(); // QXK-port initialization, might be defined in assembly
 }
@@ -121,7 +122,7 @@ void QF::stop(void) {
 static void initial_events(void); // prototype
 static void initial_events(void) {
 
-    QXK_attr_.lockPrio = static_cast<uint_fast8_t>(0); // scheduler unlocked
+    QXK_attr_.lockPrio = static_cast<uint_fast8_t>(0); // unlock the scheduler
 
     // any active objects need to be scheduled before starting event loop?
     if (QXK_sched_() != static_cast<uint_fast8_t>(0)) {
@@ -139,7 +140,6 @@ static void initial_events(void) {
 ///
 int_t QF::run(void) {
     QF_INT_DISABLE();
-    active_[0] = &l_idleThread; // NOTE: indicates kernel-started
     initial_events(); // process all events posted during initialization
     onStartup(); // application-specific startup callback
     QF_INT_ENABLE();
@@ -196,11 +196,8 @@ void QMActive::start(uint_fast8_t const prio,
 
     // see if this AO needs to be scheduled in case QXK is running
     QF_CRIT_ENTRY_();
-    // QXK kernel already running?
-    if (QF::active_[0] != static_cast<QMActive *>(0)) {
-        if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { // activation?
-            QXK_activate_();
-        }
+    if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { // activation needed?
+        QXK_activate_();
     }
     QF_CRIT_EXIT_();
 }

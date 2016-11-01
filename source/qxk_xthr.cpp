@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-30
+/// Last updated for version 5.7.4
+/// Last updated on  2016-11-01
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -148,9 +148,7 @@ void QXThread::start(uint_fast8_t const prio,
     QXK_attr_.readySet.insert(m_prio);
 
     // see if this thread needs to be scheduled in case QXK is running
-    if (QF::active_[0] != static_cast<QMActive *>(0)) {
-        (void)QXK_sched_();
-    }
+    (void)QXK_sched_();
     QF_CRIT_EXIT_();
 }
 
@@ -235,7 +233,7 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
 
             // is the queue empty?
             if (m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) {
-                m_eQueue.m_frontEvt = e;      // deliver event directly
+                m_eQueue.m_frontEvt = e;  // deliver event directly
 
                 // is this thread blocked on the queue?
                 if (m_temp.obj

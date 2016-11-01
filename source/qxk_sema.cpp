@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated for version 5.7.4
+/// Last updated on  2016-11-01
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -166,10 +166,7 @@ void QXSemaphore::signal(void) {
         // disarm the internal time event
         (void)thr->teDisarm_();
 
-        // not inside ISR? Multitasking started?
-        if ((!QXK_ISR_CONTEXT_())
-            && (QF::active_[0] != static_cast<QMActive *>(0))) // QXK started?
-        {
+        if (!QXK_ISR_CONTEXT_()) { // not inside ISR?
             (void)QXK_sched_();
         }
     }

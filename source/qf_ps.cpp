@@ -4,8 +4,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated for version 5.7.4
+/// Last updated on  2016-11-01
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -131,26 +131,27 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
         QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
     QS_END_NOCRIT_()
 
-    if (QF_PTR_AT_(QF_subscrList_, e->sig).notEmpty()) {
+    // is it a dynamic event?
+    if (e->poolId_ != static_cast<uint8_t>(0)) {
+        // NOTE: The reference counter of a dynamic event is incremented to
+        // prevent premature recycling of the event while the multicasting
+        // is still in progress. At the end of the function, the garbage
+        // collector step (QF::gc()) decrements the reference counter and
+        // recycles the event if the counter drops to zero. This covers the
+        // case when the event was published without any subscribers.
+        //
+        QF_EVT_REF_CTR_INC_(e);
+    }
 
-        // is it a dynamic event?
-        if (e->poolId_ != static_cast<uint8_t>(0)) {
-            // NOTE: QF::publish_() increments the reference counter to prevent
-            // premature recycling of the event while the multicasting is still
-            // in progress. At the end of the function, the garbage collector
-            // step decrements the reference counter and recycles the event if
-            // the counter drops to zero. This covers the case when the event
-            // was published without any subscribers.
-            //
-            QF_EVT_REF_CTR_INC_(e); // increment the reference counter, NOTE01
-        }
-        QF_CRIT_EXIT_();
+    // make a local, modifiable copy of the subscriber list
+    QPSet subscrList = QF_PTR_AT_(QF_subscrList_, e->sig);
+    QF_CRIT_EXIT_();
 
-        QPSet tmp = QF_PTR_AT_(QF_subscrList_, e->sig);
-        uint_fast8_t p = tmp.findMax(); // find highest-prio subscriber
+    if (subscrList.notEmpty()) {
+        uint_fast8_t p = subscrList.findMax(); // the highest-prio subscriber
         QF_SCHED_STAT_
 
-        QF_SCHED_LOCK_(p); // lock the scheduler upto prio 'p'
+        QF_SCHED_LOCK_(p); // lock the scheduler up to prio 'p'
         do { // loop over all subscribers */
             // the prio of the AO must be registered with the framework
             Q_ASSERT_ID(210, active_[p] != static_cast<QMActive *>(0));
@@ -158,21 +159,22 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
             // POST() asserts internally if the queue overflows
             (void)active_[p]->POST(e, sender);
 
-            tmp.remove(p);
-            if (tmp.notEmpty()) {
-                p = tmp.findMax();
+            subscrList.remove(p); // remove the handled subscriber
+            if (subscrList.notEmpty()) {  // still more subscribers?
+                p = subscrList.findMax(); // the highest-prio subscriber
             }
             else {
-                p = static_cast<uint_fast8_t>(0);
+                p = static_cast<uint_fast8_t>(0); // no more subscribers
             }
         } while (p != static_cast<uint_fast8_t>(0));
         QF_SCHED_UNLOCK_(); // unlock the scheduler
+    }
 
-        gc(e); // run the garbage collector
-    }
-    else {
-        QF_CRIT_EXIT_();
-    }
+    // The following garbage collection step decrements the reference counter
+    // and recycles the event if the counter drops to zero. This covers both
+    // cases when the event was published with or without any subscribers.
+    //
+    gc(e);
 }
 
 
