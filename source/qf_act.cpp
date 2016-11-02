@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.1
-/// Last updated on  2016-09-23
+/// Last updated for version 5.7.4
+/// Last updated on  2016-11-02
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -100,7 +100,7 @@ void QF::add_(QMActive * const a) {
 ///
 /// @sa QP::QF::add_()
 ///
-void QF::remove_(QMActive const * const a) {
+void QF::remove_(QMActive * const a) {
     uint_fast8_t p = a->m_prio;
 
     Q_REQUIRE_ID(200, (static_cast<uint_fast8_t>(0) < p)
@@ -111,6 +111,7 @@ void QF::remove_(QMActive const * const a) {
     QF_CRIT_ENTRY_();
 
     active_[p] = static_cast<QMActive *>(0); // free-up the priority level
+    a->m_state.obj = static_cast<QMState *>(0); // invalidate the state
 
     QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_REMOVE, QS::priv_.aoObjFilter, a)
         QS_TIME_();   // timestamp

@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 5.7.4
-/// Last updated on  2016-11-04
+/// Last updated on  2016-11-02
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -474,6 +474,7 @@ private:
     friend class QHsm;
     friend class QMActive;
     friend class QActive;
+    friend class QF;
     friend class QXK;
     friend class QXThread;
     friend class QXMutex;

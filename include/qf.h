@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.3
-/// Last updated on  2016-10-06
+/// Last updated for version 5.7.4
+/// Last updated on  2016-11-02
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -551,7 +551,7 @@ public:
                                QEvt const * const evtRef);
 
     //! Remove the active object from the framework.
-    static void remove_(QMActive const * const a);
+    static void remove_(QMActive * const a);
 
     //! array of registered active objects
     static QMActive *active_[QF_MAX_ACTIVE + 1];

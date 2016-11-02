@@ -106,7 +106,7 @@ void QMActive::start(uint_fast8_t prio,
 }
 //............................................................................
 void QMActive::stop() {
-    m_thread = static_cast<uint32_t>(0); // stop the thread loop
+    QF::remove_(this); // remove the AO from the framework
 }
 
 //............................................................................

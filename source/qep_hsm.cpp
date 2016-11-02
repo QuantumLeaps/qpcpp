@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.5.0
-/// Last updated on  2015-09-04
+/// Last updated for version 5.7.4
+/// Last updated on  2016-11-02
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -217,8 +217,10 @@ QState QHsm::top(void * const, QEvt const * const) {
 void QHsm::dispatch(QEvt const * const e) {
     QStateHandler t = m_state.fun;
 
-    /// @pre the state configuration must be stable
-    Q_REQUIRE_ID(400, t == m_temp.fun);
+    /// @pre the current state must be initialized and
+    /// the state configuration must be stable
+    Q_REQUIRE_ID(400, (t != Q_STATE_CAST(0))
+                       && (t == m_temp.fun));
 
     QStateHandler s;
     QState r;
