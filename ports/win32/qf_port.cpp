@@ -2,14 +2,14 @@
 /// \brief QF/C++ port to Win32 API
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-01-22
+/// Last updated for version 5.7.5
+/// Last updated on  2016-11-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -94,7 +94,6 @@ void QF::thread_(QMActive *act) {
     act->unsubscribeAll(); // make sure that no events are subscribed
     QF::remove_(act);  // remove this object from any subscriptions
     CloseHandle(act->m_osObject); // cleanup the OS event
-    delete[] act->m_eQueue.m_ring;  // free the fudged queue storage
 }
 //****************************************************************************
 // helper function to match the signature expeced by CreateThread() Win32 API
@@ -122,7 +121,6 @@ int_t QF::run(void) {
     onCleanup();            // cleanup callback
     QS_EXIT();              // cleanup the QSPY connection
     //DeleteCriticalSection(&l_win32CritSect);
-    //free all "fudged" event pools...
     return static_cast<int_t>(0); // return success
 }
 //****************************************************************************
@@ -154,25 +152,14 @@ void QMActive::start(uint_fast8_t prio,
     m_prio = prio;  // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
 
-    // ignore the original storage for the event queue 'qSto' and
-    // instead allocate an oversized "fudged" storage for the queue.
-    // See also NOTE2 in qf_port.h.
-    //
-    Q_ASSERT_ID(710, static_cast<uint32_t>(qLen) * QF_WIN32_FUDGE_FACTOR
-                     < USHRT_MAX);
-    // fudge the queue length
-    uint_fast16_t fudgedQLen = qLen * QF_WIN32_FUDGE_FACTOR;
-    QEvt const **fudgedQSto = new QEvt const *[fudgedQLen]; // fudged queue storage
-    // allocation must succeed
-    Q_ASSERT_ID(720, fudgedQSto != static_cast<QEvt const * *>(0));
-    m_eQueue.init(fudgedQSto, fudgedQLen);
+    m_eQueue.init(qSto, qLen);
 
     // save osObject as integer, in case it contains the Win32 priority
     int win32Prio = (m_osObject != static_cast<void *>(0))
                     ? reinterpret_cast<int>(m_osObject)
                     : THREAD_PRIORITY_NORMAL;
 
-    /* create the Win32 "event" to throttle the AO's event queue */
+    // create the Win32 "event" to throttle the AO's event queue
     m_osObject = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     this->init(ie); // execute initial transition (virtual call)
@@ -182,10 +169,16 @@ void QMActive::start(uint_fast8_t prio,
     if (stkSize == 0U) {
         stkSize = 1024U; // NOTE: will be rounded up to the nearest page
     }
-    m_thread = CreateThread(NULL, stkSize, &ao_thread, this, 0, NULL);
-    Q_ASSERT_ID(730, m_thread != NULL); // thread must be created
 
-    SetThreadPriority(m_thread, win32Prio);
+    // create a Win32 thread for the AO;
+    // The thread is created with THREAD_PRIORITY_NORMAL
+    m_thread = CreateThread(NULL, stkSize, &ao_thread, this, 0, NULL);
+    Q_ASSERT_ID(730, m_thread != static_cast<HANDLE>(0)); // must succeed
+
+    // was the thread priority provided?
+    if (win32Prio != 0) {
+        SetThreadPriority(m_thread, win32Prio);
+    }
 }
 //****************************************************************************
 void QMActive::stop(void) {

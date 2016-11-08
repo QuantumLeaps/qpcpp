@@ -1,5 +1,5 @@
 //****************************************************************************
-// DPP example for Windows
+// Product: "Fly 'n' Shoot" game example for Windows
 // Last updated for version 5.7.5
 // Last updated on  2016-11-08
 //
@@ -32,51 +32,63 @@
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
-#include "dpp.h"
 #include "bsp.h"
+#include "game.h"
 
 // "fudge factor" for Windows, see NOTE1
 enum { WIN_FUDGE_FACTOR = 10 };
 
 //............................................................................
 int main() {
-    static QP::QEvt const *tableQueueSto[N_PHILO*WIN_FUDGE_FACTOR];
-    static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO*WIN_FUDGE_FACTOR];
-    static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO*WIN_FUDGE_FACTOR];
+    static QP::QEvt const *missileQueueSto[2*WIN_FUDGE_FACTOR];
+    static QP::QEvt const *shipQueueSto[3*WIN_FUDGE_FACTOR];
+    static QP::QEvt const *tunnelQueueSto[(GAME_MINES_MAX + 5)*WIN_FUDGE_FACTOR];
 
-    static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
+    static QF_MPOOL_EL(QP::QEvt) smlPoolSto[10*WIN_FUDGE_FACTOR];
+    static QF_MPOOL_EL(GAME::ObjectImageEvt)
+        medPoolSto[(2*GAME_MINES_MAX + 10)*WIN_FUDGE_FACTOR];
+
+    static QP::QSubscrList subscrSto[GAME::MAX_PUB_SIG];
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-    DPP::BSP::init(); // initialize the BSP
+    GAME::BSP_init(); // initialize the Board Support Package
 
-    // object dictionaries...
+    // initialize the event pools...
+    QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+    QP::QF::poolInit(medPoolSto, sizeof(medPoolSto), sizeof(medPoolSto[0]));
+
+    // init publish-subscribe
+    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
+
+    // send object dictionaries for event queues...
+    QS_OBJ_DICTIONARY(missileQueueSto);
+    QS_OBJ_DICTIONARY(shipQueueSto);
+    QS_OBJ_DICTIONARY(tunnelQueueSto);
+
+    // send object dictionaries for event pools...
     QS_OBJ_DICTIONARY(smlPoolSto);
-    QS_OBJ_DICTIONARY(tableQueueSto);
-    QS_OBJ_DICTIONARY(philoQueueSto[0]);
-    QS_OBJ_DICTIONARY(philoQueueSto[1]);
-    QS_OBJ_DICTIONARY(philoQueueSto[2]);
-    QS_OBJ_DICTIONARY(philoQueueSto[3]);
-    QS_OBJ_DICTIONARY(philoQueueSto[4]);
+    QS_OBJ_DICTIONARY(medPoolSto);
 
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
-
-    // initialize event pools...
-    QP::QF::poolInit(smlPoolSto,
-                     sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+    // send signal dictionaries for globally published events...
+    QS_SIG_DICTIONARY(GAME::TIME_TICK_SIG,      static_cast<void *>(0));
+    QS_SIG_DICTIONARY(GAME::PLAYER_TRIGGER_SIG, static_cast<void *>(0));
+    QS_SIG_DICTIONARY(GAME::PLAYER_QUIT_SIG,    static_cast<void *>(0));
+    QS_SIG_DICTIONARY(GAME::GAME_OVER_SIG,      static_cast<void *>(0));
 
     // start the active objects...
-    for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U),
-                           philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-                           (void *)0, 0U);
-    }
-    // leave the priority level (N_PHILO + 1) free for the mutex in BSP
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 2U),
-                    tableQueueSto, Q_DIM(tableQueueSto),
-                    (void *)0, 0U);
+    GAME::AO_Tunnel ->start(1U,                     // priority
+                      tunnelQueueSto, Q_DIM(tunnelQueueSto), // evt queue
+                      static_cast<void *>(0), 0U);  // no per-thread stack
+    GAME::AO_Ship   ->start(2U,                     // priority
+                      shipQueueSto, Q_DIM(shipQueueSto), // evt queue
+                      static_cast<void *>(0), 0U);  // no per-thread stack
+    GAME::AO_Missile->start(3U,                     // priority
+                      missileQueueSto, Q_DIM(missileQueueSto), // evt queue
+                      static_cast<void *>(0), 0U);  // no per-thread stack
 
     return QP::QF::run(); // run the QF application
 }
+
 
 //****************************************************************************
 // NOTE1:
@@ -98,3 +110,4 @@ int main() {
 // this case, the generous WIN_FUDGE_FACTOR is used to oversize the
 // event queues and event pools.
 //
+

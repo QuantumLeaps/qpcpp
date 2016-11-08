@@ -2,14 +2,14 @@
 /// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.7.1
-/// Last updated on  2016-09-23
+/// Last updated for version 5.7.5
+/// Last updated on  2016-11-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -155,18 +155,8 @@ void QMActive::start(uint_fast8_t prio,
     m_prio = prio;  // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
 
-    // ignore the original storage for the event queue 'qSto' and
-    // instead allocate an oversized "fudged" storage for the queue.
-    // See also NOTE2 in qf_port.h.
-    Q_ASSERT_ID(710, static_cast<uint32_t>(qLen) * QF_WIN32_FUDGE_FACTOR
-                     < USHRT_MAX);
-    // fudged the queue length
-    uint_fast16_t fudgedQLen = qLen * QF_WIN32_FUDGE_FACTOR;
-    // fudged queue storage
-    void *fudgedQSto = new QEvt*[fudgedQLen];
-    // allocation must succeed
-    Q_ASSERT_ID(720, fudgedQSto != static_cast<void *>(0));
-    m_eQueue.init(static_cast<QEvt const **>(fudgedQSto), fudgedQLen);
+    m_eQueue.init(qSto, qLen);
+
 
     this->init(ie); // execute initial transition (virtual call)
     QS_FLUSH();     // flush the QS trace buffer to the host
@@ -175,7 +165,6 @@ void QMActive::start(uint_fast8_t prio,
 void QMActive::stop(void) {
     unsubscribeAll();
     QF::remove_(this);
-    delete[] m_eQueue.m_ring; // free the fudged queue storage
 }
 
 //****************************************************************************
