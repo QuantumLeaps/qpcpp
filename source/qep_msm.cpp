@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.1
-/// Last updated on  2016-09-23
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -81,16 +81,11 @@ QMState const QMsm::msm_top_s = {
 /// @sa The QP::QMsm example illustrates how to use the QMsm constructor
 /// in the constructor initializer list of the derived state machines.
 ///
-QMsm::QMsm(QStateHandler const initial) {
+QMsm::QMsm(QStateHandler const initial)
+  : QHsm(initial)
+{
     m_state.obj = &msm_top_s;
     m_temp.fun  = initial;
-}
-
-//****************************************************************************
-/// @description
-/// Virtual destructor of the QMsm state machine and any of its subclasses.
-///
-QMsm::~QMsm() {
 }
 
 //****************************************************************************
@@ -390,7 +385,7 @@ QState QMsm::execTatbl_(QMTranActTable const * const tatbl) {
 /// @param[in] ts   pointer to the transition source state
 ///
 void QMsm::exitToTranSource_(QMState const *s,
-                             QMState const *ts)
+                             QMState const * const ts)
 {
     // exit states from the current state to the tran. source state
     while (s != ts) {
@@ -403,15 +398,14 @@ void QMsm::exitToTranSource_(QMState const *s,
                 QS_OBJ_(this);            // this state machine object
                 QS_FUN_(s->stateHandler); // the exited state handler
             QS_END_()
-
-            s = s->superstate; // advance to the superstate
-            // reached the top of a submachine?
-            if (s == static_cast<QMState const *>(0)) {
-                ts = s; /* force exit from the while loop */
-            }
         }
-        else {
-            s = s->superstate; // advance to the superstate
+
+        s = s->superstate; // advance to the superstate
+
+        // reached the top of a submachine?
+        if (s == static_cast<QMState const *>(0)) {
+            s = m_temp.obj; // the superstate from QM_SM_EXIT()
+            Q_ASSERT_ID(510, s != static_cast<QMState const *>(0));
         }
     }
 }
@@ -483,19 +477,19 @@ QState QMsm::enterHistory_(QMState const * const hist) {
 /// of the state.
 ///
 /// \arguments
-/// \arg[in] \c state pointer to the QMState object that corresponds to the
-///                   tested state.
+/// \arg[in] \c st pointer to the QMState object that corresponds to the
+///                tested state.
 ///
-/// \returns 'true' if the MSM is in the \c state and 'false' otherwise
+/// \returns 'true' if the MSM is in the \c st and 'false' otherwise
 ///
-bool QMsm::isInState(QMState const * const state) const {
+bool QMsm::isInState(QMState const * const st) const {
     bool inState = false; // assume that this MSM is not in 'state'
 
     for (QMState const *s = m_state.obj;
          s != static_cast<QMState const *>(0);
          s = s->superstate)
     {
-        if (s == state) {
+        if (s == st) {
             inState = true; // match found, return 'true'
             break;
         }

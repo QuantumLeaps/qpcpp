@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.3
-/// Last updated on  2016-10-06
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -212,9 +212,7 @@ private:
             } \
         } \
     } while (false)
-
-    #define QACTIVE_EQUEUE_ONEMPTY_(me_) \
-        QXK_attr_.readySet.remove((me_)->m_prio)
+    #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
 
     // QXK-specific native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool

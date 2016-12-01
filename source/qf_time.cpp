@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-01-27
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -122,7 +122,7 @@ void QF::tickX_(uint8_t const tickRate, void const * const sender)
 
             // is time evt about to expire?
             if (t->m_ctr == static_cast<QTimeEvtCtr>(0)) {
-                QMActive *act = t->toActive(); // temporary for volatile
+                QActive *act = t->toActive(); // temporary for volatile
 
                 // periodic time evt?
                 if (t->m_interval != static_cast<QTimeEvtCtr>(0)) {
@@ -221,7 +221,7 @@ bool QF::noTimeEvtsActiveX(uint8_t const tickRate) {
 /// @param[in] sgnl   signal to associate with this time event.
 /// @param[in] tickRate system tick rate to associate with this time event.
 ///
-QTimeEvt::QTimeEvt(QMActive * const act,
+QTimeEvt::QTimeEvt(QActive * const act,
     enum_t const sgnl, uint8_t const tickRate)
     :
 #ifdef Q_EVT_CTOR
@@ -265,7 +265,7 @@ QTimeEvt::QTimeEvt()
 #endif // Q_EVT_CTOR
 
     m_next(static_cast<QTimeEvt *>(0)),
-    m_act(static_cast<QMActive *>(0)),
+    m_act(static_cast<QActive *>(0)),
     m_ctr(static_cast<QTimeEvtCtr>(0)),
     m_interval(static_cast<QTimeEvtCtr>(0))
 {
@@ -527,7 +527,7 @@ QTimeEvtCtr QTimeEvt::ctr(void) const {
         QS_U8_(refCtr_ & static_cast<uint8_t>(0x7F)); // tick rate
     QS_END_NOCRIT_()
 
-        QF_CRIT_EXIT_();
+    QF_CRIT_EXIT_();
     return ret;
 }
 

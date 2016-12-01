@@ -3,14 +3,14 @@
 /// @brief Internal (package scope) QF/C++ interface.
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -89,7 +89,7 @@ namespace QP {
 extern QF_EPOOL_TYPE_ QF_pool_[QF_MAX_EPOOL]; //!< allocate event pools
 extern uint_fast8_t QF_maxPool_;     //!< # of initialized event pools
 extern QSubscrList *QF_subscrList_;  //!< the subscriber list array
-extern enum_t QF_maxSignal_;         //!< the maximum published signal
+extern enum_t QF_maxPubSignal_;      //!< the maximum published signal
 
 //............................................................................
 //! Structure representing a free block in the Native QF Memory Pool

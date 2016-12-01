@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.3
-/// Last updated on  2016-10-06
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -84,7 +84,6 @@ uint_fast8_t QK_sched_(void);
 void QK_activate_(void);
 
 } // extern "C"
-
 
 
 //****************************************************************************
@@ -187,8 +186,7 @@ private:
             } \
         } \
     } while (false)
-    #define QACTIVE_EQUEUE_ONEMPTY_(me_) \
-        QK_attr_.readySet.remove((me_)->m_prio)
+    #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
 
     // QK-specific native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool

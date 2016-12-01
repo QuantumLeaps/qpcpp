@@ -5,8 +5,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -40,7 +40,7 @@
 
 #define QP_IMPL           // this is QF/QK implementation
 #include "qf_port.h"      // QF port
-#include "qk_pkg.h"       // QK package-scope internal interface
+#include "qf_pkg.h"       // QF package-scope internal interface
 #include "qassert.h"      // QP assertions
 #ifdef Q_SPY              // QS software tracing enabled?
     #include "qs_port.h"  // include QS port

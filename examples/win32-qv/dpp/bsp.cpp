@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example (console)
-// Last Updated for Version: 5.6.0
-// Date of the Last Update:  2015-12-26
+// Last Updated for Version: 5.8.0
+// Date of the Last Update:  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -64,7 +64,7 @@ static uint32_t l_rnd; // random seed
 #endif
 
 //............................................................................
-void BSP_init(void) {
+void BSP::init(void) {
     printf("Dining Philosopher Problem example"
            "\nQP %s\n"
            "Press 'p' to pause\n"
@@ -72,13 +72,13 @@ void BSP_init(void) {
            "Press ESC to quit...\n",
            QP::versionStr);
 
-    BSP_randomSeed(1234U);
+    BSP::randomSeed(1234U);
     Q_ALLEGE(QS_INIT((void *)0));
     QS_OBJ_DICTIONARY(&l_clock_tick); // must be called *after* QF::init()
     QS_USR_DICTIONARY(PHILO_STAT);
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
 #ifdef Q_SPY
     l_isRunning = false; // stop the QS output thread
@@ -86,7 +86,7 @@ void BSP_terminate(int16_t result) {
     QP::QF::stop(); // stop the main "ticker thread"
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     printf("Philosopher %2d is %s\n", (int)n, stat);
 
     QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
@@ -95,11 +95,11 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     printf("Paused is %s\n", paused ? "ON" : "OFF");
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
@@ -107,7 +107,7 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     return l_rnd >> 8;
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 
@@ -119,7 +119,7 @@ namespace QP {
 
 //............................................................................
 void QF::onStartup(void) {
-    QF_setTickRate(DPP::BSP_TICKS_PER_SEC); // set the desired tick rate
+    QF_setTickRate(DPP::BSP::TICKS_PER_SEC); // set the desired tick rate
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -131,7 +131,7 @@ void QF_onClockTick(void) {
     if (_kbhit()) {  // any key pressed?
         int ch = _getch();
         if (ch == '\33') { // see if the ESC key pressed
-            QF::PUBLISH(Q_NEW(QEvt, DPP::TERMINATE_SIG), &DPP::l_clock_tick);
+            DPP::BSP::terminate(0);
         }
         else if (ch == 'p') {
             QF::PUBLISH(Q_NEW(QEvt, DPP::PAUSE_SIG), &DPP::l_clock_tick);

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to TI-RTOS kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.7.3
-/// Last updated on  2016-10-06
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -72,10 +72,10 @@ void QF::stop(void) {
 }
 
 //............................................................................
-void QMActive::start(uint_fast8_t prio,
-                     QEvt const *qSto[], uint_fast16_t qLen,
-                     void *stkSto, uint_fast16_t /* stkSize */,
-                     QEvt const *ie)
+void QActive::start(uint_fast8_t prio,
+                    QEvt const *qSto[], uint_fast16_t qLen,
+                    void *stkSto, uint_fast16_t /* stkSize */,
+                    QEvt const *ie)
 {
     /// @pre the priority must be in range and the stack storage must not
     /// be provided, because this TI-RTOS port does not need per-AO stacks.
@@ -105,13 +105,13 @@ void QMActive::start(uint_fast8_t prio,
     Q_ENSURE_ID(490, m_thread != 0);
 }
 //............................................................................
-void QMActive::stop() {
+void QActive::stop() {
     QF::remove_(this); // remove the AO from the framework
 }
 
 //............................................................................
 static void swi_function(UArg arg0, UArg /* arg1 */) { // TI-RTOS Swi
-    QMActive *act = reinterpret_cast<QMActive *>(arg0);
+    QActive *act = reinterpret_cast<QActive *>(arg0);
     QEvt const *e = act->get_();
     act->dispatch(e);
     QF::gc(e);

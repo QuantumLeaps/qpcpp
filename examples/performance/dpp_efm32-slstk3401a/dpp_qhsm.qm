@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.3.0">
+<model version="4.0.0" links="0">
  <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
  <framework name="qpcpp"/>
  <package name="Events" stereotype="0x01" namespace="DPP::">
@@ -40,7 +40,8 @@ if (!registered) {
 QS_SIG_DICTIONARY(HUNGRY_SIG, me);  // signal for each Philos
 QS_SIG_DICTIONARY(TIMEOUT_SIG, me); // signal for each Philos
 
-me-&gt;subscribe(EAT_SIG);</action>
+me-&gt;subscribe(EAT_SIG);
+me-&gt;subscribe(TEST_SIG);</action>
      <initial_glyph conn="2,3,5,1,20,5,-3">
       <action box="0,-2,6,2"/>
      </initial_glyph>
@@ -49,15 +50,20 @@ me-&gt;subscribe(EAT_SIG);</action>
      <entry>me-&gt;m_timeEvt.armX(think_time(), 0U);</entry>
      <exit>(void)me-&gt;m_timeEvt.disarm();</exit>
      <tran trig="TIMEOUT" target="../../2">
-      <tran_glyph conn="2,14,3,1,20,11,-3">
+      <tran_glyph conn="2,13,3,1,20,12,-3">
        <action box="0,-2,6,2"/>
       </tran_glyph>
      </tran>
      <tran trig="EAT, DONE">
       <action>/* EAT or DONE must be for other Philos than this one */
 Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
-      <tran_glyph conn="2,18,3,-1,13">
+      <tran_glyph conn="2,16,3,-1,13">
        <action box="0,-2,14,2"/>
+      </tran_glyph>
+     </tran>
+     <tran trig="TEST">
+      <tran_glyph conn="2,19,3,-1,13">
+       <action box="0,-2,11,4"/>
       </tran_glyph>
      </tran>
      <state_glyph node="2,5,17,16">
@@ -114,7 +120,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
       <exit box="1,4,5,2"/>
      </state_glyph>
     </state>
-    <state_diagram size="37,61"/>
+    <state_diagram size="36,61"/>
    </statechart>
   </class>
   <class name="Table" superclass="qpcpp::QActive">
@@ -143,27 +149,26 @@ QS_SIG_DICTIONARY(DONE_SIG,      (void *)0); // global signals
 QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
 QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
 QS_SIG_DICTIONARY(SERVE_SIG,     (void *)0);
-QS_SIG_DICTIONARY(TERMINATE_SIG, (void *)0);
+QS_SIG_DICTIONARY(TEST_SIG,      (void *)0);
 
 QS_SIG_DICTIONARY(HUNGRY_SIG,    me); // signal just for Table
 
 me-&gt;subscribe(DONE_SIG);
 me-&gt;subscribe(PAUSE_SIG);
 me-&gt;subscribe(SERVE_SIG);
-me-&gt;subscribe(TERMINATE_SIG);
+me-&gt;subscribe(TEST_SIG);
 
 for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     me-&gt;m_fork[n] = FREE;
     me-&gt;m_isHungry[n] = false;
     BSP::displayPhilStat(n, THINKING);
 }</action>
-     <initial_glyph conn="3,3,5,1,44,18,-9">
+     <initial_glyph conn="3,3,5,1,45,18,-10">
       <action box="0,-2,6,2"/>
      </initial_glyph>
     </initial>
     <state name="active">
-     <tran trig="TERMINATE">
-      <action>BSP::terminate(0);</action>
+     <tran trig="TEST">
       <tran_glyph conn="2,11,3,-1,14">
        <action box="0,-2,11,4"/>
       </tran_glyph>
@@ -184,7 +189,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
         me-&gt;m_fork[n] = USED;
         TableEvt *te = Q_NEW(TableEvt, EAT_SIG);
         te-&gt;philoNum = n;
-        AO_Philo[n]-&gt;POST(te, me);
+        QP::QF::PUBLISH(te, me);
         me-&gt;m_isHungry[n] = false;
         BSP::displayPhilStat(n, EATING);
     }
@@ -311,13 +316,15 @@ me-&gt;m_fork[n] = FREE;</action>
        <exit box="1,6,18,4"/>
       </state_glyph>
      </state>
-     <state_glyph node="2,5,43,62"/>
+     <state_glyph node="2,5,44,62"/>
     </state>
-    <state_diagram size="49,69"/>
+    <state_diagram size="50,69"/>
    </statechart>
   </class>
-  <attribute name="AO_Philo[N_PHILO]" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
-  <attribute name="AO_Table" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_Philo[N_PHILO]" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_Table" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="XT_Test1" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
+  <attribute name="XT_Test2" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
  </package>
  <directory name=".">
   <file name="dpp.h">
@@ -331,7 +338,7 @@ enum DPPSignals {
     DONE_SIG,       // published by Philosopher when done eating
     PAUSE_SIG,      // published by BSP to pause the application
     SERVE_SIG,      // published by BSP to serve re-start serving forks
-    TERMINATE_SIG,  // published by BSP to terminate the application
+    TEST_SIG,       // published by BSP to test the application
     MAX_PUB_SIG,    // the last published signal
 
     HUNGRY_SIG,     // posted direclty to Table from hungry Philo
@@ -348,6 +355,11 @@ $declare(Events::TableEvt)
 $declare(AOs::AO_Philo[N_PHILO])
 
 $declare(AOs::AO_Table)
+
+#ifdef qxk_h
+$declare(AOs::XT_Test1)
+$declare(AOs::XT_Test2)
+#endif // qxk_h
 
 #endif // dpp_h</text>
   </file>
@@ -388,7 +400,7 @@ enum InternalSignals {           // internal signals
 };
 
 // Global objects ------------------------------------------------------------
-QP::QMActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Philo AO
+QP::QActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Philo AO
     &amp;l_philo[0],
     &amp;l_philo[1],
     &amp;l_philo[2],
@@ -434,7 +446,7 @@ static char_t const * const EATING   = &amp;&quot;eating  &quot;[0];
 static Table l_table; // the single instance of the Table active object
 
 // Global-scope objects ------------------------------------------------------
-QP::QMActive * const AO_Table = &amp;l_table; // &quot;opaque&quot; AO pointer
+QP::QActive * const AO_Table = &amp;l_table; // &quot;opaque&quot; AO pointer
 
 } // namespace DPP
 

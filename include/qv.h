@@ -3,8 +3,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.3
-/// Last updated on  2016-10-06
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -110,8 +110,7 @@ extern "C" {
         Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
         (QV_readySet_.insert((me_)->m_prio))
-    #define QACTIVE_EQUEUE_ONEMPTY_(me_) \
-        (QV_readySet_.remove((me_)->m_prio))
+    #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
 
     // QV-specific native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool

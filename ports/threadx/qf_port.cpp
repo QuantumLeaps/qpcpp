@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -66,7 +66,7 @@ void QF::stop(void) {
     onCleanup(); // the cleanup callback
 }
 //............................................................................
-void QF::thread_(QMActive *act) {
+void QF::thread_(QActive *act) {
     // event loop of the active object thread
     act->m_osObject = true; // enable the thread event-loop
     while (act->m_osObject) {
@@ -84,10 +84,10 @@ void QF::thread_(QMActive *act) {
 //............................................................................
 static void thread_function(ULONG thread_input) { // ThreadX signature
     // run the active-object thread
-    QF::thread_(reinterpret_cast<QMActive *>(thread_input));
+    QF::thread_(reinterpret_cast<QActive *>(thread_input));
 }
 //............................................................................
-void QMActive::start(uint_fast8_t prio,
+void QActive::start(uint_fast8_t prio,
                      QEvt const *qSto[], uint_fast16_t qLen,
                      void *stkSto, uint_fast16_t stkSize,
                      QEvt const *ie)
@@ -125,14 +125,14 @@ void QMActive::start(uint_fast8_t prio,
         == TX_SUCCESS);
 }
 //............................................................................
-void QMActive::stop(void) {
+void QActive::stop(void) {
     m_osObject = false; // stop the thread loop
 }
 //............................................................................
 #ifndef Q_SPY
-bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin)
+bool QActive::post_(QEvt const * const e, uint_fast16_t const margin)
 #else
-bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
+bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
                      void const * const sender)
 #endif
 {
@@ -192,7 +192,7 @@ bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
     return status;
 }
 //............................................................................
-void QMActive::postLIFO(QEvt const * const e) {
+void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
@@ -220,7 +220,7 @@ void QMActive::postLIFO(QEvt const * const e) {
         == TX_SUCCESS);
 }
 //............................................................................
-QEvt const *QMActive::get_(void) {
+QEvt const *QActive::get_(void) {
     QEvt const *e;
     QS_CRIT_STAT_
 

@@ -1,10 +1,10 @@
 /// @file
-/// @brief QP::QMActive services and QF support code
+/// @brief QP::QActive services and QF support code
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.4
-/// Last updated on  2016-11-02
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -51,13 +51,13 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qf_act")
 
 // public objects ************************************************************
-QMActive *QF::active_[QF_MAX_ACTIVE + 1]; // to be used by QF ports only
+QActive *QF::active_[QF_MAX_ACTIVE + 1]; // to be used by QF ports only
 
 //****************************************************************************
 /// @description
 /// This function adds a given active object to the active objects managed
 /// by the QF framework. It should not be called by the application directly,
-/// only through the function QP::QMActive::start().
+/// only through the function QP::QActive::start().
 ///
 /// @param[in]  a  pointer to the active object to add to the framework.
 ///
@@ -66,12 +66,12 @@ QMActive *QF::active_[QF_MAX_ACTIVE + 1]; // to be used by QF ports only
 ///
 /// @sa QP::QF::remove_()
 ///
-void QF::add_(QMActive * const a) {
+void QF::add_(QActive * const a) {
     uint_fast8_t p = a->m_prio;
 
     Q_REQUIRE_ID(100, (static_cast<uint_fast8_t>(0) < p)
                       && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
-                      && (active_[p] == static_cast<QMActive *>(0)));
+                      && (active_[p] == static_cast<QActive *>(0)));
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
@@ -91,7 +91,7 @@ void QF::add_(QMActive * const a) {
 /// @description
 /// This function removes a given active object from the active objects
 /// managed by the QF framework. It should not be called by the application
-/// directly, only through the function QP::QMActive::stop().
+/// directly, only through the function QP::QActive::stop().
 ///
 /// @param[in]  a  pointer to the active object to remove from the framework.
 ///
@@ -100,7 +100,7 @@ void QF::add_(QMActive * const a) {
 ///
 /// @sa QP::QF::add_()
 ///
-void QF::remove_(QMActive * const a) {
+void QF::remove_(QActive * const a) {
     uint_fast8_t p = a->m_prio;
 
     Q_REQUIRE_ID(200, (static_cast<uint_fast8_t>(0) < p)
@@ -110,8 +110,8 @@ void QF::remove_(QMActive * const a) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    active_[p] = static_cast<QMActive *>(0); // free-up the priority level
-    a->m_state.obj = static_cast<QMState *>(0); // invalidate the state
+    active_[p] = static_cast<QActive *>(0); // free-up the priority level
+    a->m_state.fun = Q_STATE_CAST(0); // invalidate the state
 
     QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_REMOVE, QS::priv_.aoObjFilter, a)
         QS_TIME_();   // timestamp
@@ -250,7 +250,6 @@ uint8_t const QF_log2Lkup[256] = {
 };
 
 #endif // QF_LOG2
-
 
 } // namespace QP
 

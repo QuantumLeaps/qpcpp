@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.4
-/// Last updated on  2016-11-02
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -113,10 +113,16 @@ static QEvt const QEP_reservedEvt_[4] = {
 /// @param[in] initial pointer to the top-most initial state-handler
 ///                    function in the derived state machine
 ///
-QHsm::QHsm(QStateHandler const initial)
-  : QMsm(initial)
-{
-    m_state.fun = Q_STATE_CAST(&QHsm::top);
+QHsm::QHsm(QStateHandler const initial) {
+    m_state.fun = Q_STATE_CAST(&top);
+    m_temp.fun = initial;
+}
+
+//****************************************************************************
+/// @description
+/// Virtual destructor of the QHsm state machine and any of its subclasses.
+///
+QHsm::~QHsm() {
 }
 
 //****************************************************************************

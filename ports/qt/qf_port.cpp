@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.6.4/Qt 5.x
-/// Last updated on  2016-05-04
+/// Last Updated for Version: QP 5.8.0/Qt 5.x
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -104,7 +104,7 @@ int_t QF::run(void) {
     return static_cast<int_t>(QCoreApplication::instance()->exec());
 }
 //............................................................................
-void QF::thread_(QMActive *act) {
+void QF::thread_(QActive *act) {
     AOThread *thread = static_cast<AOThread *>(act->m_thread);
     thread->m_isRunning = true;
 
@@ -124,7 +124,7 @@ void QF::stop(void) {
     l_tickerThread.m_isRunning = false;
 }
 //............................................................................
-void QF_setQtPrio(QMActive *act, int_t qtPrio) {
+void QF_setQtPrio(QActive *act, int_t qtPrio) {
     // thread not created yet?
     if (act->getThread() == static_cast<QThread *>(0)) {
         // store the priority for later
@@ -139,7 +139,7 @@ void QF_setTickRate(unsigned ticksPerSec) {
     l_tickerThread.m_tickInterval = 1000U/ticksPerSec;
 }
 //............................................................................
-void QMActive::start(uint_fast8_t const prio,
+void QActive::start(uint_fast8_t const prio,
                      QEvt const **qSto, uint_fast16_t qLen,
                      void * const stkSto, uint_fast16_t const stkSize,
                      QEvt const * const ie)
@@ -161,7 +161,7 @@ void QMActive::start(uint_fast8_t const prio,
     thread->start();
 }
 //............................................................................
-void QMActive::stop(void) {
+void QActive::stop(void) {
     Q_REQUIRE(m_thread != 0);
     static_cast<AOThread *>(m_thread)->m_isRunning = false;
 }

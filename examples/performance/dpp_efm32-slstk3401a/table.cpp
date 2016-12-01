@@ -24,6 +24,11 @@ Q_DEFINE_THIS_FILE
 // Active object class -------------------------------------------------------
 namespace DPP {
 
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
+
 //${AOs::Table} ..............................................................
 class Table : public QP::QActive {
 private:
@@ -65,7 +70,7 @@ static char_t const * const EATING   = &"eating  "[0];
 static Table l_table; // the single instance of the Table active object
 
 // Global-scope objects ------------------------------------------------------
-QP::QMActive * const AO_Table = &l_table; // "opaque" AO pointer
+QP::QActive * const AO_Table = &l_table; // "opaque" AO pointer
 
 } // namespace DPP
 
@@ -99,14 +104,14 @@ QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
     QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
     QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
     QS_SIG_DICTIONARY(SERVE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(TERMINATE_SIG, (void *)0);
+    QS_SIG_DICTIONARY(TEST_SIG,      (void *)0);
 
     QS_SIG_DICTIONARY(HUNGRY_SIG,    me); // signal just for Table
 
     me->subscribe(DONE_SIG);
     me->subscribe(PAUSE_SIG);
     me->subscribe(SERVE_SIG);
-    me->subscribe(TERMINATE_SIG);
+    me->subscribe(TEST_SIG);
 
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         me->m_fork[n] = FREE;
@@ -119,9 +124,8 @@ QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
 QP::QState Table::active(Table * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
-        // ${AOs::Table::SM::active::TERMINATE}
-        case TERMINATE_SIG: {
-            BSP::terminate(0);
+        // ${AOs::Table::SM::active::TEST}
+        case TEST_SIG: {
             status_ = Q_HANDLED();
             break;
         }
@@ -132,7 +136,7 @@ QP::QState Table::active(Table * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QP::QHsm::top);
+            status_ = Q_SUPER(&top);
             break;
         }
     }
@@ -153,7 +157,7 @@ QP::QState Table::serving(Table * const me, QP::QEvt const * const e) {
                     me->m_fork[n] = USED;
                     TableEvt *te = Q_NEW(TableEvt, EAT_SIG);
                     te->philoNum = n;
-                    AO_Philo[n]->POST(te, me);
+                    QP::QF::PUBLISH(te, me);
                     me->m_isHungry[n] = false;
                     BSP::displayPhilStat(n, EATING);
                 }

@@ -3,9 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Product: QK/C++
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -39,7 +38,7 @@
 
 #define QP_IMPL           // this is QF/QK implementation
 #include "qf_port.h"      // QF port
-#include "qk_pkg.h"       // QK package-scope internal interface
+#include "qf_pkg.h"       // QF package-scope internal interface
 #include "qassert.h"      // QP assertions
 #ifdef Q_SPY              // QS software tracing enabled?
     #include "qs_port.h"  // include QS port
@@ -76,14 +75,10 @@ namespace QP {
 /// uninitialized data (as is required by the C Standard).
 ///
 void QF::init(void) {
-    extern uint_fast8_t QF_maxPool_;
+    QF_maxPool_      = static_cast<uint_fast8_t>(0);
+    QF_subscrList_   = static_cast<QSubscrList *>(0);
+    QF_maxPubSignal_ = static_cast<enum_t>(0);
 
-
-
-    // clear the internal QF variables, so that the framework can start
-    // correctly even if the startup code fails to clear the uninitialized
-    // data (as is required by the C++ Standard).
-    QF_maxPool_  = static_cast<uint_fast8_t>(0);
     bzero(&QF::timeEvtHead_[0],
           static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
     bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
@@ -169,7 +164,7 @@ int_t QF::run(void) {
 // @param[in] ie      pointer to the optional initialization event
 //                    (might be NULL).
 //
-void QMActive::start(uint_fast8_t const prio,
+void QActive::start(uint_fast8_t const prio,
                      QEvt const *qSto[], uint_fast16_t const qLen,
                      void * const stkSto, uint_fast16_t const stkSize,
                      QEvt const * const ie)
@@ -201,7 +196,7 @@ void QMActive::start(uint_fast8_t const prio,
 // By the time the AO calls QP::QActive::stop(), it should have unsubscribed
 // from all events and no more events should be directly-posted to it.
 //
-void QMActive::stop(void) {
+void QActive::stop(void) {
     QF::remove_(this);  // remove this active object from the QF
 }
 
@@ -253,7 +248,7 @@ uint_fast8_t QK_sched_(void) {
 void QK_activate_(void) {
     uint_fast8_t pin = QK_attr_.actPrio; // save the active priority
     uint_fast8_t p   = QK_attr_.nextPrio; /* the next prio to run */
-    QP::QMActive *a;
+    QP::QActive *a;
 
     // QS tracing or thread-local storage?
 #ifdef Q_SPY
@@ -296,6 +291,10 @@ void QK_activate_(void) {
 
         // determine the next highest-priority AO ready to run...
         QF_INT_DISABLE();
+
+        if (a->m_eQueue.isEmpty()) { // empty queue?
+            QK_attr_.readySet.remove(p);
+        }
 
         // find new highest-prio AO ready to run...
         p = QK_attr_.readySet.findMax();

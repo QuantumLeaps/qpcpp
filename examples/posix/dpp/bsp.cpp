@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, POSIX
-// Last Updated for Version: 5.6.5
-// Date of the Last Update:  2016-06-08
+// Last Updated for Version: 5.8.0
+// Date of the Last Update:  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -58,7 +58,7 @@ static uint32_t l_rnd; // random seed
 #endif
 
 //............................................................................
-void BSP_init(void) {
+void BSP::init(void) {
     printf("Dining Philosopher Problem example"
            "\nQP %s\n"
            "Press p to pause the forks\n"
@@ -66,18 +66,18 @@ void BSP_init(void) {
            "Press ESC to quit...\n",
            QP::versionStr);
 
-    BSP_randomSeed(1234U);
+    BSP::randomSeed(1234U);
     Q_ALLEGE(QS_INIT((void *)0));
     QS_OBJ_DICTIONARY(&l_clock_tick); // must be called *after* QF::init()
     QS_USR_DICTIONARY(PHILO_STAT);
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
     QP::QF::stop();
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     printf("Philosopher %2d is %s\n", (int)n, stat);
 
     QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
@@ -86,11 +86,11 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     printf("Paused is %s\n", paused ? "ON" : "OFF");
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
@@ -98,7 +98,7 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     return l_rnd >> 8;
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 
@@ -120,7 +120,7 @@ void QF::onStartup(void) { // QS startup callback
     tio.c_lflag &= ~(ICANON | ECHO); // disable the canonical mode & echo
     tcsetattr(0, TCSANOW, &tio); // set the new attributes
 
-    QF_setTickRate(DPP::BSP_TICKS_PER_SEC); // set the desired tick rate
+    QF_setTickRate(DPP::BSP::TICKS_PER_SEC); // set the desired tick rate
 }
 //............................................................................
 void QF::onCleanup(void) {  // cleanup callback
@@ -142,7 +142,7 @@ void QF_onClockTick(void) {
         char ch;
         read(0, &ch, 1);
         if (ch == '\33') { // ESC pressed?
-            QF::PUBLISH(Q_NEW(QEvt, DPP::TERMINATE_SIG), &DPP::l_clock_tick);
+            DPP::BSP::terminate(0);
         }
         else if (ch == 'p') {
             QF::PUBLISH(Q_NEW(QEvt, DPP::PAUSE_SIG), &DPP::l_clock_tick);
@@ -156,7 +156,7 @@ void QF_onClockTick(void) {
 extern "C" void Q_onAssert(char const * const module, int loc) {
     QS_ASSERTION(module, loc, 10000U); // report assertion to QS
     fprintf(stderr, "Assertion failed in %s, location %d", module, loc);
-    DPP::BSP_terminate(-1);
+    DPP::BSP::terminate(-1);
 }
 
 //----------------------------------------------------------------------------*/

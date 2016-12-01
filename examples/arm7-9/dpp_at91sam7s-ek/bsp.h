@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP on AT91SAM7S-EK
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 5.8.0
+// Date of the Last Update:  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,23 +28,26 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #ifndef bsp_h
 #define bsp_h
 
 namespace DPP {
 
-uint32_t const BSP_TICKS_PER_SEC = static_cast<uint32_t>(50);
+class BSP {
+public:
+    enum { TICKS_PER_SEC = 100 };
 
-void BSP_init(void);
-void BSP_displayPaused(uint8_t const paused);
-void BSP_displayPhilStat(uint8_t const n, char_t const *stat);
-void BSP_terminate(int16_t const result);
+    static void init(void);
+    static void displayPaused(uint8_t const paused);
+    static void displayPhilStat(uint8_t const n, char_t const *stat);
+    static void terminate(int16_t const result);
 
-void BSP_randomSeed(uint32_t const seed); // random seed
-uint32_t BSP_random(void);                // pseudo-random generator
+    static void randomSeed(uint32_t const seed); // random seed
+    static uint32_t random(void);                // pseudo-random generator
+};
 
 } // namespace DPP
 

@@ -36,6 +36,11 @@ enum DPPSignals {
 
 namespace DPP {
 
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
+
 //${Events::TableEvt} ........................................................
 class TableEvt : public QP::QEvt {
 public:
@@ -49,13 +54,13 @@ public:
 
 namespace DPP {
 
-extern QP::QMActive * const AO_Philo[N_PHILO];
+extern QP::QActive * const AO_Philo[N_PHILO];
 
 } // namespace DPP
 
 namespace DPP {
 
-extern QP::QMActive * const AO_Table;
+extern QP::QActive * const AO_Table;
 
 } // namespace DPP
 

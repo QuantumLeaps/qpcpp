@@ -150,7 +150,7 @@ void EXTI0_IRQHandler(void) {
 } // extern "C"
 
 // BSP functions =============================================================
-void BSP_init(void) {
+void BSP::init(void) {
     // NOTE: SystemInit() already called from the startup code
     //  but SystemCoreClock needs to be updated
     //
@@ -176,7 +176,7 @@ void BSP_init(void) {
     GPIOC->OSPEEDR |=  (1U << 2*13);
     GPIOC->PUPDR   &= ~(3U << 2*13);
 
-    BSP_randomSeed(1234U);
+    BSP::randomSeed(1234U);
 
     if (QS_INIT((void *)0) == 0U) { // initialize the QS software tracing
         Q_ERROR();
@@ -186,7 +186,7 @@ void BSP_init(void) {
     QS_USR_DICTIONARY(PHILO_STAT);
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'h') {
         GPIOA->BSRRL |= LED_LD2;  // turn LED on
     }
@@ -200,7 +200,7 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     // not enough LEDs to implement this feature
     if (paused != (uint8_t)0) {
         //GPIOA->BSRRL |= LED_LD2;  // turn LED on
@@ -210,7 +210,7 @@ void BSP_displayPaused(uint8_t paused) {
     }
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
@@ -219,11 +219,11 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     return l_rnd >> 8;
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
 }
 
@@ -235,8 +235,8 @@ namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / DPP::BSP_TICKS_PER_SEC);
+    // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
+    SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
 
     // set priorities of ALL ISRs used in the system, see NOTE00
     //
@@ -337,7 +337,7 @@ bool QS::onStartup(void const *arg) {
                     (0U << 12) |   // 1 start bit, 8 data bits
                     (1U << 13));   // enable USART
 
-    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP_TICKS_PER_SEC;
+    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...

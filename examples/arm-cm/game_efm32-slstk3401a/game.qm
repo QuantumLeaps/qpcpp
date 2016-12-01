@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.3.0">
+<model version="4.0.0" links="0">
  <documentation>&quot;Fly 'n' Shoot&quot; game model from Chapters 1 &amp; 9 of PSiCC2
 
 NOTE: Requries QP5.</documentation>
@@ -40,13 +40,13 @@ score   = score_p;</code>
   </class>
  </package>
  <package name="AOs" stereotype="0x02" namespace="GAME::">
-  <class name="Tunnel" superclass="qpcpp::QMActive">
+  <class name="Tunnel" superclass="qpcpp::QActive">
    <documentation>Tunnel Active Object</documentation>
    <attribute name="m_blinkTimeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
    <attribute name="m_screenTimeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
-   <attribute name="m_mines[GAME_MINES_MAX]" type="QP::QMsm *" visibility="0x02" properties="0x00"/>
-   <attribute name="m_mine1_pool[GAME_MINES_MAX]" type="QP::QMsm *" visibility="0x02" properties="0x00"/>
-   <attribute name="m_mine2_pool[GAME_MINES_MAX]" type="QP::QMsm *" visibility="0x02" properties="0x00"/>
+   <attribute name="m_mines[GAME_MINES_MAX]" type="QP::QHsm *" visibility="0x02" properties="0x00"/>
+   <attribute name="m_mine1_pool[GAME_MINES_MAX]" type="QP::QHsm *" visibility="0x02" properties="0x00"/>
+   <attribute name="m_mine2_pool[GAME_MINES_MAX]" type="QP::QHsm *" visibility="0x02" properties="0x00"/>
    <attribute name="m_blink_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_last_mine_x" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_last_mine_y" type="uint8_t" visibility="0x02" properties="0x00"/>
@@ -54,7 +54,7 @@ score   = score_p;</code>
    <attribute name="m_wall_thickness_bottom" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_wall_gap" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Tunnel" type="" visibility="0x00" properties="0x00">
-    <code>  : QMActive(Q_STATE_CAST(&amp;Tunnel::initial)),
+    <code>  : QActive(Q_STATE_CAST(&amp;Tunnel::initial)),
     m_blinkTimeEvt(this, BLINK_TIMEOUT_SIG, 0U),
     m_screenTimeEvt(this, SCREEN_TIMEOUT_SIG, 0U),
     m_last_mine_x(0U), m_last_mine_y(0U)
@@ -62,7 +62,7 @@ score   = score_p;</code>
 for (uint8_t n = 0U; n &lt; GAME_MINES_MAX; ++n) {
     m_mine1_pool[n] = Mine1_getInst(n);  // initialize mine1-type pool
     m_mine2_pool[n] = Mine2_getInst(n);  // initialize mine2-type pool
-    m_mines[n] = static_cast&lt;QMsm *&gt;(0); // mine 'n' is unused
+    m_mines[n] = static_cast&lt;QHsm *&gt;(0); // mine 'n' is unused
 }</code>
    </operation>
    <operation name="advance" type="void" visibility="0x00" properties="0x00">
@@ -115,7 +115,7 @@ if ((m_last_mine_x + GAME_MINES_DIST_MIN &lt; GAME_TUNNEL_WIDTH)
 {
     uint8_t n;
     for (n = 0U; n &lt; Q_DIM(m_mines); ++n) { // look for disabled mines
-        if (m_mines[n] == (QMsm *)0) {
+        if (m_mines[n] == (QHsm *)0) {
             break;
         }
     }
@@ -149,7 +149,7 @@ if ((m_last_mine_x + GAME_MINES_DIST_MIN &lt; GAME_TUNNEL_WIDTH)
    <operation name="dispatchToAllMines" type="void" visibility="0x02" properties="0x00">
     <parameter name="e" type="QP::QEvt const *"/>
     <code>for (uint8_t n = 0U; n &lt; GAME_MINES_MAX; ++n) {
-    if (m_mines[n] != static_cast&lt;QMsm *&gt;(0)) { // is the mine used?
+    if (m_mines[n] != static_cast&lt;QHsm *&gt;(0)) { // is the mine used?
         m_mines[n]-&gt;dispatch(e);
     }
 }</code>
@@ -201,8 +201,8 @@ QS_SIG_DICTIONARY(SCORE_SIG,          &amp;l_tunnel);
     <state name="active">
      <tran trig="MINE_DISABLED">
       <action>Q_ASSERT((Q_EVT_CAST(MineEvt)-&gt;id &lt; GAME_MINES_MAX)
-    &amp;&amp; (me-&gt;m_mines[Q_EVT_CAST(MineEvt)-&gt;id] != static_cast&lt;QMsm *&gt;(0)));
-me-&gt;m_mines[Q_EVT_CAST(MineEvt)-&gt;id] = static_cast&lt;QMsm *&gt;(0);</action>
+    &amp;&amp; (me-&gt;m_mines[Q_EVT_CAST(MineEvt)-&gt;id] != static_cast&lt;QHsm *&gt;(0)));
+me-&gt;m_mines[Q_EVT_CAST(MineEvt)-&gt;id] = static_cast&lt;QHsm *&gt;(0);</action>
       <tran_glyph conn="2,9,3,-1,14">
        <action box="0,-2,14,2"/>
       </tran_glyph>
@@ -497,7 +497,7 @@ QP::QF::stop(); // stop QF and cleanup</entry>
     <state_diagram size="68,94"/>
    </statechart>
   </class>
-  <class name="Ship" superclass="qpcpp::QMActive">
+  <class name="Ship" superclass="qpcpp::QActive">
    <documentation>Ship Active Object</documentation>
    <attribute name="m_x" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_y" type="uint16_t" visibility="0x02" properties="0x00">
@@ -506,7 +506,7 @@ QP::QF::stop(); // stop QF and cleanup</entry>
    <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_score" type="uint16_t" visibility="0x02" properties="0x00"/>
    <operation name="Ship" type="" visibility="0x00" properties="0x00">
-    <code>  : QMActive(Q_STATE_CAST(&amp;Ship::initial)),
+    <code>  : QActive(Q_STATE_CAST(&amp;Ship::initial)),
     m_x(GAME_SHIP_X),
     m_y(GAME_SHIP_Y &lt;&lt; 2)</code>
    </operation>
@@ -651,13 +651,13 @@ AO_Tunnel-&gt;POST(gameOver, me);</action>
     <state_diagram size="40,62"/>
    </statechart>
   </class>
-  <class name="Missile" superclass="qpcpp::QMActive">
+  <class name="Missile" superclass="qpcpp::QActive">
    <documentation>Missile Active Object</documentation>
    <attribute name="m_x" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_y" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Missile" type="" visibility="0x00" properties="0x00">
-    <code>  : QMActive(Q_STATE_CAST(&amp;Missile::initial))</code>
+    <code>  : QActive(Q_STATE_CAST(&amp;Missile::initial))</code>
    </operation>
    <statechart>
     <initial target="../1">
@@ -765,13 +765,13 @@ AO_Tunnel-&gt;POST(oie, me);</action>
     <state_diagram size="46,55"/>
    </statechart>
   </class>
-  <class name="Mine1" superclass="qpcpp::QMsm">
+  <class name="Mine1" superclass="qpcpp::QHsm">
    <documentation>The Mine1 orthogonal component</documentation>
    <attribute name="m_x" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_y" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Mine1" type="" visibility="0x00" properties="0x02">
-    <code>  : QMsm(Q_STATE_CAST(&amp;Mine1::initial))</code>
+    <code>  : QHsm(Q_STATE_CAST(&amp;Mine1::initial))</code>
    </operation>
    <statechart>
     <initial target="../1">
@@ -925,13 +925,13 @@ AO_Missile-&gt;POST(&amp;mine1_destroyed, me);</action>
     <state_diagram size="53,68"/>
    </statechart>
   </class>
-  <class name="Mine2" superclass="qpcpp::QMsm">
+  <class name="Mine2" superclass="qpcpp::QHsm">
    <documentation>The Mine2 orthogonal component</documentation>
    <attribute name="m_x" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_y" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Mine2" type="" visibility="0x00" properties="0x02">
-    <code>  : QMsm(Q_STATE_CAST(&amp;Mine2::initial))</code>
+    <code>  : QHsm(Q_STATE_CAST(&amp;Mine2::initial))</code>
    </operation>
    <statechart>
     <initial target="../1">
@@ -1084,9 +1084,9 @@ AO_Missile-&gt;POST(&amp;mine2_destroyed, me);</action>
     <state_diagram size="53,68"/>
    </statechart>
   </class>
-  <attribute name="AO_Tunnel" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
-  <attribute name="AO_Ship" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
-  <attribute name="AO_Missile" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_Tunnel" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_Ship" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_Missile" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
  </package>
  <directory name=".">
   <file name="game.h">
@@ -1151,8 +1151,8 @@ enum GameBitmapIds {
 };
 
 // obtain instances of the Mines orthogonal components
-QP::QMsm *Mine1_getInst(uint8_t id);
-QP::QMsm *Mine2_getInst(uint8_t id);
+QP::QHsm *Mine1_getInst(uint8_t id);
+QP::QHsm *Mine2_getInst(uint8_t id);
 
 } // namespace GAME
 
@@ -1183,7 +1183,7 @@ namespace GAME {
 static Missile l_missile; // the sole instance of the Missile active object
 
 // Public-scope objects ------------------------------------------------------
-QP::QMActive * const AO_Missile = &amp;l_missile; // opaque pointer
+QP::QActive * const AO_Missile = &amp;l_missile; // opaque pointer
 
 } // namespace GAME
 
@@ -1209,7 +1209,7 @@ namespace GAME {
 static Ship l_ship; // the sole instance of the Ship active object
 
 // Public-scope objects ------------------------------------------------------
-QP::QMActive * const AO_Ship = &amp;l_ship; // opaque pointer
+QP::QActive * const AO_Ship = &amp;l_ship; // opaque pointer
 
 } // namespace GAME
 
@@ -1233,7 +1233,7 @@ namespace GAME {
 static Tunnel l_tunnel; // the sole instance of the Tunnel active object
 
 // Public-scope objects ------------------------------------------------------
-QP::QMActive * const AO_Tunnel = &amp;l_tunnel; // opaque pointer
+QP::QActive * const AO_Tunnel = &amp;l_tunnel; // opaque pointer
 
 } // namespace GAME
 
@@ -1256,7 +1256,7 @@ namespace GAME {
 static Mine1 l_mine1[GAME_MINES_MAX]; // a pool of type-1 mines
 
 //............................................................................
-QP::QMsm *Mine1_getInst(uint8_t id) {
+QP::QHsm *Mine1_getInst(uint8_t id) {
     Q_REQUIRE(id &lt; GAME_MINES_MAX);
     return &amp;l_mine1[id];
 }
@@ -1287,7 +1287,7 @@ namespace GAME {
 static Mine2 l_mine2[GAME_MINES_MAX]; // a pool of type-2 mines
 
 //............................................................................
-QP::QMsm *Mine2_getInst(uint8_t id) {
+QP::QHsm *Mine2_getInst(uint8_t id) {
     Q_REQUIRE(id &lt; GAME_MINES_MAX);
     return &amp;l_mine2[id];
 }

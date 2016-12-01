@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP on AT91SAM7S-EK, preemptive QK kernel, IAR-ARM toolset
-// Last Updated for Version: 5.5.0
-// Date of the Last Update:  2015-09-28
+// Last Updated for Version: 5.8.0
+// Date of the Last Update:  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -137,7 +137,7 @@ static void ISR_spur(void) {
 
 
 // BSP functions =============================================================
-void BSP_init(void) {
+void BSP::init(void) {
 
     // When using the JTAG debugger the AIC might not be initialised
     // to the correct default state. This line ensures that AIC does not
@@ -170,10 +170,10 @@ void BSP_init(void) {
     }
 
     // set the desired ticking rate for the PIT...
-    i = (get_MCK_FREQ() / 16U / BSP_TICKS_PER_SEC) - 1U;
+    i = (get_MCK_FREQ() / 16U / BSP::TICKS_PER_SEC) - 1U;
     AT91C_BASE_PITC->PITC_PIMR = (AT91C_PITC_PITEN | AT91C_PITC_PITIEN | i);
 
-    BSP_randomSeed(1234U); // seed the random number generator
+    BSP::randomSeed(1234U); // seed the random number generator
 
     if (QS_INIT((void *)0) == 0) { // initialize the QS software tracing
         Q_ERROR();
@@ -181,11 +181,11 @@ void BSP_init(void) {
     QS_OBJ_DICTIONARY(&l_ISR_tick);
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'h') {
         LED_ON(0);  // turn LED on
     }
@@ -205,7 +205,7 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     if (paused != (uint8_t)0) {
         LED_ON(2);  // turn LED on
     }
@@ -214,7 +214,7 @@ void BSP_displayPaused(uint8_t paused) {
     }
 }
 //............................................................................
-uint32_t BSP_random(void) {  // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) {  // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
@@ -222,7 +222,7 @@ uint32_t BSP_random(void) {  // a very cheap pseudo-random-number generator
     return l_rnd >> 8;
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 

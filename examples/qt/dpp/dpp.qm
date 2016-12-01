@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.3.0">
+<model version="4.0.0" links="0">
  <documentation>Dining Philosopher Problem example for Qt console application</documentation>
  <framework name="qpcpp"/>
  <package name="Qt-port" stereotype="0x00" namespace="QP::">
@@ -168,10 +168,10 @@ me-&gt;postLIFO(pe); // &lt;==</code>
   </class>
  </package>
  <package name="AOs" stereotype="0x02" namespace="DPP::">
-  <class name="Philo" superclass="qpcpp::QMActive">
+  <class name="Philo" superclass="qpcpp::QActive">
    <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
    <operation name="Philo" type="" visibility="0x00" properties="0x00">
-    <code> : QMActive(Q_STATE_CAST(&amp;Philo::initial)),
+    <code> : QActive(Q_STATE_CAST(&amp;Philo::initial)),
    m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
    </operation>
    <statechart>
@@ -273,11 +273,11 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
     <state_diagram size="37,61"/>
    </statechart>
   </class>
-  <class name="Table" superclass="qpcpp::QMActive">
+  <class name="Table" superclass="qpcpp::QActive">
    <attribute name="m_fork[N_PHILO]" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="m_isHungry[N_PHILO]" type="bool" visibility="0x02" properties="0x00"/>
    <operation name="Table" type="" visibility="0x00" properties="0x00">
-    <code>: QMActive(Q_STATE_CAST(&amp;Table::initial))
+    <code>: QActive(Q_STATE_CAST(&amp;Table::initial))
 
 for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     m_fork[n] = FREE;
@@ -464,8 +464,8 @@ me-&gt;m_fork[n] = FREE;</action>
     <state_diagram size="49,69"/>
    </statechart>
   </class>
-  <attribute name="AO_Philo[N_PHILO]" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
-  <attribute name="AO_Table" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_Philo[N_PHILO]" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_Table" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
  </package>
  <directory name=".">
   <file name="dpp.h">
@@ -535,7 +535,7 @@ enum InternalSignals {           // internal signals
 };
 
 // Global objects ------------------------------------------------------------
-QP::QMActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Philo AO
+QP::QActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Philo AO
     &amp;l_philo[0],
     &amp;l_philo[1],
     &amp;l_philo[2],
@@ -581,7 +581,7 @@ static char_t const * const EATING   = &amp;&quot;eating  &quot;[0];
 static Table l_table; // the single instance of the Table active object
 
 // Global-scope objects ------------------------------------------------------
-QP::QMActive * const AO_Table = &amp;l_table; // &quot;opaque&quot; AO pointer
+QP::QActive * const AO_Table = &amp;l_table; // &quot;opaque&quot; AO pointer
 
 } // namespace DPP
 

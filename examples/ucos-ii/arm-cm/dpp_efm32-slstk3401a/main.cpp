@@ -48,7 +48,7 @@ int main() {
     static DPP::TableEvt smlPoolSto[2*N_PHILO];
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-    DPP::BSP_init(); // initialize the BSP
+    DPP::BSP::init(); // initialize the BSP
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(smlPoolSto);

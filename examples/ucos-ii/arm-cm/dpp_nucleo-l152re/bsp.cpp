@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, STM32 NUCLEO-L152RE board, uC/OS-II kernel
-// Last updated for version 5.6.5
-// Last updated on  2016-06-29
+// Last updated for version 5.8.0
+// Last updated on  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -182,7 +182,7 @@ void App_TimeTickHook(void) {
 } // extern "C"
 
 // BSP functions =============================================================
-void BSP_init(void) {
+void BSP::init(void) {
     // NOTE: SystemInit() already called from the startup code
     //  but SystemCoreClock needs to be updated
     //
@@ -208,7 +208,7 @@ void BSP_init(void) {
     GPIOC->OSPEEDR |=  (1ul << 2*13);
     GPIOC->PUPDR   &= ~(3ul << 2*13);
 
-    BSP_randomSeed(1234U);
+    BSP::randomSeed(1234U);
 
     if (!QS_INIT((void *)0)) { // initialize the QS software tracing
         Q_ERROR();
@@ -217,7 +217,7 @@ void BSP_init(void) {
     QS_OBJ_DICTIONARY(&l_EXTI0_IRQHandler);
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'e') {
         GPIOA->BSRRL |= LED_LD2;  // turn LED on
     }
@@ -231,7 +231,7 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     // not enough LEDs to show the "Paused" status
     if (paused != (uint8_t)0) {
         //GPIOA->BSRRL |= LED_LD2;  // turn LED on
@@ -241,7 +241,7 @@ void BSP_displayPaused(uint8_t paused) {
     }
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     INT8U err;
 
     OSMutexPend(l_rndMutex, 0, &err); // lock the random-seed mutex
@@ -255,14 +255,14 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     return (rnd >> 8);
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
       INT8U err;
 
     l_rnd = seed;
       l_rndMutex = OSMutexCreate(N_PHILO, &err);
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
 }
 
@@ -333,7 +333,7 @@ bool QS::onStartup(void const *arg) {
                     (0U << 12) |   // 1 start bit, 8 data bits
                     (1U << 13));   // enable USART
 
-    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP_TICKS_PER_SEC;
+    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...

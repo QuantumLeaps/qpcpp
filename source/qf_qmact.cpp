@@ -2,8 +2,8 @@
 /// @brief QMActive::QMActive() and virtual functions
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -38,21 +38,49 @@
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.h"      // QF port
 
+//! Internal macro to cast a QP::QMActive pointer @p qact_ to QP::QMsm*
+/// @note
+/// Casting pointer to pointer pointer violates the MISRA-C++ 2008 Rule 5-2-7,
+/// cast from pointer to pointer. Additionally this cast violates the MISRA-
+/// C++ 2008 Rule 5-2-8 Unusual pointer cast (incompatible indirect types).
+/// Encapsulating these violations in a macro allows to selectively suppress
+/// this specific deviation.
+#define QF_QMACTIVE_TO_QMSM_CAST_(qact_) \
+    reinterpret_cast<QMsm *>((qact_))
+
+//! Internal macro to cast a QP::QMActive pointer @p qact_ to QP::QMsm const *
+#define QF_QMACTIVE_TO_QMSM_CONST_CAST_(qact_) \
+    reinterpret_cast<QMsm const *>((qact_))
+
 namespace QP {
 
 //****************************************************************************
 QMActive::QMActive(QStateHandler const initial)
-  : QMsm(initial)
+  : QActive(initial)
 {
     m_state.obj = &QMsm::msm_top_s;
+    m_temp.fun  = initial;
+}
 
-#ifdef QF_OS_OBJECT_TYPE
-    QF::bzero(&m_osObject, static_cast<uint_fast16_t>(sizeof(m_osObject)));
-#endif
-
-#ifdef QF_THREAD_TYPE
-    QF::bzero(&m_thread, static_cast<uint_fast16_t>(sizeof(m_thread)));
-#endif
+//****************************************************************************
+void QMActive::init(QEvt const * const e) {
+    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(e);
+}
+//****************************************************************************
+void QMActive::init(void) {
+    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init();
+}
+//****************************************************************************
+void QMActive::dispatch(QEvt const * const e) {
+    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::dispatch(e);
+}
+//****************************************************************************
+bool QMActive::isInState(QMState const * const st) const {
+    return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)->QMsm::isInState(st);
+}
+//****************************************************************************
+QMState const *QMActive::childStateObj(QMState const * const parent) const {
+    return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)->QMsm::childStateObj(parent);
 }
 
 } // namespace QP

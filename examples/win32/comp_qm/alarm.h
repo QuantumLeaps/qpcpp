@@ -18,8 +18,13 @@
 #ifndef alarm_h
 #define alarm_h
 
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
+
 //${Components::Alarm} .......................................................
-class Alarm : public QP::QMsm {
+class Alarm : public QP::QHsm {
 private:
     uint32_t m_alarm_time;
 
@@ -28,13 +33,8 @@ public:
 
 protected:
     static QP::QState initial(Alarm * const me, QP::QEvt const * const e);
-    static QP::QState off  (Alarm * const me, QP::QEvt const * const e);
-    static QP::QState off_e(Alarm * const me);
-    static QP::QState off_x(Alarm * const me);
-    static QP::QMState const off_s;
-    static QP::QState on  (Alarm * const me, QP::QEvt const * const e);
-    static QP::QState on_e(Alarm * const me);
-    static QP::QMState const on_s;
+    static QP::QState off(Alarm * const me, QP::QEvt const * const e);
+    static QP::QState on(Alarm * const me, QP::QEvt const * const e);
 };
 
 

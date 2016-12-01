@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -58,14 +58,14 @@ typedef void (*QXThreadHandler)(QXThread * const me);
 /// The customization of the thread occurs in the constructor, where you
 /// provide the thred-handler function as the parameter.
 ///
-/// @sa QP::QMActive
+/// @sa QP::QActive
 ///
 /// @usage
 /// The following example illustrates how to instantiate a "naked" thread
 /// in your application.
 /// @include qf_qxthread.cpp
 ///
-class QXThread : public QMActive {
+class QXThread : public QActive {
 public:
 
     //! public constructor

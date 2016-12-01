@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.7.2
-// Last updated on  2016-09-26
+// Last updated for version 5.8.0
+// Last updated on  2016-11-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -128,7 +128,7 @@
  Q_NEW_X,
  Q_NEW_REF)
 -estring(1960,        // 9-5-1 declaration of union
- QP::QMAttr)
+ QP::QHsmAttr)
 -esym(1960,           // 16-0-4 function-like macro
  Q_TRAN,
  Q_TRAN_HIST,
@@ -139,6 +139,7 @@
 -esym(1960,           // 16-0-4 function-like macro
  QM_ENTRY,
  QM_EXIT,
+ QM_SM_EXIT,
  QM_TRAN,
  QM_TRAN_HIST,
  QM_TRAN_INIT,
@@ -150,8 +151,11 @@
  QM_SUPER_SUB)
 -esym(1712,           // default constructor not defined
  QMsm,
- QHsm,
- QFsm)
+ QHsm)
+-esym(1511,           // 2-10-2 Member hides non-virtual member
+ QP::QHsm::isIn,
+ QP::QHsm::state,
+ QP::QHsm::childState)
 
 
 // QF
@@ -238,10 +242,6 @@
  QF_EPOOL_PUT_)
 -estring(1963, Q_NEW) // 16-3-2(adv) '#/##' used in macro
 -esym(1960, remove)   // 17-0-2, Re-use of C++ identifier
--esym(1790,           // Base class has no virtual functions
- QP::QHsm,
- QP::QFsm,
- QP::QMActive)
 -esym(1401,           // member not initialized by constructor
  QP::QMActive::m_prio,
  QP::QMActive::m_eQueue,

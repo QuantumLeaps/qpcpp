@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, STM32F4-Discovery board, ThreadX kernel
-// Last updated for version 5.6.5
-// Last updated on  2016-07-05
+// Last updated for version 5.8.0
+// Last updated on  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -78,7 +78,7 @@ extern "C" {
 } // extern "C"
 
 // BSP functions =============================================================
-void BSP_init(void) {
+void BSP::init(void) {
     // NOTE: SystemInit() already called from the startup code
     //  but SystemCoreClock needs to be updated
     //
@@ -126,14 +126,14 @@ void BSP_init(void) {
     GPIO_struct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(BTN_GPIO_PORT, &GPIO_struct);
 
-    BSP_randomSeed(1234U);
+    BSP::randomSeed(1234U);
 
     if (!QS_INIT((void *)0)) { // initialize the QS software tracing
         Q_ERROR();
     }
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     // exercise the FPU with some floating point computations
     float volatile x;
     x = 3.1415926F;
@@ -159,7 +159,7 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     if (paused) {
         LED_GPIO_PORT->BSRRL = LED4_PIN; // turn LED on
     }
@@ -168,7 +168,7 @@ void BSP_displayPaused(uint8_t paused) {
     }
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
@@ -177,11 +177,11 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     return l_rnd >> 8;
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
 }
 

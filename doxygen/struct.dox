@@ -54,25 +54,26 @@ The figure below shows the main classes comprising the QP/C++ framework and thei
   <li><span class="tag">0</span> The QP::QEvt class represents events without parameters and serves as the base class for derivation of time events and any events with parameters. For example, application-level events `ObjectPosEvt` and `ObjectImageEvt` inherit QP::QEvt and add to it some parameters (see [8]).
   </li>
 
-  <li><span class="tag">1</span> The abstract QP::QMsm class represents the most fundamental State Machine in QP/C++. This class implements the fastest and the most efficient strategy for coding hierarchical state machines, but this strategy is not human-maintainable and requires the use of the <a class="extern" target="_blank" href="http://www.state-machine.com/qm">QM modeling tool</a>. The class is abstract, meaning that it is not designed to be instantiated directly, but rather only for inheritance. The @ref game application provides an example of application-level classes deriving directly from QP::QMsm (see [7]).
+  <li><span class="tag">1</span> The abstract QP::QHsm class represents a Hierarchical State Machine (HSM) with full support for hierarchical nesting of states, entry/exit actions, initial transitions, and transitions to history in any composite state. This class is designed for ease of manual coding of HSMs in C++, but it is also supported by the <a class="extern" target="_blank" href="http://www.state-machine.com/qm">QM modeling tool</a>.
+QP::QHsm is also the base class for the QP::QMsm state machine, which provides a superior efficiency, but requires the use of the <a class="extern" target="_blank" href="http://www.state-machine.com/qm">QM modeling tool</a> to generate code.
   </li>
 
-  <li><span class="tag">2</span> The abstract QP::QHsm class derives from QP::QMsm and implements the state machine coding strategy suitable for manual coding and maintaining the code. The QP::QHsm strategy is also supported by the <a class="extern" target="_blank" href="http://www.state-machine.com/qm">QM modeling tool</a>, but is not as fast or efficient as the QP::QMsm strategy.
+  <li><span class="tag">2</span> The abstract QP::QActive class represents an active object that uses the QP::QHsm style implementation strategy for state machines. This strategy is tailored to manual coding, but it is also supported by the <a class="extern" target="_blank" href="http://www.state-machine.com/qm">QM modeling tool</a>. The resulting code is slower than in the QP::QMsm-style implementation strategy. The @ref game application provides an example of application-level classes deriving from QP::QActive and QP::QHsm (see [6] and [7]).
   </li>
 
-  <li><span class="tag">3</span> The abstract QP::QMActive class represents an active object that uses the QP::QMsm style state machine implementation strategy. This strategy requires the use of the QM modeling tool to generate state machine code automatically, but the code is faster than in the QP::QHsm style implementation strategy and needs less run-time support (smaller event-processor).
+  <li><span class="tag">3</span> The abstract QP::QMsm class (QM State Machine) derives from QP::QHsm and implements the fastest and the most efficient strategy for coding hierarchical state machines, but this strategy is not human-maintainable and requires the use of the <a class="extern" target="_blank" href="http://www.state-machine.com/qm">QM modeling tool</a>. The class is abstract, meaning that it is not designed to be instantiated directly, but rather only for inheritance.
   </li>
 
-  <li><span class="tag">4</span> The abstract QP::QActive class represents an active object that uses the QP::QHsm style implementation strategy for state machines. This strategy is tailored to manual coding, but it is also supported by the QM modeling tool. The resulting code is slower than in the QP::QMsm-style implementation strategy.
+  <li><span class="tag">4</span> The abstract QP::QMActive class represents an active object that uses the QP::QMsm state machine implementation strategy. This strategy requires the use of the QM modeling tool to generate state machine code automatically, but the code is faster than in the QP::QHsm style implementation strategy and needs less run-time support (smaller event-processor).
   </li>
 
   <li><span class="tag">5</span> The QP::QTimeEvt class represents time events in QP. **Time events** are special QP events equipped with the notion of time passage. The basic usage model of the time events is as follows. An active object allocates one or more QP::QTimeEvt objects (provides the storage for them). When the active object needs to arrange for a timeout, it arms one of its time events to fire either just once (one-shot) or periodically. Each time event times out independently from the others, so a QP application can make multiple parallel timeout requests (from the same or different active objects). When QP detects that the appropriate moment has arrived, it inserts the time event directly into the recipient's event queue. The recipient then processes the time event just like any other event.
   </li>
 
-  <li><span class="tag">6</span> Active Objects in the application derive either from the QP::QMActive or QP::QActive base class.
+  <li><span class="tag">6</span> Active Objects in the application derive either from the QP::QActive or QP::QMActive base class.
   </li>
 
-  <li><span class="tag">7</span> Applications can also use classes derived directly from the QP::QMsm or QP::QHsm base classes to represent "raw" state machines that are not active objects, because they don't have event queue and execution thread. Such "raw" state machines are typically used as "Orthogonal Components".
+  <li><span class="tag">7</span> Applications can also use classes derived directly from the QP::QHsm or QP::QMsm base classes to represent "raw" state machines that are not active objects, because they don't have event queue and execution thread. Such "raw" state machines are typically used as "Orthogonal Components".
   </li>
 
   <li><span class="tag">8</span> Application-level events with parameters derive from the QP::QEvt class.

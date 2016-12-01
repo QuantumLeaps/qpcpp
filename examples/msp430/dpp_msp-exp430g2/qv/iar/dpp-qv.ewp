@@ -105,7 +105,7 @@
         </option>
         <option>
           <name>GStackSize2</name>
-          <state>128</state>
+          <state>80</state>
         </option>
         <option>
           <name>GHeapSize2</name>

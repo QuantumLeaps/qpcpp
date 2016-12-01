@@ -1,10 +1,10 @@
 /// @file
-/// @brief QP::QMActive::defer() and QP::QMActive::recall() definitions.
+/// @brief QP::QActive::defer() and QP::QActive::recall() definitions.
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-02-11
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -65,9 +65,9 @@ Q_DEFINE_THIS_MODULE("qf_defer")
 /// An active object can use multiple event queues to defer events of
 /// different kinds.
 ///
-/// @sa QP::QMActive::recall(), QP::QEQueue, QP::QMActive::flushDeferred()
+/// @sa QP::QActive::recall(), QP::QEQueue, QP::QActive::flushDeferred()
 ///
-bool QMActive::defer(QEQueue * const eq, QEvt const * const e) const {
+bool QActive::defer(QEQueue * const eq, QEvt const * const e) const {
     return eq->post(e, static_cast<uint_fast16_t>(1)); // non-asserting post
 }
 
@@ -87,9 +87,9 @@ bool QMActive::defer(QEQueue * const eq, QEvt const * const e) const {
 /// @note An active object can use multiple event queues to defer events of
 /// different kinds.
 ///
-/// @sa QP::QMActive::recall(), QP::QEQueue, QP::QMActive::postLIFO_()
+/// @sa QP::QActive::recall(), QP::QEQueue, QP::QActive::postLIFO_()
 ///
-bool QMActive::recall(QEQueue * const eq) {
+bool QActive::recall(QEQueue * const eq) {
     QEvt const * const e = eq->get(); // try to get evt from deferred queue
     bool const recalled = (e != static_cast<QEvt const *>(0));//evt available?
     if (recalled) {
@@ -128,9 +128,9 @@ bool QMActive::recall(QEQueue * const eq) {
 /// @returns the number of events actually flushed from the queue.
 ///
 ///
-/// @sa QP::QMActive::defer(), QP::QMActive::recall(), QP::QEQueue
+/// @sa QP::QActive::defer(), QP::QActive::recall(), QP::QEQueue
 ///
-uint_fast16_t QMActive::flushDeferred(QEQueue * const eq) const {
+uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const {
     uint_fast16_t n = static_cast<uint_fast16_t>(0);
     for (QEvt const *e = eq->get();
          e != static_cast<QEvt const *>(0);

@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.4.0/Qt 5.x
-/// Last updated on  2015-05-03
+/// Last Updated for Version: QP 5.8.0/Qt 5.x
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -41,23 +41,6 @@
 namespace QP {
 
 //............................................................................
-class GuiQMActive : public QMActive {
-public:
-    GuiQMActive(QStateHandler const initial) : QMActive(initial) {}
-    virtual void start(uint_fast8_t const prio,
-                       QEvt const *qSto[], uint_fast16_t const qLen,
-                       void * const stkSto, uint_fast16_t const stkSize,
-                       QEvt const * const ie);
-#ifndef Q_SPY
-    virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
-#else
-    virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
-                       void const * const sender);
-#endif // Q_SPY
-    virtual void postLIFO(QEvt const * const e);
-};
-
-//............................................................................
 class GuiQActive : public QActive {
 public:
     GuiQActive(QStateHandler const initial) : QActive(initial) {}
@@ -70,6 +53,23 @@ public:
 #else
     virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
         void const * const sender);
+#endif // Q_SPY
+    virtual void postLIFO(QEvt const * const e);
+};
+
+//............................................................................
+class GuiQMActive : public QMActive {
+public:
+    GuiQMActive(QStateHandler const initial) : QMActive(initial) {}
+    virtual void start(uint_fast8_t const prio,
+                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       void * const stkSto, uint_fast16_t const stkSize,
+                       QEvt const * const ie);
+#ifndef Q_SPY
+    virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
+#else
+    virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
+                       void const * const sender);
 #endif // Q_SPY
     virtual void postLIFO(QEvt const * const e);
 };

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example on MSP-EXP430G2 board, preemptive QK kernel
-// Last updated for version 5.6.0
-// Last updated on  2015-12-26
+// Last updated for version 5.8.0
+// Last updated on  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -44,7 +44,7 @@ namespace DPP {
 Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
-// 8MHz clock setting, see BSP_init()
+// 8MHz clock setting, see BSP::init()
 #define BSP_MCK     8000000U
 #define BSP_SMCLK   8000000U
 
@@ -125,7 +125,7 @@ extern "C" {
 } // extern "C"
 
 // BSP functions =============================================================
-void BSP_init(void) {
+void BSP::init(void) {
     WDTCTL = WDTPW | WDTHOLD; // stop watchdog timer
 
     // configure the Basic Clock Module
@@ -148,7 +148,7 @@ void BSP_init(void) {
     QS_USR_DICTIONARY(PHILO_STAT);
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'h') { // is Philo hungry?
         P1OUT |=  LED1;  // turn LED1 on
     }
@@ -161,7 +161,7 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
         QS_STR(stat);                 // Philosopher status
     QS_END()
 }
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     // not enouhg LEDs to implement this feature
     if (paused != 0U) {
         //P1OUT |=  LED1;
@@ -171,7 +171,7 @@ void BSP_displayPaused(uint8_t paused) {
     }
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
@@ -180,11 +180,11 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     return l_rnd >> 8;
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
 }
 
@@ -208,8 +208,8 @@ namespace QP {
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
     TACTL  = (ID_3 | TASSEL_2 | MC_1);  // SMCLK, /8 divider, upmode
-    TACCR0 = (((BSP_SMCLK / 8U) + DPP::BSP_TICKS_PER_SEC/2U)
-              / DPP::BSP_TICKS_PER_SEC);
+    TACCR0 = (((BSP_SMCLK / 8U) + DPP::BSP::TICKS_PER_SEC/2U)
+              / DPP::BSP::TICKS_PER_SEC);
     CCTL0 = CCIE;  // CCR0 interrupt enabled
 }
 //............................................................................
@@ -262,7 +262,7 @@ bool QS::onStartup(void const *arg) {
     // configure the hardware UART...
     UCA0CTL1 |= UCSSEL_2;      // select SMCLK for the UART
 
-    tmp = BSP_SMCLK / 9600U;   // baud-rate value for 9600 bauds
+    tmp = BSP::SMCLK / 9600U;   // baud-rate value for 9600 bauds
     UCA0BR0 = (uint8_t)tmp;    // load the baud-rate register low
     UCA0BR1 = (uint8_t)(tmp >> 8); // load the baud-rate register hi
 
@@ -294,8 +294,8 @@ QSTimeCtr QS::onGetTime(void) {  // invoked with interrupts DISABLED
     }
     else { // the rollover occured, but the timerA_ISR did not run yet
         return DPP::QS_tickTime_
-            + (((BSP_SMCLK/8U) + DPP::BSP_TICKS_PER_SEC/2U)
-               /DPP::BSP_TICKS_PER_SEC) + 1U + TAR;
+            + (((BSP::SMCLK/8U) + DPP::BSP::TICKS_PER_SEC/2U)
+               /DPP::BSP::TICKS_PER_SEC) + 1U + TAR;
     }
 }
 //............................................................................

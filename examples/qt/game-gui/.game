@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="4.0.0">
+ <item name="license">GPL</item>
+ <group name="locked"/>
+ <group name="settings">
+  <item name="tabs">1</item>
+  <item name="windows">0</item>
+  <item name="grid">3</item>
+  <item name="backups">0</item>
+ </group>
+ <group name="windows">
+  <item id=".::missile.cpp">0,0,596,300</item>
+  <item id=".::ship.cpp">0,300,596,300</item>
+  <item id=".::tunnel.cpp">120,342,596,300</item>
+  <item id=".::game.h">120,0,596,300</item>
+  <item id=".::mine1.cpp">120,300,596,300</item>
+  <item id=".::mine2.cpp">0,0,596,300</item>
+  <item id="AOs::Tunnel::SM">0,0,716,642,*</item>
+ </group>
+ <group name="search">
+  <item name="options">4129280</item>
+  <item name="replace">0</item>
+ </group>
+ <group name="vars"/>
+ <group name="tools">
+  <group name="tool">
+   <item name="icon">0</item>
+   <item name="title"></item>
+   <item name="command"></item>
+   <item name="args"></item>
+   <item name="dir"></item>
+   <item name="options">0</item>
+  </group>
+  <group name="tool">
+   <item name="icon">0</item>
+   <item name="title"></item>
+   <item name="command"></item>
+   <item name="args"></item>
+   <item name="dir"></item>
+   <item name="options">0</item>
+  </group>
+  <group name="tool">
+   <item name="icon">0</item>
+   <item name="title"></item>
+   <item name="command"></item>
+   <item name="args"></item>
+   <item name="dir"></item>
+   <item name="options">0</item>
+  </group>
+  <group name="tool">
+   <item name="icon">0</item>
+   <item name="title"></item>
+   <item name="command"></item>
+   <item name="args"></item>
+   <item name="dir"></item>
+   <item name="options">0</item>
+  </group>
+  <group name="tool">
+   <item name="icon">0</item>
+   <item name="title"></item>
+   <item name="command"></item>
+   <item name="args"></item>
+   <item name="dir"></item>
+   <item name="options">0</item>
+  </group>
+ </group>
+</session>

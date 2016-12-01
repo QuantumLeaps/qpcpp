@@ -37,7 +37,7 @@
 
 //............................................................................
 int main() {
-    DPP::BSP_init();    // initialize the Board Support Package
+    DPP::BSP::init();    // initialize the Board Support Package
     tx_kernel_enter();  // transfet control to the ThreadX RTOS
     return 0;           // tx_kernel_enter() does not return
 }

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to embOS (v4.00) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-31
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -70,7 +70,7 @@
 namespace QP {
 
 // set task attributes (e.g., QF_TASK_USES_FPU) before starting the AO
-void QF_setEmbOsTaskAttr(QMActive *act, uint32_t attr);
+void QF_setEmbOsTaskAttr(QActive *act, uint32_t attr);
 
 } // namespace QP
 

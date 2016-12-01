@@ -5,8 +5,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -118,7 +118,7 @@ void QXMutex::lock(void) {
     }
     QXK_attr_.lockHolder =
         (QXK_attr_.curr != static_cast<void *>(0))
-        ? static_cast<QMActive volatile *>(QXK_attr_.curr)->m_prio
+        ? static_cast<QActive volatile *>(QXK_attr_.curr)->m_prio
         : static_cast<uint_fast8_t>(0);
 
     QS_BEGIN_NOCRIT_(QS_SCHED_LOCK,

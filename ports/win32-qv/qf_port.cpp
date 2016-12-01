@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.7.5
-/// Last updated on  2016-11-08
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -101,11 +101,12 @@ int_t QF::run(void) {
     Q_ASSERT_ID(310, ticker != static_cast<HANDLE>(0));
 
     // the combined event-loop and background-loop of the QV kernel */
+    QF_INT_DISABLE();
     while (l_isRunning) {
-        QF_INT_DISABLE();
+
         if (QV_readySet_.notEmpty()) {
             uint_fast8_t p = QV_readySet_.findMax();
-            QMActive *a = active_[p];
+            QActive *a = active_[p];
             QF_INT_ENABLE();
 
             // perform the run-to-completion (RTS) step...
@@ -117,6 +118,12 @@ int_t QF::run(void) {
             QEvt const *e = a->get_();
             a->dispatch(e);
             gc(e);
+
+            QF_INT_DISABLE();
+
+            if (a->m_eQueue.isEmpty()) { /* empty queue? */
+                QV_readySet_.remove(p);
+            }
         }
         else {
             // the QV kernel in embedded systems calls here the QV_onIdle()
@@ -125,8 +132,11 @@ int_t QF::run(void) {
             // QP events become available.
             QF_INT_ENABLE();
             (void)WaitForSingleObject(QV_win32Event_, (DWORD)INFINITE);
+
+            QF_INT_DISABLE();
         }
     }
+    QF_INT_ENABLE();
     onCleanup();  // cleanup callback
     QS_EXIT();    // cleanup the QSPY connection
 
@@ -140,7 +150,7 @@ void QF_setTickRate(uint32_t ticksPerSec) {
     l_tickMsec = 1000UL / ticksPerSec;
 }
 //****************************************************************************
-void QMActive::start(uint_fast8_t prio,
+void QActive::start(uint_fast8_t prio,
                      QEvt const *qSto[], uint_fast16_t qLen,
                      void *stkSto, uint_fast16_t /*stkSize*/,
                      QEvt const *ie)
@@ -162,7 +172,7 @@ void QMActive::start(uint_fast8_t prio,
     QS_FLUSH();     // flush the QS trace buffer to the host
 }
 //****************************************************************************
-void QMActive::stop(void) {
+void QActive::stop(void) {
     unsubscribeAll();
     QF::remove_(this);
 }

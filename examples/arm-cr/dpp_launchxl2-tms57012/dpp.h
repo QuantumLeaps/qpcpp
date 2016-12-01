@@ -25,7 +25,7 @@ enum DPPSignals {
     DONE_SIG,       // published by Philosopher when done eating
     PAUSE_SIG,      // published by BSP to pause the application
     SERVE_SIG,      // published by BSP to serve re-start serving forks
-    TERMINATE_SIG,  // published by BSP to terminate the application
+    TEST_SIG,       // published by BSP to test the application
     MAX_PUB_SIG,    // the last published signal
 
     HUNGRY_SIG,     // posted direclty to Table from hungry Philo
@@ -35,6 +35,11 @@ enum DPPSignals {
 } // namespace DPP
 
 namespace DPP {
+
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
 
 //${Events::TableEvt} ........................................................
 class TableEvt : public QP::QEvt {
@@ -49,20 +54,25 @@ public:
 
 namespace DPP {
 
-extern QP::QMActive * const AO_Philo[N_PHILO];
+extern QP::QActive * const AO_Philo[N_PHILO];
 
 } // namespace DPP
 
 namespace DPP {
 
-extern QP::QMActive * const AO_Table;
+extern QP::QActive * const AO_Table;
 
 } // namespace DPP
 
 #ifdef qxk_h
 namespace DPP {
 
-extern QP::QXThread * const XT_Test;
+extern QP::QXThread * const XT_Test1;
+
+} // namespace DPP
+namespace DPP {
+
+extern QP::QXThread * const XT_Test2;
 
 } // namespace DPP
 #endif // qxk_h

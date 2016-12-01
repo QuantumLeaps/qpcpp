@@ -25,6 +25,11 @@
 
 Q_DEFINE_THIS_FILE
 
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
+
 //${SMs::ToastOven} ..........................................................
 class ToastOven : public QP::QHsm {
 public:
@@ -40,7 +45,7 @@ protected:
     static QP::QState doorOpen(ToastOven * const me, QP::QEvt const * const e);
     static QP::QState final(ToastOven * const me, QP::QEvt const * const e);
 
-private:
+protected:
     QP::QStateHandler his_doorClosed;
 };
 
@@ -76,7 +81,8 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
         }
         // ${SMs::ToastOven::SM::doorClosed}
         case Q_EXIT_SIG: {
-            me->his_doorClosed = me->state(); // save history
+            // save deep history
+            me->his_doorClosed = me->state();
             status_ = Q_HANDLED();
             break;
         }
@@ -111,7 +117,7 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             break;
         }
         default: {
-            status_ = Q_SUPER(&QP::QHsm::top);
+            status_ = Q_SUPER(&top);
             break;
         }
     }
@@ -131,6 +137,11 @@ QP::QState ToastOven::heating(ToastOven * const me, QP::QEvt const * const e) {
         case Q_EXIT_SIG: {
             printf("heater-Off;");
             status_ = Q_HANDLED();
+            break;
+        }
+        // ${SMs::ToastOven::SM::doorClosed::heating::initial}
+        case Q_INIT_SIG: {
+            status_ = Q_TRAN(&toasting);
             break;
         }
         default: {
@@ -218,7 +229,7 @@ QP::QState ToastOven::doorOpen(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QP::QHsm::top);
+            status_ = Q_SUPER(&top);
             break;
         }
     }
@@ -236,7 +247,7 @@ QP::QState ToastOven::final(ToastOven * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QP::QHsm::top);
+            status_ = Q_SUPER(&top);
             break;
         }
     }

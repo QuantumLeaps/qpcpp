@@ -1,5 +1,5 @@
 /// @file
-/// @brief QP::QMActive native queue operations (based on QP::QEQueue)
+/// @brief QP::QActive native queue operations (based on QP::QEQueue)
 ///
 /// @note
 /// this source file is only included in the QF library when the native
@@ -8,8 +8,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.3
-/// Last updated on  2016-10-06
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -92,11 +92,11 @@ Q_DEFINE_THIS_MODULE("qf_actq")
 /// @usage
 /// @include qf_post.cpp
 ///
-/// @sa QMActive::postLIFO()
+/// @sa QActive::postLIFO()
 #ifndef Q_SPY
-bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin)
+bool QActive::post_(QEvt const * const e, uint_fast16_t const margin)
 #else
-bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
+bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
                     void const * const sender)
 #endif
 {
@@ -188,9 +188,9 @@ bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
 ///
 /// @param[in]  e  pointer to the event to post to the queue
 ///
-/// @sa QMActive::post_()
+/// @sa QActive::post_()
 ///
-void QMActive::postLIFO(QEvt const * const e) {
+void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();
@@ -247,7 +247,7 @@ void QMActive::postLIFO(QEvt const * const e) {
 ///
 /// @returns a pointer to the received event. The returned pointer is always
 /// valid (can't be NULL).
-QEvt const *QMActive::get_(void) {
+QEvt const *QActive::get_(void) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
@@ -316,7 +316,7 @@ QEvt const *QMActive::get_(void) {
 uint_fast16_t QF::getQueueMin(uint_fast8_t const prio) {
 
     Q_REQUIRE_ID(400, (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
-                      && (active_[prio] != static_cast<QMActive *>(0)));
+                      && (active_[prio] != static_cast<QActive *>(0)));
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();

@@ -2,8 +2,8 @@
 /// @brief QP::QActive::QActive() definition
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.0
-/// Last updated on  2016-09-14
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -38,43 +38,22 @@
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.h"      // QF port
 
-//! Internal macro to cast a QP::QActive pointer @p qact_ to QP::QHsm*
-/// @note
-/// Casting pointer to pointer pointer violates the MISRA-C++ 2008 Rule 5-2-7,
-/// cast from pointer to pointer. Additionally this cast violates the MISRA-
-/// C++ 2008 Rule 5-2-8 Unusual pointer cast (incompatible indirect types).
-/// Encapsulating these violations in a macro allows to selectively suppress
-/// this specific deviation.
-#define QF_QACTIVE_TO_QHSM_CAST_(qact_) reinterpret_cast<QHsm *>((qact_))
-
-
 namespace QP {
 
 //****************************************************************************
 QActive::QActive(QStateHandler const initial)
-  : QMActive(initial)
+  : QHsm(initial),
+    m_prio(static_cast<uint_fast8_t>(0))
 {
     m_state.fun = Q_STATE_CAST(&QHsm::top);
-}
-//****************************************************************************
-void QActive::init(QEvt const * const e) {
-    QF_QACTIVE_TO_QHSM_CAST_(this)->QHsm::init(e);
-}
-//****************************************************************************
-void QActive::init(void) {
-    QF_QACTIVE_TO_QHSM_CAST_(this)->QHsm::init();
-}
-//****************************************************************************
-void QActive::dispatch(QEvt const * const e) {
-    QF_QACTIVE_TO_QHSM_CAST_(this)->QHsm::dispatch(e);
-}
-//****************************************************************************
-bool QActive::isIn(QStateHandler const s) {
-    return QF_QACTIVE_TO_QHSM_CAST_(this)->QHsm::isIn(s);
-}
-//****************************************************************************
-QStateHandler QActive::childState(QStateHandler const parent) {
-    return QF_QACTIVE_TO_QHSM_CAST_(this)->QHsm::childState(parent);
+
+#ifdef QF_OS_OBJECT_TYPE
+    QF::bzero(&m_osObject, static_cast<uint_fast16_t>(sizeof(m_osObject)));
+#endif
+
+#ifdef QF_THREAD_TYPE
+    QF::bzero(&m_thread, static_cast<uint_fast16_t>(sizeof(m_thread)));
+#endif
 }
 
 } // namespace QP

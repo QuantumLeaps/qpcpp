@@ -23,78 +23,56 @@
 Q_DEFINE_THIS_FILE
 
 // Alarm component --------------------
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
+
 //${Components::Alarm} .......................................................
 //${Components::Alarm::Alarm} ................................................
 Alarm::Alarm()
- : QMsm(Q_STATE_CAST(&Alarm::initial))
+ : QHsm(Q_STATE_CAST(&Alarm::initial))
 {}
 
 //${Components::Alarm::SM} ...................................................
 QP::QState Alarm::initial(Alarm * const me, QP::QEvt const * const e) {
-    static struct {
-        QP::QMState const *target;
-        QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
-        &off_s,
-        {
-            Q_ACTION_CAST(&off_e), // entry
-            Q_ACTION_CAST(0)  // zero terminator
-        }
-    };
     // ${Components::Alarm::SM::initial}
     me->m_alarm_time = 12U*60U;
     (void)e; // unused parameter
-    return QM_TRAN_INIT(&tatbl_);
+    return Q_TRAN(&off);
 }
 //${Components::Alarm::SM::off} ..............................................
-QP::QMState const Alarm::off_s = {
-    static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&off),
-    Q_ACTION_CAST(&off_e),
-    Q_ACTION_CAST(&off_x),
-    Q_ACTION_CAST(0)  // no intitial tran.
-};
-// ${Components::Alarm::SM::off}
-QP::QState Alarm::off_e(Alarm * const me) {
-    // while in the off state, the alarm is kept in decimal format
-    me->m_alarm_time = (me->m_alarm_time/60)*100 + me->m_alarm_time%60;
-    BSP_showTime24H("*** Alarm OFF ", me->m_alarm_time, 100U);
-    return QM_ENTRY(&off_s);
-}
-// ${Components::Alarm::SM::off}
-QP::QState Alarm::off_x(Alarm * const me) {
-    // upon exit, the alarm is converted to binary format
-    me->m_alarm_time = (me->m_alarm_time/100U)*60U + me->m_alarm_time%100U;
-    return QM_EXIT(&off_s);
-}
-// ${Components::Alarm::SM::off}
 QP::QState Alarm::off(Alarm * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
+        // ${Components::Alarm::SM::off}
+        case Q_ENTRY_SIG: {
+            // while in the off state, the alarm is kept in decimal format
+            me->m_alarm_time = (me->m_alarm_time/60)*100 + me->m_alarm_time%60;
+            BSP_showTime24H("*** Alarm OFF ", me->m_alarm_time, 100U);
+            status_ = Q_HANDLED();
+            break;
+        }
+        // ${Components::Alarm::SM::off}
+        case Q_EXIT_SIG: {
+            // upon exit, the alarm is converted to binary format
+            me->m_alarm_time = (me->m_alarm_time/100U)*60U + me->m_alarm_time%100U;
+            status_ = Q_HANDLED();
+            break;
+        }
         // ${Components::Alarm::SM::off::ALARM_ON}
         case ALARM_ON_SIG: {
             // ${Components::Alarm::SM::off::ALARM_ON::[alarminrange?]}
             if ((me->m_alarm_time / 100U < 24U)
                 && (me->m_alarm_time % 100U < 60U))
             {
-                static struct {
-                    QP::QMState const *target;
-                    QP::QActionHandler act[3];
-                } const tatbl_ = { // transition-action table
-                    &on_s,
-                    {
-                        Q_ACTION_CAST(&off_x), // exit
-                        Q_ACTION_CAST(&on_e), // entry
-                        Q_ACTION_CAST(0)  // zero terminator
-                    }
-                };
-                status_ = QM_TRAN(&tatbl_);
+                status_ = Q_TRAN(&on);
             }
             // ${Components::Alarm::SM::off::ALARM_ON::[else]}
             else {
                 me->m_alarm_time = 0U;
                 BSP_showTime24H("*** Alarm reset", me->m_alarm_time, 100U);
-                status_ = QM_HANDLED();
+                status_ = Q_HANDLED();
             }
             break;
         }
@@ -104,52 +82,35 @@ QP::QState Alarm::off(Alarm * const me, QP::QEvt const * const e) {
             me->m_alarm_time =
                  (10U * me->m_alarm_time + Q_EVT_CAST(SetEvt)->digit) % 10000U;
             BSP_showTime24H("*** Alarm reset ",  me->m_alarm_time, 100U);
-            status_ = QM_HANDLED();
+            status_ = Q_HANDLED();
             break;
         }
         default: {
-            status_ = QM_SUPER();
+            status_ = Q_SUPER(&top);
             break;
         }
     }
     return status_;
 }
 //${Components::Alarm::SM::on} ...............................................
-QP::QMState const Alarm::on_s = {
-    static_cast<QP::QMState const *>(0), // superstate (top)
-    Q_STATE_CAST(&on),
-    Q_ACTION_CAST(&on_e),
-    Q_ACTION_CAST(0), // no exit action
-    Q_ACTION_CAST(0)  // no intitial tran.
-};
-// ${Components::Alarm::SM::on}
-QP::QState Alarm::on_e(Alarm * const me) {
-    BSP_showTime24H("*** Alarm ON ",  me->m_alarm_time, 60U);
-    return QM_ENTRY(&on_s);
-}
-// ${Components::Alarm::SM::on}
 QP::QState Alarm::on(Alarm * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
+        // ${Components::Alarm::SM::on}
+        case Q_ENTRY_SIG: {
+            BSP_showTime24H("*** Alarm ON ",  me->m_alarm_time, 60U);
+            status_ = Q_HANDLED();
+            break;
+        }
         // ${Components::Alarm::SM::on::ALARM_OFF}
         case ALARM_OFF_SIG: {
-            static struct {
-                QP::QMState const *target;
-                QP::QActionHandler act[2];
-            } const tatbl_ = { // transition-action table
-                &off_s,
-                {
-                    Q_ACTION_CAST(&off_e), // entry
-                    Q_ACTION_CAST(0)  // zero terminator
-                }
-            };
-            status_ = QM_TRAN(&tatbl_);
+            status_ = Q_TRAN(&off);
             break;
         }
         // ${Components::Alarm::SM::on::ALARM_SET}
         case ALARM_SET_SIG: {
             BSP_showMsg("*** Cannot set Alarm when it is ON");
-            status_ = QM_HANDLED();
+            status_ = Q_HANDLED();
             break;
         }
         // ${Components::Alarm::SM::on::TIME}
@@ -160,19 +121,18 @@ QP::QState Alarm::on(Alarm * const me, QP::QEvt const * const e) {
 
                 // asynchronously post the event to the container AO
                 APP_alarmClock->POST(Q_NEW(QEvt, ALARM_SIG), this);
-                status_ = QM_HANDLED();
+                status_ = Q_HANDLED();
             }
             else {
-                status_ = QM_UNHANDLED();
+                status_ = Q_UNHANDLED();
             }
             break;
         }
         default: {
-            status_ = QM_SUPER();
+            status_ = Q_SUPER(&top);
             break;
         }
     }
-    (void)me; // avoid compiler warning in case 'me' is not used
     return status_;
 }
 

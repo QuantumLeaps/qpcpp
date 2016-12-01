@@ -67,12 +67,17 @@ enum GameBitmapIds {
 };
 
 // obtain instances of the Mines orthogonal components
-QP::QMsm *Mine1_getInst(uint8_t id);
-QP::QMsm *Mine2_getInst(uint8_t id);
+QP::QHsm *Mine1_getInst(uint8_t id);
+QP::QHsm *Mine2_getInst(uint8_t id);
 
 } // namespace GAME
 
 namespace GAME {
+
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
 
 //${Events::ObjectPosEvt} ....................................................
 class ObjectPosEvt : public QP::QEvt {
@@ -165,17 +170,17 @@ public:
 // opaque pointers to active objects in the application
 namespace GAME {
 
-extern QP::QMActive * const AO_Tunnel;
+extern QP::QActive * const AO_Tunnel;
 
 } // namespace GAME
 namespace GAME {
 
-extern QP::QMActive * const AO_Ship;
+extern QP::QActive * const AO_Ship;
 
 } // namespace GAME
 namespace GAME {
 
-extern QP::QMActive * const AO_Missile;
+extern QP::QActive * const AO_Missile;
 
 } // namespace GAME
 

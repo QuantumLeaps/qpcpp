@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.4
-/// Last updated on  2016-11-01
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -72,7 +72,7 @@ Q_DEFINE_THIS_MODULE("qxk_xthr")
 /// @include qxk_xthread_ctor.cpp
 ///
 QXThread::QXThread(QXThreadHandler const handler, uint_fast8_t const tickRate)
-  : QMActive(Q_STATE_CAST(handler)),
+  : QActive(Q_STATE_CAST(handler)),
     m_timeEvt(this, static_cast<enum_t>(QXK_DELAY_SIG),
                     static_cast<uint8_t>(tickRate))
 {
@@ -435,7 +435,7 @@ void QXThread::unblock_(void) const {
     QXK_attr_.readySet.insert(m_prio);
 
     if ((!QXK_ISR_CONTEXT_()) // not inside ISR?
-        && (QF::active_[0] != static_cast<QMActive *>(0))) // kernel started?
+        && (QF::active_[0] != static_cast<QActive *>(0))) // kernel started?
     {
         (void)QXK_sched_();
     }
@@ -578,9 +578,9 @@ void QXK_threadRet_(void) {
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();
-    p = static_cast<QP::QMActive *>(QXK_attr_.curr)->m_prio;
+    p = static_cast<QP::QActive *>(QXK_attr_.curr)->m_prio;
     // remove this thread from the QF
-    QP::QF::active_[p] = static_cast<QP::QMActive *>(0);
+    QP::QF::active_[p] = static_cast<QP::QActive *>(0);
     QXK_attr_.readySet.remove(p);
     (void)QXK_sched_();
     QF_CRIT_EXIT_();

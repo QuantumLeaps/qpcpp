@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, NXP mbed-LPC1768 board, preemptive QK kernel
-// Last updated for version 5.6.5
-// Last updated on  2016-07-05
+// Last updated for version 5.8.0
+// Last updated on  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -157,7 +157,7 @@ void EINT0_IRQHandler(void) {
 } // extern "C"
 
 // BSP functions =============================================================
-void BSP_init(void) {
+void BSP::init(void) {
     // NOTE: SystemInit() already called from the startup code
     //  but SystemCoreClock needs to be updated
     //
@@ -182,7 +182,7 @@ void BSP_init(void) {
     // Set GPIO-P0 Button pin as input
     LPC_GPIO0->FIODIR &= ~BTN_EXT;
 
-    BSP_randomSeed(1234U);
+    BSP::randomSeed(1234U);
 
     if (QS_INIT((void *)0) == 0U) { // initialize the QS software tracing
         Q_ERROR();
@@ -192,7 +192,7 @@ void BSP_init(void) {
     QS_USR_DICTIONARY(PHILO_STAT);
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'h') {
         LPC_GPIO1->FIOSET = LED_1;  // turn LED on
     }
@@ -212,7 +212,7 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     if (paused != 0U) {
         LPC_GPIO1->FIOSET = LED_3;  // turn LED on
     }
@@ -221,7 +221,7 @@ void BSP_displayPaused(uint8_t paused) {
     }
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
@@ -230,11 +230,11 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     return l_rnd >> 8;
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
 }
 
@@ -246,8 +246,8 @@ namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / DPP::BSP_TICKS_PER_SEC);
+    // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
+    SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
 
     // assing all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
@@ -360,7 +360,7 @@ bool QS::onStartup(void const *arg) {
         | (0U << 3)  /* parity disable */
         | (0U << 4); /* parity none    */
 
-    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP_TICKS_PER_SEC;
+    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...

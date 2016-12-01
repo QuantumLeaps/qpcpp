@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.4
-/// Last updated on  2016-11-02
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -113,33 +113,32 @@ namespace QP {
 class QEQueue; // forward declaration
 
 //****************************************************************************
-//! QMActive active object (based on QP::QMsm implementation)
+//! QActive active object (based on QP::QHsm implementation)
 /// @description
-/// Active objects in QF are encapsulated tasks (each embedding a state
+/// Active objects in QP are encapsulated tasks (each embedding a state
 /// machine and an event queue) that communicate with one another
 /// asynchronously by sending and receiving events. Within an active object,
 /// events are processed in a run-to-completion (RTC) fashion, while QF
 /// encapsulates all the details of thread-safe event exchange and queuing.
 /// @n@n
-/// QP::QMActive represents an active object that uses the QP::QMsm-style
-/// state machine implementation strategy. This strategy requires the use of
-/// the QM modeling tool to generate state machine code automatically, but
-/// the code is faster than in the QP::QHsm-style implementation strategy
-/// and needs less run-time support (smaller event-processor).
+/// QP::QActive represents an active object that uses the QP::QHsm-style
+/// implementation strategy for state machines. This strategy is tailored
+/// to manual coding, but it is also supported by the QM modeling tool.
+/// The resulting code is slower than in the QP::QMsm-style implementation
+/// strategy.
 ///
 /// @note
-/// QP::QMActive is not intended to be instantiated directly, but rather
-/// serves as the base class for derivation of active objects in the
-/// applications.
+/// QP::QActive is not intended to be instantiated directly, but rather serves
+/// as the base class for derivation of active objects in the applications.
 ///
-/// @sa QP::QActive
+/// @sa QP::QMActive
 ///
 /// @usage
 /// The following example illustrates how to derive an active object from
-/// QP::QMActive.
-/// @include qf_qmactive.cpp
+/// QP::QActive.
+/// @include qf_qactive.cpp
 ///
-class QMActive : public QMsm {
+class QActive : public QHsm {
 public: // for access from extern "C" functions
 #ifdef QF_EQUEUE_TYPE
     //! OS-dependent event-queue type.
@@ -179,7 +178,7 @@ public: // for access from extern "C" functions
 
 protected:
     //! protected constructor (abstract class)
-    QMActive(QStateHandler const initial);
+    QActive(QStateHandler const initial);
 
 public:
     //! Starts execution of an active object and registers the object
@@ -272,57 +271,57 @@ public:
 };
 
 //****************************************************************************
-//! QMActive active object (based on QP::QHsm implementation)
+//! QMActive active object (based on QP::QMsm implementation)
 /// @description
-/// Active objects in QF are encapsulated tasks (each embedding a state
-/// machine and an event queue) that communicate with one another
-/// asynchronously by sending and receiving events. Within an active object,
-/// events are processed in a run-to-completion (RTC) fashion, while QF
-/// encapsulates all the details of thread-safe event exchange and queuing.
-/// @n@n
-/// QP::QActive represents an active object that uses the QP::QHsm-style
-/// implementation strategy for state machines. This strategy is tailored
-/// to manual coding, but it is also supported by the QM modeling tool.
-/// The resulting code is slower than in the QP::QMsm-style implementation
-/// strategy.
+/// QP::QMActive represents an active object that uses the QP::QMsm-style
+/// state machine implementation strategy. This strategy requires the use of
+/// the QM modeling tool to generate state machine code automatically, but
+/// the code is faster than in the QP::QHsm-style implementation strategy
+/// and needs less run-time support (smaller event-processor).
 ///
 /// @note
-/// QP::QActive is not intended to be instantiated directly, but rather serves
-/// as the base class for derivation of active objects in the applications.
+/// QP::QMActive is not intended to be instantiated directly, but rather
+/// serves as the base class for derivation of active objects in the
+/// applications.
 ///
-/// @sa QP::QMActive
+/// @sa QP::QActive
 ///
 /// @usage
 /// The following example illustrates how to derive an active object from
-/// QP::QActive.
-/// @include qf_qactive.cpp
+/// QP::QMActive.
+/// @include qf_qmactive.cpp
 ///
-class QActive : public QMActive {
+class QMActive : public QActive {
 public:
     // all the following operations delegate to the QHsm class...
     virtual void init(QEvt const * const e);
     virtual void init(void);
     virtual void dispatch(QEvt const * const e);
 
-    bool isIn(QStateHandler const s);
-    QStateHandler state(void) const {
-        return m_state.fun;
+    //! Tests if a given state is part of the active state configuration
+    bool isInState(QMState const * const st) const;
+
+    //! Return the current active state object (read only)
+    QMState const *stateObj(void) const {
+        return m_state.obj;
     }
-    QStateHandler childState(QStateHandler const parent);
+
+    //! Obtain the current active child state of a given parent (read only)
+    QMState const *childStateObj(QMState const * const parent) const;
 
 protected:
     //! protected constructor (abstract class)
-    QActive(QStateHandler const initial);
+    QMActive(QStateHandler const initial);
 
 private:
-    //! operation inherited from QMsm, but disallowed in QActive
-    bool isInState(QMState const *state) const;
+    //! operation inherited from QActive/QHsm, but disallowed in QP::QMActive
+    bool isIn(QStateHandler const s);
 
-    //! operation inherited from QMsm, but disallowed in QActive
-    QMState const *stateObj(void) const;
+    //! operation inherited from QActive/QHsm, but disallowed in QP::QMActive
+    QStateHandler state(void) const;
 
-    //! operation inherited from QMsm, but disallowed in QActive
-    QMState const *childStateObj(QMState const * const parent) const;
+    //! operation inherited from QActive/QHsm, but disallowed in QP::QMActive
+    QStateHandler childState(QStateHandler const parent);
 };
 
 
@@ -390,7 +389,7 @@ private:
 public:
 
     //! The Time Event constructor.
-    QTimeEvt(QMActive * const act, enum_t const sgnl,
+    QTimeEvt(QActive * const act, enum_t const sgnl,
              uint8_t const tickRate = static_cast<uint8_t>(0));
 
     //! Arm a time event (one shot or periodic) for event posting.
@@ -427,13 +426,13 @@ public:
     }
 
     //! @deprecated interface provided for backwards compatibility.
-    void postIn(QMActive * const act, QTimeEvtCtr const nTicks) {
+    void postIn(QActive * const act, QTimeEvtCtr const nTicks) {
         m_act = act;
         armX(nTicks, static_cast<QTimeEvtCtr>(0));
     }
 
     //! @deprecated interface provided for backwards compatibility.
-    void postEvery(QMActive * const act, QTimeEvtCtr const nTicks) {
+    void postEvery(QActive * const act, QTimeEvtCtr const nTicks) {
         m_act = act;
         armX(nTicks, nTicks);
     }
@@ -449,8 +448,8 @@ private:
     //! private assignment operator to disallow assigning of QTimeEvts
     QTimeEvt & operator=(QTimeEvt const &);
 
-    //! encapsulate the cast the m_act attribute to QMActive*
-    QMActive  *toActive(void)  { return static_cast<QMActive  *>(m_act); }
+    //! encapsulate the cast the m_act attribute to QActive*
+    QActive  *toActive(void)  { return static_cast<QActive  *>(m_act); }
 
     //! encapsulate the cast the m_act attribute to QTimeEvt*
     QTimeEvt *toTimeEvt(void) { return static_cast<QTimeEvt *>(m_act); }
@@ -551,16 +550,16 @@ public:
                                QEvt const * const evtRef);
 
     //! Remove the active object from the framework.
-    static void remove_(QMActive * const a);
+    static void remove_(QActive * const a);
 
     //! array of registered active objects
-    static QMActive *active_[QF_MAX_ACTIVE + 1];
+    static QActive *active_[QF_MAX_ACTIVE + 1];
 
     //! Thread routine for executing an active object @p act.
-    static void thread_(QMActive *act);
+    static void thread_(QActive *act);
 
     //! Register an active object to be managed by the framework
-    static void add_(QMActive * const a);
+    static void add_(QActive * const a);
 
     //! Clear a specified region of memory to zero.
     static void bzero(void * const start, uint_fast16_t len);
@@ -571,7 +570,7 @@ private:
     //! heads of linked lists of time events, one for every clock tick rate
     static QTimeEvt timeEvtHead_[QF_MAX_TICK_RATE];
 
-    friend class QMActive;
+    friend class QActive;
     friend class QTimeEvt;
 #ifdef qxk_h
     friend class QXThread;
@@ -759,7 +758,7 @@ private:
     /// @sa QP::QF::publish_()
     #define PUBLISH(e_, sender_)    publish_((e_), (sender_))
 
-    //! Invoke the direct event posting facility QP::QMActive::post_().
+    //! Invoke the direct event posting facility QP::QActive::post_().
     /// @description
     /// This macro asserts if the queue overflows and cannot accept the event.
     ///
@@ -778,11 +777,11 @@ private:
     /// interrupt or other context, you can create a unique object just to
     /// unambiguously identify the sender of the event.
     ///
-    /// @sa QP::QMActive::post_()
+    /// @sa QP::QActive::post_()
     #define POST(e_, sender_) \
         post_((e_), static_cast<uint_fast16_t>(0), (sender_))
 
-    //! Invoke the direct event posting facility QP::QMActive::post_()
+    //! Invoke the direct event posting facility QP::QActive::post_()
     //! without delivery guarantee.
     /// @description
     /// This macro does not assert if the queue overflows and cannot accept

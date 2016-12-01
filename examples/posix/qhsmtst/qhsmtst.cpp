@@ -20,6 +20,11 @@
 
 namespace QHSMTST {
 
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
+
 //${HSMs::QHsmTst} ...........................................................
 class QHsmTst : public QP::QHsm {
 private:
@@ -104,7 +109,7 @@ QP::QState QHsmTst::s(QHsmTst * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QP::QHsm::top);
+            status_ = Q_SUPER(&top);
             break;
         }
     }

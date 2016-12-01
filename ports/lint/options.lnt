@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last updated for version 5.7.2
-// Last updated on  2016-09-28
+// Last updated for version 5.8.0
+// Last updated on  2016-11-19
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -77,17 +77,14 @@ qpcpp.lnt         // QP/C++ options
  act)
 -efunc(661, *execTatbl_)    // Possible access of out-of-bounds pointer
 -efunc(644, *enterHistory_) // Variable 'entry' may not be initialized
--esym(1511,                 // Member hides non-virtual member
- QP::QMsm::isInState,
- QP::QMsm::stateObj,
- QP::QMsm::childStateObj)
 
 // QF
 -emacro(1960, QF_EVT_CONST_CAST_) // 5-2-5 attempt to cast away const
 -emacro(1960, QF_PTR_AT_)   // 5-0-15 pointer arithmetic
 -emacro(929,                // 5-2-7 cast from pointer to pointer
  QF_EVT_CONST_CAST_,
- QF_QACTIVE_TO_QHSM_CAST_)
+ QF_QMACTIVE_TO_QMSM_CAST_,
+ QF_QMACTIVE_TO_QMSM_CONST_CAST_)
 -emacro(925, QF_EPOOL_GET_) // 5-2-8 5-2-9 cast from pointer to pointer
 -estring(522,               // function lacks side-effects
  *QF_EVT_REF_CTR_INC_,
@@ -110,12 +107,14 @@ qpcpp.lnt         // QP/C++ options
  QF_PTR_AT_,
  QF_PTR_RANGE_,
  QF_PTR_INC_,
- QF_QACTIVE_TO_QHSM_CAST_)
+ QF_QMACTIVE_TO_QMSM_CAST_,
+ QF_QMACTIVE_TO_QMSM_CONST_CAST_)
 -esym(1923,                 // 16-2-2 Macro could become const variable 
  QF_SCHED_LOCK_,
  QF_SCHED_UNLOCK_)
 -emacro(740,                // 5-2-7 Unusual pointer cast (incompatible indirect types)
- QF_QACTIVE_TO_QHSM_CAST_)
+ QF_QMACTIVE_TO_QMSM_CAST_,
+ QF_QMACTIVE_TO_QMSM_CONST_CAST_)
 -efunc(818,                 // 7-1-2 'stkSto' could be const
  *QMActive::start,
  *QMActive::stop)

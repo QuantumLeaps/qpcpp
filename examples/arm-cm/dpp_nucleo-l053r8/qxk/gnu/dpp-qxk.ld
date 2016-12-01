@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: Linker script for for STM32L053R8, GNU-ARM linker
-* Last Updated for Version: 5.6.0
-* Date of the Last Update:  2015-12-30
+* Last Updated for Version: 5.8.0
+* Date of the Last Update:  2016-11-30
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -41,7 +41,7 @@ MEMORY {                                       /* memory map of STM32L053R8 */
 }
 
 /* The size of the stack used by the application. NOTE: you need to adjust  */
-STACK_SIZE = 512;
+STACK_SIZE = 1024;
 
 /* The size of the heap used by the application. NOTE: you need to adjust   */
 HEAP_SIZE = 0;

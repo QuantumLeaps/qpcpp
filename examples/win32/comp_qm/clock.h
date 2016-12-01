@@ -32,6 +32,11 @@ enum AlarmClockSignals {
     TERMINATE_SIG   // terminate the application
 };
 
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
+
 //${Events::SetEvt} ..........................................................
 class SetEvt : public QP::QEvt {
 public:
@@ -45,7 +50,7 @@ public:
 };
 
 
-extern QMActive * const APP_alarmClock;
+extern QActive * const APP_alarmClock;
 
 
 #endif // clock_h

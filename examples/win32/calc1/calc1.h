@@ -29,6 +29,11 @@ enum CalcSignals {
     OFF_SIG
 };
 
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
+
 //${Events::CalcEvt} .........................................................
 class CalcEvt : public QP::QEvt {
 public:
@@ -36,6 +41,6 @@ public:
 };
 
 
-extern QP::QMsm * const the_calc; // "opaque" pointer to calculator MSM
+extern QP::QHsm * const the_calc; // "opaque" pointer to calculator HSM
 
 #endif // calc1_h

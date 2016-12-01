@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.1
-/// Last updated on  2016-09-23
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -39,6 +39,7 @@
 
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.h"      // QF port
+#include "qf_pkg.h"       // QF package-scope internal interface
 #include "qassert.h"      // QP embedded systems-friendly assertions
 #ifdef Q_SPY              // QS software tracing enabled?
     #include "qs_port.h"  // include QS port
@@ -75,9 +76,10 @@ extern "C" {
 /// the uninitialized data (as is required by the C Standard).
 ///
 void QF::init(void) {
-    extern uint_fast8_t QF_maxPool_;
+    QF_maxPool_      = static_cast<uint_fast8_t>(0);
+    QF_subscrList_   = static_cast<QSubscrList *>(0);
+    QF_maxPubSignal_ = static_cast<enum_t>(0);
 
-    QF_maxPool_ = static_cast<uint_fast8_t>(0);
     bzero(&QV_readySet_, static_cast<uint_fast16_t>(sizeof(QV_readySet_)));
     bzero(&QF::timeEvtHead_[0],
           static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
@@ -104,7 +106,7 @@ void QF::stop(void) {
 /// @description
 /// QP::QF::run() is typically called from your startup code after you
 /// initialize the QF and start at least one active object with
-/// QP::QMActive::start().
+/// QP::QActive::start().
 ///
 /// @returns QP::QF::run() typically does not return in embedded applications.
 /// However, when QP runs on top of an operating system, QP::QF::run() might
@@ -124,11 +126,11 @@ int_t QF::run(void) {
     onStartup(); // startup callback
 
     // the combined event-loop and background-loop of the QV kernel...
+    QF_INT_DISABLE();
     for (;;) {
-        QF_INT_DISABLE();
         if (QV_readySet_.notEmpty()) {
             uint_fast8_t p = QV_readySet_.findMax();
-            QMActive *a = active_[p];
+            QActive *a = active_[p];
 
 #ifdef Q_SPY
             QS_BEGIN_NOCRIT_(QS_SCHED_NEXT, QS::priv_.aoObjFilter, a)
@@ -151,6 +153,12 @@ int_t QF::run(void) {
             QEvt const *e = a->get_();
             a->dispatch(e);
             gc(e);
+
+            QF_INT_DISABLE();
+
+            if (a->m_eQueue.isEmpty()) { // empty queue?
+                QV_readySet_.remove(p);
+            }
         }
         else {
 #ifdef Q_SPY
@@ -172,6 +180,8 @@ int_t QF::run(void) {
             // perhaps at the same time as putting the CPU into a power-saving
             // mode.
             QP::QV::onIdle();
+
+            QF_INT_DISABLE();
         }
     }
 
@@ -200,7 +210,7 @@ int_t QF::run(void) {
 /// The following example shows starting an AO when a per-task stack is needed
 /// @include qf_start.cpp
 ///
-void QMActive::start(uint_fast8_t const prio,
+void QActive::start(uint_fast8_t const prio,
                      QEvt const *qSto[], uint_fast16_t const qLen,
                      void * const stkSto, uint_fast16_t const,
                      QEvt const * const ie)
@@ -232,7 +242,7 @@ void QMActive::start(uint_fast8_t const prio,
 /// unsubscribed from all events and no more events should be directly-posted
 /// to it.
 ///
-void QMActive::stop(void) {
+void QActive::stop(void) {
     QF::remove_(this);
 }
 

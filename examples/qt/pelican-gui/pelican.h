@@ -37,7 +37,7 @@ enum PelicanSignals {
 // active objects ..................................................
 namespace PELICAN {
 
-extern QP::QMActive * const AO_Pelican;
+extern QP::QActive * const AO_Pelican;
 
 } // namespace PELICAN  // opaque pointer to Pelican AO
 

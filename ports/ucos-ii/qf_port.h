@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -64,7 +64,7 @@ namespace QP {
 // (e.g., OS_TASK_OPT_SAVE_FP | OS_TASK_OPT_STK_CHK)
 // for OSTaskCreateExt() **before** calling QACTIVE_START().
 //
-void QF_setUCosTaskAttr(QMActive *act, uint32_t attr);
+void QF_setUCosTaskAttr(QActive *act, uint32_t attr);
 
 } // namespace QP
 

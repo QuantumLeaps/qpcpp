@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.7.5
-/// Last updated on  2016-11-08
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -88,9 +88,9 @@ void QF_enterCriticalSection_(void);
 void QF_leaveCriticalSection_(void);
 
 // set Win32 thread priority;
-// can be called either before or after QMActive::START()
+// can be called either before or after QActive::START()
 //
-void QF_setWin32Prio(QMActive *act, int_t win32Prio);
+void QF_setWin32Prio(QActive *act, int_t win32Prio);
 
 // set clock tick rate
 void QF_setTickRate(uint32_t ticksPerSec);

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Simple Blinky example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 5.8.0
+// Date of the Last Update:  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "bsp.h"
@@ -55,7 +55,7 @@ protected:
 Blinky l_blinky;
 
 // global objects ------------------------------------------------------------
-QMActive * const AO_Blinky = &l_blinky; // opaque pointer
+QActive * const AO_Blinky = &l_blinky; // opaque pointer
 
 //............................................................................
 Blinky::Blinky()

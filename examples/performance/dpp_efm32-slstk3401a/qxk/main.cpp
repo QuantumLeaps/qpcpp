@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.6.5
-// Last updated on  2016-06-30
+// Last updated for version 5.8.0
+// Last updated on  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -36,12 +36,6 @@
 #include "test.h"
 #include "bsp.h"
 
-// stacks for all QXK threads (grouped toghether for ease of testing)
-static uint64_t idleStackSto[32];
-static uint64_t testStackSto[64];
-static uint64_t tableStackSto[64];
-static uint64_t philoStackSto[N_PHILO][64];
-
 //............................................................................
 int main() {
     static QP::QEvt const *tableQueueSto[N_PHILO];
@@ -51,8 +45,10 @@ int main() {
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
     static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO]; // small pool
 
+    // stack for the QXK extended thread
+    static uint64_t testStackSto[64];
+
     QP::QF::init();  // initialize the framework
-    QP::QXK::init(idleStackSto, sizeof(idleStackSto)); // initialize QXK
     DPP::BSP::init(); // initialize the BSP
 
     // object dictionaries...
@@ -77,18 +73,18 @@ int main() {
             static_cast<uint_fast8_t>(n + 1), // QP priority
             philoQueueSto[n],          // event queue storage
             Q_DIM(philoQueueSto[n]),   // queue length [events]
-            philoStackSto[n],          // stack storage
-            sizeof(philoStackSto[n])); // stack size [bytes]
+            static_cast<void *>(0),    // no stack storage
+            static_cast<uint_fast16_t>(0)); // stack size [bytes]
     }
 
     DPP::AO_Table->start(
             static_cast<uint_fast8_t>(N_PHILO + 2U), // QP priority
             tableQueueSto,           // event queue storage
             Q_DIM(tableQueueSto),    // queue length [events]
-            tableStackSto,           // stack storage
-            sizeof(tableStackSto));  // stack size [bytes]
+            static_cast<void *>(0),    // no stack storage
+            static_cast<uint_fast16_t>(0)); // stack size [bytes]
 
-    // start the "naked" test thread
+    // start the extended thread for testing
     DPP::XT_Test->start(
             static_cast<uint_fast8_t>(N_PHILO + 3U), // QP priority
             testQueueSto,            // event queue storage

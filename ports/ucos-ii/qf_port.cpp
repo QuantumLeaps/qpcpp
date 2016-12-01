@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-09
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -69,12 +69,12 @@ void QF::stop(void) {
     onCleanup();  // cleanup callback
 }
 //............................................................................
-void QF_setUCosTaskAttr(QMActive *act, uint32_t attr) {
+void QF_setUCosTaskAttr(QActive *act, uint32_t attr) {
     act->getThread() = attr;
 }
 
 //............................................................................
-void QMActive::start(uint_fast8_t prio,
+void QActive::start(uint_fast8_t prio,
                      QEvt const *qSto[], uint_fast16_t qLen,
                      void *stkSto, uint_fast16_t stkSize,
                      QEvt const *ie)
@@ -114,7 +114,7 @@ void QMActive::start(uint_fast8_t prio,
 }
 
 // thread for active objects -------------------------------------------------
-void QF::thread_(QMActive *act) {
+void QF::thread_(QActive *act) {
     // enable thread-loop, see NOTE2
     act->m_thread = static_cast<uint32_t>(1);  // set event-loop control
     do {
@@ -129,21 +129,21 @@ void QF::thread_(QMActive *act) {
 }
 //............................................................................
 static void task_function(void *pdata) { // uC/OS-II task signature
-    QMActive *act = reinterpret_cast<QMActive *>(pdata);
+    QActive *act = reinterpret_cast<QActive *>(pdata);
 
     QF::thread_(act);
     QF::remove_(act); // remove this object from QF
     OSTaskDel(OS_PRIO_SELF); // make uC/OS-II forget about this task
 }
 //............................................................................
-void QMActive::stop() {
+void QActive::stop() {
     m_thread = static_cast<uint32_t>(0); // stop the thread loop
 }
 //............................................................................
 #ifndef Q_SPY
-bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin)
+bool QActive::post_(QEvt const * const e, uint_fast16_t const margin)
 #else
-bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
+bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
                      void const * const sender)
 #endif
 {
@@ -202,7 +202,7 @@ bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
     return status;
 }
 //............................................................................
-void QMActive::postLIFO(QEvt const * const e) {
+void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
@@ -229,7 +229,7 @@ void QMActive::postLIFO(QEvt const * const e) {
         OSQPostFront(m_eQueue, const_cast<QEvt *>(e)) == OS_ERR_NONE);
 }
 //............................................................................
-QEvt const *QMActive::get_(void) {
+QEvt const *QActive::get_(void) {
     INT8U err;
     QS_CRIT_STAT_
 

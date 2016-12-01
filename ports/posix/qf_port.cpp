@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.5
-/// Last updated on  2016-06-08
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -115,7 +115,7 @@ void QF::stop(void) {
     l_running = false; // stop the loop in QF::run()
 }
 //............................................................................
-void QF::thread_(QMActive *act) {
+void QF::thread_(QActive *act) {
     // loop until m_thread is cleared in QActive::stop()
     do {
         QEvt const *e = act->get_(); // wait for event
@@ -127,7 +127,7 @@ void QF::thread_(QMActive *act) {
     pthread_cond_destroy(&act->m_osObject); // cleanup the condition variable
 }
 //............................................................................
-void QMActive::start(uint_fast8_t prio,
+void QActive::start(uint_fast8_t prio,
                      QEvt const *qSto[], uint_fast16_t qLen,
                      void *stkSto, uint_fast16_t stkSize,
                      QEvt const *ie)
@@ -179,13 +179,13 @@ void QMActive::start(uint_fast8_t prio,
     m_thread = static_cast<uint8_t>(1);
 }
 //............................................................................
-void QMActive::stop(void) {
+void QActive::stop(void) {
     m_thread = static_cast<uint8_t>(0); // stop the QF::thread_() loop
 }
 
 //............................................................................
 static void *ao_thread(void *arg) { // the expected POSIX signature
-    QF::thread_(static_cast<QMActive *>(arg));
+    QF::thread_(static_cast<QActive *>(arg));
     return static_cast<void *>(0); // return success
 }
 

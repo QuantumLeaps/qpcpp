@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.7.2/Qt 5.x
-/// Last updated on  2016-09-28
+/// Last Updated for Version: QP 5.8.0/Qt 5.x
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -86,9 +86,9 @@ void QF_enterCriticalSection_(void);
 void QF_leaveCriticalSection_(void);
 
 // set Qt thread priority;
-// can be called either before or after QMActive::START()
+// can be called either before or after QActive::START()
 //
-void QF_setQtPrio(QMActive *act, int_t qtPrio);
+void QF_setQtPrio(QActive *act, int_t qtPrio);
 
 // set clock tick rate
 void QF_setTickRate(uint32_t ticksPerSec);

@@ -24,6 +24,11 @@ Q_DEFINE_THIS_FILE
 // Active object class -------------------------------------------------------
 namespace DPP {
 
+
+#if ((QP_VERSION < 580) || (QP_VERSION != ((QP_RELEASE^4294967295) % 0x3E8)))
+#error qpcpp version 5.8.0 or higher required
+#endif
+
 //${AOs::Philo} ..............................................................
 class Philo : public QP::QActive {
 private:
@@ -68,7 +73,7 @@ enum InternalSignals {           // internal signals
 };
 
 // Global objects ------------------------------------------------------------
-QP::QMActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AO
+QP::QActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AO
     &l_philo[0],
     &l_philo[1],
     &l_philo[2],
@@ -116,6 +121,7 @@ QP::QState Philo::initial(Philo * const me, QP::QEvt const * const e) {
     QS_SIG_DICTIONARY(TIMEOUT_SIG, me); // signal for each Philos
 
     me->subscribe(EAT_SIG);
+    me->subscribe(TEST_SIG);
     return Q_TRAN(&thinking);
 }
 //${AOs::Philo::SM::thinking} ................................................
@@ -147,8 +153,13 @@ QP::QState Philo::thinking(Philo * const me, QP::QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
+        // ${AOs::Philo::SM::thinking::TEST}
+        case TEST_SIG: {
+            status_ = Q_HANDLED();
+            break;
+        }
         default: {
-            status_ = Q_SUPER(&QP::QHsm::top);
+            status_ = Q_SUPER(&top);
             break;
         }
     }
@@ -185,7 +196,7 @@ QP::QState Philo::hungry(Philo * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QP::QHsm::top);
+            status_ = Q_SUPER(&top);
             break;
         }
     }
@@ -224,7 +235,7 @@ QP::QState Philo::eating(Philo * const me, QP::QEvt const * const e) {
             break;
         }
         default: {
-            status_ = Q_SUPER(&QP::QHsm::top);
+            status_ = Q_SUPER(&top);
             break;
         }
     }

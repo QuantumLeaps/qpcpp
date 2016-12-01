@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, uC/OS-II kernel
-// Last Updated for Version: 5.6.5
-// Date of the Last Update:  2016-06-29
+// Last Updated for Version: 5.8.0
+// Date of the Last Update:  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -207,7 +207,7 @@ void App_TimeTickHook(void) {
 } // extern "C"
 
 // BSP functions =============================================================
-void BSP_init(void) {
+void BSP::init(void) {
     // NOTE: SystemInit() already called from the startup code
     //  but SystemCoreClock needs to be updated
     //
@@ -230,7 +230,7 @@ void BSP_init(void) {
     GPIO_PinModeSet(PB_PORT, PB1_PIN, gpioModeInputPull, 1);
 
     //...
-    BSP_randomSeed(1234U);
+    BSP::randomSeed(1234U);
 
     if (!QS_INIT((void *)0)) { // initialize the QS software tracing
         Q_ERROR();
@@ -241,7 +241,7 @@ void BSP_init(void) {
     QS_USR_DICTIONARY(COMMAND_STAT);
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     // exercise the FPU with some floating point computations
     // NOTE: this code can be only called from a task that created with
     // the option OS_TASK_OPT_SAVE_FP.
@@ -263,7 +263,7 @@ void BSP_displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP_displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t paused) {
     if (paused != 0U) {
         GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
     }
@@ -272,7 +272,7 @@ void BSP_displayPaused(uint8_t paused) {
     }
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     INT8U err;
 
     OSMutexPend(l_rndMutex, 0, &err); // lock the random-seed mutex
@@ -286,22 +286,22 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     return (rnd >> 8);
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void BSP::randomSeed(uint32_t seed) {
       INT8U err;
 
     l_rnd = seed;
       l_rndMutex = OSMutexCreate(N_PHILO, &err);
 }
 //............................................................................
-void BSP_ledOn(void) {
+void BSP::ledOn(void) {
     GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
 }
 //............................................................................
-void BSP_ledOff(void) {
+void BSP::ledOff(void) {
     GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
 }
 //............................................................................
-void BSP_terminate(int16_t result) {
+void BSP::terminate(int16_t result) {
     (void)result;
 }
 
@@ -412,7 +412,7 @@ bool QS::onStartup(void const *arg) {
     // Finally enable the UART
     USART_Enable(DPP::l_USART0, usartEnable);
 
-    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP_TICKS_PER_SEC;
+    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...

@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.4
-/// Last updated on  2016-11-02
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      574
+#define QP_VERSION      580
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "5.7.4"
+#define QP_VERSION_STR  "5.8.0"
 
-//! Tamperproof current QP release (5.7.4) and date (16-11-04)
-#define QP_RELEASE      0x9FF978C1U
+//! Tamperproof current QP release (5.8.0) and date (2016-11-30)
+#define QP_RELEASE      0x9FF5811BU
 
 //****************************************************************************
 #ifndef Q_SIGNAL_SIZE
@@ -132,6 +132,9 @@ typedef double float64_t;
 //****************************************************************************
 namespace QP {
 
+//! the current QP version number string based on QP_VERSION_STR
+extern char_t const versionStr[6];
+
 #if (Q_SIGNAL_SIZE == 1)
     typedef uint8_t QSignal;
 #elif (Q_SIGNAL_SIZE == 2)
@@ -211,39 +214,19 @@ typedef QState (*QStateHandler)(void * const me, QEvt const * const e);
 //! pointer to an action-handler function
 typedef QState (*QActionHandler)(void * const me);
 
-//! State object for the QMsm class (Meta State Machine).
-/// @description
-/// This class groups together the attributes of a QMsm state, such as the
-/// parent state (state nesting), the associated state handler function and
-/// the exit action handler function. These attributes are used inside the
-/// QP::QMsm::dispatch() and QP::QMsm::init() functions.
-///
-/// @attention
-/// The QMStateObj class is only intended for the QM code generator and
-/// should not be used in hand-crafted code.
-struct QMState {
-    QMState        const *superstate;   //!< superstate of this state
-    QStateHandler  const stateHandler;  //!< state handler function
-    QActionHandler const entryAction;   //!< entry action handler function
-    QActionHandler const exitAction;    //!< exit action handler function
-    QActionHandler const initAction;    //!< init action handler function
-};
+// forward declarations...
+struct QMState;
+struct QMTranActTable;
 
-//! Transition-Action Table for the Meta State Machine.
-struct QMTranActTable {
-    QMState        const *target;
-    QActionHandler const act[1];
-};
-
-//! Attribute of for the QMsm class (Meta State Machine).
+//! Attribute of for the QHsm class (Hierarchical State Machine).
 /// @description
 /// This union represents possible values stored in the 'state' and 'temp'
-/// attributes of the QMsm class.
-union QMAttr {
-    QMState        const *obj;    //!< pointer to QMState object
-    QMTranActTable const *tatbl;  //!< transition-action table
+/// attributes of the QHsm and QMsm classes.
+union QHsmAttr {
     QStateHandler  fun;           //!< pointer to a state handler function
     QActionHandler act;           //!< pointer to an action-handler function
+    QMState        const *obj;    //!< pointer to QMState object
+    QMTranActTable const *tatbl;  //!< transition-action table
 };
 
 //****************************************************************************
@@ -289,55 +272,101 @@ QState const Q_RET_TRAN_XP   = static_cast<QState>(12);
 
 
 //****************************************************************************
-//! Meta State Machine
+//! Hierarchical State Machine base class
+///
 /// @description
-/// QMsm represents the most fundamental State Machine in QP. The application-
-/// level state machines derived directly from QMsm typically require the use
-/// of the QM modeling tool, but are the fastest and need the least run-time
-/// support (the smallest event-processor taking up the least code space).@n
+/// QHsm represents a Hierarchical State Machine (HSM) with full support for
+/// hierarchical nesting of states, entry/exit actions, and initial
+/// transitions in any composite state. QHsm inherits QMsm without adding
+/// new attributes, so it takes the same amount of RAM as QMsm.
 /// @n
-/// QMsm is also the base class for the QFsm and QHsm state machines, which
-/// can be coded and maintained by hand (as well as by QM), but aren't as fast
-/// and requrie significantly more run-time code (0.5-1KB) to execute.
+/// QHsm is also the base class for the QMsm state machine, which provides
+/// a superior efficiency, but requries the use of the QM modeling tool to
+/// generate code.
 ///
 /// @note
-/// QMsm is not intended to be instantiated directly, but rather serves as
+/// QHsm is not intended to be instantiated directly, but rather serves as
 /// the base class for derivation of state machines in the application code.
 ///
 /// @usage
 /// The following example illustrates how to derive a state machine class
-/// from QMsm. Please note that the QMsm member 'super' is defined as the
-/// _first_ member of the derived struct.
-/// @include qep_qmsm.cpp
-class QMsm {
-    QMAttr m_state;  //!< current active state (state-variable)
-    QMAttr m_temp;   //!< temporary: transition chain, target state, etc.
+/// from QHsm.
+/// @include qep_qhsm.cpp
+///
+class QHsm {
+    QHsmAttr m_state;  //!< current active state (state-variable)
+    QHsmAttr m_temp;   //!< temporary: transition chain, target state, etc.
 
 public:
     //! virtual destructor
-    virtual ~QMsm();
+    virtual ~QHsm();
 
-    //! Executes the top-most initial transition in QP::QMsm.
+    //! Executes the top-most initial transition in QP::QHsm
     virtual void init(QEvt const * const e);
     virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
 
-    //! Dispatches an event to QMsm
+    //! Dispatches an event to QHsm
     virtual void dispatch(QEvt const * const e);
 
-    //! Tests if a given state is part of the active state configuration
-    bool isInState(QMState const *state) const;
+    //! Tests if a given state is part of the current active state
+    //! configuration
+    bool isIn(QStateHandler const s);
 
-    //! Return the current active state object (read only)
-    QMState const *stateObj(void) const {
-        return m_state.obj;
+    //! the top-state.
+    static QState top(void * const me, QEvt const * const e);
+
+    //! Obtain the current state (state handler function)
+    //! @note used in the QM code generation
+    QStateHandler state(void) const {
+        return m_state.fun;
     }
 
-    //! Obtain the current active child state of a given parent (read only)
-    QMState const *childStateObj(QMState const * const parent) const;
+    //! Obtain the current active child state of a given parent
+    //! @note used in the QM code generation
+    QStateHandler childState(QStateHandler const parent);
 
 protected:
-    //! Protected constructor of QMsm.
-    QMsm(QStateHandler const initial);
+    //! Protected constructor of QHsm.
+    QHsm(QStateHandler const initial);
+
+public: // facilities for coding HSMs...
+    //! internal helper function to specify the return of a state-handler
+    //! when it handles the event.
+    static QState Q_HANDLED(void) {
+        return Q_RET_HANDLED;
+    }
+
+    //! internal helper function to specify the return of a state-handler
+    //! function when it attempts to handle the event but a guard condition
+    //! evaluates to false and there is no other explicit way of handling
+    //! the event.
+    static QState Q_UNHANDLED(void) {
+        return Q_RET_UNHANDLED;
+    }
+
+    //! internal helper function to record a state transition
+    QState tran_(QStateHandler const target) {
+        m_temp.fun = target;
+        return Q_RET_TRAN;
+    }
+
+    //! internal helper function to record a transition to history
+    QState tran_hist_(QStateHandler const hist) {
+        m_temp.fun = hist;
+        return Q_RET_TRAN_HIST;
+    }
+
+    //! internal helper function to record the superstate
+    QState super_(QStateHandler const superstate) {
+        m_temp.fun = superstate;
+        return Q_RET_SUPER;
+    }
+
+    enum ReservedHsmSignals {
+        Q_ENTRY_SIG = 1,     //!< signal for entry actions
+        Q_EXIT_SIG,          //!< signal for exit actions
+        Q_INIT_SIG           //!< signal for nested initial transitions
+    };
 
 // protected facilities for coding MSMs...
     //! internal helper function to record a regular state transition
@@ -379,21 +408,21 @@ protected:
     }
 
     //! Internal helper function to record a state entry
-    QState qm_entry_(QMState const * const state) {
-        m_temp.obj  = state;
+    QState qm_entry_(QMState const * const s) {
+        m_temp.obj  = s;
         return Q_RET_ENTRY;
     }
 
     //! Internal helper function to record a state exit
-    QState qm_exit_(QMState const * const state) {
-        m_temp.obj  = state;
+    QState qm_exit_(QMState const * const s) {
+        m_temp.obj  = s;
         return Q_RET_EXIT;
     }
 
     //! Internal helper function to call in a QM action-handler when
     //! it passes the event to the host submachine state to handle an event.
-    QState qm_super_sub_(QMState const * const state) {
-        m_temp.obj  = state;
+    QState qm_super_sub_(QMState const * const s) {
+        m_temp.obj  = s;
         return Q_RET_SUPER_SUB;
     }
 
@@ -415,51 +444,73 @@ protected:
         return Q_RET_SUPER;
     }
 
-public: // facilities for coding HSMs...
-    //! internal helper function to specify the return of a state-handler
-    //! when it handles the event.
-    static QState Q_HANDLED(void) {
-        return Q_RET_HANDLED;
-    }
-
-    //! internal helper function to specify the return of a state-handler
-    //! function when it attempts to handle the event but a guard condition
-    //! evaluates to false and there is no other explicit way of handling
-    //! the event.
-    static QState Q_UNHANDLED(void) {
-        return Q_RET_UNHANDLED;
-    }
-
-    //! internal helper function to record a state transition
-    QState tran_(QStateHandler const target) {
-        m_temp.fun = target;
-        return Q_RET_TRAN;
-    }
-
-    //! internal helper function to record a transition to history
-    QState tran_hist_(QStateHandler const hist) {
-        m_temp.fun = hist;
-        return Q_RET_TRAN_HIST;
-    }
-
-    //! internal helper function to record the superstate
-    QState super_(QStateHandler const superstate) {
-        m_temp.fun = superstate;
-        return Q_RET_SUPER;
-    }
-
-    enum ReservedHsmSignals {
-        Q_ENTRY_SIG = 1,     //!< signal for entry actions
-        Q_EXIT_SIG,          //!< signal for exit actions
-        Q_INIT_SIG           //!< signal for nested initial transitions
+private:
+    enum {
+        MAX_NEST_DEPTH_ = 6  //!< maximum nesting depth of states in HSM
     };
+
+    //! internal helper function to take a transition
+    int_fast8_t hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]);
+
+    friend class QMsm;
+    friend class QActive;
+    friend class QMActive;
+    friend class QF;
+    friend class QXK;
+    friend class QXThread;
+    friend class QXMutex;
+    friend class QXSemaphore;
+};
+
+//****************************************************************************
+//! QM State Machine implementation strategy
+/// @description
+/// QMsm (QM State Machine) provides a more efficient state machine
+/// implementation strategy than QHsm, but requires the use of the QM
+/// modeling tool, but are the fastest and need the least run-time
+/// support (the smallest event-processor taking up the least code space).
+///
+/// @note
+/// QMsm is not intended to be instantiated directly, but rather serves as
+/// the base class for derivation of state machines in the application code.
+///
+/// @usage
+/// The following example illustrates how to derive a state machine class
+/// from QMsm. Please note that the QMsm member 'super' is defined as the
+/// _first_ member of the derived struct.
+/// @include qep_qmsm.cpp
+///
+class QMsm : public QHsm {
+public:
+    //! Performs the second step of SM initialization by triggering
+    /// the top-most initial transition.
+    virtual void init(QEvt const * const e);
+    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
+
+    //! Dispatches an event to a HSM
+    virtual void dispatch(QEvt const * const e);
+
+    //! Tests if a given state is part of the active state configuration
+    bool isInState(QMState const *st) const;
+
+    //! Return the current active state object (read only)
+    QMState const *stateObj(void) const {
+        return m_state.obj;
+    }
+
+    //! Obtain the current active child state of a given parent (read only)
+    QMState const *childStateObj(QMState const * const parent) const;
+
+protected:
+    //! Protected constructor of QMsm
+    QMsm(QStateHandler const initial);
 
 private:
     //! Internal helper function to execute a transition-action table
     QState execTatbl_(QMTranActTable const * const tatbl);
 
     //! Internal helper function to exit current state to transition source
-    void exitToTranSource_(QMState const *s, QMState const *ts);
+    void exitToTranSource_(QMState const *s, QMState const * const ts);
 
     //! Internal helper function to enter state history
     QState enterHistory_(QMState const * const hist);
@@ -470,90 +521,37 @@ private:
     //! the top state object for the QMsm
     static QMState const msm_top_s;
 
-    friend class QFsm;
-    friend class QHsm;
     friend class QMActive;
-    friend class QActive;
-    friend class QF;
-    friend class QXK;
-    friend class QXThread;
-    friend class QXMutex;
-    friend class QXSemaphore;
 };
 
 //! Top-most state of QMSM is NULL
 QMState * const QMsm_top = static_cast<QMState *>(0);
 
-//****************************************************************************
-//! Hierarchical State Machine base class
-///
+
+//! State object for the QMsm class (Meta State Machine).
 /// @description
-/// QHsm represents a Hierarchical State Machine (HSM) with full support for
-/// hierarchical nesting of states, entry/exit actions, and initial
-/// transitions in any composite state. QHsm inherits QMsm without adding
-/// new attributes, so it takes the same amount of RAM as QMsm.
+/// This class groups together the attributes of a QMsm state, such as the
+/// parent state (state nesting), the associated state handler function and
+/// the exit action handler function. These attributes are used inside the
+/// QP::QMsm::dispatch() and QP::QMsm::init() functions.
 ///
-/// @note
-/// QHsm is not intended to be instantiated directly, but rather serves as
-/// the base class for derivation of state machines in the application code.
-///
-/// @usage
-/// The following example illustrates how to derive a state machine class
-/// from QHsm.
-/// @include qep_qhsm.cpp
-class QHsm : public QMsm {
-public:
-    //! Performs the second step of FSM initialization by triggering
-    /// the top-most initial transition.
-    virtual void init(QEvt const * const e);
-    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
-
-    //! Dispatches an event to a HSM
-    virtual void dispatch(QEvt const * const e);
-
-    //! Tests if a given state is part of the current active state
-    //! configuration
-    bool isIn(QStateHandler const s);
-
-    //! the top-state.
-    static QState top(void * const me, QEvt const * const e);
-
-    //! Obtain the current active state (state handler function)
-    QStateHandler state(void) const {
-        return m_state.fun;
-    }
-
-    //! Obtain the current active child state of a given parent
-    QStateHandler childState(QStateHandler const parent);
-
-private:
-    //! operation inherited from QMsm, but disallowed in QHsm
-    bool isInState(QMState const *state) const;
-
-    //! operation inherited from QMsm, but disallowed in QHsm
-    QMState const *stateObj(void) const;
-
-    //! operation inherited from QMsm, but disallowed in QHsm
-    QMState const *childStateObj(QMState const * const parent) const;
-
-protected:
-    //! Protected constructor of a HSM
-    QHsm(QStateHandler const initial);
-
-private:
-    enum {
-        MAX_NEST_DEPTH_ = 6  //!< maximum nesting depth of states in HSM
-    };
-
-    //! internal helper function to take a transition
-    int_fast8_t hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]);
-
-    friend class QActive;
-    friend class QMActive;
+/// @attention
+/// The QMStateObj class is only intended for the QM code generator and
+/// should not be used in hand-crafted code.
+struct QMState {
+    QMState        const *superstate;   //!< superstate of this state
+    QStateHandler  const stateHandler;  //!< state handler function
+    QActionHandler const entryAction;   //!< entry action handler function
+    QActionHandler const exitAction;    //!< exit action handler function
+    QActionHandler const initAction;    //!< init action handler function
 };
 
-//! the current QP version number string based on QP_VERSION_STR
-extern char_t const versionStr[6];
+//! Transition-Action Table for the Meta State Machine.
+struct QMTranActTable {
+    QMState        const *target;
+    QActionHandler const act[1];
+};
+
 
 //****************************************************************************
 //! Provides miscellaneous QEP services.
@@ -589,17 +587,18 @@ enum_t const Q_USER_SIG = static_cast<enum_t>(4);
     (reinterpret_cast<QP::QActionHandler>(action_))
 
 #ifdef Q_SPY
-    //! Macro to call in a QM action-handler when it executes an entry
-    //! action. Applicable only to QMSMs.
+    //! Macro to call in a QM state entry-handler. Applicable only to QMSMs.
     #define QM_ENTRY(state_)  (me->qm_entry_((state_)))
 
-    //! Macro to call in a QM action-handler when it executes an exit action.
-    //! Applicable only to QMSMs.
+    //! Macro to call in a QM state exit-handler. Applicable only to QMSMs.
     #define QM_EXIT(state_)   (me->qm_exit_((state_)))
 #else
     #define QM_ENTRY(dummy)   (QP::Q_RET_ENTRY)
     #define QM_EXIT(dummy)    (QP::Q_RET_EXIT)
 #endif
+
+//! Macro to call in a QM submachine exit-handler. Applicable only to QMSMs.
+#define QM_SM_EXIT(state_)   (me->qm_exit_((state_)))
 
 //! Macro to call in a QM state-handler when it executes a regular
 //! transition. Applicable only to QMSMs.

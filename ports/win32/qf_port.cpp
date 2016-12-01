@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.7.5
-/// Last updated on  2016-11-08
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -83,8 +83,8 @@ void QF::stop(void) {
     l_isRunning = false;   // terminate the main (ticker) thread
 }
 //****************************************************************************
-void QF::thread_(QMActive *act) {
-    // loop until m_thread is cleared in QMActive::stop()
+void QF::thread_(QActive *act) {
+    // loop until m_thread is cleared in QActive::stop()
     do {
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
@@ -98,7 +98,7 @@ void QF::thread_(QMActive *act) {
 //****************************************************************************
 // helper function to match the signature expeced by CreateThread() Win32 API
 static DWORD WINAPI ao_thread(LPVOID me) {
-    QF::thread_(static_cast<QMActive *>(me));
+    QF::thread_(static_cast<QActive *>(me));
     return static_cast<DWORD>(0); // return success
 }
 //****************************************************************************
@@ -128,7 +128,7 @@ void QF_setTickRate(uint32_t ticksPerSec) {
     l_tickMsec = 1000UL / ticksPerSec;
 }
 //****************************************************************************
-void QF_setWin32Prio(QMActive *act, int_t win32Prio) {
+void QF_setWin32Prio(QActive *act, int_t win32Prio) {
     if (act->getThread() == (HANDLE)0) {  // thread not created yet?
         act->getOsObject() = (void *)win32Prio; // store the priority for later
     }
@@ -137,10 +137,10 @@ void QF_setWin32Prio(QMActive *act, int_t win32Prio) {
     }
 }
 //****************************************************************************
-void QMActive::start(uint_fast8_t prio,
-                     QEvt const *qSto[], uint_fast16_t qLen,
-                     void *stkSto, uint_fast16_t stkSize,
-                     QEvt const *ie)
+void QActive::start(uint_fast8_t prio,
+                    QEvt const *qSto[], uint_fast16_t qLen,
+                    void *stkSto, uint_fast16_t stkSize,
+                    QEvt const *ie)
 {
     Q_REQUIRE_ID(700, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
         && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*... in range */
@@ -181,7 +181,7 @@ void QMActive::start(uint_fast8_t prio,
     }
 }
 //****************************************************************************
-void QMActive::stop(void) {
+void QActive::stop(void) {
     m_thread = static_cast<HANDLE>(0);  // stop the QActive::run() loop
 }
 

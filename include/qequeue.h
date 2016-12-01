@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-28
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -246,7 +246,7 @@ private:
     QEQueue & operator=(QEQueue const &);
 
     friend class QF;
-    friend class QMActive;
+    friend class QActive;
     friend class QXThread;
 };
 

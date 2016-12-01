@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="3.3.0">
+<model version="4.0.0" links="0">
  <documentation>PEdestrian LIghto CONtrolled (PELICA) crossing for Qt with GUI</documentation>
  <framework name="qpcpp"/>
  <package name="Qt-port" stereotype="0x00" namespace="QP::">
@@ -159,13 +159,13 @@ me-&gt;postLIFO(pe); // &lt;==</code>
   </class>
  </package>
  <package name="components" stereotype="0x02" namespace="PELICAN::">
-  <class name="Pelican" superclass="Qt-port::GuiQMActive">
+  <class name="Pelican" superclass="Qt-port::GuiQActive">
    <documentation>PEdestrian LIght CONtrolled (PELICAN) crossing</documentation>
    <attribute name="m_timeout" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
    <attribute name="m_flashCtr" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Pelican" type="" visibility="0x00" properties="0x02">
     <documentation>constructor</documentation>
-    <code> : GuiQMActive(Q_STATE_CAST(&amp;Pelican::initial)),
+    <code> : GuiQActive(Q_STATE_CAST(&amp;Pelican::initial)),
    m_timeout(this, TIMEOUT_SIG)</code>
    </operation>
    <statechart>
@@ -416,7 +416,7 @@ BSP_signalPeds(PEDS_BLANK);</action>
     <state_diagram size="76,99"/>
    </statechart>
   </class>
-  <attribute name="AO_Pelican" type="QP::QMActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_Pelican" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
  </package>
  <directory name=".">
   <file name="pelican.h">
@@ -469,7 +469,7 @@ enum PelicanTimeouts {  // various timeouts in ticks
 static Pelican l_Pelican; // the single instance of Pelican active object
 
 // Global objects ------------------------------------------------------------
-QP::QMActive * const AO_Pelican = &amp;l_Pelican; // the opaque pointer
+QP::QActive * const AO_Pelican = &amp;l_Pelican; // the opaque pointer
 
 } // namespace PELICAN
 

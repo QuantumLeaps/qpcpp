@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Simple Blinky example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 5.8.0
+// Date of the Last Update:  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : http://www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #ifndef blinky_h
 #define blinky_h
@@ -44,6 +44,6 @@ enum BlinkySignals {
     MAX_SIG       // the last signal
 };
 
-extern QMActive * const AO_Blinky; // opaque pointer
+extern QActive * const AO_Blinky; // opaque pointer
 
 #endif // blinky_h

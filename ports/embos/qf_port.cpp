@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to embOS (v4.00) kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.6.2
-/// Last updated on  2016-03-09
+/// Last updated for version 5.8.0
+/// Last updated on  2016-11-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -81,12 +81,12 @@ void QF::stop(void) {
     onCleanup();  // cleanup callback
 }
 //............................................................................
-void QF_setEmbOsTaskAttr(QMActive *act, uint32_t attr) {
+void QF_setEmbOsTaskAttr(QActive *act, uint32_t attr) {
     act->getOsObject() = attr;
 }
 
 // thread for active objects -------------------------------------------------
-void QF::thread_(QMActive *act) {
+void QF::thread_(QActive *act) {
     // enable thread-loop, see NOTE2
     act->m_osObject = static_cast<uint32_t>(1);  // set event-loop control
     do {
@@ -100,7 +100,7 @@ void QF::thread_(QMActive *act) {
 
 //............................................................................
 static void thread_function(void *pVoid) { // embOS signature
-    QMActive *act = reinterpret_cast<QMActive *>(pVoid);
+    QActive *act = reinterpret_cast<QActive *>(pVoid);
 
 #ifdef __TARGET_FPU_VFP
     // does the task use the FPU? see NOTE1
@@ -114,7 +114,7 @@ static void thread_function(void *pVoid) { // embOS signature
     OS_TerminateTask(&act->getThread());
 }
 //............................................................................
-void QMActive::start(uint_fast8_t prio,
+void QActive::start(uint_fast8_t prio,
                      QEvt const *qSto[], uint_fast16_t qLen,
                      void *stkSto, uint_fast16_t stkSize,
                      QEvt const *ie)
@@ -141,14 +141,14 @@ void QMActive::start(uint_fast8_t prio,
         this);
 }
 //............................................................................
-void QMActive::stop() {
+void QActive::stop() {
     m_osObject = static_cast<uint32_t>(0); // stop the thread loop, see NOTE2
 }
 //............................................................................
 #ifndef Q_SPY
-bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin)
+bool QActive::post_(QEvt const * const e, uint_fast16_t const margin)
 #else
-bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
+bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
                      void const * const sender)
 #endif
 {
@@ -206,7 +206,7 @@ bool QMActive::post_(QEvt const * const e, uint_fast16_t const margin,
     return status;
 }
 //............................................................................
-void QMActive::postLIFO(QEvt const * const e) {
+void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
@@ -232,7 +232,7 @@ void QMActive::postLIFO(QEvt const * const e) {
         == static_cast<char>(0));
 }
 //............................................................................
-QEvt const *QMActive::get_(void) {
+QEvt const *QActive::get_(void) {
     QEvt const *e;
     QS_CRIT_STAT_
 
@@ -261,7 +261,7 @@ QEvt const *QMActive::get_(void) {
 // designated by the QF_TASK_USES_FPU attribute, which can be set wiht the
 // QF_setEmbOsTaskAttr() function. The task attributes must be set *before*
 // calling QACTIVE_START(). The task attributes are saved in
-// QMActive.m_osObject member.
+// QActive.m_osObject member.
 //
 // NOTE2:
 // The member QActive.osObject is reused as the loop control variable,

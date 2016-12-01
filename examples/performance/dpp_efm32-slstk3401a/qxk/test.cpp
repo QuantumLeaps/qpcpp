@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.6.5
-// Last updated on  2016-06-30
+// Last updated for version 5.8.0
+// Last updated on  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -39,8 +39,8 @@
 namespace DPP {
 
 //............................................................................
-static void thread_function(void *par) {
-    (void)par;
+static void thread_function(QP::QXThread * const me) {
+    (void)me; // unused parameter
     XT_Sema.init(1U); // 1 count
     for (;;) {
         (void)XT_Sema.wait(0U, 0U); // wait forever
@@ -50,7 +50,7 @@ static void thread_function(void *par) {
     }
 }
 
-// local "naked" thread object ...............................................
+// local extended thread object ..............................................
 static QP::QXThread l_test(&thread_function, 0U);
 
 // global pointer to the test thread .........................................
