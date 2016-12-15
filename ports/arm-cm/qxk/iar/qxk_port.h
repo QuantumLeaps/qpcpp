@@ -2,8 +2,8 @@
 /// @brief QXK/C++ port to ARM Cortex-M, QXK kernel, IAR-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-12
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -56,6 +56,12 @@
     } \
     QF_INT_ENABLE(); \
 } while (false)
+
+// initialization of the QXK kernel
+#define QXK_INIT() QXK_init()
+extern "C" {
+    void QXK_init(void);
+}
 
 #include "qxk.h" // QXK platform-independent public interface
 

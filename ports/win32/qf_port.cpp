@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-12
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -46,7 +46,6 @@
 #endif // Q_SPY
 
 #include <limits.h>       // limits of dynamic range for integers
-
 
 namespace QP {
 
@@ -144,8 +143,6 @@ void QActive::start(uint_fast8_t prio,
 {
     Q_REQUIRE_ID(700, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
         && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*... in range */
-        && (qSto != static_cast<QEvt const **>(0)) /* queue storage... */
-        && (qLen > static_cast<uint_fast16_t>(0))  /* ... must be provided */
         && (stkSto == static_cast<void *>(0)));    /* statck storage must NOT...
                                                     * ... be provided */
 

@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-29
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-11
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -97,7 +97,9 @@ void QF::init(void) {
     active_[0] = &l_idleThread; // register the idle thread with QF
     QXK_attr_.actPrio = static_cast<uint_fast8_t>(0); // set idle thread prio
 
-    QXK_init(); // QXK-port initialization, might be defined in assembly
+#ifdef QXK_INIT
+    QXK_INIT(); // port-specific initialization of the QXK kernel
+#endif
 }
 
 //****************************************************************************

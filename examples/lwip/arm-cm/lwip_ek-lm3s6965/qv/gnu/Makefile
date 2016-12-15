@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++, lwIP on EK-LM3S6965, QV kernel, GNU-ARM
-# Last Updated for Version: 5.5.1
-# Date of the Last Update:  2015-10-05
+# Last Updated for Version: 5.8.1
+# Date of the Last Update:  2016-12-14
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -131,7 +131,8 @@ QP_SRCS := \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
 	qf_time.cpp \
-	qv.cpp
+	qv.cpp \
+	qv_port.cpp
 
 QP_ASMS :=
 

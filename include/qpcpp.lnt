@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.8.0
-// Last updated on  2016-11-21
+// Last updated for version 5.8.1
+// Last updated on  2016-12-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -254,7 +254,8 @@
 -esym(1712,           // default constructor not defined for class
  QMActive,
  QActive,
- QTimeEvt)
+ QTimeEvt,
+ QTicker)
 -esym(641, *Signals)  // Converting enum '*Signals' to 'int'
 -esym(754, sto_)      // local structure member 'sto' not referenced
 -efunc(1960, QP::QPSet*::isEmpty)    // incorrect reporting int->bool

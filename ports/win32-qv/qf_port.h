@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -156,8 +156,6 @@ void QF_onClockTick(void);
         Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
         (QV_readySet_.insert((me_)->m_prio))
-
-    #define QACTIVE_EQUEUE_ONEMPTY_(dummy) ((void)0)
 
     // Win32-QV specific event pool operations
     #define QF_EPOOL_TYPE_  QMPool

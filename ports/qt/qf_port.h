@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.8.0/Qt 5.x
-/// Last updated on  2016-11-19
+/// Last Updated for Version: QP 5.8.1/Qt 5.x
+/// Last updated on  2016-12-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -123,8 +123,6 @@ void QS_onEvent(void);
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
         static_cast<QWaitCondition*>((me_)->m_osObject)->wakeOne()
-
-    #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
 
     // Qt-specific event pool operations
     #define QF_EPOOL_TYPE_            QMPool

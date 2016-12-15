@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-29
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-11
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -87,7 +87,9 @@ void QF::init(void) {
     QK_attr_.actPrio  = static_cast<uint_fast8_t>(0); // prio of QK idle loop
     QK_attr_.lockPrio = static_cast<uint_fast8_t>(QF_MAX_ACTIVE); // locked
 
-    QK_init(); // QK initialization ("C" linkage, might be in assembly)
+#ifdef QK_INIT
+    QK_INIT(); // port-specific initialization of the QK kernel
+#endif
 }
 
 //****************************************************************************

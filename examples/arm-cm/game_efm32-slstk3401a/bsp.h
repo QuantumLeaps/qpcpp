@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Fly 'n' Shoot" game example on EFM32-SLSTK3401A board
-// Last updated for version 5.6.5
-// Last updated on  2016-06-06
+// Last updated for version 5.8.1
+// Last updated on  2016-12-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -61,6 +61,8 @@ void BSP_displayOff(void);
 
 void BSP_randomSeed(uint32_t seed);   // random seed
 uint32_t BSP_random(void);            // pseudo-random generator
+
+extern QP::QActive *the_Ticker0;
 
 } // namespace GAME
 

@@ -248,6 +248,7 @@ private:
     friend class QF;
     friend class QActive;
     friend class QXThread;
+    friend class QTicker;
 };
 
 } // namespace QP

@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: "Fly 'n' Shoot" game example for Win32-GUI
-// Last updated for version 5.6.5
-// Last updated on  2016-05-13
+// Last updated for version 5.8.1
+// Last updated on  2016-12-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -826,7 +826,8 @@ void QF::onCleanup(void) {
 //............................................................................
 void QF_onClockTick(void) {
     static QP::QEvt const tickEvt = QEVT_INITIALIZER(GAME::TIME_TICK_SIG);
-    QP::QF::TICK_X(0U, &GAME::l_clock_tick); // process time events at rate 0
+    //QP::QF::TICK_X(0U, &GAME::l_clock_tick); // process time events at rate 0
+    GAME::the_Ticker0->POST(0, 0); // post a don't-care event to Ticker0
     QP::QF::PUBLISH(&tickEvt, &GAME::l_clock_tick); // publish the tick event
 }
 //............................................................................

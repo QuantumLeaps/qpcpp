@@ -2,14 +2,14 @@
 /// @brief QXK/C++ port to ARM Cortex-M, GNU-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-12
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -64,6 +64,11 @@ static inline uint32_t QXK_get_IPSR(void) {
     QF_INT_ENABLE(); \
 } while (false)
 
+// initialization of the QXK kernel
+#define QXK_INIT() QXK_init()
+extern "C" {
+    void QXK_init(void);
+}
 
 #include "qxk.h" // QXK platform-independent public interface
 

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for DPP on EMF32-SLSTK3401A, QV kernel, GNU-ARM
-# Last Updated for Version: 5.6.5
-# Date of the Last Update:  2016-06-08
+# Last Updated for Version: 5.8.1
+# Date of the Last Update:  2016-12-12
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -122,7 +122,8 @@ QP_SRCS := \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
 	qf_time.cpp \
-	qv.cpp
+	qv.cpp \
+	qv_port.cpp
 
 QP_ASMS := \
 

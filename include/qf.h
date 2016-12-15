@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -259,6 +259,7 @@ public:
 
     friend class QF;
     friend class QTimeEvt;
+    friend class QTicker;
 #ifdef qk_h
     friend class QMutex;
 #endif // qk_h
@@ -575,6 +576,33 @@ private:
 #ifdef qxk_h
     friend class QXThread;
 #endif // qxk_h
+};
+
+
+//****************************************************************************
+//! Ticker Active Object class
+/// @description
+/// The QTicker is an efficient active object specialized to process
+/// QF system clock tick at a specified tick frequency [0..QF_MAX_TICK_RATE].
+/// Placing system clock tick processing in an active object allows you
+/// to remove the non-deterministic QF::TICK_X() processing from the interrupt
+/// level and move it into the thread-level, where you can prioritize it
+/// as low as you wish.
+///
+class QTicker : public QActive {
+public:
+    QTicker(uint8_t const tickRate); // ctor
+
+    virtual void init(QEvt const * const e);
+    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
+    virtual void dispatch(QEvt const * const e);
+#ifndef Q_SPY
+    virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
+#else
+    virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
+                       void const * const sender);
+#endif
+    virtual void postLIFO(QEvt const * const e);
 };
 
 } // namespace QP

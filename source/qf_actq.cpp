@@ -8,14 +8,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -36,8 +36,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -254,7 +254,7 @@ QEvt const *QActive::get_(void) {
     QACTIVE_EQUEUE_WAIT_(this); // wait for event to arrive directly
 
     QEvt const *e = m_eQueue.m_frontEvt; // always remove evt from the front
-    QEQueueCtr nFree= m_eQueue.m_nFree + static_cast<QEQueueCtr>(1);
+    QEQueueCtr nFree = m_eQueue.m_nFree + static_cast<QEQueueCtr>(1);
     m_eQueue.m_nFree = nFree; // upate the number of free
 
     // any events in the ring buffer?
@@ -282,8 +282,6 @@ QEvt const *QActive::get_(void) {
         // all entries in the queue must be free (+1 for fronEvt)
         Q_ASSERT_ID(310, nFree ==
                          (m_eQueue.m_end + static_cast<QEQueueCtr>(1)));
-
-        QACTIVE_EQUEUE_ONEMPTY_(this);
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_GET_LAST, QS::priv_.aoObjFilter, this)
             QS_TIME_();                      // timestamp
@@ -325,6 +323,73 @@ uint_fast16_t QF::getQueueMin(uint_fast8_t const prio) {
     QF_CRIT_EXIT_();
 
     return min;
+}
+
+//****************************************************************************
+QTicker::QTicker(uint8_t const tickRate)
+  : QActive(Q_STATE_CAST(0))
+{
+    // reuse m_head for tick-rate
+    m_eQueue.m_head = static_cast<QEQueueCtr>(tickRate);
+}
+//****************************************************************************
+void QTicker::init(QEvt const * const /*e*/) {
+    m_eQueue.m_tail = static_cast<QEQueueCtr>(0);
+}
+//****************************************************************************
+void QTicker::dispatch(QEvt const * const /*e*/) {
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
+    QEQueueCtr n = m_eQueue.m_tail; // # ticks since the last call
+    m_eQueue.m_tail = static_cast<QEQueueCtr>(0); // clear the # ticks
+    QF_CRIT_EXIT_();
+
+    for (; n > static_cast<QEQueueCtr>(0); --n) {
+        QF::TICK_X(static_cast<uint8_t>(m_eQueue.m_head), this);
+    }
+}
+//****************************************************************************
+#ifndef Q_SPY
+bool QTicker::post_(QEvt const * const /*e*/, uint_fast16_t const /*margin*/)
+#else
+bool QTicker::post_(QEvt const * const /*e*/, uint_fast16_t const /*margin*/,
+                    void const * const sender)
+#endif
+{
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
+    if (m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) {
+
+        static QEvt const tickEvt = { static_cast<QSignal>(0),
+                                      static_cast<uint8_t>(0),
+                                      static_cast<uint8_t>(0) };
+        m_eQueue.m_frontEvt = &tickEvt; // deliver event directly
+        --m_eQueue.m_nFree; // one less free event
+
+        QACTIVE_EQUEUE_SIGNAL_(this); // signal the event queue
+    }
+
+    ++m_eQueue.m_tail; // account for one more tick event
+
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.aoObjFilter, this)
+        QS_TIME_();               // timestamp
+        QS_OBJ_(sender);          // the sender object
+        QS_SIG_(static_cast<QSignal>(0)); // the signal of the event
+        QS_OBJ_(this);            // this active object
+        QS_2U8_(static_cast<uint8_t>(0),
+                static_cast<uint8_t>(0)); // pool Id & refCtr of the evt
+        QS_EQC_(static_cast<uint8_t>(0)); // number of free entries
+        QS_EQC_(static_cast<uint8_t>(0)); // min number of free entries
+    QS_END_NOCRIT_()
+
+    QF_CRIT_EXIT_();
+
+    return true; // the event is always posted correctly
+}
+
+//****************************************************************************
+void QTicker::postLIFO(QEvt const * const /*e*/) {
+    Q_ERROR_ID(900); // operation not allowed
 }
 
 } // namespace QP

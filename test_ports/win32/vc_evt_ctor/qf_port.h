@@ -1,81 +1,85 @@
-//****************************************************************************
-// Product: QF/C++  port to Win32
-// Last Updated for Version: 5.1.0
-// Date of the Last Update:  Sep 28, 2013
-//
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
-//
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
-//
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-//
-// Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
-//****************************************************************************
+/// \file
+/// \brief QF/C++ port to Win32 API
+/// \cond
+///***************************************************************************
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-14
+///
+///                    Q u a n t u m     L e a P s
+///                    ---------------------------
+///                    innovating embedded systems
+///
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// http://www.state-machine.com
+/// mailto:info@state-machine.com
+///***************************************************************************
+/// \endcond
+
 #ifndef qf_port_h
 #define qf_port_h
-                                         // Win32 event queue and thread types
+
+// Win32 event queue and thread types
 #define QF_EQUEUE_TYPE              QEQueue
 #define QF_OS_OBJECT_TYPE           void*
 #define QF_THREAD_TYPE              void*
 
-                    // The maximum number of active objects in the application
+// The maximum number of active objects in the application
 #define QF_MAX_ACTIVE               63
-                                      // The number of system clock tick rates
+// The number of system clock tick rates
 #define QF_MAX_TICK_RATE            2
 
-                        // various QF object sizes configuration for this port
+// various QF object sizes configuration for this port
 #define QF_EVENT_SIZ_SIZE           4
 #define QF_EQUEUE_CTR_SIZE          4
 #define QF_MPOOL_SIZ_SIZE           4
 #define QF_MPOOL_CTR_SIZE           4
 #define QF_TIMEEVT_CTR_SIZE         4
 
-                                         // Win32 critical section, see NOTE01
+// Win32 critical section, see NOTE01
 // QF_CRIT_STAT_TYPE not defined
 #define QF_CRIT_ENTRY(dummy)        (QP::QF_enterCriticalSection())
 #define QF_CRIT_EXIT(dummy)         (QP::QF_leaveCriticalSection())
 
-#include "qep_port.h"                                              // QEP port
-#include "qequeue.h"                                // Win32 needs event-queue
-#include "qmpool.h"                                 // Win32 needs memory-pool
-#include "qpset.h"                                 // Win32 needs priority-set
-#include "qf.h"                    // QF platform-independent public interface
+#include "qep_port.h" // QEP port
+#include "qequeue.h"  // Win32 needs event-queue
+#include "qmpool.h"   // Win32 needs memory-pool
+#include "qpset.h"    // Win32 needs priority-set
+#include "qf.h"       // QF platform-independent public interface
 
 namespace QP {
 
 void QF_enterCriticalSection(void);
 void QF_leaveCriticalSection(void);
-void QF_setTickRate(uint32_t ticksPerSec);              // set clock tick rate
-void QF_onClockTick(void);        // clock tick callback (provided in the app)
+void QF_setTickRate(uint32_t ticksPerSec); // set clock tick rate
+void QF_onClockTick(void); // clock tick callback (provided in the app)
 
-}                                                              // namespace QP
+} // namespace QP
 
 //****************************************************************************
 // interface used only inside QF, but not in applications
 
 #ifdef qf_pkg_h
-                                   // Win32-specific event queue customization
+    // Win32-specific event queue customization
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) { \
             QF_CRIT_EXIT_(); \
@@ -86,9 +90,7 @@ void QF_onClockTick(void);        // clock tick callback (provided in the app)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
         (void)SetEvent((me_)->m_osObject)
 
-    #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
-
-                                       // Win32-specific event pool operations
+    // Win32-specific event pool operations
     #define QF_EPOOL_TYPE_            QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init(poolSto_, poolSize_, evtSize_)
@@ -98,7 +100,7 @@ void QF_onClockTick(void);        // clock tick callback (provided in the app)
     #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
 
     #define WIN32_LEAN_AND_MEAN
-    #include <windows.h>                                          // Win32 API
+    #include <windows.h> // Win32 API
 #endif
 
 //****************************************************************************
@@ -132,4 +134,4 @@ void QF_onClockTick(void);        // clock tick callback (provided in the app)
 // information.
 //
 
-#endif                                                            // qf_port_h
+#endif // qf_port_h

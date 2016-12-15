@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to TI-RTOS kernel (SYS/BIOS), all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.3
-/// Last updated on  2016-10-06
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -74,7 +74,6 @@
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
     #define QACTIVE_EQUEUE_SIGNAL_(me_) Swi_post((me_)->m_thread)
-    #define QACTIVE_EQUEUE_ONEMPTY_(dummy) ((void)0)
 
     // TI-RTOS native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool

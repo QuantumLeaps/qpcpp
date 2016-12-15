@@ -25,6 +25,7 @@
 *.suo
 *.chw
 *.sfr
+*.ewt
 *.user
 *.avrsuo
 *.Debug

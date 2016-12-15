@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -98,8 +98,6 @@ extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
         pthread_cond_signal(&(me_)->m_osObject) \
-
-    #define QACTIVE_EQUEUE_ONEMPTY_(me_) ((void)0)
 
     // native QF event pool operations...
     #define QF_EPOOL_TYPE_            QMPool

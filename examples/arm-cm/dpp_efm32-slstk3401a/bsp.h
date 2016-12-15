@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example
-// Last Updated for Version: 5.6.0
-// Date of the Last Update:  2015-12-28
+// Last Updated for Version: 5.8.1
+// Date of the Last Update:  2016-12-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -46,13 +46,15 @@ public:
     static void terminate(int16_t const result);
 
     static void randomSeed(uint32_t const seed); // random seed
-    static uint32_t random(void);                // pseudo-random generator
+    static uint32_t random(void); // pseudo-random generator
 
     // for testing...
     static void wait4SW1(void);
     static void ledOn(void);
     static void ledOff(void);
 };
+
+extern QP::QActive *the_Ticker0;
 
 } // namespace DPP
 

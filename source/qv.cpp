@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-29
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-11
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -84,6 +84,10 @@ void QF::init(void) {
     bzero(&QF::timeEvtHead_[0],
           static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
     bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
+
+#ifdef QV_INIT
+    QV_INIT(); // port-specific initialization of the QV kernel
+#endif
 }
 
 //****************************************************************************

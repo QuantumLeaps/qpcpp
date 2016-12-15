@@ -2,8 +2,8 @@
 /// @brief QK/C++ port to ARM Cortex-M, ARM-KEIL toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-11
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -58,6 +58,12 @@ static __inline uint32_t QK_get_IPSR(void) {
     } \
     QF_INT_ENABLE(); \
 } while (0)
+
+// initialization of the QK kernel
+#define QK_INIT() QK_init()
+extern "C" {
+    void QK_init(void);
+}
 
 #include "qk.h" // QK platform-independent public interface
 

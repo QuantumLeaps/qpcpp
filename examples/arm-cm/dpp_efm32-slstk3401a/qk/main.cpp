@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example
-// Last updated for version 5.6.2
-// Last updated on  2016-03-31
+// Last updated for version 5.8.1
+// Last updated on  2016-12-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,6 +35,9 @@
 #include "dpp.h"
 #include "bsp.h"
 
+static QP::QTicker l_ticker0(0); // ticker for tick rate 0
+QP::QActive *DPP::the_Ticker0 = &l_ticker0;
+
 //............................................................................
 int main() {
     static QP::QEvt const *tableQueueSto[N_PHILO];
@@ -63,11 +66,17 @@ int main() {
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U),
+        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
                            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
                            (void *)0, 0U);
     }
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 1U),
+
+    // example of prioritizing the Ticker0 active object
+    DPP::the_Ticker0->start((uint_fast8_t)(N_PHILO + 1U), // priority
+                            0, 0,
+                            0, 0);
+
+    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 2U), // priority
                     tableQueueSto, Q_DIM(tableQueueSto),
                     (void *)0, 0U);
 

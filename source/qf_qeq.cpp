@@ -2,8 +2,8 @@
 /// @brief QP::QEQueue implementation
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-14
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -84,8 +84,10 @@ void QEQueue::init(QEvt const *qSto[], uint_fast16_t const qLen) {
     m_frontEvt = static_cast<QEvt const *>(0); // no events in the queue
     m_ring     = &qSto[0];
     m_end      = static_cast<QEQueueCtr>(qLen);
-    m_head     = static_cast<QEQueueCtr>(0);
-    m_tail     = static_cast<QEQueueCtr>(0);
+    if (qLen > static_cast<uint_fast16_t>(0)) {
+        m_head = static_cast<QEQueueCtr>(0);
+        m_tail = static_cast<QEQueueCtr>(0);
+    }
     m_nFree    = static_cast<QEQueueCtr>(
                  qLen + static_cast<uint_fast16_t>(1)); //+1 for frontEvt
     m_nMin     = m_nFree;

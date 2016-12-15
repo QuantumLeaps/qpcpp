@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QK kernel
-// Last Updated for Version: 5.6.5
-// Date of the Last Update:  2016-06-02
+// Last Updated for Version: 5.8.1
+// Date of the Last Update:  2016-12-14
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -119,7 +119,8 @@ void SysTick_Handler(void) {
     }
 #endif
 
-    QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    //QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
@@ -301,7 +302,7 @@ void QF::onStartup(void) {
 
     // set priorities of ALL ISRs used in the system, see NOTE00
     //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     //

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Fly 'n' Shoot" game example for Windows
-// Last updated for version 5.7.5
-// Last updated on  2016-11-08
+// Last updated for version 5.8.1
+// Last updated on  2016-12-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -37,6 +37,9 @@
 
 // "fudge factor" for Windows, see NOTE1
 enum { WIN_FUDGE_FACTOR = 10 };
+
+static QP::QTicker l_ticker0(0); // ticker for tick rate 0
+QP::QActive *GAME::the_Ticker0 = &l_ticker0;
 
 //............................................................................
 int main() {
@@ -76,13 +79,15 @@ int main() {
     QS_SIG_DICTIONARY(GAME::GAME_OVER_SIG,      static_cast<void *>(0));
 
     // start the active objects...
-    GAME::AO_Tunnel ->start(1U,                     // priority
+    GAME::the_Ticker0->start(1U, // priority
+                             0, 0, 0, 0);
+    GAME::AO_Tunnel ->start(2U,                     // priority
                       tunnelQueueSto, Q_DIM(tunnelQueueSto), // evt queue
                       static_cast<void *>(0), 0U);  // no per-thread stack
-    GAME::AO_Ship   ->start(2U,                     // priority
+    GAME::AO_Ship   ->start(3U,                     // priority
                       shipQueueSto, Q_DIM(shipQueueSto), // evt queue
                       static_cast<void *>(0), 0U);  // no per-thread stack
-    GAME::AO_Missile->start(3U,                     // priority
+    GAME::AO_Missile->start(4U,                     // priority
                       missileQueueSto, Q_DIM(missileQueueSto), // evt queue
                       static_cast<void *>(0), 0U);  // no per-thread stack
 

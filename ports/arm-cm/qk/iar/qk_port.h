@@ -2,8 +2,8 @@
 /// @brief QK/C++ port to ARM Cortex-M, preemptive QK kernel, IAR-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 5.8.1
+/// Last updated on  2016-12-11
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -41,7 +41,7 @@
 // determination if the code executes in the ISR context
 #define QK_ISR_CONTEXT_() (__get_IPSR() != static_cast<uint32_t>(0))
 
-/* QK interrupt entry and exit */
+// QK interrupt entry and exit
 #define QK_ISR_ENTRY() ((void)0)
 
 #define QK_ISR_EXIT()  do { \
@@ -52,6 +52,12 @@
     } \
     QF_INT_ENABLE(); \
 } while (0)
+
+// initialization of the QK kernel
+#define QK_INIT() QK_init()
+extern "C" {
+    void QK_init(void);
+}
 
 #include "qk.h" // QK platform-independent public interface
 

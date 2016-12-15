@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Blinky" on LAUCHXL2-TMS570LS12 board, preemptive QK kernel
-// Last Updated for Version: 5.7.0
-// Date of the Last Update:  2016-08-31
+// Last Updated for Version: 5.8.1
+// Date of the Last Update:  2016-12-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -121,9 +121,6 @@ void QF::onStartup(void) {
 void QF::onCleanup(void) {
 }
 
-//............................................................................
-extern "C" void QK_init(void) {
-}
 //............................................................................
 void QK::onIdle(void) {
    // toggle LED1 on and then off, see NOTE01

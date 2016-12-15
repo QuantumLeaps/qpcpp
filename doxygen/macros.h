@@ -91,18 +91,6 @@ namespace QP {
     } \
 } while (false)
 
-/// \brief Platform-dependent macro defining the action QF should take
-/// when the native QF event queue becomes empty.
-///
-/// \note #QACTIVE_EQUEUE_ONEMPTY_ is called from a critical section.
-/// It should not leave the critical section.
-///
-/// \note This is just an example of #QACTIVE_EQUEUE_ONEMPTY_ for the QK-port
-/// of QF. In other QF ports you need to define the macro appropriately for
-/// the underlying kernel/OS you're using.
-#define QACTIVE_EQUEUE_ONEMPTY_(me_) \
-    QK_readySet_.remove((me_)->m_prio)
-
 /// \brief This macro defines the type of the event pool used in this QF port.
 ///
 /// \note This is a specific implementation for the QK-port of QF.
