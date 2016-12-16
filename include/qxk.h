@@ -79,13 +79,6 @@ struct QXK_Attr {
 //! global attributes of the QXK kernel
 extern QXK_Attr QXK_attr_;
 
-//! QXK initialization
-///
-/// QXK_init() is called from QF_init() in qxk.c. This function is
-/// defined in the QXK ports.
-///
-void QXK_init(void);
-
 //! QXK scheduler finds the highest-priority thread ready to run
 uint_fast8_t QXK_sched_(void);
 

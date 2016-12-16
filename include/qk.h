@@ -70,12 +70,6 @@ struct QK_Attr {
 //! global attributes of the QK kernel
 extern QK_Attr QK_attr_;
 
-//! QK initialization
-/// @descritption
-/// QK_init() is called from QF_init() in qk.c. This function is
-/// defined in the QK ports.
-void QK_init(void);
-
 //! QK scheduler finds the highest-priority thread ready to run
 uint_fast8_t QK_sched_(void);
 
