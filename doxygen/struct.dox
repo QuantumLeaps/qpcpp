@@ -2,6 +2,32 @@
 
 @tableofcontents
 
+@section files Directories and Files
+
+The following annotated directory tree lists the top-level directories provided in the standard QP/C++ distribution:
+
+<ul class="tag">
+  <li><span class="img folder">qpcpp/</span>
+  </li>
+  <ul class="tag">
+    <li><span class="img folder">3rd_party/</span> &mdash; Third-Party code used in the QP/C++ @ref ports "ports" and @ref exa "examples"
+    </li>
+    <li><span class="img folder">examples/</span> &mdash; @ref exa "QP/C++ Examples"
+    </li>
+    <li><span class="img folder">ports/</span> &mdash; @ref ports "QP/C++ Ports"
+    </li>
+    <li><span class="img folder">include/</span> &mdash; Platform-independent QP/C++ API (see <a href="dir_d44c64559bbebec7f509842c48db8b23.html"><strong>include</strong></a>)
+    </li>
+    <li><span class="img folder">source/</span> &mdash; Platform-independent QP/C++ source code (see <a href="dir_b2f33c71d4aa5e7af42a1ca61ff5af1b.html"><strong>source</strong></a>)
+    </li>
+  </ul>
+</ul>
+
+@note
+The standard QP/C++ distribution contains many @ref exa "Example Projects", which are specifically designed to help you learn to use QP/C++ and to serve you as starting points for your own projects.
+
+
+------------------------------------------------------------------------------
 @section comp Components of QP/C++
 <p>As shown in the diagram below, the QP/C++ framework has a layered structure. The Target hardware sits at the bottom. The Board Support Package (BSP) above it provides access to the board-specific features, such as the peripherals. The real-time kernel (QV, QK, QXK, or a conventional 3rd-party RTOS) provides the foundation for multitasking, such as task scheduling, context-switching, and inter-task communication. Based on these services, the event-driven framework (QF) supplies the event-driven infrastructure for executing <a href="http://www.state-machine.com/doc/concepts.html#Active" target="_blank" class="extern">active objects</a> and ensuring thread-safe event-driven exchanges among them. Finally, the event-processor (QEP) implements the hierarchical state machine semantics (based on UML statecharts). The top layer is the application-level code consisting of loosely-coupled active objects.
 </p>
@@ -39,8 +65,7 @@ QS is software tracing system that enables developers to monitor live event-driv
 
 
 ------------------------------------------------------------------------------
-@section oop Object-Orientation
-
+@section qpcpp_oo Object-Orientation
 As most C++ frameworks, QP/C++ uses classes, inheritance, and polymorphism as the main mechanisms for customizing the framework into applications. The framework is also layered and consists of components with well defined responsibilities.
 
 
@@ -78,8 +103,14 @@ QP::QHsm is also the base class for the QP::QMsm state machine, which provides a
 
   <li><span class="tag">8</span> Application-level events with parameters derive from the QP::QEvt class.
   </li>
-
 </ul>
+
+@anchor sm_MI
+@attention
+The QP/C++ implementation of state machines is <strong>not compatible with Multiple Inheritance (MI) in C++</strong>. In other words, all subclasses of QP::QHsm (which includes subclasses of QP::QMsm, QP::QActive, and QP::QMActive) should use only *single inheritance*.
+
+@remark
+Multiple inheritance exposes the interface of all listed base classes. This is most likely <strong>incorrect</strong> with respect to state machine classes, because they should be used exclusively through the event-driven state machine interface (<em>init()</em>, <em>dispatch()</em>). State machines should only be known to the outside clients as opaque state machines and NOT as any other "mix-in" class. This is because interacting with state machines, and especially with active objects (<em>encapsulated</em> state machines), by any other means than events breaks the <a href="http://www.state-machine.com/doc/concepts.html#Encapsulation" class="extern">encapsulation for concurrency</a>.
 
 
 ------------------------------------------------------------------------------

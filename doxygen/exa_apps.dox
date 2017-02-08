@@ -15,8 +15,8 @@ Additionally, the QP/C++ distribution contains several application examples desc
 - Orthogonal Component design pattern
 - Orthogonal Component with QM model design pattern
 - Deferred Event design pattern
-- Transition-to-History (with ::QHsm class)
-- Transition-to-History (with ::QMsm class)
+- Transition-to-History (with QP::QHsm class)
+- Transition-to-History (with QP::QMsm class)
 - QMsmTst Test State Machine based on QP::QMsm with QM model
 - QHsmTst Test State Machine based on QP::QHsm with QM model
 - Reminder design pattern from Chapter 5 of PSiCC2
@@ -73,7 +73,7 @@ The Blinky source code (blinky.c) is actually the same on all platforms, includi
 and the embedded boards. The only difference is in the Board Support Package (bsp.c), which is
 specific for the target.
 
-@includelineno examples/arm-cm/blinky_ek-tm4c123gxl/blinky.c
+@includelineno examples/arm-cm/blinky_ek-tm4c123gxl/blinky.cpp
 
 As you can see, the structure of the state machine is very clearly recognizable in this code. Please refer to the Application Note <a class="extern" target="_blank" href="http://state-machine.com/doc/AN_Crash_Course_in_UML_State_Machines.pdf">A Crash Course in UML State Machines</a> for exact explanation of the state machine coding techniques.
 

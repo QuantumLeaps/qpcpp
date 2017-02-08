@@ -1,7 +1,7 @@
 //****************************************************************************
 // Minimal Embedded C++ support, no exception handling, no RTTI
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-04-20
+// Last Updated for Version: 5.8.2
+// Date of the Last Update:  2017-02-06
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -40,6 +40,10 @@ void *operator new(size_t size) throw() {
 }
 //............................................................................
 void operator delete(void *p) throw() {
+    free(p);
+}
+//............................................................................
+void operator delete(void *p, unsigned int) throw() {
     free(p);
 }
 

@@ -70,5 +70,5 @@ not subject to any of its terms.
 Contact Information:
 ====================
 Quantum Leaps, LLC
-Web:   www.state-machine.com
-Email: info@state-machine.com
+http://www.state-machine.com
+mailto:info@state-machine.com

@@ -121,9 +121,9 @@ The <span class="img folder">ports/ti-rtos/qf_port.h</span> header file contains
 @endcode
 
 <ul class="tag">
-  <li><span class="tag">1</span> This port uses the native ::QEQueue class for the event queues of active objects;
+  <li><span class="tag">1</span> This port uses the native QP::QEQueue class for the event queues of active objects;
   </li>
-  <li><span class="tag">2</span> This port stores the entire TI-RTOS Swi control block (`Swi_Struct`) in the QMActive::osObject attribute; <span class="highlight">The inclusion of the whole `Swi_Struct` inside ::QMActive means that this port does not need any dynamic memory allocation by TI-RTOS, so that active objects can be allocated purely **statically.**</span>
+  <li><span class="tag">2</span> This port stores the entire TI-RTOS Swi control block (`Swi_Struct`) in the QMActive::osObject attribute; <span class="highlight">The inclusion of the whole `Swi_Struct` inside QP::QMActive means that this port does not need any dynamic memory allocation by TI-RTOS, so that active objects can be allocated purely **statically.**</span>
   </li>
   <li><span class="tag">3</span> This port stores the TI-RTOS Swi handle (`Swi_Handle`) block in the QMActive::thread attribute;
   </li>
@@ -145,9 +145,9 @@ The <span class="img folder">ports/ti-rtos/qf_port.h</span> header file contains
   </li>
   <li><span class="tag">15</span> The macro QACTIVE_EQUEUE_ONEMPTY_() customizes the behavior of the built-in queue inside the QActive::get_() operation (when the queue is becoming empty). In this port, this macro is not used (expands to an empty C statement).
   </li>
-  <li><span class="tag">16</span> This port uses the native ::QMPool memory pool to implement the event pools for dynamic events;
+  <li><span class="tag">16</span> This port uses the native QP::QMPool memory pool to implement the event pools for dynamic events;
   </li>
-  <li><span class="tag">17-20</span> These macros customize the behavior of the native ::QMPool memory pool to be used for event pools;
+  <li><span class="tag">17-20</span> These macros customize the behavior of the native QP::QMPool memory pool to be used for event pools;
   </li>
 </ul>
 
@@ -291,7 +291,7 @@ Currently, the port has been tested only on ARM Cortex-M3 and M4F.
 
 
 @section ucos-ii_source uC/OS-II Source and ARM Cortex-M3/M4 Ports
-The uC/OS-II V2.92 source code and ports are located in 3rd_party@uCOS-II. Please make sure to read about uC/OS-II licensing in the README file found in this directory.
+The uC/OS-II V2.92 source code and ports are located in 3rd_party/ucos-ii. Please make sure to read about uC/OS-II licensing in the README file found in this directory.
 
 @note
 The official Micrium ARM-Cortex-M ports have been modified by Quantum Leaps to remove the dependencies on the Micrium's uC-CPU and uC-LIB components, and instead to inter-operate with the Cortex Microcontroller Software Interface Standard (CMSIS).

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.8.2
+/// Last updated on  2016-12-22
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -123,7 +123,7 @@ void QF::thread_(QActive *act) {
         gc(e); // check if the event is garbage, and collect it if so
     } while (act->m_thread != static_cast<uint8_t>(0));
 
-    QF::remove_(act); // remove this object from any subscriptions
+    QF::remove_(act); // remove this object from the framework
     pthread_cond_destroy(&act->m_osObject); // cleanup the condition variable
 }
 //............................................................................

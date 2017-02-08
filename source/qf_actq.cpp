@@ -8,8 +8,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-14
+/// Last updated for version 5.8.2
+/// Last updated on  2017-01-05
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -360,9 +360,15 @@ bool QTicker::post_(QEvt const * const /*e*/, uint_fast16_t const /*margin*/,
     QF_CRIT_ENTRY_();
     if (m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) {
 
+#ifdef Q_EVT_CTOR
+        static QEvt const tickEvt(static_cast<QSignal>(0),
+                                  QEvt::STATIC_EVT);
+#else
         static QEvt const tickEvt = { static_cast<QSignal>(0),
                                       static_cast<uint8_t>(0),
                                       static_cast<uint8_t>(0) };
+#endif // Q_EVT_CTOR
+
         m_eQueue.m_frontEvt = &tickEvt; // deliver event directly
         --m_eQueue.m_nFree; // one less free event
 

@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-12
+/// Last updated for version 5.8.2
+/// Last updated on  2016-12-22
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -91,7 +91,7 @@ void QF::thread_(QActive *act) {
     } while (act->m_thread != NULL);
 
     act->unsubscribeAll(); // make sure that no events are subscribed
-    QF::remove_(act);  // remove this object from any subscriptions
+    QF::remove_(act);  // remove this object from the framework
     CloseHandle(act->m_osObject); // cleanup the OS event
 }
 //****************************************************************************

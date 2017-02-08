@@ -49,12 +49,7 @@ namespace QP {
 #define QF_OS_OBJECT_TYPE  uint8_t
 
 /// \brief This macro defines the type of the thread handle used for the
-/// active objects.
-///
-/// The thread type in QK is the pointer to the thread-local storage (TLS)
-/// This thread-local storage can be set on per-thread basis in
-/// QActive::start(). Later, the QK scheduler, passes the pointer to the
-/// thread-local storage to the macro #QK_TLS.
+/// active objects. This macro depends on the QP port.
 #define QF_THREAD_TYPE     void *
 
 /// \brief Platform-dependent macro defining how QF should block the calling

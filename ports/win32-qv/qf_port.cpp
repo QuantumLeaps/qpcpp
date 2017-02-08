@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-12
+/// Last updated for version 5.8.2
+/// Last updated on  2016-12-22
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -108,6 +108,10 @@ int_t QF::run(void) {
             uint_fast8_t p = QV_readySet_.findMax();
             QActive *a = active_[p];
             QF_INT_ENABLE();
+
+            // the active object 'a' must still be registered in QF
+            // (e.g., it must not be stopped)
+            Q_ASSERT_ID(320, a != static_cast<QActive *>(0));
 
             // perform the run-to-completion (RTS) step...
             // 1. retrieve the event from the AO's event queue, which by this

@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-12
+/// Last updated for version 5.8.2
+/// Last updated on  2017-01-05
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      581
+#define QP_VERSION      582
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "5.8.1"
+#define QP_VERSION_STR  "5.8.2"
 
-//! Tamperproof current QP release (5.8.1) and date (2016-12-16)
-#define QP_RELEASE      0x9FE861BAU
+//! Tamperproof current QP release (5.8.2) and date (2017-02-08)
+#define QP_RELEASE      0x9A8C4FB9U
 
 //****************************************************************************
 #ifndef Q_SIGNAL_SIZE
@@ -130,6 +130,8 @@ typedef double float64_t;
 
 
 //****************************************************************************
+//! namespace associated with the QP/C++ framework
+/// @ingroup qep qf qs qv qk qxk
 namespace QP {
 
 //! the current QP version number string based on QP_VERSION_STR
@@ -158,26 +160,37 @@ extern char_t const versionStr[6];
     //************************************************************************
     class QEvt {
     public:
-        QSignal sig; //!< signal of the event instance
-
-        //! the constructor
+        //! public constructor (dynamic event)
         QEvt(QSignal const s) // poolId_/refCtr_ intentionally uninitialized
           : sig(s) {}
 
+        enum StaticEvt { STATIC_EVT };
+
+        //! public constructor (static event)
+        QEvt(QSignal const s, StaticEvt /*dummy*/)
+          : sig(s),
+            poolId_(static_cast<uint8_t>(0)),
+            refCtr_(static_cast<uint8_t>(0))
+        {}
+
 #ifdef Q_EVT_VIRTUAL
-        // virtual destructor
+        //! virtual destructor
         virtual ~QEvt() {}
 #endif // Q_EVT_VIRTUAL
+
+    public:
+        QSignal sig; //!< signal of the event instance
 
     private:
         uint8_t poolId_;          //!< pool ID (0 for static event)
         uint8_t volatile refCtr_; //!< reference counter
 
         friend class QF;
-        friend class QMActive;
         friend class QActive;
+        friend class QMActive;
         friend class QTimeEvt;
         friend class QEQueue;
+        //friend class QTicker;
         friend uint8_t QF_EVT_POOL_ID_ (QEvt const * const e);
         friend uint8_t QF_EVT_REF_CTR_ (QEvt const * const e);
         friend void QF_EVT_REF_CTR_INC_(QEvt const * const e);

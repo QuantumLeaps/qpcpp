@@ -1,0 +1,205 @@
+C:/qp_lab/qpcpp/source/qxk.cpp:65: warning: Compound QP::QXKIdleThread is not documented.
+C:/qp_lab/qpcpp/include/qs.h:383: warning: Compound QP::QS::QSrxPriv is not documented.
+C:/qp_lab/qpcpp/include/qassert.h:197: warning: argument 'loc' of command @param is not found in the argument list of Q_onAssert(char_t const *const module, int_t location)
+C:/qp_lab/qpcpp/include/qassert.h:223: warning: The following parameters of Q_onAssert(char_t const *const module, int_t location) are not documented:
+  parameter 'location'
+C:/qp_lab/qpcpp/include/qep.h:649: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qep.h:638: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qep.h:644: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:841: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:726: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:660: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:709: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:687: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:690: warning: The following parameters of Q_NEW_X(e_, evtT_, margin_, sig_) are not documented:
+  parameter 'e_'
+C:/qp_lab/qpcpp/include/qf.h:743: warning: argument 'tickRate' of command @param is not found in the argument list of TICK_X(tickRate_, sender_)
+C:/qp_lab/qpcpp/include/qf.h:743: warning: argument 'sender' of command @param is not found in the argument list of TICK_X(tickRate_, sender_)
+C:/qp_lab/qpcpp/include/qf.h:759: warning: explicit link request to 'QF_TICK_X()' could not be resolved
+C:/qp_lab/qpcpp/include/qf.h:764: warning: The following parameters of TICK_X(tickRate_, sender_) are not documented:
+  parameter 'tickRate_'
+  parameter 'sender_'
+C:/qp_lab/qpcpp/include/qk.h:172: warning: Member QACTIVE_EQUEUE_WAIT_(me_) (macro definition) of file qk.h is not documented.
+C:/qp_lab/qpcpp/include/qk.h:175: warning: Member QACTIVE_EQUEUE_SIGNAL_(me_) (macro definition) of file qk.h is not documented.
+C:/qp_lab/qpcpp/include/qk.h:185: warning: Member QF_EPOOL_TYPE_ (macro definition) of file qk.h is not documented.
+C:/qp_lab/qpcpp/include/qk.h:186: warning: Member QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) (macro definition) of file qk.h is not documented.
+C:/qp_lab/qpcpp/include/qk.h:188: warning: Member QF_EPOOL_EVENT_SIZE_(p_) (macro definition) of file qk.h is not documented.
+C:/qp_lab/qpcpp/include/qk.h:190: warning: Member QF_EPOOL_GET_(p_, e_, m_) (macro definition) of file qk.h is not documented.
+C:/qp_lab/qpcpp/include/qk.h:192: warning: Member QF_EPOOL_PUT_(p_, e_) (macro definition) of file qk.h is not documented.
+C:/qp_lab/qpcpp/include/qs.h:495: warning: explicit link request to 'QS_QF_ACTIVE_GET' could not be resolved
+C:/qp_lab/qpcpp/include/qs.h:439: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qs.h:773: warning: explicit link request to 'QS_FUN_PTR_SIZE' could not be resolved
+C:/qp_lab/qpcpp/include/qs.h:754: warning: explicit link request to 'QS_OBJ_PTR_SIZE' could not be resolved
+C:/qp_lab/qpcpp/include/qv.h:104: warning: Member QF_SCHED_STAT_ (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qv.h:105: warning: Member QF_SCHED_LOCK_(dummy) (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qv.h:106: warning: Member QF_SCHED_UNLOCK_() (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qv.h:109: warning: Member QACTIVE_EQUEUE_WAIT_(me_) (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qv.h:111: warning: Member QACTIVE_EQUEUE_SIGNAL_(me_) (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qv.h:115: warning: Member QF_EPOOL_TYPE_ (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qv.h:116: warning: Member QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qv.h:118: warning: Member QF_EPOOL_EVENT_SIZE_(p_) (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qv.h:120: warning: Member QF_EPOOL_GET_(p_, e_, m_) (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qv.h:122: warning: Member QF_EPOOL_PUT_(p_, e_) (macro definition) of file qv.h is not documented.
+C:/qp_lab/qpcpp/include/qxk.h:197: warning: Member QACTIVE_EQUEUE_WAIT_(me_) (macro definition) of file qxk.h is not documented.
+C:/qp_lab/qpcpp/include/qxk.h:200: warning: Member QACTIVE_EQUEUE_SIGNAL_(me_) (macro definition) of file qxk.h is not documented.
+C:/qp_lab/qpcpp/include/qxk.h:210: warning: Member QF_EPOOL_TYPE_ (macro definition) of file qxk.h is not documented.
+C:/qp_lab/qpcpp/include/qxk.h:211: warning: Member QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) (macro definition) of file qxk.h is not documented.
+C:/qp_lab/qpcpp/include/qxk.h:213: warning: Member QF_EPOOL_EVENT_SIZE_(p_) (macro definition) of file qxk.h is not documented.
+C:/qp_lab/qpcpp/include/qxk.h:215: warning: Member QF_EPOOL_GET_(p_, e_, m_) (macro definition) of file qxk.h is not documented.
+C:/qp_lab/qpcpp/include/qxk.h:217: warning: Member QF_EPOOL_PUT_(p_, e_) (macro definition) of file qxk.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qep_port.h:4: warning: Unsupported xml/html tag <qpcpp> found
+C:/qp_lab/qpcpp/ports/lint/qk/qf_port.h:233: warning: Member crit_stat_t (typedef) of file qk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qk/qf_port.h:193: warning: Member intDisable(void) (function) of file qk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qk/qf_port.h:194: warning: Member intEnable(void) (function) of file qk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qk/qf_port.h:234: warning: Member critEntry(void) (function) of file qk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qk/qf_port.h:235: warning: Member critExit(QF_CRIT_STAT_TYPE stat) (function) of file qk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qv/qf_port.h:252: warning: Member crit_stat_t (typedef) of file qv/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qv/qf_port.h:198: warning: Member intDisable(void) (function) of file qv/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qv/qf_port.h:199: warning: Member intEnable(void) (function) of file qv/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qv/qf_port.h:253: warning: Member critEntry(void) (function) of file qv/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qv/qf_port.h:254: warning: Member critExit(QF_CRIT_STAT_TYPE stat) (function) of file qv/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qxk/qf_port.h:233: warning: Member crit_stat_t (typedef) of file qxk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qxk/qf_port.h:193: warning: Member intDisable(void) (function) of file qxk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qxk/qf_port.h:194: warning: Member intEnable(void) (function) of file qxk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qxk/qf_port.h:234: warning: Member critEntry(void) (function) of file qxk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qxk/qf_port.h:235: warning: Member critExit(QF_CRIT_STAT_TYPE stat) (function) of file qxk/qf_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qk/qk_port.h:100: warning: Member FPU_save(void *ctx) (function) of file qk_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qk/qk_port.h:101: warning: Member FPU_restore(void *ctx) (function) of file qk_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qk/qk_port.h:102: warning: Member impure_ptr (variable) of file qk_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qs_port.h:41: warning: Member QS_TIME_SIZE (macro definition) of file qs_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qs_port.h:42: warning: Member QS_OBJ_PTR_SIZE (macro definition) of file qs_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qs_port.h:43: warning: Member QS_FUN_PTR_SIZE (macro definition) of file qs_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qxk/qxk_port.h:88: warning: Member getSR(void) (function) of file qxk_port.h is not documented.
+C:/qp_lab/qpcpp/ports/lint/qxk/qxk_port.h:89: warning: Member trigSWI(void) (function) of file qxk_port.h is not documented.
+C:/qp_lab/qpcpp/source/qep_hsm.cpp:39: warning: Member QP_IMPL (macro definition) of file qep_hsm.cpp is not documented.
+C:/qp_lab/qpcpp/source/qep_msm.cpp:39: warning: Member QP_IMPL (macro definition) of file qep_msm.cpp is not documented.
+C:/qp_lab/qpcpp/source/qf_act.cpp:39: warning: Member QP_IMPL (macro definition) of file qf_act.cpp is not documented.
+C:/qp_lab/qpcpp/source/qf_qmact.cpp:38: warning: Member QP_IMPL (macro definition) of file qf_qmact.cpp is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:288: warning: Member rxParseData_(uint8_t const b) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:563: warning: Member rxHandleGoodFrame_(void) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:724: warning: Member rxHandleBadFrame_(void) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:738: warning: Member rxReportSuccess_(enum QSpyRxRecords const recId) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:747: warning: Member rxReportError_(uint8_t const stateId) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:756: warning: Member rxAddr_(uint8_t const b, QSAddr *const addr, uint8_t *const idx) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qxk.cpp:70: warning: Member l_idleThread (variable) of namespace QP is not documented.
+C:/qp_lab/qpcpp/doxygen/history.dox:25: warning: explicit link request to 'QF_BASEPRI' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:205: warning: explicit link request to 'QF_SCHED_STAT_TYPE_' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:326: warning: Found unknown command `\examples'
+C:/qp_lab/qpcpp/doxygen/history.dox:326: warning: Found unknown command `\arm'
+C:/qp_lab/qpcpp/doxygen/history.dox:326: warning: Found unknown command `\dpp_ek'
+C:/qp_lab/qpcpp/doxygen/history.dox:326: warning: Found unknown command `\qspy'
+C:/qp_lab/qpcpp/doxygen/history.dox:352: warning: expected whitespace after \ command
+C:/qp_lab/qpcpp/doxygen/history.dox:359: warning: Found unknown command `\examples'
+C:/qp_lab/qpcpp/doxygen/history.dox:364: warning: Found unknown command `\examples'
+C:/qp_lab/qpcpp/doxygen/history.dox:364: warning: Found unknown command `\arm'
+C:/qp_lab/qpcpp/doxygen/history.dox:364: warning: Found unknown command `\dpp_ek'
+C:/qp_lab/qpcpp/doxygen/history.dox:369: warning: Found unknown command `\examples'
+C:/qp_lab/qpcpp/doxygen/history.dox:369: warning: Found unknown command `\arm'
+C:/qp_lab/qpcpp/doxygen/history.dox:369: warning: Found unknown command `\dpp_ek'
+C:/qp_lab/qpcpp/doxygen/history.dox:369: warning: Found unknown command `\qspy'
+C:/qp_lab/qpcpp/doxygen/history.dox:371: warning: Found unknown command `\examples'
+C:/qp_lab/qpcpp/doxygen/history.dox:421: warning: explicit link request to 'QMActive' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:421: warning: explicit link request to 'QMActive' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:421: warning: explicit link request to 'QActive' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:450: warning: explicit link request to 'QActive' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:486: warning: unable to resolve reference to `avr' for \ref command
+C:/qp_lab/qpcpp/doxygen/history.dox:486: warning: unable to resolve reference to `exa_avr' for \ref command
+C:/qp_lab/qpcpp/doxygen/history.dox:486: warning: unable to resolve reference to `exa_avr' for \ref command
+C:/qp_lab/qpcpp/doxygen/history.dox:490: warning: unable to resolve reference to `cmsis-rtx' for \ref command
+C:/qp_lab/qpcpp/doxygen/history.dox:494: warning: unable to resolve reference to `freertos' for \ref command
+C:/qp_lab/qpcpp/doxygen/history.dox:596: warning: Found unknown command `\examples'
+C:/qp_lab/qpcpp/doxygen/history.dox:596: warning: Found unknown command `\win32'
+C:/qp_lab/qpcpp/doxygen/history.dox:596: warning: Found unknown command `\mingw'
+C:/qp_lab/qpcpp/doxygen/history.dox:596: warning: Found unknown command `\history'
+C:/qp_lab/qpcpp/doxygen/history.dox:598: warning: Found unknown command `\examples'
+C:/qp_lab/qpcpp/doxygen/history.dox:598: warning: Found unknown command `\win32'
+C:/qp_lab/qpcpp/doxygen/history.dox:598: warning: Found unknown command `\mingw'
+C:/qp_lab/qpcpp/doxygen/history.dox:598: warning: Found unknown command `\history_qm'
+C:/qp_lab/qpcpp/doxygen/history.dox:607: warning: explicit link request to 'QF::tickX_()' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:607: warning: explicit link request to 'QF::noTimeEvtsActiveX()' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:609: warning: explicit link request to 'QF::poolInit()' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:612: warning: explicit link request to 'QF::newX_()' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:620: warning: explicit link request to 'QEQueue::init()' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:621: warning: explicit link request to 'post()' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:786: warning: explicit link request to 'QMsm' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:795: warning: explicit link request to 'QHsm' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:939: warning: Found unknown command `\ports'
+C:/qp_lab/qpcpp/doxygen/history.dox:939: warning: Found unknown command `\arm'
+C:/qp_lab/qpcpp/doxygen/history.dox:939: warning: Found unknown command `\cmsis'
+C:/qp_lab/qpcpp/doxygen/history.dox:1104: warning: Found unknown command `\arm'
+C:/qp_lab/qpcpp/doxygen/history.dox:1276: warning: explicit link request to 'if' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:1442: warning: Unsupported xml/html tag <new> found
+C:/qp_lab/qpcpp/doxygen/history.dox:1472: warning: explicit link request to 'QF_TICK' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:1472: warning: explicit link request to 'QF_PUBLISH' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:1472: warning: explicit link request to 'QACTIVE_POST' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:1481: warning: explicit link request to 'QS_U32_HEX_T' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:1569: warning: Unsupported xml/html tag <qpcpp> found
+C:/qp_lab/qpcpp/doxygen/history.dox:1576: warning: Unsupported xml/html tag <qpcpp> found
+C:/qp_lab/qpcpp/doxygen/history.dox:1844: warning: explicit link request to 'Q_HANDLED()' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:1859: warning: explicit link request to 'QF_FSM_ACTIVE' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:1860: warning: explicit link request to 'QF_ACTIVE_SUPER_' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:1860: warning: explicit link request to 'QF_ACTIVE_STATE_' could not be resolved
+C:/qp_lab/qpcpp/doxygen/history.dox:1868: warning: explicit link request to 'QACTIVE_EQUEUE_ONEMPTY_()' could not be resolved
+C:/qp_lab/qpcpp/source/qs_rx.cpp:288: warning: Member rxParseData_(uint8_t const b) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:563: warning: Member rxHandleGoodFrame_(void) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:724: warning: Member rxHandleBadFrame_(void) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:738: warning: Member rxReportSuccess_(enum QSpyRxRecords const recId) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:747: warning: Member rxReportError_(uint8_t const stateId) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qs_rx.cpp:756: warning: Member rxAddr_(uint8_t const b, QSAddr *const addr, uint8_t *const idx) (function) of namespace QP is not documented.
+C:/qp_lab/qpcpp/source/qxk.cpp:70: warning: Member l_idleThread (variable) of namespace QP is not documented.
+C:/qp_lab/qpcpp/include/qep.h:308: warning: Member init(void) (function) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/include/qep.h:367: warning: Member ReservedHsmSignals (enumeration) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/include/qf.h:137: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qf_actq.cpp:94: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:205: warning: The following parameters of QP::QActive::post_(QEvt const *const e, uint_fast16_t const margin, void const *const sender) are not documented:
+  parameter 'sender'
+C:/qp_lab/qpcpp/source/qv.cpp:213: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qf_ps.cpp:192: warning: included file qf_subscribe.c is not found. Check your EXAMPLE_PATH
+C:/qp_lab/qpcpp/include/qep.h:197: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qf_ps.cpp:82: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:525: warning: The following parameters of QP::QF::tickX_(uint8_t const tickRate, void const *const sender) are not documented:
+  parameter 'sender'
+C:/qp_lab/qpcpp/include/qep.h:367: warning: Member ReservedHsmSignals (enumeration) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/include/qep.h:308: warning: Member init(void) (function) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/include/qep.h:292: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qep_hsm.cpp:529: warning: argument 'state' of command @param is not found in the argument list of QP::QHsm::isIn(QStateHandler const s)
+C:/qp_lab/qpcpp/include/qep.h:315: warning: The following parameters of QP::QHsm::isIn(QStateHandler const s) are not documented:
+  parameter 's'
+C:/qp_lab/qpcpp/include/qep.h:318: warning: The following parameters of QP::QHsm::top(void *const me, QEvt const *const e) are not documented:
+  parameter 'me'
+C:/qp_lab/qpcpp/include/qf.h:299: warning: Member init(void) (function) of class QP::QMActive is not documented.
+C:/qp_lab/qpcpp/include/qep.h:367: warning: Member ReservedHsmSignals (enumeration) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/include/qf.h:290: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:293: warning: included file qf_qmactive.cpp is not found. Check your EXAMPLE_PATH
+C:/qp_lab/qpcpp/include/qep.h:490: warning: Member init(void) (function) of class QP::QMsm is not documented.
+C:/qp_lab/qpcpp/include/qep.h:367: warning: Member ReservedHsmSignals (enumeration) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/include/qep.h:479: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qep_msm.cpp:479: warning: Found unknown command `\arguments'
+C:/qp_lab/qpcpp/source/qk_mutex.cpp:75: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qk_mutex.cpp:97: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qk_mutex.cpp:138: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qs.h:381: warning: Member priv_ (variable) of class QP::QS is not documented.
+C:/qp_lab/qpcpp/include/qs.h:388: warning: Member rxPriv_ (variable) of class QP::QS is not documented.
+C:/qp_lab/qpcpp/include/qf.h:594: warning: Member QTicker(uint8_t const tickRate) (function) of class QP::QTicker is not documented.
+C:/qp_lab/qpcpp/include/qf.h:597: warning: Member init(void) (function) of class QP::QTicker is not documented.
+C:/qp_lab/qpcpp/include/qep.h:367: warning: Member ReservedHsmSignals (enumeration) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/source/qf_actq.cpp:94: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qf.h:602: warning: The following parameters of QP::QTicker::post_(QEvt const *const e, uint_fast16_t const margin, void const *const sender) are not documented:
+  parameter 'sender'
+C:/qp_lab/qpcpp/source/qf_time.cpp:309: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qep.h:367: warning: Member ReservedHsmSignals (enumeration) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/include/qep.h:308: warning: Member init(void) (function) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/source/qxk_mutex.cpp:75: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qxk_mutex.cpp:100: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qxk_mutex.cpp:147: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qxthread.h:88: warning: Member init(void) (function) of class QP::QXThread is not documented.
+C:/qp_lab/qpcpp/include/qep.h:367: warning: Member ReservedHsmSignals (enumeration) of class QP::QHsm is not documented.
+C:/qp_lab/qpcpp/include/qxthread.h:63: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/include/qxthread.h:66: warning: included file qf_qxthread.cpp is not found. Check your EXAMPLE_PATH
+C:/qp_lab/qpcpp/source/qxk_xthr.cpp:69: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qxk_xthr.cpp:72: warning: included file qxk_xthread_ctor.cpp is not found. Check your EXAMPLE_PATH
+C:/qp_lab/qpcpp/include/qxthread.h:114: warning: The following parameters of QP::QXThread::post_(QEvt const *const e, uint_fast16_t const margin, void const *const sender) are not documented:
+  parameter 'sender'
+C:/qp_lab/qpcpp/source/qxk_xthr.cpp:299: warning: expected whitespace after [ command
+C:/qp_lab/qpcpp/source/qxk_xthr.cpp:112: warning: Illegal command n as part of a title section
+C:/qp_lab/qpcpp/source/qxk_xthr.cpp:114: warning: included file qxk_xthread_start.cpp is not found. Check your EXAMPLE_PATH

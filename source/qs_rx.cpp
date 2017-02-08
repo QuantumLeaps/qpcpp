@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-26
+/// Last updated for version 5.8.2
+/// Last updated on  2015-12-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -59,12 +59,14 @@ QS::QSrxPriv QS::rxPriv_; // QS-RX private data
     typedef uint64_t QSAddr;
 #endif
 
-// extended-state variables used for parsing various QS-RX Records...
+/// @cond
+/// Exlcude the following internals from the Doxygen documentation
+/// Extended-state variables used for parsing various QS-RX Records
 struct CmdVar {
     uint32_t param;
     uint8_t  idx;
     uint8_t  cmdId;
-} ;
+};
 
 struct TickVar {
     uint8_t rate;
@@ -173,6 +175,8 @@ static inline void tran_(RxStateEnum const target) {
 
 // QS-RX identifier for output of trace records
 static uint8_t const l_QS_RX = static_cast<uint8_t>(0);
+
+/// @endcond
 
 //****************************************************************************
 /// @description

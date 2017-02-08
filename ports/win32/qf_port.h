@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-14
+/// Last updated for version 5.8.2
+/// Last updated on  2016-12-22
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -65,16 +65,7 @@
 #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
 #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
-#ifdef _MSC_VER // Microsoft C/C++ compiler?
-    // use built-in intrinsic function for fast LOG2
-    #define QF_LOG2(x_) (static_cast<uint_fast8_t>(32U - __lzcnt(x_)))
-    #include <intrin.h>    // VC++ intrinsic functions
-#elif __GNUC__  // GNU C/C++ compiler?
-    // use built-in intrinsic function for fast LOG2
-    #define QF_LOG2(x_) (static_cast<uint_fast8_t>(32U - __builtin_clz(x_)))
-#else
-    // use the internal LOG2() implementation
-#endif
+// QF_LOG2 not defined -- use the internal LOG2() implementation
 
 #include "qep_port.h"  // QEP port
 #include "qequeue.h"   // Win32 needs event-queue
@@ -165,6 +156,8 @@ void QF_onClockTick(void);
         }
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
+        Q_ASSERT_ID(410, QF::active_[(me_)->m_prio] \
+                         != static_cast<QActive *>(0)); \
         (void)SetEvent((me_)->m_osObject)
 
     // Win32-specific event pool operations

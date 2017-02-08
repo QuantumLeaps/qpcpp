@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Nov 08, 2013
+// Last updated for version 5.8.2
+// Last updated on  2017-01-15
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,11 +28,10 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
-#include "qp_port.h"
+#include "qpcpp.h"
 #include "dpp.h"
 #include "bsp.h"
 
@@ -41,7 +40,7 @@ Q_DEFINE_THIS_FILE
 // Active object class -------------------------------------------------------
 class Philo : public QActive {
 private:
-    QTimeEvt m_timeEvt;                       // to timeout thinking or eating
+    QTimeEvt m_timeEvt; // to timeout thinking or eating
 
 public:
     Philo();
@@ -54,18 +53,19 @@ private:
 };
 
 // Local objects -------------------------------------------------------------
-static Philo l_philo[N_PHILO];                       // storage for all Philos
+static Philo l_philo[N_PHILO]; // storage for all Philos
 
 #define THINK_TIME  7
 #define EAT_TIME    5
-                              // helper macro to provide the ID of Philo "me_"
+
+// helper macro to provide the ID of Philo "me_"
 #define PHILO_ID(me_)    ((uint8_t)((me_) - l_philo))
 
-enum InternalSignals {                                     // internal signals
+enum InternalSignals { // internal signals
     TIMEOUT_SIG = MAX_SIG
 };
 // Global objects ------------------------------------------------------------
-QActive * const AO_Philo[N_PHILO] = {        // "opaque" pointers to Philo AOs
+QActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AOs
     &l_philo[0],
     &l_philo[1],
     &l_philo[2],
@@ -80,7 +80,7 @@ Philo::Philo()
 {}
 //............................................................................
 QState Philo::initial(Philo *me, QEvt const *) {
-    static uint8_t registered;            // starts off with 0, per C-standard
+    static uint8_t registered; // starts off with 0, per C-standard
     if (!registered) {
         QS_OBJ_DICTIONARY(&l_philo[0]);
         QS_OBJ_DICTIONARY(&l_philo[0].m_timeEvt);
@@ -100,8 +100,8 @@ QState Philo::initial(Philo *me, QEvt const *) {
 
         registered = (uint8_t)1;
     }
-    QS_SIG_DICTIONARY(HUNGRY_SIG, me);               // signal for each Philos
-    QS_SIG_DICTIONARY(TIMEOUT_SIG, me);              // signal for each Philos
+    QS_SIG_DICTIONARY(HUNGRY_SIG, me);  // signal for each Philos
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, me); // signal for each Philos
 
     me->subscribe(EAT_SIG);
 
@@ -117,9 +117,9 @@ QState Philo::thinking(Philo *me, QEvt const *e) {
         case TIMEOUT_SIG: {
             return Q_TRAN(&Philo::hungry);
         }
-        case EAT_SIG:                            // intentionally fall-through
+        case EAT_SIG: // intentionally fall-through
         case DONE_SIG: {
-                         // EAT or DONE must be for other Philos than this one
+            // EAT or DONE must be for other Philos than this one
             Q_ASSERT(((TableEvt const *)e)->philoNum != PHILO_ID(me));
             return Q_HANDLED();
         }
@@ -142,7 +142,7 @@ QState Philo::hungry(Philo *me, QEvt const *e) {
             break;
         }
         case DONE_SIG: {
-                                // DONE must be for other Philos than this one
+            // DONE must be for other Philos than this one
             Q_ASSERT(((TableEvt const *)e)->philoNum != PHILO_ID(me));
             return Q_HANDLED();
         }
@@ -165,9 +165,9 @@ QState Philo::eating(Philo *me, QEvt const *e) {
         case TIMEOUT_SIG: {
             return Q_TRAN(&Philo::thinking);
         }
-        case EAT_SIG:                            // intentionally fall-through
+        case EAT_SIG: // intentionally fall-through
         case DONE_SIG: {
-                         // EAT or DONE must be for other Philos than this one
+            // EAT or DONE must be for other Philos than this one
             Q_ASSERT(((TableEvt const *)e)->philoNum != PHILO_ID(me));
             return Q_HANDLED();
         }

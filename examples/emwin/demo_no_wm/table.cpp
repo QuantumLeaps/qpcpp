@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example with emWin/uC/GUI, NO Window Manager
-// Last Updated for Version: 5.1.1
-// Date of the Last Update:  Nov 08, 2013
+// Last updated for version 5.8.2
+// Last updated on  2017-01-15
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,9 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web sites: http://www.quantum-leaps.com
-//                          http://www.state-machine.com
-// e-mail:                  info@quantum-leaps.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 #include "qp_port.h"
 #include "dpp.h"
@@ -65,7 +64,7 @@ private:
 enum m_forkState { FREE, USED };
 
 // Local objects -------------------------------------------------------------
-static Table l_table;                                    // local Table object
+static Table l_table; // local Table object
 
 #ifdef Q_SPY
 enum QSUserRecords {
@@ -75,7 +74,7 @@ enum QSUserRecords {
 #endif
 
 // Public-scope objects ------------------------------------------------------
-QActive * const AO_Table = &l_table;                    // "opaque" AO pointer
+QActive * const AO_Table = &l_table; // "opaque" AO pointer
 
 
 // GUI definition ============================================================
@@ -110,9 +109,9 @@ static void displyPhilStat(uint8_t n, char const *stat) {
     l_philoStat[n] = stat;
     GUI_DispStringAt(stat,  l_xOrg + STATE_X, l_yOrg + l_philoY[n]);
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin */
-        QS_U8(1, n);                                     // Philosopher number */
-        QS_STR(stat);                                    // Philosopher status */
+    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
+        QS_U8(1, n);  // Philosopher number
+        QS_STR(stat); // Philosopher status
     QS_END()
 }
 //............................................................................
@@ -124,8 +123,8 @@ static void displyTableStat(char const *stat) {
     l_tableState = stat;
     GUI_DispStringAt(stat,  l_xOrg + STATE_X, l_yOrg + l_tableY);
 
-    QS_BEGIN(TABLE_STAT, AO_Table)        // application-specific record begin */
-        QS_STR(stat);                                    // Philosopher status */
+    QS_BEGIN(TABLE_STAT, AO_Table) // application-specific record begin
+        QS_STR(stat); // Philosopher status
     QS_END()
 }
 
@@ -175,13 +174,13 @@ QState Table::initial(Table *me, QEvt const *) {
     QS_FUN_DICTIONARY(&Table::initial);
     QS_FUN_DICTIONARY(&Table::serving);
 
-    QS_SIG_DICTIONARY(DONE_SIG,      0);                     // global signals
-    QS_SIG_DICTIONARY(EAT_SIG,       0);
+    QS_SIG_DICTIONARY(DONE_SIG,  0); // global signals
+    QS_SIG_DICTIONARY(EAT_SIG,   0);
     QS_SIG_DICTIONARY(PAUSE_SIG, 0);
 
-    QS_SIG_DICTIONARY(HUNGRY_SIG,    me);             // signal just for Table
+    QS_SIG_DICTIONARY(HUNGRY_SIG, me); // signal just for Table
 
-    GUI_Init();                                 // initialize the embedded GUI
+    GUI_Init(); // initialize the embedded GUI
 
     me->subscribe(DONE_SIG);
     me->subscribe(PAUSE_SIG);
@@ -200,19 +199,19 @@ QState Table::ready(Table *me, QEvt const *e) {
         }
 
         // ... hardkey events ...
-        case KEY_LEFT_REL_SIG: {                      // hardkey LEFT released
+        case KEY_LEFT_REL_SIG: { // hardkey LEFT released
             moveDppScreen(-5, 0);
             return Q_HANDLED();
         }
-        case KEY_RIGHT_REL_SIG: {                    // hardkey RIGHT released
+        case KEY_RIGHT_REL_SIG: { // hardkey RIGHT released
             moveDppScreen(5, 0);
             return Q_HANDLED();
         }
-        case KEY_DOWN_REL_SIG: {                      // hardkey DOWN released
+        case KEY_DOWN_REL_SIG: { // hardkey DOWN released
             moveDppScreen(0, 5);
             return Q_HANDLED();
         }
-        case KEY_UP_REL_SIG: {                          // hardkey UP released
+        case KEY_UP_REL_SIG: {   // hardkey UP released
             moveDppScreen(0, -5);
             return Q_HANDLED();
         }
@@ -227,7 +226,7 @@ QState Table::serving(Table *me, QEvt const *e) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             displyTableStat("serving");
-            for (n = 0; n < N_PHILO; ++n) {      // give permissions to eat...
+            for (n = 0; n < N_PHILO; ++n) { // give permissions to eat...
                 if (me->m_isHungry[n]
                     && (me->m_fork[LEFT(n)] == FREE)
                         && (me->m_fork[n] == FREE))
@@ -264,7 +263,7 @@ QState Table::serving(Table *me, QEvt const *e) {
             Q_ASSERT(n < N_PHILO);
             displyPhilStat(n, "thinking");
             me->m_fork[LEFT(n)] = me->m_fork[n] = FREE;
-            m = RIGHT(n);                          // check the right neighbor
+            m = RIGHT(n); // check the right neighbor
             if (me->m_isHungry[m] && me->m_fork[m] == FREE) {
                 me->m_fork[n] = me->m_fork[m] = USED;
                 me->m_isHungry[m] = 0;
@@ -273,7 +272,7 @@ QState Table::serving(Table *me, QEvt const *e) {
                 QF::PUBLISH(pe, me);
                 displyPhilStat(m, "eating  ");
             }
-            m = LEFT(n);                            // check the left neighbor
+            m = LEFT(n); // check the left neighbor
             n = LEFT(m);
             if (me->m_isHungry[m] && me->m_fork[n] == FREE) {
                 me->m_fork[m] = me->m_fork[n] = USED;
@@ -285,8 +284,8 @@ QState Table::serving(Table *me, QEvt const *e) {
             }
             return Q_HANDLED();
         }
-        case PAUSE_SIG:                             // "Toggle" button pressed
-        case KEY_CENTER_PRESS_SIG: {                 // hardkey CENTER pressed
+        case PAUSE_SIG: // "Toggle" button pressed
+        case KEY_CENTER_PRESS_SIG: { // hardkey CENTER pressed
             return Q_TRAN(&Table::paused);
         }
     }
@@ -315,8 +314,8 @@ QState Table::paused(Table *me, QEvt const *e) {
             me->m_fork[LEFT(n)] = me->m_fork[n] = FREE;
             return Q_HANDLED();
         }
-        case PAUSE_SIG:                             // "Toggle" button pressed
-        case KEY_CENTER_REL_SIG: {                  // hardkey CENTER released
+        case PAUSE_SIG: // "Toggle" button pressed
+        case KEY_CENTER_REL_SIG: { // hardkey CENTER released
             return Q_TRAN(&Table::serving);
         }
     }

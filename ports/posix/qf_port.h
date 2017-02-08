@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-14
+/// Last updated for version 5.8.2
+/// Last updated on  2016-12-22
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -97,6 +97,8 @@ extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
             pthread_cond_wait(&(me_)->m_osObject, &QF_pThreadMutex_)
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
+        Q_ASSERT_ID(410, QF::active_[(me_)->m_prio] \
+                         != static_cast<QActive *>(0)); \
         pthread_cond_signal(&(me_)->m_osObject) \
 
     // native QF event pool operations...
