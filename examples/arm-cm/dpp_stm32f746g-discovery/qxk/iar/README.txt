@@ -14,7 +14,7 @@ relative location.
 
 Stack Size and Heap Size
 ------------------------
-In this project, the size of the C++ stack and heap are determined in
+In this project, the size of the C stack and heap are determined in
 the linker script (.icf file, see the next section). 
 
 

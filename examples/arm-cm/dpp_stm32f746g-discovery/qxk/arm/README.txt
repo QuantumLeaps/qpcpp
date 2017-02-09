@@ -7,16 +7,20 @@ a QP application.
 ARM-KEIL Project File
 ---------------------
 The ARM-KEIL uVision project file provided with this example uses
-relative paths to the QP/C framework location (includes, port). These
+relative paths to the QP framework location (includes, ports). These
 relative paths must be modified when the project is moved to different
 relative location.
 
 
-Stack Size and Heap Size
-------------------------
-In this project, the size of the C stack and heap are determined in
-the assembly options, because both the stack and the heap are
-allocated in the assembly startup code (see the next section).
+Adjusting Stack and Heap Sizes
+==============================
+The stack and heap sizes are determined in this project by the 
+command-line options for the ARM assembler (see the Asm tab in
+the "Options for Target" dialog box in uVision). Specifically,
+you should define symbols: Stack_Size=xxx Heap_Size=yyy, where
+xxx represents a numerical value of stack size and yyy the
+numerical value of the heap size (for most embedded projects
+yyy should be 0, as the using the heap is not recommended).
 
 
 Startup Code
