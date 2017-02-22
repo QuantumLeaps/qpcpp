@@ -24,6 +24,7 @@ Finally, this release fixes the following bugs:
 - bug#152 Typo (qpcpp\ports\arm7-9\qk\gnu\qk_port.s:42) prevents
   compilation
 - bug#151 QTicker compile error when #Q_EVT_CTOR is defined
+- bug#154 qspy.c parses history transitions incorrectly
 
 
 ------------------------------------------------------------------------------

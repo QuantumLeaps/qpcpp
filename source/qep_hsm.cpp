@@ -3,14 +3,14 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.8.2
+/// Last updated on  2017-02-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -136,7 +136,7 @@ QHsm::~QHsm() {
 void QHsm::init(QEvt const * const e) {
     QStateHandler t = m_state.fun;
 
-    /// @pre ctor must be executed and initial tran. NOT taken
+    /// @pre ctor must have been executed and initial tran NOT taken
     Q_REQUIRE_ID(200, (m_temp.fun != Q_STATE_CAST(0))
                       && (t == Q_STATE_CAST(&QHsm::top)));
 
@@ -147,20 +147,16 @@ void QHsm::init(QEvt const * const e) {
     Q_ASSERT_ID(210, r == Q_RET_TRAN);
 
     QS_CRIT_STAT_
+    QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
+        QS_OBJ_(this);       // this state machine object
+        QS_FUN_(t);          // the source state
+        QS_FUN_(m_temp.fun); // the target of the initial transition
+    QS_END_()
 
     // drill down into the state hierarchy with initial transitions...
     do {
-        // transition entry path
-        QStateHandler path[MAX_NEST_DEPTH_];
-
-        // transition entry path index
-        int_fast8_t ip = static_cast<int_fast8_t>(0);
-
-        QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
-            QS_OBJ_(this);       // this state machine object
-            QS_FUN_(t);          // the source state
-            QS_FUN_(m_temp.fun); // the target of the initial transition
-        QS_END_()
+        QStateHandler path[MAX_NEST_DEPTH_];          // tran entry path array
+        int_fast8_t ip = static_cast<int_fast8_t>(0); // tran entry path index
 
         path[0] = m_temp.fun;
         (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
@@ -179,12 +175,25 @@ void QHsm::init(QEvt const * const e) {
         } while (ip >= static_cast<int_fast8_t>(0));
 
         t = path[0]; // current state becomes the new source
-    } while (QEP_TRIG_(t, Q_INIT_SIG) == Q_RET_TRAN);
 
-    QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
-        QS_OBJ_(this);       // this state machine object
-        QS_FUN_(&QHsm::top); // source of initial tran (the top state)
-        QS_FUN_(t);          // the new active state
+        r = QEP_TRIG_(t, Q_INIT_SIG); // execute initial transition
+
+#ifdef Q_SPY
+        if (r == Q_RET_TRAN) {
+            QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
+                QS_OBJ_(this);       // this state machine object
+                QS_FUN_(t);          // the source state
+                QS_FUN_(m_temp.fun); // the target of the initial transition
+            QS_END_()
+        }
+#endif /* Q_SPY */
+
+    } while (r == Q_RET_TRAN);
+
+    QS_BEGIN_(QS_QEP_INIT_TRAN, QS::priv_.smObjFilter, this)
+        QS_TIME_();    // time stamp
+        QS_OBJ_(this); // this state machine object
+        QS_FUN_(t);    // the new active state
     QS_END_()
 
     m_state.fun = t; // change the current active state
@@ -222,15 +231,14 @@ QState QHsm::top(void * const, QEvt const * const) {
 ///
 void QHsm::dispatch(QEvt const * const e) {
     QStateHandler t = m_state.fun;
+    QStateHandler s;
+    QState r;
+    QS_CRIT_STAT_
 
     /// @pre the current state must be initialized and
     /// the state configuration must be stable
     Q_REQUIRE_ID(400, (t != Q_STATE_CAST(0))
                        && (t == m_temp.fun));
-
-    QStateHandler s;
-    QState r;
-    QS_CRIT_STAT_
 
     QS_BEGIN_(QS_QEP_DISPATCH, QS::priv_.smObjFilter, this)
         QS_TIME_();              // time stamp
@@ -258,7 +266,7 @@ void QHsm::dispatch(QEvt const * const e) {
     } while (r == Q_RET_SUPER);
 
     // transition taken?
-    if ((r == Q_RET_TRAN) || (r == Q_RET_TRAN_HIST)) {
+    if (r >= Q_RET_TRAN) {
         QStateHandler path[MAX_NEST_DEPTH_];
 
         path[0] = m_temp.fun; // save the target of the transition
@@ -266,20 +274,31 @@ void QHsm::dispatch(QEvt const * const e) {
         path[2] = s;
 
         // exit current state to transition source s...
-        while (t != s) {
+        for (; t != s; t = m_temp.fun) {
             // exit handled?
             if (QEP_TRIG_(t, Q_EXIT_SIG) == Q_RET_HANDLED) {
                 QS_BEGIN_(QS_QEP_STATE_EXIT, QS::priv_.smObjFilter, this)
-                    QS_OBJ_(this);   // this state machine object
-                    QS_FUN_(t);      // the exited state
+                    QS_OBJ_(this); // this state machine object
+                    QS_FUN_(t);    // the exited state
                 QS_END_()
 
                 (void)QEP_TRIG_(t, QEP_EMPTY_SIG_); // find superstate of t
             }
-            t = m_temp.fun; // m_temp.fun holds the superstate
         }
 
         int_fast8_t ip = hsm_tran(path); // take the HSM transition
+
+#ifdef Q_SPY
+        if (r == Q_RET_TRAN_HIST) {
+
+            QS_BEGIN_(QS_QEP_TRAN_HIST, QS::priv_.smObjFilter, this)
+                QS_OBJ_(this);    // this state machine object
+                QS_FUN_(t);       // the source of the transition
+                QS_FUN_(path[0]); // the target of the tran. to history
+            QS_END_()
+
+        }
+#endif // Q_SPY
 
         // retrace the entry path in reverse (desired) order...
         for (; ip >= static_cast<int_fast8_t>(0); --ip) {
@@ -299,7 +318,9 @@ void QHsm::dispatch(QEvt const * const e) {
 
             ip = static_cast<int_fast8_t>(0);
             path[0] = m_temp.fun;
+
             (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_); // find superstate
+
             while (m_temp.fun != t) {
                 ++ip;
                 path[ip] = m_temp.fun;
@@ -310,7 +331,7 @@ void QHsm::dispatch(QEvt const * const e) {
             // entry path must not overflow
             Q_ASSERT_ID(410, ip < static_cast<int_fast8_t>(MAX_NEST_DEPTH_));
 
-             // retrace the entry path in reverse (correct) order...
+            // retrace the entry path in reverse (correct) order...
             do {
                 QEP_ENTER_(path[ip]);  // enter path[ip]
                 --ip;
@@ -319,57 +340,37 @@ void QHsm::dispatch(QEvt const * const e) {
             t = path[0];
         }
 
+        QS_BEGIN_(QS_QEP_TRAN, QS::priv_.smObjFilter, this)
+            QS_TIME_();          // time stamp
+            QS_SIG_(e->sig);     // the signal of the event
+            QS_OBJ_(this);       // this state machine object
+            QS_FUN_(s);          // the source of the transition
+            QS_FUN_(t);          // the new active state
+        QS_END_()
+    }
+
 #ifdef Q_SPY
-        if (r == Q_RET_TRAN) {
+    if (r == Q_RET_HANDLED) {
 
-            QS_BEGIN_(QS_QEP_TRAN, QS::priv_.smObjFilter, this)
-                QS_TIME_();          // time stamp
-                QS_SIG_(e->sig);     // the signal of the event
-                QS_OBJ_(this);       // this state machine object
-                QS_FUN_(s);          // the source of the transition
-                QS_FUN_(t);          // the new active state
-            QS_END_()
-
-        }
-        else {
-
-            QS_BEGIN_(QS_QEP_TRAN_HIST, QS::priv_.smObjFilter, this)
-                QS_TIME_();          // time stamp
-                QS_SIG_(e->sig);     // the signal of the event
-                QS_OBJ_(this);       // this state machine object
-                QS_FUN_(s);          // the source of the transition
-                QS_FUN_(t);          // the new active state
-            QS_END_()
-
-        }
-#endif // Q_SPY
+        QS_BEGIN_(QS_QEP_INTERN_TRAN, QS::priv_.smObjFilter, this)
+            QS_TIME_();          // time stamp
+            QS_SIG_(e->sig);     // the signal of the event
+            QS_OBJ_(this);       // this state machine object
+            QS_FUN_(s);          // the source state
+        QS_END_()
 
     }
-    // transition not taken
     else {
-#ifdef Q_SPY
-        if (r == Q_RET_HANDLED) {
 
-            QS_BEGIN_(QS_QEP_INTERN_TRAN, QS::priv_.smObjFilter, this)
-                QS_TIME_();          // time stamp
-                QS_SIG_(e->sig);     // the signal of the event
-                QS_OBJ_(this);       // this state machine object
-                QS_FUN_(m_state.fun);// the state that handled the event
-            QS_END_()
+        QS_BEGIN_(QS_QEP_IGNORED, QS::priv_.smObjFilter, this)
+            QS_TIME_();          // time stamp
+            QS_SIG_(e->sig);     // the signal of the event
+            QS_OBJ_(this);       // this state machine object
+            QS_FUN_(m_state.fun);// the current state
+        QS_END_()
 
-        }
-        else {
-
-            QS_BEGIN_(QS_QEP_IGNORED, QS::priv_.smObjFilter, this)
-                QS_TIME_();          // time stamp
-                QS_SIG_(e->sig);     // the signal of the event
-                QS_OBJ_(this);       // this state machine object
-                QS_FUN_(m_state.fun);// the current state
-            QS_END_()
-
-        }
-#endif
     }
+#endif // Q_SPY
 
     m_state.fun = t; // change the current active state
     m_temp.fun  = t; // mark the configuration as stable
@@ -442,7 +443,7 @@ int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]) {
                             iq = static_cast<int_fast8_t>(1);
 
                             // entry path must not overflow
-                            Q_ASSERT_ID(520,
+                            Q_ASSERT_ID(510,
                                 ip < static_cast<int_fast8_t>(MAX_NEST_DEPTH_));
                             --ip;  // do not enter the source
                             r = Q_RET_HANDLED; // terminate the loop
@@ -456,7 +457,7 @@ int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]) {
                     // LCA found yet?
                     if (iq == static_cast<int_fast8_t>(0)) {
                         // entry path must not overflow
-                        Q_ASSERT_ID(510,
+                        Q_ASSERT_ID(520,
                             ip < static_cast<int_fast8_t>(MAX_NEST_DEPTH_));
 
                         QEP_EXIT_(s); // exit the source
