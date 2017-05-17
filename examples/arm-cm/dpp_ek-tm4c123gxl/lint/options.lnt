@@ -67,7 +67,7 @@ qpcpp.lnt                     // QP/C++ options
 -esym(1960,                   // 16-0-4, Function-like macro defined
  QF_SET_BASEPRI,
  QK_ISR_CONTEXT_)
--esym(1923,                   // 16-2-2, could become const variable 
+-esym(1923,                   // 16-2-2, could become const variable
  QF_BASEPRI)
 -emacro(717,                  // do ... while(0);
  QK_ISR_ENTRY,

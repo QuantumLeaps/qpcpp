@@ -25,7 +25,7 @@ namespace QP {
 /*##########################################################################*/
 /*! @page exa_win32 Win32 API (Windows)
 
-<p>The <span class="img folder">examples/win32</span> folder contains all examples described in the book <a class="extern" target="_blank" href="http://www.state-machine.com/psicc2" >Practical UML Statecharts in C/C++, 2nd Edition</a>. These examples include:
+<p>The <span class="img folder">examples/win32</span> folder contains all examples described in the book <a class="extern" target="_blank" href="https://www.state-machine.com/psicc2" >Practical UML Statecharts in C/C++, 2nd Edition</a>. These examples include:
 </p>
 
 - <span class="img folder">blinky</span> Simple "Blinky" for Windows (command line)

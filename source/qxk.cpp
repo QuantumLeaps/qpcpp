@@ -4,14 +4,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-11
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -52,14 +52,14 @@
     #error "Source file included in a project NOT based on the QXK kernel"
 #endif // qxk_h
 
-Q_DEFINE_THIS_MODULE("qxk")
-
 // Public-scope objects ******************************************************
 extern "C" {
     QXK_Attr QXK_attr_;   // global attributes of the QXK kernel
 } // extern "C"
 
 namespace QP {
+
+Q_DEFINE_THIS_MODULE("qxk")
 
 // Local-scope objects *******************************************************
 class QXKIdleThread : public QActive {
@@ -68,7 +68,6 @@ public:
     {}
 };
 static QXKIdleThread l_idleThread;
-
 
 //****************************************************************************
 /// @description
@@ -122,7 +121,6 @@ void QF::stop(void) {
 //! process all events posted during initialization
 static void initial_events(void); // prototype
 static void initial_events(void) {
-
     QXK_attr_.lockPrio = static_cast<uint_fast8_t>(0); // unlock the scheduler
 
     // any active objects need to be scheduled before starting event loop?
@@ -163,10 +161,10 @@ int_t QF::run(void) {
 // @param[in] prio    priority at which to start the active object
 // @param[in] qSto    pointer to the storage for the ring buffer of the
 //                    event queue (used only with the built-in QP::QEQueue)
-// @param[in] qLen    length of the event queue (in events)
+// @param[in] qLen    length of the event queue [events]
 // @param[in] stkSto  pointer to the stack storage (used only when
 //                    per-AO stack is needed)
-// @param[in] stkSize stack size (in bytes)
+// @param[in] stkSize stack size [bytes]
 // @param[in] ie      pointer to the optional initialization event
 //                    (might be NULL).
 //
@@ -175,14 +173,17 @@ void QActive::start(uint_fast8_t const prio,
                      void * const stkSto, uint_fast16_t const stkSize,
                      QEvt const * const ie)
 {
-    Q_REQUIRE_ID(500, (!QXK_ISR_CONTEXT_()) /* don't start AO's in an ISR! */
-                      && (prio <= (uint_fast8_t)QF_MAX_ACTIVE)
-                      && (qSto != static_cast<QEvt const **>(0))
-                      && (qLen != static_cast<uint_fast16_t>(0))
+    /// @pre AO cannot be started from an ISR, the priority must be in range
+    /// and the stack storage must not be provided, because the QK kernel
+    /// does not need per-AO stacks.
+    ///
+    Q_REQUIRE_ID(500, (!QXK_ISR_CONTEXT_())
+                      && (static_cast<uint_fast8_t>(0) < prio)
+                      && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
                       && (stkSto == static_cast<void *>(0))
                       && (stkSize == static_cast<uint_fast16_t>(0)));
 
-    m_eQueue.init(qSto, qLen);   // initialize QEQueue of this AO
+    m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
 
     m_thread = static_cast<void *>(0); // no private stack for AO
     m_prio = prio;    // set the QF priority of this AO
@@ -205,27 +206,24 @@ void QActive::start(uint_fast8_t const prio,
 
 //****************************************************************************
 // @description
-// The preferred way of calling this function is from within the active
-// object that needs to stop. In other words, an active object should stop
-// itself rather than being stopped by someone else. This policy works
-// best, because only the active object itself "knows" when it has reached
-// the appropriate state for the shutdown.
+// This function must be called from within the AO that needs to stop.
+// In other words, an AO should stop itself rather than being stopped by
+// someone else. This policy works best, because only the AO itself "knows"
+// when it has reached the appropriate state for the shutdown.
 //
 // @note
 // By the time the AO calls QP::QActive::stop(), it should have unsubscribed
 // from all events and no more events should be directly-posted to it.
 //
 void QActive::stop(void) {
-    QF_CRIT_STAT_
-
-    QF_CRIT_ENTRY_();
     /// @pre QActive_stop() must be called from the AO that wants to stop.
-    Q_REQUIRE_ID(300, (!QXK_ISR_CONTEXT_()) /* don't stop AO's from an ISR! */
+    Q_REQUIRE_ID(600, (!QXK_ISR_CONTEXT_()) /* don't stop AO's from an ISR! */
                       && (this == QXK_attr_.curr));
 
     QF::remove_(this); // remove this active object from the QF
 
-
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
     QXK_attr_.readySet.remove(m_prio);
     if (QXK_sched_() != static_cast<uint_fast8_t>(0)) {
         QXK_activate_();
@@ -238,7 +236,6 @@ void QActive::stop(void) {
 
 //============================================================================
 extern "C" {
-
 
 //****************************************************************************
 /// @description
@@ -263,7 +260,7 @@ uint_fast8_t QXK_sched_(void) {
     QP::QActive *next = QP::QF::active_[p];
 
     // the thread found must be registered in QF
-    Q_ASSERT_ID(610, next != static_cast<QP::QActive *>(0));
+    //Q_ASSERT_ID(610, next != static_cast<QP::QActive *>(0));
 
     // is the current thread a basic-thread?
     if (QXK_attr_.curr == static_cast<void *>(0)) {
@@ -280,7 +277,8 @@ uint_fast8_t QXK_sched_(void) {
         }
         else {  // this is an extened-thread
 
-            QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT, QP::QS::priv_.aoObjFilter,
+            QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT,
+                             QP::QS::priv_.locFilter[QP::QS::AO_OBJ],
                              QXK_attr_.next)
                 QS_TIME_();         // timestamp
                 QS_2U8_(static_cast<uint8_t>(p), // prio of the next thread
@@ -297,9 +295,10 @@ uint_fast8_t QXK_sched_(void) {
 
         // is the new prio different from the current prio?
         if (p != static_cast<QP::QActive volatile*>(QXK_attr_.curr)->m_prio) {
-            QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT, QP::QS::priv_.aoObjFilter,
+            QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT,
+                             QP::QS::priv_.locFilter[QP::QS::AO_OBJ],
                              QXK_attr_.next)
-                QS_TIME_();         // timestamp
+                QS_TIME_(); // timestamp
                 QS_2U8_(static_cast<uint8_t>(p), // prio of the next thread
                         static_cast<uint8_t>(    // prio of the curent thread
                         static_cast<QP::QActive *>(QXK_attr_.curr)->m_prio));
@@ -344,7 +343,8 @@ void QXK_activate_(void) {
         QXK_attr_.actPrio = p; // this becomes the active prio
         QXK_attr_.next = static_cast<void *>(0); // clear the next AO
 
-        QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT, QP::QS::priv_.aoObjFilter, a)
+        QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT,
+                         QP::QS::priv_.locFilter[QP::QS::AO_OBJ], a)
             QS_TIME_();         // timestamp
             QS_2U8_(static_cast<uint8_t>(p), // prio of the next thread
                     static_cast<uint8_t>(pprev)); // prio of the prev thread
@@ -383,7 +383,7 @@ void QXK_activate_(void) {
         a = QP::QF::active_[p];
 
         // the AO must be registered in QF
-        Q_ASSERT_ID(710, a != static_cast<QP::QActive *>(0));
+        //Q_ASSERT_ID(710, a != static_cast<QP::QActive *>(0));
 
         // is the next an AO-thread?
         if (a->m_thread == static_cast<void *>(0)) {
@@ -397,7 +397,8 @@ void QXK_activate_(void) {
         }
         else {  // next is the-extened thread
 
-            QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT, QP::QS::priv_.aoObjFilter,
+            QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT,
+                             QP::QS::priv_.locFilter[QP::QS::AO_OBJ],
                              QXK_attr_.next)
                 QS_TIME_(); // timestamp
                 QS_2U8_(static_cast<uint8_t>(p), // prio of the next thread
@@ -417,7 +418,8 @@ void QXK_activate_(void) {
     if (pin != static_cast<uint_fast8_t>(0)) { // resuming an active object?
         a = QP::QF::active_[pin]; // the pointer to the preempted AO
 
-        QS_BEGIN_NOCRIT_(QP::QS_SCHED_RESUME, QP::QS::priv_.aoObjFilter, a)
+        QS_BEGIN_NOCRIT_(QP::QS_SCHED_RESUME,
+                         QP::QS::priv_.locFilter[QP::QS::AO_OBJ], a)
             QS_TIME_();  // timestamp
             QS_2U8_(static_cast<uint8_t>(p),      // prio of the next thread
                     static_cast<uint8_t>(pprev)); // prio of the prev thread

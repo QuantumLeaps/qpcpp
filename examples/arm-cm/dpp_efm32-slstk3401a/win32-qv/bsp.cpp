@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// http://www.state-machine.com
+// https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -494,13 +494,18 @@ void QS::onReset(void) {
 }
 //............................................................................
 //! callback function to execute a uesr command (to be implemented in BSP)
-void QS::onCommand(uint8_t cmdId, uint32_t param) {
+void QS::onCommand(uint8_t cmdId, uint32_t param1,
+                   uint32_t param2, uint32_t param3)
+{
     (void)cmdId;
-    (void)param;
-    // application-specific record begin
+    (void)param1;
+    (void)param2;
+    (void)param3;
+
+    // application-specific record
     QS_BEGIN(DPP::COMMAND_STAT, static_cast<void *>(0))
         QS_U8(2, cmdId);
-        QS_U32(8, param);
+        QS_U32(8, param1);
     QS_END()
 
     if (cmdId == 10U) {

@@ -4,8 +4,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -32,7 +32,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -178,7 +178,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
 }
 
 
-//****************************************************************************/
+//****************************************************************************
 /// @description
 /// This function is part of the Publish-Subscribe event delivery mechanism
 /// available in QF. Subscribing to an event means that the framework will
@@ -205,7 +205,8 @@ void QActive::subscribe(enum_t const sig) const {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_SUBSCRIBE, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_SUBSCRIBE,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();    // timestamp
         QS_SIG_(sig);  // the signal of this event
         QS_OBJ_(this); // this active object
@@ -246,7 +247,8 @@ void QActive::unsubscribe(enum_t const sig) const {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_UNSUBSCRIBE, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_UNSUBSCRIBE,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();         // timestamp
         QS_SIG_(sig);       // the signal of this event
         QS_OBJ_(this);      // this active object
@@ -290,7 +292,7 @@ void QActive::unsubscribeAll(void) const {
             QF_PTR_AT_(QF_subscrList_, sig).remove(p);
 
             QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_UNSUBSCRIBE,
-                             QS::priv_.aoObjFilter, this)
+                             QS::priv_.locFilter[QS::AO_OBJ], this)
                 QS_TIME_();     // timestamp
                 QS_SIG_(sig);   // the signal of this event
                 QS_OBJ_(this);  // this active object

@@ -5,8 +5,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-29
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -33,7 +33,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -115,7 +115,7 @@ void QMutex::lock(void) {
     QS_BEGIN_NOCRIT_(QS_SCHED_LOCK,
                      static_cast<void *>(0), static_cast<void *>(0))
         QS_TIME_(); // timestamp
-        QS_2U8_(static_cast<uint8_t>(m_prevPrio), /* the previous lock prio */
+        QS_2U8_(static_cast<uint8_t>(m_prevPrio), /* previous lock prio */
                 static_cast<uint8_t>(QK_attr_.lockPrio)); // the new lock prio
     QS_END_NOCRIT_()
 
@@ -148,15 +148,19 @@ void QMutex::unlock(void) {
     Q_REQUIRE_ID(800, (!QK_ISR_CONTEXT_())
                  && (m_prevPrio != static_cast<uint_fast8_t>(MUTEX_UNUSED)));
 
+    uint_fast8_t p = m_prevPrio;
+    m_prevPrio = static_cast<uint_fast8_t>(MUTEX_UNUSED);
+
     QS_BEGIN_NOCRIT_(QS_SCHED_UNLOCK,
                      static_cast<void *>(0), static_cast<void *>(0))
         QS_TIME_(); // timestamp
-        QS_2U8_(static_cast<uint8_t>(m_prevPrio),/* the previouis lock prio */
-                static_cast<uint8_t>(QK_attr_.lockPrio)); // the new lock prio
+        QS_2U8_(static_cast<uint8_t>(QK_attr_.lockPrio), /* prev lock prio */
+                (QK_attr_.lockPrio > p)               /* the new lock prio */
+                    ? static_cast<uint8_t>(p)
+                    : static_cast<uint8_t>(QK_attr_.lockPrio));
     QS_END_NOCRIT_()
 
-    uint_fast8_t p = m_prevPrio;
-    m_prevPrio = static_cast<uint_fast8_t>(MUTEX_UNUSED);
+
 
     if (QK_attr_.lockPrio > p) {
         QK_attr_.lockPrio = p; // restore the previous lock prio
@@ -168,4 +172,3 @@ void QMutex::unlock(void) {
 }
 
 } // namespace QP
-

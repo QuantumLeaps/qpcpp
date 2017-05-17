@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: BSP for DPP with lwIP on EK-LM3S9665 board, QK kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 5.9.0
+// Last updated on  2017-05-09
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// http://www.state-machine.com
+// https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"    // QP port header file
@@ -334,9 +334,13 @@ void QS::onReset(void) {
 }
 //............................................................................
 //! callback function to execute a uesr command (to be implemented in BSP)
-void QS::onCommand(uint8_t cmdId, uint32_t param) {
+void QS::onCommand(uint8_t cmdId, uint32_t param1,
+                   uint32_t param2, uint32_t param3)
+{
     (void)cmdId;
-    (void)param;
+    (void)param1;
+    (void)param2;
+    (void)param3;
     //TBD
 }
 #endif // Q_SPY

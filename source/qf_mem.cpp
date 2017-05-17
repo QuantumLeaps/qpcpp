@@ -2,8 +2,8 @@
 /// @brief QF/C++ memory management services
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-04-29
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// https://state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -54,7 +54,8 @@ Q_DEFINE_THIS_MODULE("qf_mem")
 /// @description
 /// Default constructor of a fixed block-size memory pool.
 ///
-/// @note The memory pool is __not__ ready to use directly after instantiation.
+/// @note
+/// The memory pool is __not__ ready to use directly after instantiation.
 /// To become ready, the QP::QMPool::init() must be called to give the pool
 /// memory, size of this memory, and the block size to manage.
 ///
@@ -150,7 +151,7 @@ void QMPool::init(void * const poolSto, uint_fast32_t poolSize,
     m_end      = fb;      // the last block in this pool
 
     QS_CRIT_STAT_
-    QS_BEGIN_(QS_QF_MPOOL_INIT, QS::priv_.mpObjFilter, m_start)
+    QS_BEGIN_(QS_QF_MPOOL_INIT, QS::priv_.locFilter[QS::MP_OBJ], m_start)
         QS_OBJ_(m_start);  // the memory managed by this pool
         QS_MPC_(m_nTot);   // the total number of blocks
     QS_END_()
@@ -185,7 +186,8 @@ void QMPool::put(void * const b) {
     m_free_head = b; // set as new head of the free list
     ++m_nFree;       // one more free block in this pool
 
-    QS_BEGIN_NOCRIT_(QS_QF_MPOOL_PUT, QS::priv_.mpObjFilter, m_start)
+    QS_BEGIN_NOCRIT_(QS_QF_MPOOL_PUT,
+                     QS::priv_.locFilter[QS::MP_OBJ], m_start)
         QS_TIME_();       // timestamp
         QS_OBJ_(m_start); // the memory managed by this pool
         QS_MPC_(m_nFree); // the number of free blocks in the pool
@@ -253,7 +255,8 @@ void *QMPool::get(uint_fast16_t const margin) {
 
         m_free_head = fb_next; // adjust list head to the next free block
 
-        QS_BEGIN_NOCRIT_(QS_QF_MPOOL_GET, QS::priv_.mpObjFilter, m_start)
+        QS_BEGIN_NOCRIT_(QS_QF_MPOOL_GET,
+                         QS::priv_.locFilter[QS::MP_OBJ], m_start)
             QS_TIME_();        // timestamp
             QS_OBJ_(m_start);  // the memory managed by this pool
             QS_MPC_(m_nFree);  // the number of free blocks in the pool
@@ -264,7 +267,7 @@ void *QMPool::get(uint_fast16_t const margin) {
         fb = static_cast<QFreeBlock *>(0);
 
         QS_BEGIN_NOCRIT_(QS_QF_MPOOL_GET_ATTEMPT,
-                         QS::priv_.mpObjFilter, m_start)
+                         QS::priv_.locFilter[QS::MP_OBJ], m_start)
             QS_TIME_();        // timestamp
             QS_OBJ_(m_start);  // the memory managed by this pool
             QS_MPC_(m_nFree);  // the # free blocks in the pool
@@ -304,4 +307,3 @@ uint_fast16_t QF::getPoolMin(uint_fast8_t const poolId) {
 }
 
 } // namespace QP
-

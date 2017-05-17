@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.2
-/// Last updated on  2017-02-08
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -53,7 +53,7 @@
 //! helper macro to trigger exit action in an HSM
 #define QEP_EXIT_(state_) do { \
     if (QEP_TRIG_(state_, Q_EXIT_SIG) == Q_RET_HANDLED) { \
-        QS_BEGIN_(QS_QEP_STATE_EXIT, QS::priv_.smObjFilter, this) \
+        QS_BEGIN_(QS_QEP_STATE_EXIT, QS::priv_.locFilter[QS::SM_OBJ], this) \
             QS_OBJ_(this); \
             QS_FUN_(state_); \
         QS_END_() \
@@ -63,7 +63,7 @@
 //! helper macro to trigger entry action in an HSM
 #define QEP_ENTER_(state_) do { \
     if (QEP_TRIG_(state_, Q_ENTRY_SIG) == Q_RET_HANDLED) { \
-        QS_BEGIN_(QS_QEP_STATE_ENTRY, QS::priv_.smObjFilter, this) \
+        QS_BEGIN_(QS_QEP_STATE_ENTRY, QS::priv_.locFilter[QS::SM_OBJ], this) \
             QS_OBJ_(this); \
             QS_FUN_(state_); \
         QS_END_() \
@@ -147,7 +147,7 @@ void QHsm::init(QEvt const * const e) {
     Q_ASSERT_ID(210, r == Q_RET_TRAN);
 
     QS_CRIT_STAT_
-    QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
+    QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.locFilter[QS::SM_OBJ], this)
         QS_OBJ_(this);       // this state machine object
         QS_FUN_(t);          // the source state
         QS_FUN_(m_temp.fun); // the target of the initial transition
@@ -180,7 +180,8 @@ void QHsm::init(QEvt const * const e) {
 
 #ifdef Q_SPY
         if (r == Q_RET_TRAN) {
-            QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
+            QS_BEGIN_(QS_QEP_STATE_INIT,
+                      QS::priv_.locFilter[QS::SM_OBJ], this)
                 QS_OBJ_(this);       // this state machine object
                 QS_FUN_(t);          // the source state
                 QS_FUN_(m_temp.fun); // the target of the initial transition
@@ -190,7 +191,7 @@ void QHsm::init(QEvt const * const e) {
 
     } while (r == Q_RET_TRAN);
 
-    QS_BEGIN_(QS_QEP_INIT_TRAN, QS::priv_.smObjFilter, this)
+    QS_BEGIN_(QS_QEP_INIT_TRAN, QS::priv_.locFilter[QS::SM_OBJ], this)
         QS_TIME_();    // time stamp
         QS_OBJ_(this); // this state machine object
         QS_FUN_(t);    // the new active state
@@ -240,11 +241,11 @@ void QHsm::dispatch(QEvt const * const e) {
     Q_REQUIRE_ID(400, (t != Q_STATE_CAST(0))
                        && (t == m_temp.fun));
 
-    QS_BEGIN_(QS_QEP_DISPATCH, QS::priv_.smObjFilter, this)
-        QS_TIME_();              // time stamp
-        QS_SIG_(e->sig);         // the signal of the event
-        QS_OBJ_(this);           // this state machine object
-        QS_FUN_(t);              // the current state
+    QS_BEGIN_(QS_QEP_DISPATCH, QS::priv_.locFilter[QS::SM_OBJ], this)
+        QS_TIME_();         // time stamp
+        QS_SIG_(e->sig);    // the signal of the event
+        QS_OBJ_(this);      // this state machine object
+        QS_FUN_(t);         // the current state
     QS_END_()
 
     // process the event hierarchically...
@@ -252,10 +253,9 @@ void QHsm::dispatch(QEvt const * const e) {
         s = m_temp.fun;
         r = (*s)(this, e); // invoke state handler s
 
-        // unhandled due to a guard?
-        if (r == Q_RET_UNHANDLED) {
+        if (r == Q_RET_UNHANDLED) { // unhandled due to a guard?
 
-            QS_BEGIN_(QS_QEP_UNHANDLED, QS::priv_.smObjFilter, this)
+            QS_BEGIN_(QS_QEP_UNHANDLED, QS::priv_.locFilter[QS::SM_OBJ], this)
                 QS_SIG_(e->sig); // the signal of the event
                 QS_OBJ_(this);   // this state machine object
                 QS_FUN_(s);      // the current state
@@ -277,7 +277,8 @@ void QHsm::dispatch(QEvt const * const e) {
         for (; t != s; t = m_temp.fun) {
             // exit handled?
             if (QEP_TRIG_(t, Q_EXIT_SIG) == Q_RET_HANDLED) {
-                QS_BEGIN_(QS_QEP_STATE_EXIT, QS::priv_.smObjFilter, this)
+                QS_BEGIN_(QS_QEP_STATE_EXIT,
+                          QS::priv_.locFilter[QS::SM_OBJ], this)
                     QS_OBJ_(this); // this state machine object
                     QS_FUN_(t);    // the exited state
                 QS_END_()
@@ -291,10 +292,10 @@ void QHsm::dispatch(QEvt const * const e) {
 #ifdef Q_SPY
         if (r == Q_RET_TRAN_HIST) {
 
-            QS_BEGIN_(QS_QEP_TRAN_HIST, QS::priv_.smObjFilter, this)
-                QS_OBJ_(this);    // this state machine object
-                QS_FUN_(t);       // the source of the transition
-                QS_FUN_(path[0]); // the target of the tran. to history
+            QS_BEGIN_(QS_QEP_TRAN_HIST, QS::priv_.locFilter[QS::SM_OBJ], this)
+                QS_OBJ_(this);     // this state machine object
+                QS_FUN_(t);        // the source of the transition
+                QS_FUN_(path[0]);  // the target of the tran. to history
             QS_END_()
 
         }
@@ -310,7 +311,8 @@ void QHsm::dispatch(QEvt const * const e) {
         // drill into the target hierarchy...
         while (QEP_TRIG_(t, Q_INIT_SIG) == Q_RET_TRAN) {
 
-            QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.smObjFilter, this)
+            QS_BEGIN_(QS_QEP_STATE_INIT,
+                      QS::priv_.locFilter[QS::SM_OBJ], this)
                 QS_OBJ_(this);       // this state machine object
                 QS_FUN_(t);          // the source (pseudo)state
                 QS_FUN_(m_temp.fun); // the target of the transition
@@ -340,7 +342,7 @@ void QHsm::dispatch(QEvt const * const e) {
             t = path[0];
         }
 
-        QS_BEGIN_(QS_QEP_TRAN, QS::priv_.smObjFilter, this)
+        QS_BEGIN_(QS_QEP_TRAN, QS::priv_.locFilter[QS::SM_OBJ], this)
             QS_TIME_();          // time stamp
             QS_SIG_(e->sig);     // the signal of the event
             QS_OBJ_(this);       // this state machine object
@@ -350,9 +352,9 @@ void QHsm::dispatch(QEvt const * const e) {
     }
 
 #ifdef Q_SPY
-    if (r == Q_RET_HANDLED) {
+    else if (r == Q_RET_HANDLED) {
 
-        QS_BEGIN_(QS_QEP_INTERN_TRAN, QS::priv_.smObjFilter, this)
+        QS_BEGIN_(QS_QEP_INTERN_TRAN, QS::priv_.locFilter[QS::SM_OBJ], this)
             QS_TIME_();          // time stamp
             QS_SIG_(e->sig);     // the signal of the event
             QS_OBJ_(this);       // this state machine object
@@ -362,7 +364,7 @@ void QHsm::dispatch(QEvt const * const e) {
     }
     else {
 
-        QS_BEGIN_(QS_QEP_IGNORED, QS::priv_.smObjFilter, this)
+        QS_BEGIN_(QS_QEP_IGNORED, QS::priv_.locFilter[QS::SM_OBJ], this)
             QS_TIME_();          // time stamp
             QS_SIG_(e->sig);     // the signal of the event
             QS_OBJ_(this);       // this state machine object
@@ -444,7 +446,7 @@ int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]) {
 
                             // entry path must not overflow
                             Q_ASSERT_ID(510,
-                                ip < static_cast<int_fast8_t>(MAX_NEST_DEPTH_));
+                              ip < static_cast<int_fast8_t>(MAX_NEST_DEPTH_));
                             --ip;  // do not enter the source
                             r = Q_RET_HANDLED; // terminate the loop
                         }
@@ -493,7 +495,8 @@ int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]) {
                                 if (QEP_TRIG_(t, Q_EXIT_SIG) == Q_RET_HANDLED)
                                 {
                                     QS_BEGIN_(QS_QEP_STATE_EXIT,
-                                              QS::priv_.smObjFilter, this)
+                                              QS::priv_.locFilter[QS::SM_OBJ],
+                                              this)
                                         QS_OBJ_(this);
                                         QS_FUN_(t);
                                     QS_END_()

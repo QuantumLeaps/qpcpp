@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.7.2
-// Last updated on  2016-09-28
+// Last updated for version 5.8.3
+// Last updated on  2017-03-13
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,12 +28,15 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// http://www.state-machine.com
+// https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
 #include "bsp.h"
+
+static QP::QTicker l_ticker0(0); // ticker for tick rate 0
+QP::QActive *DPP::the_Ticker0 = &l_ticker0;
 
 //............................................................................
 int main() {
@@ -86,10 +89,14 @@ int main() {
             static_cast<uint_fast16_t>(0), // stack size [bytes]
             static_cast<QP::QEvt *>(0));   // initialization event
     }
+    // example of prioritizing the Ticker0 active object
+    DPP::the_Ticker0->start((uint_fast8_t)(N_PHILO + 2U), // priority
+                            0, 0,
+                            0, 0);
 
     // start the extended Test2 thread
     DPP::XT_Test2->start(
-            static_cast<uint_fast8_t>(N_PHILO + 2), // QP prio of the thread
+            static_cast<uint_fast8_t>(N_PHILO + 3), // QP prio of the thread
             test2QueueSto,           // event queue storage
             Q_DIM(test2QueueSto),    // queue length [events]
             test2StackSto,           // stack storage
@@ -97,7 +104,7 @@ int main() {
             static_cast<QP::QEvt *>(0)); // initialization event
 
     DPP::AO_Table->start(
-            static_cast<uint_fast8_t>(N_PHILO + 3), // QP priority of the AO
+            static_cast<uint_fast8_t>(N_PHILO + 4), // QP priority of the AO
             tableQueueSto,           // event queue storage
             Q_DIM(tableQueueSto),    // queue length [events]
             static_cast<void *>(0),  // no stack storage

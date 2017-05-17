@@ -1,6 +1,6 @@
-/// \file
-/// \brief QF/C++ port to Win32 API
-/// \cond
+/// @file
+/// @brief QF/C++ port to Win32 API
+/// @cond
 ///***************************************************************************
 /// Last updated for version 5.8.2
 /// Last updated on  2016-12-22
@@ -30,10 +30,10 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
-/// \endcond
+/// @endcond
 
 #ifndef qf_port_h
 #define qf_port_h
@@ -100,7 +100,7 @@ void QF_onClockTick(void);
 #endif
 
 // portable "safe" facilities from <stdio.h> and <string.h> ...
-#ifdef _MSC_VER /* Microsoft C/C++ compiler? */
+#ifdef _MSC_VER // Microsoft C/C++ compiler?
 
 #define SNPRINTF_S(buf_, len_, format_, ...) \
     _snprintf_s(buf_, len_, _TRUNCATE, format_, ##__VA_ARGS__)
@@ -111,7 +111,7 @@ void QF_onClockTick(void);
 #define FOPEN_S(fp_, fName_, mode_) \
     if (fopen_s(&fp_, fName_, mode_) != 0) { \
         fp_ = static_cast<FILE *>(0); \
-    } else (void)0
+    } else ((void)0)
 
 #define CTIME_S(buf_, len_, time_) \
     ctime_s((char *)buf_, len_, time_)

@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.8.1
-// Last updated on  2016-12-12
+// Last updated for version 5.9.0
+// Last updated on  2017-05-16
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// http://www.state-machine.com
+// https://state-machine.com
 // mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 
@@ -76,11 +76,11 @@
 -esym(1960,           // Rule 7-3-1, Global declaration of symbol
  Q_onAssert,
  Q_onTestAssert)
--emacro(944,          // 0-1-1/2/9 operator ? always evaluates to True 
+-emacro(944,          // 0-1-1/2/9 operator ? always evaluates to True
  Q_ASSERT_COMPILE)
 -emacro(948,          // 0-1-9  Operator '==' always evaluates to True
  Q_ASSERT_COMPILE)
--esym(752,            // 0-1-3 local declarator not referenced   
+-esym(752,            // 0-1-3 local declarator not referenced
  Q_assert_compile)
 -estring(1960,        // 16-0-4 function-like macro
  Q_ASSERT,
@@ -96,7 +96,6 @@
  Q_INVARIANT,
  Q_INVARIANT_ID,
  Q_ASSERT_COMPILE,
- Q_TEST_ASSERT,
  Q_DEFINE_THIS_MODULE)
 -emacro(522,          // Highest operation lacks side-effects
  Q_ASSERT,
@@ -249,8 +248,8 @@
  QP::QMActive::m_thread)
 -esym(1704,           // constructor has private access specification
  QP::QTimeEvt::QTimeEvt,
- QP::QEQueue::QEQueue,           
- QP::QMPool::QMPool)           
+ QP::QEQueue::QEQueue,
+ QP::QMPool::QMPool)
 -esym(1712,           // default constructor not defined for class
  QMActive,
  QActive,
@@ -297,7 +296,7 @@
  intNest,
  readySet)
 -esym(1712,           // default constructor not defined
- QXThread) 
+ QXThread)
 -esym(1960, signal)   // 17-0-2, Re-use of C++ identifier
 
 
@@ -314,10 +313,9 @@
  QS_TIME_SIZE,
  QS_OBJ_PTR_SIZE,
  QS_FUN_PTR_SIZE,
+ QS_REC_DONE,
  QS_OBJ_,
- QS_FUN_,
- QS_TEST,
- QS_TEST_ASSERTION)
+ QS_FUN_)
 -esym(1960,           // 16-0-4 function-like macro
  QS_INIT,
  QS_EXIT,
@@ -357,8 +355,6 @@
  QS_FUN_DICTIONARY,
  QS_USR_DICTIONARY,
  QS_ASSERTION,
- QS_TEST_ASSERTION,
- QS_TEST,
  QS_FLUSH,
  QS_STR_ROM,
  QS_MEM,
@@ -371,13 +367,13 @@
  QS_GLB_FILTER_,
  QS_BEGIN_NOCRIT_,
  QS_END_NOCRIT_,
+ QS_REC_DONE,
  QS_U8_,
  QS_2U8_,
  QS_U16_,
  QS_U32_,
  QS_U64_,
  QS_STR_,
- QS_STR_ROM_,
  QS_TIME_,
  QS_SIG_,
  QS_EVS_,
@@ -386,7 +382,11 @@
  QS_EQC_,
  QS_MPC_,
  QS_MPS_,
- QS_TEC_)
+ QS_TEC_,
+ QS_TEST_PAUSE,
+ QS_TEST_PROBE_DEF,
+ QS_TEST_PROBE,
+ QS_TEST_PROBE_ID)
 -esym(1923,           // 16-2-2 could become const variable
  QS_INIT,
  QS_EXIT,
@@ -404,7 +404,8 @@
  QS_BEGIN,
  QS_END,
  QS_BEGIN_NOCRIT,
- QS_END_NOCRIT)
+ QS_END_NOCRIT,
+ QS_END_REC)
 -esym(1923,           // 16-2-2 could become const variable
  QS_I8,
  QS_U8,

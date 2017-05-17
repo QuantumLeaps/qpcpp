@@ -4,14 +4,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-26
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2017 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -32,17 +32,13 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
 #ifndef qs_dummy_h
 #define qs_dummy_h
-
-/// @description
-/// Dummy definitions of the QS macros that avoid code generation from
-/// the QS instrumentation.
 
 #ifdef Q_SPY
     #error "Q_SPY must NOT be defined to include qs_dummy.h"
@@ -90,6 +86,11 @@
 #define QS_USR_DICTIONARY(rec_)         ((void)0)
 #define QS_ASSERTION(module_, loc_, delay_) ((void)0)
 #define QS_FLUSH()                      ((void)0)
+
+#define QS_TEST_PROBE_DEF(fun_)
+#define QS_TEST_PROBE(code_)
+#define QS_TEST_PROBE_ID(id_, code_)
+#define QS_TEST_PAUSE()                 ((void)0)
 
 //****************************************************************************
 // internal QS macros used only in the QP components

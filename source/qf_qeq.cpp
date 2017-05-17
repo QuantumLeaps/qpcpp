@@ -2,8 +2,8 @@
 /// @brief QP::QEQueue implementation
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-14
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -93,7 +93,7 @@ void QEQueue::init(QEvt const *qSto[], uint_fast16_t const qLen) {
     m_nMin     = m_nFree;
 
     QS_CRIT_STAT_
-    QS_BEGIN_(QS_QF_EQUEUE_INIT, QS::priv_.eqObjFilter, this)
+    QS_BEGIN_(QS_QF_EQUEUE_INIT, QS::priv_.locFilter[QS::EQ_OBJ], this)
         QS_OBJ_(this);   // this QEQueue object
         QS_EQC_(m_end);  // the length of the queue
     QS_END_()
@@ -132,7 +132,8 @@ bool QEQueue::post(QEvt const * const e, uint_fast16_t const margin) {
     // required margin available?
     if (nFree > static_cast<QEQueueCtr>(margin)) {
 
-        QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_FIFO, QS::priv_.eqObjFilter, this)
+        QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_FIFO,
+                         QS::priv_.locFilter[QS::EQ_OBJ], this)
             QS_TIME_();                      // timestamp
             QS_SIG_(e->sig);                 // the signal of this event
             QS_OBJ_(this);                   // this queue object
@@ -175,8 +176,8 @@ bool QEQueue::post(QEvt const * const e, uint_fast16_t const margin) {
         /// policy for most events posted within the framework.
         Q_ASSERT_ID(210, margin != static_cast<uint_fast16_t>(0));
 
-        QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_ATTEMPT, QS::priv_.eqObjFilter,
-                         this)
+        QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_ATTEMPT,
+                         QS::priv_.locFilter[QS::EQ_OBJ], this)
             QS_TIME_();                      // timestamp
             QS_SIG_(e->sig);                 // the signal of this event
             QS_OBJ_(this);                   // this queue object
@@ -218,7 +219,8 @@ void QEQueue::postLIFO(QEvt const * const e) {
     /// @pre the queue must be able to accept the event (cannot overflow)
     Q_REQUIRE_ID(300, nFree != static_cast<QEQueueCtr>(0));
 
-    QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_LIFO, QS::priv_.eqObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_LIFO,
+                     QS::priv_.locFilter[QS::EQ_OBJ], this)
         QS_TIME_();                      // timestamp
         QS_SIG_(e->sig);                 // the signal of this event
         QS_OBJ_(this);                   // this queue object
@@ -286,7 +288,8 @@ QEvt const *QEQueue::get(void) {
             }
             --m_tail;
 
-            QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_GET, QS::priv_.eqObjFilter, this)
+            QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_GET,
+                             QS::priv_.locFilter[QS::EQ_OBJ], this)
                 QS_TIME_();              // timestamp
                 QS_SIG_(e->sig);         // the signal of this event
                 QS_OBJ_(this);           // this queue object
@@ -300,7 +303,8 @@ QEvt const *QEQueue::get(void) {
             // all entries in the queue must be free (+1 for fronEvt)
             Q_ASSERT_ID(410, nFree == (m_end + static_cast<QEQueueCtr>(1)));
 
-            QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_GET_LAST, QS::priv_.eqObjFilter,
+            QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_GET_LAST,
+                             QS::priv_.locFilter[QS::EQ_OBJ],
                              this)
                 QS_TIME_();              // timestamp
                 QS_SIG_(e->sig);         // the signal of this event
@@ -314,4 +318,3 @@ QEvt const *QEQueue::get(void) {
 }
 
 } // namespace QP
-

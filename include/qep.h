@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.2
-/// Last updated on  2017-01-05
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      582
+#define QP_VERSION      590
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "5.8.2"
+#define QP_VERSION_STR  "5.9.0"
 
-//! Tamperproof current QP release (5.8.2) and date (2017-02-08)
-#define QP_RELEASE      0x9A8C4FB9U
+//! Tamperproof current QP release (5.9.0) and date (2017-05-19)
+#define QP_RELEASE      0x9A5CDB41U
 
 //****************************************************************************
 #ifndef Q_SIGNAL_SIZE

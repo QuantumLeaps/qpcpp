@@ -4,14 +4,14 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-11
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -80,10 +80,10 @@ void QF::init(void) {
     QF_subscrList_   = static_cast<QSubscrList *>(0);
     QF_maxPubSignal_ = static_cast<enum_t>(0);
 
-    bzero(&QV_readySet_, static_cast<uint_fast16_t>(sizeof(QV_readySet_)));
     bzero(&QF::timeEvtHead_[0],
           static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
     bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
+    bzero(&QV_readySet_, static_cast<uint_fast16_t>(sizeof(QV_readySet_)));
 
 #ifdef QV_INIT
     QV_INIT(); // port-specific initialization of the QV kernel
@@ -132,23 +132,26 @@ int_t QF::run(void) {
     // the combined event-loop and background-loop of the QV kernel...
     QF_INT_DISABLE();
     for (;;) {
+
+        // find the maximum priority AO ready to run
         if (QV_readySet_.notEmpty()) {
             uint_fast8_t p = QV_readySet_.findMax();
             QActive *a = active_[p];
 
 #ifdef Q_SPY
-            QS_BEGIN_NOCRIT_(QS_SCHED_NEXT, QS::priv_.aoObjFilter, a)
+            QS_BEGIN_NOCRIT_(QS_SCHED_NEXT,
+                             QS::priv_.locFilter[QS::AO_OBJ], a)
                 QS_TIME_(); // timestamp
                 QS_2U8_(static_cast<uint8_t>(p), // prio of the scheduled AO
                         static_cast<uint8_t>(pprev)); // previous priority
             QS_END_NOCRIT_()
 
-            pprev = p; /* update previous priority */
+            pprev = p; // update previous priority
 #endif // Q_SPY
 
             QF_INT_ENABLE();
 
-            // perform the run-to-completion (RTS) step...
+            // perform the run-to-completion (RTC) step...
             // 1. retrieve the event from the AO's event queue, which by this
             //    time must be non-empty and The "Vanialla" kernel asserts it.
             // 2. dispatch the event to the AO's state machine.
@@ -164,12 +167,12 @@ int_t QF::run(void) {
                 QV_readySet_.remove(p);
             }
         }
-        else {
+        else { // no AO ready to run --> idle
 #ifdef Q_SPY
             if (pprev != static_cast<uint_fast8_t>(0)) {
                 QS_BEGIN_NOCRIT_(QS_SCHED_IDLE,
                     static_cast<void *>(0), static_cast<void *>(0))
-                    QS_TIME_(); // timestamp
+                    QS_TIME_();                          // timestamp
                     QS_U8_(static_cast<uint8_t>(pprev)); // previous prio
                 QS_END_NOCRIT_()
 
@@ -188,7 +191,6 @@ int_t QF::run(void) {
             QF_INT_DISABLE();
         }
     }
-
 #ifdef __GNUC__ // GNU compiler?
     return static_cast<int_t>(0);
 #endif
@@ -202,11 +204,9 @@ int_t QF::run(void) {
 /// @param[in] qSto    pointer to the storage for the ring buffer of the
 ///                    event queue (used only with the built-in QP::QEQueue)
 /// @param[in] qLen    length of the event queue (in events)
-/// @param[in] stkSto  pointer to the stack storage (used only when
-///                    per-AO stack is needed)
-/// @param[in] stkSize stack size (in bytes)
-/// @param[in] ie      pointer to the optional initialization event
-///                    (might be NULL).
+/// @param[in] stkSto  pointer to the stack storage (must be NULL in QV)
+/// @param[in] stkSize stack size [bytes]
+/// @param[in] ie      pointer to the optional initial event (might be NULL).
 ///
 /// @note This function should be called via the macro START().
 ///
@@ -220,17 +220,18 @@ void QActive::start(uint_fast8_t const prio,
                      QEvt const * const ie)
 {
     /// @pre the priority must be in range and the stack storage must not
-    /// be provided, because "Vanilla" kernel does not need per-AO stacks.
+    /// be provided, because the QV kernel does not need per-AO stacks.
     ///
-    Q_REQUIRE_ID(400, (static_cast<uint_fast8_t>(0) < prio)
-              && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
-              && (stkSto == static_cast<void *>(0)));
+    Q_REQUIRE_ID(500, (static_cast<uint_fast8_t>(0) < prio)
+                      && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
+                      && (stkSto == static_cast<void *>(0)));
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
     m_prio = prio;  // set the QF priority of this AO
-    QF::add_(this); // make QF aware of this AO
-    this->init(ie); // execute initial transition (virtual call)
 
+    QF::add_(this); // make QF aware of this AO
+
+    this->init(ie); // take the top-most initial tran. (virtual call)
     QS_FLUSH();     // flush the trace buffer to the host
 }
 
@@ -247,8 +248,12 @@ void QActive::start(uint_fast8_t const prio,
 /// to it.
 ///
 void QActive::stop(void) {
-    QF::remove_(this);
+    QF::remove_(this); // remove this active object from the QF
+
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
+    QV_readySet_.remove(m_prio); // make sure the AO is not ready
+    QF_CRIT_EXIT_();
 }
 
 } // namespace QP
-

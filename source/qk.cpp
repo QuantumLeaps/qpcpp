@@ -3,14 +3,14 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-11
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -146,7 +146,6 @@ int_t QF::run(void) {
     for (;;) {
         QK::onIdle(); // invoke the QK on-idle callback
     }
-
 #ifdef __GNUC__  // GNU compiler?
     return static_cast<int_t>(0);
 #endif
@@ -159,31 +158,46 @@ int_t QF::run(void) {
 // @param[in] prio    priority at which to start the active object
 // @param[in] qSto    pointer to the storage for the ring buffer of the
 //                    event queue (used only with the built-in QP::QEQueue)
-// @param[in] qLen    length of the event queue (in events)
-// @param[in] stkSto  pointer to the stack storage (used only when
-//                    per-AO stack is needed)
-// @param[in] stkSize stack size (in bytes)
-// @param[in] ie      pointer to the optional initialization event
-//                    (might be NULL).
+// @param[in] qLen    length of the event queue [events]
+// @param[in] stkSto  pointer to the stack storage (must be NULL in QK)
+// @param[in] stkSize stack size [bytes]
+// @param[in] ie      pointer to the optional initial event (might be NULL)
+//
+// @note This function should be called via the macro START().
+//
+// @usage
+// The following example shows starting an AO when a per-task stack is needed:
+// @include qf_start.cpp
 //
 void QActive::start(uint_fast8_t const prio,
-                     QEvt const *qSto[], uint_fast16_t const qLen,
-                     void * const stkSto, uint_fast16_t const stkSize,
-                     QEvt const * const ie)
+                    QEvt const *qSto[], uint_fast16_t const qLen,
+                    void * const stkSto, uint_fast16_t const,
+                    QEvt const * const ie)
 {
-    Q_REQUIRE_ID(500, (static_cast<uint_fast8_t>(0) < prio)
-                      && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)));
+    /// @pre AO cannot be started from an ISR, the priority must be in range
+    /// and the stack storage must not be provided, because the QK kernel does
+    /// not need per-AO stacks.
+    ///
+    Q_REQUIRE_ID(500, (!QK_ISR_CONTEXT_())
+                      && (static_cast<uint_fast8_t>(0) < prio)
+                      && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
+                      && (stkSto == static_cast<void *>(0)));
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
     m_prio = prio;             // set the QF priority of this AO
-    QF::add_(this);            // make QF aware of this AO
 
-    // QK kernel does not need per-thread stack
-    Q_ASSERT_ID(510, (stkSto == static_cast<void *>(0))
-                     && (stkSize == static_cast<uint_fast16_t>(0)));
+    QF::add_(this);            // make QF aware of this AO
 
     this->init(ie); // take the top-most initial tran. (virtual)
     QS_FLUSH();     // flush the trace buffer to the host
+
+    // See if this AO needs to be scheduled in case QK is already running
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
+    if (QK_sched_() != static_cast<uint_fast8_t>(0)) { // activation needed?
+        QK_activate_();
+    }
+    QF_CRIT_EXIT_();
 }
 
 //****************************************************************************
@@ -199,7 +213,18 @@ void QActive::start(uint_fast8_t const prio,
 // from all events and no more events should be directly-posted to it.
 //
 void QActive::stop(void) {
+    //! @pre QActive::stop() must be called from the AO that wants to stop.
+    Q_REQUIRE_ID(600, (this == QF::active_[QK_attr_.actPrio]));
+
     QF::remove_(this);  // remove this active object from the QF
+
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
+    QK_attr_.readySet.remove(m_prio);
+    if (QK_sched_() != static_cast<uint_fast8_t>(0)) {
+        QK_activate_();
+    }
+    QF_CRIT_EXIT_();
 }
 
 } // namespace QP
@@ -267,7 +292,8 @@ void QK_activate_(void) {
         a = QP::QF::active_[p]; // obtain the pointer to the AO
         QK_attr_.actPrio = p; // this becomes the active priority
 
-        QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT, QP::QS::priv_.aoObjFilter, a)
+        QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT,
+                         QP::QS::priv_.locFilter[QP::QS::AO_OBJ], a)
             QS_TIME_();   // timestamp
             QS_2U8_(static_cast<uint8_t>(p), // prio of the scheduled AO
                     static_cast<uint8_t>(pprev)); // previous priority
@@ -319,7 +345,8 @@ void QK_activate_(void) {
     if (pin != static_cast<uint_fast8_t>(0)) { // resuming an active object?
         a = QP::QF::active_[pin]; // the pointer to the preempted AO
 
-        QS_BEGIN_NOCRIT_(QP::QS_SCHED_RESUME, QP::QS::priv_.aoObjFilter, a)
+        QS_BEGIN_NOCRIT_(QP::QS_SCHED_RESUME,
+                         QP::QS::priv_.locFilter[QP::QS::AO_OBJ], a)
             QS_TIME_();  // timestamp
             QS_2U8_(static_cast<uint8_t>(pin), // prio of the resumed AO
                     static_cast<uint8_t>(pprev)); // previous priority

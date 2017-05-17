@@ -28,7 +28,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# http://www.state-machine.com
+# https://state-machine.com
 # mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
@@ -209,7 +209,7 @@ $(BIN_DIR)/%.o : %.cpp
 .PHONY : clean
 clean:
 	-$(RM) $(BIN_DIR)/*.o $(TARGET_LIB)
-	
+
 #-----------------------------------------------------------------------------
 # the show target for debugging
 #

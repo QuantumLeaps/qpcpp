@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -78,7 +78,7 @@ void QF::add_(QActive * const a) {
 
     active_[p] = a;  // registger the active object at this priority
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_ADD, QS::priv_.aoObjFilter, a)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_ADD, QS::priv_.locFilter[QS::AO_OBJ], a)
         QS_TIME_();   // timestamp
         QS_OBJ_(a);   // the active object
         QS_U8_(p);    // the priority of the active object
@@ -113,7 +113,7 @@ void QF::remove_(QActive * const a) {
     active_[p] = static_cast<QActive *>(0); // free-up the priority level
     a->m_state.fun = Q_STATE_CAST(0); // invalidate the state
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_REMOVE, QS::priv_.aoObjFilter, a)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_REMOVE, QS::priv_.locFilter[QS::AO_OBJ], a)
         QS_TIME_();   // timestamp
         QS_OBJ_(a);   // the active object
         QS_U8_(p);    // the priority of the active object
@@ -252,4 +252,3 @@ uint8_t const QF_log2Lkup[256] = {
 #endif // QF_LOG2
 
 } // namespace QP
-

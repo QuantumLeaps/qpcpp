@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ////**************************************************************************
 /// @endcond
@@ -137,12 +137,13 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks,
 
 //****************************************************************************
 /// @description
-/// If the semaphore counter value is 0 or more, it is incremented, and
-/// this function returns to its caller. If the extended threads are waiting
-/// for the semaphore to be signaled, QXSemaphore_signal() removes the highest-
+/// If the semaphore counter value is 0 or more, it is incremented, and this
+/// function returns to its caller. If the extended threads are waiting for
+/// the semaphore to be signaled, QXSemaphore_signal() removes the highest-
 /// priority thread waiting for the semaphore from the waiting list and makes
-/// this thread ready-to-run. The QXK scheduler is then called to determine if
-/// the awakened thread is now the highest-priority thread that is ready-to-run.
+/// this thread ready-to-run. The QXK scheduler is then called to determine
+/// if the awakened thread is now the highest-priority thread that is
+/// ready-to-run.
 ///
 /// @note
 /// A semaphore can be signaled from many places, including from ISRs, basic
@@ -177,4 +178,3 @@ void QXSemaphore::signal(void) {
 }
 
 } // namespace QP
-

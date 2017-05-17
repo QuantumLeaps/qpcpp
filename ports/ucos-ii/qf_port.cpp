@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ////**************************************************************************
 /// @endcond
@@ -157,7 +157,7 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
          - reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSNMsgs);
 
     if (nFree > margin) {
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.aoObjFilter, this)
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();             // timestamp
             QS_OBJ_(sender);        // the sender object
             QS_SIG_(e->sig);        // the signal of the event
@@ -184,7 +184,7 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         Q_ASSERT_ID(720, margin != static_cast<uint_fast16_t>(0));
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
-                         QS::priv_.aoObjFilter, this)
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();             // timestamp
             QS_OBJ_(sender);        // the sender object
             QS_SIG_(e->sig);        // the signal of the event
@@ -206,7 +206,7 @@ void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();             // timestamp
         QS_SIG_(e->sig);        // the signal of this event
         QS_OBJ_(this);          // this active object
@@ -237,7 +237,7 @@ QEvt const *QActive::get_(void) {
         OSQPend(static_cast<OS_EVENT *>(m_eQueue), 0U, &err));
     Q_ASSERT_ID(910, err == OS_ERR_NONE);
 
-    QS_BEGIN_(QS_QF_ACTIVE_GET, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_(QS_QF_ACTIVE_GET, QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();             // timestamp
         QS_SIG_(e->sig);        // the signal of this event
         QS_OBJ_(this);          // this active object

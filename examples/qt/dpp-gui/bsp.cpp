@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: BSP for DPP-GUI example with Qt5
-// Last Updated for Version: QP/C++ 5.5.0/Qt 5.x
-// Last updated on  2015-09-26
+// Last Updated for Version: QP/C++ 5.9.0/Qt 5.x
+// Last updated on  2017-05-09
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// http://www.state-machine.com
+// https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include <QtWidgets>
@@ -215,9 +215,13 @@ void QP::QS::onReset(void) {
 }
 //............................................................................
 //! callback function to execute a uesr command (to be implemented in BSP)
-void QP::QS::onCommand(uint8_t cmdId, uint32_t param) {
+void QS::onCommand(uint8_t cmdId, uint32_t param1,
+                   uint32_t param2, uint32_t param3)
+{
     (void)cmdId;
-    (void)param;
+    (void)param1;
+    (void)param2;
+    (void)param3;
     //TBD
 }
 

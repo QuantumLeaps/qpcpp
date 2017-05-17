@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -391,7 +391,7 @@ public:
 
     //! The Time Event constructor.
     QTimeEvt(QActive * const act, enum_t const sgnl,
-             uint8_t const tickRate = static_cast<uint8_t>(0));
+             uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
 
     //! Arm a time event (one shot or periodic) for event posting.
     void armX(QTimeEvtCtr const nTicks,
@@ -407,7 +407,6 @@ public:
     QTimeEvtCtr ctr(void) const;
 
 #if (!defined QP_IMPL) && (QP_API_VERSION < 500)
-
     //! @deprecated TimeEvt ctor provided for backwards compatibility.
     QTimeEvt(enum_t const sgnl) :
 #ifdef Q_EVT_CTOR
@@ -515,20 +514,21 @@ public:
 
 #ifndef Q_SPY
     static void publish_(QEvt const *e);
-    static void tickX_(uint8_t const tickRate);
+    static void tickX_(uint_fast8_t const tickRate);
 #else
 
     //! Publish event to the framework.
     static void publish_(QEvt const *e, void const *sender);
 
     //! Processes all armed time events at every clock tick.
-    static void tickX_(uint8_t const tickRate, void const * const sender);
+    static void tickX_(uint_fast8_t const tickRate,
+                       void const * const sender);
 
 #endif // Q_SPY
 
     //! Returns true if all time events are inactive and false
     //! any time event is active.
-    static bool noTimeEvtsActiveX(uint8_t const tickRate);
+    static bool noTimeEvtsActiveX(uint_fast8_t const tickRate);
 
 
     //! This function returns the minimum of free entries of the given
@@ -591,7 +591,7 @@ private:
 ///
 class QTicker : public QActive {
 public:
-    QTicker(uint8_t const tickRate); // ctor
+    QTicker(uint_fast8_t const tickRate); // ctor
 
     virtual void init(QEvt const * const e);
     virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
@@ -857,4 +857,3 @@ public:
 #define TICK(sender_) TICK_X(static_cast<uint8_t>(0), (sender_))
 
 #endif // qf_h
-

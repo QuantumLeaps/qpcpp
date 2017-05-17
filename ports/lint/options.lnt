@@ -48,8 +48,8 @@
 -sbo4             // sizeof(bool)
 
 
-au-misra-cpp.lnt  // MISRA-C++:2008 options 
-//au-misra-cpp-alt.lnt  // MISRA-C++:2008 options (alternate version) 
+au-misra-cpp.lnt  // MISRA-C++:2008 options
+//au-misra-cpp-alt.lnt  // MISRA-C++:2008 options (alternate version)
 au-ds.lnt         // Dan Saks recommendations
 qpcpp.lnt         // QP/C++ options
 -strong(AXJ)      // Strong type checking
@@ -109,7 +109,7 @@ qpcpp.lnt         // QP/C++ options
  QF_PTR_INC_,
  QF_QMACTIVE_TO_QMSM_CAST_,
  QF_QMACTIVE_TO_QMSM_CONST_CAST_)
--esym(1923,                 // 16-2-2 Macro could become const variable 
+-esym(1923,                 // 16-2-2 Macro could become const variable
  QF_SCHED_LOCK_,
  QF_SCHED_UNLOCK_)
 -emacro(740,                // 5-2-7 Unusual pointer cast (incompatible indirect types)
@@ -136,7 +136,7 @@ qpcpp.lnt         // QP/C++ options
  QK_ISR_CONTEXT_)
 -efunc(527, *QF::run)       // 0-1-1 Unreachable code
 -esym(1923,
- QACTIVE_EQUEUE_ONEMPTY_)   // 16-2-2 Macro could become const variable 
+ QACTIVE_EQUEUE_ONEMPTY_)   // 16-2-2 Macro could become const variable
 
 
 // QS -- the following options are needed only when Q_SPY is defined

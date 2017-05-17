@@ -3,14 +3,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -118,8 +118,6 @@ void QXThread::start(uint_fast8_t const prio,
                        void * const stkSto, uint_fast16_t const stkSize,
                        QEvt const * const /*ie*/)
 {
-    QF_CRIT_STAT_
-
     Q_REQUIRE_ID(300, (!QXK_ISR_CONTEXT_()) /* don't start AO's in an ISR! */
         && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
         && (stkSto != static_cast<void *>(0))
@@ -138,12 +136,13 @@ void QXThread::start(uint_fast8_t const prio,
 
     m_prio = prio;
 
-    QF_CRIT_ENTRY_();
     QF::add_(this); // make QF aware of this extended thread
 
     // the new thread is not blocked on any object
     m_temp.obj = static_cast<QMState const *>(0);
 
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
     // extended-thread becomes ready immediately
     QXK_attr_.readySet.insert(m_prio);
 
@@ -210,7 +209,7 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
         if (nFree > static_cast<QEQueueCtr>(margin)) {
 
             QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
-                             QS::priv_.aoObjFilter, this)
+                             QS::priv_.QS::priv_.locFilter[QS::AO_OBJ], this)
                 QS_TIME_();               // timestamp
                 QS_OBJ_(sender);          // the sender object
                 QS_SIG_(e->sig);          // the signal of the event
@@ -266,8 +265,8 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
             /// not acceptable
             Q_ASSERT_ID(310, margin != static_cast<uint_fast16_t>(0));
 
-            QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT, QS::priv_.aoObjFilter,
-                             this)
+            QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
+                             QS::priv_.QS::priv_.locFilter[QS::AO_OBJ], this)
                 QS_TIME_();        // timestamp
                 QS_OBJ_(sender);   // the sender object
                 QS_SIG_(e->sig);   // the signal of the event
@@ -306,13 +305,14 @@ void QXThread::postLIFO(QEvt const * const /*e*/) {
 
 //****************************************************************************
 /// @description
-/// The QXThread_queueGet() operation allows the calling extended thread to
+/// The QXThread::queueGet() operation allows the calling extended thread to
 /// receive QP events directly into its own built-in event queue from an ISR,
 /// basic thread (AO), or another extended thread.
 ///
-/// If QXThread_queueGet() is called when no events are present in the thread’s
-/// event queue, the operation blocks the current extended thread until either
-/// an event is received, or a user-specified timeout expires.
+/// If QXThread::queueGet() is called when no events are present in the
+/// thread's private event queue, the operation blocks the current extended
+/// thread until either an event is received, or a user-specified timeout
+/// expires.
 ///
 /// @param[in]  nTicks    number of clock ticks (at the associated rate)
 ///                       to wait for the event to arrive. The value of
@@ -376,8 +376,8 @@ QEvt const *QXThread::queueGet(uint_fast16_t const nTicks,
             }
             --thr->m_eQueue.m_tail;
 
-            QS_BEGIN_NOCRIT_(QP::QS_QF_ACTIVE_GET,
-                             QP::QS::priv_.aoObjFilter, thr)
+            QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_GET,
+                             QS::priv_.locFilter[QS::AO_OBJ], thr)
                 QS_TIME_();      // timestamp
                 QS_SIG_(e->sig); // the signal of this event
                 QS_OBJ_(&thr);   // this active object
@@ -393,8 +393,8 @@ QEvt const *QXThread::queueGet(uint_fast16_t const nTicks,
             Q_ASSERT_ID(520, nFree == (thr->m_eQueue.m_end
                                        + static_cast<QEQueueCtr>(1)));
 
-            QS_BEGIN_NOCRIT_(QP::QS_QF_ACTIVE_GET_LAST,
-                             QP::QS::priv_.aoObjFilter, thr)
+            QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_GET_LAST,
+                             QS::priv_.locFilter[QS::AO_OBJ], thr)
                 QS_TIME_();      // timestamp
                 QS_SIG_(e->sig); // the signal of this event
                 QS_OBJ_(&thr);   // this active object

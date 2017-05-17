@@ -5,8 +5,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -33,7 +33,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -124,8 +124,8 @@ void QXMutex::lock(void) {
     QS_BEGIN_NOCRIT_(QS_SCHED_LOCK,
         static_cast<void *>(0), static_cast<void *>(0))
         QS_TIME_(); // timestamp
-        QS_2U8_(static_cast<uint8_t>(m_prevPrio), /* the previouis lock prio */
-                static_cast<uint8_t>(QXK_attr_.lockPrio)); // new lock priority
+        QS_2U8_(static_cast<uint8_t>(m_prevPrio),    /* previouis lock prio */
+                static_cast<uint8_t>(QXK_attr_.lockPrio)); // new lock prio
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();
@@ -164,8 +164,10 @@ void QXMutex::unlock(void) {
     QS_BEGIN_NOCRIT_(QS_SCHED_UNLOCK,
         static_cast<void *>(0), static_cast<void *>(0))
         QS_TIME_(); // timestamp
-        QS_2U8_(static_cast<uint8_t>(p), /* the previouis lock prio */
-                static_cast<uint8_t>(QXK_attr_.lockPrio)); // new lock prio
+        QS_2U8_(static_cast<uint8_t>(QXK_attr_.lockPrio), /* prev lock prio */
+                (QXK_attr_.lockPrio > p)               /* the new lock prio */
+                    ? static_cast<uint8_t>(p)
+                    : static_cast<uint8_t>(QXK_attr_.lockPrio));
     QS_END_NOCRIT_()
 
     if (QXK_attr_.lockPrio > p) {

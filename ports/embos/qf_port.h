@@ -1,9 +1,9 @@
 /// @file
-/// @brief QF/C++ port to embOS (v4.00) kernel, all supported compilers
+/// @brief QF/C++ port to embOS kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.9.0 / embOS v4.34.1
+/// Last updated on  2017-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -82,12 +82,12 @@ void QF_setEmbOsTaskAttr(QActive *act, uint32_t attr);
     // embOS-specific scheduler locking, see NOTE3
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) do { \
-        if (OS_InInt == static_cast<OS_U8>(0)) { \
+        if (OS_InInterrupt() == static_cast<OS_BOOL>(0)) { \
             OS_EnterRegion(); \
         } \
     } while (false)
     #define QF_SCHED_UNLOCK_() do { \
-        if (OS_InInt == static_cast<OS_U8>(0)) { \
+        if (OS_InInterrupt() == static_cast<OS_BOOL>(0)) { \
             OS_LeaveRegion(); \
         } \
     } while (false)

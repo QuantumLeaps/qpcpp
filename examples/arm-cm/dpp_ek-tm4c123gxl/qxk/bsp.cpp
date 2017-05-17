@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, preemptive QXK kernel
-// Last updated for version 5.6.2
-// Last updated on  2016-03-31
+// Last updated for version 5.9.0
+// Last updated on  2017-05-09
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// http://www.state-machine.com
+// https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -462,14 +462,18 @@ void QS::onReset(void) {
 //............................................................................
 //! callback function to execute a user command (to be implemented in BSP)
 extern "C" void assert_failed(char const *module, int loc);
-void QS::onCommand(uint8_t cmdId, uint32_t param) {
+void QS::onCommand(uint8_t cmdId, uint32_t param1,
+                   uint32_t param2, uint32_t param3)
+{
     (void)cmdId;
-    (void)param;
+    (void)param1;
+    (void)param2;
+    (void)param3;
 
     // application-specific record
     QS_BEGIN(DPP::COMMAND_STAT, static_cast<void *>(0))
         QS_U8(2, cmdId);
-        QS_U32(8, param);
+        QS_U32(8, param1);
     QS_END()
 
     if (cmdId == 10U) {

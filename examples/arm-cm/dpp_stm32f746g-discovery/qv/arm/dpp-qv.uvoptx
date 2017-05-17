@@ -301,7 +301,7 @@
   </Target>
 
   <Target>
-    <TargetName>dbg-rel</TargetName>
+    <TargetName>dpp-rel</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -580,7 +580,7 @@
   </Target>
 
   <Target>
-    <TargetName>dbg-spy</TargetName>
+    <TargetName>dpp-spy</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>

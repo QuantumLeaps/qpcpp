@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-26
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -78,14 +78,14 @@ void QS::initBuf(uint8_t sto[], uint_fast16_t const stoSize) {
     // tracing can start correctly even if the startup code fails to clear
     // any uninitialized data (as is required by the C Standard).
     //
-    filterOff(QS_ALL_RECORDS); // disable all maskable filters
+    QS_FILTER_OFF(QS_ALL_RECORDS); // disable all maskable filters
 
-    priv_.smObjFilter = static_cast<void *>(0);
-    priv_.aoObjFilter = static_cast<void *>(0);
-    priv_.mpObjFilter = static_cast<void *>(0);
-    priv_.eqObjFilter = static_cast<void *>(0);
-    priv_.teObjFilter = static_cast<void *>(0);
-    priv_.apObjFilter = static_cast<void *>(0);
+    priv_.locFilter[SM_OBJ] = static_cast<void *>(0);
+    priv_.locFilter[AO_OBJ] = static_cast<void *>(0);
+    priv_.locFilter[MP_OBJ] = static_cast<void *>(0);
+    priv_.locFilter[EQ_OBJ] = static_cast<void *>(0);
+    priv_.locFilter[TE_OBJ] = static_cast<void *>(0);
+    priv_.locFilter[TE_OBJ] = static_cast<void *>(0);
 
     priv_.buf      = &sto[0];
     priv_.end      = static_cast<QSCtr>(stoSize);
@@ -120,23 +120,81 @@ void QS::initBuf(uint8_t sto[], uint_fast16_t const stoSize) {
 /// QS_FILTER_MP_OBJ, QS_FILTER_EQ_OBJ, and QS_FILTER_TE_OBJ.
 ///
 void QS::filterOn(uint_fast8_t const rec) {
-    if (rec == QS_ALL_RECORDS) {
+    if (rec == static_cast<uint_fast8_t>(QS_ALL_RECORDS)) {
         uint_fast8_t i;
         for (i = static_cast<uint_fast8_t>(0);
-             i < static_cast<uint_fast8_t>(sizeof(priv_.glbFilter) - 1U);
-             ++i)
+             i < static_cast<uint_fast8_t>(15); ++i)
         {
-            priv_.glbFilter[i] = static_cast<uint8_t>(0xFF);
+            priv_.glbFilter[i] = static_cast<uint8_t>(0xFF); // set all bits
         }
         // never turn the last 3 records on (0x7D, 0x7E, 0x7F)
-        priv_.glbFilter[sizeof(priv_.glbFilter) - 1U] =
-            static_cast<uint8_t>(0x1F);
+        priv_.glbFilter[sizeof(priv_.glbFilter) - 1U]
+                = static_cast<uint8_t>(0x1F);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_SM_RECORDS)) {
+        priv_.glbFilter[0] |= static_cast<uint8_t>(0xFE);
+        priv_.glbFilter[1] |= static_cast<uint8_t>(0x03);
+        priv_.glbFilter[6] |= static_cast<uint8_t>(0x80);
+        priv_.glbFilter[7] |= static_cast<uint8_t>(0x03);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_AO_RECORDS)) {
+        priv_.glbFilter[1] |= static_cast<uint8_t>(0xFC);
+        priv_.glbFilter[2] |= static_cast<uint8_t>(0x03);
+        priv_.glbFilter[5] |= static_cast<uint8_t>(0x20);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_EQ_RECORDS)) {
+        priv_.glbFilter[2] |= static_cast<uint8_t>(0x7C);
+        priv_.glbFilter[5] |= static_cast<uint8_t>(0x40);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_MP_RECORDS)) {
+        priv_.glbFilter[2] |= static_cast<uint8_t>(0x80);
+        priv_.glbFilter[3] |= static_cast<uint8_t>(0x03);
+        priv_.glbFilter[5] |= static_cast<uint8_t>(0x80);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_QF_RECORDS)) {
+        priv_.glbFilter[3] |= static_cast<uint8_t>(0xFC);
+        priv_.glbFilter[4] |= static_cast<uint8_t>(0x80);
+        priv_.glbFilter[5] |= static_cast<uint8_t>(0x1F);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_TE_RECORDS)) {
+        priv_.glbFilter[4] |= static_cast<uint8_t>(0x7F);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_SC_RECORDS)) {
+        priv_.glbFilter[6] |= static_cast<uint8_t>(0x7C);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U0_RECORDS)) {
+        priv_.glbFilter[8] |= static_cast<uint8_t>(0xC0);
+        priv_.glbFilter[9] |= static_cast<uint8_t>(0xFF);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U1_RECORDS)) {
+        priv_.glbFilter[10] |= static_cast<uint8_t>(0xFF);
+        priv_.glbFilter[11] |= static_cast<uint8_t>(0x03);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U2_RECORDS)) {
+        priv_.glbFilter[11] |= static_cast<uint8_t>(0xFC);
+        priv_.glbFilter[12] |= static_cast<uint8_t>(0x0F);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U3_RECORDS)) {
+        priv_.glbFilter[12] |= static_cast<uint8_t>(0xF0);
+        priv_.glbFilter[13] |= static_cast<uint8_t>(0x3F);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U4_RECORDS)) {
+        priv_.glbFilter[13] |= static_cast<uint8_t>(0xC0);
+        priv_.glbFilter[14] |= static_cast<uint8_t>(0xFF);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_UA_RECORDS)) {
+        priv_.glbFilter[8]  |= static_cast<uint8_t>(0xC0);
+        priv_.glbFilter[9]  |= static_cast<uint8_t>(0xFF);
+        priv_.glbFilter[10] |= static_cast<uint8_t>(0xFF);
+        priv_.glbFilter[11] |= static_cast<uint8_t>(0xFF);
+        priv_.glbFilter[12] |= static_cast<uint8_t>(0xFF);
+        priv_.glbFilter[14] |= static_cast<uint8_t>(0xFF);
     }
     else {
         // record numbers can't exceed QS_ESC, so they don't need escaping
         Q_ASSERT_ID(210, rec < static_cast<uint_fast8_t>(QS_ESC));
         priv_.glbFilter[rec >> 3] |=
-            static_cast<uint8_t>(1U << (rec & static_cast<uint_fast8_t>(7)));
+            static_cast<uint8_t>(1U << (rec & static_cast<uint_fast8_t>(7U)));
     }
 }
 
@@ -153,28 +211,83 @@ void QS::filterOn(uint_fast8_t const rec) {
 void QS::filterOff(uint_fast8_t const rec) {
     uint8_t tmp;
 
-    if (rec == QS_ALL_RECORDS) {
+    if (rec == static_cast<uint_fast8_t>(QS_ALL_RECORDS)) {
         // first clear all global filters
-        for (tmp = static_cast<uint8_t>(
-                        static_cast<uint8_t>(sizeof(priv_.glbFilter))
-                                            - static_cast<uint8_t>(1));
-             tmp > static_cast<uint8_t>(0);
-             --tmp)
+        for (tmp = static_cast<uint8_t>(15);
+             tmp > static_cast<uint8_t>(0); --tmp)
         {
             priv_.glbFilter[tmp] = static_cast<uint8_t>(0);
         }
-
         // next leave the specific filters enabled
         priv_.glbFilter[0] = static_cast<uint8_t>(0x01);
-        priv_.glbFilter[7] = static_cast<uint8_t>(0xF0);
+        priv_.glbFilter[7] = static_cast<uint8_t>(0xFC);
         priv_.glbFilter[8] = static_cast<uint8_t>(0x3F);
     }
+    else if (rec == static_cast<uint_fast8_t>(QS_SM_RECORDS)) {
+        priv_.glbFilter[0] &= static_cast<uint8_t>(~0xFEU);
+        priv_.glbFilter[1] &= static_cast<uint8_t>(~0x03U);
+        priv_.glbFilter[6] &= static_cast<uint8_t>(~0x80U);
+        priv_.glbFilter[7] &= static_cast<uint8_t>(~0x03U);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_AO_RECORDS)) {
+        priv_.glbFilter[1] &= static_cast<uint8_t>(~0xFCU);
+        priv_.glbFilter[2] &= static_cast<uint8_t>(~0x03U);
+        priv_.glbFilter[5] &= static_cast<uint8_t>(~0x20U);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_EQ_RECORDS)) {
+        priv_.glbFilter[2] &= static_cast<uint8_t>(~0x7CU);
+        priv_.glbFilter[5] &= static_cast<uint8_t>(~0x40U);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_MP_RECORDS)) {
+        priv_.glbFilter[2] &= static_cast<uint8_t>(~0x80U);
+        priv_.glbFilter[3] &= static_cast<uint8_t>(~0x03U);
+        priv_.glbFilter[5] &= static_cast<uint8_t>(~0x80U);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_QF_RECORDS)) {
+        priv_.glbFilter[3] &= static_cast<uint8_t>(~0xFCU);
+        priv_.glbFilter[4] &= static_cast<uint8_t>(~0x80U);
+        priv_.glbFilter[5] &= static_cast<uint8_t>(~0x1FU);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_TE_RECORDS)) {
+        priv_.glbFilter[4] &= static_cast<uint8_t>(~0x7FU);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_SC_RECORDS)) {
+        priv_.glbFilter[6] &= static_cast<uint8_t>(~0x7CU);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U0_RECORDS)) {
+        priv_.glbFilter[8] &= static_cast<uint8_t>(~0xC0U);
+        priv_.glbFilter[9] = static_cast<uint8_t>(0);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U1_RECORDS)) {
+        priv_.glbFilter[10] = static_cast<uint8_t>(0);
+        priv_.glbFilter[11] &= static_cast<uint8_t>(~0x03U);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U2_RECORDS)) {
+        priv_.glbFilter[11] &= static_cast<uint8_t>(~0xFCU);
+        priv_.glbFilter[12] &= static_cast<uint8_t>(~0x0FU);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U3_RECORDS)) {
+        priv_.glbFilter[12] &= static_cast<uint8_t>(~0xF0U);
+        priv_.glbFilter[13] &= static_cast<uint8_t>(~0x3FU);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_U4_RECORDS)) {
+        priv_.glbFilter[13] &= static_cast<uint8_t>(~0xC0U);
+        priv_.glbFilter[14] = static_cast<uint8_t>(0);
+    }
+    else if (rec == static_cast<uint_fast8_t>(QS_UA_RECORDS)) {
+        priv_.glbFilter[8]  &= static_cast<uint8_t>(~0xC0U);
+        priv_.glbFilter[9]  = static_cast<uint8_t>(0);
+        priv_.glbFilter[10] = static_cast<uint8_t>(0);
+        priv_.glbFilter[11] = static_cast<uint8_t>(0);
+        priv_.glbFilter[12] = static_cast<uint8_t>(0);
+        priv_.glbFilter[14] = static_cast<uint8_t>(0);
+    }
     else {
-        // record numbers can't exceed QS_ESC, so they don't need escaping
+        // record IDs can't exceed QS_ESC, so they don't need escaping
         Q_ASSERT_ID(310, rec < static_cast<uint_fast8_t>(QS_ESC));
-        tmp = static_cast<uint8_t>(
-                  1U << (rec & static_cast<uint_fast8_t>(7)));
-        tmp ^= static_cast<uint8_t>(0xFF);
+        tmp =  static_cast<uint8_t>(
+                        1U << (rec & static_cast<uint_fast8_t>(0x07U)));
+        tmp ^= static_cast<uint8_t>(0xFF); // invert all bits
         priv_.glbFilter[rec >> 3] &= tmp;
     }
 }
@@ -267,7 +380,7 @@ void QS_target_info_(uint8_t const isReset) {
                | static_cast<uint8_t>(
                      static_cast<uint8_t>(QF_MPOOL_CTR_SIZE) << 4));
 #else
-        QS_U8_((uint8_t)0);
+        QS_U8_(static_cast<uint8_t>(0));
 #endif // ifdef QF_MPOOL_CTR_SIZE
 
         QS_U8_(static_cast<uint8_t>(QS_OBJ_PTR_SIZE)
@@ -611,7 +724,7 @@ uint16_t QS::getByte(void) {
     return ret;  // return the byte or EOD
 }
 
-//****************************************************************************/
+//****************************************************************************
 /// @description
 /// This function delivers a contiguous block of data from the QS data buffer.
 /// The function returns the pointer to the beginning of the block, and writes
@@ -803,5 +916,3 @@ void QS::str(char_t const *s) {
 }
 
 } // namespace QP
-
-

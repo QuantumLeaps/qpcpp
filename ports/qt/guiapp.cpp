@@ -117,7 +117,7 @@ bool GuiQActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                  // timestamp
         QS_OBJ_(sender);             // the sender object
         QS_SIG_(e->sig);             // the signal of the event
@@ -143,7 +143,7 @@ void GuiQActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                  // timestamp
         QS_SIG_(e->sig);             // the signal of this event
         QS_OBJ_(this);               // this active object
@@ -193,7 +193,7 @@ bool GuiQMActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                  // timestamp
         QS_OBJ_(sender);             // the sender object
         QS_SIG_(e->sig);             // the signal of the event
@@ -219,7 +219,7 @@ void GuiQMActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                  // timestamp
         QS_SIG_(e->sig);             // the signal of this event
         QS_OBJ_(this);               // this active object

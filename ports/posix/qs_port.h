@@ -1,9 +1,9 @@
 /// \file
-/// \brief QEP/C++ port to generic C++ compiler
+/// \brief QS/C++ port to GNU compiler
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.6.0
-/// Last updated on  2015-12-26
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// \endcond
@@ -38,14 +38,14 @@
 #ifndef qs_port_h
 #define qs_port_h
 
-#define QS_TIME_SIZE            4
+#define QS_TIME_SIZE        4
 
 #if defined(__LP64__) || defined(_LP64) // 64-bit architecture?
-    #define QS_OBJ_PTR_SIZE     8
-    #define QS_FUN_PTR_SIZE     8
+    #define QS_OBJ_PTR_SIZE 8
+    #define QS_FUN_PTR_SIZE 8
 #else                                   // 32-bit architecture
-    #define QS_OBJ_PTR_SIZE     4
-    #define QS_FUN_PTR_SIZE     4
+    #define QS_OBJ_PTR_SIZE 4
+    #define QS_FUN_PTR_SIZE 4
 #endif
 
 //****************************************************************************

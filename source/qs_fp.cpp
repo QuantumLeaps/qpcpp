@@ -127,4 +127,3 @@ void QS::f64(uint8_t format, float64_t const d) {
 }
 
 } // namespace QP
-

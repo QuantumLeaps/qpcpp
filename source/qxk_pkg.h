@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -65,4 +65,3 @@ void QXK_threadRet_(void);
 #include "qf_pkg.h"  // QF package-scope interface
 
 #endif // qxk_pkg_h
-

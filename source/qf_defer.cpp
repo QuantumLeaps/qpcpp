@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -143,5 +143,3 @@ uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const {
 }
 
 } // namespace QP
-
-

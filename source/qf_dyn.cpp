@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailo:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -81,9 +81,9 @@ uint_fast8_t QF_maxPool_;              // number of initialized event pools
 /// of the blocks that the pool might perform. You can always check the
 /// capacity of the pool by calling QF_getPoolMin().
 ///
-/// @note The dynamic allocation of events is optional, meaning that you
-/// might choose not to use dynamic events. In that case calling
-/// QP::QF::poolInit() and using up memory for the memory blocks is unnecessary.
+/// @note The dynamic allocation of events is optional, meaning that you might
+/// choose not to use dynamic events. In that case calling QP::QF::poolInit()
+/// and using up memory for the memory blocks is unnecessary.
 ///
 /// @sa QF initialization example for QP::QF::init()
 ///

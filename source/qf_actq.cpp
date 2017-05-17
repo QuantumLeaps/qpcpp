@@ -8,8 +8,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.2
-/// Last updated on  2017-01-05
+/// Last updated for version 5.9.0
+/// Last updated on  2017-05-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -36,7 +36,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// http://www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -112,7 +112,8 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     // margin available?
     if (nFree > static_cast<QEQueueCtr>(margin)) {
 
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.aoObjFilter, this)
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();               // timestamp
             QS_OBJ_(sender);          // the sender object
             QS_SIG_(e->sig);          // the signal of the event
@@ -156,10 +157,10 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     else {
         /// @note assert if event cannot be posted and dropping events is
         /// not acceptable
-        Q_ASSERT_ID(120, margin != static_cast<uint_fast16_t>(0));
+        Q_ASSERT_ID(110, margin != static_cast<uint_fast16_t>(0));
 
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT, QS::priv_.aoObjFilter,
-                         this)
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();               // timestamp
             QS_OBJ_(sender);          // the sender object
             QS_SIG_(e->sig);          // the signal of the event
@@ -199,7 +200,8 @@ void QActive::postLIFO(QEvt const * const e) {
     // the queue must be able to accept the event (cannot overflow)
     Q_ASSERT_ID(210, nFree != static_cast<QEQueueCtr>(0));
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                      // timestamp
         QS_SIG_(e->sig);                 // the signal of this event
         QS_OBJ_(this);                   // this active object
@@ -267,7 +269,8 @@ QEvt const *QActive::get_(void) {
         }
         --m_eQueue.m_tail;
 
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_GET, QS::priv_.aoObjFilter, this)
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_GET,
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();                      // timestamp
             QS_SIG_(e->sig);                 // the signal of this event
             QS_OBJ_(this);                   // this active object
@@ -283,7 +286,8 @@ QEvt const *QActive::get_(void) {
         Q_ASSERT_ID(310, nFree ==
                          (m_eQueue.m_end + static_cast<QEQueueCtr>(1)));
 
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_GET_LAST, QS::priv_.aoObjFilter, this)
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_GET_LAST,
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();                      // timestamp
             QS_SIG_(e->sig);                 // the signal of this event
             QS_OBJ_(this);                   // this active object
@@ -326,7 +330,7 @@ uint_fast16_t QF::getQueueMin(uint_fast8_t const prio) {
 }
 
 //****************************************************************************
-QTicker::QTicker(uint8_t const tickRate)
+QTicker::QTicker(uint_fast8_t const tickRate)
   : QActive(Q_STATE_CAST(0))
 {
     // reuse m_head for tick-rate
@@ -345,7 +349,7 @@ void QTicker::dispatch(QEvt const * const /*e*/) {
     QF_CRIT_EXIT_();
 
     for (; n > static_cast<QEQueueCtr>(0); --n) {
-        QF::TICK_X(static_cast<uint8_t>(m_eQueue.m_head), this);
+        QF::TICK_X(m_eQueue.m_head, this);
     }
 }
 //****************************************************************************
@@ -377,7 +381,8 @@ bool QTicker::post_(QEvt const * const /*e*/, uint_fast16_t const /*margin*/,
 
     ++m_eQueue.m_tail; // account for one more tick event
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.aoObjFilter, this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();               // timestamp
         QS_OBJ_(sender);          // the sender object
         QS_SIG_(static_cast<QSignal>(0)); // the signal of the event

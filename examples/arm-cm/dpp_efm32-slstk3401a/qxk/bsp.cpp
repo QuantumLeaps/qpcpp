@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last Updated for Version: 5.7.2
-// Date of the Last Update:  2016-09-29
+// Last Updated for Version: 5.9.0
+// Date of the Last Update:  2017-05-09
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// http://www.state-machine.com
+// https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -125,7 +125,8 @@ void SysTick_Handler(void) {
     }
 #endif
 
-    QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    //QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
@@ -305,7 +306,7 @@ void QF::onStartup(void) {
 
     // set priorities of ALL ISRs used in the system, see NOTE00
     //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     //
@@ -493,14 +494,18 @@ void QS::onReset(void) {
 //............................................................................
 //! callback function to execute a user command (to be implemented in BSP)
 extern "C" void assert_failed(char const *module, int loc);
-void QS::onCommand(uint8_t cmdId, uint32_t param) {
+void QS::onCommand(uint8_t cmdId, uint32_t param1,
+                   uint32_t param2, uint32_t param3)
+{
     (void)cmdId;
-    (void)param;
+    (void)param1;
+    (void)param2;
+    (void)param3;
 
     // application-specific record
     QS_BEGIN(DPP::COMMAND_STAT, static_cast<void *>(0))
         QS_U8(2, cmdId);
-        QS_U32(8, param);
+        QS_U32(8, param1);
     QS_END()
 
     if (cmdId == 10U) {
