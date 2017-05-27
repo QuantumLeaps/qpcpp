@@ -67,7 +67,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;../../include;../../source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../include;../../src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>QWIN_GUI;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -86,7 +86,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>Full</Optimization>
-      <AdditionalIncludeDirectories>.;../../include;../../source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../include;../../src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>QWIN_GUI;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -107,7 +107,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='QSpy|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;../../include;../../source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../include;../../src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>Q_SPY;QWIN_GUI;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -144,40 +144,44 @@
     </CustomBuildStep>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\qep_hsm.cpp" />
-    <ClCompile Include="..\..\source\qep_msm.cpp" />
-    <ClCompile Include="..\..\source\qf_act.cpp" />
-    <ClCompile Include="..\..\source\qf_actq.cpp" />
-    <ClCompile Include="..\..\source\qf_defer.cpp" />
-    <ClCompile Include="..\..\source\qf_dyn.cpp" />
-    <ClCompile Include="..\..\source\qf_mem.cpp" />
-    <ClCompile Include="..\..\source\qf_ps.cpp" />
-    <ClCompile Include="..\..\source\qf_qact.cpp" />
-    <ClCompile Include="..\..\source\qf_qeq.cpp" />
-    <ClCompile Include="..\..\source\qf_qmact.cpp" />
-    <ClCompile Include="..\..\source\qf_time.cpp" />
-    <ClCompile Include="..\..\source\qs.cpp">
+    <ClCompile Include="..\..\src\qf\qep_hsm.cpp" />
+    <ClCompile Include="..\..\src\qf\qep_msm.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_act.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_actq.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_defer.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_dyn.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_mem.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_ps.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_qact.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_qeq.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_qmact.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_time.cpp" />
+    <ClCompile Include="..\..\src\qs\qs.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\source\qs_64bit.cpp">
+    <ClCompile Include="..\..\src\qs\qs_64bit.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\source\qs_fp.cpp">
+    <ClCompile Include="..\..\src\qs\qs_fp.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\source\qs_rx.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    <ClCompile Include="..\..\src\qs\qs_rx.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qs\qutest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="qf_port.cpp" />
     <ClCompile Include="qwin_gui.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\qf_pkg.h" />
-    <ClInclude Include="..\..\source\qs_pkg.h">
+    <ClInclude Include="..\..\src\qf\qf_pkg.h" />
+    <ClInclude Include="..\..\src\qs\qs_pkg.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>

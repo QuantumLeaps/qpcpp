@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: Game-GUI exampe for Qt5
-# Last Updated for Version: QP 5.5.0/Qt5.x
-# Date of the Last Update:  2015-09-26
+# Last Updated for Version: QP/C++ 5.9.1/Qt 5.x
+# Date of the Last Update:  2017-05-26
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -11,7 +11,7 @@
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 2 of the License, or
+# by the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # Alternatively, this program may be distributed and modified under the
@@ -28,7 +28,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# http://www.state-machine.com
+# https://state-machine.com
 # mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
 
@@ -88,18 +88,18 @@ SOURCES += \
 
 # QP/C++ headers/sources
 SOURCES += \
-    $$QPCPP/source/qep_hsm.cpp \
-    $$QPCPP/source/qep_msm.cpp \
-    $$QPCPP/source/qf_act.cpp \
-    $$QPCPP/source/qf_actq.cpp \
-    $$QPCPP/source/qf_defer.cpp \
-    $$QPCPP/source/qf_dyn.cpp \
-    $$QPCPP/source/qf_mem.cpp \
-    $$QPCPP/source/qf_ps.cpp \
-    $$QPCPP/source/qf_qact.cpp \
-    $$QPCPP/source/qf_qeq.cpp \
-    $$QPCPP/source/qf_qmact.cpp \
-    $$QPCPP/source/qf_time.cpp
+    $$QPCPP/src/qf/qep_hsm.cpp \
+    $$QPCPP/src/qf/qep_msm.cpp \
+    $$QPCPP/src/qf/qf_act.cpp \
+    $$QPCPP/src/qf/qf_actq.cpp \
+    $$QPCPP/src/qf/qf_defer.cpp \
+    $$QPCPP/src/qf/qf_dyn.cpp \
+    $$QPCPP/src/qf/qf_mem.cpp \
+    $$QPCPP/src/qf/qf_ps.cpp \
+    $$QPCPP/src/qf/qf_qact.cpp \
+    $$QPCPP/src/qf/qf_qeq.cpp \
+    $$QPCPP/src/qf/qf_qmact.cpp \
+    $$QPCPP/src/qf/qf_time.cpp
 
 INCLUDEPATH += $$QPCPP/source
 
@@ -114,10 +114,10 @@ CONFIG(debug, debug|release) {
 
     # QS software tracing sources
 #    SOURCES += \
-#        $$QPCPP/source/qs.cpp \
-#        $$QPCPP/source/qs_rx.cpp \
-#        $$QPCPP/source/qs_fp.cpp \
-#        $$QPCPP/source/qs_64bit.cpp
+#        $$QPCPP/src/qs/qs.cpp \
+#        $$QPCPP/src/qs/qs_rx.cpp \
+#        $$QPCPP/src/qs/qs_fp.cpp \
+#        $$QPCPP/src/qs/qs_64bit.cpp
 
 #    HEADERS += $$QPCPP/ports/qt/qs_port.h
 
@@ -134,4 +134,3 @@ CONFIG(debug, debug|release) {
     # Release build configuartion
     DEFINES += NDEBUG
 }
-

@@ -1,8 +1,8 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ build script for PC-Lint(TM), Standard C++ compiler
-: Last Updated for Version: 5.6.0
-:: Date of the Last Update: 2015-12-14
+:: Last Updated for Version: 5.9.1
+:: Date of the Last Update:  2017-05-25
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -51,17 +51,15 @@ if NOT exist "%PC_LINT%" (
 set LINTFLAGS=..\..\include\std.lnt options.lnt %1 %2 %3 %4
 
 :: do the linting...
-%PC_LINT%\lint-nt -os(lint_qep.log) %LINTFLAGS% -iqv ..\..\source\qep*.cpp
+%PC_LINT%\lint-nt -os(lint_qf.log)  %LINTFLAGS% -iqv ..\..\src\qf\*.cpp 
 
-%PC_LINT%\lint-nt -os(lint_qf.log)  %LINTFLAGS% -iqv ..\..\source\qf*.cpp 
+%PC_LINT%\lint-nt -os(lint_qv.log)  %LINTFLAGS% -iqv ..\..\src\qv\*.cpp
 
-%PC_LINT%\lint-nt -os(lint_qv.log)  %LINTFLAGS% -iqv ..\..\source\qv*.cpp
+%PC_LINT%\lint-nt -os(lint_qk.log)  %LINTFLAGS% -iqk ..\..\src\qk\*.cpp
 
-%PC_LINT%\lint-nt -os(lint_qk.log)  %LINTFLAGS% -iqk ..\..\source\qk*.cpp
+%PC_LINT%\lint-nt -os(lint_qxk.log) %LINTFLAGS% -iqxk ..\..\src\qxk\*.cpp
 
-%PC_LINT%\lint-nt -os(lint_qxk.log) %LINTFLAGS% -iqxk ..\..\source\qxk*.cpp
-
-%PC_LINT%\lint-nt -os(lint_qs.log)  %LINTFLAGS% -iqv -DQ_SPY ..\..\source\qs*.cpp
+%PC_LINT%\lint-nt -os(lint_qs.log)  %LINTFLAGS% -iqv -DQ_SPY ..\..\src\qs\*.cpp
 
 :end
 endlocal

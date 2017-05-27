@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product:  Calculator Example
-// Last Updated for Version: 5.7.0
-// Date of the Last Update:  2018-08-04
+// Last Updated for Version: 5.9.1
+// Date of the Last Update:  2017-05-26
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : https://state-machine.com
-// Email: info@state-machine.com
+// https://state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h" // QP API
 #include "bsp.h"   // board support package
@@ -69,6 +69,7 @@ int main() {
         cout.flush();
 
         e.key_code = (uint8_t)_getche(); // get a char with echo
+        cout << " ";
 
         switch (e.key_code) {
             case 'c': // intentionally fall through

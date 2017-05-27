@@ -59,7 +59,7 @@ extern "C" int main(int argc, char *argv[ ]) {
 
         printf("QMsmTst example, built on %s at %s\n"
                "QEP: %s.\nPress ESC to quit...\n",
-               __DATE__, __TIME__, QP::QEP::getVersion());
+               __DATE__, __TIME__, QP_VERSION_STR);
 
         the_msm->init();          // trigger the initial tran. in the test MSM
 

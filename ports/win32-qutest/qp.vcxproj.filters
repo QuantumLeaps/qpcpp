@@ -7,66 +7,66 @@
     <Filter Include="QP">
       <UniqueIdentifier>{f23cedd0-0f13-4d39-b4f1-77eaa32e87fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="QS">
+      <UniqueIdentifier>{83db361d-b95e-42e4-aec7-b7a40473cacb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\qep_hsm.c">
+    <ClCompile Include="..\..\src\qf\qep_hsm.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qep_msm.c">
+    <ClCompile Include="..\..\src\qf\qep_msm.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qf_act.c">
+    <ClCompile Include="..\..\src\qf\qf_act.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qf_defer.c">
+    <ClCompile Include="..\..\src\qf\qf_defer.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qf_dyn.c">
+    <ClCompile Include="..\..\src\qf\qf_dyn.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qf_mem.c">
+    <ClCompile Include="..\..\src\qf\qf_mem.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qf_ps.c">
+    <ClCompile Include="..\..\src\qf\qf_ps.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qf_qact.c">
+    <ClCompile Include="..\..\src\qf\qf_qact.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qf_qeq.c">
+    <ClCompile Include="..\..\src\qf\qf_qeq.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qf_qmact.c">
+    <ClCompile Include="..\..\src\qf\qf_qmact.cpp">
       <Filter>QP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qs.c">
-      <Filter>QP</Filter>
+    <ClCompile Include="..\..\src\qs\qs.cpp">
+      <Filter>QS</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qs_64bit.c">
-      <Filter>QP</Filter>
+    <ClCompile Include="..\..\src\qs\qs_64bit.cpp">
+      <Filter>QS</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qs_fp.c">
-      <Filter>QP</Filter>
+    <ClCompile Include="..\..\src\qs\qs_fp.cpp">
+      <Filter>QS</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\qs_rx.c">
-      <Filter>QP</Filter>
+    <ClCompile Include="..\..\src\qs\qs_rx.cpp">
+      <Filter>QS</Filter>
     </ClCompile>
-    <ClCompile Include="qutest_port.c">
+    <ClCompile Include="..\..\src\qs\qutest.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="qutest_port.cpp">
       <Filter>QP_port</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\qf_pkg.h">
-      <Filter>QP</Filter>
-    </ClInclude>
     <ClInclude Include="qep_port.h">
       <Filter>QP_port</Filter>
     </ClInclude>
     <ClInclude Include="qf_port.h">
       <Filter>QP_port</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\qs_pkg.h">
-      <Filter>QP</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

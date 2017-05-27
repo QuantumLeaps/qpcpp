@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QP/C++ port to Qt5
-# Last Updated for Version: QP/C++ 5.5.0/Qt 5.x
-# Date of the Last Update:  2015-09-26
+# Last Updated for Version: QP/C++ 5.9.1/Qt 5.x
+# Date of the Last Update:  2017-05-26s
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,7 +28,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# http://www.state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
 
@@ -49,37 +49,37 @@ TEMPLATE = lib
 CONFIG  += staticlib
 DEFINES += QT_NO_STATEMACHINE
 
-QPCPP = ../../..
+QPCPP = ../..
 
 INCLUDEPATH += .. \
     $$QPCPP/include \
-    $$QPCPP/source
+    $$QPCPP/src
 
 HEADERS +=  \
-    ../qep_port.h \
-    ../qf_port.h \
-    ../tickerthread.h \
-    ../aothread.h \
-    ../guiapp.h \
-    ../guiactive.h \
-    ../pixellabel.h
+    qep_port.h \
+    qf_port.h \
+    tickerthread.h \
+    aothread.h \
+    guiapp.h \
+    guiactive.h \
+    pixellabel.h
 
 SOURCES += \
-    ../qf_port.cpp \
-    ../guiapp.cpp \
-    ../pixellabel.cpp \
-    $$QPCPP/source/qep_hsm.cpp \
-    $$QPCPP/source/qep_msm.cpp \
-    $$QPCPP/source/qf_act.cpp \
-    $$QPCPP/source/qf_actq.cpp \
-    $$QPCPP/source/qf_defer.cpp \
-    $$QPCPP/source/qf_dyn.cpp \
-    $$QPCPP/source/qf_mem.cpp \
-    $$QPCPP/source/qf_ps.cpp \
-    $$QPCPP/source/qf_qact.cpp \
-    $$QPCPP/source/qf_qeq.cpp \
-    $$QPCPP/source/qf_qmact.cpp \
-    $$QPCPP/source/qf_time.cpp
+    qf_port.cpp \
+    guiapp.cpp \
+    pixellabel.cpp \
+    $$QPCPP/src/qf/qep_hsm.cpp \
+    $$QPCPP/src/qf/qep_msm.cpp \
+    $$QPCPP/src/qf/qf_act.cpp \
+    $$QPCPP/src/qf/qf_actq.cpp \
+    $$QPCPP/src/qf/qf_defer.cpp \
+    $$QPCPP/src/qf/qf_dyn.cpp \
+    $$QPCPP/src/qf/qf_mem.cpp \
+    $$QPCPP/src/qf/qf_ps.cpp \
+    $$QPCPP/src/qf/qf_qact.cpp \
+    $$QPCPP/src/qf/qf_qeq.cpp \
+    $$QPCPP/src/qf/qf_qmact.cpp \
+    $$QPCPP/src/qf/qf_time.cpp
 
 
 CONFIG(debug, debug|release) {
@@ -92,10 +92,10 @@ CONFIG(debug, debug|release) {
     DEFINES += Q_SPY
 
     SOURCES += \
-        $$QPCPP/source/qs.cpp \
-        $$QPCPP/source/qs_rx.cpp \
-        $$QPCPP/source/qs_fp.cpp \
-        $$QPCPP/source/qs_64bit.cpp
+        $$QPCPP/src/qs/qs.cpp \
+        $$QPCPP/src/qs/qs_rx.cpp \
+        $$QPCPP/src/qs/qs_fp.cpp \
+        $$QPCPP/src/qs/qs_64bit.cpp
 
 } else {
 

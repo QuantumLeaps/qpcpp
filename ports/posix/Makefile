@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ port to POSIX, GNU toolset
-# Last Updated for Version: 5.5.0
-# Date of the Last Update:  2015-09-24
+# Last Updated for Version: 5.9.1
+# Date of the Last Update:  2017-05-25
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 # mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
-# building configurations: Debug (default), Release, and Spy
+# building configurations: Debug (default), Release and Spy
 # make
 # make CONF=rel
 # make CONF=spy
@@ -61,13 +61,14 @@ QP_PORT_DIR := .
 
 # list of all source directories used by this project
 VPATH = \
-	$(QPCPP)/source \
+	$(QPCPP)/src/qf \
+	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR)
 
 # list of all include directories needed by this project
 INCLUDES  = \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/source \
+	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR)
 
 #-----------------------------------------------------------------------------
@@ -110,8 +111,8 @@ LIB   := ar
 ##############################################################################
 # Typically, you should not need to change anything below this line
 
-MKDIR := mkdir
-RM    := rm
+MKDIR := mkdir -p
+RM    := rm -f
 
 #-----------------------------------------------------------------------------
 # build options for various configurations
@@ -170,7 +171,7 @@ $(BIN_DIR)/%.d : %.cpp
 	$(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@
 
 $(BIN_DIR)/%.o : %.cpp
-	$(CPP) $(CPPFLAGS) -c $< -o $@
+	$(CPP) $(CPPFLAGS) $< -o $@
 
 # include dependency files only if our goal depends on their existence
 ifneq ($(MAKECMDGOALS),clean)

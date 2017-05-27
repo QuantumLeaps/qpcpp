@@ -15,76 +15,79 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\qep_hsm.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qep_msm.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_act.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_actq.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_defer.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_dyn.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_mem.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_ps.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_qact.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_qeq.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_qmact.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qf_time.cpp">
-      <Filter>QP</Filter>
-    </ClCompile>
     <ClCompile Include="qf_port.cpp">
       <Filter>QP_port</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qs.cpp">
-      <Filter>QS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qs_64bit.cpp">
-      <Filter>QS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qs_fp.cpp">
-      <Filter>QS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\qs_rx.cpp">
-      <Filter>QS</Filter>
     </ClCompile>
     <ClCompile Include="qwin_gui.c">
       <Filter>QWIN-GUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\qf\qep_hsm.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qep_msm.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_act.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_actq.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_defer.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_dyn.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_mem.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_ps.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_qact.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_qeq.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_qmact.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_time.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qs\qs.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qs\qs_64bit.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qs\qs_fp.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qs\qs_rx.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qs\qutest.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\qf_pkg.h">
-      <Filter>QP</Filter>
-    </ClInclude>
     <ClInclude Include="qep_port.h">
       <Filter>QP_port</Filter>
     </ClInclude>
     <ClInclude Include="qf_port.h">
       <Filter>QP_port</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\qs_pkg.h">
-      <Filter>QS</Filter>
-    </ClInclude>
     <ClInclude Include="qwin_gui.h">
       <Filter>QWIN-GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\qf\qf_pkg.h">
+      <Filter>QP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\qs\qs_pkg.h">
+      <Filter>QS</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

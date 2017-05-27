@@ -28,17 +28,27 @@
 		<link>
 			<name>QP</name>
 			<type>2</type>
-			<location>PARENT-5-PROJECT_LOC/source</location>
+			<locationURI>PARENT-5-PROJECT_LOC/src/qf</locationURI>
 		</link>
 		<link>
 			<name>QP_include</name>
 			<type>2</type>
-			<location>PARENT-5-PROJECT_LOC/include</location>
+			<locationURI>PARENT-5-PROJECT_LOC/include</locationURI>
 		</link>
 		<link>
 			<name>QP_port</name>
 			<type>2</type>
-			<location>PARENT-5-PROJECT_LOC/ports/arm-cm/qv/ti</location>
+			<locationURI>PARENT-5-PROJECT_LOC/ports/arm-cm/qv/ti</locationURI>
+		</link>
+		<link>
+			<name>QS</name>
+			<type>2</type>
+			<locationURI>PARENT-5-PROJECT_LOC/src/qs</locationURI>
+		</link>
+		<link>
+			<name>QV</name>
+			<type>2</type>
+			<locationURI>PARENT-5-PROJECT_LOC/src/qv</locationURI>
 		</link>
 		<link>
 			<name>bsp.cpp</name>
@@ -58,7 +68,7 @@
 		<link>
 			<name>ek-tm4c123gxl</name>
 			<type>2</type>
-			<location>PARENT-5-PROJECT_LOC/3rd_party/ek-tm4c123gxl</location>
+			<locationURI>PARENT-5-PROJECT_LOC/3rd_party/ek-tm4c123gxl</locationURI>
 		</link>
 		<link>
 			<name>main.cpp</name>

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QUTEST, QP/C++, Win32, MinGW toolset
-# Last Updated for Version: 5.9.0
-# Date of the Last Update:  2017-05-15
+# Last Updated for Version: 5.9.1
+# Date of the Last Update:  2017-05-25
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -61,13 +61,14 @@ QP_PORT_DIR := .
 
 # list of all source directories used by this project
 VPATH = \
-	$(QPCPP)/source \
+	$(QPCPP)/src/qf \
+	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR)
 
 # list of all include directories needed by this project
 INCLUDES  = \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/source \
+	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR)
 
 #-----------------------------------------------------------------------------
@@ -126,10 +127,10 @@ RM    := rm
 
 BIN_DIR = mingw
 
-CFLAGS = -g -O -Wall -Wstrict-prototypes -W $(INCLUDES) $(DEFINES) \
+CFLAGS = -c -g -O -Wall -Wstrict-prototypes -W $(INCLUDES) $(DEFINES) \
 	-DQ_SPY -DQ_UTEST -DQ_HOST
 
-CPPFLAGS = -g -O -Wall -W -fno-rtti -fno-exceptions $(INCLUDES) $(DEFINES) \
+CPPFLAGS = -c -g -O -Wall -W -fno-rtti -fno-exceptions $(INCLUDES) $(DEFINES) \
 	-DQ_SPY -DQ_UTEST -DQ_HOST
 
 LIBFLAGS := rs
@@ -157,10 +158,10 @@ $(TARGET_LIB) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
 	$(LIB) $(LIBFLAGS) $@ $^
 
 $(BIN_DIR)/%.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 $(BIN_DIR)/%.o : %.cpp
-	$(CPP) $(CPPFLAGS) -c $< -o $@
+	$(CPP) $(CPPFLAGS) $< -o $@
 
 #-----------------------------------------------------------------------------
 # the clean target

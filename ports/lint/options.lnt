@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++
-// Last updated for version 5.8.0
-// Last updated on  2016-11-19
+// Last updated for version 5.9.1
+// Last updated on  2017-05-25
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -40,6 +40,7 @@
 +fdi              // start #include search in directory of the including file
 -i.               // QP/C++ port includes (see also qk/ and qv/)
 -i../../include   // QP/C++ includes
+-i../../src       // QP/C++ package-scope includes
 
 -si4              // sizeof(int)
 -ss2              // sizeof(short)
