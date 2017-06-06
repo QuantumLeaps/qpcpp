@@ -60,7 +60,7 @@ Q_DEFINE_THIS_FILE
 #define BTN_GPIO_CLK      RCC_AHB1Periph_GPIOA
 #define BTN_B1            GPIO_Pin_0
 
-static unsigned  l_rnd; // random seed
+static uint32_t l_rnd;    // random seed
 
 #ifdef Q_SPY
     QP::QSTimeCtr QS_tickTime_;
@@ -68,22 +68,33 @@ static unsigned  l_rnd; // random seed
 
     // event-source identifiers used for tracing
     static uint8_t const l_embos_ticker = 0U;
-    static uint8_t const l_EXTI0_IRQHandler = 0U;
 
     enum AppRecords { // application-specific trace records
-        PHILO_STAT = QP::QS_USER
+        PHILO_STAT = QP::QS_USER,
+        COMMAND_STAT
     };
 #endif
 
 extern "C" {
 
 // ISRs used in this project =================================================
-// example ISR handler for embOS
-void EXTI0_IRQHandler(void);
-void EXTI0_IRQHandler(void) {
-    AO_Table->POST(Q_NEW(QP::QEvt, MAX_SIG), // for testing...
-                 &l_EXTI0_IRQHandler);
+#ifdef Q_SPY
+/*
+* ISR for receiving bytes from the QSPY Back-End
+* NOTE: This ISR is "kernel-unaware" meaning that it does not interact with
+* the QF/embOS and is not disabled.
+*/
+void USART2_IRQHandler(void);
+void USART2_IRQHandler(void) {
+    if ((USART2->SR & USART_SR_RXNE) != 0) {
+        uint32_t b = USART2->DR;
+        QP::QS::rxPut(b);
+    }
 }
+#else
+void USART2_IRQHandler(void);
+void USART2_IRQHandler(void) {}
+#endif
 
 // embOS application hooks ===================================================
 static void tick_handler(void) {  // signature of embOS tick hook routine
@@ -99,75 +110,89 @@ static void tick_handler(void) {  // signature of embOS tick hook routine
     if (--ctr == 0U) {
         ctr = 1000U / BSP::TICKS_PER_SEC;
         QP::QF::TICK_X(0U, &l_embos_ticker);
-    }
 
-    // Perform the debouncing of buttons. The algorithm for debouncing
-    // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
-    // and Michael Barr, page 71.
-    //
-    static struct ButtonsDebouncing {
-        uint32_t depressed;
-        uint32_t previous;
-    } buttons = { 0U, 0U }; // state of the button debouncing
-    uint32_t current;
-    current = BTN_GPIO_PORT->IDR; // read BTN GPIO
-    tmp = buttons.depressed; // save the debounced depressed buttons
-    buttons.depressed |= (buttons.previous & current); // set depressed
-    buttons.depressed &= (buttons.previous | current); // clear released
-    buttons.previous   = current; // update the history
-    tmp ^= buttons.depressed;     // changed debounced depressed
-    if ((tmp & BTN_B1) != 0U) {  // debounced B1 state changed?
-        if ((buttons.depressed & BTN_B1) != 0U) { // is B1 depressed?
-            static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
-            QP::QF::PUBLISH(&pauseEvt, &l_embos_ticker);
-        }
-        else {            // the button is released
-            static QP::QEvt const serveEvt = { SERVE_SIG, 0U, 0U};
-            QP::QF::PUBLISH(&serveEvt, &l_embos_ticker);
+        // Perform the debouncing of buttons. The algorithm for debouncing
+        // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
+        // and Michael Barr, page 71.
+        //
+        static struct ButtonsDebouncing {
+            uint32_t depressed;
+            uint32_t previous;
+        } buttons = { 0U, 0U }; // state of the button debouncing
+        uint32_t current;
+        current = BTN_GPIO_PORT->IDR; // read BTN GPIO
+        tmp = buttons.depressed; // save the debounced depressed buttons
+        buttons.depressed |= (buttons.previous & current); // set depressed
+        buttons.depressed &= (buttons.previous | current); // clear released
+        buttons.previous   = current; // update the history
+        tmp ^= buttons.depressed;     // changed debounced depressed
+        if ((tmp & BTN_B1) != 0U) {  // debounced B1 state changed?
+            if ((buttons.depressed & BTN_B1) != 0U) { // is B1 depressed?
+                static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
+                QP::QF::PUBLISH(&pauseEvt, &l_embos_ticker);
+            }
+            else {            // the button is released
+                static QP::QEvt const serveEvt = { SERVE_SIG, 0U, 0U};
+                QP::QF::PUBLISH(&serveEvt, &l_embos_ticker);
+            }
         }
     }
 }
+/*..........................................................................*/
+/*
+*  OS_Idle() function overridden from RTOSInit_STM32F4x_CMSIS.c
+*
+*  Function description
+*    This is basically the "core" of the embOS idle loop.
+*    This core loop can be changed, but:
+*    The idle loop does not have a stack of its own, therefore no
+*    functionality should be implemented that relies on the stack
+*    to be preserved. However, a simple program loop can be programmed
+*    (like toggling an output or incrementing a counter)
+*/
+void OS_Idle(void) {
+    while (1) {
 
-//..........................................................................
-void BSP_onIdle(void) {  // idle callback from embOS RTOSInit.c
-    QF_INT_DISABLE();
-    LED_GPIO_PORT->BSRRL = LED6_PIN; // turn LED on
-    __NOP(); // wait a little to actually see the LED glow
-    __NOP();
-    __NOP();
-    __NOP();
-    LED_GPIO_PORT->BSRRH = LED6_PIN; // turn LED off
-    QF_INT_ENABLE();
-
-#ifdef Q_SPY
-    if ((USART2->SR & 0x80U) != 0U) {  // is TXE empty?
-        uint16_t b;
-
+       /* toggle LED6 on and then off, see NOTE01 */
         QF_INT_DISABLE();
-        b = QP::QS::getByte();
+        LED_GPIO_PORT->BSRRL = LED6_PIN; /* turn LED on  */
+        __NOP(); /* wait a little to actually see the LED glow */
+        __NOP();
+        __NOP();
+        __NOP();
+        LED_GPIO_PORT->BSRRH = LED6_PIN; /* turn LED off */
         QF_INT_ENABLE();
 
-        if (b != QP::QS_EOD) {  // not End-Of-Data?
-            USART2->DR  = (b & 0xFFU);  // put into the DR register
+#ifdef Q_SPY
+        QP::QS::rxParse();  /* parse all the received bytes */
+
+        if ((USART2->SR & USART_FLAG_TXE) != 0) {  /* is TXE empty? */
+            uint16_t b;
+
+            QF_INT_DISABLE();
+            b = QP::QS::getByte();
+            QF_INT_ENABLE();
+
+            if (b != QP::QS_EOD) {  /* not End-Of-Data? */
+                USART2->DR  = (b & 0xFFU);  /* put into the DR register */
+            }
         }
-    }
 #elif defined NDEBUG
-    // Put the CPU and peripherals to the low-power mode.
-    // you might need to customize the clock management for your application,
-    // see the datasheet for your particular Cortex-M3 MCU.
-    //
-    // !!!CAUTION!!!
-    // The WFI instruction stops the CPU clock, which unfortunately disables
-    // the JTAG port, so the ST-Link debugger can no longer connect to the
-    // board. For that reason, the call to __WFI() has to be used with CAUTION.
-    //
-    // NOTE: If you find your board "frozen" like this, strap BOOT0 to VDD and
-    // reset the board, then connect with ST-Link Utilities and erase the part.
-    // The trick with BOOT(0) is it gets the part to run the System Loader
-    // instead of your broken code. When done disconnect BOOT0, and start over.
-    //
-    //__WFI(); // Wait-For-Interrupt
+        /* Put the CPU and peripherals to the low-power mode.
+        * NOTE: You might need to customize the clock management for your
+        * application, see the datasheet for your particular Cortex-M3 MCU.
+        */
+        /* !!!CAUTION!!!
+        * The WFI instruction stops the CPU clock, which unfortunately
+        * disables the STM32 JTAG port, so the ST-Link debugger can no longer
+        * connect to the board. For that reason, the call to __WFI() has to
+        * be used with CAUTION. See also NOTE02
+        */
+#if ((OS_VIEW_IFSELECT != OS_VIEW_IF_JLINK) && (OS_DEBUG == 0))
+        //__WFI(); /* Wait-For-Interrupt */
 #endif
+#endif
+    }
 }
 
 } // extern "C"
@@ -227,7 +252,8 @@ void BSP::init(void) {
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_embos_ticker);
-    QS_OBJ_DICTIONARY(&l_EXTI0_IRQHandler);
+    QS_USR_DICTIONARY(PHILO_STAT);
+    QS_USR_DICTIONARY(COMMAND_STAT);
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -292,6 +318,11 @@ namespace QP {
 void QF::onStartup(void) {
     static OS_TICK_HOOK tick_hook;
     OS_TICK_AddHook(&tick_hook, &DPP::tick_handler);
+
+#ifdef Q_SPY
+    NVIC_SetPriority(USART2_IRQn, 0);
+    NVIC_EnableIRQ(USART2_IRQn); // USART2 interrupt used for QS-RX
+#endif
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -312,8 +343,11 @@ extern "C" void Q_onAssert(char const *module, int loc) {
 #ifdef Q_SPY
 //............................................................................
 bool QS::onStartup(void const *arg) {
-    static uint8_t qsBuf[1024]; // buffer for Quantum Spy
+    static uint8_t qsBuf[2*1024]; // buffer for QS-TX channel
+    static uint8_t qsRxBuf[100];  // buffer for QS-RX channel
+
     initBuf(qsBuf, sizeof(qsBuf));
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     GPIO_InitTypeDef GPIO_struct;
     USART_InitTypeDef USART_struct;
@@ -325,7 +359,7 @@ bool QS::onStartup(void const *arg) {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 
     // GPIOA Configuration:  USART2 TX on PA2
-    GPIO_struct.GPIO_Pin = GPIO_Pin_2;
+    GPIO_struct.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
     GPIO_struct.GPIO_Mode = GPIO_Mode_AF;
     GPIO_struct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_struct.GPIO_OType = GPIO_OType_PP;
@@ -341,23 +375,19 @@ bool QS::onStartup(void const *arg) {
     USART_struct.USART_StopBits = USART_StopBits_1;
     USART_struct.USART_Parity = USART_Parity_No;
     USART_struct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_struct.USART_Mode = USART_Mode_Tx;
+    USART_struct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
     USART_Init(USART2, &USART_struct);
 
+    USART_ITConfig(USART2, USART_IT_RXNE, ENABLE); // enable RX interrupt
     USART_Cmd(USART2, ENABLE); // enable USART2
 
-    // setup the QS filters...
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_ON(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_ON(QS_QEP_UNHANDLED);
+    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
+    DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
-    QS_FILTER_ON(DPP::PHILO_STAT);
+    // setup the QS filters...
+    QS_FILTER_ON(QS_SM_RECORDS); // state machine records */
+    QS_FILTER_ON(QS_AO_RECORDS); // active object records */
+    QS_FILTER_ON(QS_UA_RECORDS); // all user records */
 
     return true; // return success
 }
@@ -389,12 +419,10 @@ void QS::onFlush(void) {
     QF_INT_ENABLE();
 }
 //............................................................................
-//! callback function to reset the target (to be implemented in the BSP)
 void QS::onReset(void) {
-    //TBD
+    NVIC_SystemReset();
 }
 //............................................................................
-//! callback function to execute a uesr command (to be implemented in BSP)
 void QS::onCommand(uint8_t cmdId, uint32_t param1,
                    uint32_t param2, uint32_t param3)
 {
@@ -402,8 +430,21 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param1;
     (void)param2;
     (void)param3;
-    //TBD
+    QS_BEGIN(DPP::COMMAND_STAT, (void *)1) //application-specific record begin
+        QS_U8(2, cmdId);
+        QS_U32(8, param1);
+        QS_U32(8, param2);
+        QS_U32(8, param3);
+    QS_END()
+
+    if (cmdId == 10U) {
+        //Q_ERROR();
+    }
+    else if (cmdId == 11U) {
+        //Q_ERROR();
+    }
 }
+
 #endif // Q_SPY
 //----------------------------------------------------------------------------
 

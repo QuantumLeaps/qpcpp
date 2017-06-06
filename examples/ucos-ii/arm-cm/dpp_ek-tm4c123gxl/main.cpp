@@ -38,8 +38,8 @@
 //............................................................................
 int main() {
     // stacks for uC/OS-II tasks...
-    static OS_STK philoStk[N_PHILO][128];
-    static OS_STK tableStk[256];
+    static OS_STK philoStk[N_PHILO][200];
+    static OS_STK tableStk[300];
 
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];

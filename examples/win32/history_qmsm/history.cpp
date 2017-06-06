@@ -87,7 +87,7 @@ QP::QState ToastOven::initial(ToastOven * const me, QP::QEvt const * const e) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[3];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &doorClosed_s, // target state
         {
             Q_ACTION_CAST(&doorClosed_e), // entry
@@ -126,7 +126,7 @@ QP::QState ToastOven::doorClosed_i(ToastOven * const me) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &off_s, // target state
         {
             Q_ACTION_CAST(&off_e), // entry
@@ -145,7 +145,7 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &final_s, // target state
                 {
                     Q_ACTION_CAST(&doorClosed_x), // exit
@@ -161,7 +161,7 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &doorOpen_s, // target state
                 {
                     Q_ACTION_CAST(&doorClosed_x), // exit
@@ -177,7 +177,7 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &toasting_s, // target state
                 {
                     Q_ACTION_CAST(&heating_e), // entry
@@ -193,7 +193,7 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &baking_s, // target state
                 {
                     Q_ACTION_CAST(&heating_e), // entry
@@ -209,7 +209,7 @@ QP::QState ToastOven::doorClosed(ToastOven * const me, QP::QEvt const * const e)
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[2];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &off_s, // target state
                 {
                     Q_ACTION_CAST(&off_e), // entry
@@ -251,7 +251,7 @@ QP::QState ToastOven::heating_i(ToastOven * const me) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &toasting_s, // target state
         {
             Q_ACTION_CAST(&toasting_e), // entry
@@ -380,7 +380,7 @@ QP::QState ToastOven::doorOpen(ToastOven * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &doorClosed_s, // target state
                 {
                     Q_ACTION_CAST(&doorOpen_x), // exit
@@ -396,7 +396,7 @@ QP::QState ToastOven::doorOpen(ToastOven * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &final_s, // target state
                 {
                     Q_ACTION_CAST(&doorOpen_x), // exit

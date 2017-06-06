@@ -126,7 +126,7 @@ QP::QState Calc::initial(Calc * const me, QP::QEvt const * const e) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[3];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &on_s, // target state
         {
             Q_ACTION_CAST(&on_e), // entry
@@ -164,7 +164,7 @@ QP::QState Calc::on_i(Calc * const me) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[3];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &ready_s, // target state
         {
             Q_ACTION_CAST(&ready_e), // entry
@@ -185,7 +185,7 @@ QP::QState Calc::on(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[4];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &on_s, // target state
                 {
                     Q_ACTION_CAST(&on_x), // exit
@@ -203,7 +203,7 @@ QP::QState Calc::on(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &final_s, // target state
                 {
                     Q_ACTION_CAST(&on_x), // exit
@@ -246,7 +246,7 @@ QP::QState Calc::ready_i(Calc * const me) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &begin_s, // target state
         {
             Q_ACTION_CAST(&begin_e), // entry
@@ -266,7 +266,7 @@ QP::QState Calc::ready(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[4];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &operand1_s.super, // target state
                 {
                     Q_ACTION_CAST(&ready_x), // exit
@@ -284,7 +284,7 @@ QP::QState Calc::ready(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[4];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &operand1_s.super, // target state
                 {
                     Q_ACTION_CAST(&ready_x), // exit
@@ -303,7 +303,7 @@ QP::QState Calc::ready(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[4];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &operand1_s.super, // target state
                 {
                     Q_ACTION_CAST(&ready_x), // exit
@@ -323,7 +323,7 @@ QP::QState Calc::ready(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &opEntered_s, // target state
                 {
                     Q_ACTION_CAST(&ready_x), // exit
@@ -406,7 +406,7 @@ QP::QState Calc::begin(Calc * const me, QP::QEvt const * const e) {
                 static struct {
                     QP::QMState const *target;
                     QP::QActionHandler act[5];
-                } const tatbl_ = { // transition-action table
+                } const tatbl_ = { // tran-action table
                     &operand1_s.super, // target state
                     {
                         Q_ACTION_CAST(&begin_x), // exit
@@ -452,15 +452,17 @@ QP::QState Calc::operand1_e(Calc * const me) {
 QP::QState Calc::operand1_ce(Calc * const me) {
     static struct {
         QP::QMState const *target;
-        QP::QActionHandler act[3];
-    } const tatbl_ = { // transition-action table
+        QP::QActionHandler act[4];
+    } const tatbl_ = { // tran-action table
         &ready_s, // target state
         {
+            Q_ACTION_CAST(&operand_x), // submachine exit
             Q_ACTION_CAST(&ready_e), // entry
             Q_ACTION_CAST(&ready_i), // initial tran.
             Q_ACTION_CAST(0) // zero terminator
         }
     };
+    (void)me; /* avoid compiler warning in case 'me' is not used */
     BSP_message("operand1-XP:ce;");
     return QM_TRAN(&tatbl_);
 }
@@ -473,7 +475,7 @@ QP::QState Calc::operand1(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[2];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &opEntered_s, // target state
                 {
                     Q_ACTION_CAST(&opEntered_e), // entry
@@ -490,7 +492,7 @@ QP::QState Calc::operand1(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &result_s, // target state
                 {
                     Q_ACTION_CAST(&ready_e), // entry
@@ -537,7 +539,7 @@ QP::QState Calc::opEntered(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[4];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &operand2_s.super, // target state
                 {
                     Q_ACTION_CAST(&opEntered_x), // exit
@@ -555,7 +557,7 @@ QP::QState Calc::opEntered(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[4];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &operand2_s.super, // target state
                 {
                     Q_ACTION_CAST(&opEntered_x), // exit
@@ -574,7 +576,7 @@ QP::QState Calc::opEntered(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[4];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &operand2_s.super, // target state
                 {
                     Q_ACTION_CAST(&opEntered_x), // exit
@@ -596,7 +598,7 @@ QP::QState Calc::opEntered(Calc * const me, QP::QEvt const * const e) {
                 static struct {
                     QP::QMState const *target;
                     QP::QActionHandler act[4];
-                } const tatbl_ = { // transition-action table
+                } const tatbl_ = { // tran-action table
                     &operand2_s.super, // target state
                     {
                         Q_ACTION_CAST(&opEntered_x), // exit
@@ -673,14 +675,16 @@ QP::QState Calc::operand2_e(Calc * const me) {
 QP::QState Calc::operand2_ce(Calc * const me) {
     static struct {
         QP::QMState const *target;
-        QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
+        QP::QActionHandler act[3];
+    } const tatbl_ = { // tran-action table
         &opEntered_s, // target state
         {
+            Q_ACTION_CAST(&operand_x), // submachine exit
             Q_ACTION_CAST(&opEntered_e), // entry
             Q_ACTION_CAST(0) // zero terminator
         }
     };
+    (void)me; /* avoid compiler warning in case 'me' is not used */
     BSP_message("operand2-XP:ce;");
     return QM_TRAN(&tatbl_);
 }
@@ -695,7 +699,7 @@ QP::QState Calc::operand2(Calc * const me, QP::QEvt const * const e) {
                 static struct {
                     QP::QMState const *target;
                     QP::QActionHandler act[2];
-                } const tatbl_ = { // transition-action table
+                } const tatbl_ = { // tran-action table
                     &opEntered_s, // target state
                     {
                         Q_ACTION_CAST(&opEntered_e), // entry
@@ -709,7 +713,7 @@ QP::QState Calc::operand2(Calc * const me, QP::QEvt const * const e) {
                 static struct {
                     QP::QMState const *target;
                     QP::QActionHandler act[2];
-                } const tatbl_ = { // transition-action table
+                } const tatbl_ = { // tran-action table
                     &error_s, // target state
                     {
                         Q_ACTION_CAST(&error_e), // entry
@@ -727,7 +731,7 @@ QP::QState Calc::operand2(Calc * const me, QP::QEvt const * const e) {
                 static struct {
                     QP::QMState const *target;
                     QP::QActionHandler act[3];
-                } const tatbl_ = { // transition-action table
+                } const tatbl_ = { // tran-action table
                     &result_s, // target state
                     {
                         Q_ACTION_CAST(&ready_e), // entry
@@ -742,7 +746,7 @@ QP::QState Calc::operand2(Calc * const me, QP::QEvt const * const e) {
                 static struct {
                     QP::QMState const *target;
                     QP::QActionHandler act[2];
-                } const tatbl_ = { // transition-action table
+                } const tatbl_ = { // tran-action table
                     &error_s, // target state
                     {
                         Q_ACTION_CAST(&error_e), // entry
@@ -812,7 +816,7 @@ QP::QState Calc::operand_i(Calc * const me) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &SM_operand::zero_s, // target state
         {
             Q_ACTION_CAST(&SM_operand::zero_e), // entry
@@ -829,13 +833,9 @@ QP::QState Calc::operand(Calc * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // ${SMs::Calc::SM::operand::CE}
         case CE_SIG: {
-            static struct {
-                QP::QMState const *target;
-                QP::QActionHandler act[2];
-            } const tatbl_ = { // transition-action table
+            static QP::QMTranActTable const tatbl_ = { // tran-action table
                 &operand_s, // target submachine
                 {
-                    Q_ACTION_CAST(&operand_x), // exit
                     Q_ACTION_CAST(0) // zero terminator
                 }
             };
@@ -856,7 +856,7 @@ QP::QState Calc::SM_operand::zero_ep(Calc * const me) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &SM_operand::zero_s, // target state
         {
             Q_ACTION_CAST(&SM_operand::zero_e), // entry
@@ -871,7 +871,7 @@ QP::QState Calc::SM_operand::intgr_ep(Calc * const me) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &SM_operand::intgr_s, // target state
         {
             Q_ACTION_CAST(&SM_operand::intgr_e), // entry
@@ -886,7 +886,7 @@ QP::QState Calc::SM_operand::frac_ep(Calc * const me) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &SM_operand::frac_s, // target state
         {
             Q_ACTION_CAST(&SM_operand::frac_e), // entry
@@ -901,7 +901,7 @@ QP::QState Calc::SM_operand::neg_ep(Calc * const me) {
     static struct {
         QP::QMState const *target;
         QP::QActionHandler act[2];
-    } const tatbl_ = { // transition-action table
+    } const tatbl_ = { // tran-action table
         &SM_operand::neg_s, // target state
         {
             Q_ACTION_CAST(&SM_operand::neg_e), // entry
@@ -946,7 +946,7 @@ QP::QState Calc::SM_operand::zero(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &SM_operand::intgr_s, // target state
                 {
                     Q_ACTION_CAST(&SM_operand::zero_x), // exit
@@ -963,7 +963,7 @@ QP::QState Calc::SM_operand::zero(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &SM_operand::frac_s, // target state
                 {
                     Q_ACTION_CAST(&SM_operand::zero_x), // exit
@@ -1012,7 +1012,7 @@ QP::QState Calc::SM_operand::intgr(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &SM_operand::frac_s, // target state
                 {
                     Q_ACTION_CAST(&SM_operand::intgr_x), // exit
@@ -1114,7 +1114,7 @@ QP::QState Calc::SM_operand::neg(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &SM_operand::zero_s, // target state
                 {
                     Q_ACTION_CAST(&SM_operand::neg_x), // exit
@@ -1131,7 +1131,7 @@ QP::QState Calc::SM_operand::neg(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &SM_operand::intgr_s, // target state
                 {
                     Q_ACTION_CAST(&SM_operand::neg_x), // exit
@@ -1148,7 +1148,7 @@ QP::QState Calc::SM_operand::neg(Calc * const me, QP::QEvt const * const e) {
             static struct {
                 QP::QMState const *target;
                 QP::QActionHandler act[3];
-            } const tatbl_ = { // transition-action table
+            } const tatbl_ = { // tran-action table
                 &SM_operand::frac_s, // target state
                 {
                     Q_ACTION_CAST(&SM_operand::neg_x), // exit
