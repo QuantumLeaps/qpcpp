@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-17
+/// Last updated for version 5.9.3
+/// Last updated on  2017-06-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -88,12 +88,14 @@ bool QActive::post_(QEvt const * const e,
     QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into the temporary
 
     // test probe for reaching the margin
-    QS_TEST_PROBE_ID(1,
-        nFree = margin;
+    QS_TEST_PROBE(
+        nFree = static_cast<QEQueueCtr>(qs_tp_ - static_cast<uint32_t>(1));
     )
 
     // margin available?
-    if (nFree > static_cast<QEQueueCtr>(margin)) {
+    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
+        || (nFree > static_cast<QEQueueCtr>(margin)))
+    {
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -119,7 +121,7 @@ bool QActive::post_(QEvt const * const e,
     else {
         /// @note assert if event cannot be posted and dropping events is
         /// not acceptable
-        Q_ASSERT_ID(110, margin != static_cast<uint_fast16_t>(0));
+        Q_ASSERT_ID(110, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
                          QS::priv_.locFilter[QS::AO_OBJ], this)

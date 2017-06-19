@@ -1357,7 +1357,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\source</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\embos</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\embOS\Start\Inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\stm32f4-discovery</state>
@@ -2377,7 +2377,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\source</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\embos</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\embOS\Start\Inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\stm32f4-discovery</state>

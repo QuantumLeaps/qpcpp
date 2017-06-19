@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.9.3
+/// Last updated on  2017-06-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -144,7 +144,7 @@ void QActive::stop() {
 bool QActive::post_(QEvt const * const e, uint_fast16_t const margin)
 #else
 bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
-                     void const * const sender)
+                    void const * const sender)
 #endif
 {
     bool status;
@@ -156,7 +156,9 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSQSize
          - reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSNMsgs);
 
-    if (nFree > margin) {
+    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
+        || (nFree > static_cast<QEQueueCtr>(margin)))
+    {
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();             // timestamp
             QS_OBJ_(sender);        // the sender object
@@ -173,7 +175,7 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
 
         QF_CRIT_EXIT_();
 
-        // posting the event to uC/OS-II message queue must succeed, NOTE3
+        // posting the event to uC/OS-II message queue must succeed
         Q_ALLEGE_ID(710,
             OSQPost(m_eQueue, const_cast<QEvt *>(e)) == OS_ERR_NONE);
 
@@ -181,14 +183,14 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     }
     else {
         // can tolerate dropping evts?
-        Q_ASSERT_ID(720, margin != static_cast<uint_fast16_t>(0));
+        Q_ASSERT_ID(520, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
-            QS_TIME_();             // timestamp
-            QS_OBJ_(sender);        // the sender object
-            QS_SIG_(e->sig);        // the signal of the event
-            QS_OBJ_(this);          // this active object (recipient)
+            QS_TIME_();         // timestamp
+            QS_OBJ_(sender);    // the sender object
+            QS_SIG_(e->sig);    // the signal of the event
+            QS_OBJ_(this);      // this active object (recipient)
             QS_2U8_(e->poolId_, e->refCtr_); // pool Id & ref Count
             QS_EQC_(static_cast<QEQueueCtr>(nFree)); // # free entries
             QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free (unknown)
@@ -224,7 +226,7 @@ void QActive::postLIFO(QEvt const * const e) {
 
     QF_CRIT_EXIT_();
 
-    // posting the event to uC/OS-II message queue must succeed, NOTE3
+    // posting the event to uC/OS-II message queue must succeed
     Q_ALLEGE_ID(810,
         OSQPostFront(m_eQueue, const_cast<QEvt *>(e)) == OS_ERR_NONE);
 }
@@ -265,13 +267,10 @@ QEvt const *QActive::get_(void) {
 // NOTE1:
 // The member QActive.thread is set to the uC/OS-II task options in the
 // function QF_setUCosTaskAttr(), which must be called **before**
-// QACTIVE_START().
+// QActive::start().
 //
 // NOTE2:
 // The member QActive.thread is reused as the loop control variable,
 // because the task options are alredy applied.
 //
-// NOTE3:
-// The following uC/OS-II OSQPost() API is called inside a critical section,
-// but this is OK, because uC/OS-II critical sections are designed to nest.
-//
+

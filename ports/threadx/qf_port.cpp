@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.9.3
+/// Last updated on  2017-06-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -143,7 +143,9 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     uint_fast16_t nFree =
         static_cast<uint_fast16_t>(m_eQueue.tx_queue_available_storage);
 
-    if (nFree > margin) {
+    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
+        || (nFree > static_cast<QEQueueCtr>(margin)))
+    {
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();              // timestamp
             QS_OBJ_(sender);         // the sender object
@@ -170,8 +172,7 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     }
     else {
         // can tolerate dropping evts?
-        Q_ASSERT_ID(520,
-            margin != static_cast<uint_fast16_t>(0));
+        Q_ASSERT_ID(520, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
             QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -245,10 +246,10 @@ void QFSchedLock::lock(uint_fast8_t prio) {
     m_lockHolder = tx_thread_identify();
 
     /// @pre must be thread level, so current TX thread must be available
-    Q_REQUIRE_ID(700, m_lockHolder != static_cast<TX_THREAD *>(0));
+    Q_REQUIRE_ID(800, m_lockHolder != static_cast<TX_THREAD *>(0));
 
     // change the preemption threshold of the current thread
-    Q_ALLEGE_ID(710, tx_thread_preemption_change(m_lockHolder,
+    Q_ALLEGE_ID(810, tx_thread_preemption_change(m_lockHolder,
                      (QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - prio),
                      &m_prevThre) == TX_SUCCESS);
 
@@ -266,7 +267,7 @@ void QFSchedLock::unlock(void) const {
     QS_CRIT_STAT_
 
     /// @pre the lock holder TX thread must be available */
-    Q_REQUIRE_ID(800, m_lockHolder != static_cast<TX_THREAD *>(0));
+    Q_REQUIRE_ID(900, m_lockHolder != static_cast<TX_THREAD *>(0));
 
     QS_BEGIN_(QS_SCHED_UNLOCK,
               static_cast<void *>(0), static_cast<void *>(0))
@@ -278,7 +279,7 @@ void QFSchedLock::unlock(void) const {
 
     // restore the preemption threshold of the lock holder
     UINT old_thre;
-    Q_ALLEGE_ID(810, tx_thread_preemption_change(m_lockHolder,
+    Q_ALLEGE_ID(910, tx_thread_preemption_change(m_lockHolder,
                      m_prevThre,
                      &old_thre) == TX_SUCCESS);
 }

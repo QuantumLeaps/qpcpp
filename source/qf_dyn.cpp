@@ -2,8 +2,8 @@
 /// @brief QF/C++ dynamic event management
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.6.5
-/// Last updated on  2016-06-09
+/// Last updated for version 5.9.3
+/// Last updated on  2017-06-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -110,6 +110,8 @@ void QF::poolInit(void * const poolSto,
 /// @param[in] evtSize the size (in bytes) of the event to allocate
 /// @param[in] margin  the number of un-allocated events still available
 ///                    in a given event pool after the allocation completes
+///                    The special value QP::QF_NO_MARGIN means that this
+///                    function will assert if allocation fails.
 /// @param[in] sig     the signal to be assigned to the allocated event
 ///
 /// @returns pointer to the newly allocated event. This pointer can be NULL
@@ -117,9 +119,9 @@ void QF::poolInit(void * const poolSto,
 /// margin still available in the given pool.
 ///
 /// @note The internal QF function QP::QF::newX_() raises an assertion when
-/// the margin argument is 0 and allocation of the event turns out to be
-/// impossible due to event pool depletion, or incorrect (too big) size
-/// of the requested event.
+/// the margin argument is QP::QF_NO_MARGIN and allocation of the event turns
+/// out to be impossible due to event pool depletion, or incorrect (too big)
+/// size of the requested event.
 ///
 /// @note The application code should not call this function directly.
 /// The only allowed use is thorough the macros Q_NEW() or Q_NEW_X().
@@ -145,8 +147,12 @@ QEvt *QF::newX_(uint_fast16_t const evtSize,
         QS_SIG_(static_cast<QSignal>(sig));      // the signal of the event
     QS_END_()
 
+    // get e -- platform-dependent
     QEvt *e;
-    QF_EPOOL_GET_(QF_pool_[idx], e, margin); // get e -- platform-dependent
+    QF_EPOOL_GET_(QF_pool_[idx], e,
+                  ((margin != QF_NO_MARGIN)
+                      ? margin
+                      : static_cast<uint_fast16_t>(0)));
 
     // was e allocated correctly?
     if (e != static_cast<QEvt const *>(0)) {

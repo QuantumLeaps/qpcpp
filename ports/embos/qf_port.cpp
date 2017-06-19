@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to embOS (v4.00) kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.9.3
+/// Last updated on  2017-06-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -159,7 +159,9 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     QF_CRIT_ENTRY_();
     nFree = static_cast<uint_fast16_t>(m_eQueue.maxMsg - m_eQueue.nofMsg);
 
-    if (nFree > margin) {
+    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
+        || (nFree > static_cast<QEQueueCtr>(margin)))
+    {
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();             // timestamp
             QS_OBJ_(sender);        // the sender object
@@ -177,7 +179,7 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         QF_CRIT_EXIT_();
 
         // posting to the embOS mailbox must succeed, see NOTE3
-        Q_ALLEGE_ID(710,
+        Q_ALLEGE_ID(510,
             OS_PutMailCond(&m_eQueue, static_cast<OS_CONST_PTR void *>(&e))
             == static_cast<char>(0));
 
@@ -185,7 +187,7 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     }
     else {
         // can tolerate dropping evts?
-        Q_ASSERT_ID(720, margin != static_cast<uint_fast16_t>(0));
+        Q_ASSERT_ID(520, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
                          QS::priv_.locFilter[QS::AO_OBJ], this)

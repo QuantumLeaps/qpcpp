@@ -8,8 +8,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-08
+/// Last updated for version 5.9.3
+/// Last updated on  2017-06-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -58,24 +58,23 @@ Q_DEFINE_THIS_MODULE("qf_actq")
 //****************************************************************************
 /// @description
 /// Direct event posting is the simplest asynchronous communication method
-/// available in QF. The following example illustrates how the Philo active
-/// object posts directly the HUNGRY event to the Table active object.@n
-/// @n
-/// The argument @p margin specifies the minimum number of free slots in
-/// the queue that must be available for posting to succeed. The function
-/// returns 1 (success) if the posting succeeded (with the provided margin)
-/// and 0 (failure) when the posting fails.
+/// available in QF.
 ///
 /// @param[in,out] e      pointer to the event to be posted
 /// @param[in]     margin number of required free slots in the queue
-///                       after posting the event.
-/// @note
+///                after posting the event. The special value QP::QF_NO_MARGIN
+///                means that this function will assert if posting fails.
+///
+/// @returns  The function returns true (success) if the posting succeeded
+/// (with the provided margin) and false (failure) when the posting fails.
+///
+/// @attention
 /// This function should be called only via the macro POST() or POST_X().
 ///
-/// @note The zero value of the 'margin' argument is special and denotes
-/// situation when the post() operation is assumed to succeed (event delivery
-/// guarantee). An assertion fires, when the event cannot be delivered in
-/// this case.
+/// @note The QP::QF_NO_MARGIN value of the @p margin argument is special and
+/// denotes situation when the post() operation is assumed to succeed (event
+/// delivery guarantee). An assertion fires, when the event cannot be
+/// delivered in this case.
 ///
 /// @note Direct event posting should not be confused with direct event
 /// dispatching. In contrast to asynchronous event posting through event
@@ -86,7 +85,7 @@ Q_DEFINE_THIS_MODULE("qf_actq")
 /// This function is used internally by a QF port to extract events from
 /// the event queue of an active object. This function depends on the event
 /// queue implementation and is sometimes implemented in the QF port
-/// (file qf_port.c). Depending on the underlying OS or kernel, the
+/// (file qf_port.cpp). Depending on the underlying OS or kernel, the
 /// function might block the calling thread when no events are available.
 ///
 /// @usage
@@ -110,7 +109,9 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into the temporary
 
     // margin available?
-    if (nFree > static_cast<QEQueueCtr>(margin)) {
+    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
+        || (nFree > static_cast<QEQueueCtr>(margin)))
+    {
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -157,7 +158,7 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     else {
         /// @note assert if event cannot be posted and dropping events is
         /// not acceptable
-        Q_ASSERT_ID(110, margin != static_cast<uint_fast16_t>(0));
+        Q_ASSERT_ID(110, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -349,7 +350,7 @@ void QTicker::dispatch(QEvt const * const /*e*/) {
     QF_CRIT_EXIT_();
 
     for (; n > static_cast<QEQueueCtr>(0); --n) {
-        QF::TICK_X(m_eQueue.m_head, this);
+        QF::TICK_X(static_cast<uint_fast8_t>(m_eQueue.m_head), this);
     }
 }
 //****************************************************************************

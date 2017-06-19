@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-14
+/// Last updated for version 5.9.3
+/// Last updated on  2017-06-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -578,6 +578,10 @@ private:
 #endif // qxk_h
 };
 
+//! special value of margin that causes asserting failure in case
+//! event allocation or event posting fails
+uint16_t const QF_NO_MARGIN = static_cast<uint16_t>(0xFFFF);
+
 
 //****************************************************************************
 //! Ticker Active Object class
@@ -627,7 +631,7 @@ public:
 
     #define Q_NEW(evtT_, sig_, ...) \
         (new(QP::QF::newX_(static_cast<uint_fast16_t>(sizeof(evtT_)), \
-                     static_cast<uint_fast16_t>(0), static_cast<enum_t>(0))) \
+                     QP::QF_NO_MARGIN, static_cast<enum_t>(0))) \
             evtT_((sig_),  ##__VA_ARGS__))
 
     #define Q_NEW_X(e_, evtT_, margin_, sig_, ...) do { \
@@ -643,8 +647,8 @@ public:
     //! Allocate a dynamic event.
     /// @description
     /// The macro calls the internal QF function QP::QF::newX_() with
-    /// margin == 0, which causes an assertion when the event cannot be
-    /// successfully allocated.
+    /// margin == QP::QF_NO_MARGIN, which causes an assertion when the event
+    /// cannot be successfully allocated.
     ///
     /// @param[in] evtT_ event type (class name) of the event to allocate
     /// @param[in] sig_  signal to assign to the newly allocated event
@@ -663,7 +667,7 @@ public:
     #define Q_NEW(evtT_, sig_) \
         (static_cast<evtT_ *>(QP::QF::newX_( \
                 static_cast<uint_fast16_t>(sizeof(evtT_)), \
-                static_cast<uint_fast16_t>(0), (sig_))))
+                QP::QF_NO_MARGIN, (sig_))))
 
     //! Allocate a dynamic event (non-asserting version).
     /// @description
@@ -672,7 +676,9 @@ public:
     ///
     /// @param[in] evtT_   event type (class name) of the event to allocate
     /// @param[in] margin_ number of events that must remain available
-    ///                    in the given pool after this allocation
+    ///                    in the given pool after this allocation. The
+    ///                    special value QP::QF_NO_MARGIN causes asserting
+    ///                    failure in case event allocation fails.
     /// @param[in] sig_    signal to assign to the newly allocated event
     ///
     /// @returns an event pointer cast to the type @p evtT_ or NULL if the
@@ -801,13 +807,13 @@ public:
     /// avoided.
     ///
     /// @note the pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, if QACTIVE_POST() is called from an
+    /// to an active object. In fact, if QP::QActive::post() is called from an
     /// interrupt or other context, you can create a unique object just to
     /// unambiguously identify the sender of the event.
     ///
     /// @sa QP::QActive::post_()
     #define POST(e_, sender_) \
-        post_((e_), static_cast<uint_fast16_t>(0), (sender_))
+        post_((e_), QP::QF_NO_MARGIN, (sender_))
 
     //! Invoke the direct event posting facility QP::QActive::post_()
     //! without delivery guarantee.
@@ -817,7 +823,9 @@ public:
     ///
     /// @param[in]  e_      pointer to the event to post
     /// @param[in]  margin_ the minimum free slots in the queue, which
-    ///                     must still be available after posting the event
+    ///                     must still be available after posting the event.
+    ///                     The special value QP::QF_NO_MARGIN causes
+    ///                     asserting failure in case event posting fails.
     /// @param[in]  sender_ pointer to the sender object.
     ///
     /// @returns
@@ -834,7 +842,7 @@ public:
     ///
     /// @note
     /// The pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, if QACTIVE_POST() is called from an
+    /// to an active object. In fact, if QP::QActive::post() is called from an
     /// interrupt or other context, you can create a unique object just to
     /// unambiguously identify the sender of the event.
     ///
@@ -846,7 +854,7 @@ public:
 #else
 
     #define PUBLISH(e_, dummy_)  publish_((e_))
-    #define POST(e_, dummy_)     post_((e_), static_cast<uint_fast16_t>(0))
+    #define POST(e_, dummy_)     post_((e_), QP::QF_NO_MARGIN)
     #define POST_X(e_, margin_, dummy_) post_((e_), (margin_))
     #define TICK_X(tickRate_, dummy_)   tickX_((tickRate_))
 
