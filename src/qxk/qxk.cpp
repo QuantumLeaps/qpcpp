@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-04
+/// Last updated for version 5.9.4
+/// Last updated on  2017-07-06
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -157,7 +157,8 @@ int_t QF::run(void) {
 // @description
 // Starts execution of the AO and registers the AO with the framework.
 // Also takes the top-most initial transition in the AO's state machine.
-// This initial transition is taken in the callee's thread of execution.//
+// This initial transition is taken in the callee's thread of execution.
+//
 // @param[in] prio    priority at which to start the active object
 // @param[in] qSto    pointer to the storage for the ring buffer of the
 //                    event queue (used only with the built-in QP::QEQueue)
@@ -185,7 +186,7 @@ void QActive::start(uint_fast8_t const prio,
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
 
-    m_thread = static_cast<void *>(0); // no private stack for AO
+    m_osObject = static_cast<void *>(0); // no private stack for AO
     m_prio = prio;    // set the QF priority of this AO
 
     QF_CRIT_STAT_
@@ -263,12 +264,12 @@ uint_fast8_t QXK_sched_(void) {
     //Q_ASSERT_ID(610, next != static_cast<QP::QActive *>(0));
 
     // is the current thread a basic-thread?
-    if (QXK_attr_.curr == static_cast<void *>(0)) {
+    if (QXK_attr_.curr == static_cast<QP::QActive *>(0)) {
 
         // is next a basic-thread?
-        if (next->m_thread == static_cast<void *>(0)) {
+        if (next->m_osObject == static_cast<void *>(0)) {
             if (p <= QXK_attr_.actPrio) {
-                QXK_attr_.next = static_cast<void *>(0);
+                QXK_attr_.next = static_cast<QP::QActive *>(0);
                 p = static_cast<uint_fast8_t>(0); // no activation needed
             }
             else {
@@ -294,14 +295,13 @@ uint_fast8_t QXK_sched_(void) {
     else { // currently executing an extended-thread
 
         // is the new prio different from the current prio?
-        if (p != static_cast<QP::QActive volatile*>(QXK_attr_.curr)->m_prio) {
+        if (p != QXK_attr_.curr->m_prio) {
             QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT,
                              QP::QS::priv_.locFilter[QP::QS::AO_OBJ],
                              QXK_attr_.next)
                 QS_TIME_(); // timestamp
                 QS_2U8_(static_cast<uint8_t>(p), // prio of the next thread
-                        static_cast<uint8_t>(    // prio of the curent thread
-                        static_cast<QP::QActive *>(QXK_attr_.curr)->m_prio));
+                        static_cast<uint8_t>(QXK_attr_.curr->m_prio));
             QS_END_NOCRIT_()
 
             QXK_attr_.next = next;
@@ -309,7 +309,7 @@ uint_fast8_t QXK_sched_(void) {
             QXK_CONTEXT_SWITCH_();
         }
         else {
-            QXK_attr_.next = static_cast<void *>(0);
+            QXK_attr_.next = static_cast<QP::QActive *>(0);
             p = static_cast<uint_fast8_t>(0); // no activation needed
         }
     }
@@ -326,8 +326,7 @@ uint_fast8_t QXK_sched_(void) {
 /// returns with interrupts **disabled**.
 ///
 void QXK_activate_(void) {
-    uint_fast8_t p =
-        static_cast<QP::QActive volatile *>(QXK_attr_.next)->m_prio;
+    uint_fast8_t p   = QXK_attr_.next->m_prio;
     uint_fast8_t pin = QXK_attr_.actPrio; // save the initial active prio
     QP::QActive *a;
 
@@ -341,7 +340,7 @@ void QXK_activate_(void) {
         a = QP::QF::active_[p]; // obtain the pointer to the AO
 
         QXK_attr_.actPrio = p; // this becomes the active prio
-        QXK_attr_.next = static_cast<void *>(0); // clear the next AO
+        QXK_attr_.next = static_cast<QP::QActive *>(0); // clear the next AO
 
         QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT,
                          QP::QS::priv_.locFilter[QP::QS::AO_OBJ], a)
@@ -386,9 +385,9 @@ void QXK_activate_(void) {
         //Q_ASSERT_ID(710, a != static_cast<QP::QActive *>(0));
 
         // is the next an AO-thread?
-        if (a->m_thread == static_cast<void *>(0)) {
+        if (a->m_osObject == static_cast<void *>(0)) {
             if (p <= pin) {
-                QXK_attr_.next = static_cast<void *>(0);
+                QXK_attr_.next = static_cast<QP::QActive *>(0);
                 p = static_cast<uint_fast8_t>(0); // no activation needed
             }
             else {
@@ -402,7 +401,7 @@ void QXK_activate_(void) {
                              QXK_attr_.next)
                 QS_TIME_(); // timestamp
                 QS_2U8_(static_cast<uint8_t>(p), // prio of the next thread
-                        static_cast<uint8_t>(    // prioof the curent thread
+                        static_cast<uint8_t>(    // prio of the curent thread
                             QXK_attr_.actPrio));
             QS_END_NOCRIT_()
 
@@ -433,6 +432,18 @@ void QXK_activate_(void) {
         QS_END_NOCRIT_()
     }
 #endif // Q_SPY
+}
+
+//****************************************************************************
+QP::QActive *QXK_current(void) {
+    QP::QActive *curr;
+    QF_CRIT_STAT_
+
+    QF_CRIT_ENTRY_();
+    curr = QXK_attr_.curr;
+    QF_CRIT_EXIT_();
+
+    return curr;
 }
 
 } // extern "C"

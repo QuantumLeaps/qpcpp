@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-14
+/// Last updated for version 5.9.4
+/// Last updated on  2017-07-06
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -53,20 +53,36 @@
 ///
 #define QF_EQUEUE_TYPE      QEQueue
 
-//! OS-dependent representation of the private thread
+//! Private OS-object attribute of active objects in QXK
+///
 /// @description
 /// QXK uses this member to store the private stack poiner for the thread.
 /// (The private stack pointer is NULL for AO-threads).///
 ///
+#define QF_OS_OBJECT_TYPE   void*
+
+//! OS-dependent representation of the private thread
+/// @description
+/// QXK uses this member to store the private Thread-Local Storage pointer.
+///
 #define QF_THREAD_TYPE      void*
+
+//! Access Thread-Local Storage (TLS) and cast it on the given @p type_
+#define QXK_TLS(type_) (static_cast<type_>(QXK_current()->m_thread))
+
+
+//****************************************************************************
+namespace QP {
+    class QActive; // forward declaration
+} // namespace QP
 
 //****************************************************************************
 extern "C" {
 
 //! attributes of the QXK kernel
 struct QXK_Attr {
-    void *curr;  //!< currently executing thread
-    void *next;  //!< next thread to execute
+    QP::QActive *curr;  //!< currently executing thread
+    QP::QActive *next;  //!< next thread to execute
     uint_fast8_t volatile actPrio;    //!< prio of the active basic thread
     uint_fast8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
     uint_fast8_t volatile lockHolder; //!< prio of the lock holder
@@ -86,6 +102,9 @@ uint_fast8_t QXK_sched_(void);
 // the currently executing AOs.
 //
 void QXK_activate_(void);
+
+//! return the currently executing active-object/thread
+QP::QActive *QXK_current(void);
 
 } // extern "C"
 

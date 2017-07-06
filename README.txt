@@ -42,6 +42,11 @@ mailto:info@state-machine.com
 #######################################################################
 ################### QP/C++ Revision History ###########################
 
+QP/C++ Version 5.9.4 (07-Jul-2017)
+--------------------------------
+This release adds Thread-Local Storage (TLS) feature for the dual-mode
+QXK kernel (https://state-machine.com/qpcpp/group__qxk.html#qxk_tls).
+
 QP/C++ Version 5.9.3 (19-Jun-2017)
 --------------------------------
 This release implements the feature request #126 "Allow non-asserting

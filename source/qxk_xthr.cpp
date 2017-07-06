@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-04
+/// Last updated for version 5.9.4
+/// Last updated on  2017-07-05
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -578,7 +578,7 @@ void QXK_threadRet_(void) {
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();
-    p = static_cast<QP::QActive *>(QXK_attr_.curr)->m_prio;
+    p = QXK_attr_.curr->m_prio;
     // remove this thread from the QF
     QP::QF::active_[p] = static_cast<QP::QActive *>(0);
     QXK_attr_.readySet.remove(p);

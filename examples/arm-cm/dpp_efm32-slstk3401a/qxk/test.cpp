@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.7.2
-// Last updated on  2016-09-28
+// Last updated for version 5.9.4
+// Last updated on  2017-07-06
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -51,8 +51,22 @@ static QP::QXSemaphore l_sema;
 QP::QXThread * const XT_Test1 = &l_test1;
 QP::QXThread * const XT_Test2 = &l_test2;
 
+// Thread-Local Storage for the "extended" threads ...........................
+struct TLS_test {
+    uint32_t foo;
+    uint8_t bar[10];
+};
+static TLS_test l_tls1;
+static TLS_test l_tls2;
+
+static void lib_fun(uint32_t x) {
+    QXK_TLS(TLS_test *)->foo = x;
+}
+
 //............................................................................
-static void Thread1_run(QP::QXThread * const /*me*/) {
+static void Thread1_run(QP::QXThread * const me) {
+
+    me->m_thread = &l_tls1; // initialize the TLS for Thread1
 
     l_mutex.init(3U);
 
@@ -73,11 +87,16 @@ static void Thread1_run(QP::QXThread * const /*me*/) {
 
         // publish to Thread2
         QP::QF::PUBLISH(Q_NEW(QP::QEvt, TEST_SIG), &l_test1);
+
+        // test TLS
+        lib_fun(1U);
     }
 }
 
 //............................................................................
 static void Thread2_run(QP::QXThread * const me) {
+
+    me->m_thread = &l_tls2; // initialize the TLS for Thread2
 
     // subscribe to the test signal */
     me->subscribe(TEST_SIG);
@@ -104,6 +123,9 @@ static void Thread2_run(QP::QXThread * const me) {
             me->delay(BSP::TICKS_PER_SEC/2, 0U);  // wait some more (BLOCK)
             l_sema.signal(); // signal Thread1
         }
+
+        // test TLS
+        lib_fun(2U);
     }
 }
 
