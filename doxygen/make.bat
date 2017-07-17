@@ -45,7 +45,7 @@ set DOXHOME="C:\tools\doxygen\bin"
 set RCMHOME="C:\tools\MSquared\M2 RSM"
 
 set RSM_OUTPUT=metrics.dox
-set RSM_INPUT=..\include\*.h ..\source\*.h ..\source\*.cpp
+set RSM_INPUT=..\include\*.h ..\src\*.h ..\src\qf\*.cpp ..\src\qv\*.cpp  ..\src\qk\*.cpp  ..\src\qxk\*.cpp
 
 echo /** @page metrics Code Metrics > %RSM_OUTPUT%
 echo.>> %RSM_OUTPUT%
