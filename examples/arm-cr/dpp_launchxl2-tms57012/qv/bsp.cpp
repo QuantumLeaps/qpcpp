@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, LAUCHXL2-TMS570LS12 board, cooperative QV kernel
-// Last Updated for Version: 5.9.0
-// Date of the Last Update:  2017-05-09
+// Last Updated for Version: 5.9.5
+// Date of the Last Update:  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -45,10 +45,10 @@
 #include "sci.h"
 // add other drivers if necessary...
 
+Q_DEFINE_THIS_FILE
+
 // namespace DPP *************************************************************
 namespace DPP {
-
-Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
 #define LED2_PIN    1

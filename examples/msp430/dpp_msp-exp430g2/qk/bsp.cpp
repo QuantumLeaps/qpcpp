@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example on MSP-EXP430G2 board, preemptive QK kernel
-// Last updated for version 5.9.0
-// Last updated on  2017-05-09
+// Last updated for version 5.9.5
+// Last updated on  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -38,10 +38,10 @@
 #include <msp430g2553.h>  // MSP430 variant used
 // add other drivers if necessary...
 
+Q_DEFINE_THIS_FILE
+
 // namespace DPP *************************************************************
 namespace DPP {
-
-Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
 // 8MHz clock setting, see BSP::init()

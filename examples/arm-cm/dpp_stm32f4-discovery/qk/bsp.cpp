@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32F4-Discovery board, preemptive QK kernel
-// Last Updated for Version: 5.9.1
-// Date of the Last Update:  2017-06-02
+// Last Updated for Version: 5.9.5
+// Date of the Last Update:  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -42,10 +42,10 @@
 #include "stm32f4xx_usart.h"
 // add other drivers if necessary...
 
+Q_DEFINE_THIS_FILE
+
 // namespace DPP *************************************************************
 namespace DPP {
-
-Q_DEFINE_THIS_FILE
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, QUTEST
-// Last Updated for Version: 5.9.0
-// Date of the Last Update:  2017-05-10
+// Last Updated for Version: 5.9.5
+// Date of the Last Update:  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,10 +35,10 @@
 #include "dpp.h"
 #include "bsp.h"
 
+Q_DEFINE_THIS_MODULE("bsp")
+
 // namespace DPP *************************************************************
 namespace DPP {
-
-Q_DEFINE_THIS_MODULE("bsp")
 
 static uint32_t l_rnd; // random seed
 

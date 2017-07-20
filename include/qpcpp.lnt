@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.9.4
-// Last updated on  2017-07-05
+// Last updated for version 5.9.5
+// Last updated on  2017-07-19
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -75,7 +75,8 @@
 // Assertions
 -esym(1960,           // Rule 7-3-1, Global declaration of symbol
  Q_onAssert,
- Q_onTestAssert)
+ Q_onTestAssert,
+ Q_this_module_)
 -emacro(944,          // 0-1-1/2/9 operator ? always evaluates to True
  Q_ASSERT_COMPILE)
 -emacro(948,          // 0-1-9  Operator '==' always evaluates to True

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, STM32 NUCLEO-L152RE board, uC/OS-II kernel
-// Last updated for version 5.9.0
-// Last updated on  2017-05-09
+// Last updated for version 5.9.5
+// Last updated on  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -38,10 +38,10 @@
 #include "stm32l1xx.h"  // CMSIS-compliant header file for the MCU used
 // add other drivers if necessary...
 
+Q_DEFINE_THIS_FILE
+
 // namespace DPP *************************************************************
 namespace DPP {
-
-Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
 // LED pins available on the board (just one LED)

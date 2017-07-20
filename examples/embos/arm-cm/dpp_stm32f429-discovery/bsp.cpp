@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, STM32F4-Discovery board, embOS kernel
-// Last updated for version 5.9.0
-// Last updated on  2017-05-09
+// Last updated for version 5.9.5
+// Last updated on  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -42,10 +42,10 @@
 #include "stm32f4xx_usart.h"
 // add other drivers if necessary...
 
+Q_DEFINE_THIS_FILE
+
 // namespace DPP *************************************************************
 namespace DPP {
-
-Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
 #define LED_GPIO_PORT     GPIOD

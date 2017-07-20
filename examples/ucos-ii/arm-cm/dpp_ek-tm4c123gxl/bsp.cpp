@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, uC/OS-II kernel
-// Last updated for version 5.9.0
-// Last updated on  2017-05-09
+// Last updated for version 5.9.5
+// Last updated on  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -41,10 +41,10 @@
 #include "gpio.h"                // GPIO driver (TI)
 // add other drivers if necessary...
 
+Q_DEFINE_THIS_FILE
+
 // namespace DPP *************************************************************
 namespace DPP {
-
-Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
 #define LED_RED     (1U << 1)

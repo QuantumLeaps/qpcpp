@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: "Fly 'n' Shoot" game example, EFM32-SLSTK3401A board, QV kernel
-// Last Updated for Version: 5.9.0
-// Date of the Last Update:  2017-05-09
+// Last Updated for Version: 5.9.5
+// Date of the Last Update:  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -42,10 +42,10 @@
 #include "display_ls013b7dh03.h" // LS013b7DH03 display (SiLabs/QL)
 // add other drivers if necessary...
 
+Q_DEFINE_THIS_FILE
+
 // namespace GAME ************************************************************
 namespace GAME {
-
-Q_DEFINE_THIS_FILE
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().

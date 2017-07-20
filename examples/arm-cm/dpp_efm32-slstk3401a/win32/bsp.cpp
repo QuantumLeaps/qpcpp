@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, Win32-GUI
-// Last updated for version 5.6.5
-// Last updated on  2016-05-13
+// Last updated for version 5.9.5
+// Last updated on  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -47,6 +47,8 @@
     #include <winsock2.h> // for Windows network facilities
 #endif
 
+Q_DEFINE_THIS_FILE
+
 //****************************************************************************
 // thread function for running the application main()
 static DWORD WINAPI appThread(LPVOID par) {
@@ -56,8 +58,6 @@ static DWORD WINAPI appThread(LPVOID par) {
 
 //****************************************************************************
 namespace DPP {
-
-Q_DEFINE_THIS_FILE
 
 // local variables -----------------------------------------------------------
 static HINSTANCE l_hInst;   // this application instance

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP on AT91SAM7S-EK, cooperative QV kernel, IAR-ARM toolset
-// Last Updated for Version: 5.9.0
-// Date of the Last Update:  2017-05-09
+// Last Updated for Version: 5.9.5
+// Date of the Last Update:  2017-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -41,6 +41,8 @@
 #pragma diag_suppress=Ta022  // possible ROM access <ptr> from __ramfunc
 #pragma diag_suppress=Ta023  // call to non __ramfunc from __ramfunc
 
+Q_DEFINE_THIS_FILE
+
 // extern "C" functions in C =================================================
 extern "C" {
 //............................................................................
@@ -59,8 +61,6 @@ void BSP_irq(void) {
 } // extern "C"
 
 namespace DPP {
-
-Q_DEFINE_THIS_FILE
 
 // Local objects -------------------------------------------------------------
 typedef void (*IntVector)(void);  // IntVector pointer-to-function
