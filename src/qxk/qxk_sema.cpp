@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.7.4
-/// Last updated on  2016-11-01
+/// Last updated for version 5.9.5
+/// Last updated on  2017-07-20
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -161,7 +161,7 @@ void QXSemaphore::signal(void) {
         QXThread *thr = static_cast<QXThread *>(QF::active_[p]);
 
         // the thread must be extended and the semaphore count must be zero
-        Q_ASSERT_ID(210, (thr->m_thread != static_cast<void *>(0))
+        Q_ASSERT_ID(210, (thr->m_osObject != static_cast<void *>(0))
              && (m_count == static_cast<uint_fast16_t>(0)));
 
         // disarm the internal time event
