@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.9.5
-/// Last updated on  2017-07-20
+/// Last updated for version 5.9.6
+/// Last updated on  2017-07-27
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -57,21 +57,30 @@ Q_DEFINE_THIS_MODULE("qxk_sema")
 
 //****************************************************************************
 /// @description
-/// Initializes a semaphore with the specified count. If the semaphore is used
-/// for resource sharing, the initial value of the semaphore count should be
-/// set to the number of identical resources guarded by the semaphore. If the
-/// semaphore is used as a signaling mechanism, the initial count should set
-/// to 0.
+/// Initializes a semaphore with the specified count and maximum count.
+/// If the semaphore is used for resource sharing, both the initial count
+/// and maximum count should be set to the number of identical resources
+/// guarded by the semaphore. If the semaphore is used as a signaling
+/// mechanism, the initial count should set to 0 and maximum count to 1
+/// (binary semaphore).
 ///
 /// @param[in]     count  initial value of the semaphore counter
-///
+/// @param[in]     max_count  maximum value of the semaphore counter.
+///                The purpose of the max_count is to limit the counter
+///                so that the semaphore cannot unblock more times than
+///                the maximum.
 /// @note
 /// QXSemaphore::init() must be called **before** the semaphore can be used
 /// (signaled or waited on).
 ///
-void QXSemaphore::init(uint_fast16_t const count) {
-    m_count = count;
+void QXSemaphore::init(uint_fast16_t const count,
+                       uint_fast16_t const max_count)
+{
+    Q_REQUIRE_ID(100, max_count > static_cast<uint_fast16_t>(0));
+
     m_waitSet.setEmpty();
+    m_count = count;
+    m_max_count = max_count;
 }
 
 //****************************************************************************
@@ -105,8 +114,14 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks,
 
     QXThread *thr = static_cast<QXThread *>(QXK_attr_.curr);
 
-    Q_REQUIRE_ID(100, (!QXK_ISR_CONTEXT_()) /* can't block inside an ISR */
+    /// @pre this function must:
+    /// (1) NOT be called from an ISR; (2) be called from an extended thread;
+    /// (3) the thread must NOT be holding a mutex and
+    /// (4) the thread must NOT be already blocked on any object.
+    ///
+    Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) /* can't block inside an ISR */
         && (thr != static_cast<QXThread *>(0)) /* current must be extended */
+        && (QXK_attr_.lockPrio == static_cast<uint_fast8_t>(0)) /* no lock */
         && (thr->m_temp.obj == static_cast<QMState const *>(0))); // !blocked
 
     if (m_count > static_cast<uint_fast16_t>(0)) {
@@ -125,7 +140,7 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks,
 
         QF_CRIT_ENTRY_();
         // the blocking object must be this semaphore
-        Q_ASSERT_ID(110, thr->m_temp.obj
+        Q_ASSERT_ID(210, thr->m_temp.obj
                          == reinterpret_cast<QMState const *>(this));
         thr->m_temp.obj = static_cast<QMState const *>(0); // clear
     }
@@ -145,11 +160,15 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks,
 /// if the awakened thread is now the highest-priority thread that is
 /// ready-to-run.
 ///
+/// @returns true when the semaphore gets signaled and false when
+/// the semaphore count exceeded the maximum.
+///
 /// @note
 /// A semaphore can be signaled from many places, including from ISRs, basic
 /// threads (AOs), and extended threads.
 ///
-void QXSemaphore::signal(void) {
+bool QXSemaphore::signal(void) {
+    bool signaled = true; // assume that the semaphore will be signaled
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();
@@ -161,8 +180,9 @@ void QXSemaphore::signal(void) {
         QXThread *thr = static_cast<QXThread *>(QF::active_[p]);
 
         // the thread must be extended and the semaphore count must be zero
-        Q_ASSERT_ID(210, (thr->m_osObject != static_cast<void *>(0))
-             && (m_count == static_cast<uint_fast16_t>(0)));
+        Q_ASSERT_ID(210, (thr != static_cast<QXThread *>(0)) /* registered */
+             && (thr->m_osObject != static_cast<void *>(0)) /* extended */
+             && (m_count == static_cast<uint_fast16_t>(0))); // not signaled
 
         // disarm the internal time event
         (void)thr->teDisarm_();
@@ -172,9 +192,16 @@ void QXSemaphore::signal(void) {
         }
     }
     else {
-        ++m_count;
+        if (m_count < m_max_count) {
+            ++m_count;
+        }
+        else {
+            signaled = false; // semaphore NOT signaled
+        }
     }
     QF_CRIT_EXIT_();
+
+    return signaled;
 }
 
 } // namespace QP

@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.5
-/// Last updated on  2017-07-19
+/// Last updated for version 5.9.6
+/// Last updated on  2017-07-27
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -441,6 +441,9 @@ QP::QActive *QXK_current(void) {
 
     QF_CRIT_ENTRY_();
     curr = QXK_attr_.curr;
+    if (curr == static_cast<QP::QActive *>(0)) { // basic thread?
+        curr = QP::QF::active_[QXK_attr_.actPrio];
+    }
     QF_CRIT_EXIT_();
 
     //! @post the current thread must be valid

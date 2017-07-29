@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.9.6
+/// Last updated on  2017-07-27
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -69,18 +69,19 @@ class QXThread : public QActive {
 public:
 
     //! public constructor
-    QXThread(QXThreadHandler const handler, uint_fast8_t const tickRate);
+    QXThread(QXThreadHandler const handler,
+             uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
 
     //! delay (block) the current extended thread for a specified # ticks
     static bool delay(uint_fast16_t const nTicks,
-                      uint_fast8_t const tickRate);
+                uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
 
     //! cancel the delay
     bool delayCancel(void);
 
     //! obtain a message from the private message queue (block if no messages)
     static QEvt const *queueGet(uint_fast16_t const nTicks,
-                                uint_fast8_t const tickRate);
+                uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
 
     // virtual function overrides...
     //! Executes the top-most initial transition in QP::QMsm.
@@ -123,7 +124,7 @@ private:
     void block_(void) const;
     void unblock_(void) const;
     void teArm_(enum_t const sig, uint_fast16_t const nTicks,
-                uint_fast8_t const tickRate);
+                uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
     bool teDisarm_(void);
 
     // attributes...
@@ -141,18 +142,20 @@ private:
 class QXSemaphore {
 public:
     //! initialize the counting semaphore
-    void init(uint_fast16_t const count);
+    void init(uint_fast16_t const count,
+              uint_fast16_t const max_count = UINT16_MAX);
 
     //! signal (unblock) the semaphore
-    void signal(void);
+    bool signal(void);
 
     //! wait (block) on the semaphore
     bool wait(uint_fast16_t const nTicks,
-              uint_fast8_t const tickRate);
+              uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
 
 private:
-    uint_fast16_t m_count;
     QPSet m_waitSet; //!< set of extended threads waiting on this semaphore
+    uint_fast16_t m_count;
+    uint_fast16_t m_max_count;
 };
 
 } // namespace QP

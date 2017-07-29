@@ -1,9 +1,9 @@
 /// @file
-/// @brief QP/C++ port to ARM Cortex-M, cooperative QV kernel, IAR-ARM toolset
+/// @brief QP/C++ port to ARM Cortex-M, cooperative QV kernel, ARM-KEIL toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-12
+/// Last updated for version 5.9.6
+/// Last updated on  2017-07-28
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// www.state-machine.com
+/// https://state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -61,7 +61,6 @@ extern "C" {
 * The interrupt priorities established in QV_init() can be later
 * changed by the application-level code.
 */
-
 void QV_init(void) {
 
     // set exception priorities to QF_BASEPRI...
@@ -75,7 +74,7 @@ void QV_init(void) {
     SCB_SYSPRI[3] |= (QF_BASEPRI << 24) | (QF_BASEPRI << 16) | QF_BASEPRI;
 
     // set all implemented IRQ priories to QF_BASEPRI...
-    uint32_t n = 8 + (*SCnSCB_ICTR << 3); // # interrupt priority registers
+    uint32_t n = 8U + ((*SCnSCB_ICTR & 0x7U) << 3); // (# NVIC_PRIO regs)/4
     do {
         --n;
         NVIC_IP[n] = (QF_BASEPRI << 24) | (QF_BASEPRI << 16)

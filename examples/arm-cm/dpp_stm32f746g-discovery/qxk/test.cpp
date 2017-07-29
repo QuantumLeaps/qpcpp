@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.8.2
-// Last updated on  2017-02-03
+// Last updated for version 5.9.6
+// Last updated on  2017-07-27
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -41,7 +41,6 @@ namespace DPP {
 static void Thread1_run(QP::QXThread * const me);
 static void Thread2_run(QP::QXThread * const me);
 
-
 static QP::QXThread l_test1(&Thread1_run, 0U);
 static QP::QXThread l_test2(&Thread2_run, 0U);
 static QP::QXMutex l_mutex;
@@ -67,6 +66,7 @@ static void Thread1_run(QP::QXThread * const /*me*/) {
         // some flating point code to exercise the VFP...
         float volatile x = 1.4142135F;
         x = x * 1.4142135F;
+        //QP::QXThread::delay(1U, 0U); // asserts (blocking while holding a mutex)
         l_mutex.unlock();
 
         QP::QXThread::delay(BSP::TICKS_PER_SEC/7, 0U);  // BLOCK
@@ -86,7 +86,8 @@ static void Thread2_run(QP::QXThread * const me) {
     // NOTE: the semaphore is initialized in the highest-priority thread
     // that uses it. Alternatively, the semaphore can be initialized
     // before any thread runs.
-    l_sema.init(0U); // start with zero count
+    l_sema.init(0U,   // count==0 (signaling semaphore)
+                1U);  // max_count==1 (binary semaphore)
 
     for (;;) {
         // some flating point code to exercise the VFP...
@@ -101,7 +102,7 @@ static void Thread2_run(QP::QXThread * const me) {
             QP::QF::gc(e); // recycle the event manually!
         }
         else {
-            me->delay(BSP::TICKS_PER_SEC/2, 0U);  // wait some more (BLOCK)
+            QP::QXThread::delay(BSP::TICKS_PER_SEC/2, 0U);  // BLOCK
             l_sema.signal(); // signal Thread1
         }
     }

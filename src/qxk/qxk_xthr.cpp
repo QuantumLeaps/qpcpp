@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.4
-/// Last updated on  2017-07-05
+/// Last updated for version 5.9.6
+/// Last updated on  2017-07-27
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -335,8 +335,14 @@ QEvt const *QXThread::queueGet(uint_fast16_t const nTicks,
     QF_CRIT_ENTRY_();
     QXThread *thr = static_cast<QXThread *>(QXK_attr_.curr);
 
+    /// @pre this function must:
+    /// (1) NOT be called from an ISR; (2) be called from an extended thread;
+    /// (3) the thread must NOT be holding a mutex and
+    /// (4) the thread must NOT be already blocked on any object.
+    ///
     Q_REQUIRE_ID(500, (!QXK_ISR_CONTEXT_()) /* can't block inside an ISR */
         && (thr != static_cast<QXThread *>(0)) /* current must be extended */
+        && (QXK_attr_.lockPrio == static_cast<uint_fast8_t>(0)) /* !locked */
         && (thr->m_temp.obj == static_cast<QMState const *>(0))); // !blocked
 
     // is the queue empty? -- block and wait for event(s)
@@ -453,7 +459,7 @@ void QXThread::teArm_(enum_t const sig,
                       uint_fast16_t const nTicks,
                       uint_fast8_t const tickRate)
 {
-    // the time event must be unused
+    /// @pre the time event must be unused
     Q_REQUIRE_ID(700, m_timeEvt.m_ctr == static_cast<QTimeEvtCtr>(0));
 
     m_timeEvt.sig = static_cast<QSignal>(sig);
@@ -517,8 +523,16 @@ bool QXThread::delay(uint_fast16_t const nTicks,
     QF_CRIT_ENTRY_();
     QXThread *thr = static_cast<QXThread *>(QXK_attr_.curr);
 
-    // the delaying thread must not be blocked on any object
-    Q_REQUIRE_ID(900, thr->m_temp.obj == static_cast<QMState const *>(0));
+    /// @pre this function must:
+    /// (1) NOT be called from an ISR; (2) be called from an extended thread;
+    /// (3) the thread must NOT be holding a mutex and
+    /// (4) the thread must NOT be already blocked on any object.
+    ///
+    Q_REQUIRE_ID(900, (!QXK_ISR_CONTEXT_()) /* can't block inside an ISR */
+        && (thr != static_cast<QXThread *>(0)) /* current must be extended */
+        && (QXK_attr_.lockPrio == static_cast<uint_fast8_t>(0)) /* !locked */
+        && (thr->m_temp.obj == static_cast<QMState const *>(0))); // !blocked
+
 
     // remember the blocking object
     thr->m_temp.obj = reinterpret_cast<QMState const *>(&thr->m_timeEvt);
