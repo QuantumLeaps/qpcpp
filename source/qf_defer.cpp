@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.8.1
+/// Last updated on  2017-08-01
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -68,7 +68,7 @@ Q_DEFINE_THIS_MODULE("qf_defer")
 /// @sa QP::QActive::recall(), QP::QEQueue, QP::QActive::flushDeferred()
 ///
 bool QActive::defer(QEQueue * const eq, QEvt const * const e) const {
-    return eq->post(e, static_cast<uint_fast16_t>(1)); // non-asserting post
+    return eq->post(e, static_cast<uint_fast16_t>(0)); // non-asserting post
 }
 
 //****************************************************************************

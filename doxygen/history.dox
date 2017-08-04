@@ -2,6 +2,22 @@ namespace QP {
 
 /** @page history Revision History
 
+@section qpcpp_5_9_6 Version 5.9.6, 2017-08-04
+The main focus of this release are improvements to the "dual-mode" QXK kernel. Specifically, this release implements the <a href="https://sourceforge.net/p/qpc/feature-requests/128/" class="extern">featrue request #128 "QP Semaphore Max Value Setting"</a> for QXK. This feature changes the QXK function QP::QXSemaphore::init(), which now takes additional parameter `count`. This parameter specifies the maximum allowed count for the semaphore (e.g., count of 1 makes the semaphore a binary-semaphore).
+
+@note
+This change does NOT break any existing code, because the additional parameter has a default value (0xFFFF).
+
+This release also fixes a bug inside the assertions in QP::QXSemaphore::signal(), where the check for the extended-thread is performed.
+
+Also, this release adds assertions to the QXK code, which ensure that any available blocking calls can only be made from extended-threads and not from basic-threads (active objects) or ISRs.
+
+Also, this release adds protection in the IRQ priorities initialization in QK/QV/QXK for ARM Cortex-M3/M4/M7, so that the number of IRQs is extracted from bits 0-2 of the ICTR register (INTLINESNUM).
+
+Finally, this release consistently changes all example projects (for all toolchains) to use the **src/** directory for QP/C++ source code, instead of the **source/** directory. The source/ directory is now truly obsolete, but is still provided in this release for backwards compatibility with user projects.
+
+
+-----------------------------------------------------------------------------
 @section qpcpp_5_9_5 Version 5.9.5, 2017-07-20
 This release fixes the following bugs:
 - <a href="https://sourceforge.net/p/qpc/bugs/178/" class="extern">bug#178</a> "GNU-ARM compiler reports "Error: unaligned opcodes..." in startup code for QP/C/C++/nano examples". The bug fix entails modifying the startup code for the GNU-ARM compiler in the `3rd_party` directory. Specifically, the proper alignment directives have been added to the inline assembly in the exception handlers.

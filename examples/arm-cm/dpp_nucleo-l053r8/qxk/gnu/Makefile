@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++, DPP on NUCLEO-L053R8, QXK kernel, GNU-ARM
-# Last Updated for Version: 5.6.0
-# Date of the Last Update:  2015-12-30
+# Last Updated for Version: 5.9.6
+# Date of the Last Update:  2017-08-03
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -69,7 +69,9 @@ QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qxk/gnu
 VPATH = \
 	.. \
 	../.. \
-	$(QPCPP)/source \
+	$(QPCPP)/src/qf \
+	$(QPCPP)/src/qxk \
+	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
 	$(QPCPP)/3rd_party/nucleo-l053r8 \
 	$(QPCPP)/3rd_party/nucleo-l053r8/gnu
@@ -78,7 +80,7 @@ VPATH = \
 INCLUDES  = \
 	-I../.. \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/source \
+	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
 	-I$(QPCPP)/3rd_party/nucleo-l053r8

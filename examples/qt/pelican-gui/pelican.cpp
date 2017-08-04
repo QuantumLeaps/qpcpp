@@ -199,7 +199,7 @@ QP::QState Pelican::carsGreen(Pelican * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-//${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenNoPed} 
+//${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenNoPed}
 QP::QState Pelican::carsGreenNoPed(Pelican * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
@@ -226,7 +226,7 @@ QP::QState Pelican::carsGreenNoPed(Pelican * const me, QP::QEvt const * const e)
     }
     return status_;
 }
-//${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenInt} 
+//${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenInt}
 QP::QState Pelican::carsGreenInt(Pelican * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {
@@ -248,7 +248,7 @@ QP::QState Pelican::carsGreenInt(Pelican * const me, QP::QEvt const * const e) {
     }
     return status_;
 }
-//${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenPedWait} 
+//${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenPedWait}
 QP::QState Pelican::carsGreenPedWait(Pelican * const me, QP::QEvt const * const e) {
     QP::QState status_;
     switch (e->sig) {

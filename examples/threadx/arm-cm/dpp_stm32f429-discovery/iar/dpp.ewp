@@ -337,7 +337,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\source</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\threadx</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\threadx</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\CMSIS\Include</state>
@@ -1358,7 +1358,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\source</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\threadx</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\threadx</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\CMSIS\Include</state>
@@ -2379,7 +2379,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\source</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\threadx</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\threadx</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\CMSIS\Include</state>
@@ -3091,37 +3091,37 @@
     <group>
         <name>QP</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qep_hsm.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qep_hsm.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qep_msm.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qep_msm.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qf_act.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_act.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qf_defer.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_defer.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qf_dyn.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_dyn.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qf_pkg.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_pkg.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qf_ps.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_ps.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qf_qact.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_qact.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qf_qeq.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_qeq.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qf_qmact.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_qmact.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qf_time.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_time.cpp</name>
         </file>
     </group>
     <group>
@@ -3146,16 +3146,16 @@
             <configuration>Release</configuration>
         </excluded>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qs.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qs_fp.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_fp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qs_pkg.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qs_pkg.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\source\qs_rx.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_rx.cpp</name>
         </file>
     </group>
     <group>

@@ -70,20 +70,21 @@ QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qutest
 
 # list of all source directories used by this project
 VPATH = \
-    ../$(TARGET) \
-    $(QPCPP)/source \
-    $(QP_PORT_DIR) \
-    $(QPCPP)/3rd_party/ek-tm4c123gxl \
-    $(QPCPP)/3rd_party/ek-tm4c123gxl/gnu
+	../$(TARGET) \
+	$(QPCPP)/src/qf \
+	$(QPCPP)/src/qs \
+	$(QP_PORT_DIR) \
+	$(QPCPP)/3rd_party/ek-tm4c123gxl \
+	$(QPCPP)/3rd_party/ek-tm4c123gxl/gnu
 
 # list of all include directories needed by this project
 INCLUDES  = \
-    -I../$(TARGET) \
-    -I$(QPCPP)/include \
-    -I$(QPCPP)/source \
-    -I$(QP_PORT_DIR) \
-    -I$(QPCPP)/3rd_party/CMSIS/Include \
-    -I$(QPCPP)/3rd_party/ek-tm4c123gxl
+	-I../$(TARGET) \
+	-I$(QPCPP)/include \
+	-I$(QPCPP)/src \
+	-I$(QP_PORT_DIR) \
+	-I$(QPCPP)/3rd_party/CMSIS/Include \
+	-I$(QPCPP)/3rd_party/ek-tm4c123gxl
 
 #-----------------------------------------------------------------------------
 # files
@@ -94,40 +95,40 @@ ASM_SRCS :=
 
 # C source files
 C_SRCS := \
-    system_TM4C123GH6PM.c \
-    startup_TM4C123GH6PM.c
+	system_TM4C123GH6PM.c \
+	startup_TM4C123GH6PM.c
 
 # C++ source files
 CPP_SRCS := \
-    test_qutest.cpp \
-    qutest_port.cpp
+	test_qutest.cpp \
+	qutest_port.cpp
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := ../$(TARGET)/test.ld
 
 QP_SRCS := \
-    qep_hsm.cpp \
-    qep_msm.cpp \
-    qf_act.cpp \
-    qf_defer.cpp \
-    qf_dyn.cpp \
-    qf_mem.cpp \
-    qf_ps.cpp \
-    qf_qact.cpp \
-    qf_qeq.cpp \
-    qf_qmact.cpp \
-    qs.cpp \
-    qs_64bit.cpp \
-    qs_rx.cpp \
-    qs_fp.cpp \
-    qutest.cpp
+	qep_hsm.cpp \
+	qep_msm.cpp \
+	qf_act.cpp \
+	qf_defer.cpp \
+	qf_dyn.cpp \
+	qf_mem.cpp \
+	qf_ps.cpp \
+	qf_qact.cpp \
+	qf_qeq.cpp \
+	qf_qmact.cpp \
+	qs.cpp \
+	qs_64bit.cpp \
+	qs_rx.cpp \
+	qs_fp.cpp \
+	qutest.cpp
 
 QP_ASMS :=
 
 QS_SRCS := \
-    qs.cpp \
-    qs_rx.cpp \
-    qs_fp.cpp
+	qs.cpp \
+	qs_rx.cpp \
+	qs_fp.cpp
 
 LIB_DIRS  :=
 LIBS      :=
@@ -216,17 +217,17 @@ CPP_SRCS += $(QS_SRCS)
 ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
 CFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-    -ffunction-sections -fdata-sections \
-    -O $(INCLUDES) $(DEFINES) -DQ_SPY -DQ_UTEST
+	-ffunction-sections -fdata-sections \
+	-O $(INCLUDES) $(DEFINES) -DQ_SPY -DQ_UTEST
 
 CPPFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-    -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
-    -O $(INCLUDES) $(DEFINES) -DQ_SPY -DQ_UTEST
+	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+	-O $(INCLUDES) $(DEFINES) -DQ_SPY -DQ_UTEST
 
 
 LINKFLAGS = -T$(LD_SCRIPT) $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) \
-    -mthumb -nostdlib \
-    -Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
+	-mthumb -nostdlib \
+	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
 
 ASM_OBJS     := $(patsubst %.s,%.o,  $(notdir $(ASM_SRCS)))
 C_OBJS       := $(patsubst %.c,%.o,  $(notdir $(C_SRCS)))
@@ -263,36 +264,36 @@ TESTS := *.tcl
 endif
 
 $(TARGET_BIN) : $(TARGET_ELF)
-    $(BIN) -O binary $< $@
-    $(LMFLASH) -q ek-tm4c123gxl $(TARGET_BIN)
-    echo Press RESET button on the EK-TM4C123GXL board
-    @pause
+	$(BIN) -O binary $< $@
+	$(LMFLASH) -q ek-tm4c123gxl $(TARGET_BIN)
+	echo Press RESET button on the EK-TM4C123GXL board
+	@pause
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-    $(CPP) $(CPPFLAGS) -c $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
-    $(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
+	$(CPP) $(CPPFLAGS) -c $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 flash :
-    $(LMFLASH) -q ek-tm4c123gxl $(TARGET_BIN)
-    echo Press RESET button on the EK-TM4C123GXL board
+	$(LMFLASH) -q ek-tm4c123gxl $(TARGET_BIN)
+	echo Press RESET button on the EK-TM4C123GXL board
 
 run : $(TARGET_BIN)
-    $(TCLSH) $(QUTEST) $(TESTS)
+	$(TCLSH) $(QUTEST) $(TESTS)
 
 $(BIN_DIR)/%.d : %.c
-    $(CC) -MM -MT $(@:.d=.o) $(CFLAGS) $< > $@
+	$(CC) -MM -MT $(@:.d=.o) $(CFLAGS) $< > $@
 
 $(BIN_DIR)/%.d : %.cpp
-    $(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@
+	$(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@
 
 $(BIN_DIR)/%.o : %.s
-    $(AS) $(ASFLAGS) $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 $(BIN_DIR)/%.o : %.c
-    $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BIN_DIR)/%.o : %.cpp
-    $(CPP) $(CPPFLAGS) -c $< -o $@
+	$(CPP) $(CPPFLAGS) -c $< -o $@
 
 .PHONY : clean show
 
@@ -304,29 +305,29 @@ ifneq ($(MAKECMDGOALS),clean)
 endif
 
 clean :
-    -$(RM) $(BIN_DIR)/*.o \
-    $(BIN_DIR)/*.d \
-    $(BIN_DIR)/*.bin \
-    $(BIN_DIR)/*.elf \
-    $(BIN_DIR)/*.map
+	-$(RM) $(BIN_DIR)/*.o \
+	$(BIN_DIR)/*.d \
+	$(BIN_DIR)/*.bin \
+	$(BIN_DIR)/*.elf \
+	$(BIN_DIR)/*.map
 
 show :
-    @echo PROJECT      = $(PROJECT)
-    @echo TESTS        = $(TESTS)
-    @echo TARGET_ELF   = $(TARGET_ELF)
-    @echo CONF         = $(CONF)
-    @echo VPATH        = $(VPATH)
-    @echo C_SRCS       = $(C_SRCS)
-    @echo CPP_SRCS     = $(CPP_SRCS)
-    @echo ASM_SRCS     = $(ASM_SRCS)
-    @echo C_DEPS_EXT   = $(C_DEPS_EXT)
-    @echo C_OBJS_EXT   = $(C_OBJS_EXT)
+	@echo PROJECT      = $(PROJECT)
+	@echo TESTS        = $(TESTS)
+	@echo TARGET_ELF   = $(TARGET_ELF)
+	@echo CONF         = $(CONF)
+	@echo VPATH        = $(VPATH)
+	@echo C_SRCS       = $(C_SRCS)
+	@echo CPP_SRCS     = $(CPP_SRCS)
+	@echo ASM_SRCS     = $(ASM_SRCS)
+	@echo C_DEPS_EXT   = $(C_DEPS_EXT)
+	@echo C_OBJS_EXT   = $(C_OBJS_EXT)
 
-    @echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)
-    @echo CPP_OBJS_EXT = $(CPP_OBJS_EXT)
+	@echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)
+	@echo CPP_OBJS_EXT = $(CPP_OBJS_EXT)
 
-    @echo ASM_OBJS_EXT = $(ASM_OBJS_EXT)
-    @echo LIB_DIRS     = $(LIB_DIRS)
-    @echo LIBS         = $(LIBS)
-    @echo DEFINES      = $(DEFINES)
-    @echo QUTEST       = $(QUTEST)
+	@echo ASM_OBJS_EXT = $(ASM_OBJS_EXT)
+	@echo LIB_DIRS     = $(LIB_DIRS)
+	@echo LIBS         = $(LIBS)
+	@echo DEFINES      = $(DEFINES)
+	@echo QUTEST       = $(QUTEST)

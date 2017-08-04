@@ -143,7 +143,8 @@ class QXSemaphore {
 public:
     //! initialize the counting semaphore
     void init(uint_fast16_t const count,
-              uint_fast16_t const max_count = UINT16_MAX);
+              uint_fast16_t const max_count
+                  = static_cast<uint_fast16_t>(0xFFFF));
 
     //! signal (unblock) the semaphore
     bool signal(void);

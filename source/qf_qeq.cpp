@@ -2,8 +2,8 @@
 /// @brief QP::QEQueue implementation
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-08
+/// Last updated for version 5.9.6
+/// Last updated on  2017-08-01
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -105,12 +105,14 @@ void QEQueue::init(QEvt const *qSto[], uint_fast16_t const qLen) {
 /// First-In-First-Out (FIFO) order.
 ///
 /// @param[in] e      pointer to the event to be posted to the queue
-/// @param[in] margin number of unused slots in the queue that must
-///                   be still available after posting the event
+/// @param[in] margin number of required free slots in the queue after
+///                   posting the event. The special value QP::QF_NO_MARGIN
+///                   means that this function will assert if posting
 /// @note
-/// The zero value of the @p margin parameter is special and denotes situation
-/// when event posting is assumed to succeed (event delivery guarantee).
-/// An assertion fires, when the event cannot be delivered in this case.
+/// The QP::QF_NO_MARGIN value of the @p margin argument is special and
+/// denotes situation when the post() operation is assumed to succeed (event
+/// delivery guarantee). An assertion fires, when the event cannot be
+/// delivered in this case.
 ///
 /// @returns 'true' (success) when the posting succeeded with the provided
 /// margin and 'false' (failure) when the posting fails.
@@ -129,9 +131,10 @@ bool QEQueue::post(QEvt const * const e, uint_fast16_t const margin) {
     QF_CRIT_ENTRY_();
     QEQueueCtr nFree = m_nFree; // temporary to avoid UB for volatile access
 
-    // required margin available?
-    if (nFree > static_cast<QEQueueCtr>(margin)) {
-
+    // margin available?
+    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
+        || (nFree > static_cast<QEQueueCtr>(margin)))
+    {
         QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_FIFO,
                          QS::priv_.locFilter[QS::EQ_OBJ], this)
             QS_TIME_();                      // timestamp
@@ -171,10 +174,9 @@ bool QEQueue::post(QEvt const * const e, uint_fast16_t const margin) {
         status = true; // event posted successfully
     }
     else {
-        /// @note If the @p margin is zero, assert that the queue can accept
-        /// the event. This is to support the "guaranteed event delivery"
-        /// policy for most events posted within the framework.
-        Q_ASSERT_ID(210, margin != static_cast<uint_fast16_t>(0));
+        /// @note assert if event cannot be posted and dropping events is
+        /// not acceptable
+        Q_ASSERT_ID(210, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_ATTEMPT,
                          QS::priv_.locFilter[QS::EQ_OBJ], this)

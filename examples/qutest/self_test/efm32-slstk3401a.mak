@@ -71,7 +71,8 @@ QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qutest
 # list of all source directories used by this project
 VPATH = \
 	../$(TARGET) \
-	$(QPCPP)/source \
+	$(QPCPP)/src/qf \
+	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
 	$(QPCPP)/3rd_party/efm32pg1b \
 	$(QPCPP)/3rd_party/efm32pg1b/gnu
@@ -82,7 +83,7 @@ INCLUDES  = \
 	-I.. \
 	-I../$(TARGET) \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/source \
+	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
 	-I$(QPCPP)/3rd_party/efm32pg1b

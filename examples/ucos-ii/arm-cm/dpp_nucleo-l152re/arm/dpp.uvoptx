@@ -989,7 +989,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qep_hsm.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qep_hsm.cpp</PathWithFileName>
       <FilenameWithoutPath>qep_hsm.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1001,7 +1001,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qep_msm.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qep_msm.cpp</PathWithFileName>
       <FilenameWithoutPath>qep_msm.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1013,7 +1013,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qf_act.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qf_act.cpp</PathWithFileName>
       <FilenameWithoutPath>qf_act.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1025,7 +1025,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qf_defer.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qf_defer.cpp</PathWithFileName>
       <FilenameWithoutPath>qf_defer.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1037,7 +1037,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qf_dyn.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qf_dyn.cpp</PathWithFileName>
       <FilenameWithoutPath>qf_dyn.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1049,7 +1049,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qf_ps.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qf_ps.cpp</PathWithFileName>
       <FilenameWithoutPath>qf_ps.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1061,7 +1061,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qf_qact.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qf_qact.cpp</PathWithFileName>
       <FilenameWithoutPath>qf_qact.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1073,7 +1073,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qf_qeq.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qf_qeq.cpp</PathWithFileName>
       <FilenameWithoutPath>qf_qeq.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1085,7 +1085,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qf_qmact.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qf_qmact.cpp</PathWithFileName>
       <FilenameWithoutPath>qf_qmact.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1097,7 +1097,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qf_time.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qf\qf_time.cpp</PathWithFileName>
       <FilenameWithoutPath>qf_time.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1129,30 +1129,6 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\ports\ucos-ii\app_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>app_cfg.h</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>42</FileNumber>
-      <FileType>5</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\ports\ucos-ii\os_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>os_cfg.h</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>43</FileNumber>
-      <FileType>5</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\ports\ucos-ii\qep_port.h</PathWithFileName>
       <FilenameWithoutPath>qep_port.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -1160,7 +1136,7 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>44</FileNumber>
+      <FileNumber>42</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1172,7 +1148,7 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>45</FileNumber>
+      <FileNumber>43</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1184,7 +1160,7 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
-      <FileNumber>46</FileNumber>
+      <FileNumber>44</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1204,24 +1180,24 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>47</FileNumber>
+      <FileNumber>45</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qs.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qs\qs.cpp</PathWithFileName>
       <FilenameWithoutPath>qs.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>48</FileNumber>
+      <FileNumber>46</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\source\qs_fp.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\src\qs\qs_fp.cpp</PathWithFileName>
       <FilenameWithoutPath>qs_fp.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.3
-/// Last updated on  2017-06-18
+/// Last updated for version 5.9.6
+/// Last updated on  2017-08-01
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -580,7 +580,7 @@ private:
 
 //! special value of margin that causes asserting failure in case
 //! event allocation or event posting fails
-uint16_t const QF_NO_MARGIN = static_cast<uint16_t>(0xFFFF);
+uint_fast16_t const QF_NO_MARGIN = static_cast<uint_fast16_t>(0xFFFF);
 
 
 //****************************************************************************

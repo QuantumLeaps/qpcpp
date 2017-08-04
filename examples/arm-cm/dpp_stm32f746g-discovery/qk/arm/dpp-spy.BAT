@@ -1,4 +1,4 @@
-SET PATH=C:\tools\Keil_v5\ARM\ARMCC\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\ProgramData\Oracle\Java\javapath;C:\qp\qtools\bin;C:\utils\;C:\Program Files (x86)\Microchip\xc32\v1.42\bin;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Users\miro\AppData\Local\Microsoft\WindowsApps;
+SET PATH=C:\tools\Keil_v5\ARM\ARMCC\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\ProgramData\Oracle\Java\javapath;C:\qp\qtools\bin;C:\utils\;C:\Users\miro\AppData\Local\Pandoc\
 SET ARMCC5_ASMOPT=--diag_suppress=9931
 SET ARMCC5_CCOPT=--diag_suppress=9931
 SET ARMCC5_LINKOPT=--diag_suppress=9931
@@ -12,7 +12,7 @@ cmd /c "if exist .\spy\qstamp.o del .\spy\qstamp.o"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\philo.__i"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\table.__i"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\qstamp.__i"
-"C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmAsm" --Via ".\spy\startup_stm32f4xx._ia"
+"C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmAsm" --Via ".\spy\startup_stm32f746xx._ia"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\stm32746g_discovery.__i"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\stm32f7xx_hal_msp.__i"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\system_stm32f7xx.__i"
