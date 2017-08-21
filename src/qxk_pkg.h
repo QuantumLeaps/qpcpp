@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -54,7 +54,7 @@ enum QXK_Timeouts {
 extern "C" {
 
 //! initialize the private stack of a given AO
-void QXK_stackInit_(void *act, QP::QXThreadHandler handler,
+void QXK_stackInit_(void *thr, QP::QXThreadHandler handler,
                     void *stkSto, uint_fast16_t stkSize);
 
 //! called when a thread function returns

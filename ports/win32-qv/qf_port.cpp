@@ -135,6 +135,7 @@ int_t QF::run(void) {
             // for events. Instead, the Win32-QV port efficiently waits until
             // QP events become available.
             QF_INT_ENABLE();
+
             (void)WaitForSingleObject(QV_win32Event_, (DWORD)INFINITE);
 
             QF_INT_DISABLE();

@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -222,6 +222,21 @@ public:
     /// @sa QP::QMActive::defer(), QP::QMActive::recall()
     QEQueueCtr getNFree(void) const {
         return m_nFree;
+    }
+
+    //! "raw" thread-safe QF event queue operation for obtaining the minimum
+    //! number of free entries ever in the queue (a.k.a. "low-watermark").
+    ///
+    /// @description
+    /// This operation needs to be used with caution because the
+    /// "low-watermark" can change unexpectedly. The main intent for using
+    /// this operation is to get an idea of queue usage to size the queue
+    /// adequately.
+    ///
+    /// @returns the minimum number of free entries ever in the queue
+    /// since init.
+    QEQueueCtr getNMin(void) const {
+        return m_nMin;
     }
 
     //! "raw" thread-safe QF event queue operation to find out if the queue

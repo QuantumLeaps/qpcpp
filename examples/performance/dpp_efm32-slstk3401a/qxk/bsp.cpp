@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last Updated for Version: 5.9.5
-// Date of the Last Update:  2017-07-20
+// Last Updated for Version: 5.9.7
+// Date of the Last Update:  2017-08-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------

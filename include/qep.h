@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.6
-/// Last updated on  2017-08-01
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      596
+#define QP_VERSION      597
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "5.9.6"
+#define QP_VERSION_STR  "5.9.7"
 
-//! Tamperproof current QP release (5.9.6) and date (2017-08-04)
-#define QP_RELEASE      0x9A315E6BU
+//! Tamperproof current QP release (5.9.7) and date (2017-08-18)
+#define QP_RELEASE      0x9A2F3B8AU
 
 //****************************************************************************
 #ifndef Q_SIGNAL_SIZE
@@ -315,8 +315,10 @@ public:
     virtual ~QHsm();
 
     //! Executes the top-most initial transition in QP::QHsm
-    virtual void init(QEvt const * const e);
     virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
+
+    //! @overload init(void)
+    virtual void init(QEvt const * const e);
 
     //! Dispatches an event to QHsm
     virtual void dispatch(QEvt const * const e);

@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.4
-/// Last updated on  2017-07-06
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -81,11 +81,11 @@ extern "C" {
 
 //! attributes of the QXK kernel
 struct QXK_Attr {
-    QP::QActive *curr;  //!< currently executing thread
-    QP::QActive *next;  //!< next thread to execute
-    uint_fast8_t volatile actPrio;    //!< prio of the active basic thread
-    uint_fast8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
-    uint_fast8_t volatile lockHolder; //!< prio of the lock holder
+    QP::QActive *curr;       //!< currently executing thread
+    QP::QActive *next;       //!< next thread to execute
+    uint_fast8_t actPrio;    //!< prio of the active basic thread
+    uint_fast8_t lockPrio;   //!< lock prio (0 == no-lock)
+    uint_fast8_t lockHolder; //!< prio of the lock holder
 #ifndef QXK_ISR_CONTEXT_
     uint_fast8_t volatile intNest;    //!< ISR nesting level
 #endif // QXK_ISR_CONTEXT_
@@ -111,6 +111,9 @@ QP::QActive *QXK_current(void);
 //****************************************************************************
 namespace QP {
 
+//! The scheduler lock status
+typedef uint_fast16_t QSchedStatus;
+
 //****************************************************************************
 //! QXK services.
 /// @description
@@ -124,13 +127,11 @@ namespace QP {
 /// the extern "C" linkage specification.
 class QXK {
 public:
+    //! QXK selective scheduler lock
+    static QSchedStatus schedLock(uint_fast8_t const ceiling);
 
-    //! QXK initialization
-    /// @description
-    /// QP::QXK::init() must be called from the application before
-    /// QP::QF::run() to initialize the stack for the QXK idle thread.
-    static void init(void * const idleStkSto,
-                     uint_fast16_t const idleStkSize);
+    //! QXK selective scheduler unlock
+    static void schedUnlock(QSchedStatus const stat);
 
     //! QXK idle callback (customized in BSPs for QXK)
     /// @description
@@ -148,28 +149,6 @@ public:
     static char_t const *getVersion(void) {
         return versionStr;
     }
-};
-
-//****************************************************************************
-//! Priority Ceiling Mutex the QXK preemptive kernel
-class QXMutex {
-public:
-
-    //! initialize the QXK priority-ceiling mutex
-    void init(uint_fast8_t const prio);
-
-    //! lock the QXK priority-ceiling mutex
-    void lock(void);
-
-    //! unlock the QXK priority-ceiling mutex
-    void unlock(void);
-
-private:
-    uint_fast8_t m_lockPrio;   //!< lock prio (priority ceiling)
-    uint_fast8_t m_prevPrio;   //!< previoius lock prio
-    uint_fast8_t m_prevHolder; //!< priority of the thread holding the lock
-
-    friend class QF;
 };
 
 } // namespace QP
@@ -193,22 +172,21 @@ private:
     //! Internal macro to represent the scheduler lock status
     // that needs to be preserved to allow nesting of locks.
     //
-    #define QF_SCHED_STAT_ QXMutex schedLock_;
+    #define QF_SCHED_STAT_ QSchedStatus lockStat_;
 
     //! Internal macro for selective scheduler locking.
     #define QF_SCHED_LOCK_(prio_) do { \
         if (QXK_ISR_CONTEXT_()) { \
-            schedLock_.m_lockPrio = static_cast<uint_fast8_t>(0); \
+            lockStat_ = static_cast<QSchedStatus>(0xFF); \
         } else { \
-            schedLock_.init((prio_)); \
-            schedLock_.lock(); \
+            lockStat_ = QXK::schedLock((prio_)); \
         } \
     } while (false)
 
     //! Internal macro for selective scheduler unlocking.
     #define QF_SCHED_UNLOCK_() do { \
-        if (schedLock_.m_lockPrio != static_cast<uint_fast8_t>(0)) { \
-            schedLock_.unlock(); \
+        if (lockStat_ != static_cast<QSchedStatus>(0xFF)) { \
+            QXK::schedUnlock(lockStat_); \
         } \
     } while (false)
 

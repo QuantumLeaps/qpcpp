@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.6
-/// Last updated on  2017-07-27
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-20
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -38,6 +38,9 @@
 
 #ifndef qxthread_h
 #define qxthread_h
+
+//! no-timeout sepcification when blocking on queues or semaphores
+#define QXTHREAD_NO_TIMEOUT  (static_cast<uint_fast16_t>(0))
 
 namespace QP {
 
@@ -73,15 +76,14 @@ public:
              uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
 
     //! delay (block) the current extended thread for a specified # ticks
-    static bool delay(uint_fast16_t const nTicks,
-                uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
+    static bool delay(uint_fast16_t const nTicks);
 
     //! cancel the delay
     bool delayCancel(void);
 
     //! obtain a message from the private message queue (block if no messages)
-    static QEvt const *queueGet(uint_fast16_t const nTicks,
-                uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
+    static QEvt const *queueGet(
+        uint_fast16_t const nTicks = QXTHREAD_NO_TIMEOUT);
 
     // virtual function overrides...
     //! Executes the top-most initial transition in QP::QMsm.
@@ -123,8 +125,7 @@ public:
 private:
     void block_(void) const;
     void unblock_(void) const;
-    void teArm_(enum_t const sig, uint_fast16_t const nTicks,
-                uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
+    void teArm_(enum_t const sig, uint_fast16_t const nTicks);
     bool teDisarm_(void);
 
     // attributes...
@@ -132,10 +133,8 @@ private:
 
     // friendships...
     friend class QXSemaphore;
+    friend class QXMutex;
 };
-
-//! no-timeout sepcification when blocking on queues or semaphores
-#define QXTHREAD_NO_TIMEOUT  (static_cast<uint_fast16_t>(0))
 
 //****************************************************************************
 //! Counting Semaphore of the QXK preemptive kernel
@@ -146,17 +145,65 @@ public:
               uint_fast16_t const max_count
                   = static_cast<uint_fast16_t>(0xFFFF));
 
+    //! wait (block) on the semaphore
+    bool wait(uint_fast16_t const nTicks = QXTHREAD_NO_TIMEOUT);
+
+    //! try wait on the semaphore (non-blocking)
+    bool tryWait(void);
+
     //! signal (unblock) the semaphore
     bool signal(void);
-
-    //! wait (block) on the semaphore
-    bool wait(uint_fast16_t const nTicks,
-              uint_fast8_t const tickRate = static_cast<uint_fast8_t>(0));
 
 private:
     QPSet m_waitSet; //!< set of extended threads waiting on this semaphore
     uint_fast16_t m_count;
     uint_fast16_t m_max_count;
+};
+
+//****************************************************************************
+//! Priority Ceiling Mutex the QXK preemptive kernel */
+///
+/// @description
+/// QP::QXMutex is a blocking mutual exclusion mechanism. The mutex is
+/// initialized with the ceiling QP priority, which must be bigger than any
+/// extended thread competing for this mutex. The QP priority level used a the
+/// ceiling must be not used for any other active object or thread in the
+/// application.
+///
+/// @note
+/// QP::QXMutex should be used in situations when at least one of the extended
+/// threads contending for the mutex blocks while holding the mutex (between
+/// the QXMutex::lock() and QXMutex::unlock() operations). If no blocking is
+/// needed while holding the mutex, the more efficient non-blocking mechanism
+/// of @ref QXK::schedLock() "selective QXK scheduler locking" should be used
+/// instead. @ref QXK::schedLock() "Selective scheduler locking" is available
+/// for both @ref QP::QActive "basic threads" and @ref QP::QXThread extended
+/// threads, so it is applicable to situations where resources are shared
+/// among all these threads.
+///
+/// @usage
+/// The following example illustrates how to instantiate the mutex
+/// in your application.
+/// @include qf_mutex.cpp
+///
+class QXMutex {
+public:
+    //! initialize the QXK priority-ceiling mutex QP::QXMutex
+    void init(uint_fast8_t ceiling);
+
+    //! lock the QXK priority-ceiling mutex QP::QXMutex
+    bool lock(uint_fast16_t const nTicks = QXTHREAD_NO_TIMEOUT);
+
+    //! try to lock the QXK priority-ceiling mutex QP::QXMutex
+    bool tryLock(void);
+
+    //! unlock the QXK priority-ceiling mutex QP::QXMutex
+    void unlock(void);
+
+private:
+    QPSet m_waitSet; //!< set of extended-threads waiting on this mutex
+    uint_fast8_t m_ceiling;
+    uint_fast8_t m_lockNest;
 };
 
 } // namespace QP

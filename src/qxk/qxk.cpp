@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.6
-/// Last updated on  2017-07-27
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-20
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -67,19 +67,20 @@ public:
     QXKIdleThread() : QActive(Q_STATE_CAST(0))
     {}
 };
-static QXKIdleThread l_idleThread;
 
 //****************************************************************************
 /// @description
 /// Initializes QF and must be called exactly once before any other QF
-/// function. Typically, QF_init() is called from main() even before
+/// function. Typically, QF::init() is called from main() even before
 /// initializing the Board Support Package (BSP).
 ///
 /// @note QF::init() clears the internal QF variables, so that the framework
 /// can start correctly even if the startup code fails to clear the
-/// uninitialized data (as is required by the C+ Standard).
+/// uninitialized data (as is required by the C++ Standard).
 ///
 void QF::init(void) {
+    static QXKIdleThread s_idleThread;
+
     QF_maxPool_      = static_cast<uint_fast8_t>(0);
     QF_subscrList_   = static_cast<QSubscrList *>(0);
     QF_maxPubSignal_ = static_cast<enum_t>(0);
@@ -87,13 +88,13 @@ void QF::init(void) {
     bzero(&timeEvtHead_[0], static_cast<uint_fast16_t>(sizeof(timeEvtHead_)));
     bzero(&active_[0],      static_cast<uint_fast16_t>(sizeof(active_)));
     bzero(&QXK_attr_,       static_cast<uint_fast16_t>(sizeof(QXK_attr_)));
-    bzero(&l_idleThread,    static_cast<uint_fast16_t>(sizeof(l_idleThread)));
+    bzero(&s_idleThread,    static_cast<uint_fast16_t>(sizeof(s_idleThread)));
 
     // setup the QXK scheduler as initially locked and not running
     QXK_attr_.lockPrio = static_cast<uint_fast8_t>(QF_MAX_ACTIVE + 1);
 
     // setup the QXK idle loop...
-    active_[0] = &l_idleThread; // register the idle thread with QF
+    active_[0] = &s_idleThread; // register the idle thread with QF
     QXK_attr_.actPrio = static_cast<uint_fast8_t>(0); // set idle thread prio
 
 #ifdef QXK_INIT
@@ -131,9 +132,8 @@ static void initial_events(void) {
 
 //****************************************************************************
 /// @description
-/// QP::QF::run() is typically called from your startup code after you
-/// initialize the QF and start at least one basic- or extended-thread
-/// (with QP::QActive::start() or QP::QXThread::start(), respectively).
+/// QF::run() is typically called from main() after you initialize
+/// the QF and start at least one active object with QActive::start().
 ///
 /// @returns In QXK, the QF::run() function does not return.
 ///
@@ -174,30 +174,28 @@ void QActive::start(uint_fast8_t const prio,
                      void * const stkSto, uint_fast16_t const stkSize,
                      QEvt const * const ie)
 {
-    /// @pre AO cannot be started from an ISR, the priority must be in range
-    /// and the stack storage must not be provided, because the QK kernel
-    /// does not need per-AO stacks.
-    ///
-    Q_REQUIRE_ID(500, (!QXK_ISR_CONTEXT_())
-                      && (static_cast<uint_fast8_t>(0) < prio)
-                      && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
-                      && (stkSto == static_cast<void *>(0))
-                      && (stkSize == static_cast<uint_fast16_t>(0)));
+    /// @pre AO cannot be started:
+    /// - from an ISR;
+    /// - the priority must be in range;
+    /// - the stack storage must NOT be provided (because the QXK kernel does
+    /// not need per-AO stacks).
+    Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
+        && (static_cast<uint_fast8_t>(0) < prio)
+        && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
+        && (stkSto == static_cast<void *>(0))
+        && (stkSize == static_cast<uint_fast16_t>(0)));
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
-
     m_osObject = static_cast<void *>(0); // no private stack for AO
-    m_prio = prio;    // set the QF priority of this AO
-
-    QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    m_prio = prio;      // set the QF priority of this AO
+    m_startPrio = prio; // set the start QF priority of this AO
     QF::add_(this);   // make QF aware of this AO
-    QF_CRIT_EXIT_();
 
     this->init(ie); // take the top-most initial tran. (virtual)
     QS_FLUSH();     // flush the trace buffer to the host
 
     // see if this AO needs to be scheduled in case QXK is running
+    QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
     if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { // activation needed?
         QXK_activate_();
@@ -217,9 +215,8 @@ void QActive::start(uint_fast8_t const prio,
 // from all events and no more events should be directly-posted to it.
 //
 void QActive::stop(void) {
-    /// @pre QActive_stop() must be called from the AO that wants to stop.
-    Q_REQUIRE_ID(600, (!QXK_ISR_CONTEXT_()) /* don't stop AO's from an ISR! */
-                      && (this == QXK_attr_.curr));
+    /// @pre QActive::stop() must be called from the AO that wants to stop.
+    Q_REQUIRE_ID(300, (this == QF::active_[QXK_attr_.actPrio]));
 
     QF::remove_(this); // remove this active object from the QF
 
@@ -230,6 +227,115 @@ void QActive::stop(void) {
         QXK_activate_();
     }
     QF_CRIT_EXIT_();
+}
+
+//****************************************************************************
+/// @description
+/// This function locks the QXK scheduler to the specified ceiling.
+///
+/// @param[in]   ceiling    priority ceiling to which the QXK scheduler
+///                         needs to be locked
+///
+/// @returns
+/// The previous QXK Scheduler lock status, which is to be used to unlock
+/// the scheduler by restoring its previous lock status in QXK::schedUnlock().
+///
+/// @note
+/// QXK::schedLock() must be always followed by the corresponding
+/// QXK::schedUnlock().
+///
+/// @sa QXK::schedUnlock()
+///
+/// @usage
+/// The following example shows how to lock and unlock the QXK scheduler:
+/// @include qxk_lock.cpp
+///
+QSchedStatus QXK::schedLock(uint_fast8_t const ceiling) {
+    QSchedStatus stat;
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
+
+    /// @pre The QXK scheduler lock:
+    /// - cannot be called from an ISR;
+    Q_REQUIRE_ID(400, !QXK_ISR_CONTEXT_());
+
+    // first store the previous lock prio
+    if (QXK_attr_.lockPrio < ceiling) { // raising the lock prio?
+        stat = static_cast<QSchedStatus>(QXK_attr_.lockPrio << 8);
+        QXK_attr_.lockPrio = ceiling;
+
+        QS_BEGIN_NOCRIT_(QS_SCHED_LOCK,
+                         static_cast<void *>(0), static_cast<void *>(0))
+            QS_TIME_(); // timestamp
+            QS_2U8_(static_cast<uint8_t>(stat), /* the previous lock prio */
+                    static_cast<uint8_t>(QXK_attr_.lockPrio)); // new lock prio
+        QS_END_NOCRIT_()
+
+        // add the previous lock holder priority
+        stat |= static_cast<QSchedStatus>(QXK_attr_.lockHolder);
+        QXK_attr_.lockHolder =
+            (QXK_attr_.curr != static_cast<QActive *>(0))
+            ? QXK_attr_.curr->m_prio
+            : static_cast<uint_fast8_t>(0);
+    }
+    else {
+       stat = static_cast<QSchedStatus>(0xFF);
+    }
+    QF_CRIT_EXIT_();
+
+    return stat; // return the status to be saved in a stack variable
+}
+
+//****************************************************************************
+///
+/// @description
+/// This function unlocks the QXK scheduler to the previous status.
+///
+/// @param[in]   stat       previous QXK Scheduler lock status returned from
+///                         QXK::schedLock()
+/// @note
+/// QXK::schedUnlock() must always follow the corresponding
+/// QXK::schedLock().
+///
+/// @sa QXK::schedLock()
+///
+/// @usage
+/// The following example shows how to lock and unlock the QXK scheduler:
+/// @include qxk_lock.cpp
+///
+void QXK::schedUnlock(QSchedStatus const stat) {
+    // has the scheduler been actually locked by the last QXK_schedLock()?
+    if (stat != static_cast<QSchedStatus>(0xFF)) {
+        uint_fast8_t lockPrio = QXK_attr_.lockPrio; // volatilie into tmp
+        uint_fast8_t prevPrio = static_cast<uint_fast8_t>(stat >> 8);
+        QF_CRIT_STAT_
+        QF_CRIT_ENTRY_();
+
+        /// @pre The scheduler cannot be unlocked:
+        /// - from the ISR context; and
+        /// - the current lock priority must be greater than the previous
+        Q_REQUIRE_ID(500, (!QXK_ISR_CONTEXT_())
+                          && (lockPrio > prevPrio));
+
+        QS_BEGIN_NOCRIT_(QS_SCHED_UNLOCK,
+                         static_cast<void *>(0), static_cast<void *>(0))
+            QS_TIME_(); // timestamp
+            QS_2U8_(static_cast<uint8_t>(lockPrio),/* prio before unlocking */
+                    static_cast<uint8_t>(prevPrio));// prio after unlocking
+        QS_END_NOCRIT_()
+
+        // restore the previous lock priority and lock holder
+        QXK_attr_.lockPrio   = prevPrio;
+        QXK_attr_.lockHolder =
+            static_cast<uint_fast8_t>(stat & static_cast<QSchedStatus>(0xFF));
+
+        // find the highest-prio thread ready to run
+        if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { // priority found?
+            QXK_activate_(); // activate any unlocked basic threads
+        }
+
+        QF_CRIT_EXIT_();
+    }
 }
 
 } // namespace QP
@@ -261,7 +367,7 @@ uint_fast8_t QXK_sched_(void) {
     QP::QActive *next = QP::QF::active_[p];
 
     // the thread found must be registered in QF
-    //Q_ASSERT_ID(610, next != static_cast<QP::QActive *>(0));
+    Q_ASSERT_ID(610, next != static_cast<QP::QActive *>(0));
 
     // is the current thread a basic-thread?
     if (QXK_attr_.curr == static_cast<QP::QActive *>(0)) {
@@ -296,6 +402,7 @@ uint_fast8_t QXK_sched_(void) {
 
         // is the new prio different from the current prio?
         if (p != QXK_attr_.curr->m_prio) {
+
             QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT,
                              QP::QS::priv_.locFilter[QP::QS::AO_OBJ],
                              QXK_attr_.next)
@@ -326,8 +433,8 @@ uint_fast8_t QXK_sched_(void) {
 /// returns with interrupts **disabled**.
 ///
 void QXK_activate_(void) {
-    uint_fast8_t p   = QXK_attr_.next->m_prio;
     uint_fast8_t pin = QXK_attr_.actPrio; // save the initial active prio
+    uint_fast8_t p   = QXK_attr_.next->m_prio;
     QP::QActive *a;
 
     // QS tracing or thread-local storage?
@@ -377,12 +484,12 @@ void QXK_activate_(void) {
         p = QXK_attr_.readySet.findMax();
 
         if (p <= QXK_attr_.lockPrio) { // is it below the lock prio?
-            p = QXK_attr_.lockHolder; // prio of the thread holding the lock
+            p = QXK_attr_.lockHolder; // prio of the thread holding lock
         }
         a = QP::QF::active_[p];
 
         // the AO must be registered in QF
-        //Q_ASSERT_ID(710, a != static_cast<QP::QActive *>(0));
+        Q_ASSERT_ID(710, a != static_cast<QP::QActive *>(0));
 
         // is the next an AO-thread?
         if (a->m_osObject == static_cast<void *>(0)) {
@@ -400,8 +507,8 @@ void QXK_activate_(void) {
                              QP::QS::priv_.locFilter[QP::QS::AO_OBJ],
                              QXK_attr_.next)
                 QS_TIME_(); // timestamp
-                QS_2U8_(static_cast<uint8_t>(p), // prio of the next thread
-                        static_cast<uint8_t>(    // prio of the curent thread
+                QS_2U8_(static_cast<uint8_t>(p), /* prio of the next thr */
+                        static_cast<uint8_t>(    /* prio of the curent thr */
                             QXK_attr_.actPrio));
             QS_END_NOCRIT_()
 
@@ -440,6 +547,11 @@ QP::QActive *QXK_current(void) {
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();
+
+    /// @pre the QXK kernel must be running
+    Q_REQUIRE_ID(800,
+        QXK_attr_.lockPrio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE));
+
     curr = QXK_attr_.curr;
     if (curr == static_cast<QP::QActive *>(0)) { // basic thread?
         curr = QP::QF::active_[QXK_attr_.actPrio];
@@ -447,7 +559,7 @@ QP::QActive *QXK_current(void) {
     QF_CRIT_EXIT_();
 
     //! @post the current thread must be valid
-    Q_ENSURE_ID(900, curr != static_cast<QP::QActive *>(0));
+    Q_ENSURE_ID(890, curr != static_cast<QP::QActive *>(0));
 
     return curr;
 }

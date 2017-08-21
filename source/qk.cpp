@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-04
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -116,26 +116,19 @@ static void initial_events(void) {
 
     // any active objects need to be scheduled before starting event loop?
     if (QK_sched_() != static_cast<uint_fast8_t>(0)) {
-        QK_activate_(); // process all events produced so far
+        QK_activate_(); // activate AOs to process all events posted so far
     }
 }
 
 //****************************************************************************
-// @description
-// QP::QF::run() is typically called from your startup code after you
-// initialize the QF and start at least one active object with
-// QP::QActive::start().
-//
-// @returns QP::QF::run() typically does not return in embedded applications.
-// However, when QP runs on top of an operating system, QP::QF::run() might
-// return and in this case the return represents the error code (0 for
-// success). Typically the value returned from QP::QF::run() is subsequently
-// passed on as return from main().
-//
-// @note This function is strongly platform-dependent and is not implemented
-// in the QF, but either in the QF port or in the Board Support Package (BSP)
-// for the given application. All QF ports must implement QP::QF::run().
-//
+/// @description
+///
+/// QP::QF::run() is typically called from your startup code after you
+/// initialize the QF and start at least one active object with
+/// QP::QActive::start().
+///
+/// @returns In QK, the QP::QF::run() function does not return.
+///
 int_t QF::run(void) {
     QF_INT_DISABLE();
     initial_events(); // process all events posted during initialization
@@ -144,7 +137,7 @@ int_t QF::run(void) {
 
     // the QK idle loop...
     for (;;) {
-        QK::onIdle(); // invoke the QK on-idle callback
+        QK::onIdle(); // application-specific QK on-idle callback
     }
 #ifdef __GNUC__  // GNU compiler?
     return static_cast<int_t>(0);
@@ -177,16 +170,15 @@ void QActive::start(uint_fast8_t const prio,
     /// @pre AO cannot be started from an ISR, the priority must be in range
     /// and the stack storage must not be provided, because the QK kernel does
     /// not need per-AO stacks.
-    ///
-    Q_REQUIRE_ID(500, (!QK_ISR_CONTEXT_())
+    Q_REQUIRE_ID(300, (!QK_ISR_CONTEXT_())
                       && (static_cast<uint_fast8_t>(0) < prio)
                       && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
                       && (stkSto == static_cast<void *>(0)));
 
-    m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
-    m_prio = prio;             // set the QF priority of this AO
+    m_eQueue.init(qSto, qLen); // initialize the built-in queue
 
-    QF::add_(this);            // make QF aware of this AO
+    m_prio = prio;  // set the QF priority of this AO
+    QF::add_(this); // make QF aware of this AO
 
     this->init(ie); // take the top-most initial tran. (virtual)
     QS_FLUSH();     // flush the trace buffer to the host
@@ -201,20 +193,20 @@ void QActive::start(uint_fast8_t const prio,
 }
 
 //****************************************************************************
-// @description
-// The preferred way of calling this function is from within the active
-// object that needs to stop. In other words, an active object should stop
-// itself rather than being stopped by someone else. This policy works
-// best, because only the active object itself "knows" when it has reached
-// the appropriate state for the shutdown.
-//
-// @note
-// By the time the AO calls QP::QActive::stop(), it should have unsubscribed
-// from all events and no more events should be directly-posted to it.
-//
+/// @description
+/// This function must be called from within the AO that needs to stop.
+/// In other words, an AO should stop itself rather than being stopped by
+/// someone else. This policy works best, because only the AO itself "knows"
+/// when it has reached the appropriate state for the shutdown.
+///
+/// @note
+/// By the time the AO calls QP::QActive::stop(), it should have unsubscribed
+/// from all events and no more events should be directly-posted to it.
+///
 void QActive::stop(void) {
-    //! @pre QActive::stop() must be called from the AO that wants to stop.
-    Q_REQUIRE_ID(600, (this == QF::active_[QK_attr_.actPrio]));
+
+    //! @pre QP::QActive::stop() must be called from the AO that wants to stop.
+    Q_REQUIRE_ID(400, (this == QF::active_[QK_attr_.actPrio]));
 
     QF::remove_(this);  // remove this active object from the QF
 
@@ -227,6 +219,115 @@ void QActive::stop(void) {
     QF_CRIT_EXIT_();
 }
 
+//****************************************************************************
+///
+/// @description
+/// This function locks the QK scheduler to the specified ceiling.
+///
+/// @param[in]   ceiling    priority ceiling to which the QK scheduler
+///                         needs to be locked
+///
+/// @returns
+/// The previous QK Scheduler lock status, which is to be used to unlock
+/// the scheduler by restoring its previous lock status in
+/// QP::QK::schedUnlock().
+///
+/// @note
+/// QP::QK::schedLock() must be always followed by the corresponding
+/// QP::QK::schedUnlock().
+///
+/// @sa QK_schedUnlock()
+///
+/// @usage
+/// The following example shows how to lock and unlock the QK scheduler:
+/// @include qk_lock.cpp
+///
+QSchedStatus QK::schedLock(uint_fast8_t const ceiling) {
+    QSchedStatus stat;
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
+
+    /// @pre The QK scheduler lock:
+    /// - cannot be called from an ISR;
+    Q_REQUIRE_ID(600, !QK_ISR_CONTEXT_());
+
+    // first store the previous lock prio
+    if (QK_attr_.lockPrio < ceiling) { // raising the lock prio?
+        stat = static_cast<QSchedStatus>(QK_attr_.lockPrio << 8);
+        QK_attr_.lockPrio = ceiling;
+
+        QS_BEGIN_NOCRIT_(QS_SCHED_LOCK,
+                         static_cast<void *>(0), static_cast<void *>(0))
+            QS_TIME_(); // timestamp
+            QS_2U8_(static_cast<uint8_t>(stat), /* the previous lock prio */
+                    static_cast<uint8_t>(QK_attr_.lockPrio)); // new lock prio
+        QS_END_NOCRIT_()
+
+        // add the previous lock holder priority
+        stat |= static_cast<QSchedStatus>(QK_attr_.lockHolder);
+
+        QK_attr_.lockHolder = QK_attr_.actPrio;
+    }
+    else {
+       stat = static_cast<QSchedStatus>(0xFF);
+    }
+    QF_CRIT_EXIT_();
+
+    return stat; // return the status to be saved in a stack variable
+}
+
+//****************************************************************************
+///
+/// @description
+/// This function unlocks the QK scheduler to the previous status.
+///
+/// @param[in]   stat       previous QK Scheduler lock status returned from
+///                         QP::QK::schedLock()
+/// @note
+/// QP::QK::schedUnlock() must always follow the corresponding
+/// QP::QK::schedLock().
+///
+/// @sa QP::QK::schedLock()
+///
+/// @usage
+/// The following example shows how to lock and unlock the QK scheduler:
+/// @include qk_lock.cpp
+///
+void QK::schedUnlock(QSchedStatus const stat) {
+    // has the scheduler been actually locked by the last QK_schedLock()?
+    if (stat != static_cast<QSchedStatus>(0xFF)) {
+        uint_fast8_t lockPrio = QK_attr_.lockPrio; // volatilie into tmp
+        uint_fast8_t prevPrio = static_cast<uint_fast8_t>(stat >> 8);
+        QF_CRIT_STAT_
+        QF_CRIT_ENTRY_();
+
+        /// @pre The scheduler cannot be unlocked:
+        /// - from the ISR context; and
+        /// - the current lock priority must be greater than the previous
+        Q_REQUIRE_ID(700, (!QK_ISR_CONTEXT_())
+                          && (lockPrio > prevPrio));
+
+        QS_BEGIN_NOCRIT_(QS_SCHED_UNLOCK,
+                         static_cast<void *>(0), static_cast<void *>(0))
+            QS_TIME_(); // timestamp
+            QS_2U8_(static_cast<uint8_t>(lockPrio),/* prio before unlocking */
+                    static_cast<uint8_t>(prevPrio));// prio after unlocking
+        QS_END_NOCRIT_()
+
+        // restore the previous lock priority and lock holder
+        QK_attr_.lockPrio   = prevPrio;
+        QK_attr_.lockHolder =
+            static_cast<uint_fast8_t>(stat & static_cast<QSchedStatus>(0xFF));
+
+        // find the highest-prio thread ready to run
+        if (QK_sched_() != static_cast<uint_fast8_t>(0)) { // priority found?
+            QK_activate_(); // activate any unlocked basic threads
+        }
+
+        QF_CRIT_EXIT_();
+    }
+}
+
 } // namespace QP
 
 //============================================================================
@@ -234,16 +335,16 @@ extern "C" {
 
 //****************************************************************************
 /// @description
-/// This function finds out the priority of the highest-priority active object
-/// that (1) has events to process, and (2) has priority that is above the
-/// current priority, and (3) has priority that is above the mutex ceiling,
-/// if mutex is configured in the port.
+/// The QK scheduler finds out the priority of the highest-priority AO
+/// that (1) has events to process and (2) has priority that is above the
+/// current priority.
 ///
 /// @returns the 1-based priority of the the active object, or zero if
 /// no eligible active object is ready to run.
 ///
-/// @attention QK_sched_() must be always called with interrupts
-/// __disabled__  and returns with interrupts __disabled__.
+/// @attention
+/// QK_sched_() must be always called with interrupts **disabled** and
+/// returns with interrupts **disabled**.
 ///
 uint_fast8_t QK_sched_(void) {
     // find the highest-prio AO with non-empty event queue

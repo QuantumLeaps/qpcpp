@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2016-12-14
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-18
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -57,10 +57,10 @@
 extern "C" {
 
 struct QK_Attr {
-    uint_fast8_t volatile actPrio;  //!< prio of the active AO
-    uint_fast8_t volatile nextPrio; //!< prio of the next AO to execute
-    uint_fast8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
-    uint_fast8_t volatile lockHolder; //!< prio of the lock holder
+    uint_fast8_t actPrio;    //!< prio of the active AO
+    uint_fast8_t nextPrio;   //!< prio of the next AO to execute
+    uint_fast8_t lockPrio;   //!< lock prio (0 == no-lock)
+    uint_fast8_t lockHolder; //!< prio of the lock holder
 #ifndef QK_ISR_CONTEXT_
     uint_fast8_t volatile intNest;    //!< ISR nesting level
 #endif // QK_ISR_CONTEXT_
@@ -83,23 +83,28 @@ void QK_activate_(void);
 //****************************************************************************
 namespace QP {
 
+//! The scheduler lock status
+typedef uint_fast16_t QSchedStatus;
+
 //****************************************************************************
 //! QK services.
 /// @description
 /// This class groups together QK services. It has only static members and
 /// should not be instantiated.
 ///
-// @note The QK scheduler, QK priority, QK ready set, etc. belong conceptually
-/// to the QK class (as static class members). However, to avoid C++ potential
-/// name-mangling problems in assembly language, these elements are defined
-/// outside of the QK class and use the extern "C" linkage specification.
+/// @note
+/// The QK scheduler, QK priority, QK ready set, etc. belong conceptually
+/// to the QK class (as static class members). However, to avoid potential
+/// C++ name-mangling problems in assembly language, these elements are
+/// defined outside of the QK class and use the extern "C" linkage.
 class QK {
 public:
+    // QK scheduler locking...
+    //! QK selective scheduler lock
+    static QSchedStatus schedLock(uint_fast8_t const ceiling);
 
-    //! get the current QK version number string of the form X.Y.Z
-    static char_t const *getVersion(void) {
-        return versionStr;
-    }
+    //! QK selective scheduler unlock
+    static void schedUnlock(QSchedStatus const stat);
 
     //! QK idle callback (customized in BSPs for QK)
     /// @description
@@ -112,20 +117,11 @@ public:
     ///
     /// @sa QP::QF::onIdle()
     static void onIdle(void);
-};
 
-/*! Priority-ceiling Mutex the QK preemptive kernel */
-class QMutex {
-public:
-    void init(uint_fast8_t const prio);
-    void lock(void);
-    void unlock(void);
-
-private:
-    uint_fast8_t m_lockPrio; //!< lock prio (priority ceiling)
-    uint_fast8_t m_prevPrio; //!< previoius lock prio
-
-    friend class QF;
+    //! get the current QK version number string of the form X.Y.Z
+    static char_t const *getVersion(void) {
+        return versionStr;
+    }
 };
 
 } // namespace QP
@@ -149,22 +145,21 @@ private:
     //! Internal macro to represent the scheduler lock status
     // that needs to be preserved to allow nesting of locks.
     //
-    #define QF_SCHED_STAT_ QMutex schedLock_;
+    #define QF_SCHED_STAT_ QSchedStatus lockStat_;
 
     //! Internal macro for selective scheduler locking.
     #define QF_SCHED_LOCK_(prio_) do { \
         if (QK_ISR_CONTEXT_()) { \
-            schedLock_.m_lockPrio = static_cast<uint_fast8_t>(0); \
+            lockStat_ = static_cast<QSchedStatus>(0xFF); \
         } else { \
-            schedLock_.init((prio_)); \
-            schedLock_.lock(); \
+            lockStat_ = QK::schedLock((prio_)); \
         } \
     } while (false)
 
     //! Internal macro for selective scheduler unlocking.
     #define QF_SCHED_UNLOCK_() do { \
-        if (schedLock_.m_lockPrio != static_cast<uint_fast8_t>(0)) { \
-            schedLock_.unlock(); \
+        if (lockStat_ != static_cast<QSchedStatus>(0xFF)) { \
+            QK::schedUnlock(lockStat_); \
         } \
     } while (false)
 

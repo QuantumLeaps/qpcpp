@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.9.6
-// Last updated on  2017-07-27
+// Last updated for version 5.9.7
+// Last updated on  2017-08-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -43,9 +43,9 @@ static void thread_function(QP::QXThread * const me) {
     (void)me; // unused parameter
     XT_Sema.init(1U); // 1 count
     for (;;) {
-        (void)XT_Sema.wait(0U, 0U); // wait forever
+        (void)XT_Sema.wait(QXTHREAD_NO_TIMEOUT); // wait forever
         BSP::ledOn();
-        QP::QXThread::delay(1, 0U);  // 1 cycle
+        QP::QXThread::delay(1U);  // block for 1 clock tick
         BSP::ledOff();
     }
 }

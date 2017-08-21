@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.9.6
-// Last updated on  2017-07-27
+// Last updated for version 5.9.7
+// Last updated on  2017-08-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -50,61 +50,84 @@ static QP::QXSemaphore l_sema;
 QP::QXThread * const XT_Test1 = &l_test1;
 QP::QXThread * const XT_Test2 = &l_test2;
 
-//............................................................................
-static void Thread1_run(QP::QXThread * const /*me*/) {
+// Thread-Local Storage for the "extended" threads ...........................
+struct TLS_test {
+    uint32_t foo;
+    uint8_t bar[10];
+};
+static TLS_test l_tls1;
+static TLS_test l_tls2;
 
-    l_mutex.init(3U);
+static void lib_fun(uint32_t x) {
+    QXK_TLS(TLS_test *)->foo = x;
+}
+
+//............................................................................
+static void Thread1_run(QP::QXThread * const me) {
+
+    me->m_thread = &l_tls1; // initialize the TLS for Thread1
 
     for (;;) {
+        l_mutex.lock(QXTHREAD_NO_TIMEOUT); // lock the mutex
+        BSP::ledOn();
 
-        // wait on a semaphore (BLOCK with timeout)
-        (void)l_sema.wait(BSP::TICKS_PER_SEC, 0U);
-        //BSP::ledOn();
+        if (l_mutex.tryLock()) { // exercise the mutex
+            float volatile x;
 
+            // some flating point code to exercise the VFP...
+            x = 1.4142135F;
+            x = x * 1.4142135F;
 
-        l_mutex.lock(); // exercise the mutex
-        // some flating point code to exercise the VFP...
-        float volatile x = 1.4142135F;
-        x = x * 1.4142135F;
-        //QP::QXThread::delay(1U, 0U); // asserts (blocking while holding a mutex)
+            (void)l_sema.signal(); // signal Thread2
+            QP::QXThread::delay(10U);  // BLOCK while holding a mutex
+
+            l_mutex.unlock();
+        }
+
         l_mutex.unlock();
+        BSP::ledOff();
 
-        QP::QXThread::delay(BSP::TICKS_PER_SEC/7, 0U);  // BLOCK
+        QP::QXThread::delay(BSP::TICKS_PER_SEC/7);  // BLOCK
 
         // publish to Thread2
-        QP::QF::PUBLISH(Q_NEW(QP::QEvt, TEST_SIG), &l_test1);
+        //QP::QF::PUBLISH(Q_NEW(QP::QEvt, TEST_SIG), &l_test1);
+
+        // test TLS
+        lib_fun(1U);
     }
 }
 
 //............................................................................
 static void Thread2_run(QP::QXThread * const me) {
 
+    // initialize the semaphore before using it
+    // NOTE: Here the semaphore is initialized in the highest-priority thread
+    // that uses it. Alternatively, the semaphore can be initialized
+    // before any thread runs.
+    l_sema.init(0U,  // count==0 (signaling semaphore)
+                1U); // max_count==1 (binary semaphore)
+
+    // initialize the mutex before using it
+    // NOTE: Here the semaphore is initialized in the highest-priority thread
+    // that uses it. Alternatively, the semaphore can be initialized
+    // before any thread runs.
+    l_mutex.init(N_PHILO + 6U);
+
+    me->m_thread = &l_tls2; // initialize the TLS for Thread2
+
     // subscribe to the test signal */
     me->subscribe(TEST_SIG);
 
-    // initialize the semaphore before using it
-    // NOTE: the semaphore is initialized in the highest-priority thread
-    // that uses it. Alternatively, the semaphore can be initialized
-    // before any thread runs.
-    l_sema.init(0U,   // count==0 (signaling semaphore)
-                1U);  // max_count==1 (binary semaphore)
-
     for (;;) {
-        // some flating point code to exercise the VFP...
-        float volatile x = 1.4142135F;
-        x = x * 1.4142135F;
+        // wait on a semaphore (BLOCK indefinitely)
+        l_sema.wait();
 
-        // wait on the internal event queue (BLOCK) with timeout
-        QP::QEvt const *e = me->queueGet(BSP::TICKS_PER_SEC/2, 0U);
-        //BSP::ledOff();
+        l_mutex.lock(QXTHREAD_NO_TIMEOUT); // lock the mutex
+        QP::QXThread::delay(1U);  // wait more (BLOCK)
+        l_mutex.unlock();
 
-        if (e != static_cast<QP::QEvt *>(0)) { // event actually delivered?
-            QP::QF::gc(e); // recycle the event manually!
-        }
-        else {
-            QP::QXThread::delay(BSP::TICKS_PER_SEC/2, 0U);  // BLOCK
-            l_sema.signal(); // signal Thread1
-        }
+        // test TLS
+        lib_fun(2U);
     }
 }
 

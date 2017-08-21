@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: PC-Lint 9.x option file for linting QP/C++ applications
-// Last updated for version 5.9.5
-// Last updated on  2017-07-19
+// Last updated for version 5.9.7
+// Last updated on  2017-08-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -168,13 +168,13 @@
  *toTimeEvt)
 
 -esym(1927,           // 8-5-1 Symbol not in the ctor initializer list
- QP::QMActive::m_prio,
- QP::QMActive::m_eQueue,
- QP::QMActive::m_osObject,
- QP::QMActive::m_thread)
+ QP::QActive::m_prio,
+ QP::QActive::m_eQueue,
+ QP::QActive::m_osObject,
+ QP::QActive::m_thread)
 -esym(1536,           // 9-3-1, 9-3-2 Exposing low access member
- QP::QMActive::m_osObject,
- QP::QMActive::m_thread)
+ QP::QActive::m_osObject,
+ QP::QActive::m_thread)
 -estring(1960,        // 11-0-1(req) non-private data member
  m_eQueue,
  m_thread,
@@ -244,10 +244,10 @@
 -estring(1963, Q_NEW) // 16-3-2(adv) '#/##' used in macro
 -esym(1960, remove)   // 17-0-2, Re-use of C++ identifier
 -esym(1401,           // member not initialized by constructor
- QP::QMActive::m_prio,
- QP::QMActive::m_eQueue,
- QP::QMActive::m_osObject,
- QP::QMActive::m_thread)
+ QP::QActive::m_prio,
+ QP::QActive::m_eQueue,
+ QP::QActive::m_osObject,
+ QP::QActive::m_thread)
 -esym(1704,           // constructor has private access specification
  QP::QTimeEvt::QTimeEvt,
  QP::QEQueue::QEQueue,
@@ -293,6 +293,8 @@
 -esym(1960,           // 3-2-3(req) type previously declared
  QP::QActive)
 -estring(1960,        // 11-0-1(req) non-private data member
+ m_startPrio)
+-estring(1960,        // 11-0-1(req) non-private data member
  curr,
  next,
  lockPrio,
@@ -304,6 +306,8 @@
 -esym(1712,           // default constructor not defined
  QXThread)
 -esym(1960, signal)   // 17-0-2, Re-use of C++ identifier
+-esym(1927,           // 8-5-1 Symbol not in the ctor initializer list
+ QP::QActive::m_startPrio)
 
 
 // QS

@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last Updated for Version: 5.9.5
-// Date of the Last Update:  2017-07-20
+// Last Updated for Version: 5.9.7
+// Date of the Last Update:  2017-08-19
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -77,7 +77,6 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 #define PB1_PIN     7
 
 static uint32_t l_rnd; // random seed
-static QP::QXMutex l_rndMutex; // to protect the random number generator
 
 #ifdef Q_SPY
 
@@ -88,11 +87,6 @@ static QP::QXMutex l_rndMutex; // to protect the random number generator
     static uint8_t const l_SysTick_Handler = (uint8_t)0;
     static uint8_t const l_GPIO_EVEN_IRQHandler = (uint8_t)0;
     static USART_TypeDef * const l_USART0 = ((USART_TypeDef *)(0x40010000UL));
-
-    #define UART_BAUD_RATE      115200U
-    #define UART_FR_TXFE        (1U << 7)
-    #define UART_FR_RXFE        (1U << 4)
-    #define UART_TXFIFO_DEPTH   16U
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,
@@ -262,19 +256,18 @@ uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     float volatile x = 3.1415926F;
     x = x + 2.7182818F;
 
-    l_rndMutex.lock(); // lock the random-seed mutex
+    QP::QSchedStatus lockStat = QP::QXK::schedLock(N_PHILO); // protect l_rnd
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
     uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
     l_rnd = rnd; // set for the next time
-    l_rndMutex.unlock(); // unlock the random-seed mutex
+    QP::QXK::schedUnlock(lockStat); // sched unlock around l_rnd
 
     return (rnd >> 8);
 }
 //............................................................................
 void BSP::randomSeed(uint32_t seed) {
-    l_rndMutex.init(N_PHILO); // ceiling <== maximum Philo priority
     l_rnd = seed;
 }
 //............................................................................
@@ -301,7 +294,7 @@ void QF::onStartup(void) {
     // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
     SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
 
-    // assing all priority bits for preemption-prio. and none to sub-prio.
+    // assingn all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE00

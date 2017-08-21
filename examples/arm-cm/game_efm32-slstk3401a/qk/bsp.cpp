@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: "Fly 'n' Shoot" game example, EFM32-SLSTK3401A board, QK kernel
-// Last Updated for Version: 5.9.5
-// Date of the Last Update:  2017-07-20
+// Last Updated for Version: 5.9.7
+// Date of the Last Update:  2017-08-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -84,7 +84,6 @@ static uint32_t l_fb[BSP_SCREEN_HEIGHT + 1][BSP_SCREEN_WIDTH / 32U];
 static uint32_t l_walls[GAME_TUNNEL_HEIGHT + 1][BSP_SCREEN_WIDTH / 32U];
 
 static unsigned l_rnd;  /* random seed */
-static QP::QMutex l_rndMutex; /* mutex to protect the random seed */
 
 static void paintBits(uint8_t x, uint8_t y, uint8_t const *bits, uint8_t h);
 static void paintBitsClear(uint8_t x, uint8_t y,
@@ -650,24 +649,24 @@ void BSP_displayOff(void) {
 }
 //............................................................................
 uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
-    // Some flating point code is to exercise the VFP...
+    // The flating point code is to exercise the FPU
     float volatile x = 3.1415926F;
     x = x + 2.7182818F;
 
-    l_rndMutex.lock(); // lock the random-seed mutex
+    // lock the scheduler around l_rnd up to the Tunnel priority
+    QP::QSchedStatus lockStat = QP::QK::schedLock(GAME::AO_Tunnel->m_prio);
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
     uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
     l_rnd = rnd; // set for the next time
-    l_rndMutex.unlock(); // unlock the random-seed mutex
+    QP::QK::schedUnlock(lockStat); // unlock sched after accessing l_rnd
 
     return (rnd >> 8);
 }
 //............................................................................
 void BSP_randomSeed(uint32_t seed) {
     l_rnd = seed;
-    l_rndMutex.init(1U); // ceiling == Tunnel priority
 }
 //..........................................................................*/
 static void paintBits(uint8_t x, uint8_t y, uint8_t const *bits, uint8_t h) {

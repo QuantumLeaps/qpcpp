@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QK kernel
-// Last Updated for Version: 5.9.5
-// Date of the Last Update:  2017-07-20
+// Last Updated for Version: 5.9.7
+// Date of the Last Update:  2017-08-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -77,7 +77,6 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 #define PB1_PIN     7
 
 static uint32_t l_rnd; // random seed
-static QP::QMutex l_rndMutex; // to protect the random number generator
 
 #ifdef Q_SPY
 
@@ -260,24 +259,24 @@ void BSP::displayPaused(uint8_t paused) {
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
-    // Some flating point code is to exercise the VFP...
+    // The flating point code is to exercise the FPU
     float volatile x = 3.1415926F;
     x = x + 2.7182818F;
 
-    l_rndMutex.lock(); // lock the random-seed mutex
+    // lock the scheduler around l_rnd up to the (N_PHILO + 1U) ceiling
+    QP::QSchedStatus lockStat = QP::QK::schedLock(N_PHILO + 1U);
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
     uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
     l_rnd = rnd; // set for the next time
-    l_rndMutex.unlock(); // unlock the random-seed mutex
+    QP::QK::schedUnlock(lockStat); // unlock sched after accessing l_rnd
 
     return (rnd >> 8);
 }
 //............................................................................
 void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
-    l_rndMutex.init(N_PHILO); // ceiling <== maximum Philo priority
 }
 
 //............................................................................

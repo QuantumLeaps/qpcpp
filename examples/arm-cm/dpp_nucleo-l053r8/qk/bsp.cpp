@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QK kernel
-// Last updated for version 5.9.5
-// Last updated on  2016-07-20
+// Last updated for version 5.9.7
+// Last updated on  2016-08-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -71,7 +71,6 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 #define BTN_B1   (1U << 13)
 
 static unsigned  l_rnd; // random seed
-static QP::QMutex l_rndMutex; // to protect the random number generator
 
 #ifdef Q_SPY
 
@@ -212,19 +211,19 @@ void BSP::displayPaused(uint8_t paused) {
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
-    l_rndMutex.lock(); // lock the shared random seed
+    // lock the scheduler around l_rnd up to the (N_PHILO + 1U) ceiling
+    QP::QSchedStatus lockStat = QP::QK::schedLock(N_PHILO + 1U);
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
     uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
     l_rnd = rnd; // set for the next time
-    l_rndMutex.unlock(); // unlock the shared random seed
+    QP::QK::schedUnlock(lockStat); // unlock sched after accessing l_rnd
 
     return (rnd >> 8);
 }
 //............................................................................
 void BSP::randomSeed(uint32_t seed) {
-    l_rndMutex.init(N_PHILO + 1U);
     l_rnd = seed;
 }
 //............................................................................

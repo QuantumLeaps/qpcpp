@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.6
-/// Last updated on  2017-08-01
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-20
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -173,8 +173,14 @@ public: // for access from extern "C" functions
     QF_THREAD_TYPE m_thread;
 #endif
 
-    //! QF priority associated with the active object.
+    //! QF priority (1..#QF_MAX_ACTIVE) of this active object.
     uint_fast8_t m_prio;
+
+#ifdef qxk_h // QXK kernel used?
+    //! QF start priority (1..#QF_MAX_ACTIVE) of this active object.
+    uint_fast8_t m_startPrio;
+#endif
+
 
 protected:
     //! protected constructor (abstract class)
@@ -353,13 +359,16 @@ private:
 /// list, so only armed time events consume CPU cycles.
 ///
 /// @note
-/// QF manages the time events in the macro TICK_X(), which must be
-/// called periodically, eitehr from a clock tick ISR, or from a task level.
+/// QF manages the time events in the macro TICK_X(), which must be called
+/// periodically, from the clock tick ISR or from the special QP::QTicker
+/// active object.
 ///
 /// @note
-/// In this version of QF QTimeEvt objects should __not__ be allocated
-/// dynamically from event pools. Currently, QF will not correctly recycle
-/// the dynamically allocated Time Events.
+/// Even though QP::QTimeEvt is a subclass of QP::QEvt, QP::QTimeEvt instances
+/// can NOT be allocated dynamically from event pools. In other words, it is
+/// illegal to allocate QP::QTimeEvt instances with the Q_NEW() or Q_NEW_X()
+/// macros.
+///
 class QTimeEvt : public QEvt {
 private:
 
@@ -408,6 +417,8 @@ public:
 
 #if (!defined QP_IMPL) && (QP_API_VERSION < 500)
     //! @deprecated TimeEvt ctor provided for backwards compatibility.
+    /// @overload QTimeEvt::QTimeEvt(QActive * const, enum_t const,
+    ///                              uint_fast8_t const)
     QTimeEvt(enum_t const sgnl) :
 #ifdef Q_EVT_CTOR
         QEvt(static_cast<QSignal>(sgnl)),

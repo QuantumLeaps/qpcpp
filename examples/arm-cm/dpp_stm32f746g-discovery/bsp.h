@@ -49,7 +49,6 @@ public:
     static uint32_t random(void); // pseudo-random generator
 
     // for testing...
-    static void wait4SW1(void);
     static void ledOn(void);
     static void ledOff(void);
 };
