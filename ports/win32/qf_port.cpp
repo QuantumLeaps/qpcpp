@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Win32 API
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.8.2
-/// Last updated on  2016-12-22
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-25
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -53,12 +53,18 @@ Q_DEFINE_THIS_MODULE("qf_port")
 
 // Local objects *************************************************************
 static CRITICAL_SECTION l_win32CritSect;
+static CRITICAL_SECTION l_startupCritSect;
 static DWORD l_tickMsec = 10U; // clock tick in msec (argument for Sleep())
 static bool  l_isRunning;      // flag indicating when QF is running
 
 //****************************************************************************
 void QF::init(void) {
     InitializeCriticalSection(&l_win32CritSect);
+
+    // initialize and enter the startup critical section object to block
+    // any active objects started before calling QF::run()
+    InitializeCriticalSection(&l_startupCritSect);
+    EnterCriticalSection(&l_startupCritSect);
 
     // clear the internal QF variables, so that the framework can (re)start
     // correctly even if the startup code is not called to clear the
@@ -83,6 +89,11 @@ void QF::stop(void) {
 }
 //****************************************************************************
 void QF::thread_(QActive *act) {
+    // block this thread until the startup critical section is exited
+    // from QF::run()
+    EnterCriticalSection(&l_startupCritSect);
+    LeaveCriticalSection(&l_startupCritSect);
+
     // loop until m_thread is cleared in QActive::stop()
     do {
         QEvt const *e = act->get_(); // wait for event
@@ -104,6 +115,10 @@ static DWORD WINAPI ao_thread(LPVOID me) {
 int_t QF::run(void) {
     onStartup();  // startup callback
 
+    // leave the startup critical section to unblock any active objects
+    // started before calling QF::run()
+    LeaveCriticalSection(&l_startupCritSect);
+
     l_isRunning = true; // QF is running
 
     // set the ticker thread priority below normal to prevent
@@ -119,6 +134,7 @@ int_t QF::run(void) {
 
     onCleanup();            // cleanup callback
     QS_EXIT();              // cleanup the QSPY connection
+    //DeleteCriticalSection(&l_startupCritSect);
     //DeleteCriticalSection(&l_win32CritSect);
     return static_cast<int_t>(0); // return success
 }
@@ -160,7 +176,7 @@ void QActive::start(uint_fast8_t prio,
     m_osObject = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     this->init(ie); // execute initial transition (virtual call)
-    QS_FLUSH(); /* flush the QS trace buffer to the host */
+    QS_FLUSH(); // flush the QS trace buffer to the host
 
     // stack size not provided?
     if (stkSize == 0U) {

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.2
-/// Last updated on  2016-12-22
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-25
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -56,7 +56,8 @@ Q_DEFINE_THIS_MODULE("qf_port")
 pthread_mutex_t QF_pThreadMutex_;
 
 // Local-scope objects -------------------------------------------------------
-static bool l_running;
+static pthread_mutex_t l_startupMutex;
+static bool l_isRunning;
 static struct timespec l_tick;
 enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 
@@ -69,6 +70,13 @@ void QF::init(void) {
 
     // init the global mutex with the default non-recursive initializer
     pthread_mutex_init(&QF_pThreadMutex_, NULL);
+
+    // init the startup mutex with the default non-recursive initializer
+    pthread_mutex_init(&l_startupMutex, NULL);
+
+    // lock the startup mutex to block any active objects started before
+    // calling QF::run()
+    pthread_mutex_lock(&l_startupMutex);
 
     // clear the internal QF variables, so that the framework can (re)start
     // correctly even if the startup code is not called to clear the
@@ -96,13 +104,18 @@ int_t QF::run(void) {
         // setting priority failed, probably due to insufficient privieges
     }
 
-    l_running = true;
-    while (l_running) { // the clock tick loop...
+    // unlock the startup mutex to unblock any active objects started before
+    // calling QF::run()
+    pthread_mutex_unlock(&l_startupMutex);
+
+    l_isRunning = true;
+    while (l_isRunning) { // the clock tick loop...
         QF_onClockTick(); // clock tick callback (must call QF_TICK_X())
 
         nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
     }
     onCleanup(); // invoke cleanup callback
+    pthread_mutex_destroy(&l_startupMutex);
     pthread_mutex_destroy(&QF_pThreadMutex_);
     return static_cast<int_t>(0); // return success
 }
@@ -112,10 +125,14 @@ void QF_setTickRate(uint32_t ticksPerSec) {
 }
 //............................................................................
 void QF::stop(void) {
-    l_running = false; // stop the loop in QF::run()
+    l_isRunning = false; // stop the loop in QF::run()
 }
 //............................................................................
 void QF::thread_(QActive *act) {
+    // block this thread until the startup mutex is unlocked from QF::run()
+    pthread_mutex_lock(&l_startupMutex);
+    pthread_mutex_unlock(&l_startupMutex);
+
     // loop until m_thread is cleared in QActive::stop()
     do {
         QEvt const *e = act->get_(); // wait for event
