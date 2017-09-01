@@ -9,7 +9,7 @@
   License Type: Windows Single User License
   Licensed To : Quantum Leaps, LLC
   License No. : WS2975                          License Date: Dec 15, 2013
-  Build Date  : Sep  2 2009                         Run Date: Aug 23, 2017
+  Build Date  : Sep  2 2009                         Run Date: Sep 01, 2017
   (C)1996-2009 M Squared Technologies LLC
   ________________________________________________________________________
 
@@ -747,16 +747,6 @@
   File: ..\src\qf_pkg.h
   ________________________________________________________________________
 
-  Inline Function: QP::QF_EVT_POOL_ID_
-  Parameters: (QEvt const * const e)
-  Complexity   Param 1       Return 1      Cyclo Vg 1       Total        3
-  LOC 1        eLOC 1        lLOC 1        Comment 1        Lines        1
-
-  Inline Function: QP::QF_EVT_REF_CTR_
-  Parameters: (QEvt const * const e)
-  Complexity   Param 1       Return 1      Cyclo Vg 1       Total        3
-  LOC 1        eLOC 1        lLOC 1        Comment 1        Lines        1
-
   Inline Function: QP::QF_EVT_REF_CTR_INC_
   Parameters: (QEvt const * const e)
   Complexity   Param 1       Return 1      Cyclo Vg 1       Total        3
@@ -771,20 +761,20 @@
 
                           ~~ Total File Summary ~~
 
-  LOC 71       eLOC 67       lLOC 11       Comment 109      Lines      205
+  LOC 69       eLOC 65       lLOC 9        Comment 107      Lines      199
   ------------------------------------------------------------------------
 
                         ~~ File Functional Summary ~~
 
-  File Function Count....:          4
-  Total Function LOC.....:          8  Total Function Pts LOC :        0.0
-  Total Function eLOC....:          6  Total Function Pts eLOC:        0.0
-  Total Function lLOC....:          4  Total Function Pts lLOC:        0.0
-  Total Function Params .:          4  Total Function Return .:          4
-  Total Cyclo Complexity :          4  Total Function Complex.:         12
+  File Function Count....:          2
+  Total Function LOC.....:          6  Total Function Pts LOC :        0.0
+  Total Function eLOC....:          4  Total Function Pts eLOC:        0.0
+  Total Function lLOC....:          2  Total Function Pts lLOC:        0.0
+  Total Function Params .:          2  Total Function Return .:          2
+  Total Cyclo Complexity :          2  Total Function Complex.:          6
          ------     -----     -----     ------     ------     -----
-  Max Function LOC ......:          3  Average Function LOC ..:       2.00
-  Max Function eLOC .....:          2  Average Function eLOC .:       1.50
+  Max Function LOC ......:          3  Average Function LOC ..:       3.00
+  Max Function eLOC .....:          2  Average Function eLOC .:       2.00
   Max Function lLOC .....:          1  Average Function lLOC .:       1.00
          ------     -----     -----     ------     ------     -----
   Max Function Parameters:          1  Avg Function Parameters:       1.00
@@ -1252,9 +1242,9 @@
   Parameters: (QEvt const * const e, QEvt const * const evtRef)
     Cyclomatic Complexity Vg Detail
       Function Base           : 1
-      Conditional if / else if: 1
+      Logical and ( && )      : 1
   Complexity   Param 2       Return 1      Cyclo Vg 2       Total        5
-  LOC 10       eLOC 8        lLOC 5        Comment 15       Lines       14
+  LOC 10       eLOC 9        lLOC 5        Comment 15       Lines       14
 
   Function: QP::QF::poolGetMaxBlockSize
   Parameters: (void)
@@ -1265,20 +1255,20 @@
 
                           ~~ Total File Summary ~~
 
-  LOC 104      eLOC 88       lLOC 40       Comment 177      Lines      281
+  LOC 104      eLOC 89       lLOC 40       Comment 177      Lines      281
   ------------------------------------------------------------------------
 
                         ~~ File Functional Summary ~~
 
   File Function Count....:          5
   Total Function LOC.....:         86  Total Function Pts LOC :        2.0
-  Total Function eLOC....:         71  Total Function Pts eLOC:        1.7
+  Total Function eLOC....:         72  Total Function Pts eLOC:        1.7
   Total Function lLOC....:         38  Total Function Pts lLOC:        0.8
   Total Function Params .:          9  Total Function Return .:          5
   Total Cyclo Complexity :         13  Total Function Complex.:         27
          ------     -----     -----     ------     ------     -----
   Max Function LOC ......:         32  Average Function LOC ..:      17.20
-  Max Function eLOC .....:         28  Average Function eLOC .:      14.20
+  Max Function eLOC .....:         28  Average Function eLOC .:      14.40
   Max Function lLOC .....:         14  Average Function lLOC .:       7.60
          ------     -----     -----     ------     ------     -----
   Max Function Parameters:          3  Avg Function Parameters:       1.80
@@ -2243,9 +2233,9 @@
 
                          ~~ Total Project Summary ~~
 
-  LOC 4869     eLOC 4314     lLOC 1884     Comment 6428     Lines    11582
+  LOC 4867     eLOC 4313     lLOC 1882     Comment 6426     Lines    11576
   Average per File, metric/37 files
-  LOC 131      eLOC 116      lLOC 50       Comment 173      Lines      313
+  LOC 131      eLOC 116      lLOC 50       Comment 173      Lines      312
 
   ------------------------------------------------------------------------
 
@@ -2578,16 +2568,6 @@
   Complexity   Param 5       Return 1      Cyclo Vg 1       Total        7
   LOC 4        eLOC 2        lLOC 1        Comment 1        Lines        4
 
-  Function: QP::QF_EVT_POOL_ID_
-  Parameters: (QEvt const * const e)
-  Complexity   Param 1       Return 1      Cyclo Vg 1       Total        3
-  LOC 1        eLOC 1        lLOC 1        Comment 1        Lines        1
-
-  Function: QP::QF_EVT_REF_CTR_
-  Parameters: (QEvt const * const e)
-  Complexity   Param 1       Return 1      Cyclo Vg 1       Total        3
-  LOC 1        eLOC 1        lLOC 1        Comment 1        Lines        1
-
   Function: QP::QF_EVT_REF_CTR_INC_
   Parameters: (QEvt const * const e)
   Complexity   Param 1       Return 1      Cyclo Vg 1       Total        3
@@ -2773,7 +2753,7 @@
   Function: QP::QF::newRef_
   Parameters: (QEvt const * const e, QEvt const * const evtRef)
   Complexity   Param 2       Return 1      Cyclo Vg 2       Total        5
-  LOC 10       eLOC 8        lLOC 5        Comment 15       Lines       14
+  LOC 10       eLOC 9        lLOC 5        Comment 15       Lines       14
 
   Function: QP::QF::poolGetMaxBlockSize
   Parameters: (void)
@@ -3156,26 +3136,26 @@
   LOC 14       eLOC 11       lLOC 7        Comment 2        Lines       16
 
   Total: Functions
-  LOC 2741     eLOC 2285     lLOC 1364     InCmp 344      CycloCmp     466
+  LOC 2739     eLOC 2284     lLOC 1362     InCmp 340      CycloCmp     464
   Function Points         FP(LOC) 46.7    FP(eLOC) 39.5   FP(lLOC)    23.8
 
   ------------------------------------------------------------------------
 
                       ~~ Project Functional Analysis ~~
 
-  Total Functions .......:        177  Total Physical Lines ..:       3793
-  Total LOC .............:       2741  Total Function Pts LOC :       46.7
-  Total eLOC ............:       2285  Total Function Pts eLOC:       39.5
-  Total lLOC.............:       1364  Total Function Pts lLOC:       23.8
-  Total Cyclomatic Comp. :        466  Total Interface Comp. .:        344
-  Total Parameters ......:        167  Total Return Points ...:        177
-  Total Comment Lines ...:       2682  Total Blank Lines .....:        513
+  Total Functions .......:        175  Total Physical Lines ..:       3791
+  Total LOC .............:       2739  Total Function Pts LOC :       46.7
+  Total eLOC ............:       2284  Total Function Pts eLOC:       39.5
+  Total lLOC.............:       1362  Total Function Pts lLOC:       23.8
+  Total Cyclomatic Comp. :        464  Total Interface Comp. .:        340
+  Total Parameters ......:        165  Total Return Points ...:        175
+  Total Comment Lines ...:       2680  Total Blank Lines .....:        513
          ------     -----     -----     ------     ------     -----
-  Avg Physical Lines ....:      21.43
-  Avg LOC ...............:      15.49  Avg eLOC ..............:      12.91
-  Avg lLOC ..............:       7.71  Avg Cyclomatic Comp. ..:       2.63
+  Avg Physical Lines ....:      21.66
+  Avg LOC ...............:      15.65  Avg eLOC ..............:      13.05
+  Avg lLOC ..............:       7.78  Avg Cyclomatic Comp. ..:       2.65
   Avg Interface Comp. ...:       1.94  Avg Parameters ........:       0.94
-  Avg Return Points .....:       1.00  Avg Comment Lines .....:      15.15
+  Avg Return Points .....:       1.00  Avg Comment Lines .....:      15.31
          ------     -----     -----     ------     ------     -----
   Max LOC ...............:        117
   Max eLOC ..............:        100  Max lLOC ..............:         61

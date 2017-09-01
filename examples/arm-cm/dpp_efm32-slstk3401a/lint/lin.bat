@@ -1,8 +1,8 @@
 @echo off
 :: ===========================================================================
 :: Product: QP/C++ build script for PC-Lint(TM)
-:: Last Updated for Version: 5.4.0
-:: Date of the Last Update:  2015-04-15
+:: Last Updated for Version: 5.9.7
+:: Date of the Last Update:  2017-08-31
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -50,6 +50,6 @@ set LINTFLAGS=-i%PC_LINT_DIR%\lnt %QPCPP%\include\std.lnt options.lnt %1 %2 %3 %
 set PROJ_DIR=..
 
 :: linting -------------------------------------------------------------------
-%PC_LINT_DIR%\lint-nt -os(lint_out.txt) %LINTFLAGS% %PROJ_DIR%\philo.cpp %PROJ_DIR%\table.cpp
+%PC_LINT_DIR%\lint-nt -os(lint_out.log) %LINTFLAGS% %PROJ_DIR%\philo.cpp %PROJ_DIR%\table.cpp
 
 endlocal

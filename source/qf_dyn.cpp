@@ -2,8 +2,8 @@
 /// @brief QF/C++ dynamic event management
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.3
-/// Last updated on  2017-06-19
+/// Last updated for version 5.9.7
+/// Last updated on  2017-08-25
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -196,7 +196,7 @@ QEvt *QF::newX_(uint_fast16_t const evtSize,
 ///
 void QF::gc(QEvt const * const e) {
     // is it a dynamic event?
-    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
+    if (e->poolId_ != static_cast<uint8_t>(0)) {
         QF_CRIT_STAT_
         QF_CRIT_ENTRY_();
 
@@ -255,15 +255,15 @@ void QF::gc(QEvt const * const e) {
 /// The only allowed use is thorough the macro Q_NEW_REF().
 ///
 QEvt const *QF::newRef_(QEvt const * const e, QEvt const * const evtRef) {
-    // the provided event reference must not be in use
-    Q_REQUIRE_ID(500, evtRef == static_cast<QEvt const *>(0));
+    //! @pre the event must be dynamic and the provided event reference
+    //! must not be already in use
+    Q_REQUIRE_ID(500,
+        (e->poolId_ != static_cast<uint8_t>(0))
+        && (evtRef == static_cast<QEvt const *>(0)));
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-    // is the current event dynamic?
-    if (e->poolId_ != static_cast<uint8_t>(0)) {
-        QF_EVT_REF_CTR_INC_(e); // increments the ref counter
-    }
+    QF_EVT_REF_CTR_INC_(e); // increments the ref counter
     QF_CRIT_EXIT_();
 
     return e;
