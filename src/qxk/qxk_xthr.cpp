@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-19
+/// Last updated for version 5.9.8
+/// Last updated on  2017-09-07
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -64,11 +64,12 @@ Q_DEFINE_THIS_MODULE("qxk_xthr")
 /// @param[in]     handler  the thread-handler function
 /// @param[in]     tickRate the system clock tick rate to use for timeouts
 ///
-/// @note  Must be called only ONCE before QXThread::start().
+/// @note
+/// Must be called only ONCE before QXThread::start().
 ///
 /// @usage
 /// The following example illustrates how to invoke the QXThread ctor in the
-/// main() function
+/// main() function:
 /// @include qxk_xctor.cpp
 ///
 QXThread::QXThread(QXThreadHandler const handler, uint_fast8_t const tickRate)
@@ -168,15 +169,20 @@ void QXThread::start(uint_fast8_t const prio,
 ///
 /// @param[in]     e      pointer to the event to be posted
 /// @param[in]     margin number of required free slots in the queue
-///                       after posting the event.
+///                after posting the event. The special value QP::QF_NO_MARGIN
+///                means that this function will assert if posting fails.
+///
+/// @returns
+/// 'true' (success) if the posting succeeded (with the provided margin) and
+/// 'false' (failure) when the posting fails.
+///
+/// @attention
+/// Should be called only via the macro POST() or POST_X().
 ///
 /// @note
-/// This function should be called only via the macro POST() or POST_X().
-///
-/// @note
-/// The zero value of the @p margin parameter is special and denotes
-/// situation when the QXThread::post_() operation is assumed to succeed
-/// (event delivery guarantee). An assertion fires, when the event cannot be
+/// The QP::QF_NO_MARGIN value of the @p margin argument is special and
+/// denotes situation when the post() operation is assumed to succeed (event
+/// delivery guarantee). An assertion fires, when the event cannot be
 /// delivered in this case.
 ///
 #ifndef Q_SPY
@@ -303,7 +309,8 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
 ///
 /// @param[in  e  pointer to the event to post to the queue
 ///
-/// @sa QActive_postLIFO_()
+/// @sa
+/// QActive::postLIFO_()
 ///
 void QXThread::postLIFO(QEvt const * const /*e*/) {
     Q_ERROR_ID(410);
@@ -325,7 +332,7 @@ void QXThread::postLIFO(QEvt const * const /*e*/) {
 ///                       QXTHREAD_NO_TIMEOUT indicates that no timeout will
 ///                       occur and the queue will block indefinitely.
 /// @returns
-/// Returns pointer to the event. If the pointer is not NULL, the event
+/// A pointer to the event. If the pointer is not NULL, the event
 /// was delivered. Otherwise the event pointer of NULL indicates that the
 /// queue has timed out.
 ///
@@ -423,7 +430,7 @@ QEvt const *QXThread::queueGet(uint_fast16_t const nTicks) {
 /// Intenral implementation of blocking the given extended thread.
 ///
 /// @note
-/// must be called from within a critical section
+/// Must be called from within a critical section
 ///
 void QXThread::block_(void) const {
     /// @pre the thread holding the lock cannot block!
@@ -455,7 +462,7 @@ void QXThread::unblock_(void) const {
 /// a given timeout at a given system tick rate.
 ///
 /// @note
-/// must be called from within a critical section
+/// Must be called from within a critical section
 ///
 void QXThread::teArm_(enum_t const sig, uint_fast16_t const nTicks) {
     /// @pre the time event must be unused
@@ -496,7 +503,7 @@ void QXThread::teArm_(enum_t const sig, uint_fast16_t const nTicks) {
 /// Intenral implementation of disarming the private time event.
 ///
 /// @note
-/// must be called from within a critical section
+/// Must be called from within a critical section
 ///
 bool QXThread::teDisarm_(void) {
     bool wasArmed;
@@ -514,7 +521,7 @@ bool QXThread::teDisarm_(void) {
 }
 
 //****************************************************************************
-//! delay (timed block) the current extended thread
+//! delay (timed blocking of) the current extended thread
 bool QXThread::delay(uint_fast16_t const nTicks) {
     QF_CRIT_STAT_
 

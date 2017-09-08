@@ -8,8 +8,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.3
-/// Last updated on  2017-06-19
+/// Last updated for version 5.9.8
+/// Last updated on  2017-09-07
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -65,33 +65,25 @@ Q_DEFINE_THIS_MODULE("qf_actq")
 ///                after posting the event. The special value QP::QF_NO_MARGIN
 ///                means that this function will assert if posting fails.
 ///
-/// @returns  The function returns true (success) if the posting succeeded
-/// (with the provided margin) and false (failure) when the posting fails.
+/// @returns
+/// 'true' (success) if the posting succeeded (with the provided margin) and
+/// 'false' (failure) when the posting fails.
 ///
 /// @attention
-/// This function should be called only via the macro POST() or POST_X().
+/// Should be called only via the macro POST() or POST_X().
 ///
-/// @note The QP::QF_NO_MARGIN value of the @p margin argument is special and
+/// @note
+/// The QP::QF_NO_MARGIN value of the @p margin argument is special and
 /// denotes situation when the post() operation is assumed to succeed (event
 /// delivery guarantee). An assertion fires, when the event cannot be
 /// delivered in this case.
 ///
-/// @note Direct event posting should not be confused with direct event
-/// dispatching. In contrast to asynchronous event posting through event
-/// queues, direct event dispatching is synchronous. Direct event
-/// dispatching occurs when you call QP::QMsm::dispatch().
-///
-/// @note
-/// This function is used internally by a QF port to extract events from
-/// the event queue of an active object. This function depends on the event
-/// queue implementation and is sometimes implemented in the QF port
-/// (file qf_port.cpp). Depending on the underlying OS or kernel, the
-/// function might block the calling thread when no events are available.
-///
 /// @usage
 /// @include qf_post.cpp
 ///
-/// @sa QActive::postLIFO()
+/// @sa
+/// QActive::postLIFO()
+///
 #ifndef Q_SPY
 bool QActive::post_(QEvt const * const e, uint_fast16_t const margin)
 #else
@@ -185,12 +177,14 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
 /// posts an event to the event queue of the active object  using the
 /// Last-In-First-Out (LIFO) policy.
 ///
-/// @note The LIFO policy should be used only for self-posting and with
-/// caution because it alters order of events in the queue.
+/// @note
+/// The LIFO policy should be used only for self-posting and with caution,
+/// because it alters order of events in the queue.
 ///
 /// @param[in]  e  pointer to the event to post to the queue
 ///
-/// @sa QActive::post_()
+/// @sa
+/// QActive::post_()
 ///
 void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
@@ -248,8 +242,18 @@ void QActive::postLIFO(QEvt const * const e) {
 /// the queue is not empty, so it doesn't block. For a blocking kernel/OS
 /// the function can block and wait for delivery of an event.
 ///
-/// @returns a pointer to the received event. The returned pointer is always
+/// @returns
+/// A pointer to the received event. The returned pointer is guaranteed to be
 /// valid (can't be NULL).
+///
+/// @note
+/// This function is used internally by a QF port to extract events from
+/// the event queue of an active object. This function depends on the event
+/// queue implementation and is sometimes customized in the QF port
+/// (file qf_port.h). Depending on the definition of the macro
+/// QACTIVE_EQUEUE_WAIT_(), the function might block the calling thread when
+/// no events are available.
+///
 QEvt const *QActive::get_(void) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
@@ -313,9 +317,10 @@ QEvt const *QActive::get_(void) {
 ///
 /// @param[in] prio  Priority of the active object, whose queue is queried
 ///
-/// @returns the minimum of free ever present in the given event
-/// queue of an active object with priority @p prio, since the active object
-/// was started.
+/// @returns
+/// the minimum of free ever present in the given event queue of an active
+/// object with priority @p prio, since the active object was started.
+///
 uint_fast16_t QF::getQueueMin(uint_fast8_t const prio) {
 
     Q_REQUIRE_ID(400, (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
