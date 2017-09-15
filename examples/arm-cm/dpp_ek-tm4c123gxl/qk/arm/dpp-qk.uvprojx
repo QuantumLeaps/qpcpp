@@ -522,11 +522,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\src\qk\qk.cpp</FilePath>
             </File>
-            <File>
-              <FileName>qk_mutex.cpp</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\src\qk\qk_mutex.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1148,11 +1143,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\src\qk\qk.cpp</FilePath>
             </File>
-            <File>
-              <FileName>qk_mutex.cpp</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\src\qk\qk_mutex.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1773,11 +1763,6 @@
               <FileName>qk.cpp</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\src\qk\qk.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qk_mutex.cpp</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\src\qk\qk_mutex.cpp</FilePath>
             </File>
           </Files>
         </Group>

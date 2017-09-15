@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: Linker script for for STM32L053R8, GNU-ARM linker
-* Last Updated for Version: 5.8.0
-* Date of the Last Update:  2016-11-30
+* Last Updated for Version: 5.9.8
+* Date of the Last Update:  2017-09-13
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -33,9 +33,9 @@
 *****************************************************************************/
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
-ENTRY(Reset_Handler)                                         /* entry Point */
+ENTRY(Reset_Handler) /* entry Point */
 
-MEMORY {                                       /* memory map of STM32L053R8 */
+MEMORY { /* memory map of STM32L053R8 */
     ROM (rx)  : ORIGIN = 0x08000000, LENGTH = 64K
     RAM (xrw) : ORIGIN = 0x20000000, LENGTH = 8K
 }
@@ -48,17 +48,17 @@ HEAP_SIZE = 0;
 
 SECTIONS {
 
-    .isr_vector : {                 /* the vector table goes FIRST into ROM */
-        KEEP(*(.isr_vector))                                /* vector table */
+    .isr_vector : {        /* the vector table goes FIRST into ROM */
+        KEEP(*(.isr_vector)) /* vector table */
         . = ALIGN(4);
     } >ROM
 
-    .text : {                                         /* code and constants */
+    .text : {              /* code and constants */
         . = ALIGN(4);
-        *(.text)                                   /* .text sections (code) */
-        *(.text*)                                 /* .text* sections (code) */
-        *(.rodata)           /* .rodata sections (constants, strings, etc.) */
-        *(.rodata*)         /* .rodata* sections (constants, strings, etc.) */
+        *(.text)           /* .text sections (code) */
+        *(.text*)          /* .text* sections (code) */
+        *(.rodata)         /* .rodata sections (constants, strings, etc.) */
+        *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
 
         KEEP (*(.init))
         KEEP (*(.fini))
@@ -86,7 +86,7 @@ SECTIONS {
         PROVIDE_HIDDEN (__fini_array_end = .);
     } >ROM
 
-    _etext = .;                            /* global symbols at end of code */
+    _etext = .;            /* global symbols at end of code */
 
     .stack : {
         __stack_start__ = .;
@@ -98,8 +98,8 @@ SECTIONS {
     .data :  AT (_etext) {
         __data_load = LOADADDR (.data);
         __data_start = .;
-        *(.data)                                          /* .data sections */
-        *(.data*)                                        /* .data* sections */
+        *(.data)           /* .data sections */
+        *(.data*)          /* .data* sections */
         . = ALIGN(4);
         __data_end__ = .;
         _edata = __data_end__;
@@ -111,9 +111,13 @@ SECTIONS {
         *(.bss*)
         *(COMMON)
         . = ALIGN(4);
-        _ebss = .;                     /* define a global symbol at bss end */
+        _ebss = .;         /* define a global symbol at bss end */
         __bss_end__ = .;
     } >RAM
+
+    __exidx_start = .;
+    .ARM.exidx   : { *(.ARM.exidx* .gnu.linkonce.armexidx.*) } >RAM
+    __exidx_end = .;
 
     PROVIDE ( end = _ebss );
     PROVIDE ( _end = _ebss );

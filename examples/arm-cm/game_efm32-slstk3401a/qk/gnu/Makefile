@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for "Fly 'n' Shot" on EMF32-SLSTK3401A, QK kernel, GNU-ARM
-# Last Updated for Version: 5.6.4
-# Date of the Last Update:  2016-06-06
+# Last Updated for Version: 5.9.8
+# Date of the Last Update:  2017-09-15
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -134,8 +134,7 @@ QP_SRCS := \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
 	qf_time.cpp \
-	qk.cpp \
-	qk_mutex.cpp
+	qk.cpp
 
 QP_ASMS := \
     qk_port.s

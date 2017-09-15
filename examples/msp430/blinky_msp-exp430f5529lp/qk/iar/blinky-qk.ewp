@@ -3450,9 +3450,6 @@
       <name>$PROJ_DIR$\..\..\..\..\..\src\qk\qk.cpp</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\src\qk\qk_mutex.cpp</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\src\qk_pkg.h</name>
     </file>
   </group>

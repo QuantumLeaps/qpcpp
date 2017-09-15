@@ -1,7 +1,7 @@
 ##############################################################################
-# Product: Makefile for QP/C++, lwIP on EK-LM3S6965, QK kernel, GNU-ARM
+# Product: Makefile for DPP on EMF32-SLSTK3401A, QXK kernel, GNU-ARM + RTTI
 # Last Updated for Version: 5.9.8
-# Date of the Last Update:  2017-09-15
+# Date of the Last Update:  2017-09-13
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -51,7 +51,7 @@
 #-----------------------------------------------------------------------------
 # project name
 #
-PROJECT     := lwip-qk
+PROJECT     := dpp-qxk
 
 #-----------------------------------------------------------------------------
 # project directories
@@ -59,24 +59,22 @@ PROJECT     := lwip-qk
 
 # location of the QP/C++ framework (if not provided in an environemnt var.)
 ifeq ($(QPCPP),)
-QPCPP := ../../../../../..
+QPCPP := ../../../../..
 endif
 
 # QP port used in this project
-QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qk/gnu
+QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qxk/gnu
 
 # list of all source directories used by this project
 VPATH = \
 	.. \
 	../.. \
 	$(QPCPP)/src/qf \
-	$(QPCPP)/src/qk \
+	$(QPCPP)/src/qxk \
 	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
-	$(QPCPP)/3rd_party/ek-lm3s6965 \
-	$(QPCPP)/3rd_party/ek-lm3s6965/gnu \
-	$(QPCPP)/3rd_party/ek-lm3s6965/lwip_driver/netif \
-	$(QPCPP)/3rd_party/lwip/apps/webserver_raw
+	$(QPCPP)/3rd_party/efm32pg1b \
+	$(QPCPP)/3rd_party/efm32pg1b/gnu
 
 # list of all include directories needed by this project
 INCLUDES  = \
@@ -85,12 +83,7 @@ INCLUDES  = \
 	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
-	-I$(QPCPP)/3rd_party/ek-lm3s6965 \
-	-I$(QPCPP)/3rd_party/ek-lm3s6965/lwip_driver \
-	-I$(QPCPP)/3rd_party/lwip/src/include \
-	-I$(QPCPP)/3rd_party/lwip/src/include/ipv4 \
-	-I$(QPCPP)/3rd_party/lwip/src \
-	-I$(QPCPP)/3rd_party/lwip/apps/webserver_raw
+	-I$(QPCPP)/3rd_party/efm32pg1b
 
 #-----------------------------------------------------------------------------
 # files
@@ -101,21 +94,20 @@ ASM_SRCS :=
 
 # C source files
 C_SRCS := \
-	fs.c \
-	httpd.c \
-	lwip.c \
-	rit128x96x4.c \
-	system_LM3S6965.c \
-	startup_LM3S6965.c
+	startup_efm32pg1b.c \
+	system_efm32pg1b.c \
+	em_cmu.c \
+	em_emu.c \
+	em_gpio.c \
+	em_usart.c
 
 # C++ source files
-CPP_SRCS :=	 \
+CPP_SRCS :=	\
 	bsp.cpp \
 	main.cpp \
-	eth_driver.cpp \
-	lwipmgr.cpp \
 	philo.cpp \
-	table.cpp
+	table.cpp \
+	test.cpp
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := $(PROJECT).ld
@@ -133,10 +125,13 @@ QP_SRCS := \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
 	qf_time.cpp \
-	qk.cpp
+	qxk.cpp \
+	qxk_mutex.cpp \
+	qxk_sema.cpp \
+	qxk_xthr.cpp
 
 QP_ASMS := \
-    qk_port.s
+    qxk_port.s
 
 QS_SRCS := \
 	qs.cpp \
@@ -147,12 +142,18 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   :=
+DEFINES   := -DEFM32PG1B200F256GM48=1
 
-# ARM CPU, FPU, and Float-ABI types
-ARM_CPU   := -mcpu=cortex-m3
-ARM_FPU   :=
-FLOAT_ABI :=
+# ARM CPU, ARCH, FPU, and Float-ABI types...
+# ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
+# ARM_ARCH:  [6 | 7] (NOTE: must match ARM_CPU!)
+# ARM_FPU:   [ | vfp]
+# FLOAT_ABI: [ | soft | softfp | hard]
+#
+ARM_CPU   := -mcpu=cortex-m4
+ARM_ARCH  := 7   # NOTE: must match the ARM_CPU!
+ARM_FPU   := -mfpu=vfp
+FLOAT_ABI := -mfloat-abi=softfp
 
 #-----------------------------------------------------------------------------
 # GNU-ARM toolset (NOTE: You need to adjust to your machine)
@@ -187,9 +188,12 @@ RM    := rm
 #
 
 # combine all the soruces...
-VPATH    += $(QPCPP)/3rd_party/gnu_cpp
-CPP_SRCS += $(QP_SRCS) mini_cpp.cpp
+CPP_SRCS += $(QP_SRCS)
 ASM_SRCS += $(QP_ASMS)
+
+# add the pre-defined symbol for ARM architecture
+DEFINES += -D__ARM_ARCH=$(ARM_ARCH)
+ASM_CPU += -defsym=__ARM_ARCH=$(ARM_ARCH)
 
 # add the pre-defined symbol __FPU_PRESENT if needed...
 ifneq (,$(ARM_FPU))
@@ -201,14 +205,14 @@ ifeq (rel, $(CONF)) # Release configuration ..................................
 
 BIN_DIR := rel
 
-ASFLAGS = $(ARM_CPU) $(ASM_FPU)
+ASFLAGS = $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
-CFLAGS = $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+CFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
 	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
 
-CPPFLAGS = $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+CPPFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+	-ffunction-sections -fdata-sections \
 	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
@@ -217,37 +221,35 @@ BIN_DIR := spy
 
 CPP_SRCS += $(QS_SRCS)
 
-ASFLAGS = -g $(ARM_CPU) $(ASM_FPU)
+ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
-CFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+CFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
-CPPFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+CPPFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
 else # default Debug configuration ..........................................
 
 BIN_DIR := dbg
 
-ASFLAGS = -g $(ARM_CPU) $(ASM_FPU)
+ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
-CFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+CFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+CPPFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES)
 
 endif # ......................................................................
 
 
-LINKFLAGS = -T$(LD_SCRIPT) $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) \
-	-mthumb -nostdlib \
-	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
-
+LINKFLAGS = -T$(LD_SCRIPT) $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb  \
+	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS) -lsupc++
 
 ASM_OBJS     := $(patsubst %.s,%.o,  $(notdir $(ASM_SRCS)))
 C_OBJS       := $(patsubst %.c,%.o,  $(notdir $(C_SRCS)))
@@ -290,10 +292,10 @@ $(BIN_DIR)/%.o : %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 $(BIN_DIR)/%.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 $(BIN_DIR)/%.o : %.cpp
-	$(CPP) $(CPPFLAGS) -c $< -o $@
+	$(CPP) $(CPPFLAGS) $< -o $@
 
 # include dependency files only if our goal depends on their existence
 ifneq ($(MAKECMDGOALS),clean)

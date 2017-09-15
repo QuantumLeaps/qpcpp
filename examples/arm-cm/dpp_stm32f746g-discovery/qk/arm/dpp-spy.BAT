@@ -1,4 +1,4 @@
-SET PATH=C:\tools\Keil_v5\ARM\ARMCC\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\ProgramData\Oracle\Java\javapath;C:\qp\qtools\bin;C:\utils\;C:\Users\miro\AppData\Local\Pandoc\
+SET PATH=C:\tools\Keil_v5\ARM\ARMCC\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\ProgramData\Oracle\Java\javapath;C:\qp\qtools\bin;C:\utils\;
 SET ARMCC5_ASMOPT=--diag_suppress=9931
 SET ARMCC5_CCOPT=--diag_suppress=9931
 SET ARMCC5_LINKOPT=--diag_suppress=9931
