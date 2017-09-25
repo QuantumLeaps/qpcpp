@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.9.3
-/// Last updated on  2017-06-19
+/// Last updated for version 5.9.8
+/// Last updated on  2017-09-20
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -156,10 +156,26 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSQSize
          - reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSNMsgs);
 
-    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
-        || (nFree > static_cast<QEQueueCtr>(margin)))
-    {
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
+    if (margin == QF_NO_MARGIN) {
+        if (nFree > static_cast<QEQueueCtr>(0)) {
+            status = true; // can post
+        }
+        else {
+            status = false; // cannot post
+            Q_ERROR_ID(710); // must be able to post the event
+        }
+    }
+    else if (nFree > static_cast<QEQueueCtr>(margin)) {
+        status = true; // can post
+    }
+    else {
+        status = false; // cannot post
+    }
+
+    if (status) { // can post the event?
+
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();             // timestamp
             QS_OBJ_(sender);        // the sender object
             QS_SIG_(e->sig);        // the signal of the event
@@ -176,14 +192,10 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         QF_CRIT_EXIT_();
 
         // posting the event to uC/OS-II message queue must succeed
-        Q_ALLEGE_ID(710,
+        Q_ALLEGE_ID(720,
             OSQPost(m_eQueue, const_cast<QEvt *>(e)) == OS_ERR_NONE);
-
-        status = true; // report success
     }
     else {
-        // can tolerate dropping evts?
-        Q_ASSERT_ID(520, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -197,8 +209,6 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         QS_END_NOCRIT_()
 
         QF_CRIT_EXIT_();
-
-        status = false; // report failure
     }
 
     return status;
@@ -208,7 +218,8 @@ void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();             // timestamp
         QS_SIG_(e->sig);        // the signal of this event
         QS_OBJ_(this);          // this active object

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.9.3
-/// Last updated on  2017-06-19
+/// Last updated for version 5.9.8
+/// Last updated on  2017-09-20
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -143,9 +143,24 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     uint_fast16_t nFree =
         static_cast<uint_fast16_t>(m_eQueue.tx_queue_available_storage);
 
-    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
-        || (nFree > static_cast<QEQueueCtr>(margin)))
-    {
+    if (margin == QF_NO_MARGIN) {
+        if (nFree > static_cast<QEQueueCtr>(0)) {
+            status = true; // can post
+        }
+        else {
+            status = false; // cannot post
+            Q_ERROR_ID(510); // must be able to post the event
+        }
+    }
+    else if (nFree > static_cast<QEQueueCtr>(margin)) {
+        status = true; // can post
+    }
+    else {
+        status = false; // cannot post
+    }
+
+    if (status) { // can post the event?
+
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();              // timestamp
             QS_OBJ_(sender);         // the sender object
@@ -164,15 +179,11 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         QF_CRIT_EXIT_();
 
         QEvt const *ep = const_cast<QEvt const *>(e);
-        Q_ALLEGE_ID(510,
+        Q_ALLEGE_ID(520,
             tx_queue_send(&m_eQueue, static_cast<VOID *>(&ep), TX_NO_WAIT)
             == TX_SUCCESS);
-
-        status = true;  // report success
     }
     else {
-        // can tolerate dropping evts?
-        Q_ASSERT_ID(520, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
             QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -186,8 +197,6 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         QS_END_NOCRIT_()
 
         QF_CRIT_EXIT_();
-
-        status = false; // report failure
     }
 
     return status;

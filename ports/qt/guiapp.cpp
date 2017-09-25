@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last Updated for Version: QP 5.4.0/Qt 5.x
-/// Last updated on  2015-05-03
+/// Last updated on  2017-09-20
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// https://state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 

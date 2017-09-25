@@ -9,7 +9,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 5.9.8
-/// Last updated on  2017-09-07
+/// Last updated on  2017-09-20
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -100,10 +100,23 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     QF_CRIT_ENTRY_();
     QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into the temporary
 
-    // margin available?
-    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
-        || (nFree > static_cast<QEQueueCtr>(margin)))
-    {
+    if (margin == QF_NO_MARGIN) {
+        if (nFree > static_cast<QEQueueCtr>(0)) {
+            status = true; // can post
+        }
+        else {
+            status = false; // cannot post
+            Q_ERROR_ID(110); // must be able to post the event
+        }
+    }
+    else if (nFree > static_cast<QEQueueCtr>(margin)) {
+        status = true; // can post
+    }
+    else {
+        status = false; // cannot post
+    }
+
+    if (status) { // can post the event?
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
