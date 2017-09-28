@@ -214,8 +214,6 @@ QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that e
 - QXThread class
 - QXThread::QXThread()
 - QXThread::start()
-- %QXThread:: POST()
-- %QXThread:: POST_X()
 - QXThread::delay()
 - QXThread::delayCancel()
 - QXThread::queueGet()
@@ -242,7 +240,8 @@ QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that e
 
 <div class="separate"></div>
 @subsection api_qxk_queue Message Queues
-- QXThread::postX() - posting messages to blocking threads
+- %QXThread:: POST()
+- %QXThread:: POST_X()
 - QXThread::queueGet() - waiting (blocking) on message queue
 
 

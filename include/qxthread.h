@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-20
+/// Last updated for version 5.9.9
+/// Last updated on  2017-09-27
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -156,8 +156,8 @@ public:
 
 private:
     QPSet m_waitSet; //!< set of extended threads waiting on this semaphore
-    uint_fast16_t m_count;
-    uint_fast16_t m_max_count;
+    uint16_t m_count;
+    uint16_t m_max_count;
 };
 
 //****************************************************************************
@@ -202,8 +202,9 @@ public:
 
 private:
     QPSet m_waitSet; //!< set of extended-threads waiting on this mutex
-    uint_fast8_t m_ceiling;
-    uint_fast8_t m_lockNest;
+    uint8_t m_ceiling;
+    uint8_t m_lockNest;
+    uint8_t m_holderPrio;
 };
 
 } // namespace QP

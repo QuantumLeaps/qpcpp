@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-20
+/// Last updated for version 5.9.9
+/// Last updated on  2017-09-27
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -79,8 +79,8 @@ void QXSemaphore::init(uint_fast16_t const count,
     Q_REQUIRE_ID(100, max_count > static_cast<uint_fast16_t>(0));
 
     m_waitSet.setEmpty();
-    m_count = count;
-    m_max_count = max_count;
+    m_count     = static_cast<uint16_t>(count);
+    m_max_count = static_cast<uint16_t>(max_count);
 }
 
 //****************************************************************************
@@ -108,7 +108,7 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QXThread *thr = static_cast<QXThread *>(QXK_attr_.curr);
+    QXThread *curr = static_cast<QXThread *>(QXK_attr_.curr);
 
     /// @pre this function must:
     /// (1) NOT be called from an ISR; (2) be called from an extended thread;
@@ -116,34 +116,34 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
     /// (4) the thread must NOT be already blocked on any object.
     ///
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) /* can't block inside an ISR */
-        && (thr != static_cast<QXThread *>(0)) /* current must be extended */
+        && (curr != static_cast<QXThread *>(0)) /* curr must be extended */
         && (QXK_attr_.lockPrio == static_cast<uint_fast8_t>(0)) /* no lock */
-        && (thr->m_temp.obj == static_cast<QMState *>(0))); // !blocked
+        && (curr->m_temp.obj == static_cast<QMState *>(0))); // not blocked
 
-    if (m_count > static_cast<uint_fast16_t>(0)) {
+    if (m_count > static_cast<uint16_t>(0)) {
         --m_count;
-        thr->m_timeEvt.sig = static_cast<QSignal>(QXK_SEMA_SIG); // non-zero
+        curr->m_timeEvt.sig = static_cast<QSignal>(QXK_SEMA_SIG); // non-zero
     }
     else {
         // remember the blocking object
-        thr->m_temp.obj = reinterpret_cast<QMState const *>(this);
-        thr->teArm_(static_cast<enum_t>(QXK_SEMA_SIG), nTicks);
-        m_waitSet.insert(thr->m_prio);
-        QXK_attr_.readySet.remove(thr->m_prio);
+        curr->m_temp.obj = reinterpret_cast<QMState const *>(this);
+        curr->teArm_(static_cast<enum_t>(QXK_SEMA_SIG), nTicks);
+        m_waitSet.insert(curr->m_prio);
+        QXK_attr_.readySet.remove(curr->m_prio);
         (void)QXK_sched_();
         QF_CRIT_EXIT_();
         QF_CRIT_EXIT_NOP(); // BLOCK here
 
         QF_CRIT_ENTRY_();
         // the blocking object must be this semaphore
-        Q_ASSERT_ID(210, thr->m_temp.obj
+        Q_ASSERT_ID(210, curr->m_temp.obj
                          == reinterpret_cast<QMState const *>(this));
-        thr->m_temp.obj = static_cast<QMState *>(0); // clear
+        curr->m_temp.obj = static_cast<QMState *>(0); // clear
     }
     QF_CRIT_EXIT_();
 
     // signal of non-zero means that the time event has not expired
-    return (thr->m_timeEvt.sig != static_cast<QSignal>(0));
+    return (curr->m_timeEvt.sig != static_cast<QSignal>(0));
 }
 
 //****************************************************************************
@@ -164,11 +164,11 @@ bool QXSemaphore::tryWait(void) {
     QF_CRIT_STAT_
 
     /// @pre the semaphore must be initialized
-    Q_REQUIRE_ID(300, (m_max_count > static_cast<uint_fast16_t>(0)));
+    Q_REQUIRE_ID(300, (m_max_count > static_cast<uint16_t>(0)));
 
     QF_CRIT_ENTRY_();
     // is the semaphore available?
-    if (m_count > static_cast<uint_fast16_t>(0)) {
+    if (m_count > static_cast<uint16_t>(0)) {
         --m_count;
         isAvailable = true;
     }
@@ -202,7 +202,7 @@ bool QXSemaphore::signal(void) {
     QF_CRIT_STAT_
 
     /// @pre the semaphore must be initialized
-    Q_REQUIRE_ID(400, (m_max_count > (uint_fast16_t)0));
+    Q_REQUIRE_ID(400, m_max_count > static_cast<uint16_t>(0));
 
     QF_CRIT_ENTRY_();
     if (m_waitSet.notEmpty()) {
@@ -215,7 +215,7 @@ bool QXSemaphore::signal(void) {
         // the thread must be extended and the semaphore count must be zero
         Q_ASSERT_ID(410, (thr != static_cast<QXThread *>(0)) /* registered */
              && (thr->m_osObject != static_cast<void *>(0)) /* extended */
-             && (m_count == static_cast<uint_fast16_t>(0))); // not signaled
+             && (m_count == static_cast<uint16_t>(0))); // not signaled
 
         // disarm the internal time event
         (void)thr->teDisarm_();

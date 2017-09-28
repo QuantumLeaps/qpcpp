@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.9.7
-// Last updated on  2017-08-20
+// Last updated for version 5.9.9
+// Last updated on  2017-09-27
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -108,10 +108,12 @@ static void Thread2_run(QP::QXThread * const me) {
                 1U); // max_count==1 (binary semaphore)
 
     // initialize the mutex before using it
-    // NOTE: Here the semaphore is initialized in the highest-priority thread
-    // that uses it. Alternatively, the semaphore can be initialized
+    // NOTE: Here the mutex is initialized in the highest-priority thread
+    // that uses it. Alternatively, the mutex can be initialized
     // before any thread runs.
-    l_mutex.init(N_PHILO + 6U);
+
+    //l_mutex.init(0U); // priority-ceiling NOT used
+    l_mutex.init(N_PHILO + 6U); // priority-ceiling protocol used
 
     me->m_thread = &l_tls2; // initialize the TLS for Thread2
 
