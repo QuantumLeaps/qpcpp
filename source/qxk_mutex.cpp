@@ -5,7 +5,7 @@
 ///***************************************************************************
 /// Product: QK/C++
 /// Last updated for version 5.9.9
-/// Last updated on  2017-09-27
+/// Last updated on  2017-09-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -276,7 +276,7 @@ bool QXMutex::tryLock(void) {
             QXK_attr_.readySet.remove(curr->m_startPrio);
             QXK_attr_.readySet.insert(curr->m_prio);
         }
-        
+
         // make curr thread the new mutex holder
         m_holderPrio = static_cast<uint8_t>(curr->m_startPrio);
 

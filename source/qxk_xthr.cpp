@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.8
-/// Last updated on  2017-09-07
+/// Last updated for version 5.9.9
+/// Last updated on  2017-09-29
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -75,7 +75,7 @@ Q_DEFINE_THIS_MODULE("qxk_xthr")
 QXThread::QXThread(QXThreadHandler const handler, uint_fast8_t const tickRate)
   : QActive(Q_STATE_CAST(handler)),
     m_timeEvt(this, static_cast<enum_t>(QXK_DELAY_SIG),
-                    static_cast<uint8_t>(tickRate))
+                    static_cast<uint_fast8_t>(tickRate))
 {
     m_state.act = Q_ACTION_CAST(0); // mark as extended thread
 }
@@ -221,7 +221,7 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
         if (nFree > static_cast<QEQueueCtr>(margin)) {
 
             QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
-                             QS::priv_.QS::priv_.locFilter[QS::AO_OBJ], this)
+                             QS::priv_.locFilter[QS::AO_OBJ], this)
                 QS_TIME_();        // timestamp
                 QS_OBJ_(sender);   // the sender object
                 QS_SIG_(e->sig);   // the signal of the event
@@ -278,7 +278,7 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
             Q_ASSERT_ID(310, margin != static_cast<uint_fast16_t>(0));
 
             QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
-                             QS::priv_.QS::priv_.locFilter[QS::AO_OBJ], this)
+                             QS::priv_.locFilter[QS::AO_OBJ], this)
                 QS_TIME_();        // timestamp
                 QS_OBJ_(sender);   // the sender object
                 QS_SIG_(e->sig);   // the signal of the event
