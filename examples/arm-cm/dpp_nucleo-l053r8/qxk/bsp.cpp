@@ -227,6 +227,13 @@ void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 //............................................................................
+void BSP::wait4SW1(void) {
+    while ((GPIOC->IDR  & BTN_B1) != 0U) {
+        GPIOA->BSRR |= (LED_LD2);        // turn LED2 on
+        GPIOA->BSRR |= (LED_LD2 << 16);  // turn LED2 off
+    }
+}
+//............................................................................
 void BSP::ledOn(void) {
     GPIOA->BSRR |= (LED_LD2);        // turn LED2 on
 }
@@ -311,6 +318,10 @@ extern "C" void Q_onAssert(char const *module, int loc) {
     (void)module;
     (void)loc;
     QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
+
+#ifndef NDEBUG
+    DPP::BSP::wait4SW1();
+#endif
     NVIC_SystemReset();
 }
 
