@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QXK kernel
-// Last Updated for Version: 5.9.7
-// Date of the Last Update:  2017-08-19
+// Last Updated for Version: 5.6.0
+// Date of the Last Update:  2017-10-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -422,6 +422,17 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
     //TBD
 }
+
+/*???
+void bug_test(void) {
+    uint32_t i;
+    for(i = 0; i < 10; i++) {
+        QS_BEGIN(123, 0);
+        QS_U32(8, 0);
+        QS_END();
+    }
+}
+*/
 #endif // Q_SPY
 //--------------------------------------------------------------------------*/
 
