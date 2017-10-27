@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.9
-/// Last updated on  2017-09-29
+/// Last updated for version 6.0.1
+/// Last updated on  2017-10-17
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -70,7 +70,8 @@ Q_DEFINE_THIS_MODULE("qxk_xthr")
 /// @usage
 /// The following example illustrates how to invoke the QXThread ctor in the
 /// main() function:
-/// @include qxk_xctor.cpp
+/// @include
+/// qxk_xctor.cpp
 ///
 QXThread::QXThread(QXThreadHandler const handler, uint_fast8_t const tickRate)
   : QActive(Q_STATE_CAST(handler)),
@@ -141,10 +142,10 @@ void QXThread::start(uint_fast8_t const prio,
     m_prio = prio;
     m_startPrio = prio;
 
-    QF::add_(this); // make QF aware of this extended thread
-
     // the new thread is not blocked on any object
     m_temp.obj = static_cast<QMState const *>(0);
+
+    QF::add_(this); // make QF aware of this extended thread
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
@@ -180,9 +181,10 @@ void QXThread::start(uint_fast8_t const prio,
 /// Should be called only via the macro POST() or POST_X().
 ///
 /// @note
-/// The QP::QF_NO_MARGIN value of the @p margin argument is special and
-/// denotes situation when the post() operation is assumed to succeed (event
-/// delivery guarantee). An assertion fires, when the event cannot be
+/// The QP::QF_NO_MARGIN value of the @p margin parameter is special and
+/// denotes situation when the post() operation is assumed to succeed
+/// (event delivery guarantee). An assertion fires, when the event cannot
+/// be delivered in this case.
 /// delivered in this case.
 ///
 #ifndef Q_SPY
@@ -198,7 +200,6 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
     // is it the private time event?
     if (e == &m_timeEvt) {
         QF_CRIT_ENTRY_();
-        status = true;
         // the private time event is disarmed and not in any queue,
         // so it is safe to change its signal. The signal of 0 means
         // that the time event has expired.
@@ -206,6 +207,8 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
 
         unblock_();
         QF_CRIT_EXIT_();
+
+        status = true;
     }
     // is the event queue provided?
     else if (m_eQueue.m_end != static_cast<QEQueueCtr>(0)) {
@@ -218,7 +221,9 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
         QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into temporary
 
         // margin available?
-        if (nFree > static_cast<QEQueueCtr>(margin)) {
+        if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
+            || (nFree > static_cast<QEQueueCtr>(margin)))
+        {
 
             QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
                              QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -242,7 +247,7 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
                 m_eQueue.m_nMin = nFree;  // update minimum so far
             }
 
-            // is the queue empty?
+            // queue empty?
             if (m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) {
                 m_eQueue.m_frontEvt = e;  // deliver event directly
 
@@ -266,7 +271,7 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
                 if (m_eQueue.m_head == static_cast<QEQueueCtr>(0)) {
                     m_eQueue.m_head = m_eQueue.m_end; // wrap around
                 }
-                --m_eQueue.m_head;
+                --m_eQueue.m_head; // advance the head (counter clockwise)
             }
             QF_CRIT_EXIT_();
 
@@ -275,7 +280,7 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
         else {
             /// @note assert if event cannot be posted and dropping events is
             /// not acceptable
-            Q_ASSERT_ID(310, margin != static_cast<uint_fast16_t>(0));
+            Q_ASSERT_ID(310, margin != QF_NO_MARGIN);
 
             QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
                              QS::priv_.locFilter[QS::AO_OBJ], this)

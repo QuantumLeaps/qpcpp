@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.9.9
-/// Last updated on  2017-09-29
+/// Last updated for version 6.0.0
+/// Last updated on  2017-10-17
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -111,8 +111,9 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
     QXThread *curr = static_cast<QXThread *>(QXK_attr_.curr);
 
     /// @pre this function must:
-    /// (1) NOT be called from an ISR; (2) be called from an extended thread;
-    /// (3) the thread must NOT be holding a mutex and
+    /// (1) NOT be called from an ISR;
+    /// (2) be called from an extended thread;
+    /// (3) the scheduler must NOT be locked and
     /// (4) the thread must NOT be already blocked on any object.
     ///
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) /* can't block inside an ISR */
@@ -190,8 +191,9 @@ bool QXSemaphore::tryWait(void) {
 /// if the awakened thread is now the highest-priority thread that is
 /// ready-to-run.
 ///
-/// @returns true when the semaphore gets signaled and false when
-/// the semaphore count exceeded the maximum.
+/// @returns
+/// 'true' when the semaphore gets signaled and 'false' when the semaphore
+/// count exceeded the maximum.
 ///
 /// @note
 /// A semaphore can be signaled from many places, including from ISRs, basic
@@ -212,9 +214,11 @@ bool QXSemaphore::signal(void) {
 
         QXThread *thr = static_cast<QXThread *>(QF::active_[p]);
 
-        // the thread must be extended and the semaphore count must be zero
+        // the thread must be extended, must be blocked on this semaphore,
+        // and the semaphore count must be zero (semaphore not signaled)
         Q_ASSERT_ID(410, (thr != static_cast<QXThread *>(0)) /* registered */
              && (thr->m_osObject != static_cast<void *>(0)) /* extended */
+             && (thr->m_temp.obj == reinterpret_cast<QMState const *>(this))
              && (m_count == static_cast<uint16_t>(0))); // not signaled
 
         // disarm the internal time event

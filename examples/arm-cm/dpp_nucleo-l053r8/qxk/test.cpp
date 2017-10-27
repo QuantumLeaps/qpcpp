@@ -111,7 +111,7 @@ static void Thread2_run(QP::QXThread * const me) {
     // NOTE: Here the semaphore is initialized in the highest-priority thread
     // that uses it. Alternatively, the semaphore can be initialized
     // before any thread runs.
-    l_mutex.init(N_PHILO + 6U);
+    l_mutex.init(0U /*N_PHILO + 6U*/);
 
     me->m_thread = &l_tls2; // initialize the TLS for Thread2
 

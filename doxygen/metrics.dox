@@ -9,7 +9,7 @@
   License Type: Windows Single User License
   Licensed To : Quantum Leaps, LLC
   License No. : WS2975                          License Date: Dec 15, 2013
-  Build Date  : Sep  2 2009                         Run Date: Oct 13, 2017
+  Build Date  : Sep  2 2009                         Run Date: Oct 18, 2017
   (C)1996-2009 M Squared Technologies LLC
   ________________________________________________________________________
 
@@ -2136,8 +2136,10 @@
     Cyclomatic Complexity Vg Detail
       Function Base           : 1
       Conditional if / else if: 9     
-  Complexity   Param 2       Return 1      Cyclo Vg 10      Total       13
-  LOC 79       eLOC 64       lLOC 44       Comment 70       Lines      111
+      Logical or ( || )       : 1     
+      Logical and ( && )      : 1     
+  Complexity   Param 2       Return 1      Cyclo Vg 12      Total       15
+  LOC 81       eLOC 65       lLOC 44       Comment 72       Lines      114
 
   Function: QP::QXThread::postLIFO
   Parameters: (QEvt const * const)
@@ -2203,27 +2205,27 @@
 
                           ~~ Total File Summary ~~
 
-  LOC 290      eLOC 242      lLOC 138      Comment 317      Lines      607
+  LOC 292      eLOC 243      lLOC 138      Comment 319      Lines      611
   ------------------------------------------------------------------------
 
                         ~~ File Functional Summary ~~
 
   File Function Count....:         13
-  Total Function LOC.....:        249  Total Function Pts LOC :        5.5
-  Total Function eLOC....:        204  Total Function Pts eLOC:        4.6
+  Total Function LOC.....:        251  Total Function Pts LOC :        5.5
+  Total Function eLOC....:        205  Total Function Pts eLOC:        4.6
   Total Function lLOC....:        131  Total Function Pts lLOC:        2.6
   Total Function Params .:         17  Total Function Return .:         13
-  Total Cyclo Complexity :         43  Total Function Complex.:         73
+  Total Cyclo Complexity :         45  Total Function Complex.:         75
          ------     -----     -----     ------     ------     -----       
-  Max Function LOC ......:         79  Average Function LOC ..:      19.15
-  Max Function eLOC .....:         64  Average Function eLOC .:      15.69
+  Max Function LOC ......:         81  Average Function LOC ..:      19.31
+  Max Function eLOC .....:         65  Average Function eLOC .:      15.77
   Max Function lLOC .....:         44  Average Function lLOC .:      10.08
          ------     -----     -----     ------     ------     -----       
   Max Function Parameters:          6  Avg Function Parameters:       1.31
   Max Function Returns ..:          1  Avg Function Returns ..:       1.00
   Max Interface Complex. :          7  Avg Interface Complex. :       2.31
-  Max Cyclomatic Complex.:         10  Avg Cyclomatic Complex.:       3.31
-  Max Total Complexity ..:         13  Avg Total Complexity ..:       5.62
+  Max Cyclomatic Complex.:         12  Avg Cyclomatic Complex.:       3.46
+  Max Total Complexity ..:         15  Avg Total Complexity ..:       5.77
   ________________________________________________________________________
   End of File: ..\src\qxk\qxk_xthr.cpp
 
@@ -2236,7 +2238,7 @@
 
                          ~~ Total Project Summary ~~
 
-  LOC 4913     eLOC 4347     lLOC 1895     Comment 6482     Lines    11680
+  LOC 4915     eLOC 4348     lLOC 1895     Comment 6484     Lines    11684
   Average per File, metric/37 files
   LOC 132      eLOC 117      lLOC 51       Comment 175      Lines      315
 
@@ -3095,8 +3097,8 @@
 
   Function: QP::QXThread::post_
   Parameters: (QEvt const * const e, uint_fast16_t const margin)
-  Complexity   Param 2       Return 1      Cyclo Vg 10      Total       13
-  LOC 79       eLOC 64       lLOC 44       Comment 70       Lines      111
+  Complexity   Param 2       Return 1      Cyclo Vg 12      Total       15
+  LOC 81       eLOC 65       lLOC 44       Comment 72       Lines      114
 
   Function: QP::QXThread::postLIFO
   Parameters: (QEvt const * const)
@@ -3139,26 +3141,26 @@
   LOC 14       eLOC 11       lLOC 7        Comment 2        Lines       16
 
   Total: Functions  
-  LOC 2783     eLOC 2316     lLOC 1373     InCmp 340      CycloCmp     478
+  LOC 2785     eLOC 2317     lLOC 1373     InCmp 340      CycloCmp     480
   Function Points         FP(LOC) 47.5    FP(eLOC) 40.1   FP(lLOC)    24.0
 
   ------------------------------------------------------------------------
 
                       ~~ Project Functional Analysis ~~
 
-  Total Functions .......:        175  Total Physical Lines ..:       3847
-  Total LOC .............:       2783  Total Function Pts LOC :       47.5
-  Total eLOC ............:       2316  Total Function Pts eLOC:       40.1
+  Total Functions .......:        175  Total Physical Lines ..:       3850
+  Total LOC .............:       2785  Total Function Pts LOC :       47.5
+  Total eLOC ............:       2317  Total Function Pts eLOC:       40.1
   Total lLOC.............:       1373  Total Function Pts lLOC:       24.0
-  Total Cyclomatic Comp. :        478  Total Interface Comp. .:        340
+  Total Cyclomatic Comp. :        480  Total Interface Comp. .:        340
   Total Parameters ......:        165  Total Return Points ...:        175
-  Total Comment Lines ...:       2713  Total Blank Lines .....:        519
+  Total Comment Lines ...:       2715  Total Blank Lines .....:        520
          ------     -----     -----     ------     ------     -----       
-  Avg Physical Lines ....:      21.98
-  Avg LOC ...............:      15.90  Avg eLOC ..............:      13.23
-  Avg lLOC ..............:       7.85  Avg Cyclomatic Comp. ..:       2.73
+  Avg Physical Lines ....:      22.00
+  Avg LOC ...............:      15.91  Avg eLOC ..............:      13.24
+  Avg lLOC ..............:       7.85  Avg Cyclomatic Comp. ..:       2.74
   Avg Interface Comp. ...:       1.94  Avg Parameters ........:       0.94
-  Avg Return Points .....:       1.00  Avg Comment Lines .....:      15.50
+  Avg Return Points .....:       1.00  Avg Comment Lines .....:      15.51
          ------     -----     -----     ------     ------     -----       
   Max LOC ...............:        117
   Max eLOC ..............:        100  Max lLOC ..............:         61
