@@ -4,8 +4,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 5.9.9
-/// Last updated on  2017-09-29
+/// Last updated for version 6.0.1
+/// Last updated on  2017-11-03
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -81,7 +81,7 @@ Q_DEFINE_THIS_MODULE("qxk_mutex")
 /// @usage
 /// @include qxk_mux.cpp
 ///
-void QXMutex::init(uint_fast8_t ceiling) {
+void QXMutex::init(uint_fast8_t const ceiling) {
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package name="Comp" stereotype="0x02" namespace="DPP::">
+ <class name="Philo" superclass="qpcpp::QHsm">
+  <attribute name="m_timeEvt" type="CompTimeEvt" visibility="0x02" properties="0x00"/>
+  <operation name="Philo" type="" visibility="0x00" properties="0x00">
+   <code>  : QHsm(Q_STATE_CAST(&amp;Philo::initial)),
+    m_timeEvt(AO_Table, this, TIMEOUT_SIG, 0U)</code>
+  </operation>
+  <statechart>
+   <initial target="../1">
+    <action>static bool registered = false; // starts off with 0, per C-standard
+(void)e; // suppress the compiler warning about unused parameter
+if (!registered) {
+    registered = true;
+    QS_FUN_DICTIONARY(&amp;Philo::initial);
+    QS_FUN_DICTIONARY(&amp;Philo::thinking);
+    QS_FUN_DICTIONARY(&amp;Philo::hungry);
+    QS_FUN_DICTIONARY(&amp;Philo::eating);
+}
+QS_SIG_DICTIONARY(HUNGRY_SIG, me);  // signal for each Philos</action>
+    <initial_glyph conn="2,3,5,1,20,5,-4">
+     <action box="0,-2,6,2"/>
+    </initial_glyph>
+   </initial>
+   <state name="thinking">
+    <entry>me-&gt;m_timeEvt.armX(think_time(), 0U);</entry>
+    <exit>(void)me-&gt;m_timeEvt.disarm();</exit>
+    <tran trig="TIMEOUT" target="../../2">
+     <tran_glyph conn="2,14,3,1,20,12,-4">
+      <action box="0,-2,10,2"/>
+     </tran_glyph>
+    </tran>
+    <tran trig="TEST">
+     <tran_glyph conn="2,18,3,-1,12">
+      <action box="0,-2,11,4"/>
+     </tran_glyph>
+    </tran>
+    <state_glyph node="2,5,16,17">
+     <entry box="1,2,5,2"/>
+     <exit box="1,4,5,2"/>
+    </state_glyph>
+   </state>
+   <state name="hungry">
+    <entry>TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
+pe-&gt;philo = me;
+AO_Table-&gt;postLIFO(pe);</entry>
+    <tran trig="EAT" target="../../3">
+     <tran_glyph conn="2,31,3,1,19,9,-3">
+      <action box="0,-2,14,2"/>
+     </tran_glyph>
+    </tran>
+    <state_glyph node="2,24,16,12">
+     <entry box="1,2,5,2"/>
+    </state_glyph>
+   </state>
+   <state name="eating">
+    <entry>me-&gt;m_timeEvt.armX(eat_time(), 0U);</entry>
+    <exit>(void)me-&gt;m_timeEvt.disarm();
+
+// asynchronously post event to the Container
+TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
+pe-&gt;philo = me;
+AO_Table-&gt;postLIFO(pe);</exit>
+    <tran trig="TIMEOUT" target="../../1">
+     <tran_glyph conn="2,48,3,1,22,-38,-6">
+      <action box="0,-2,12,2"/>
+     </tran_glyph>
+    </tran>
+    <state_glyph node="2,38,16,14">
+     <entry box="1,2,5,2"/>
+     <exit box="1,4,5,2"/>
+    </state_glyph>
+   </state>
+   <state_diagram size="28,54"/>
+  </statechart>
+ </class>
+ <directory name=".">
+  <file name="philo.cpp">
+   <text>#include &quot;qpcpp.h&quot;
+#include &quot;dpp.h&quot;
+#include &quot;bsp.h&quot;
+
+Q_DEFINE_THIS_FILE
+
+namespace DPP {
+
+// helper function to provide a randomized think time for Philos
+inline QP::QTimeEvtCtr think_time() {
+    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + (BSP::TICKS_PER_SEC/2U));
+}
+
+// helper function to provide a randomized eat time for Philos
+inline QP::QTimeEvtCtr eat_time() {
+    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + BSP::TICKS_PER_SEC);
+}
+
+} // namespace DPP
+
+// Philo definition ----------------------------------------------------------
+$define(Comp::Philo)</text>
+  </file>
+ </directory>
+</package>

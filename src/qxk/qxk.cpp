@@ -389,8 +389,8 @@ uint_fast8_t QXK_sched_(void) {
                              QP::QS::priv_.locFilter[QP::QS::AO_OBJ],
                              QXK_attr_.next)
                 QS_TIME_();         // timestamp
-                QS_2U8_(static_cast<uint8_t>(p), // prio of the next thread
-                        static_cast<uint8_t>(    // prio of the curent thread
+                QS_2U8_(static_cast<uint8_t>(p), /* prio of the next AO */
+                        static_cast<uint8_t>(    /* prio of the curent AO */
                              QXK_attr_.actPrio));
             QS_END_NOCRIT_()
 

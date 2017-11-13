@@ -95,7 +95,7 @@ void QXThread::dispatch(QEvt const * const /*e*/) {
 //****************************************************************************
 ///
 /// @description
-/// Starts an extended thread and registers it with the framework.
+/// Starts execution of an extended thread and registers it with the framework.
 /// The extended thread becomes ready-to-run immediately and is scheduled
 /// if the QXK is already running.
 ///
@@ -287,15 +287,15 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
                 QS_TIME_();        // timestamp
                 QS_OBJ_(sender);   // the sender object
                 QS_SIG_(e->sig);   // the signal of the event
-                QS_OBJ_(this);     // this active object
-                QS_2U8_(e->poolId_, e->refCtr_); // poolID & refCtr of the evt
+                QS_OBJ_(this);     // this active object (recipient)
+                QS_2U8_(e->poolId_, e->refCtr_); // poolID & ref Count
                 QS_EQC_(nFree);    // number of free entries
                 QS_EQC_(static_cast<QEQueueCtr>(margin)); // margin requested
             QS_END_NOCRIT_()
 
             QF_CRIT_EXIT_();
 
-            QF::gc(e); // recycle the evnet to avoid a leak
+            QF::gc(e); // recycle the event to avoid a leak
             status = false; // event not posted
         }
     }

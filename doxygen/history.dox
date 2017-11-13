@@ -2,6 +2,27 @@ namespace QP {
 
 /** @page history Revision History
 
+@section qpcpp_6_0_1 Version 6.0.1, 2017-11-10
+The main focus of this release is to fix the remaining problems with transitions out of eXit-Points in sub-machines. Specifically, this release modifies the QMsm-based state machine implementation strategy (file src/qf/qep_msm.cpp to properly handle transitions from eXit-Points to Entry-Points and to History connectors in sub-machines. These changes are part of fixing the following bugs reported for QM:
+
+- [bug#190 "Exit-Point segment targeting History doesn't work](https://sourceforge.net/p/qpc/bugs/190/)
+
+- [bug#189 "Exit-Point segment targeting an Entry-Point to sub-machine state doesn't work"](https://sourceforge.net/p/qpc/bugs/189/)
+
+Additionally, this release fixes the following bug in transitions to "shallow history":
+- [bug#191 "Transition to shallow history in QMsm causes assertion qep_msm#810"](https://sourceforge.net/p/qpc/bugs/191/)
+
+The bug#191 is fixed by modifying the function QMsm::childStateObj() in qep_msm.cpp to return the parent state in the corner case when the current state is the parent state.
+
+
+@note
+This QP/C++ 6.0.1 release is the minium version required in the upcoming QM 4.1.0. This is because QM 4.1.0 assumes the modified QMsm-state machine implementation strategy in order to properly handle the various transitions out of eXit-Points in sub-machine states.
+
+
+Additionally, this release changes the QXK implementation still related to the [bug#186 "QXK: Extended thread context switch causes assertion in PendSV_Handler"](https://sourceforge.net/p/qpc/bugs/186/). Specifically, the case of context switching away and back to the same thread (which can arise under specific interrupt preemption scenarios) is now handled as a simple return from PendSV. The QXK scheduler has been modified to set the "next" thread pointer to NULL when it detects switching back to the "current" thread.
+
+
+------------------------------------------------------------------------------
 @section qpcpp_6_0_0 Version 6.0.0, 2017-10-13
 This release fixes two bugs found in the QXK kernel:
 - [bug#185](https://sourceforge.net/p/qpc/bugs/185/) "QXK: PendSV_Handler uses inconsistent stack frames for saving and restoring AO for Cortex-M0(+)"

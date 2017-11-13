@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.1
-/// Last updated on  2017-05-24
+/// Last updated for version 6.0.1
+/// Last updated on  2017-11-03
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -75,10 +75,12 @@ QMState const QMsm::msm_top_s = {
 ///
 /// @param[in] initial  the top-most initial transition for the MSM.
 ///
-/// @note The constructor is protected to prevent direct instantiating
-/// of the QP::QMsm objects. This class is intended for subclassing only.
+/// @note
+/// The constructor is protected to prevent direct instantiating of the
+/// QP::QMsm objects. This class is intended for subclassing only.
 ///
-/// @sa The QP::QMsm example illustrates how to use the QMsm constructor
+/// @sa
+/// The QP::QMsm example illustrates how to use the QMsm constructor
 /// in the constructor initializer list of the derived state machines.
 ///
 QMsm::QMsm(QStateHandler const initial)
@@ -139,22 +141,23 @@ void QMsm::init(QEvt const * const e) {
 ///
 /// @param[in] e  pointer to the event to be dispatched to the MSM
 ///
-/// @note Must be called after QP::QMsm::init().
+/// @note
+/// Must be called after QP::QMsm::init().
 ///
 void QMsm::dispatch(QEvt const * const e) {
     QMState const *s = m_state.obj;  // store the current state
     QMState const *t = s;
-    QState r = Q_RET_SUPER;
+    QState r;
     QS_CRIT_STAT_
 
     /// @pre current state must be initialized
     Q_REQUIRE_ID(300, s != static_cast<QMState const *>(0));
 
     QS_BEGIN_(QS_QEP_DISPATCH, QS::priv_.locFilter[QS::SM_OBJ], this)
-        QS_TIME_();                  // time stamp
-        QS_SIG_(e->sig);             // the signal of the event
-        QS_OBJ_(this);               // this state machine object
-        QS_FUN_(s->stateHandler);    // the current state handler
+        QS_TIME_();               // time stamp
+        QS_SIG_(e->sig);          // the signal of the event
+        QS_OBJ_(this);            // this state machine object
+        QS_FUN_(s->stateHandler); // the current state handler
     QS_END_()
 
     // scan the state hierarchy up to the top state...
@@ -204,14 +207,11 @@ void QMsm::dispatch(QEvt const * const e) {
             QMTranActTable const *tatbl = m_temp.tatbl;
             QHsmAttr tmp; // temporary to save intermediate values
 
-            // was a regular state transition segment taken?
-            if (r == Q_RET_TRAN) {
+            // was TRAN, TRAN_INIT, or TRAN_EP taken?
+            if (r < Q_RET_TRAN_HIST) {
                 exitToTranSource_(s, t);
                 r = execTatbl_(tatbl);
-            }
-            // was an initial transition segment taken?
-            else if (r == Q_RET_TRAN_INIT) {
-                r = execTatbl_(tatbl);
+                s = m_state.obj;
             }
             // was a transition segment to history taken?
             else if (r == Q_RET_TRAN_HIST) {
@@ -220,10 +220,7 @@ void QMsm::dispatch(QEvt const * const e) {
                 exitToTranSource_(s, t);
                 (void)execTatbl_(tatbl);
                 r = enterHistory_(tmp.obj);
-            }
-            // was a transition segment to an entry point taken?
-            else if (r == Q_RET_TRAN_EP) {
-                r = execTatbl_(tatbl);
+                s = m_state.obj;
             }
             // was a transition segment to an exit point taken?
             else if (r == Q_RET_TRAN_XP) {
@@ -231,32 +228,32 @@ void QMsm::dispatch(QEvt const * const e) {
                 m_state.obj = s; // restore the original state
 
                 r = (*act)(this); // execute the XP action
-                if (r == Q_RET_TRAN) {
+                if (r == Q_RET_TRAN) { // XP -> TRAN ?
                     exitToTranSource_(s, t);
-                    tmp.tatbl = m_temp.tatbl; // save XP-Segment
                     // take the tran-to-XP segment inside submachine
                     (void)execTatbl_(tatbl);
-                    m_state.obj = s; // restore original state
-#ifdef Q_SPY
-                    t = m_temp.tatbl->target; // store for tracing
-#endif /* Q_SPY */
-                    // take the XP-Segment from submachine-state
-                    r = execTatbl_(tmp.tatbl);
-
-                    QS_BEGIN_(QS_QEP_TRAN_XP,
-                              QS::priv_.locFilter[QS::SM_OBJ], this)
-                        QS_OBJ_(this); // this state machine object
-                        QS_FUN_(s);    // source handler
-                        QS_FUN_(t);    // target handler
-                    QS_END_()
+                    s = m_state.obj;
+                }
+                else if (r == Q_RET_TRAN_HIST) { // XP -> HIST ?
+                    tmp.obj = m_state.obj; // save the history
+                    m_state.obj = s; // restore the original state
+                    exitToTranSource_(s, t);
+                    // take the tran-to-XP segment inside submachine
+                    (void)execTatbl_(tatbl);
+                    s = m_state.obj;
+                    m_state.obj = tmp.obj; // restore the history
+                }
+                else {
+                    // TRAN_XP must NOT be followed by any other tran type
+                    Q_ASSERT_ID(330, r < Q_RET_TRAN);
                 }
             }
             else {
                 // no other return value should be produced
-                Q_ERROR_ID(330);
+                Q_ERROR_ID(340);
             }
-            s = m_state.obj;
-            t = s;
+
+            t = s; // set target to the current state
 
         } while (r >= Q_RET_TRAN);
 
@@ -307,7 +304,8 @@ void QMsm::dispatch(QEvt const * const e) {
 ///
 /// @param[in] tatbl pointer to the transition-action table
 ///
-/// @returns status of the last action from the transition-action table.
+/// @returns
+/// the status of the last action from the transition-action table.
 ///
 /// @note
 /// This function is for internal use inside the QEP event processor and
@@ -371,13 +369,9 @@ QState QMsm::execTatbl_(QMTranActTable const * const tatbl) {
 #endif // Q_SPY
     }
 
-    if (r >= Q_RET_TRAN_INIT) {
-        m_state.obj = m_temp.tatbl->target; // the tran. target
-    }
-    else {
-        m_state.obj = tatbl->target; // the tran. target
-    }
-
+    m_state.obj = (r >= Q_RET_TRAN)
+        ? m_temp.tatbl->target
+        : tatbl->target;
     return r;
 }
 
@@ -424,8 +418,9 @@ void QMsm::exitToTranSource_(QMState const *s,
 ///
 /// @param[in] hist pointer to the history substate
 ///
-/// @returns QP::Q_RET_INIT, if an initial transition has been executed in
-/// the last entered state or QP::Q_RET_NULL if no such transition was taken.
+/// @returns
+/// QP::Q_RET_INIT, if an initial transition has been executed in the last
+/// entered state or QP::Q_RET_NULL if no such transition was taken.
 ///
 QState QMsm::enterHistory_(QMState const * const hist) {
     QMState const *s = hist;
@@ -477,17 +472,17 @@ QState QMsm::enterHistory_(QMState const * const hist) {
 }
 
 //****************************************************************************
-/// \description
+/// @description
 /// Tests if a state machine derived from QMsm is-in a given state.
 ///
-/// \note For a MSM, to "be-in" a state means also to "be-in" a superstate of
+/// @note
+/// For a MSM, to "be-in" a state means also to "be-in" a superstate of
 /// of the state.
 ///
-/// \arguments
-/// \arg[in] \c st pointer to the QMState object that corresponds to the
+/// @param[in] st  pointer to the QMState object that corresponds to the
 ///                tested state.
-///
-/// \returns 'true' if the MSM is in the \c st and 'false' otherwise
+/// @returns
+/// 'true' if the MSM is in the \c st and 'false' otherwise
 ///
 bool QMsm::isInState(QMState const * const st) const {
     bool inState = false; // assume that this MSM is not in 'state'
@@ -514,20 +509,22 @@ bool QMsm::isInState(QMState const * const st) const {
 ///
 /// @param[in] parent pointer to the state-handler object
 ///
-/// @returns the child of a given @c parent state, which is an ancestor of
-/// the currently active state
+/// @returns
+/// the child of a given @c parent state, which is an ancestor of the
+/// currently active state. For the corner case when the currently active
+/// state is the given @c parent state, function returns the @c parent state.
 ///
 QMState const *QMsm::childStateObj(QMState const * const parent) const {
     QMState const *child = m_state.obj;
-    bool isConfirmed = false; // start with the child not confirmed
+    bool isFound = false; // start with the child not found
     QMState const *s;
 
-    for (s = m_state.obj->superstate;
+    for (s = m_state.obj;
          s != static_cast<QMState const *>(0);
          s = s->superstate)
     {
         if (s == parent) {
-            isConfirmed = true; // child is confirmed
+            isFound = true; // child is found
             break;
         }
         else {
@@ -535,8 +532,8 @@ QMState const *QMsm::childStateObj(QMState const * const parent) const {
         }
     }
 
-    /// @post the child must be confirmed
-    Q_ENSURE_ID(810, isConfirmed != false);
+    /// @post the child must be found
+    Q_ENSURE_ID(810, isFound);
 
     return child; // return the child
 }

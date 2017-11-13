@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.9
-/// Last updated on  2017-09-29
+/// Last updated for version 6.0.1
+/// Last updated on  2017-11-03
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -211,7 +211,7 @@ private:
 class QXMutex {
 public:
     //! initialize the QXK priority-ceiling mutex QP::QXMutex
-    void init(uint_fast8_t ceiling);
+    void init(uint_fast8_t const ceiling);
 
     //! lock the QXK priority-ceiling mutex QP::QXMutex
     bool lock(uint_fast16_t const nTicks = QXTHREAD_NO_TIMEOUT);

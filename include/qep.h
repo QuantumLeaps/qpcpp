@@ -50,8 +50,8 @@
 // and Z is a 1-digit release number.
 #define QP_VERSION_STR  "6.0.1"
 
-//! Tamperproof current QP release (6.0.1) and date (2017-10-20)
-#define QP_RELEASE      0x9A1068E6U
+//! Tamperproof current QP release (6.0.1) and date (2017-11-10)
+#define QP_RELEASE      0x9A02AD46U
 
 
 //****************************************************************************
@@ -275,11 +275,11 @@ QState const Q_RET_TRAN      = static_cast<QState>(8);
 //! initial transition taken
 QState const Q_RET_TRAN_INIT = static_cast<QState>(9);
 
-//! event handled (transition to history)
-QState const Q_RET_TRAN_HIST = static_cast<QState>(10);
-
 //! entry-point transition into a submachine
-QState const Q_RET_TRAN_EP   = static_cast<QState>(11);
+QState const Q_RET_TRAN_EP   = static_cast<QState>(10);
+
+//! transition to history of a given state
+QState const Q_RET_TRAN_HIST = static_cast<QState>(11);
 
 //! exit-point transition out of a submachine
 QState const Q_RET_TRAN_XP   = static_cast<QState>(12);
