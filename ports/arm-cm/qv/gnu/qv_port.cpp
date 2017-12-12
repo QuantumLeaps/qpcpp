@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to ARM Cortex-M, cooperative QV kernel, GNU-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.6
-/// Last updated on  2017-07-28
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-12
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -37,30 +37,70 @@
 
 #include "qf_port.h"
 
-#if (__ARM_ARCH != 6) // NOT Cortex-M0/M0+/M1 ?
+#if (__ARM_ARCH == 6) // NOT Cortex-M0/M0+/M1 ?
 
 extern "C" {
 
-#define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004)
-#define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED14)
-#define NVIC_IP      ((uint32_t volatile *)0xE000E400)
+// hand-optimized quick LOG2 in assembly
+//
+// NOTE:
+// The inline GNU assembler does not accept mnemonics 'lsrs' and 'adds',
+// but for Cortex-M0/M0+/M1 the mnemonics 'lsr' and 'add' always set the
+// condition flags in the PSR.
+//
+__attribute__ ((naked))
+uint_fast8_t QF_qlog2(uint32_t x) {
+    __asm volatile (
+        "    mov  r1,#0\n\t"
+        "    lsr  r2,r0,#16\n\t"
+        "    beq  QF_qlog2_1\n\t"
+        "    mov  r1,#16\n\t"
+        "    mov  r0,r2\n\t"
+        "QF_qlog2_1:\n\t"
+        "    lsr  r2,r0,#8\n\t"
+        "    beq  QF_qlog2_2\n\t"
+        "    add  r1, r1,#8\n\t"
+        "    mov  r0, r2\n\t"
+        "QF_qlog2_2:\n\t"
+        "    lsr  r2,r0,#4\n\t"
+        "    beq  QF_qlog2_3\n\t"
+        "    add  r1,r1,#4\n\t"
+        "    mov  r0,r2\n\t"
+        "QF_qlog2_3:\n\t"
+        "    ldr  r2,=QF_qlog2_LUT\n\t"
+        "    ldrb r0,[r2,r0]\n\t"
+        "    add  r0,r1, r0\n\t"
+        "    bx   lr\n\t"
+        "QF_qlog2_LUT:\n\t"
+        "   .byte 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4\n\t"
+    );
+}
 
-/*
-* Initialize the exception priorities and IRQ priorities to safe values.
-*
-* Description:
-* On Cortex-M3/M4/M7, this QV port disables interrupts by means of the
-* BASEPRI register. However, this method cannot disable interrupt
-* priority zero, which is the default for all interrupts out of reset.
-* The following code changes the SysTick priority and all IRQ priorities
-* to the safe value QF_BASEPRI, wich the QF critical section can disable.
-* This avoids breaching of the QF critical sections in case the
-* application programmer forgets to explicitly set priorities of all
-* "kernel aware" interrupts.
-*
-* The interrupt priorities established in QV_init() can be later
-* changed by the application-level code.
-*/
+} // extern "C"
+
+#else // NOT Cortex-M0/M0+/M1
+
+extern "C" {
+
+#define SCnSCB_ICTR  (reinterpret_cast<uint32_t volatile *>(0xE000E004))
+#define SCB_SYSPRI   (reinterpret_cast<uint32_t volatile *>(0xE000ED14))
+#define NVIC_IP      (reinterpret_cast<uint32_t volatile *>(0xE000E400))
+
+// Initialize the exception priorities and IRQ priorities to safe values.
+//
+// Description:
+// On Cortex-M3/M4/M7, this QV port disables interrupts by means of the
+// BASEPRI register. However, this method cannot disable interrupt
+// priority zero, which is the default for all interrupts out of reset.
+// The following code changes the SysTick priority and all IRQ priorities
+// to the safe value QF_BASEPRI, wich the QF critical section can disable.
+// This avoids breaching of the QF critical sections in case the
+// application programmer forgets to explicitly set priorities of all
+// "kernel aware" interrupts.
+//
+// The interrupt priorities established in QV_init() can be later
+// changed by the application-level code.
+//
 void QV_init(void) {
 
     // set exception priorities to QF_BASEPRI...

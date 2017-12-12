@@ -3,8 +3,8 @@
 /// @ingroup qutest
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-04
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -76,12 +76,12 @@ extern uint8_t volatile QF_intNest;
 
 #ifdef QP_IMPL
 
-    /* QUTEST scheduler locking (not used) */
+    // QUTEST scheduler locking (not used)
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) ((void)0)
     #define QF_SCHED_UNLOCK_()    ((void)0)
 
-    /* QUTEST active object event queue customization (not used) */
+    // QUTEST active object event queue customization (not used)
     #define QACTIVE_EQUEUE_WAIT_(me_)   ((void)0)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) ((void)0)
 

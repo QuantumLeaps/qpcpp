@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last Updated for Version: 5.9.9
-// Date of the Last Update:  2017-09-27
+// Last Updated for Version: 6.0.3
+// Date of the Last Update:  2017-12-11
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -147,6 +147,9 @@ void SysTick_Handler(void) {
 }
 //............................................................................
 void GPIO_EVEN_IRQHandler(void);  // prototype
+
+// NOTE: to trigger this ISR from the debugger, write 0x200 to NVIC_ISPR0.
+//
 void GPIO_EVEN_IRQHandler(void) {
     QXK_ISR_ENTRY(); // inform QXK about entering an ISR
 

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.9.8
-/// Last updated on  2017-09-20
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -96,7 +96,7 @@ void QActive::start(uint_fast8_t prio,
     // allege that the ThreadX queue is created successfully
     Q_ALLEGE_ID(210,
         tx_queue_create(&m_eQueue,
-            "Q",
+            (char_t *)"Q",
             TX_1_ULONG,
             static_cast<VOID *>(qSto),
             static_cast<ULONG>(qLen * sizeof(ULONG)))
@@ -113,7 +113,7 @@ void QActive::start(uint_fast8_t prio,
     Q_ALLEGE_ID(220,
         tx_thread_create(
             &m_thread, // ThreadX thread control block
-            "AO",      // thread name
+            (char_t *)"AO",   // thread name
             &thread_function, // thread function
             reinterpret_cast<ULONG>(this), // thread argument
             stkSto,    // stack start
@@ -161,18 +161,19 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
 
     if (status) { // can post the event?
 
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
-            QS_TIME_();              // timestamp
-            QS_OBJ_(sender);         // the sender object
-            QS_SIG_(e->sig);         // the signal of the event
-            QS_OBJ_(this);           // this active object (recipient)
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
+            QS_TIME_();       // timestamp
+            QS_OBJ_(sender);  // the sender object
+            QS_SIG_(e->sig);  // the signal of the event
+            QS_OBJ_(this);    // this active object (recipient)
             QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
             QS_EQC_(static_cast<QEQueueCtr>(nFree)); // # free entries
             QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free (unknown)
         QS_END_NOCRIT_()
 
         // is it a pool event?
-        if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
+        if (e->poolId_ != static_cast<uint8_t>(0)) {
             QF_EVT_REF_CTR_INC_(e);  // increment the reference counter
         }
 
@@ -187,10 +188,10 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
             QS::priv_.locFilter[QS::AO_OBJ], this)
-            QS_TIME_();              // timestamp
-            QS_OBJ_(sender);         // the sender object
-            QS_SIG_(e->sig);         // the signal of the event
-            QS_OBJ_(this);           // this active object (recipient)
+            QS_TIME_();       // timestamp
+            QS_OBJ_(sender);  // the sender object
+            QS_SIG_(e->sig);  // the signal of the event
+            QS_OBJ_(this);    // this active object (recipient)
             QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
             QS_EQC_(static_cast<QEQueueCtr>(nFree)); // # free entries
             QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free (unknown)
@@ -206,10 +207,11 @@ void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();                  // timestamp
-        QS_SIG_(e->sig);             // the signal of this event
-        QS_OBJ_(this);               // this active object
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_TIME_();           // timestamp
+        QS_SIG_(e->sig);      // the signal of this event
+        QS_OBJ_(this);        // this active object
         QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
         // # free entries available
         QS_EQC_(static_cast<QEQueueCtr>(m_eQueue.tx_queue_available_storage));
@@ -217,7 +219,7 @@ void QActive::postLIFO(QEvt const * const e) {
     QS_END_NOCRIT_()
 
     // is it a pool event?
-    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
+    if (e->poolId_ != static_cast<uint8_t>(0)) {
         QF_EVT_REF_CTR_INC_(e);  // increment the reference counter
     }
 
@@ -239,9 +241,9 @@ QEvt const *QActive::get_(void) {
         == TX_SUCCESS);
 
     QS_BEGIN_(QS_QF_ACTIVE_GET, QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();                  // timestamp
-        QS_SIG_(e->sig);             // the signal of this event
-        QS_OBJ_(this);               // this active object
+        QS_TIME_();           // timestamp
+        QS_SIG_(e->sig);      // the signal of this event
+        QS_OBJ_(this);        // this active object
         QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
         QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free entries (unknown)
     QS_END_()

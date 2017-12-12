@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-18
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -81,13 +81,13 @@ extern "C" {
 
 //! attributes of the QXK kernel
 struct QXK_Attr {
-    QP::QActive *curr;       //!< currently executing thread
-    QP::QActive *next;       //!< next thread to execute
-    uint_fast8_t actPrio;    //!< prio of the active basic thread
-    uint_fast8_t lockPrio;   //!< lock prio (0 == no-lock)
-    uint_fast8_t lockHolder; //!< prio of the lock holder
+    QP::QActive * volatile curr; //!< currently executing thread
+    QP::QActive * volatile next; //!< next thread to execute
+    uint8_t volatile actPrio;    //!< prio of the active basic thread
+    uint8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
+    uint8_t volatile lockHolder; //!< prio of the lock holder
 #ifndef QXK_ISR_CONTEXT_
-    uint_fast8_t volatile intNest;    //!< ISR nesting level
+    uint8_t volatile intNest;    //!< ISR nesting level
 #endif // QXK_ISR_CONTEXT_
     QP::QPSet readySet; //!< ready-set of basic- and extended-threads
 };
@@ -195,7 +195,7 @@ public:
         Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
-        QXK_attr_.readySet.insert((me_)->m_prio); \
+        QXK_attr_.readySet.insert(static_cast<uint_fast8_t>((me_)->m_prio)); \
         if (!QXK_ISR_CONTEXT_()) { \
             if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { \
                 QXK_activate_(); \

@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 6.0.0
-/// Last updated on  2017-10-17
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -118,7 +118,7 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
     ///
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) /* can't block inside an ISR */
         && (curr != static_cast<QXThread *>(0)) /* curr must be extended */
-        && (QXK_attr_.lockPrio == static_cast<uint_fast8_t>(0)) /* no lock */
+        && (QXK_attr_.lockPrio == static_cast<uint8_t>(0)) /* no lock */
         && (curr->m_temp.obj == static_cast<QMState *>(0))); // not blocked
 
     if (m_count > static_cast<uint16_t>(0)) {
@@ -129,8 +129,8 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
         // remember the blocking object
         curr->m_temp.obj = reinterpret_cast<QMState const *>(this);
         curr->teArm_(static_cast<enum_t>(QXK_SEMA_SIG), nTicks);
-        m_waitSet.insert(curr->m_prio);
-        QXK_attr_.readySet.remove(curr->m_prio);
+        m_waitSet.insert(static_cast<uint_fast8_t>(curr->m_prio));
+        QXK_attr_.readySet.remove(static_cast<uint_fast8_t>(curr->m_prio));
         (void)QXK_sched_();
         QF_CRIT_EXIT_();
         QF_CRIT_EXIT_NOP(); // BLOCK here

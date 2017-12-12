@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-17
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -1129,7 +1129,7 @@ static void rxReportAck_(enum QSpyRxRecords recId) {
 //****************************************************************************
 static void rxReportError_(uint8_t const code) {
     QS::beginRec(static_cast<uint_fast8_t>(QS_RX_STATUS));
-        QS_U8_(static_cast<uint8_t>(0x80U | code)); // error code
+        QS_U8_(static_cast<uint8_t>(static_cast<uint8_t>(0x80) | code));
     QS::endRec();
     QS_REC_DONE();
 }
@@ -1164,7 +1164,7 @@ static void rxPoke_(void) {
 
     l_rx.var.poke.data = static_cast<uint32_t>(0);
     l_rx.var.poke.idx  = static_cast<uint8_t>(0);
-    l_rx.var.poke.offs += l_rx.var.poke.size;
+    l_rx.var.poke.offs += static_cast<uint16_t>(l_rx.var.poke.size);
 }
 
 //============================================================================
@@ -1184,16 +1184,20 @@ static void rxPoke_(void) {
 ///
 uint32_t QS::getTestProbe_(void (* const api)(void)) {
     uint32_t data = static_cast<uint32_t>(0);
-    uint8_t i;
-    for (i = static_cast<uint8_t>(0); i < l_testData.tpNum; ++i) {
+    uint_fast8_t i;
+    for (i = static_cast<uint_fast8_t>(0);
+         i < static_cast<uint_fast8_t>(l_testData.tpNum);
+         ++i)
+    {
         if (l_testData.tpBuf[i].addr == (QSFun)api) {
             QS_CRIT_STAT_
 
             data = l_testData.tpBuf[i].data;
             --l_testData.tpNum;
             // move all remaining entries in the buffer up by one
-            for (; i < l_testData.tpNum; ++i) {
-                l_testData.tpBuf[i] = l_testData.tpBuf[i + 1];
+            for (; i < static_cast<uint_fast8_t>(l_testData.tpNum); ++i) {
+                l_testData.tpBuf[i] =
+                    l_testData.tpBuf[i + static_cast<uint_fast8_t>(1)];
             }
             // i == l_testData.tpNum, which terminates the top loop
             QS::beginRec(static_cast<uint_fast8_t>(QS_TEST_PROBE_GET));

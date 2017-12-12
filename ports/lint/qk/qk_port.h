@@ -2,8 +2,8 @@
 /// @brief QK/C++ port to Lint, Generic C++ compiler
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -32,7 +32,6 @@
 /// Contact information:
 /// https://state-machine.com
 /// mailto:info@state-machine.com
-
 ///***************************************************************************
 /// @endcond
 
@@ -85,7 +84,7 @@
 /// skeleton code in assembly.
 #define QK_ISR_EXIT()     do { \
     --QK_attr_.intNest; \
-    if (QK_attr_.intNest == static_cast<uint_fast8_t>(0)) { \
+    if (QK_attr_.intNest == static_cast<uint8_t>(0)) { \
         if (QK_sched_() != static_cast<uint_fast8_t>(0)) { \
             QK_activate_(); \
         } \

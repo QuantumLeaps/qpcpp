@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-18
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -57,12 +57,12 @@
 extern "C" {
 
 struct QK_Attr {
-    uint_fast8_t actPrio;    //!< prio of the active AO
-    uint_fast8_t nextPrio;   //!< prio of the next AO to execute
-    uint_fast8_t lockPrio;   //!< lock prio (0 == no-lock)
-    uint_fast8_t lockHolder; //!< prio of the lock holder
+    uint8_t volatile actPrio;    //!< prio of the active AO
+    uint8_t volatile nextPrio;   //!< prio of the next AO to execute
+    uint8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
+    uint8_t volatile lockHolder; //!< prio of the lock holder
 #ifndef QK_ISR_CONTEXT_
-    uint_fast8_t volatile intNest;    //!< ISR nesting level
+    uint8_t volatile intNest;    //!< ISR nesting level
 #endif // QK_ISR_CONTEXT_
     QP::QPSet readySet;          //!< QK ready-set of AOs and "naked" threads
 };
@@ -138,7 +138,7 @@ public:
         /// @returns true if the code executes in the ISR context and false
         /// otherwise
         #define QK_ISR_CONTEXT_() \
-            (QK_attr_.intNest != static_cast<uint_fast8_t>(0))
+            (QK_attr_.intNest != static_cast<uint8_t>(0))
     #endif // QK_ISR_CONTEXT_
 
     // QK-specific scheduler locking
@@ -168,7 +168,7 @@ public:
         Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
-        QK_attr_.readySet.insert((me_)->m_prio); \
+        QK_attr_.readySet.insert(static_cast<uint_fast8_t>((me_)->m_prio)); \
         if (!QK_ISR_CONTEXT_()) { \
             if (QK_sched_() != static_cast<uint_fast8_t>(0)) { \
                 QK_activate_(); \

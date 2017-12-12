@@ -4,8 +4,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-08
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -195,7 +195,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
 /// QP::QActive::unsubscribeAll()
 ///
 void QActive::subscribe(enum_t const sig) const {
-    uint_fast8_t p = m_prio;
+    uint_fast8_t p = static_cast<uint_fast8_t>(m_prio);
     Q_REQUIRE_ID(300, (Q_USER_SIG <= sig)
               && (sig < QF_maxPubSignal_)
               && (static_cast<uint_fast8_t>(0) < p)
@@ -237,7 +237,7 @@ void QActive::subscribe(enum_t const sig) const {
 /// @sa QP::QF::publish_(), QP::QActive::subscribe(), and
 /// QP::QActive::unsubscribeAll()
 void QActive::unsubscribe(enum_t const sig) const {
-    uint_fast8_t p = m_prio;
+    uint_fast8_t p = static_cast<uint_fast8_t>(m_prio);
     Q_REQUIRE_ID(400, (Q_USER_SIG <= sig)
                       && (sig < QF_maxPubSignal_)
                       && (static_cast<uint_fast8_t>(0) < p)
@@ -279,7 +279,7 @@ void QActive::unsubscribe(enum_t const sig) const {
 /// QP::QActive::unsubscribe()
 ///
 void QActive::unsubscribeAll(void) const {
-    uint_fast8_t const p = m_prio;
+    uint_fast8_t const p = static_cast<uint_fast8_t>(m_prio);
 
     Q_REQUIRE_ID(500, (static_cast<uint_fast8_t>(0) < p)
                       && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))

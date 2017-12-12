@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: QXK port to ARM Cortex-M (M0,M0+,M3,M4,M7), GNU-ARM assembler
-* Last Updated for Version: 6.0.1
-* Date of the Last Update:  2017-10-17
+* Last Updated for Version: 6.0.3
+* Date of the Last Update:  2017-12-08
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -41,18 +41,18 @@
     /* NOTE: keep in synch with the QXK_Attr struct in "qxk.h" !!! */
     .equ QXK_CURR,0
     .equ QXK_NEXT,4
-    .equ QXK_TOP_PRIO,8
+    .equ QXK_ACT_PRIO,8
 
     /* NOTE: keep in synch with the QMActive struct in "qf.h/qxk.h" !!! */
-    .equ QMACTIVE_OSOBJ,40
-    .equ QMACTIVE_PRIO,48
+    .equ QMACTIVE_OSOBJ,28
+    .equ QMACTIVE_PRIO,36
 
 /*****************************************************************************
 * The QXK_init() function sets the priority of PendSV to 0xFF (lowest urgency).
 * For Cortex-M3/4/7, it also sets priorities of all other exceptions and IRQs
 * to the safe value. All this is performed in a nestable critical section.
 *****************************************************************************/
-    .section .text.QXK_init
+    .section .text.QXK_init , "ax", %progbits
     .global QXK_init
     .type   QXK_init, %function
 
@@ -158,7 +158,7 @@ QXK_init_irq:
 * exception). In QXK, this is exactly the time when the QXK activator needs to
 * handle the asynchronous preemption.
 *****************************************************************************/
-    .section .text.PendSV_Handler
+    .section .text.PendSV_Handler , "ax", %progbits
     .global PendSV_Handler    /* CMSIS-compliant exception name */
     .type   PendSV_Handler, %function
 
@@ -279,7 +279,7 @@ PendSV_save_ao:
 PendSV_restore_ao:
     MOVS    r0,#0
     STR     r0,[r3,#QXK_CURR] /* QXK_attr_.curr := 0 */
-    STR     r0,[r3,#QXK_NEXT] /* QXK_attr_.next := 0 */
+    /* don't clear QXK_attr_.next, as it might be needed for AO activation */
 
   .if  __ARM_ARCH == 6        /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
     MOV     r0,sp             /* r0 := top of stack */
@@ -309,12 +309,17 @@ PendSV_restore_ao:
   .endif                      /* M3/M4/M7 */
 
     MOV     r0,r12            /* r0 := QXK_attr_.next */
-    LDR     r0,[r0,#QMACTIVE_PRIO] /* r0 := QXK_attr_.next->prio */
-    LDR     r1,[r3,#QXK_TOP_PRIO]  /* r1 := QXK_attr_.topPrio */
+    MOVS    r1,#QMACTIVE_PRIO /* r1 := offset of .next into QActive */
+    LDRB    r0,[r0,r1]        /* r0 := QXK_attr_.next->prio */
+    LDRB    r1,[r3,#QXK_ACT_PRIO]  /* r1 := QXK_attr_.actPrio */
     CMP     r1,r0
     BCC     PendSV_activate   /* if (next->prio > topPrio) activate next AO */
 
-    /* otherwise re-enable interrupts and return from PendSV */
+    /* otherwise no activation needed... */
+    MOVS    r0,#0
+    STR     r0,[r3,#QXK_NEXT] /* QXK_attr_.next := 0 (clear the next) */
+
+    /* re-enable interrupts and return from PendSV */
 PendSV_return:
   .if  __ARM_ARCH == 6        /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
     CPSIE   i                 /* enable interrupts (clear PRIMASK) */
@@ -425,7 +430,7 @@ PendSV_restore_ex:
 * NOTE: Thread_ret does not execute in the PendSV context!
 * NOTE: Thread_ret executes entirely with interrupts DISABLED.
 *****************************************************************************/
-    .section .text.Thread_ret
+    .section .text.Thread_ret , "ax", %progbits
     .type   Thread_ret, %function
 
 Thread_ret:
@@ -465,7 +470,7 @@ Thread_ret:
 * NOTE: The NMI exception is entered with interrupts DISABLED, so it needs
 * to re-enable interrupts before it returns to the preempted task.
 *****************************************************************************/
-    .section .text.NMI_Handler
+    .section .text.NMI_Handler , "ax", %progbits
     .global NMI_Handler
     .type   NMI_Handler, %function
 
@@ -502,7 +507,7 @@ NMI_Handler:
 * aware of this QXK thread. In that case there can be no external
 * communication with this thread, so no critical section is needed.
 *****************************************************************************/
-    .section .text.QXK_stackInit_
+    .section .text.QXK_stackInit_ , "ax", %progbits
     .global QXK_stackInit_
     .type   QXK_stackInit_, %function
 
@@ -611,5 +616,52 @@ QXK_stackInit_fill:
 
     BX      lr                /* return to the caller */
   .size   QXK_stackInit_, . - QXK_stackInit_
+
+
+  .if  __ARM_ARCH == 6        /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
+/*****************************************************************************
+* Hand-optimized quick LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
+* This function returns (log2(x) + 1). For the corner case of x==0, the
+* function returns 0 immediately.
+* C prototype:
+* uint_fast8_t QF_qlog2(uint32_t x);
+*****************************************************************************/
+    .section .text.QF_qlog2 , "ax", %progbits
+    .global QF_qlog2
+    .type   QF_qlog2, %function
+QF_qlog2:
+    CMP     r0,#0
+    BEQ.N   QF_qlog2_4
+    MOVS    r1,#0
+    LSRS    r2,r0,#16
+    BEQ.N   QF_qlog2_1
+    MOVS    r1,#16
+    MOVS    r0,r2
+
+QF_qlog2_1:
+    LSRS    r2,r0,#8
+    BEQ.N   QF_qlog2_2
+    ADDS    r1,r1,#8
+    MOVS    r0,r2
+
+QF_qlog2_2:
+    LSRS    r2,r0,#4
+    BEQ.N   QF_qlog2_3
+    ADDS    r1,r1,#4
+    MOVS    r0,r2
+
+QF_qlog2_3:
+    LDR     r2,=QF_qlog2_LUT
+    LDRB    r0,[r2,r0]
+    ADDS    r0,r1,r0
+
+QF_qlog2_4:
+    BX      lr                /* return to the caller */
+
+QF_qlog2_LUT:
+  .byte   0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4
+  .size   QF_qlog2, . - QF_qlog2
+
+  .endif                      /* M0/M0+/M1 */
 
   .end

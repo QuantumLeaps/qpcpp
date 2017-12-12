@@ -1,4 +1,4 @@
-SET PATH=C:\tools\Keil_v5\ARM\ARMCC\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\ProgramData\Oracle\Java\javapath;C:\qp\qtools\bin;C:\utils\;
+SET PATH=C:\tools\Keil_v5\ARM\ARMCC\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\ProgramData\Oracle\Java\javapath;C:\qp\qtools\bin\;C:\utils\;;C:\SysGCC\arm-eabi\bin
 SET ARMCC5_ASMOPT=--diag_suppress=9931
 SET ARMCC5_CCOPT=--diag_suppress=9931
 SET ARMCC5_LINKOPT=--diag_suppress=9931
@@ -38,7 +38,6 @@ cmd /c "if exist .\spy\qstamp.o del .\spy\qstamp.o"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\qf_qmact.__i"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\qf_time.__i"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\qk.__i"
-"C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\qk_mutex.__i"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmAsm" --Via ".\spy\qk_port._ia"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\qs.__i"
 "C:\tools\Keil_v5\ARM\ARMCC\Bin\ArmCC" --Via ".\spy\qs_64bit.__i"

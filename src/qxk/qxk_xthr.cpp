@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.1
-/// Last updated on  2017-10-17
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -139,8 +139,8 @@ void QXThread::start(uint_fast8_t const prio,
     QXK_stackInit_(this, reinterpret_cast<QXThreadHandler>(m_temp.act),
                    stkSto, stkSize);
 
-    m_prio = prio;
-    m_startPrio = prio;
+    m_prio      = static_cast<uint8_t>(prio);
+    m_startPrio = static_cast<uint8_t>(prio);
 
     // the new thread is not blocked on any object
     m_temp.obj = static_cast<QMState const *>(0);
@@ -150,7 +150,7 @@ void QXThread::start(uint_fast8_t const prio,
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
     // extended-thread becomes ready immediately
-    QXK_attr_.readySet.insert(m_prio);
+    QXK_attr_.readySet.insert(static_cast<uint_fast8_t>(m_prio));
 
     // see if this thread needs to be scheduled in case QXK is running
     (void)QXK_sched_();
@@ -256,7 +256,8 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
                     == reinterpret_cast<QMState const *>(&m_eQueue))
                 {
                     (void)teDisarm_();
-                    QXK_attr_.readySet.insert(m_prio);
+                    QXK_attr_.readySet.insert(
+                        static_cast<uint_fast8_t>(m_prio));
                     if (!QXK_ISR_CONTEXT_()) {
                         (void)QXK_sched_();
                     }
@@ -366,7 +367,7 @@ QEvt const *QXThread::queueGet(uint_fast16_t const nTicks) {
         thr->m_temp.obj = reinterpret_cast<QMState const *>(&thr->m_eQueue);
 
         thr->teArm_(static_cast<enum_t>(QXK_QUEUE_SIG), nTicks);
-        QXK_attr_.readySet.remove(thr->m_prio);
+        QXK_attr_.readySet.remove(static_cast<uint_fast8_t>(thr->m_prio));
         (void)QXK_sched_();
         QF_CRIT_EXIT_();
         QF_CRIT_EXIT_NOP(); // BLOCK here
@@ -440,7 +441,7 @@ QEvt const *QXThread::queueGet(uint_fast16_t const nTicks) {
 void QXThread::block_(void) const {
     /// @pre the thread holding the lock cannot block!
     Q_REQUIRE_ID(600, (QXK_attr_.lockHolder != m_prio));
-    QXK_attr_.readySet.remove(m_prio);
+    QXK_attr_.readySet.remove(static_cast<uint_fast8_t>(m_prio));
     (void)QXK_sched_();
 }
 
@@ -452,7 +453,7 @@ void QXThread::block_(void) const {
 /// must be called from within a critical section
 ///
 void QXThread::unblock_(void) const {
-    QXK_attr_.readySet.insert(m_prio);
+    QXK_attr_.readySet.insert(static_cast<uint_fast8_t>(m_prio));
 
     if ((!QXK_ISR_CONTEXT_()) // not inside ISR?
         && (QF::active_[0] != static_cast<QActive *>(0))) // kernel started?
@@ -587,6 +588,8 @@ bool QXThread::delayCancel(void) {
 //****************************************************************************
 extern "C" {
 
+Q_DEFINE_THIS_MODULE("qxk_xthr")
+
 /// @description
 /// Called when the extended-thread handler function returns.
 ///
@@ -597,11 +600,23 @@ extern "C" {
 /// cleanup after the thread.
 ///
 void QXK_threadRet_(void) {
-    uint_fast8_t p;
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();
-    p = QXK_attr_.curr->m_prio;
+    QP::QXThread *thr = static_cast<QP::QXThread *>(QXK_attr_.curr);
+
+    /// @pre this function must:
+    /// - NOT be called from an ISR;
+    /// - be called from an extended thread;
+    /// - the thread must NOT be holding a scheduler lock and;
+    /// - the thread must NOT be already blocked on any object.
+    Q_REQUIRE_ID(900, (!QXK_ISR_CONTEXT_()) /* can't be in the ISR context */
+        && (thr != static_cast<QP::QXThread *>(0)) /* thr must be extended */
+        && (QXK_attr_.lockHolder != thr->m_prio) /* not holding a lock */
+        && (thr->getBlockingObj() == static_cast<void const *>(0)));//!blocked
+
+    uint_fast8_t p = static_cast<uint_fast8_t>(QXK_attr_.curr->m_startPrio);
+
     // remove this thread from the QF
     QP::QF::active_[p] = static_cast<QP::QActive *>(0);
     QXK_attr_.readySet.remove(p);

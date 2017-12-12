@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.1
-/// Last updated on  2017-10-17
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-12
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      601
+#define QP_VERSION      603
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "6.0.1"
+#define QP_VERSION_STR  "6.0.3"
 
-//! Tamperproof current QP release (6.0.1) and date (2017-11-10)
-#define QP_RELEASE      0x9A02AD46U
+//! Tamperproof current QP release (6.0.3) and date (2017-12-12)
+#define QP_RELEASE      0x99F31CE4U
 
 
 //****************************************************************************
@@ -192,7 +192,6 @@ extern char_t const versionStr[6];
         friend class QTimeEvt;
         friend class QEQueue;
         //friend class QTicker;
-        friend uint8_t QF_EVT_POOL_ID_ (QEvt const * const e);
         friend uint8_t QF_EVT_REF_CTR_ (QEvt const * const e);
         friend void QF_EVT_REF_CTR_INC_(QEvt const * const e);
         friend void QF_EVT_REF_CTR_DEC_(QEvt const * const e);

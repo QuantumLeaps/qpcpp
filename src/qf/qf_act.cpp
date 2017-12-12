@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -67,7 +67,7 @@ QActive *QF::active_[QF_MAX_ACTIVE + 1]; // to be used by QF ports only
 /// @sa QP::QF::remove_()
 ///
 void QF::add_(QActive * const a) {
-    uint_fast8_t p = a->m_prio;
+    uint_fast8_t p = static_cast<uint_fast8_t>(a->m_prio);
 
     Q_REQUIRE_ID(100, (static_cast<uint_fast8_t>(0) < p)
                       && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
@@ -81,7 +81,7 @@ void QF::add_(QActive * const a) {
     QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_ADD, QS::priv_.locFilter[QS::AO_OBJ], a)
         QS_TIME_();   // timestamp
         QS_OBJ_(a);   // the active object
-        QS_U8_(p);    // the priority of the active object
+        QS_U8_(static_cast<uint8_t>(p)); // prio of the active object
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();
@@ -101,7 +101,7 @@ void QF::add_(QActive * const a) {
 /// @sa QP::QF::add_()
 ///
 void QF::remove_(QActive * const a) {
-    uint_fast8_t p = a->m_prio;
+    uint_fast8_t p = static_cast<uint_fast8_t>(a->m_prio);
 
     Q_REQUIRE_ID(200, (static_cast<uint_fast8_t>(0) < p)
                       && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
@@ -116,7 +116,7 @@ void QF::remove_(QActive * const a) {
     QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_REMOVE, QS::priv_.locFilter[QS::AO_OBJ], a)
         QS_TIME_();   // timestamp
         QS_OBJ_(a);   // the active object
-        QS_U8_(p);    // the priority of the active object
+        QS_U8_(static_cast<uint8_t>(p)); // prio of the active object
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();
@@ -153,101 +153,62 @@ void QF::bzero(void * const start, uint_fast16_t len) {
     }
 }
 
-/* log-base-2 lookup table **************************************************/
+// Log-base-2 calculations ...
 #ifndef QF_LOG2
 
-uint8_t const QF_log2Lkup[256] = {
-    static_cast<uint8_t>(0),
-    static_cast<uint8_t>(1),
-    static_cast<uint8_t>(2), static_cast<uint8_t>(2),
-    static_cast<uint8_t>(3), static_cast<uint8_t>(3), static_cast<uint8_t>(3),
-    static_cast<uint8_t>(3),
-    static_cast<uint8_t>(4), static_cast<uint8_t>(4), static_cast<uint8_t>(4),
-    static_cast<uint8_t>(4), static_cast<uint8_t>(4), static_cast<uint8_t>(4),
-    static_cast<uint8_t>(4), static_cast<uint8_t>(4),
-    static_cast<uint8_t>(5), static_cast<uint8_t>(5), static_cast<uint8_t>(5),
-    static_cast<uint8_t>(5), static_cast<uint8_t>(5), static_cast<uint8_t>(5),
-    static_cast<uint8_t>(5), static_cast<uint8_t>(5), static_cast<uint8_t>(5),
-    static_cast<uint8_t>(5), static_cast<uint8_t>(5), static_cast<uint8_t>(5),
-    static_cast<uint8_t>(5), static_cast<uint8_t>(5), static_cast<uint8_t>(5),
-    static_cast<uint8_t>(5),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(6), static_cast<uint8_t>(6),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7), static_cast<uint8_t>(7), static_cast<uint8_t>(7),
-    static_cast<uint8_t>(7),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8), static_cast<uint8_t>(8),
-    static_cast<uint8_t>(8), static_cast<uint8_t>(8)
-};
+//! function that returns (log2(x) + 1), where @p x is a 32-bit bitmask */
+///
+/// @description
+/// This function returns the 1-based number of the most significant 1-bit
+/// of a 32-bit bitmask. This function can be replaced in the QP ports, if
+/// the CPU has special instructions, such as CLZ (count leading zeros).
+///
+uint_fast8_t QPSet::findMax(void) const {
+    static uint8_t const log2LUT[16] = {
+        static_cast<uint8_t>(0), static_cast<uint8_t>(1),
+        static_cast<uint8_t>(2), static_cast<uint8_t>(2),
+        static_cast<uint8_t>(3), static_cast<uint8_t>(3),
+        static_cast<uint8_t>(3), static_cast<uint8_t>(3),
+        static_cast<uint8_t>(4), static_cast<uint8_t>(4),
+        static_cast<uint8_t>(4), static_cast<uint8_t>(4),
+        static_cast<uint8_t>(4), static_cast<uint8_t>(4),
+        static_cast<uint8_t>(4), static_cast<uint8_t>(4)
+    };
+#if (QF_MAX_ACTIVE <= 32)
+    uint32_t x = m_bits;
+    uint_fast8_t n = static_cast<uint_fast8_t>(0);
+#else
+    uint32_t x;
+    uint_fast8_t n;
+    if (m_bits[1] != static_cast<uint32_t>(0)) {
+        x = m_bits[1];
+        n = static_cast<uint_fast8_t>(32);
+    }
+    else {
+        x = m_bits[0];
+        n = static_cast<uint_fast8_t>(0);
+    }
+#endif
+    if (x != static_cast<uint32_t>(0)) {
+        uint32_t t = (x >> 16);
+        if (t != static_cast<uint32_t>(0)) {
+            x = t;
+            n += static_cast<uint_fast8_t>(16);
+        }
+        t = (x >> 8);
+        if (t != static_cast<uint32_t>(0)) {
+            x = t;
+            n += static_cast<uint_fast8_t>(8);
+        }
+        t = (x >> 4);
+        if (t != static_cast<uint32_t>(0)) {
+            x = t;
+            n += static_cast<uint_fast8_t>(4);
+        }
+        n += static_cast<uint_fast8_t>(log2LUT[x]);
+    }
+    return n;
+}
 
 #endif // QF_LOG2
 

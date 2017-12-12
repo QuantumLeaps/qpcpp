@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to ARM Cortex-M, cooperative QV kernel, IAR-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.6
-/// Last updated on  2017-07-28
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -37,30 +37,70 @@
 
 #include "qf_port.h"
 
-#if (__CORE__ != __ARM6M__) // NOT Cortex-M0/M0+/M1 ?
+#if (__CORE__ == __ARM6M__) // Cortex-M0/M0+/M1 ?
 
 extern "C" {
 
-#define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004)
-#define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED14)
-#define NVIC_IP      ((uint32_t volatile *)0xE000E400)
+// hand-optimized quick LOG2 in assembly
+uint_fast8_t QF_qlog2(uint32_t x) {
+    static uint8_t const log2LUT[16] = {
+        static_cast<uint8_t>(0), static_cast<uint8_t>(1),
+        static_cast<uint8_t>(2), static_cast<uint8_t>(2),
+        static_cast<uint8_t>(3), static_cast<uint8_t>(3),
+        static_cast<uint8_t>(3), static_cast<uint8_t>(3),
+        static_cast<uint8_t>(4), static_cast<uint8_t>(4),
+        static_cast<uint8_t>(4), static_cast<uint8_t>(4),
+        static_cast<uint8_t>(4), static_cast<uint8_t>(4),
+        static_cast<uint8_t>(4), static_cast<uint8_t>(4)
+    };
+    uint_fast8_t n;
+    __asm (
+        "MOVS    %[n],#0\n"
+        "LSRS    r2,r0,#16\n"
+        "BEQ.N   QF_qlog2_1\n"
+        "MOVS    %[n],#16\n"
+        "MOVS    r0,r2\n"
+    "QF_qlog2_1:\n"
+        "LSRS    r2,r0,#8\n"
+        "BEQ.N   QF_qlog2_2\n"
+        "ADDS    %[n],%[n],#8\n"
+        "MOVS    r0,r2\n"
+    "QF_qlog2_2:\n"
+        "LSRS    r2,r0,#4\n"
+        "BEQ.N   QF_qlog2_3\n"
+        "ADDS    %[n],%[n],#4\n"
+        "MOVS    r0,r2\n"
+    "QF_qlog2_3:"
+        : [n]"=r"(n)
+    );
+    return n + log2LUT[x];
+}
 
-/*
-* Initialize the exception priorities and IRQ priorities to safe values.
-*
-* Description:
-* On Cortex-M3/M4/M7, this QV port disables interrupts by means of the
-* BASEPRI register. However, this method cannot disable interrupt
-* priority zero, which is the default for all interrupts out of reset.
-* The following code changes the SysTick priority and all IRQ priorities
-* to the safe value QF_BASEPRI, wich the QF critical section can disable.
-* This avoids breaching of the QF critical sections in case the
-* application programmer forgets to explicitly set priorities of all
-* "kernel aware" interrupts.
-*
-* The interrupt priorities established in QV_init() can be later
-* changed by the application-level code.
-*/
+} // extern "C"
+
+#else // NOT Cortex-M0/M0+/M1 ?
+
+extern "C" {
+
+#define SCnSCB_ICTR  (reinterpret_cast<uint32_t volatile *>(0xE000E004))
+#define SCB_SYSPRI   (reinterpret_cast<uint32_t volatile *>(0xE000ED14))
+#define NVIC_IP      (reinterpret_cast<uint32_t volatile *>(0xE000E400))
+
+// Initialize the exception priorities and IRQ priorities to safe values.
+//
+// Description:
+// On Cortex-M3/M4/M7, this QV port disables interrupts by means of the
+// BASEPRI register. However, this method cannot disable interrupt
+// priority zero, which is the default for all interrupts out of reset.
+// The following code changes the SysTick priority and all IRQ priorities
+// to the safe value QF_BASEPRI, wich the QF critical section can disable.
+// This avoids breaching of the QF critical sections in case the
+// application programmer forgets to explicitly set priorities of all
+// "kernel aware" interrupts.
+//
+// The interrupt priorities established in QV_init() can be later
+// changed by the application-level code.
+//
 void QV_init(void) {
 
     // set exception priorities to QF_BASEPRI...

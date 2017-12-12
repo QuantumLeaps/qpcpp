@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-04
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -227,7 +227,7 @@ void QActive::start(uint_fast8_t const prio,
                       && (stkSto == static_cast<void *>(0)));
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
-    m_prio = prio;  // set the QF priority of this AO
+    m_prio = static_cast<uint8_t>(prio);  // set the QF prio of this AO
 
     QF::add_(this); // make QF aware of this AO
 
@@ -252,7 +252,7 @@ void QActive::stop(void) {
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-    QV_readySet_.remove(m_prio); // make sure the AO is not ready
+    QV_readySet_.remove(static_cast<uint_fast8_t>(m_prio)); // AO is not ready
     QF_CRIT_EXIT_();
 }
 

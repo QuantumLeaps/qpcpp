@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-18
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -69,11 +69,11 @@ namespace QP {
     /// @description
     /// The dynamic range of this data type determines the maximum length
     /// of the ring buffer managed by the native QF event queue.
-    typedef uint_fast8_t QEQueueCtr;
+    typedef uint8_t QEQueueCtr;
 #elif (QF_EQUEUE_CTR_SIZE == 2)
-    typedef uint_fast16_t QEQueueCtr;
+    typedef uint16_t QEQueueCtr;
 #elif (QF_EQUEUE_CTR_SIZE == 4)
-    typedef uint_fast32_t QEQueueCtr;
+    typedef uint32_t QEQueueCtr;
 #else
     #error "QF_EQUEUE_CTR_SIZE defined incorrectly, expected 1, 2, or 4"
 #endif

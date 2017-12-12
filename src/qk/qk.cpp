@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-18
+/// Last updated for version 6.02
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -84,8 +84,8 @@ void QF::init(void) {
     bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
     bzero(&QK_attr_,   static_cast<uint_fast16_t>(sizeof(QK_attr_)));
 
-    QK_attr_.actPrio  = static_cast<uint_fast8_t>(0); // prio of QK idle loop
-    QK_attr_.lockPrio = static_cast<uint_fast8_t>(QF_MAX_ACTIVE); // locked
+    QK_attr_.actPrio  = static_cast<uint8_t>(0); // prio of QK idle loop
+    QK_attr_.lockPrio = static_cast<uint8_t>(QF_MAX_ACTIVE); // locked
 
 #ifdef QK_INIT
     QK_INIT(); // port-specific initialization of the QK kernel
@@ -112,7 +112,7 @@ void QF::stop(void) {
 //! process all events posted during initialization */
 static void initial_events(void); // prototype
 static void initial_events(void) {
-    QK_attr_.lockPrio = static_cast<uint_fast8_t>(0); // scheduler unlocked
+    QK_attr_.lockPrio = static_cast<uint8_t>(0); // scheduler unlocked
 
     // any active objects need to be scheduled before starting event loop?
     if (QK_sched_() != static_cast<uint_fast8_t>(0)) {
@@ -156,11 +156,10 @@ int_t QF::run(void) {
 // @param[in] stkSize stack size [bytes]
 // @param[in] ie      pointer to the optional initial event (might be NULL)
 //
-// @note This function should be called via the macro START().
-//
 // @usage
 // The following example shows starting an AO when a per-task stack is needed:
-// @include qf_start.cpp
+// @include
+// qf_start.cpp
 //
 void QActive::start(uint_fast8_t const prio,
                     QEvt const *qSto[], uint_fast16_t const qLen,
@@ -177,7 +176,7 @@ void QActive::start(uint_fast8_t const prio,
 
     m_eQueue.init(qSto, qLen); // initialize the built-in queue
 
-    m_prio = prio;  // set the QF priority of this AO
+    m_prio = static_cast<uint8_t>(prio);  // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
 
     this->init(ie); // take the top-most initial tran. (virtual)
@@ -212,7 +211,7 @@ void QActive::stop(void) {
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-    QK_attr_.readySet.remove(m_prio);
+    QK_attr_.readySet.remove(static_cast<uint_fast8_t>(m_prio));
     if (QK_sched_() != static_cast<uint_fast8_t>(0)) {
         QK_activate_();
     }
@@ -251,16 +250,16 @@ QSchedStatus QK::schedLock(uint_fast8_t const ceiling) {
     /// - cannot be called from an ISR;
     Q_REQUIRE_ID(600, !QK_ISR_CONTEXT_());
 
-    // first store the previous lock prio
-    if (QK_attr_.lockPrio < ceiling) { // raising the lock prio?
-        stat = static_cast<QSchedStatus>(QK_attr_.lockPrio << 8);
-        QK_attr_.lockPrio = ceiling;
+    // first store the previous lock prio if it is below the ceiling
+    if (static_cast<uint_fast8_t>(QK_attr_.lockPrio) < ceiling) {
+        stat = (static_cast<QSchedStatus>(QK_attr_.lockPrio) << 8);
+        QK_attr_.lockPrio = static_cast<uint8_t>(ceiling);
 
         QS_BEGIN_NOCRIT_(QS_SCHED_LOCK,
                          static_cast<void *>(0), static_cast<void *>(0))
             QS_TIME_(); // timestamp
             QS_2U8_(static_cast<uint8_t>(stat), /* the previous lock prio */
-                    static_cast<uint8_t>(QK_attr_.lockPrio)); // new lock prio
+                    QK_attr_.lockPrio); // new lock prio
         QS_END_NOCRIT_()
 
         // add the previous lock holder priority
@@ -296,7 +295,7 @@ QSchedStatus QK::schedLock(uint_fast8_t const ceiling) {
 void QK::schedUnlock(QSchedStatus const stat) {
     // has the scheduler been actually locked by the last QK_schedLock()?
     if (stat != static_cast<QSchedStatus>(0xFF)) {
-        uint_fast8_t lockPrio = QK_attr_.lockPrio; // volatilie into tmp
+        uint_fast8_t lockPrio = static_cast<uint_fast8_t>(QK_attr_.lockPrio);
         uint_fast8_t prevPrio = static_cast<uint_fast8_t>(stat >> 8);
         QF_CRIT_STAT_
         QF_CRIT_ENTRY_();
@@ -315,9 +314,9 @@ void QK::schedUnlock(QSchedStatus const stat) {
         QS_END_NOCRIT_()
 
         // restore the previous lock priority and lock holder
-        QK_attr_.lockPrio   = prevPrio;
+        QK_attr_.lockPrio   = static_cast<uint8_t>(prevPrio);
         QK_attr_.lockHolder =
-            static_cast<uint_fast8_t>(stat & static_cast<QSchedStatus>(0xFF));
+            static_cast<uint8_t>(stat & static_cast<QSchedStatus>(0xFF));
 
         // find the highest-prio thread ready to run
         if (QK_sched_() != static_cast<uint_fast8_t>(0)) { // priority found?
@@ -351,15 +350,15 @@ uint_fast8_t QK_sched_(void) {
     uint_fast8_t p = QK_attr_.readySet.findMax();
 
     // is the highest-prio below the active prio?
-    if (p <= QK_attr_.actPrio) {
+    if (p <= static_cast<uint_fast8_t>(QK_attr_.actPrio)) {
         p = static_cast<uint_fast8_t>(0); // active object not eligible
     }
-    else if (p <= QK_attr_.lockPrio) { // is it below the lock prio?
+    else if (p <= static_cast<uint_fast8_t>(QK_attr_.lockPrio)) {//below lock?
         p = static_cast<uint_fast8_t>(0); // active object not eligible
     }
     else {
         Q_ASSERT_ID(610, p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE));
-        QK_attr_.nextPrio = p; // next AO to run
+        QK_attr_.nextPrio = static_cast<uint8_t>(p); // next AO to run
     }
     return p;
 }
@@ -374,8 +373,8 @@ uint_fast8_t QK_sched_(void) {
 /// interrupts **disabled**.
 ///
 void QK_activate_(void) {
-    uint_fast8_t pin = QK_attr_.actPrio; // save the active priority
-    uint_fast8_t p   = QK_attr_.nextPrio; /* the next prio to run */
+    uint_fast8_t pin = static_cast<uint_fast8_t>(QK_attr_.actPrio);
+    uint_fast8_t p   = static_cast<uint_fast8_t>(QK_attr_.nextPrio);
     QP::QActive *a;
 
     // QS tracing or thread-local storage?
@@ -386,12 +385,12 @@ void QK_activate_(void) {
     // QK_attr_.nextPrio must be non-zero upon entry to QK_activate_()
     Q_REQUIRE_ID(800, p != static_cast<uint_fast8_t>(0));
 
-    QK_attr_.nextPrio = static_cast<uint_fast8_t>(0); // clear for next time
+    QK_attr_.nextPrio = static_cast<uint8_t>(0); // clear for next time
 
     // loop until no more ready-to-run AOs of higher prio than the initial
     do {
         a = QP::QF::active_[p]; // obtain the pointer to the AO
-        QK_attr_.actPrio = p; // this becomes the active priority
+        QK_attr_.actPrio = static_cast<uint8_t>(p); // the new active prio
 
         QS_BEGIN_NOCRIT_(QP::QS_SCHED_NEXT,
                          QP::QS::priv_.locFilter[QP::QS::AO_OBJ], a)
@@ -432,7 +431,7 @@ void QK_activate_(void) {
         if (p <= pin) {
             p = static_cast<uint_fast8_t>(0); // active object not eligible
         }
-        else if (p <= QK_attr_.lockPrio) { // is it below the lock prio?
+        else if (p <= static_cast<uint_fast8_t>(QK_attr_.lockPrio)) {
             p = static_cast<uint_fast8_t>(0); // active object not eligible
         }
         else {
@@ -440,7 +439,7 @@ void QK_activate_(void) {
         }
     } while (p != static_cast<uint_fast8_t>(0));
 
-    QK_attr_.actPrio = pin; // restore the active priority
+    QK_attr_.actPrio = static_cast<uint8_t>(pin); // restore the active prio
 
 #ifdef Q_SPY
     if (pin != static_cast<uint_fast8_t>(0)) { // resuming an active object?
@@ -449,7 +448,7 @@ void QK_activate_(void) {
         QS_BEGIN_NOCRIT_(QP::QS_SCHED_RESUME,
                          QP::QS::priv_.locFilter[QP::QS::AO_OBJ], a)
             QS_TIME_();  // timestamp
-            QS_2U8_(static_cast<uint8_t>(pin), // prio of the resumed AO
+            QS_2U8_(static_cast<uint8_t>(pin), /* prio of the resumed AO */
                     static_cast<uint8_t>(pprev)); // previous priority
         QS_END_NOCRIT_()
     }

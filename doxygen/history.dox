@@ -2,7 +2,30 @@ namespace QP {
 
 /** @page history Revision History
 
-@section qpcpp_6_0_1 Version 6.0.1, 2017-11-10
+@section qpcpp_6_0_3 Version 6.0.3, 2017-12-12
+
+Changes since version 6.0.1:
+
+- fixed [bug#193 "QXK: context switch from extended to basic thread fails"](https://sourceforge.net/p/qpc/bugs/193/)
+
+- replaced attributes of QP::QActive and QP::QEQueue classes from type `uint_fastX_t` to `uintX_t`. For the ARM Cortex-M port, these changes reduce the memory footprint of each QP::QActive instance from 50 to 38 bytes (25% improvement).
+
+- improved the performance of the ARM Cortex-M0/M0+ ports, which do not supprt the CLZ (count leading zeros) instruction. All QP ports to Cortex-M0/M0+ (qv, qk and qxk) now contain hand-optimized assembly implementation of the LOG2 (log-base-2) function. The implementation executes only in 14 machine instructions and uses only 16-byte look-up-table (LUT). This replaces LOG2 implementation based on a 256-byte LUT.
+
+- changed the interrupt disabling policy in ARM Cortex-M ports back to "unconditional interrupt disabling", which is simpler and faster than "saving-and-restoring interrupt status".
+
+- added a port to ARM Cortex-M with the LLVM compiler (currently only for the dual-mode QXK kernel). Unlike the other ARM Cortex-M ports, the port to LLVM uses the "saving-and-restoring interrupt status" interrupt disabling policy (explicit request from a commercial customer).
+
+- removed ARM Cortex-M port and examples for the TI-ARM compiler. (Projects for the TI CCS can use the GNU-ARM toolchain and the existing GNU-ARM ports).
+
+- Added the DPP-COMP example (Dining Philosophers Problem) with the "Orthogonal Component" state pattern located in `qpcpp/examples/win32/dpp-comp`. This example demonstrates also a partitioned QM model into external packages for the Container (Table active object) and the Components (Philo active objects).
+
+@note
+This release does not change any of the QP/C++ APIs.
+
+
+------------------------------------------------------------------------------
+@section qpcpp_6_0_1 Version 6.0.1, 2017-12-10
 The main focus of this release is to fix the remaining problems with transitions out of eXit-Points in sub-machines. Specifically, this release modifies the QMsm-based state machine implementation strategy (file src/qf/qep_msm.cpp to properly handle transitions from eXit-Points to Entry-Points and to History connectors in sub-machines. These changes are part of fixing the following bugs reported for QM:
 
 - [bug#190 "Exit-Point segment targeting History doesn't work](https://sourceforge.net/p/qpc/bugs/190/)

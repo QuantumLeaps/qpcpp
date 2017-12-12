@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-20
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -174,11 +174,11 @@ public: // for access from extern "C" functions
 #endif
 
     //! QF priority (1..#QF_MAX_ACTIVE) of this active object.
-    uint_fast8_t m_prio;
+    uint8_t m_prio;
 
 #ifdef qxk_h // QXK kernel used?
     //! QF start priority (1..#QF_MAX_ACTIVE) of this active object.
-    uint_fast8_t m_startPrio;
+    uint8_t m_startPrio;
 #endif
 
 
@@ -240,12 +240,12 @@ public:
 
     //! Get the priority of the active object.
     uint_fast8_t getPrio(void) const {
-        return m_prio;
+        return static_cast<uint_fast8_t>(m_prio);
     }
 
     //! Set the priority of the active object.
     void setPrio(uint_fast8_t const prio) {
-        m_prio = prio;
+        m_prio = static_cast<uint8_t>(prio);
     }
 
 #ifdef QF_OS_OBJECT_TYPE
@@ -873,6 +873,6 @@ public:
 
 //! Invoke the system clock tick processing for rate 0
 /// @sa TICK_X()
-#define TICK(sender_) TICK_X(static_cast<uint8_t>(0), (sender_))
+#define TICK(sender_) TICK_X(static_cast<uint_fast8_t>(0), (sender_))
 
 #endif // qf_h

@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-26
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -44,54 +44,6 @@
 #endif
 
 namespace QP {
-
-/****************************************************************************/
-/* Log-base-2 calculations ...*/
-#ifndef QF_LOG2
-
-    //! Lookup table for (log2(n) + 1), where n = 0..255 */
-    ///
-    /// @description
-    /// This lookup delivers the 1-based number of the most significant 1-bit
-    /// of a byte.
-    extern uint8_t const QF_log2Lkup[256];
-
-    //! function that returns (log2(x) + 1), where @p x is uint32_t */
-    ///
-    /// @description
-    /// This function returns the 1-based number of the most significant 1-bit
-    /// of a 32-bit number. This function can be replaced in the QP ports, if
-    /// the CPU supports special instructions, such as CLZ
-    /// (count leading zeros).
-    ///
-    inline uint_fast8_t QF_LOG2(uint32_t const x) {
-        uint_fast8_t n;
-        uint_fast8_t i;
-
-        if ((x >> 16) != static_cast<uint32_t>(0)) {
-            if ((x >> 24) != static_cast<uint32_t>(0)) {
-                i = static_cast<uint_fast8_t>(x >> 24);
-                n = static_cast<uint_fast8_t>(24);
-            }
-            else {
-                i = static_cast<uint_fast8_t>(x >> 16);
-                n = static_cast<uint_fast8_t>(16);
-            }
-        }
-        else {
-            if ((x >> 8) != static_cast<uint32_t>(0)) {
-                i = static_cast<uint_fast8_t>(x >> 8);
-                n = static_cast<uint_fast8_t>(8);
-            }
-            else {
-                i = static_cast<uint_fast8_t>(x);
-                n = static_cast<uint_fast8_t>(0);
-            }
-        }
-        return static_cast<uint_fast8_t>(QF_log2Lkup[i]) + n;
-    }
-
-#endif // QF_LOG2
 
 //****************************************************************************
 #if (QF_MAX_ACTIVE <= 32)
@@ -141,10 +93,16 @@ public:
            ~(static_cast<uint32_t>(1) << (n - static_cast<uint_fast8_t>(1))));
     }
 
+#ifdef QF_LOG2
     //! find the maximum element in the set, returns zero if the set is empty
+    //! inline definition
     uint_fast8_t findMax(void) const {
         return QF_LOG2(m_bits);
     }
+#else
+    //! find the maximum element in the set, returns zero if the set is empty
+    uint_fast8_t findMax(void) const;
+#endif
 };
 
 #else // QF_MAX_ACTIVE > 32
@@ -218,12 +176,17 @@ public:
         }
     }
 
+#ifdef QF_LOG2
     //! find the maximum element in the set, returns zero if the set is empty
     uint_fast8_t findMax(void) const {
         return (m_bits[1] != static_cast<uint32_t>(0))
             ? (QF_LOG2(m_bits[1]) + static_cast<uint_fast8_t>(32)) \
             : (QF_LOG2(m_bits[0]));
     }
+#else
+    //! find the maximum element in the set, returns zero if the set is empty
+    uint_fast8_t findMax(void) const;
+#endif
 };
 
 #endif // QF_MAX_ACTIVE

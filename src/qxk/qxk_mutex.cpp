@@ -4,8 +4,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 6.0.1
-/// Last updated on  2017-11-03
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -143,7 +143,7 @@ bool QXMutex::lock(uint_fast16_t const nTicks) {
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) /* don't call from an ISR! */
         && (curr != static_cast<QXThread *>(0)) /* curr must be extended */
         && ((m_ceiling == static_cast<uint8_t>(0)) /* below ceiling */
-            || (curr->m_startPrio < static_cast<uint_fast8_t>(m_ceiling)))
+            || (curr->m_startPrio < m_ceiling))
         && (QXK_attr_.lockHolder != curr->m_prio) /* not holding a lock */
         && (curr->m_temp.obj == static_cast<QMState *>(0))); // not blocked
 
@@ -157,23 +157,25 @@ bool QXMutex::lock(uint_fast16_t const nTicks) {
                 QF::active_[m_ceiling] == reinterpret_cast<QActive *>(this));
 
             // switch the priority of this thread to the mutex ceiling
-            curr->m_prio = static_cast<uint_fast8_t>(m_ceiling);
+            curr->m_prio = m_ceiling;
             QF::active_[m_ceiling] = curr;
 
-            QXK_attr_.readySet.remove(curr->m_startPrio);
-            QXK_attr_.readySet.insert(curr->m_prio);
+            QXK_attr_.readySet.remove(
+                static_cast<uint_fast8_t>(curr->m_startPrio));
+            QXK_attr_.readySet.insert(
+                static_cast<uint_fast8_t>(curr->m_prio));
         }
         m_holderPrio = static_cast<uint8_t>(curr->m_startPrio);
 
         QS_BEGIN_NOCRIT_(QS_MUTEX_LOCK,
             static_cast<void *>(0), static_cast<void *>(0))
             QS_TIME_();  // timestamp
-            QS_2U8_(static_cast<uint8_t>(curr->m_startPrio), /* start prio */
+            QS_2U8_(curr->m_startPrio, /* start prio */
                     m_ceiling); // current ceiling
         QS_END_NOCRIT_()
     }
     // is the mutex locked by this thread already (nested locking)?
-    else if (static_cast<uint_fast8_t>(m_holderPrio) == curr->m_startPrio) {
+    else if (m_holderPrio == curr->m_startPrio) {
 
         // the nesting level must not exceed 0xFF
         Q_ASSERT_ID(220, m_lockNest < static_cast<uint8_t>(0xFF));
@@ -193,8 +195,8 @@ bool QXMutex::lock(uint_fast16_t const nTicks) {
 
         // remove this thr prio from the ready set (block)
         // and insert to the waiting set on this mutex
-        QXK_attr_.readySet.remove(curr->m_prio);
-        m_waitSet.insert(curr->m_prio);
+        QXK_attr_.readySet.remove(static_cast<uint_fast8_t>(curr->m_prio));
+        m_waitSet.insert(static_cast<uint_fast8_t>(curr->m_prio));
 
         // store the blocking object (this mutex)
         curr->m_temp.obj = reinterpret_cast<QMState *>(this);
@@ -254,10 +256,10 @@ bool QXMutex::tryLock(void) {
     ///   - the thread priority must be below the ceiling of the mutex;
     /// - the thread must NOT be holding a scheduler lock;
     Q_REQUIRE_ID(300, (!QXK_ISR_CONTEXT_()) /* don't call from an ISR! */
-        && (QXK_attr_.lockPrio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
+        && (QXK_attr_.lockPrio <= static_cast<uint8_t>(QF_MAX_ACTIVE))
         && (curr != static_cast<QActive *>(0)) /* curr thread must be valid */
         && ((m_ceiling == static_cast<uint8_t>(0)) /* below ceiling */
-            || (curr->m_startPrio < static_cast<uint_fast8_t>(m_ceiling)))
+            || (curr->m_startPrio < m_ceiling))
         && (curr->m_prio != QXK_attr_.lockHolder)); // not holding a lock
 
     // is the mutex available?
@@ -270,11 +272,13 @@ bool QXMutex::tryLock(void) {
                 QF::active_[m_ceiling] == reinterpret_cast<QActive *>(this));
 
             // switch the priority of this thread to the mutex ceiling
-            curr->m_prio = static_cast<uint_fast8_t>(m_ceiling);
+            curr->m_prio = m_ceiling;
             QF::active_[m_ceiling] = curr;
 
-            QXK_attr_.readySet.remove(curr->m_startPrio);
-            QXK_attr_.readySet.insert(curr->m_prio);
+            QXK_attr_.readySet.remove(
+                static_cast<uint_fast8_t>(curr->m_startPrio));
+            QXK_attr_.readySet.insert(
+                static_cast<uint_fast8_t>(curr->m_prio));
         }
 
         // make curr thread the new mutex holder
@@ -288,7 +292,7 @@ bool QXMutex::tryLock(void) {
         QS_END_NOCRIT_()
     }
     // is the mutex held by this thread already (nested locking)?
-    else if (static_cast<uint_fast8_t>(m_holderPrio) == curr->m_startPrio) {
+    else if (m_holderPrio == curr->m_startPrio) {
         // the nesting level must not exceed 0xFF
         Q_ASSERT_ID(320, m_lockNest < static_cast<uint8_t>(0xFF));
 
@@ -343,9 +347,9 @@ void QXMutex::unlock(void) {
     /// - the mutex must be already locked at least once.
     Q_REQUIRE_ID(400, (!QXK_ISR_CONTEXT_()) /* don't call from an ISR! */
         && (curr != static_cast<QActive *>(0)) /* curr must be valid */
-        && (curr->m_startPrio == static_cast<uint_fast8_t>(m_holderPrio))
+        && (curr->m_startPrio == static_cast<uint8_t>(m_holderPrio))
         && ((m_ceiling == static_cast<uint8_t>(0)) /* curr at ceiling prio */
-            || (curr->m_prio == static_cast<uint_fast8_t>(m_ceiling)))
+            || (curr->m_prio == m_ceiling))
         && (m_lockNest > static_cast<uint8_t>(0))); // locked at least once
 
     // is this the last nesting level?
@@ -357,16 +361,16 @@ void QXMutex::unlock(void) {
 
             // remove the boosted priority and insert the original priority
             QXK_attr_.readySet.remove(static_cast<uint_fast8_t>(m_ceiling));
-            QXK_attr_.readySet.insert(curr->m_startPrio);
+            QXK_attr_.readySet.insert(
+                static_cast<uint_fast8_t>(curr->m_startPrio));
         }
 
         // the mutex no longer held by a thread
         m_holderPrio = static_cast<uint8_t>(0);
 
-        QS_BEGIN_NOCRIT_(QS_MUTEX_UNLOCK,
-            static_cast<void *>(0), static_cast<void *>(0))
+        QS_BEGIN_NOCRIT_(QS_MUTEX_UNLOCK, static_cast<void *>(0), curr)
             QS_TIME_();  // timestamp
-            QS_2U8_(static_cast<uint8_t>(curr->m_startPrio),  /* start prio */
+            QS_2U8_(static_cast<uint8_t>(curr->m_startPrio), /* start prio */
                     m_ceiling);  // the mutex ceiling
         QS_END_NOCRIT_()
 
@@ -400,7 +404,7 @@ void QXMutex::unlock(void) {
 
             if (m_ceiling != static_cast<uint8_t>(0)) {
                 // switch the priority of this thread to the mutex ceiling
-                thr->m_prio = static_cast<uint_fast8_t>(m_ceiling);
+                thr->m_prio = m_ceiling;
                 QF::active_[m_ceiling] = thr;
             }
 
@@ -408,10 +412,9 @@ void QXMutex::unlock(void) {
             m_holderPrio = static_cast<uint8_t>(thr->m_startPrio);
 
             // make the thread ready to run
-            QXK_attr_.readySet.insert(thr->m_prio);
+            QXK_attr_.readySet.insert(static_cast<uint_fast8_t>(thr->m_prio));
 
-            QS_BEGIN_NOCRIT_(QS_MUTEX_LOCK,
-                static_cast<void *>(0), static_cast<void *>(0))
+            QS_BEGIN_NOCRIT_(QS_MUTEX_LOCK, static_cast<void *>(0), thr)
                 QS_TIME_();  // timestamp
                 QS_2U8_(static_cast<uint8_t>(thr->m_startPrio),/*start prio*/
                         m_ceiling);  // ceiling prio

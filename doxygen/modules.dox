@@ -68,7 +68,9 @@ Sometimes it is not practical to break up long RTC steps, and consequently the t
 @brief
 Preemptive Dual-Mode (Run-to-Completion/Blocking) RTOS Kernel
 
-QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that executes active objects like the @ref qk "QK kernel", but can also execute traditional __blocking__ threads (extended threads). In this respect, QXK behaves exactly as a conventional __RTOS__ (Real-Time Operating System). QXK has been designed specifically for mixing event-driven active objects with traditional blocking code, such as commercial middleware (TCP/IP stacks, UDP stacks, embedded file systems, etc.) or legacy software.
+QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that executes active objects like the @ref qk "QK kernel" (@ref qxk_basic "basic threads"), but can also execute traditional __blocking__ threads (@ref qxk_extended "extended threads"). In this respect, QXK behaves exactly like a __conventional RTOS__ (Real-Time Operating System).
+
+QXK has been designed specifically for mixing event-driven active objects with traditional blocking code, such as commercial middleware (TCP/IP stacks, UDP stacks, embedded file systems, etc.) or legacy software. To this end, QXK is not only more efficient than running QP on top of a @ref ports_rtos "traditional 3rd-party RTOS" (because non-blocking @ref qxk_basic "basic threads" take far less stack space and CPU cycles for context switch than the much heavier @ref qxk_extended "extended threads"). But the biggest advantage of QXK is that it __protects__ the application-level code from inadvertent mixing of blocking calls inside the event-driven active objects. Specifically, QXK "knows" the type of the thread context (extended/basic) and asserts internally if a blocking call (e.g., semaphore-wait or a time-delay) is attempted in a basic thread (active object). This is something that a QP port to a @ref ports_rtos "conventional 3rd-party RTOS" cannot do, because such an RTOS runs all code (including active objects) in the context of havyweight extended threads.
 
 Currently, the QXK kernel has been ported to the following CPUs:
 
@@ -88,12 +90,26 @@ Example illustrates: 6 active objects plus two extended threads, QXK blocking de
 
 
 ------------------------------------------------------------------------------
-@section qxk_overview QXK Overview
+@section qxk_basic Basic Threads
+QXK supports **basic**-threads (non-blocking, run-to-completion activations). The basic-threads all nest on the same stack (Main Stack Pointer in ARM Cortex-M), so the stack usage is reduced. The additional advantage of basic-threads is that switching from basic-thread to another basic-thread requires only @ref QXK_activate_() "activation" of the basic-thread, which is much simpler and faster than full context-switch required for @ref qxk_extended "extended"-threads that QXK also supports (see below).
 
-QXK distinguishes two kinds of threads: **basic**-threads (non-blocking, run-to-completion activations) and **extended**-threads (blocking, typically structrued as endless loops). The basic-threads all nest on the same stack (Main Stack Pointer in ARM Cortex-M). The extended-threads use private per-thread stacks, as in conventional RTOS kernels. Any switching from basic- to extended-thread or extended- to extended-thread requires full context switch. On the other hand, switching from basic-thread to another basic-thread requires only activation of the basic-thread, which is much simpler and faster.
+@remarks
+QXK adopts the "basic/exteded thread" terms from the <a class="extern" target="_blank"  href="https://www.autosar.org">OSEK/AUTOSAR Operating System</a> specification. Other real-time kernels might use different terminology for similar concepts. For example, the <a class="extern" target="_blank" href="http://www.quasarsoft.com/">Q-Kernel</a> uses the term "fibers", while <a class="extern" target="_blank"  href="http://www.ti.com/tool/TI-RTOS">TI-RTOS</a> uses the term "software interrupts" for concepts closely related to "basic threads".
 
-<div class="separate"></div>
-@subsection qxk_classes Classes in QXK
+
+------------------------------------------------------------------------------
+@section qxk_extended Extended Threads
+QXK supports **extended**-threads (blocking, typically structrued as endless loops). The extended-threads use private per-thread stacks, as in conventional RTOS kernels. Any switching from basic-to-extended thread or extended-to-extended thread requires full context switch.
+
+@remarks
+QXK is a unique dual-mode kernel on the market that supports interleaving the priorities of basic threads and extended threads. Other dual-mode kernels typically limit the priorities of basic threads to be always higher (more urgent) than any of the extended threads.
+
+
+@sa QP::QXThread
+
+
+------------------------------------------------------------------------------
+@section qxk_classes Classes in QXK
 The figure below shows the main classes introduced in the QXK kernel and their relation to the classes of the QP framework.
 
 @image html qxk_classes.gif "Classes of the QXK dual-mode kernel"
@@ -117,7 +133,7 @@ The main takeaway from the QXK class diagram is QXK's **optimal, tight integrati
 
 
 ------------------------------------------------------------------------------
-@section qxk_features QXK Features
+@section qxk_features QXK Feature Summary
 As you can see in the list below, <span class="highlight">QXK provides most features you might expect of a traditional blocking **RTOS** kernel and is <strong>recommended</strong> as the preferred RTOS kernel for QP applications</span> that need to mix active objects with traditional blocking code.
 
 <ul class="tag">
@@ -127,7 +143,7 @@ As you can see in the list below, <span class="highlight">QXK provides most feat
 
 > NOTE: QXK always executes the highest-priority thread that is ready to run (is not blocked). The scheduling algorithm used in QXK meets all the requirement of the Rate Monotonic Scheduling (a.k.a. Rate Monotonic Analysis — RMA) and can be used in hard real-time systems.
 
-<li><span class="bullet">&gt;</span>All threads in QXK are capable of **blocking**. However, QXK distinguishes between two types of threads:
+<li><span class="bullet">&gt;</span>QXK distinguishes between two types of threads:
 </li>
 
 - **basic threads** of active objects that are made ready-to-run by events posted to the active objects. Such basic threads are non-blocking, run-to-completion activations that cannot block in the middle of the RTC step. QXK asserts when a basic thread attempts to use a blocking mechanism, such as a time-delay or a semaphore-wait. All basic threads share the common stack.
@@ -165,68 +181,6 @@ As you can see in the list below, <span class="highlight">QXK provides most feat
 
 </ul>
 
-
-<div class="separate"></div>
-@subsection qxk_kernel Kernel Initialization and Control
-
-@sa
-- QXK_init()
-- QP::QF::run()
-- QP::QXK::onIdle()
-- QP::QXK::getVersion()
-
-<div class="separate"></div>
-@subsection qxk_thread Thread Management
-
-@sa
-- QP::QXThread class (Thread Control Block)
-- QP::QXThread::QXThread()
-- QP::QXThread::start()
-- QP::QXThread::delay()
-- QP::QXThread::delayCancel()
-
-<div class="separate"></div>
-@subsection qxk_isr Interrupt Management
-
-@sa
-- QXK_ISR_ENTRY()
-- QXK_ISR_EXIT()
-
-<div class="separate"></div>
-@subsection qxk_mutex Mutexes
-
-@sa
-- QP::QMutex class (Mutex Control Block)
-- QP::QXMutex::init()
-- QP::QXMutex::lock()
-- QP::QXMutex::unlock()
-
-<div class="separate"></div>
-@subsection qxk_queue Message Queues
-
-@sa
-- QP::QActive::post_() - posting events to Active Objects
-- QP::QXThread::post_() - posting messages to blocking threads
-- QP::QXThread::queueGet() - waiting (blocking) on message queue
-
-<div class="separate"></div>
-@subsection qxk_sema Semaphores
-
-@sa
-- QP::QXSemaphore class (Semaphore Control Block)
-- QP::QXSemaphore::init()
-- QP::QXSemaphore::wait()
-- QP::QXSemaphore::signal()
-
-<div class="separate"></div>
-@subsection qxk_mem Memory Pools
-
-@sa
-- QP::QMPool class
-- QP::QMPool::init()
-- QP::QMPool::get()
-- QP::QMPool::put()
-
 <div class="separate"></div>
 @subsection qxk_tls Thread Local Storage
 <b>Thread-local storage (TLS)</b> is a programming method that uses static or global memory local to a thread. TLS is specifically useful for writing library-type code, which is used in a multithreaded environment and needs to access per-thread data in an independent way.
@@ -239,10 +193,10 @@ Typical usage of TLS in QXK is illustrated in the example <span class="img folde
 
 - define the TLS structure
 @code{cpp}
-struct {
+struct TLS_test {
     uint32_t foo;
     uint8_t bar[10];
-} TLS_test;
+};
 @endcode
 
 - allocate the TLS storage for all participating threads (extended or basic threads)
@@ -253,19 +207,19 @@ static TLS_test l_tls2;
 
 - initialize the TLS per-thread pointer in each thread routine (for extended threads) or the top-most initial transition (for basic threads of active objects):
 @code{cpp}
-static void Thread1_run(QXThread * const me) {
+static void Thread1_run(QP::QXThread * const me) {
     me->m_thread = &l_tls1; // initialize the TLS for Thread1
     . . .
 }
 . . .
-static void Thread2_run(QXThread * const me) {
+static void Thread2_run(QP::QXThread * const me) {
     me->m_thread = &l_tls2; // initialize the TLS for Thread2
     . . .
 }
 @endcode
 
 - access the TLS from your code:
-@code{c}
+@code{cpp}
 void lib_fun(uint32_t x) {
     QXK_TLS(TLS_test *)->foo = x;
 }

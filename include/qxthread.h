@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.1
-/// Last updated on  2017-11-03
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -122,6 +122,11 @@ public:
     //! using the Last-In-First-Out (LIFO) policy.
     virtual void postLIFO(QEvt const * const e);
 
+    //! get the blocking object for this thread (NULL if not blocked)
+    void const *getBlockingObj(void) const {
+        return m_temp.obj;
+    }
+
 private:
     void block_(void) const;
     void unblock_(void) const;
@@ -169,7 +174,7 @@ public:
 
 private:
     QPSet m_waitSet; //!< set of extended threads waiting on this semaphore
-    uint16_t m_count;
+    uint16_t volatile m_count;
     uint16_t m_max_count;
 };
 
@@ -224,9 +229,9 @@ public:
 
 private:
     QPSet m_waitSet; //!< set of extended-threads waiting on this mutex
+    uint8_t volatile m_lockNest;
+    uint8_t volatile m_holderPrio;
     uint8_t m_ceiling;
-    uint8_t m_lockNest;
-    uint8_t m_holderPrio;
 };
 
 } // namespace QP

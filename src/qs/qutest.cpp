@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.3
-/// Last updated on  2017-06-19
+/// Last updated for version 6.0.3
+/// Last updated on  2017-12-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -184,7 +184,7 @@ void QActive::start(uint_fast8_t const prio,
                  && (prio <= (uint_fast8_t)QF_MAX_ACTIVE));
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
-    m_prio = prio;             // set the QF priority of this AO
+    m_prio = static_cast<uint8_t>(prio); // set the QF prio of this AO
 
     QF::add_(this);            // make QF aware of this AO
 
@@ -230,7 +230,7 @@ QTimeEvt::QTimeEvt(QActive * const act,
 {
     /// @pre The signal must be valid and the tick rate in range
     Q_REQUIRE_ID(300, (sgnl >= Q_USER_SIG)
-        && (tickRate < static_cast<uint8_t>(QF_MAX_TICK_RATE)));
+        && (tickRate < static_cast<uint_fast8_t>(QF_MAX_TICK_RATE)));
 
 #ifndef Q_EVT_CTOR
     sig = static_cast<QSignal>(sgnl); // set QEvt::sig of this time event

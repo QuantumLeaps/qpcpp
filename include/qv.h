@@ -109,7 +109,7 @@ extern "C" {
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QV_readySet_.insert((me_)->m_prio))
+        (QV_readySet_.insert(static_cast<uint_fast8_t>((me_)->m_prio)))
 
     // QV-specific native QF event pool operations...
     #define QF_EPOOL_TYPE_  QMPool
