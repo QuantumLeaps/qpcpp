@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last Updated for Version: 6.0.3
-/// Date of the Last Update:  2017-12-09
+/// Date of the Last Update:  2017-12-20
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -107,7 +107,7 @@
 
 #if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1(v6-M, v6S-M)?
     // hand-optimized quick LOG2 in assembly
-    uint_fast8_t QF_qlog2(uint32_t x);
+    extern "C" uint_fast8_t QF_qlog2(uint32_t x);
 #endif // Cortex-M0/M0+/M1(v6-M, v6S-M)
 
 #include "qxk_port.h" // QXK dual-mode kernel port
