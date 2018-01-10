@@ -6,6 +6,7 @@ namespace QP {
 The main purpose of integrating QP/C++ with conventional RTOSes is to enable you to incorporate various communication stacks (TCP/IP, USB, CAN, etc.) as well as other middleware, which requires the ability to **block** the task code. Currently the following 3rd-party RTOSes are supported:
 
 - @subpage exa_embos (directory <span class="img folder">examples/embos/</span>)
+- @subpage exa_freertos (directory <span class="img folder">examples/freertos/</span>)
 - @subpage exa_threadx (directory <span class="img folder">examples/threadx/</span>)
 - @subpage exa_ti-rtos (directory <span class="img folder">examples/ti-rtos/</span>)
 - @subpage exa_ucos-ii (directory <span class="img folder">examples/ucos-ii/</span>)
@@ -31,7 +32,7 @@ The QP/C++ examples for SEGGER embOS are as follows:
 @note
 You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; icon in the list below to see the picture of the board.
 
-@next{exa_threadx examples}
+@next{embos_dpp_stm32f429-discovery}
 */
 /*##########################################################################*/
 /*! @page embos_dpp_stm32f429-discovery DPP on STM32F4-Discovery
@@ -71,6 +72,74 @@ qspy -cCOM1
 
 The actual COM port number might be different on your Windows machine. Please check the Device Manager to find the COM port number.
 
+@next{exa_freertos examples}
+*/
+
+/*##########################################################################*/
+/*! @page exa_freertos FreeRTOS
+@htmlonly
+<script src="preview.js" type="text/javascript"></script>
+@endhtmlonly
+
+The QP/C examples for FreeRTOS are as follows:
+
+- ARM Cortex-M
+    - @subpage freertos_dpp_ek-tm4c123gxl (Cortex-M4F) <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a><br>(ARM-KEIL, GNU-ARM and IAR EWARM toolchains)
+    - @subpage freertos_dpp_stm32f746g-disco (Cortex-M7) <a class="preview board" href="bd_STM32F746G-Disco.jpg" title="STM32F746G-Discovery"></a><br>(ARM-KEIL, GNU-ARM and IAR EWARM toolchains)
+
+@note
+You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; icon in the list below to see the picture of the board.
+
+@next{exa_os examples}
+*/
+/*##########################################################################*/
+/*! @page freertos_dpp_ek-tm4c123gxl DPP on EK-TM4C123GXL
+
+@image html bd_EK-TM4C123GXL.jpg EK-TM4C123GXL board
+
+@ref dpp "DPP example" for @ref freertos "FreeRTOS" on Texas Instruments TivaC123GXL MCU (Cortex-M4F) with the following toolchains:
+- ARM-Keil
+- GNU-ARM
+- IAR-ARM
+
+Demonstrated features:
+- Multiple Active Objects
+- Regular "kernel-aware" ISR with "FromISR" APIs
+  + `QF::TICK_X_FROM_ISR()`
+  + `QF::PUBLISH_FROM_ISR()`
+  + `Q_NEW_FROM_ISR()`
+  + `QActive::POST_FROM_ISR()`
+- Hi-priority "kernel-unaware" ISR
+- `vApplicationTickHook()`
+- QP/Spy output over the virtual COM port (Spy build configuration)
+- QP/Spy input over the virtual COM port (bi-directional Spy) (Spy build configuration)
+
+
+@next{freertos_dpp_stm32f746g-disco examples}
+*/
+/*##########################################################################*/
+/*! @page freertos_dpp_stm32f746g-disco DPP on STM32F746G-Discovery
+
+@image html bd_STM32F746G-Disco.jpg STM32F746G-Discovery
+
+@ref dpp "DPP example" for @ref freertos "FreeRTOS" on STM32F746G-Discovery MCU (Cortex-M7) with the following toolchains:
+- ARM-Keil
+- GNU-ARM
+- IAR-ARM
+
+Demonstrated features:
+- Multiple Active Objects
+- Regular "kernel-aware" ISR with "FromISR" APIs
+  + `QF::TICK_X_FROM_ISR()`
+  + `QF::PUBLISH_FROM_ISR()`
+  + `Q_NEW_FROM_ISR()`
+  + `QActive::POST_FROM_ISR()`
+- Hi-priority "kernel-unaware" ISR
+- `vApplicationTickHook()`
+- QP/Spy output over the virtual COM port (Spy build configuration)
+- QP/Spy input over the virtual COM port (bi-directional Spy) (Spy build configuration)
+
+
 @next{exa_threadx examples}
 */
 
@@ -86,6 +155,7 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 
 @next{exa_ti-rtos examples}
 */
+
 /*##########################################################################*/
 /*! @page threadx_dpp_stm32f429-discovery DPP on STM32F4-Discovery
 
@@ -130,6 +200,7 @@ The actual COM port number might be different on your Windows machine. Please ch
 
 @next{exa_ti-rtos examples}
 */
+
 /*##########################################################################*/
 /*! @page exa_ti-rtos TI-RTOS
 @htmlonly
@@ -197,8 +268,8 @@ The `main.cpp` for TI-RTOS is actually identical as for the built-in QV/QK/QXK k
                         tableQueueSto, Q_DIM(tableQueueSto),
 [2]                     (void *)0, 0U); // no stack
 
-        return QP::QF::run(); // run the QF application
-    }
+           return QP::QF::run(); // run the QF application
+       }
 @endcode
 
 <ul class="tag">

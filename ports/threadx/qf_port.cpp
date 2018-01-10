@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-09
+/// Last updated for version 6.0.4
+/// Last updated on  2018-01-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -88,15 +88,14 @@ static void thread_function(ULONG thread_input) { // ThreadX signature
 }
 //............................................................................
 void QActive::start(uint_fast8_t prio,
-                     QEvt const *qSto[], uint_fast16_t qLen,
-                     void *stkSto, uint_fast16_t stkSize,
-                     QEvt const *ie)
+                    QEvt const *qSto[], uint_fast16_t qLen,
+                    void *stkSto, uint_fast16_t stkSize,
+                    QEvt const *ie)
 {
-
     // allege that the ThreadX queue is created successfully
     Q_ALLEGE_ID(210,
         tx_queue_create(&m_eQueue,
-            (char_t *)"Q",
+            const_cast<CHAR *>("AO"),
             TX_1_ULONG,
             static_cast<VOID *>(qSto),
             static_cast<ULONG>(qLen * sizeof(ULONG)))
@@ -113,9 +112,9 @@ void QActive::start(uint_fast8_t prio,
     Q_ALLEGE_ID(220,
         tx_thread_create(
             &m_thread, // ThreadX thread control block
-            (char_t *)"AO",   // thread name
+            const_cast<CHAR *>("AO"), // thread name
             &thread_function, // thread function
-            reinterpret_cast<ULONG>(this), // thread argument
+            reinterpret_cast<ULONG>(this), // thread parameter
             stkSto,    // stack start
             stkSize,   // stack size in bytes
             tx_prio,   // ThreadX priority
@@ -133,7 +132,7 @@ void QActive::stop(void) {
 bool QActive::post_(QEvt const * const e, uint_fast16_t const margin)
 #else
 bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
-                     void const * const sender)
+                    void const * const sender)
 #endif
 {
     bool status;
@@ -245,7 +244,8 @@ QEvt const *QActive::get_(void) {
         QS_SIG_(e->sig);      // the signal of this event
         QS_OBJ_(this);        // this active object
         QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-        QS_EQC_(static_cast<QEQueueCtr>(0)); // min # free entries (unknown)
+        // min # free entries
+        QS_EQC_(static_cast<QEQueueCtr>(m_eQueue.tx_queue_available_storage));
     QS_END_()
 
     return e;
@@ -253,32 +253,43 @@ QEvt const *QActive::get_(void) {
 
 //............................................................................
 void QFSchedLock::lock(uint_fast8_t prio) {
-    QS_CRIT_STAT_
     m_lockHolder = tx_thread_identify();
 
     /// @pre must be thread level, so current TX thread must be available
     Q_REQUIRE_ID(800, m_lockHolder != static_cast<TX_THREAD *>(0));
 
-    // change the preemption threshold of the current thread
-    Q_ALLEGE_ID(810, tx_thread_preemption_change(m_lockHolder,
+    UINT tx_err = tx_thread_preemption_change(m_lockHolder,
                      (QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - prio),
-                     &m_prevThre) == TX_SUCCESS);
+                     &m_prevThre);
 
-    m_lockPrio = prio;
-    QS_BEGIN_(QS_SCHED_LOCK, static_cast<void *>(0), static_cast<void *>(0))
-        QS_TIME_(); // timestamp
-        QS_2U8_(static_cast<uint8_t>(QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE
-                                     - m_prevThre),
-                static_cast<uint8_t>(m_lockPrio)); // new lock prio
-    QS_END_()
+    if (tx_err == TX_SUCCESS) {
+        QS_CRIT_STAT_
+        m_lockPrio = prio;
+
+        QS_BEGIN_(QS_SCHED_LOCK, static_cast<void *>(0), static_cast<void *>(0))
+            QS_TIME_(); // timestamp
+            QS_2U8_(static_cast<uint8_t>(QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE
+                                         - m_prevThre),
+                    static_cast<uint8_t>(prio)); // new lock prio
+        QS_END_()
+    }
+    else if (tx_err == TX_THRESH_ERROR) {
+        // threshold was greater than (lower prio) than the current prio
+        m_lockPrio = static_cast<uint_fast8_t>(0); // threshold not changed
+    }
+    else {
+        /* no other errors are tolerated */
+        Q_ERROR_ID(810);
+    }
 }
 
 //............................................................................
 void QFSchedLock::unlock(void) const {
     QS_CRIT_STAT_
 
-    /// @pre the lock holder TX thread must be available */
-    Q_REQUIRE_ID(900, m_lockHolder != static_cast<TX_THREAD *>(0));
+    /// @pre the lock holder TX thread must be available
+    Q_REQUIRE_ID(900, (m_lockHolder != static_cast<TX_THREAD *>(0))
+                      && (m_lockPrio != static_cast<uint_fast8_t>(0)));
 
     QS_BEGIN_(QS_SCHED_UNLOCK,
               static_cast<void *>(0), static_cast<void *>(0))

@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.9.7
-// Last updated on  2017-08-20
+// Last updated for version 6.0.4
+// Last updated on  2018-01-07
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -42,7 +42,6 @@ QP::QActive *DPP::the_Ticker0 = &l_ticker0;
 int main() {
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
-
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
     static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO]; // small pool
 
@@ -53,7 +52,21 @@ int main() {
     static uint64_t test2StackSto[64];
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-    DPP::BSP::init(); // initialize the BSP
+
+    // init publish-subscribe
+    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
+
+    // initialize event pools...
+    QP::QF::poolInit(smlPoolSto,
+                     sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+    // initialize the Board Support Package
+    // NOTE: BSP::init() is called *after* initializing publish-subscribe and
+    // event pools, to make the system ready to accept SysTick interrupts.
+    // Unfortunately, the STM32Cube code that must be called from BSP,
+    // configures and starts SysTick.
+    //
+    DPP::BSP::init();
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(smlPoolSto);
@@ -63,13 +76,6 @@ int main() {
     QS_OBJ_DICTIONARY(philoQueueSto[2]);
     QS_OBJ_DICTIONARY(philoQueueSto[3]);
     QS_OBJ_DICTIONARY(philoQueueSto[4]);
-
-    // init publish-subscribe
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
-
-    // initialize event pools...
-    QP::QF::poolInit(smlPoolSto,
-                     sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
     // start the extended Test1 thread
     DPP::XT_Test1->start(

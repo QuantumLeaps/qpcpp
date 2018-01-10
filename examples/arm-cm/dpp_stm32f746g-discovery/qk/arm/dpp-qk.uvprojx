@@ -588,9 +588,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qk_port.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.s</FilePath>
+              <FileName>qk_port.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1269,9 +1269,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qk_port.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.s</FilePath>
+              <FileName>qk_port.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1950,9 +1950,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qk_port.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.s</FilePath>
+              <FileName>qk_port.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.cpp</FilePath>
             </File>
           </Files>
         </Group>

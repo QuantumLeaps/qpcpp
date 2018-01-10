@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.0.0" links="0">
+<model version="4.1.1" links="0">
  <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
  <framework name="qpcpp"/>
  <package name="Events" stereotype="0x01" namespace="DPP::">
@@ -23,14 +23,14 @@ if (!registered) {
 
     QS_OBJ_DICTIONARY(&amp;l_philo[0]);
     QS_OBJ_DICTIONARY(&amp;l_philo[0].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[1]);
-    QS_OBJ_DICTIONARY(&amp;l_philo[1].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[2]);
-    QS_OBJ_DICTIONARY(&amp;l_philo[2].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[3]);
-    QS_OBJ_DICTIONARY(&amp;l_philo[3].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[4]);
-    QS_OBJ_DICTIONARY(&amp;l_philo[4].m_timeEvt);
+    //QS_OBJ_DICTIONARY(&amp;l_philo[1]);
+    //QS_OBJ_DICTIONARY(&amp;l_philo[1].m_timeEvt);
+    //QS_OBJ_DICTIONARY(&amp;l_philo[2]);
+    //QS_OBJ_DICTIONARY(&amp;l_philo[2].m_timeEvt);
+    //QS_OBJ_DICTIONARY(&amp;l_philo[3]);
+    //QS_OBJ_DICTIONARY(&amp;l_philo[3].m_timeEvt);
+    //QS_OBJ_DICTIONARY(&amp;l_philo[4]);
+    //QS_OBJ_DICTIONARY(&amp;l_philo[4].m_timeEvt);
 
     QS_FUN_DICTIONARY(&amp;Philo::initial);
     QS_FUN_DICTIONARY(&amp;Philo::thinking);
@@ -350,7 +350,8 @@ enum DPPSignals {
 $declare(Events::TableEvt)
 
 // number of philosophers
-#define N_PHILO ((uint8_t)5)
+// NOTE: Only one Philo, because of the ThreadX demo library limits
+#define N_PHILO (static_cast&lt;uint8_t&gt;(1))
 
 $declare(AOs::AO_Philo[N_PHILO])
 
@@ -361,7 +362,8 @@ $declare(AOs::XT_Test1)
 $declare(AOs::XT_Test2)
 #endif // qxk_h
 
-#endif // dpp_h</text>
+#endif // dpp_h
+</text>
   </file>
   <file name="philo.cpp">
    <text>#include &quot;qpcpp.h&quot;
@@ -402,10 +404,10 @@ enum InternalSignals {           // internal signals
 // Global objects ------------------------------------------------------------
 QP::QActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Philo AO
     &amp;l_philo[0],
-    &amp;l_philo[1],
-    &amp;l_philo[2],
-    &amp;l_philo[3],
-    &amp;l_philo[4]
+    //&amp;l_philo[1],
+    //&amp;l_philo[2],
+    //&amp;l_philo[3],
+    //&amp;l_philo[4]
 };
 
 } // namespace DPP

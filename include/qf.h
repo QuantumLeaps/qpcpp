@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-08
+/// Last updated for version 6.0.4
+/// Last updated on  2018-01-10
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -181,7 +181,6 @@ public: // for access from extern "C" functions
     uint8_t m_startPrio;
 #endif
 
-
 protected:
     //! protected constructor (abstract class)
     QActive(QStateHandler const initial);
@@ -248,6 +247,9 @@ public:
         m_prio = static_cast<uint8_t>(prio);
     }
 
+    //! Generic setting of additional attributes (useful in QP ports)
+    void setAttr(uint32_t attr1, void const *attr2 = static_cast<void *>(0));
+
 #ifdef QF_OS_OBJECT_TYPE
     //! accessor to the OS-object for extern "C" functions, such as
     //! the QK scheduler
@@ -263,6 +265,20 @@ public:
     //! Get an event from the event queue of an active object.
     QEvt const *get_(void);
 
+// duplicated API to be used exclusively inside ISRs (useful in some QP ports)
+#ifdef QF_ISR_API
+#ifdef Q_SPY
+    virtual bool postFromISR_(QEvt const * const e,
+                              uint_fast16_t const margin, void *par,
+                              void const * const sender);
+#else
+    virtual bool postFromISR_(QEvt const * const e,
+                              uint_fast16_t const margin, void *par);
+#endif // Q_SPY
+#endif // QF_ISR_API
+
+// friendships...
+private:
     friend class QF;
     friend class QTimeEvt;
     friend class QTicker;
@@ -527,20 +543,17 @@ public:
     static void publish_(QEvt const *e);
     static void tickX_(uint_fast8_t const tickRate);
 #else
-
     //! Publish event to the framework.
     static void publish_(QEvt const *e, void const *sender);
 
     //! Processes all armed time events at every clock tick.
     static void tickX_(uint_fast8_t const tickRate,
                        void const * const sender);
-
 #endif // Q_SPY
 
     //! Returns true if all time events are inactive and false
     //! any time event is active.
     static bool noTimeEvtsActiveX(uint_fast8_t const tickRate);
-
 
     //! This function returns the minimum of free entries of the given
     //! event pool.
@@ -576,9 +589,26 @@ public:
     //! Clear a specified region of memory to zero.
     static void bzero(void * const start, uint_fast16_t len);
 
+// API to be used exclusively inside ISRs (useful in some QP ports)
+#ifdef QF_ISR_API
+#ifdef Q_SPY
+    static void publishFromISR_(QEvt const *e, void *par,
+                                void const *sender);
+    static void tickXfromISR_(uint_fast8_t const tickRate, void *par,
+                              void const * const sender);
+#else
+    static void publishFromISR_(QEvt const *e, void *par);
+    static void tickXfromISR_(uint_fast8_t const tickRate, void *par);
+#endif // Q_SPY
+
+    static QEvt *newXfromISR_(uint_fast16_t const evtSize,
+                              uint_fast16_t const margin, enum_t const sig);
+    static void gcFromISR(QEvt const *e);
+
+#endif // QF_ISR_API
+
 // to be used in QF ports only...
 private:
-
     //! heads of linked lists of time events, one for every clock tick rate
     static QTimeEvt timeEvtHead_[QF_MAX_TICK_RATE];
 

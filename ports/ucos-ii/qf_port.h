@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.2
-/// Last updated on  2017-02-02
+/// Last updated for version 6.0.4
+/// Last updated on  2018-01-07
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -57,16 +57,6 @@
 #include "qpset.h"     // this QP port uses the native QP priority set
 #include "qf.h"        // QF platform-independent public interface
 
-// Facilities specific to the uC/OS-II port...
-namespace QP {
-
-// set uC/OS-II task attributes
-// (e.g., OS_TASK_OPT_SAVE_FP | OS_TASK_OPT_STK_CHK)
-// for OSTaskCreateExt() **before** calling QACTIVE_START().
-//
-void QF_setUCosTaskAttr(QActive *act, uint32_t attr);
-
-} // namespace QP
 
 //****************************************************************************
 // interface used only inside QF, but not in applications
@@ -115,9 +105,6 @@ void QF_setUCosTaskAttr(QActive *act, uint32_t attr);
         Q_ALLEGE_ID(305, OSMemPut((pool_), (e_)) == OS_ERR_NONE)
 
 #endif // ifdef QP_IMPL
-
-#endif // qf_port_h
-
 //****************************************************************************
 // NOTE1:
 // The uC/OS-II critical section must be able to nest.
@@ -127,3 +114,5 @@ void QF_setUCosTaskAttr(QActive *act, uint32_t attr);
 // by means of OSSchedLock() and OSSchedUnlock(). Therefore, locking the
 // scheduler only up to the specified lock priority is not supported.
 //
+
+#endif // qf_port_h

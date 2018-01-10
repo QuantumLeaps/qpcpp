@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to embOS kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0 / embOS v4.34.1
-/// Last updated on  2017-05-04
+/// Last updated for version 6.0.4 / embOS v4.34.1
+/// Last updated on  2018-01-08
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -65,14 +65,6 @@
 #include "qmpool.h"    // this QP port uses the native QF memory pool
 #include "qf.h"        // QF platform-independent public interface
 
-
-// Facilities specific to the embOS port...
-namespace QP {
-
-// set task attributes (e.g., QF_TASK_USES_FPU) before starting the AO
-void QF_setEmbOsTaskAttr(QActive *act, uint32_t attr);
-
-} // namespace QP
 
 //****************************************************************************
 // interface used only inside QF, but not in applications

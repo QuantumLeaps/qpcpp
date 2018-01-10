@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ARM Cortex-M, dual-mode QXK kernel, ARM-KEIL toolset
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.0.3
-/// Date of the Last Update:  2017-12-09
+/// Last Updated for Version: 6.0.4
+/// Date of the Last Update:  2018-01-06
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -82,9 +82,7 @@
     #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
     // BASEPRI threshold for "QF-aware" interrupts, see NOTE3.
-    // CAUTION: keep in synch with the value defined in "qk_port.s"
-    //
-    #define QF_BASEPRI          (0xFFU >> 2)
+    #define QF_BASEPRI           0x3F
 
     // CMSIS threshold for "QF-aware" interrupts, see NOTE4
     #define QF_AWARE_ISR_CMSIS_PRI (QF_BASEPRI >> (8 - __NVIC_PRIO_BITS))

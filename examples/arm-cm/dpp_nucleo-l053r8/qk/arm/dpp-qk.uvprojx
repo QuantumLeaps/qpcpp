@@ -533,9 +533,9 @@
               <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.h</FilePath>
             </File>
             <File>
-              <FileName>qk_port.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.s</FilePath>
+              <FileName>qk_port.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_port.h</FileName>
@@ -1164,9 +1164,9 @@
               <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.h</FilePath>
             </File>
             <File>
-              <FileName>qk_port.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.s</FilePath>
+              <FileName>qk_port.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_port.h</FileName>
@@ -1795,9 +1795,9 @@
               <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.h</FilePath>
             </File>
             <File>
-              <FileName>qk_port.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.s</FilePath>
+              <FileName>qk_port.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\ports\arm-cm\qk\arm\qk_port.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_port.h</FileName>

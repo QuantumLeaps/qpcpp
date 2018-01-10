@@ -41,7 +41,7 @@
 #include "gpio.h"                // GPIO driver (TI)
 // add other drivers if necessary...
 
-Q_DEFINE_THIS_FILE
+Q_DEFINE_THIS_FILE // define the name of this file for assertions
 
 // namespace DPP *************************************************************
 namespace DPP {
@@ -50,7 +50,7 @@ namespace DPP {
 // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
 // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
 //
-enum KernelUnawareISRs { // see NOTE00
+enum KernelUnawareISRs { // see NOTE1
     UART0_PRIO,
     // ...
     MAX_KERNEL_UNAWARE_CMSIS_PRI  // keep always last
@@ -59,7 +59,7 @@ enum KernelUnawareISRs { // see NOTE00
 Q_ASSERT_COMPILE(MAX_KERNEL_UNAWARE_CMSIS_PRI <= QF_AWARE_ISR_CMSIS_PRI);
 
 enum KernelAwareISRs {
-    GPIOA_PRIO = QF_AWARE_ISR_CMSIS_PRI, // see NOTE00
+    GPIOA_PRIO = QF_AWARE_ISR_CMSIS_PRI, // see NOTE1
     SYSTICK_PRIO,
     // ...
     MAX_KERNEL_AWARE_CMSIS_PRI // keep always last
@@ -75,6 +75,7 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 #define BTN_SW1     (1U << 4)
 #define BTN_SW2     (1U << 0)
 
+// Local-scope objects -------------------------------------------------------
 static uint32_t l_rnd; // random seed
 
 #ifdef Q_SPY
@@ -137,7 +138,7 @@ void SysTick_Handler(void) {
             static QP::QEvt const pauseEvt = { DPP::PAUSE_SIG, 0U, 0U};
             QP::QF::PUBLISH(&pauseEvt, &l_SysTick_Handler);
         }
-        else {            // the button is released
+        else { // the button is released
             static QP::QEvt const serveEvt = { DPP::SERVE_SIG, 0U, 0U};
             QP::QF::PUBLISH(&serveEvt, &l_SysTick_Handler);
         }
@@ -182,9 +183,8 @@ void UART0_IRQHandler(void) {}
 
 // BSP functions =============================================================
 void BSP::init(void) {
-    // NOTE: SystemInit() already called from the startup code
-    //  but SystemCoreClock needs to be updated
-    //
+    // NOTE: SystemInit() has been already called from the startup code
+    // but SystemCoreClock needs to be updated
     SystemCoreClockUpdate();
 
     /* NOTE: The VFP (hardware Floating Point) unit is configured by QXK */
@@ -194,11 +194,11 @@ void BSP::init(void) {
     SYSCTL->RCGCGPIO |= (1U << 5); // enable Run mode for GPIOF
 
     // configure the LEDs and push buttons
-    GPIOF->DIR |= (LED_RED | LED_GREEN | LED_BLUE); // set direction: output
+    GPIOF->DIR |= (LED_RED | LED_GREEN | LED_BLUE); // set as output
     GPIOF->DEN |= (LED_RED | LED_GREEN | LED_BLUE); // digital enable
-    GPIOF->DATA_Bits[LED_RED]   = 0U;  // turn the LED off
-    GPIOF->DATA_Bits[LED_GREEN] = 0U;  // turn the LED off
-    GPIOF->DATA_Bits[LED_BLUE]  = 0U;  // turn the LED off
+    GPIOF->DATA_Bits[LED_RED]   = 0U; // turn the LED off
+    GPIOF->DATA_Bits[LED_GREEN] = 0U; // turn the LED off
+    GPIOF->DATA_Bits[LED_BLUE]  = 0U; // turn the LED off
 
     // configure the Buttons
     GPIOF->DIR &= ~(BTN_SW1 | BTN_SW2); //  set direction: input
@@ -227,7 +227,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
     QS_END()
 }
 //............................................................................
-void BSP::displayPaused(uint8_t paused) {
+void BSP::displayPaused(uint8_t const paused) {
     //GPIOF->DATA_Bits[LED_RED] = ((paused != 0U) ? 0xFFU : 0U);
 
     static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
@@ -285,7 +285,7 @@ void QF::onStartup(void) {
     // assingn all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
-    // set priorities of ALL ISRs used in the system, see NOTE00
+    // set priorities of ALL ISRs used in the system, see NOTE1
     //
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
@@ -299,7 +299,7 @@ void QF::onStartup(void) {
     // enable IRQs...
     NVIC_EnableIRQ(GPIOA_IRQn);
 #ifdef Q_SPY
-    NVIC_EnableIRQ(UART0_IRQn);  // UART0 interrupt used for QS-RX
+    NVIC_EnableIRQ(UART0_IRQn); // UART interrupt used for QS-RX
 #endif
 }
 //............................................................................
@@ -307,7 +307,7 @@ void QF::onCleanup(void) {
 }
 //............................................................................
 void QXK::onIdle(void) {
-    // toggle the User LED on and then off, see NOTE01
+    // toggle the User LED on and then off, see NOTE2
     QF_INT_DISABLE();
     GPIOF->DATA_Bits[LED_BLUE] = 0xFFU;  // turn the Blue LED on
     GPIOF->DATA_Bits[LED_BLUE] = 0U;     // turn the Blue LED off
@@ -361,11 +361,11 @@ extern "C" void Q_onAssert(char const *module, int loc) {
 #ifdef Q_SPY
 //............................................................................
 bool QS::onStartup(void const *arg) {
-    static uint8_t qsBuf[2*1024]; // buffer for Quantum Spy
-    static uint8_t qsRxBuf[100];  // buffer for QS receive channel
+    static uint8_t qsTxBuf[2*1024]; // buffer for QS transmit channel
+    static uint8_t qsRxBuf[100];    // buffer for QS receive channel
     uint32_t tmp;
 
-    initBuf(qsBuf, sizeof(qsBuf));
+    initBuf(qsTxBuf, sizeof(qsTxBuf));
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     // enable clock for UART0 and GPIOA (used by UART0 pins)
@@ -404,19 +404,10 @@ bool QS::onStartup(void const *arg) {
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_ON(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_ON(QS_QEP_UNHANDLED);
-
-    QS_FILTER_ON(DPP::PHILO_STAT);
-    QS_FILTER_ON(DPP::PAUSED_STAT);
-    QS_FILTER_ON(DPP::COMMAND_STAT);
+    QS_FILTER_ON(QS_SM_RECORDS); // state machine records */
+    QS_FILTER_ON(QS_UA_RECORDS); // all usedr records */
+    //QS_FILTER_ON(QS_MUTEX_LOCK);
+    //QS_FILTER_ON(QS_MUTEX_UNLOCK);
 
     return true; // return success
 }
@@ -437,9 +428,7 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
 void QS::onFlush(void) {
     uint16_t fifo = UART_TXFIFO_DEPTH; // Tx FIFO depth
     uint8_t const *block;
-    QF_INT_DISABLE();
     while ((block = getBlock(&fifo)) != static_cast<uint8_t *>(0)) {
-        QF_INT_ENABLE();
         // busy-wait until TX FIFO empty
         while ((UART0->FR & UART_FR_TXFE) == 0U) {
         }
@@ -448,9 +437,7 @@ void QS::onFlush(void) {
             UART0->DR = *block++; // put into the TX FIFO
         }
         fifo = UART_TXFIFO_DEPTH; // re-load the Tx FIFO depth
-        QF_INT_DISABLE();
     }
-    QF_INT_ENABLE();
 }
 //............................................................................
 //! callback function to reset the target (to be implemented in the BSP)
@@ -485,7 +472,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 } // namespace QP
 
 //****************************************************************************
-// NOTE00:
+// NOTE1:
 // The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
 // ISR priority that is disabled by the QF framework. The value is suitable
 // for the NVIC_SetPriority() CMSIS function.
@@ -504,7 +491,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 // by which a "QF-unaware" ISR can communicate with the QF framework is by
 // triggering a "QF-aware" ISR, which can post/publish events.
 //
-// NOTE01:
+// NOTE2:
 // The User LED is used to visualize the idle loop activity. The brightness
 // of the LED is proportional to the frequency of invcations of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt

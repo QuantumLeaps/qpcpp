@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example, uC/OS-II kernel
-// Last updated for version 5.4.0
-// Last updated on  2015-05-12
+// Last updated for version 6.0.4
+// Last updated on  2018-01-08
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -38,8 +38,8 @@
 //............................................................................
 int main() {
     // stacks for uC/OS-II tasks...
-    static OS_STK philoStk[N_PHILO][200];
-    static OS_STK tableStk[300];
+    static OS_STK philoStk[N_PHILO][128];
+    static OS_STK tableStk[256];
 
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
@@ -69,7 +69,7 @@ int main() {
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         // NOTE: provide uC/OS-II task attributes for the AO's task
-        QP::QF_setUCosTaskAttr(DPP::AO_Philo[n], OS_TASK_OPT_STK_CHK);
+        DPP::AO_Philo[n]->setAttr(OS_TASK_OPT_STK_CHK, 0);
         DPP::AO_Philo[n]->start(
             static_cast<uint_fast8_t>(n + 1), // QP priority
             philoQueueSto[n],        // storage for the AO's queue
@@ -79,7 +79,7 @@ int main() {
     }
 
     // NOTE: provide uC/OS-II task attributes for the AO's task
-    QP::QF_setUCosTaskAttr(DPP::AO_Table, OS_TASK_OPT_STK_CHK);
+    DPP::AO_Table->setAttr(OS_TASK_OPT_STK_CHK, 0);
     DPP::AO_Table->start(
         static_cast<uint_fast8_t>(N_PHILO + 1U), // QP priority
         tableQueueSto,            // storage for the AO's queue

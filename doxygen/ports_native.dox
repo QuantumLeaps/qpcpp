@@ -1,7 +1,7 @@
 /*##########################################################################*/
 /*! @page ports_native Native (Bare-Metal) Ports
 
-- @subpage lint (generic C compiler)
+- @subpage lint (generic C++ compiler)
 - @subpage arm-cm (Cortex-M0/M0+/M3/M4/M4F)
     - @ref arm-cm_qv  (ARM-KEIL, GNU-ARM, IAR-ARM, TI-CCS toolsets)
     - @ref arm-cm_qk  (ARM-KEIL, GNU-ARM, IAR-ARM, TI-CCS toolsets)

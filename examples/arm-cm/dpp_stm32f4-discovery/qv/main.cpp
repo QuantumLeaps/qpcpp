@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example
-// Last updated for version 5.8.1
-// Last updated on  2016-12-12
+// Last updated for version 6.0.4
+// Last updated on  2018-01-07
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -47,7 +47,20 @@ int main() {
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
 
-    DPP::BSP::init(); // initialize the BSP
+    // init publish-subscribe
+    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
+
+    // initialize event pools...
+    QP::QF::poolInit(smlPoolSto,
+                     sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+    // initialize the Board Support Package
+    // NOTE: BSP::init() is called *after* initializing publish-subscribe and
+    // event pools, to make the system ready to accept SysTick interrupts.
+    // Unfortunately, the STM32Cube code that must be called from BSP,
+    // configures and starts SysTick.
+    //
+    DPP::BSP::init();
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(smlPoolSto);
@@ -58,27 +71,21 @@ int main() {
     QS_OBJ_DICTIONARY(philoQueueSto[3]);
     QS_OBJ_DICTIONARY(philoQueueSto[4]);
 
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
-
-    // initialize event pools...
-    QP::QF::poolInit(smlPoolSto,
-                     sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
-
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
-                           philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-                           (void *)0, 0U);
+            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
+            (void *)0, 0U);
     }
 
     // example of prioritizing the Ticker0 active object
     DPP::the_Ticker0->start((uint_fast8_t)(N_PHILO + 1U), // priority
-                            0, 0,
-                            0, 0);
+        (QP::QEvt const **)0, 0U,
+        (void *)0, 0U);
 
     DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 2U), // priority
-                    tableQueueSto, Q_DIM(tableQueueSto),
-                    (void *)0, 0U);
+        tableQueueSto, Q_DIM(tableQueueSto),
+        (void *)0, 0U);
 
     return QP::QF::run(); // run the QF application
 }

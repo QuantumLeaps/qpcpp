@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32746G-Discovery board, cooperative QV kernel
-// Last Updated for Version: 5.9.5
-// Date of the Last Update:  2017-07-20
+// Last Updated for Version: 6.0.4
+// Date of the Last Update:  2018-01-09
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -158,16 +158,10 @@ void USART1_IRQHandler(void) {
 
 // BSP functions =============================================================
 void BSP::init(void) {
-    // NOTE:
-    // The global interrupt disable code prevents interrutps from firing
-    // prematurely until QF_onStartup(), when QF is fully initialized.
-    // Unfortunately, the STM32Cube code that must be called from here,
-    // configures and starts interrutps (such as SysTick).
+    // NOTE: SystemInit() has been already called from the startup code
+    //  but SystemCoreClock needs to be updated
     //
-    QF_PRIMASK_DISABLE(); // globally disable interrupts until QF::onStart()
-
-    RCC_OscInitTypeDef RCC_OscInitStruct;
-    RCC_ClkInitTypeDef RCC_ClkInitStruct;
+    SystemCoreClockUpdate();
 
     SCB_EnableICache(); // Enable I-Cache
     SCB_EnableDCache(); // Enable D-Cache
@@ -176,33 +170,6 @@ void BSP::init(void) {
 #if (ART_ACCLERATOR_ENABLE != 0)
     __HAL_FLASH_ART_ENABLE();
 #endif // ART_ACCLERATOR_ENABLE
-
-    // Configure the system clock to 216 MHz...
-    // Enable HSE Oscillator and activate PLL with HSE as source
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLM = 25;
-    RCC_OscInitStruct.PLL.PLLN = 432;
-    RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-    RCC_OscInitStruct.PLL.PLLQ = 9;
-    Q_ALLEGE(HAL_RCC_OscConfig(&RCC_OscInitStruct) == HAL_OK);
-
-    // Activate the OverDrive to reach the 216 MHz Frequency
-    Q_ALLEGE(HAL_PWREx_EnableOverDrive() == HAL_OK);
-
-    // Set PLL as system clock source
-    // and configure the HCLK, PCLK1 and PCLK2 clocks dividers
-    //
-    RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK
-                                 | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
-    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
-    Q_ALLEGE(HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7)
-             == HAL_OK);
 
     // configure the FPU usage by choosing one of the options...
     // Do NOT to use the automatic FPU state preservation and
@@ -231,6 +198,14 @@ void BSP::init(void) {
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
 }
+/*..........................................................................*/
+void BSP::ledOn(void) {
+    //BSP_LED_On(LED1); not enough LEDs
+}
+/*..........................................................................*/
+void BSP::ledOff(void) {
+    //BSP_LED_Off(LED1); not enough LEDs
+}
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'e') {
@@ -256,7 +231,7 @@ void BSP::displayPaused(uint8_t paused) {
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
-    // Some flating point code is to exercise the VFP...
+    // The flating point code is to exercise the FPU
     float volatile x = 3.1415926F;
     x = x + 2.7182818F;
 
@@ -301,8 +276,8 @@ void QF::onStartup(void) {
     // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     //
-    NVIC_SetPriority(USART1_IRQn,    DPP::USART1_PRIO);
-    NVIC_SetPriority(SysTick_IRQn,   DPP::SYSTICK_PRIO);
+    NVIC_SetPriority(USART1_IRQn,  DPP::USART1_PRIO);
+    NVIC_SetPriority(SysTick_IRQn, DPP::SYSTICK_PRIO);
     //NVIC_SetPriority(GPIO_EVEN_IRQn, DPP::GPIO_EVEN_PRIO);
     // ...
 
@@ -311,8 +286,6 @@ void QF::onStartup(void) {
 #ifdef Q_SPY
     NVIC_EnableIRQ(USART1_IRQn); // UART1 interrupt used for QS-RX
 #endif
-
-    QF_PRIMASK_ENABLE(); // ready to accept interrupts
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -407,18 +380,8 @@ bool QS::onStartup(void const *arg) {
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_ON(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_ON(QS_QEP_UNHANDLED);
-
-    QS_FILTER_ON(DPP::PHILO_STAT);
-    QS_FILTER_ON(DPP::COMMAND_STAT);
+    QS_FILTER_ON(QS_SM_RECORDS);
+    QS_FILTER_ON(QS_UA_RECORDS);
 
     return true; // return success
 }

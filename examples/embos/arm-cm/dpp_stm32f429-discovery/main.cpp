@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example, embOS kernel
-// Last updated for version 5.4.0
-// Last updated on  2015-05-11
+// Last updated for version 6.0.4
+// Last updated on  2018-01-08
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// https://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
@@ -78,7 +78,7 @@ int main() {
     }
 
     // set the embOS task attributes BEFORE starting the AO
-    QP::QF_setEmbOsTaskAttr(DPP::AO_Table, QF_TASK_USES_FPU);
+    DPP::AO_Table->setAttr(QF_TASK_USES_FPU, 0);
     DPP::AO_Table->start(
         static_cast<uint_fast8_t>(N_PHILO + 1U), // QP priority of the AO
         tableQueueSto,         // event queue storage

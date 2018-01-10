@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-18
+/// Last updated for version 6.0.4
+/// Last updated on  2018-01-05
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -1039,7 +1039,7 @@ enum QSpyRxRecords {
         static_cast<void *>(0), static_cast<void *>(0)) \
         QS_TIME_(); \
         QS_U16_(static_cast<uint16_t>(loc_)); \
-        QS_STR_(module_); \
+        QS_STR_(((module_) != static_cast<char_t *>(0)) ? (module_) : "?"); \
     QS_END_NOCRIT_() \
     QP::QS::onFlush(); \
     for (uint32_t volatile delay_ctr_ = (delay_);  \

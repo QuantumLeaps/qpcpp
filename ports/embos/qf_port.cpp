@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to embOS (v4.00) kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 5.9.8
-/// Last updated on  2017-09-20
+/// Last updated for version 6.0.4
+/// Last updated on  2018-01-10
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -80,10 +80,6 @@ int_t QF::run(void) {
 void QF::stop(void) {
     onCleanup();  // cleanup callback
 }
-//............................................................................
-void QF_setEmbOsTaskAttr(QActive *act, uint32_t attr) {
-    act->getOsObject() = attr;
-}
 
 // thread for active objects -------------------------------------------------
 void QF::thread_(QActive *act) {
@@ -143,6 +139,10 @@ void QActive::start(uint_fast8_t prio,
 //............................................................................
 void QActive::stop() {
     m_osObject = static_cast<uint32_t>(0); // stop the thread loop, see NOTE2
+}
+//............................................................................
+void QActive::setAttr(uint32_t attr1, void const * /*attr2*/) {
+    m_osObject = attr1;
 }
 //............................................................................
 #ifndef Q_SPY

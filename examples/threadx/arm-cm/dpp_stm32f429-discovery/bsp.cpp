@@ -126,11 +126,13 @@ void BSP::init(void) {
     GPIO_struct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(BTN_GPIO_PORT, &GPIO_struct);
 
+    // seed the random number generator
     BSP::randomSeed(1234U);
 
     if (!QS_INIT((void *)0)) { // initialize the QS software tracing
         Q_ERROR();
     }
+    QS_USR_DICTIONARY(PHILO_STAT);
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -214,26 +216,26 @@ void QF::onStartup(void) {
     // or from active object(s).
     //
     Q_ALLEGE(tx_timer_create(&l_tick_timer, // ThreadX timer object
-                 "QF",     // name of the timer
-                 (VOID (*)(ULONG))&QP::QF::tickX_, // expiration function
-                 0U,       // expiration function input (tick rate)
-                 1U,       // initial ticks
-                 1U,       // reschedule ticks
-                 TX_AUTO_ACTIVATE) // automatically activate timer
+        const_cast<CHAR *>("QF_TICK"),    // name of the timer
+        (VOID (*)(ULONG))&QP::QF::tickX_, // expiration fun
+        0U,       // expiration function input (tick rate)
+        1U,       // initial ticks
+        1U,       // reschedule ticks
+        TX_AUTO_ACTIVATE) // automatically activate timer
              == TX_SUCCESS);
 
 #ifdef Q_SPY
     // start a ThreadX timer to perform QS output. See NOTE1...
     Q_ALLEGE(tx_thread_create(&l_qs_output_thread, // thread control block
-                 "QS",                  // thread name
-                 &qs_thread_function,   // thread function
-                 (ULONG)0,              // thread input (unsued)
-                 qs_thread_stkSto,      // stack start
-                 sizeof(qs_thread_stkSto), // stack size in bytes
-                 TX_MAX_PRIORITIES - 1, // ThreadX priority (lowest possible)
-                 TX_MAX_PRIORITIES - 1, // preemption threshold disabled
-                 TX_NO_TIME_SLICE,
-                 TX_AUTO_START)
+        const_cast<CHAR *>("QS_TX"), // thread name
+        &qs_thread_function,    // thread function
+        0LU,                    // thread input (unsued)
+        qs_thread_stkSto,       // stack start
+        sizeof(qs_thread_stkSto), // stack size in bytes
+        TX_MAX_PRIORITIES - 1U, // ThreadX priority (lowest possible)
+        TX_MAX_PRIORITIES - 1U, // preemption threshold disabled
+        TX_NO_TIME_SLICE,
+        TX_AUTO_START)
              == TX_SUCCESS);
 #endif // Q_SPY
 }
@@ -266,7 +268,7 @@ static void qs_thread_function(ULONG /*thread_input*/) { // see NOTE1
         __NOP();
         LED_GPIO_PORT->BSRRH = LED6_PIN; // turn LED off
 
-        if ((USART2->SR & 0x80U) != 0U) {  // is TXE empty?
+        if ((USART2->SR & 0x80U) != 0U) { // is TXE empty?
             uint16_t b;
             QF_CRIT_STAT_TYPE intStat;
 
@@ -284,11 +286,12 @@ static void qs_thread_function(ULONG /*thread_input*/) { // see NOTE1
 
 //............................................................................
 bool QS::onStartup(void const *arg) {
-    static uint8_t qsBuf[1024]; // buffer for Quantum Spy
-    initBuf(qsBuf, sizeof(qsBuf));
+    static uint8_t qsBuf[2*1024]; // buffer for Quantum Spy
 
     GPIO_InitTypeDef GPIO_struct;
     USART_InitTypeDef USART_struct;
+
+    initBuf(qsBuf, sizeof(qsBuf));
 
     // enable peripheral clock for USART2
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
@@ -317,6 +320,9 @@ bool QS::onStartup(void const *arg) {
     USART_Init(USART2, &USART_struct);
 
     USART_Cmd(USART2, ENABLE); // enable USART2
+
+    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
+    DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...
     QS_FILTER_ON(QS_QEP_STATE_ENTRY);

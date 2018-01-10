@@ -1,9 +1,9 @@
 /// @file
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
-////**************************************************************************
-/// Last updated for version 5.9.8
-/// Last updated on  2017-09-20
+///***************************************************************************
+/// Last updated for version 6.0.4
+/// Last updated on  2018-01-10
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -32,7 +32,7 @@
 /// Contact information:
 /// https://state-machine.com
 /// mailto:info@state-machine.com
-////**************************************************************************
+///***************************************************************************
 /// @endcond
 
 #define QP_IMPL           // this is QP implementation
@@ -67,10 +67,6 @@ int_t QF::run(void) {
 //............................................................................
 void QF::stop(void) {
     onCleanup();  // cleanup callback
-}
-//............................................................................
-void QF_setUCosTaskAttr(QActive *act, uint32_t attr) {
-    act->getThread() = attr;
 }
 
 //............................................................................
@@ -112,6 +108,15 @@ void QActive::start(uint_fast8_t prio,
     // uC/OS-II task must be created correctly
     Q_ENSURE_ID(220, err == OS_ERR_NONE);
 }
+//............................................................................
+void QActive::stop() {
+    m_thread = static_cast<uint32_t>(0); // stop the thread loop
+}
+//............................................................................
+// NOTE: This function must be called BEFORE starting an active object
+void QActive::setAttr(uint32_t attr1, void const * /*attr2*/) {
+    m_thread = attr1; // use as temporary
+}
 
 // thread for active objects -------------------------------------------------
 void QF::thread_(QActive *act) {
@@ -134,10 +139,6 @@ static void task_function(void *pdata) { // uC/OS-II task signature
     QF::thread_(act);
     QF::remove_(act); // remove this object from QF
     OSTaskDel(OS_PRIO_SELF); // make uC/OS-II forget about this task
-}
-//............................................................................
-void QActive::stop() {
-    m_thread = static_cast<uint32_t>(0); // stop the thread loop
 }
 //............................................................................
 #ifndef Q_SPY

@@ -8,8 +8,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.8
-/// Last updated on  2017-09-20
+/// Last updated for version 6.0.4
+/// Last updated on  2018-01-07
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -154,16 +154,11 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
             if (m_eQueue.m_head == static_cast<QEQueueCtr>(0)) {
                 m_eQueue.m_head = m_eQueue.m_end; // wrap around
             }
-            --m_eQueue.m_head;
+            --m_eQueue.m_head; // advance the head (counter clockwise)
         }
         QF_CRIT_EXIT_();
-
-        status = true; // event posted successfully
     }
     else {
-        /// @note assert if event cannot be posted and dropping events is
-        /// not acceptable
-        Q_ASSERT_ID(110, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -179,7 +174,6 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         QF_CRIT_EXIT_();
 
         QF::gc(e); // recycle the evnet to avoid a leak
-        status = false; // event not posted
     }
 
     return status;

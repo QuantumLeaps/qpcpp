@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2016-09-28
+/// Last updated for version 6.0.4
+/// Last updated on  2018-01-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -99,7 +99,8 @@
     // TreadX block pool operations...
     #define QF_EPOOL_TYPE_   TX_BLOCK_POOL
     #define QF_EPOOL_INIT_(pool_, poolSto_, poolSize_, evtSize_) \
-        Q_ALLEGE(tx_block_pool_create(&(pool_), "P", (evtSize_), \
+        Q_ALLEGE(tx_block_pool_create(&(pool_), \
+                 const_cast<CHAR *>("QP"), (evtSize_), \
                  (poolSto_), (poolSize_)) == TX_SUCCESS)
 
     #define QF_EPOOL_EVENT_SIZE_(pool_) \

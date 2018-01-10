@@ -35,56 +35,58 @@
 #include "dpp.h"
 #include "bsp.h"
 
+// Local-scope objects -------------------------------------------------------
+static QP::QEvt const *l_tableQueueSto[N_PHILO];
+static QP::QEvt const *l_philoQueueSto[N_PHILO][N_PHILO];
+static QP::QSubscrList l_subscrSto[DPP::MAX_PUB_SIG];
+
+static union SmallEvents {
+    void   *e0;  // minimum event size
+    uint8_t e1[sizeof(DPP::TableEvt)];
+    // ... other event types to go into this pool
+} l_smlPoolSto[2*N_PHILO + 10]; // storage for the small event pool
+
+static ULONG l_philoStk[N_PHILO][256]; // stacks for the Philosophers
+static ULONG l_tableStk[256];          // stack for the Table
+
 //............................................................................
 int main() {
-    DPP::BSP::init();    // initialize the Board Support Package
+    DPP::BSP::init();   // initialize the Board Support Package
     tx_kernel_enter();  // transfet control to the ThreadX RTOS
-    return 0;           // tx_kernel_enter() does not return
+    return 0; // tx_kernel_enter() does not return
 }
 //............................................................................
-void tx_application_define(void *first_unused_memory) {
-    // stacks...
-    static ULONG philoStk[N_PHILO][128];
-    static ULONG tableStk[256];
-
-    static QP::QEvt const *tableQueueSto[N_PHILO];
-    static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
-    static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
-
-    static union SmallEvents {
-        void   *e0;  // minimum event size
-        uint8_t e1[sizeof(DPP::TableEvt)];
-        // ... other event types to go into this pool
-    } smlPoolSto[2*N_PHILO + 10]; // storage for the small event pool
-
+void tx_application_define(void * /*first_unused_memory*/) {
     // initialize the framework and the underlying RT kernel...
     QP::QF::init();
 
     // init publish-subscribe
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QP::QF::psInit(l_subscrSto, Q_DIM(l_subscrSto));
 
     // initialize event pools...
-    QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+    QP::QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto),
+                     sizeof(l_smlPoolSto[0]));
 
-    QS_OBJ_DICTIONARY(smlPoolSto);
-    QS_OBJ_DICTIONARY(tableQueueSto);
-    QS_OBJ_DICTIONARY(philoQueueSto[0]);
-    //QS_OBJ_DICTIONARY(philoQueueSto[1]);
-    //QS_OBJ_DICTIONARY(philoQueueSto[2]);
-    //QS_OBJ_DICTIONARY(philoQueueSto[3]);
-    //QS_OBJ_DICTIONARY(philoQueueSto[4]);
+    QS_OBJ_DICTIONARY(l_smlPoolSto);
+    QS_OBJ_DICTIONARY(l_tableQueueSto);
+    QS_OBJ_DICTIONARY(l_philoQueueSto[0]);
+    //NOTE: can't use more active objects in the ThreadX demo!
+    //QS_OBJ_DICTIONARY(l_philoQueueSto[1]);
+    //QS_OBJ_DICTIONARY(l_philoQueueSto[2]);
+    //QS_OBJ_DICTIONARY(l_philoQueueSto[3]);
+    //QS_OBJ_DICTIONARY(l_philoQueueSto[4]);
 
     // start the active objects...
     for (uint8_t n = 0; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start(
             static_cast<uint_fast8_t>(n + 1),
-            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-            philoStk[n], sizeof(philoStk[n]));
+            l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
+            l_philoStk[n], sizeof(l_philoStk[n]));
     }
     DPP::AO_Table->start(
         static_cast<uint_fast8_t>(N_PHILO + 1),
-        tableQueueSto, Q_DIM(tableQueueSto),
-        tableStk, sizeof(tableStk));
+        l_tableQueueSto, Q_DIM(l_tableQueueSto),
+        l_tableStk, sizeof(l_tableStk));
 
     (void)QP::QF::run(); // run the QF application
 }
