@@ -452,7 +452,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, static_cast<void *>(0))
+    QS_BEGIN(DPP::COMMAND_STAT, reinterpret_cast<void *>(1))
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()

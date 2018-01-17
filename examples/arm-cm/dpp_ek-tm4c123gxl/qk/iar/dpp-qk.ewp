@@ -288,11 +288,11 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
-                    <state></state>
+                    <state>--enable_restrict</state>
                 </option>
                 <option>
                     <name>CCLangConformance</name>
@@ -1087,7 +1087,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>7.40.3.8937</state>
+                    <state>8.11.1.13270</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -1309,11 +1309,11 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
-                    <state></state>
+                    <state>--enable_restrict</state>
                 </option>
                 <option>
                     <name>CCLangConformance</name>
@@ -2074,11 +2074,11 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing.</state>
+                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing, without multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>No specifier a, A, no specifier n, no float nor long long, no flags.</state>
+                    <state>No specifier a, A, no specifier n, no float nor long long, no flags, without multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -2108,7 +2108,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>7.40.3.8937</state>
+                    <state>8.11.1.13270</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -2159,7 +2159,7 @@
                 <option>
                     <name>GBECoreSlave</name>
                     <version>25</version>
-                    <state>40</state>
+                    <state>39</state>
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
@@ -2330,11 +2330,11 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
-                    <state></state>
+                    <state>--enable_restrict</state>
                 </option>
                 <option>
                     <name>CCLangConformance</name>
@@ -2447,7 +2447,7 @@
                 </option>
                 <option>
                     <name>IccStaticDestr</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>IccCppInlineSemantics</name>

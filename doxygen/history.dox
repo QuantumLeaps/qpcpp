@@ -9,6 +9,8 @@ The main purpose of this release is the provision of the official @ref freertos 
 
 This release also replaces assembly with C implementation in the ARM-KEIL ports or the QK and QXK kernels to Cortex-M to take advantage of the `__asm` functions. (NOTE: this change has impact on the existing QP/C++ applications that use the ARM-KEIL toolchain and the QK or QXK kernels.)
 
+Additionally, this release modifies all IAR-ARM example projects by adding compiler option "--enable_restrict". This option is necessary to compile the CMSIS header file "mpu_armv7.h" under the IAR C++, where the "restrict" keyword is not supported by default.
+
 Additionally, this release fixes some problems with the native examples for STM32F4 and STM32F7 boards.
 
 Additionally, this release adds a generic function QP::QActive::setAttr() to set thread attributes in various QP ports to 3rd-party RTOSes. This function is then used in the @ref embos "embOS port" and the @ref ucos-ii "uC/OS-II port".
