@@ -1,9 +1,9 @@
 /// @file
-/// @brief QP/C++ port to ARM Cortex-M, cooperative QV kernel, GNU-ARM toolset
+/// @brief QV/C++ port to ARM Cortex-M, GNU-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-12
+/// Last updated for version 6.1.0
+/// Last updated on  2018-02-07
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -37,42 +37,43 @@
 
 #include "qf_port.h"
 
-#if (__ARM_ARCH == 6) // NOT Cortex-M0/M0+/M1 ?
+#if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1 ?
 
 extern "C" {
 
-// hand-optimized quick LOG2 in assembly
-//
-// NOTE:
-// The inline GNU assembler does not accept mnemonics 'lsrs' and 'adds',
-// but for Cortex-M0/M0+/M1 the mnemonics 'lsr' and 'add' always set the
-// condition flags in the PSR.
-//
+/*
+* Hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction)
+*
+* NOTE:
+* The inline GNU assembler does not accept mnemonics MOVS, LSRS and ADDS,
+* but for Cortex-M0/M0+/M1 the mnemonics MOV, LSR and ADD always set the
+* condition flags in the PSR.
+*/
 __attribute__ ((naked))
 uint_fast8_t QF_qlog2(uint32_t x) {
-    __asm volatile (
-        "    mov  r1,#0\n\t"
-        "    lsr  r2,r0,#16\n\t"
-        "    beq  QF_qlog2_1\n\t"
-        "    mov  r1,#16\n\t"
-        "    mov  r0,r2\n\t"
-        "QF_qlog2_1:\n\t"
-        "    lsr  r2,r0,#8\n\t"
-        "    beq  QF_qlog2_2\n\t"
-        "    add  r1, r1,#8\n\t"
-        "    mov  r0, r2\n\t"
-        "QF_qlog2_2:\n\t"
-        "    lsr  r2,r0,#4\n\t"
-        "    beq  QF_qlog2_3\n\t"
-        "    add  r1,r1,#4\n\t"
-        "    mov  r0,r2\n\t"
-        "QF_qlog2_3:\n\t"
-        "    ldr  r2,=QF_qlog2_LUT\n\t"
-        "    ldrb r0,[r2,r0]\n\t"
-        "    add  r0,r1, r0\n\t"
-        "    bx   lr\n\t"
-        "QF_qlog2_LUT:\n\t"
-        "   .byte 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4\n\t"
+__asm volatile (
+    "  MOV     r1,#0            \n"
+    "  LSR     r2,r0,#16        \n"
+    "  BEQ     QF_qlog2_1       \n"
+    "  MOV     r1,#16           \n"
+    "  MOV     r0,r2            \n"
+    "QF_qlog2_1:                \n"
+    "  LSR     r2,r0,#8         \n"
+    "  BEQ     QF_qlog2_2       \n"
+    "  ADD     r1, r1,#8        \n"
+    "  MOV     r0, r2           \n"
+    "QF_qlog2_2:                \n"
+    "  LSR     r2,r0,#4         \n"
+    "  BEQ     QF_qlog2_3       \n"
+    "  ADD     r1,r1,#4         \n"
+    "  MOV     r0,r2            \n"
+    "QF_qlog2_3:                \n"
+    "  LDR     r2,=QF_qlog2_LUT \n"
+    "  LDRB    r0,[r2,r0]       \n"
+    "  ADD     r0,r1, r0        \n"
+    "  BX      lr               \n"
+    "QF_qlog2_LUT:              \n"
+    "  .byte 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4"
     );
 }
 

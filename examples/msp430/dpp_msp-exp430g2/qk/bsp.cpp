@@ -262,7 +262,7 @@ bool QS::onStartup(void const *arg) {
     // configure the hardware UART...
     UCA0CTL1 |= UCSSEL_2;      // select SMCLK for the UART
 
-    tmp = BSP::SMCLK / 9600U;   // baud-rate value for 9600 bauds
+    tmp = BSP_SMCLK / 9600U;   // baud-rate value for 9600 bauds
     UCA0BR0 = (uint8_t)tmp;    // load the baud-rate register low
     UCA0BR1 = (uint8_t)(tmp >> 8); // load the baud-rate register hi
 
@@ -294,7 +294,7 @@ QSTimeCtr QS::onGetTime(void) {  // invoked with interrupts DISABLED
     }
     else { // the rollover occured, but the timerA_ISR did not run yet
         return DPP::QS_tickTime_
-            + (((BSP::SMCLK/8U) + DPP::BSP::TICKS_PER_SEC/2U)
+            + (((BSP_SMCLK/8U) + DPP::BSP::TICKS_PER_SEC/2U)
                /DPP::BSP::TICKS_PER_SEC) + 1U + TAR;
     }
 }

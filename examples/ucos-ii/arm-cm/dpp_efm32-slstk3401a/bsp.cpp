@@ -197,7 +197,7 @@ void App_TimeTickHook(void) {
             static QP::QEvt const pauseEvt = { DPP::PAUSE_SIG, 0U, 0U};
             QP::QF::PUBLISH(&pauseEvt, &l_SysTick_Handler);
         }
-        else {            // the button is released
+        else { // the button is released
             static QP::QEvt const serveEvt = { DPP::SERVE_SIG, 0U, 0U};
             QP::QF::PUBLISH(&serveEvt, &l_SysTick_Handler);
         }
@@ -287,10 +287,10 @@ uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
 }
 //............................................................................
 void BSP::randomSeed(uint32_t seed) {
-      INT8U err;
+    INT8U err;
 
     l_rnd = seed;
-      l_rndMutex = OSMutexCreate(N_PHILO, &err);
+    l_rndMutex = OSMutexCreate(N_PHILO, &err);
 }
 //............................................................................
 void BSP::ledOn(void) {

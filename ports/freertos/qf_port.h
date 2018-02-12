@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.0.4
-/// Date of the Last Update:  2018-01-09
+/// Last Updated for Version: 6.1.0
+/// Date of the Last Update:  2018-02-10
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -125,9 +125,13 @@
                          (margin_), (sig_))))
 #endif
 
+namespace QP {
+
 enum FreeRTOS_TaskAttrs {
     TASK_NAME_ATTR
 };
+
+} // namespace QP
 
 // FreeRTOS hooks prototypes (not provided by FreeRTOS)
 extern "C" {

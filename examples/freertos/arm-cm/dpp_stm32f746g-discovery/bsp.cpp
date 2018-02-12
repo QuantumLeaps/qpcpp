@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32746G-Discovery board, FreeRTOS kernel
-// Last Updated for Version: 6.0.4
-// Date of the Last Update:  2018-01-10
+// Last Updated for Version: 6.1.0
+// Date of the Last Update:  2018-02-03
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,7 +35,7 @@
 #include "dpp.h"
 #include "bsp.h"
 
-// STM32Cube include files
+// STM32CubeF7 include files
 #include "stm32f7xx_hal.h"
 #include "stm32746g_discovery.h"
 // add other drivers if necessary...
@@ -102,7 +102,7 @@ void EXTI0_IRQHandler(void) {
     AO_Table->POST_FROM_ISR(
         Q_NEW_FROM_ISR(QP::QEvt, DPP::MAX_PUB_SIG),
         &xHigherPriorityTaskWoken,
-        &l_GPIOPortA_IRQHandler);
+        &l_EXTI0_IRQHandler);
 
     // the usual end of FreeRTOS ISR...
     portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);

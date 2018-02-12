@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example, uC/OS-II kernel
-// Last updated for version 6.0.4
-// Last updated on  2018-01-08
+// Last updated for version 6.1.0
+// Last updated on  2018-02-11
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// https://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
@@ -37,12 +37,13 @@
 
 //............................................................................
 int main() {
-    // stacks for uC/OS-II tasks...
-    static OS_STK philoStk[N_PHILO][128];
-    static OS_STK tableStk[256];
+    // stacks for all uC/OS-II threads (grouped toghether for ease of testing)
+    static OS_STK philoStkSto[N_PHILO][128];
+    static OS_STK tableStkSto[256];
 
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
+
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
 
     static DPP::TableEvt smlPoolSto[2*N_PHILO];
@@ -69,23 +70,23 @@ int main() {
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         // NOTE: provide uC/OS-II task attributes for the AO's task
-        DPP::AO_Philo[n]->setAttr(OS_TASK_OPT_STK_CHK, 0);
+        DPP::AO_Philo[n]->setAttr(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK, 0);
         DPP::AO_Philo[n]->start(
             static_cast<uint_fast8_t>(n + 1), // QP priority
             philoQueueSto[n],        // storage for the AO's queue
             Q_DIM(philoQueueSto[n]), // queue's length [events]
-            philoStk[n],             // stack storage
-            sizeof(philoStk[n]));    // sack size [bytes]
+            philoStkSto[n],          // stack storage
+            sizeof(philoStkSto[n])); // stack size [bytes]
     }
 
     // NOTE: provide uC/OS-II task attributes for the AO's task
-    DPP::AO_Table->setAttr(OS_TASK_OPT_STK_CHK, 0);
+    DPP::AO_Table->setAttr(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK, 0);
     DPP::AO_Table->start(
         static_cast<uint_fast8_t>(N_PHILO + 1U), // QP priority
-        tableQueueSto,            // storage for the AO's queue
-        Q_DIM(tableQueueSto),     // queue's length [events]
-        tableStk,                 // stack storage
-        sizeof(tableStk));        // sack size [bytes]
+        tableQueueSto,           // storage for the AO's queue
+        Q_DIM(tableQueueSto),    // queue's length [events]
+        tableStkSto,             // stack storage
+        sizeof(tableStkSto));    // stack size [bytes]
 
     return QP::QF::run(); // run the QF application
 }

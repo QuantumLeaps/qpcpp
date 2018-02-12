@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example, uC/OS-II kernel
-// Last updated for version 5.6.5
-// Last updated on  2016-07-02
+// Last updated for version 6.1.0
+// Last updated on  2018-02-11
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -39,13 +39,13 @@
 
 Q_DEFINE_THIS_FILE
 
-// stacks for all uC/OS-II threads (grouped toghether for ease of testing)
-static OS_STK testStackSto[128];
-static OS_STK tableStackSto[256];
-static OS_STK philoStackSto[N_PHILO][128];
-
 //............................................................................
 int main() {
+    // stacks for all uC/OS-II threads (grouped toghether for ease of testing)
+    static OS_STK philoStackSto[N_PHILO][128];
+    static OS_STK tableStackSto[256];
+    static OS_STK testStackSto[128];
+
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
 
@@ -74,7 +74,7 @@ int main() {
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         // NOTE: provide uC/OS-II task attributes for the AO's task
-        QP::QF_setUCosTaskAttr(DPP::AO_Philo[n], OS_TASK_OPT_STK_CLR);
+        DPP::AO_Philo[n]->setAttr(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK, 0);
         DPP::AO_Philo[n]->start(
             static_cast<uint_fast8_t>(n + 1), // QP priority
             philoQueueSto[n],          // event queue storage
@@ -87,13 +87,13 @@ int main() {
     // protect the random number generator shared among Philo AOs
 
     // NOTE: provide uC/OS-II task attributes for the AO's task
-    QP::QF_setUCosTaskAttr(DPP::AO_Table, OS_TASK_OPT_STK_CLR);
+    DPP::AO_Table->setAttr(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK, 0);
     DPP::AO_Table->start(
-            static_cast<uint_fast8_t>(N_PHILO + 2U), // QP priority
-            tableQueueSto,           // event queue storage
-            Q_DIM(tableQueueSto),    // queue length [events]
-            tableStackSto,           // stack storage
-            sizeof(tableStackSto));  // stack size [bytes]
+        static_cast<uint_fast8_t>(N_PHILO + 2U), // QP priority
+        tableQueueSto,           // event queue storage
+        Q_DIM(tableQueueSto),    // queue length [events]
+        tableStackSto,           // stack storage
+        sizeof(tableStackSto));  // stack size [bytes]
 
     // start a "naked" uC/OS-II task for testing...
     Q_ALLEGE(OS_ERR_NONE == OSTaskCreateExt(

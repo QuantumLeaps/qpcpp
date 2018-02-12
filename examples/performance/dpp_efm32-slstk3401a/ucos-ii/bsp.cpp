@@ -127,11 +127,11 @@ void App_TaskCreateHook (OS_TCB *ptcb) { (void)ptcb; }
 void App_TaskDelHook    (OS_TCB *ptcb) { (void)ptcb; }
 //............................................................................
 void App_TaskIdleHook(void) {
-/*
 #if OS_CRITICAL_METHOD == 3u  // Allocate storage for CPU status register
     OS_CPU_SR cpu_sr;
 #endif
 
+/*
     // toggle LED1 on and then off, see NOTE01
     OS_ENTER_CRITICAL();
     GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN); // turn the LED on
