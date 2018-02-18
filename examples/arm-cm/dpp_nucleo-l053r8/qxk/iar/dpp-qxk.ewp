@@ -219,7 +219,7 @@
                 </option>
                 <option>
                     <name>CCDefines</name>
-                    <state></state>
+                    <state>QXK_ON_CONTEXT_SW</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -2088,11 +2088,11 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing.</state>
+                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing, without multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>No specifier a, A, no specifier n, no float nor long long, no flags.</state>
+                    <state>No specifier a, A, no specifier n, no float nor long long, no flags, without multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -2276,6 +2276,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>Q_SPY</state>
+                    <state>QXK_ON_CONTEXT_SW</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -3199,10 +3200,10 @@
             <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qs_port.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qxk_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qxk_port.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qxk_port.s</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qxk_port.h</name>
         </file>
     </group>
     <group>

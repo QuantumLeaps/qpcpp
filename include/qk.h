@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-08
+/// Last updated for version 6.1.1
+/// Last updated on  2018-02-17
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -45,14 +45,27 @@
 
 
 //****************************************************************************
-// QF configuration for QK
+// QF configuration for QK -- data members of the QActive class...
 
-//! This macro defines the type of the event queue used for active objects.
+//! Kernel-dependent type of the event queue used for QK threads
+//
 /// @description
-///QK uses the native QF event queue QEQueue.
-#define QF_EQUEUE_TYPE         QEQueue
+/// QK uses the native QF event queue QEQueue.
+#define QF_EQUEUE_TYPE      QEQueue
+
+//! Kernel-dependent type of the thread attribute
+//
+/// @description
+/// QK uses this member to store the private Thread-Local Storage pointer.
+///
+#define QF_THREAD_TYPE      void*
+
 
 //****************************************************************************
+namespace QP {
+    class QActive; // forward declaration
+} // namespace QP
+
 //! attributes of the QK kernel (in C for easy access in assembly)
 extern "C" {
 
@@ -61,9 +74,7 @@ struct QK_Attr {
     uint8_t volatile nextPrio;   //!< prio of the next AO to execute
     uint8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
     uint8_t volatile lockHolder; //!< prio of the lock holder
-#ifndef QK_ISR_CONTEXT_
     uint8_t volatile intNest;    //!< ISR nesting level
-#endif // QK_ISR_CONTEXT_
     QP::QPSet readySet;          //!< QK ready-set of AOs and "naked" threads
 };
 
@@ -76,6 +87,32 @@ uint_fast8_t QK_sched_(void);
 //! QK activator activates the next active object. The activated AO preempts
 // the currently executing AOs.
 void QK_activate_(void);
+
+#ifdef QK_ON_CONTEXT_SW
+
+    //! QK context switch callback (customized in BSPs for QK)
+    ///
+    /// @description
+    /// This callback function provides a mechanism to perform additional
+    /// custom operations when QK switches context from one thread to
+    /// another.
+    ///
+    /// @param[in] prev   pointer to the previous thread (active object)
+    ///                   (prev==0 means that @p prev was the QK idle loop)
+    /// @param[in] next   pointer to the next thread (active object)
+    ///                   (next==0) means that @p next is the QK idle loop)
+    /// @attention
+    /// QK_onContextSw() is invoked with interrupts **disabled** and must also
+    /// return with interrupts **disabled**.
+    ///
+    /// @note
+    /// This callback is enabled by defining the macro #QK_ON_CONTEXT_SW.
+    ///
+    /// @include qk_oncontextsw.cpp
+    ///
+    void QK_onContextSw(QP::QActive *prev, QP::QActive *next);
+
+#endif // QK_ON_CONTEXT_SW
 
 } // extern "C"
 
@@ -112,7 +149,8 @@ public:
     /// callback gives the application an opportunity to enter a power-saving
     /// CPU mode, or perform some other idle processing.
     ///
-    /// @note QP::QK::onIdle() is invoked with interrupts enabled and must
+    /// @note
+    /// QP::QK::onIdle() is invoked with interrupts enabled and must
     /// also return with interrupts enabled.
     ///
     /// @sa QP::QF::onIdle()

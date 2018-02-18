@@ -1,8 +1,8 @@
 ##############################################################################
 # Product: Makefile for DPP on STM32F746G-Discovery, QV kernel, GNU-ARM
-# Last Updated for Version: 6.1.0
-# Date of the Last Update:  2018-02-07
-#
+# Last Updated for Version: 6.1.1
+# Date of the Last Update:  2018-02-17
+##
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
@@ -45,7 +45,7 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    http://sourceforge.net/projects/qpc/files/Qtools/
+#    http://sourceforge.net/projects/qpc/files/QTools/
 #
 
 #-----------------------------------------------------------------------------
@@ -73,10 +73,10 @@ VPATH = \
 	$(QPCPP)/src/qv \
 	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
-	$(QPCPP)/3rd_party/stm32f7-discovery \
-	$(QPCPP)/3rd_party/stm32f7-discovery/gnu \
-	$(QPCPP)/3rd_party/stm32f7-discovery/Drivers/BSP/STM32746G-Discovery \
-	$(QPCPP)/3rd_party/stm32f7-discovery/Drivers/STM32F7xx_HAL_Driver/Src
+	$(QPCPP)/3rd_party/nucleo-h743zi \
+	$(QPCPP)/3rd_party/nucleo-h743zi/gnu \
+	$(QPCPP)/3rd_party/nucleo-h743zi/Drivers/BSP/STM32H7xx_Nucleo_144 \
+	$(QPCPP)/3rd_party/nucleo-h743zi/Drivers/STM32H7xx_HAL_Driver/Src
 
 # list of all include directories needed by this project
 INCLUDES  = \
@@ -85,9 +85,9 @@ INCLUDES  = \
 	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
-	-I$(QPCPP)/3rd_party/stm32f7-discovery \
-	-I$(QPCPP)/3rd_party/stm32f7-discovery/Drivers/BSP/STM32746G-Discovery \
-	-I$(QPCPP)/3rd_party/stm32f7-discovery/Drivers/STM32F7xx_HAL_Driver/Inc
+	-I$(QPCPP)/3rd_party/nucleo-h743zi \
+	-I$(QPCPP)/3rd_party/nucleo-h743zi/Drivers/BSP/STM32H7xx_Nucleo_144 \
+	-I$(QPCPP)/3rd_party/nucleo-h743zi/Drivers/STM32H7xx_HAL_Driver/Inc
 
 #-----------------------------------------------------------------------------
 # files
@@ -98,20 +98,20 @@ ASM_SRCS :=
 
 # C source files
 C_SRCS := \
-	startup_stm32f746xx.c \
-	system_stm32f7xx.c \
-	stm32746g_discovery.c \
-	stm32f7xx_hal.c \
-	stm32f7xx_hal_cortex.c \
-	stm32f7xx_hal_gpio.c \
-	stm32f7xx_hal_pwr_ex.c \
-	stm32f7xx_hal_rcc.c \
-	stm32f7xx_hal_rcc_ex.c \
-	stm32f7xx_hal_msp.c \
-	stm32f7xx_hal_uart.c
+	startup_stm32h743xx.c \
+	system_stm32h7xx.c \
+	stm32h7xx_nucleo_144.c \
+	stm32h7xx_hal.c \
+	stm32h7xx_hal_cortex.c \
+	stm32h7xx_hal_gpio.c \
+	stm32h7xx_hal_pwr_ex.c \
+	stm32h7xx_hal_rcc.c \
+	stm32h7xx_hal_rcc_ex.c \
+	stm32h7xx_hal_msp.c \
+	stm32h7xx_hal_uart.c
 
 # C++ source files
-CPP_SRCS :=	 \
+CPP_SRCS := \
 	bsp.cpp \
 	main.cpp \
 	philo.cpp \
@@ -147,7 +147,7 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DSTM32F746xx
+DEFINES   := -DQK_ON_CONTEXT_SW -DSTM32H743xx -DUSE_HAL_DRIVER -DUSE_STM32H7XX_NUCLEO_144
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -157,7 +157,7 @@ DEFINES   := -DSTM32F746xx
 #
 ARM_CPU   := -mcpu=cortex-m7
 ARM_ARCH  := 7   # NOTE: must match the ARM_CPU!
-ARM_FPU   := -mfpu=vfp
+ARM_FPU   := -mfpu=fpv5-d16
 FLOAT_ABI := -mfloat-abi=softfp
 
 #-----------------------------------------------------------------------------
@@ -203,11 +203,11 @@ BIN_DIR := rel
 
 ASFLAGS = $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
-CFLAGS = $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+CFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
 	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
 
-CPPFLAGS = $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+CPPFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
 	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
 
@@ -219,11 +219,11 @@ CPP_SRCS += $(QS_SRCS)
 
 ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
-CFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+CFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
-CPPFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+CPPFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
 	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
@@ -233,11 +233,11 @@ BIN_DIR := dbg
 
 ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
-CFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+CFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+CPPFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
 	-O $(INCLUDES) $(DEFINES)
 
@@ -247,7 +247,6 @@ endif # ......................................................................
 LINKFLAGS = -T$(LD_SCRIPT) $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) \
 	-mthumb -nostdlib \
 	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
-
 
 ASM_OBJS     := $(patsubst %.s,%.o,  $(notdir $(ASM_SRCS)))
 C_OBJS       := $(patsubst %.c,%.o,  $(notdir $(C_SRCS)))
@@ -277,7 +276,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CPPFLAGS) -c $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.c
@@ -290,10 +289,10 @@ $(BIN_DIR)/%.o : %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 $(BIN_DIR)/%.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 $(BIN_DIR)/%.o : %.cpp
-	$(CPP) $(CPPFLAGS) -c $< -o $@
+	$(CPP) $(CPPFLAGS) $< -o $@
 
 # include dependency files only if our goal depends on their existence
 ifneq ($(MAKECMDGOALS),clean)

@@ -3,8 +3,8 @@
 /// @cond
 ///===========================================================================
 /// Product: QP/C++
-/// Last Updated for Version: 5.9.7
-/// Date of the Last Update:  2017-08-20
+/// Last Updated for Version: 6.1.1
+/// Date of the Last Update:  2018-02-17
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -31,8 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
-/// info@state-machine.com
+/// https://www.state-machine.com
+/// mailto:info@state-machine.com
 ///============================================================================
 /// @endcond
 
@@ -142,6 +142,8 @@ qpcpp.lnt         // QP/C++ options
  QK_ISR_CONTEXT_)
 -efunc(527, *QF::run)       // 0-1-1 Unreachable code
 -esym(1923,
+ QK_ON_CONTEXT_SW,
+ QXK_ON_CONTEXT_SW,
  QACTIVE_EQUEUE_ONEMPTY_)   // 16-2-2 Macro could become const variable
 
 

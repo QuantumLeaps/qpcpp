@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, NUCLEO-H743ZI board, premptive QK kernel
-// Last Updated for Version: 6.1.0
-// Date of the Last Update:  2018-02-03
+// Last Updated for Version: 6.1.1
+// Date of the Last Update:  2018-02-17
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -82,7 +82,8 @@ static uint32_t l_rnd; // random seed
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,
         PAUSED_STAT,
-        COMMAND_STAT
+        COMMAND_STAT,
+        ON_CONTEXT_SW
     };
 
 #endif
@@ -216,6 +217,7 @@ void BSP::init(void) {
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(PAUSED_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
+    QS_USR_DICTIONARY(ON_CONTEXT_SW);
 }
 /*..........................................................................*/
 void BSP::ledOn(void) {
@@ -251,7 +253,7 @@ void BSP::displayPaused(uint8_t paused) {
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     // flating point code is to exercise the FPU
-    float volatile x = 3.1415926F;
+    double volatile x = 3.1415926F;
     x = x + 2.7182818F;
 
     QP::QSchedStatus lockStat = QP::QK::schedLock(N_PHILO); // protect l_rnd
@@ -310,6 +312,22 @@ void QF::onStartup(void) {
 //............................................................................
 void QF::onCleanup(void) {
 }
+
+//............................................................................
+#ifdef QK_ON_CONTEXT_SW
+// NOTE: the context-switch callback is called with interrupts DISABLED
+extern "C"
+void QK_onContextSw(QActive *prev, QActive *next) {
+    (void)prev;
+    if (next != (QActive *)0) {
+        //_impure_ptr = next->thread; // switch to next TLS
+    }
+    QS_BEGIN_NOCRIT(DPP::ON_CONTEXT_SW, (void *)1) // no critical section!
+        QS_OBJ(prev);
+        QS_OBJ(next);
+    QS_END_NOCRIT()
+}
+#endif // QK_ON_CONTEXT_SW
 //............................................................................
 void QK::onIdle(void) {
     // toggle the User LED on and then off, see NOTE01

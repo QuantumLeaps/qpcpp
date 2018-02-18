@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.9.7
-// Last updated on  2017-08-20
+// Last updated for version 6.1.1
+// Last updated on  2017-02-17
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -65,6 +65,8 @@ static void lib_fun(uint32_t x) {
 //............................................................................
 static void Thread1_run(QP::QXThread * const me) {
 
+    QS_OBJ_DICTIONARY(&l_test1);
+
     me->m_thread = &l_tls1; // initialize the TLS for Thread1
 
     for (;;) {
@@ -100,6 +102,8 @@ static void Thread1_run(QP::QXThread * const me) {
 //............................................................................
 static void Thread2_run(QP::QXThread * const me) {
 
+    QS_OBJ_DICTIONARY(&l_test2);
+
     // initialize the semaphore before using it
     // NOTE: Here the semaphore is initialized in the highest-priority thread
     // that uses it. Alternatively, the semaphore can be initialized
@@ -111,7 +115,7 @@ static void Thread2_run(QP::QXThread * const me) {
     // NOTE: Here the semaphore is initialized in the highest-priority thread
     // that uses it. Alternatively, the semaphore can be initialized
     // before any thread runs.
-    l_mutex.init(0U /*N_PHILO + 6U*/);
+    l_mutex.init(N_PHILO + 6U);
 
     me->m_thread = &l_tls2; // initialize the TLS for Thread2
 

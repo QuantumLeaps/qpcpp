@@ -1,146 +1,98 @@
-/// @file
-/// @brief QXK/C++ port to ARM Cortex-M, GNU-ARM toolset
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.1.0
-/// Last updated on  2018-02-07
-///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
-///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
-///
-/// Contact information:
-/// https://state-machine.com
-/// mailto:info@state-machine.com
-///***************************************************************************
-/// @endcond
-
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
-#else
-    #include "qs_dummy.h" // disable the QS software tracing
-#endif // Q_SPY
-
-#if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1 ?
-
-extern "C" {
-
-/*
-* Hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction)
+/**
+* @file
+* @brief QK/C++ port to ARM Cortex-M, GNU-ARM toolset
+* @cond
+******************************************************************************
+* Last Updated for Version: 6.1.1
+* Date of the Last Update:  2018-02-17
 *
-* NOTE:
-* The inline GNU assembler does not accept mnemonics MOVS, LSRS and ADDS,
-* but for Cortex-M0/M0+/M1 the mnemonics MOV, LSR and ADD always set the
-* condition flags in the PSR.
+*                    Q u a n t u m     L e a P s
+*                    ---------------------------
+*                    innovating embedded systems
+*
+* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+*
+* This program is open source software: you can redistribute it and/or
+* modify it under the terms of the GNU General Public License as published
+* by the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Alternatively, this program may be distributed and modified under the
+* terms of Quantum Leaps commercial licenses, which expressly supersede
+* the GNU General Public License and are specifically designed for
+* licensees interested in retaining the proprietary status of their code.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
+* Contact information:
+* https://www.state-machine.com
+* mailto:info@state-machine.com
+******************************************************************************
+* @endcond
 */
-__attribute__ ((naked))
-uint_fast8_t QF_qlog2(uint32_t x) {
-__asm volatile (
-    "  MOV     r1,#0            \n"
-    "  LSR     r2,r0,#16        \n"
-    "  BEQ     QF_qlog2_1       \n"
-    "  MOV     r1,#16           \n"
-    "  MOV     r0,r2            \n"
-    "QF_qlog2_1:                \n"
-    "  LSR     r2,r0,#8         \n"
-    "  BEQ     QF_qlog2_2       \n"
-    "  ADD     r1, r1,#8        \n"
-    "  MOV     r0, r2           \n"
-    "QF_qlog2_2:                \n"
-    "  LSR     r2,r0,#4         \n"
-    "  BEQ     QF_qlog2_3       \n"
-    "  ADD     r1,r1,#4         \n"
-    "  MOV     r0,r2            \n"
-    "QF_qlog2_3:                \n"
-    "  LDR     r2,=QF_qlog2_LUT \n"
-    "  LDRB    r0,[r2,r0]       \n"
-    "  ADD     r0,r1, r0        \n"
-    "  BX      lr               \n"
-    "QF_qlog2_LUT:              \n"
-    "  .byte 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4"
-    );
-}
-
-} // extern "C"
-
-#endif // Cortex-M0/M0+/M1(v6-M, v6S-M)?
+#include "qf_port.h"
 
 extern "C" {
 
-#define SCnSCB_ICTR  (reinterpret_cast<uint32_t volatile *>(0xE000E004))
-#define SCB_SYSPRI   (reinterpret_cast<uint32_t volatile *>(0xE000ED14))
-#define NVIC_IP      (reinterpret_cast<uint32_t volatile *>(0xE000E400))
+#define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004)
+#define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED14)
+#define NVIC_IP      ((uint32_t volatile *)0xE000E400)
 #define NVIC_ICSR    0xE000ED04
 
-// helper macros to "stringify" values
+/* helper macros to "stringify" values */
 #define VAL(x) #x
 #define STRINGIFY(x) VAL(x)
 
-
-// Initialize the exception priorities and IRQ priorities to safe values.
-//
-// Description:
-// On Cortex-M3/M4/M7, this QV port disables interrupts by means of the
-// BASEPRI register. However, this method cannot disable interrupt
-// priority zero, which is the default for all interrupts out of reset.
-// The following code changes the SysTick priority and all IRQ priorities
-// to the safe value QF_BASEPRI, wich the QF critical section can disable.
-// This avoids breaching of the QF critical sections in case the
-// application programmer forgets to explicitly set priorities of all
-// "kernel aware" interrupts.
-//
-// The interrupt priorities established in QV_init() can be later
-// changed by the application-level code.
-//
+/*
+* Initialize the exception priorities and IRQ priorities to safe values.
+*
+* Description:
+* On Cortex-M3/M4/M7, this QK port disables interrupts by means of the
+* BASEPRI register. However, this method cannot disable interrupt
+* priority zero, which is the default for all interrupts out of reset.
+* The following code changes the SysTick priority and all IRQ priorities
+* to the safe value QF_BASEPRI, wich the QF critical section can disable.
+* This avoids breaching of the QF critical sections in case the
+* application programmer forgets to explicitly set priorities of all
+* "kernel aware" interrupts.
+*
+* The interrupt priorities established in QK_init() can be later
+* changed by the application-level code.
+*/
 void QK_init(void) {
 
-#if (__ARM_ARCH != 6) // NOT Cortex-M0/M0+/M1(v6-M, v6S-M)
+#if (__ARM_ARCH != 6) /* NOT Cortex-M0/M0+/M1 ? */
 
-    // set exception priorities to QF_BASEPRI...
-    // SCB_SYSPRI1: Usage-fault, Bus-fault, Memory-fault
+    uint32_t n;
+
+    /* set exception priorities to QF_BASEPRI...
+    * SCB_SYSPRI1: Usage-fault, Bus-fault, Memory-fault
+    */
     SCB_SYSPRI[1] |= (QF_BASEPRI << 16) | (QF_BASEPRI << 8) | QF_BASEPRI;
 
-    // SCB_SYSPRI2: SVCall
+    /* SCB_SYSPRI2: SVCall */
     SCB_SYSPRI[2] |= (QF_BASEPRI << 24);
 
-    // SCB_SYSPRI3:  SysTick, PendSV, Debug
+    /* SCB_SYSPRI3:  SysTick, Debug */
     SCB_SYSPRI[3] |= (QF_BASEPRI << 24) | (QF_BASEPRI << 16) | QF_BASEPRI;
 
-    // set all implemented IRQ priories to QF_BASEPRI...
-    uint32_t n = 8U + ((*SCnSCB_ICTR & 0x7U) << 3); // (# NVIC_PRIO regs)/4
+    /* set all implemented IRQ priories to QF_BASEPRI... */
+    n = 8U + ((*SCnSCB_ICTR & 0x7U) << 3); /* (# NVIC_PRIO registers)/4 */
     do {
         --n;
         NVIC_IP[n] = (QF_BASEPRI << 24) | (QF_BASEPRI << 16)
                      | (QF_BASEPRI << 8) | QF_BASEPRI;
     } while (n != 0);
 
-#endif // NOT Cortex-M0/M0+/M1(v6-M, v6S-M)
+#endif /* NOT Cortex-M0/M0+/M1(v6-M, v6S-M) */
 
-    // SCB_SYSPRI3: PendSV set to the lowest priority 0xFF
+    /* SCB_SYSPRI3: PendSV set to the lowest priority 0xFF */
     SCB_SYSPRI[3] |= (0xFFU << 16);
 }
 
@@ -291,6 +243,47 @@ __asm volatile (
 #endif                              /* M3/M4/M7 */
     );
 }
+
+/*****************************************************************************
+* hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction)
+*****************************************************************************/
+#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 ? */
+
+/*
+* NOTE:
+* The inline GNU assembler does not accept mnemonics MOVS, LSRS and ADDS,
+* but for Cortex-M0/M0+/M1 the mnemonics MOV, LSR and ADD always set the
+* condition flags in the PSR.
+*/
+__attribute__ ((naked))
+uint_fast8_t QF_qlog2(uint32_t x) {
+__asm volatile (
+    "  MOV     r1,#0            \n"
+    "  LSR     r2,r0,#16        \n"
+    "  BEQ     QF_qlog2_1       \n"
+    "  MOV     r1,#16           \n"
+    "  MOV     r0,r2            \n"
+    "QF_qlog2_1:                \n"
+    "  LSR     r2,r0,#8         \n"
+    "  BEQ     QF_qlog2_2       \n"
+    "  ADD     r1, r1,#8        \n"
+    "  MOV     r0, r2           \n"
+    "QF_qlog2_2:                \n"
+    "  LSR     r2,r0,#4         \n"
+    "  BEQ     QF_qlog2_3       \n"
+    "  ADD     r1,r1,#4         \n"
+    "  MOV     r0,r2            \n"
+    "QF_qlog2_3:                \n"
+    "  LDR     r2,=QF_qlog2_LUT \n"
+    "  LDRB    r0,[r2,r0]       \n"
+    "  ADD     r0,r1, r0        \n"
+    "  BX      lr               \n"
+    "QF_qlog2_LUT:              \n"
+    "  .byte 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4"
+    );
+}
+
+#endif /* NOT Cortex-M0/M0+/M1 */
 
 } // extern "C"
 

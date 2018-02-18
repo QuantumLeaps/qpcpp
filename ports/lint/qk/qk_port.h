@@ -2,8 +2,8 @@
 /// @brief QK/C++ port to Lint, Generic C++ compiler
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-08
+/// Last updated for version 6.1.1
+/// Last updated on  2018-02-17
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -40,27 +40,9 @@
 
 //lint -save -e1960    MISRA-C++:2008 Rule 7-3-1, Global declaration
 
-
 //****************************************************************************
-// QK extended context (FPU) save/restore
-
-//! Define the method for saving the extended context (e.g.,
-//! the context of a floating-point co-processor)
-/// @note This is just an example of #QK_EXT_SAVE macro. You need to define
-/// the macro appropriately for the co-processor you're using. This macro
-/// is only used in the extended QK scheduler QK_scheduleExt_(). If you define
-/// #QK_EXT_SAVE, you also need to provide #QK_EXT_RESTORE.
-#define QK_EXT_SAVE(act_)   \
-    FPU_save(static_cast<void *>((act_)->getThread()))
-
-//! Define the method for restoring the extended context (e.g.,
-/// the context of a floating-point co-processor).
-/// @note This is just an example of #QK_EXT_RESTORE macro. You need to define
-/// the macro appropriately for the co-processor you're using. This macro
-/// is only used in the extended QK scheduler QK_scheduleExt_(). If you define
-/// #QK_EXT_RESTORE, you also need to provide #QK_EXT_SAVE.
-#define QK_EXT_RESTORE(act_) \
-    FPU_restore(static_cast<void *>((act_)->getThread()))
+//! enable the context-switch callback
+#define QK_ON_CONTEXT_SW 1
 
 //****************************************************************************
 // QK interrupt entry and exit

@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.4
-/// Last updated on  2018-01-05
+/// Last updated for version 6.1.1
+/// Last updated on  2018-02-17
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -920,30 +920,30 @@ enum QSpyRxRecords {
 
 
 #if (QS_OBJ_PTR_SIZE == 1)
-    #define QS_OBJ(obj_)        (QP::QS::u8(QS_OBJ_T, (uint8_t)(obj_)))
+    #define QS_OBJ(obj_)        (QP::QS::u8(QP::QS::OBJ_T, (uint8_t)(obj_)))
 #elif (QS_OBJ_PTR_SIZE == 2)
-    #define QS_OBJ(obj_)        (QP::QS::u16(QS_OBJ_T, (uint16_t)(obj_)))
+    #define QS_OBJ(obj_)        (QP::QS::u16(QP::QS::OBJ_T, (uint16_t)(obj_)))
 #elif (QS_OBJ_PTR_SIZE == 4)
-    #define QS_OBJ(obj_)        (QP::QS::u32(QS_OBJ_T, (uint32_t)(obj_)))
+    #define QS_OBJ(obj_)        (QP::QS::u32(QP::QS::OBJ_T, (uint32_t)(obj_)))
 #elif (QS_OBJ_PTR_SIZE == 8)
-    #define QS_OBJ(obj_)        (QP::QS::u64(QS_OBJ_T, (uint64_t)(obj_)))
+    #define QS_OBJ(obj_)        (QP::QS::u64(QP::QS::OBJ_T, (uint64_t)(obj_)))
 #else
     //! Output formatted object pointer to the QS record
-    #define QS_OBJ(obj_)        (QP::QS::u32(QS_OBJ_T, (uint32_t)(obj_)))
+    #define QS_OBJ(obj_)        (QP::QS::u32(QP::QS::OBJ_T, (uint32_t)(obj_)))
 #endif
 
 
 #if (QS_FUN_PTR_SIZE == 1)
-    #define QS_FUN(fun_)        (QP::QS::u8(QS_FUN_T, (uint8_t)(fun_)))
+    #define QS_FUN(fun_)        (QP::QS::u8(QP::QS::FUN_T, (uint8_t)(fun_)))
 #elif (QS_FUN_PTR_SIZE == 2)
-    #define QS_FUN(fun_)        (QP::QS::u16(QS_FUN_T, (uint16_t)(fun_)))
+    #define QS_FUN(fun_)        (QP::QS::u16(QP::QS::FUN_T, (uint16_t)(fun_)))
 #elif (QS_FUN_PTR_SIZE == 4)
-    #define QS_FUN(fun_)        (QP::QS::u32(QS_FUN_T, (uint32_t)(fun_)))
+    #define QS_FUN(fun_)        (QP::QS::u32(QP::QS::FUN_T, (uint32_t)(fun_)))
 #elif (QS_FUN_PTR_SIZE == 8)
-    #define QS_FUN(fun_)        (QP::QS::u64(QS_FUN_T, (uint64_t)(fun_)))
+    #define QS_FUN(fun_)        (QP::QS::u64(QP::QS::FUN_T, (uint64_t)(fun_)))
 #else
     //! Output formatted function pointer to the QS record
-    #define QS_FUN(fun_)        (QP::QS::u32(QS_FUN_T, (uint32_t)(fun_)))
+    #define QS_FUN(fun_)        (QP::QS::u32(QP::QS::FUN_T, (uint32_t)(fun_)))
 #endif
 
 

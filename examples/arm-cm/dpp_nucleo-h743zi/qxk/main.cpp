@@ -76,6 +76,7 @@ int main() {
     QS_OBJ_DICTIONARY(philoQueueSto[2]);
     QS_OBJ_DICTIONARY(philoQueueSto[3]);
     QS_OBJ_DICTIONARY(philoQueueSto[4]);
+    QS_OBJ_DICTIONARY(&l_ticker0);
 
     // start the extended Test1 thread
     DPP::XT_Test1->start(

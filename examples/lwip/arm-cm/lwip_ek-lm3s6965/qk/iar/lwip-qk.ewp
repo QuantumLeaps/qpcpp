@@ -3229,7 +3229,7 @@
             <name>$PROJ_DIR$\..\..\..\..\..\..\ports\arm-cm\qk\iar\qk_port.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\..\ports\arm-cm\qk\iar\qk_port.s</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\..\ports\arm-cm\qk\iar\qk_port.cpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\..\ports\arm-cm\qk\iar\qs_port.h</name>

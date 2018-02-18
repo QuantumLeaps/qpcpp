@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.7.2
-/// Last updated on  2019-09-26
+/// Last updated for version 6.1.1
+/// Last updated on  2018-02-17
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -31,9 +31,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
-
 ///***************************************************************************
 /// @endcond
 
@@ -50,6 +49,9 @@
 //! trigger context switch (used internally in QXK only)
 #define QXK_CONTEXT_SWITCH_() (trigSWI())
 
+//****************************************************************************
+//! activate the context-switch callback
+#define QXK_ON_CONTEXT_SW 1
 
 //****************************************************************************
 // QXK interrupt entry and exit

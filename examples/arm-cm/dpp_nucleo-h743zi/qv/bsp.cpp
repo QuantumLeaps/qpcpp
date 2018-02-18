@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, NUCLEO-H743ZI board, cooperative QV kernel
-// Last Updated for Version: 6.1.0
-// Date of the Last Update:  2018-02-03
+// Last Updated for Version: 6.1.1
+// Date of the Last Update:  2018-02-17
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -246,7 +246,7 @@ void BSP::displayPaused(uint8_t paused) {
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     // flating point code is to exercise the FPU
-    float volatile x = 3.1415926F;
+    double volatile x = 3.1415926F;
     x = x + 2.7182818F;
 
     // "Super-Duper" Linear Congruential Generator (LCG)
@@ -306,8 +306,8 @@ void QF::onCleanup(void) {
 //............................................................................
 void QV::onIdle(void) { // called with interrupts disabled, see NOTE01
     // toggle the User LED on and then off, see NOTE01
-    //BSP_LED_On(LED3); not enough LEDs
-    //BSP_LED_On(LED3); not enough LEDs
+    BSP_LED_On(LED3);
+    BSP_LED_On(LED3);
 
 #ifdef Q_SPY
     QF_INT_ENABLE();

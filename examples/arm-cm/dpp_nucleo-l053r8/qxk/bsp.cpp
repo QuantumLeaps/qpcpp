@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QXK kernel
-// Last Updated for Version: 5.6.0
-// Date of the Last Update:  2017-10-12
+// Last Updated for Version: 6.1.1
+// Date of the Last Update:  2018-02-17
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -38,7 +38,7 @@
 #include "stm32l0xx.h"  // CMSIS-compliant header file for the MCU used
 // add other drivers if necessary...
 
-Q_DEFINE_THIS_FILE
+Q_DEFINE_THIS_FILE // define the name of this file for assertions
 
 // namespace DPP *************************************************************
 namespace DPP {
@@ -47,7 +47,7 @@ namespace DPP {
 // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
 // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
 //
-enum KernelUnawareISRs { // see NOTE00
+enum KernelUnawareISRs { // see NOTE1
     // ...
     MAX_KERNEL_UNAWARE_CMSIS_PRI  // keep always last
 };
@@ -82,7 +82,10 @@ static unsigned  l_rnd; // random seed
     static uint8_t const l_EXTI0_1_IRQHandler = 0U;
 
     enum AppRecords { // application-specific trace records
-        PHILO_STAT = QP::QS_USER
+        PHILO_STAT = QP::QS_USER,
+        PAUSED_STAT,
+        COMMAND_STAT,
+        ON_CONTEXT_SW
     };
 
 #endif
@@ -110,8 +113,8 @@ void SysTick_Handler(void) {
     }
 #endif
 
-    //QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
-    the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
+    QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    //the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
@@ -128,7 +131,7 @@ void SysTick_Handler(void) {
             static QP::QEvt const pauseEvt = { DPP::PAUSE_SIG, 0U, 0U};
             QP::QF::PUBLISH(&pauseEvt, &l_SysTick_Handler);
         }
-        else {            // the button is released
+        else { // the button is released
             static QP::QEvt const serveEvt = { DPP::SERVE_SIG, 0U, 0U};
             QP::QF::PUBLISH(&serveEvt, &l_SysTick_Handler);
         }
@@ -136,6 +139,7 @@ void SysTick_Handler(void) {
 
     QXK_ISR_EXIT();  // inform QXK about exiting an ISR
 }
+
 //............................................................................
 void EXTI0_1_IRQHandler(void); // prototype
 void EXTI0_1_IRQHandler(void) {
@@ -185,6 +189,9 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_EXTI0_1_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
+    QS_USR_DICTIONARY(PAUSED_STAT);
+    QS_USR_DICTIONARY(COMMAND_STAT);
+    QS_USR_DICTIONARY(ON_CONTEXT_SW);
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -273,6 +280,22 @@ void QF::onStartup(void) {
 //............................................................................
 void QF::onCleanup(void) {
 }
+
+//............................................................................
+#ifdef QXK_ON_CONTEXT_SW
+// NOTE: the context-switch callback is called with interrupts DISABLED
+extern "C"
+void QXK_onContextSw(QActive *prev, QActive *next) {
+    (void)prev;
+    if (next != (QActive *)0) {
+        //_impure_ptr = next->thread; // switch to next TLS
+    }
+    QS_BEGIN_NOCRIT(DPP::ON_CONTEXT_SW, (void *)1) // no critical section!
+        QS_OBJ(prev);
+        QS_OBJ(next);
+    QS_END_NOCRIT()
+}
+#endif // QXK_ON_CONTEXT_SW
 //............................................................................
 void QXK::onIdle(void) {
     // toggle the User LED on and then off (not enough LEDs, see NOTE01)
@@ -305,8 +328,7 @@ void QXK::onIdle(void) {
     // reset the board, then connect with ST-Link Utilities and erase the part.
     // The trick with BOOT(0) is it gets the part to run the System Loader
     // instead of your broken code. When done disconnect BOOT0, and start over.
-    //
-    //__WFI();   Wait-For-Interrupt
+    //__WFI(); // Wait-For-Interrupt
 #endif
 }
 
@@ -365,17 +387,8 @@ bool QS::onStartup(void const *arg) {
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_ON(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_ON(QS_QEP_UNHANDLED);
-
-    QS_FILTER_ON(DPP::PHILO_STAT);
+    QS_FILTER_ON(QS_SM_RECORDS);
+    QS_FILTER_ON(QS_UA_RECORDS);
 
     return true; // return success
 }
@@ -401,7 +414,7 @@ void QS::onFlush(void) {
         QF_INT_ENABLE();
         while ((USART2->ISR & 0x0080U) == 0U) { // while TXE not empty
         }
-        USART2->TDR  = (b & 0xFFU);  // put into the DR register
+        USART2->TDR  = (b & 0xFFU); // put into the DR register
         QF_INT_DISABLE();
     }
     QF_INT_ENABLE();
@@ -412,7 +425,7 @@ void QS::onReset(void) {
     //TBD
 }
 //............................................................................
-//! callback function to execute a uesr command (to be implemented in BSP)
+//! callback function to execute a user command (to be implemented in BSP)
 void QS::onCommand(uint8_t cmdId, uint32_t param1,
                    uint32_t param2, uint32_t param3)
 {
@@ -439,7 +452,7 @@ void bug_test(void) {
 } // namespace QP
 
 //****************************************************************************
-// NOTE00:
+// NOTE1:
 // The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
 // ISR priority that is disabled by the QF framework. The value is suitable
 // for the NVIC_SetPriority() CMSIS function.
@@ -457,9 +470,10 @@ void bug_test(void) {
 // by which a "QF-unaware" ISR can communicate with the QF framework is by
 // triggering a "QF-aware" ISR, which can post/publish events.
 //
-// NOTE01:
+// NOTE2:
 // The User LED is used to visualize the idle loop activity. The brightness
 // of the LED is proportional to the frequency of invcations of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt
 // execution time contributes to the brightness of the User LED.
 //
+
