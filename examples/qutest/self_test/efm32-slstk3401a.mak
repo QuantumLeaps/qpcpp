@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for EMF32-SLSTK3401A, QUTEST, GNU-ARM
-# Last Updated for Version: 6.1.0
-# Date of the Last Update:  2018-02-07
+# Last Updated for Version: 6.1.1
+# Date of the Last Update:  2018-02-18
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -303,7 +303,7 @@ clean :
 	$(BIN_DIR)/*.bin \
 	$(BIN_DIR)/*.elf \
 	$(BIN_DIR)/*.map
-	
+
 show :
 	@echo PROJECT      = $(PROJECT)
 	@echo TESTS        = $(TESTS)

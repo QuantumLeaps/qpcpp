@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for EK-TM4C123GXL, QUTEST, GNU-ARM
-# Last Updated for Version: 6.1.0
-# Date of the Last Update:  2018-02-07
+# Last Updated for Version: 6.1.1
+# Date of the Last Update:  2018-02-18
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
