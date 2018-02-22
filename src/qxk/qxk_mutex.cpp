@@ -4,8 +4,8 @@
 /// @cond
 ///***************************************************************************
 /// Product: QK/C++
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-09
+/// Last updated for version 6.1.1
+/// Last updated on  2018-02-22
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -32,7 +32,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -284,8 +284,7 @@ bool QXMutex::tryLock(void) {
         // make curr thread the new mutex holder
         m_holderPrio = static_cast<uint8_t>(curr->m_startPrio);
 
-        QS_BEGIN_NOCRIT_(QS_MUTEX_LOCK,
-            static_cast<void *>(0), static_cast<void *>(0))
+        QS_BEGIN_NOCRIT_(QS_MUTEX_LOCK, static_cast<void *>(0), curr)
             QS_TIME_();  // timestamp
             QS_2U8_(static_cast<uint8_t>(curr->m_startPrio), /* start prio */
                     m_ceiling);  // current ceiling
@@ -360,7 +359,8 @@ void QXMutex::unlock(void) {
             curr->m_prio = curr->m_startPrio;
 
             // remove the boosted priority and insert the original priority
-            QXK_attr_.readySet.remove(static_cast<uint_fast8_t>(m_ceiling));
+            QXK_attr_.readySet.remove(
+                static_cast<uint_fast8_t>(m_ceiling));
             QXK_attr_.readySet.insert(
                 static_cast<uint_fast8_t>(curr->m_startPrio));
         }

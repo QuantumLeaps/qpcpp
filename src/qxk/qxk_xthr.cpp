@@ -268,7 +268,7 @@ bool QXThread::post_(QEvt const * const e, uint_fast16_t const margin,
                 // insert event into the ring buffer (FIFO)
                 QF_PTR_AT_(m_eQueue.m_ring, m_eQueue.m_head) = e;
 
-                // need to wrap head?
+                // need to wrap the head couner?
                 if (m_eQueue.m_head == static_cast<QEQueueCtr>(0)) {
                     m_eQueue.m_head = m_eQueue.m_end; // wrap around
                 }
@@ -527,7 +527,7 @@ bool QXThread::teDisarm_(void) {
 }
 
 //****************************************************************************
-//! delay (timed blocking of) the current extended thread
+//! delay (timed blocking of) the current extended thread (static)
 bool QXThread::delay(uint_fast16_t const nTicks) {
     QF_CRIT_STAT_
 
