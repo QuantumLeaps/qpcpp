@@ -1,16 +1,16 @@
 /**
 * @file
-* @brief QXK/C++ port to ARM Cortex-M, ARM-CLANG toolset
+* @brief QXK/C++ port to ARM Cortex-M, LLVM-ARM toolset
 * @cond
 ******************************************************************************
 * Last Updated for Version: 6.1.1
-* Date of the Last Update:  2018-02-17
+* Date of the Last Update:  2018-03-06
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -36,7 +36,7 @@
 ******************************************************************************
 * @endcond
 */
-#include "qf_port.h"      /* QF port */
+#include "qf_port.h"
 
 extern "C" {
 
@@ -82,7 +82,7 @@ void QXK_init(void) {
     /* SCB_SYSPRI2: SVCall */
     SCB_SYSPRI[2] |= (QF_BASEPRI << 24);
 
-    /* SCB_SYSPRI3:  SysTick, Debug */
+    /* SCB_SYSPRI3:  SysTick, PendSV, Debug */
     SCB_SYSPRI[3] |= (QF_BASEPRI << 24) | (QF_BASEPRI << 16) | QF_BASEPRI;
 
     /* set all implemented IRQ priories to QF_BASEPRI... */
@@ -109,7 +109,7 @@ void QXK_init(void) {
 * NOTE: QXK_stackInit_() must be called before the QXK kernel is made aware
 * of this thread. In that case the kernel cannot use the thread yet, so no
 * critical section is needed.
-****************************************************************************/
+*****************************************************************************/
 void QXK_stackInit_(void *act, QP::QActionHandler thread,
                     void *stkSto, uint_fast16_t stkSize)
 {
@@ -155,6 +155,7 @@ void QXK_stackInit_(void *act, QP::QActionHandler thread,
     }
 }
 
+/* NOTE: keep in synch with the QXK_Attr struct in "qxk.h" !!! */
 #define QXK_CURR       0
 #define QXK_NEXT       4
 #define QXK_ACT_PRIO   8
@@ -562,10 +563,11 @@ __asm volatile (
     );
 }
 
-/****************************************************************************/
 #if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
 
-/* hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction) */
+/*****************************************************************************
+* hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
+*****************************************************************************/
 __attribute__ ((naked))
 uint_fast8_t QF_qlog2(uint32_t x) {
 __asm volatile (

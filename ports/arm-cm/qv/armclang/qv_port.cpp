@@ -4,13 +4,13 @@
 * @cond
 ******************************************************************************
 * Last Updated for Version: 6.1.1
-* Date of the Last Update:  2018-02-17
+* Date of the Last Update:  2018-03-06
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -71,7 +71,7 @@ __asm volatile (
     );
 }
 
-#else /* NOT Cortex-M0/M0+/M1 */
+#else /* NOT Cortex-M0/M0+/M1(v6-M, v6S-M)? */
 
 #define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004)
 #define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED14)
@@ -116,7 +116,7 @@ void QV_init(void) {
     } while (n != 0);
 }
 
-#endif /* NOT Cortex-M0/M0+/M1 */
+#endif /* NOT Cortex-M0/M0+/M1(v6-M, v6S-M)? */
 
-} // extner "C"
+} // extern "C"
 

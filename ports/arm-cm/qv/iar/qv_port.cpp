@@ -1,16 +1,16 @@
 /**
 * @file
-* @brief QV/C++ port to ARM Cortex-M, ARM-KEIL toolset
+* @brief QV/C++ port to ARM Cortex-M, IAR-ARM toolset
 * @cond
 ******************************************************************************
 * Last Updated for Version: 6.1.1
-* Date of the Last Update:  2018-02-17
+* Date of the Last Update:  2018-03-06
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -40,9 +40,9 @@
 
 extern "C" {
 
-#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
+#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 ? */
 
-/* hand-optimized quick LOG2 in assembly */
+/* hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction) */
 uint_fast8_t QF_qlog2(uint32_t x) {
     static uint8_t const log2LUT[16] = {
         (uint8_t)0, (uint8_t)1, (uint8_t)2, (uint8_t)2,
@@ -73,7 +73,7 @@ uint_fast8_t QF_qlog2(uint32_t x) {
     return n + log2LUT[x];
 }
 
-#else /* NOT Cortex-M0/M0+/M1 ? */
+#else /* NOT Cortex-M0/M0+/M1(v6-M, v6S-M)? */
 
 #define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004)
 #define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED14)
@@ -118,7 +118,7 @@ void QV_init(void) {
     } while (n != 0);
 }
 
-#endif /* NOT Cortex-M0/M0+/M1 */
+#endif /* NOT Cortex-M0/M0+/M1(v6-M, v6S-M)? */
 
 } // extern "C"
 

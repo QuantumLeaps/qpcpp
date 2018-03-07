@@ -4,13 +4,13 @@
 * @cond
 ******************************************************************************
 * Last Updated for Version: 6.1.1
-* Date of the Last Update:  2018-02-17
+* Date of the Last Update:  2018-03-06
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond

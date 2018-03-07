@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last Updated for Version: 6.1.1
-/// Date of the Last Update:  2018-02-17
+/// Date of the Last Update:  2018-03-05
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -45,7 +45,8 @@
 #define QF_MAX_TICK_RATE        2
 
 // QF interrupt disable/enable and log2()...
-#if (__ARM_ARCH == 6)   // Cortex-M0/M0+/M1 (v6-M, v6S-M)?
+#if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1(v6-M, v6S-M)?
+
     // Cortex-M0/M0+/M1(v6-M, v6S-M) interrupt disabling policy, see NOTE2
     #define QF_INT_DISABLE()    __disable_interrupt()
     #define QF_INT_ENABLE()     __enable_interrupt()
@@ -55,7 +56,7 @@
     #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
     #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
-    // CMSIS threshold for "QF-aware" interrupts, see NOTE2 and NOTE5
+    // CMSIS threshold for "QF-aware" interrupts, see NOTE2 and NOTE4
     #define QF_AWARE_ISR_CMSIS_PRI 0
 
     // hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
@@ -78,14 +79,12 @@
     // QF critical section entry/exit (unconditional interrupt disabling)
     //#define QF_CRIT_STAT_TYPE not defined
     #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
-    #define QF_CRIT_EXIT(dummy) QF_INT_ENABLE()
+    #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
-    // BASEPRI threshold for "QF-aware" interrupts, see NOTE3.
-    // CAUTION: keep in synch with the value defined in "qk_port.s"
-    //
-    #define QF_BASEPRI          (0xFFU >> 2)
+    // BASEPRI threshold for "QF-aware" interrupts, see NOTE3
+    #define QF_BASEPRI           0x3F
 
-    // CMSIS threshold for "QF-aware" interrupts, see NOTE4
+    // CMSIS threshold for "QF-aware" interrupts, see NOTE5
     #define QF_AWARE_ISR_CMSIS_PRI (QF_BASEPRI >> (8 - __NVIC_PRIO_BITS))
 
     // Cortex-M3/M4/M7 provide the CLZ instruction for fast LOG2
@@ -98,14 +97,14 @@
 #include <intrinsics.h> // IAR intrinsic functions
 #include "qep_port.h"   // QEP port
 
-#if (__ARM_ARCH == 6)   // Cortex-M0/M0+/M1 (v6-M, v6S-M)?
+#if (__ARM_ARCH == 6)   // Cortex-M0/M0+/M1(v6-M, v6S-M)?
     // hand-optimized quick LOG2 in assembly
     extern "C" uint_fast8_t QF_qlog2(uint32_t x);
 #endif // Cortex-M0/M0+/M1(v6-M, v6S-M)
 
-#include "qxk_port.h"   // QXK dual-mode kernel port
-#include "qf.h"         // QF platform-independent public interface
-#include "qxthread.h"   // QXK extended thread interface
+#include "qxk_port.h" // QXK dual-mode kernel port
+#include "qf.h"       // QF platform-independent public interface
+#include "qxthread.h" // QXK extended thread interface
 
 //****************************************************************************
 // NOTE1:
@@ -131,13 +130,6 @@
 // ("QF-aware" interrupts ), can call QF services.
 //
 // NOTE4:
-// The selective disabling of "QF-aware" interrupts with the BASEPRI register
-// has a problem on ARM Cortex-M7 core r0p1 (see ARM-EPM-064408, errata
-// 837070). The workaround recommended by ARM is to surround MSR BASEPRI with
-// the CPSID i/CPSIE i pair, which is implemented in the QF_INT_DISABLE()
-// macro. This workaround works also for Cortex-M3/M4 cores.
-//
-// NOTE5:
 // The QF_AWARE_ISR_CMSIS_PRI macro is useful as an offset for enumerating
 // the "QF-aware" interrupt priorities in the applications, whereas the
 // numerical values of the "QF-aware" interrupts must be greater or equal to
@@ -150,5 +142,13 @@
 // remains generic and not dependent on the number of implemented priority bits
 // implemented in the NVIC.
 //
+// NOTE5:
+// The selective disabling of "QF-aware" interrupts with the BASEPRI register
+// has a problem on ARM Cortex-M7 core r0p1 (see ARM-EPM-064408, errata
+// 837070). The workaround recommended by ARM is to surround MSR BASEPRI with
+// the CPSID i/CPSIE i pair, which is implemented in the QF_INT_DISABLE()
+// macro. This workaround works also for Cortex-M3/M4 cores.
+//
 
 #endif // qf_port_h
+

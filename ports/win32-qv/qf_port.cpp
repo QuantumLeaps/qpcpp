@@ -2,14 +2,14 @@
 /// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
 /// \cond
 ///***************************************************************************
-/// Last updated for version 5.8.2
-/// Last updated on  2016-12-22
+/// Last updated for version 6.1.1
+/// Last updated on  2018-03-06
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// \endcond
@@ -90,15 +90,19 @@ void QF::stop(void) {
 }
 //****************************************************************************
 int_t QF::run(void) {
+
     onStartup(); // application-specific startup callback
 
-    l_isRunning = true; /* QF is running */
+    l_isRunning = true; // QF is running
 
-    // create the ticker thread...
-    HANDLE ticker = CreateThread(NULL, 1024, &ticker_thread,
-                                 static_cast<void *>(0), 0U, NULL);
-    // thread must be created
-    Q_ASSERT_ID(310, ticker != static_cast<HANDLE>(0));
+    // system clock tick configured?
+    if (l_tickMsec != static_cast<uint32_t>(0)) {
+        // create the ticker thread...
+        HANDLE ticker = CreateThread(NULL, 1024, &ticker_thread,
+                                     static_cast<void *>(0), 0U, NULL);
+        // thread must be created
+        Q_ASSERT_ID(310, ticker != static_cast<HANDLE>(0));
+    }
 
     // the combined event-loop and background-loop of the QV kernel */
     QF_INT_DISABLE();
@@ -152,7 +156,12 @@ int_t QF::run(void) {
 }
 //****************************************************************************
 void QF_setTickRate(uint32_t ticksPerSec) {
-    l_tickMsec = 1000UL / ticksPerSec;
+    if (ticksPerSec != static_cast<uint32_t>(0)) {
+        l_tickMsec = 1000UL / ticksPerSec;
+    }
+    else {
+        l_tickMsec = static_cast<uint32_t>(0); // means NO system clock tick
+    }
 }
 //****************************************************************************
 void QActive::start(uint_fast8_t prio,

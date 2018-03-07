@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to ARM Cortex-M, preemptive QK kernel, ARM-CLANG toolset
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.1.0
-/// Date of the Last Update:  2018-02-02
+/// Last Updated for Version: 6.1.1
+/// Date of the Last Update:  2018-03-05
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -56,7 +56,7 @@
     #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
     #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
-    // CMSIS threshold for "QF-aware" interrupts, see NOTE2,4
+    // CMSIS threshold for "QF-aware" interrupts, see NOTE2 and NOTE4
     #define QF_AWARE_ISR_CMSIS_PRI 0
 
     // hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
@@ -68,7 +68,7 @@
     #define QF_PRIMASK_DISABLE() __asm volatile ("cpsid i")
     #define QF_PRIMASK_ENABLE()  __asm volatile ("cpsie i")
 
-    // Cortex-M3/M4/M7 interrupt disabling policy, see NOTE3,4
+    // Cortex-M3/M4/M7 interrupt disabling policy, see NOTE3 and NOTE4
     #define QF_INT_DISABLE() __asm volatile (\
         "cpsid i\n" "msr BASEPRI,%0\n" "cpsie i" :: "r" (QF_BASEPRI) : )
     #define QF_INT_ENABLE()  __asm volatile (\
@@ -79,10 +79,8 @@
     #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
     #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
-    // BASEPRI threshold for "QF-aware" interrupts, see NOTE3.
-    // CAUTION: keep in synch with the value defined in "qk_port.s"
-    //
-    #define QF_BASEPRI          (0xFFU >> 2)
+    // BASEPRI threshold for "QF-aware" interrupts, see NOTE3
+    #define QF_BASEPRI           0x3F
 
     // CMSIS threshold for "QF-aware" interrupts, see NOTE5
     #define QF_AWARE_ISR_CMSIS_PRI (QF_BASEPRI >> (8 - __NVIC_PRIO_BITS))
@@ -149,3 +147,4 @@
 //
 
 #endif // qf_port_h
+
