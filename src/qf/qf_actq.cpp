@@ -8,14 +8,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.4
-/// Last updated on  2018-01-07
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -36,7 +36,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -93,12 +93,18 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
 {
     bool status;
     QF_CRIT_STAT_
+    QS_TEST_PROBE_DEF(&QActive::post_)
 
     /// @pre event pointer must be valid
     Q_REQUIRE_ID(100, e != static_cast<QEvt const *>(0));
 
     QF_CRIT_ENTRY_();
     QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into the temporary
+
+    // test-probe#1 for faking queue overflow
+    QS_TEST_PROBE_ID(1,
+        nFree = static_cast<QEQueueCtr>(0);
+    )
 
     if (margin == QF_NO_MARGIN) {
         if (nFree > static_cast<QEQueueCtr>(0)) {
@@ -118,6 +124,11 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
 
     if (status) { // can post the event?
 
+        // is it a dynamic event?
+        if (e->poolId_ != static_cast<uint8_t>(0)) {
+            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+        }
+
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();               // timestamp
@@ -129,10 +140,20 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
             QS_EQC_(m_eQueue.m_nMin); // min number of free entries
         QS_END_NOCRIT_()
 
-        // is it a dynamic event?
-        if (e->poolId_ != static_cast<uint8_t>(0)) {
-            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-        }
+#ifdef Q_UTEST
+    // in QUTest the event is posted under the following conditions:
+    // 1. the test-probe#2 is provided; OR
+    // 2. the 'sender' is 'me' (self-posting); OR
+    // 3. the AO-local-filter is set and is 'me'; OR
+    // 4. the AO-local-filter is not set AND the 'sender' is QS_RX
+    //
+    if ((qs_tp_ == static_cast<uint32_t>(2))
+        || (sender == this)
+        || (QS::priv_.locFilter[QS::AO_OBJ] == this)
+        || ((QS::priv_.locFilter[QS::AO_OBJ] == static_cast<void *>(0))
+            && (sender == &QS::rxPriv_)))
+    {
+#endif
 
         --nFree;  // one free entry just used up
         m_eQueue.m_nFree = nFree;     // update the volatile
@@ -156,18 +177,21 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
             }
             --m_eQueue.m_head; // advance the head (counter clockwise)
         }
+#ifdef Q_UTEST
+    }
+#endif
         QF_CRIT_EXIT_();
     }
     else {
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
-            QS_TIME_();               // timestamp
-            QS_OBJ_(sender);          // the sender object
-            QS_SIG_(e->sig);          // the signal of the event
-            QS_OBJ_(this);            // this active object
+            QS_TIME_();           // timestamp
+            QS_OBJ_(sender);      // the sender object
+            QS_SIG_(e->sig);      // the signal of the event
+            QS_OBJ_(this);        // this active object
             QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-            QS_EQC_(nFree);           // number of free entries
+            QS_EQC_(nFree);       // number of free entries
             QS_EQC_(static_cast<QEQueueCtr>(margin)); // margin requested
         QS_END_NOCRIT_()
 
@@ -195,12 +219,22 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
 ///
 void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
+    QS_TEST_PROBE_DEF(&QActive::postLIFO)
 
     QF_CRIT_ENTRY_();
     QEQueueCtr nFree = m_eQueue.m_nFree;// tmp to avoid UB for volatile access
 
+    QS_TEST_PROBE_ID(1,
+        nFree = static_cast<QEQueueCtr>(0);
+    )
+
     // the queue must be able to accept the event (cannot overflow)
     Q_ASSERT_ID(210, nFree != static_cast<QEQueueCtr>(0));
+
+    // is it a dynamic event?
+    if (e->poolId_ != static_cast<uint8_t>(0)) {
+        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    }
 
     QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -211,11 +245,6 @@ void QActive::postLIFO(QEvt const * const e) {
         QS_EQC_(nFree);                  // number of free entries
         QS_EQC_(m_eQueue.m_nMin);        // min number of free entries
     QS_END_NOCRIT_()
-
-    // is it a dynamic event?
-    if (e->poolId_ != static_cast<uint8_t>(0)) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-    }
 
     --nFree;  // one free entry just used up
     m_eQueue.m_nFree = nFree; // update the volatile
@@ -349,11 +378,11 @@ QTicker::QTicker(uint_fast8_t const tickRate)
     // reuse m_head for tick-rate
     m_eQueue.m_head = static_cast<QEQueueCtr>(tickRate);
 }
-//****************************************************************************
+//............................................................................
 void QTicker::init(QEvt const * const /*e*/) {
     m_eQueue.m_tail = static_cast<QEQueueCtr>(0);
 }
-//****************************************************************************
+//............................................................................
 void QTicker::dispatch(QEvt const * const /*e*/) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
@@ -365,7 +394,7 @@ void QTicker::dispatch(QEvt const * const /*e*/) {
         QF::TICK_X(static_cast<uint_fast8_t>(m_eQueue.m_head), this);
     }
 }
-//****************************************************************************
+//............................................................................
 #ifndef Q_SPY
 bool QTicker::post_(QEvt const * const /*e*/, uint_fast16_t const /*margin*/)
 #else
@@ -417,3 +446,4 @@ void QTicker::postLIFO(QEvt const * const /*e*/) {
 }
 
 } // namespace QP
+

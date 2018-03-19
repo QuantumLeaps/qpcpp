@@ -4,14 +4,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-08
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -73,11 +73,13 @@ enum_t QF_maxPubSignal_;
 /// to the unique priority of an active object. The size of the
 /// QP::QSubscrList bitmask depends on the value of the #QF_MAX_ACTIVE macro.
 ///
-/// @note The publish-subscribe facilities are optional, meaning that you
-/// might choose not to use publish-subscribe. In that case calling
-/// QF::psInit() and using up memory for the subscriber-lists is unnecessary.
+/// @note
+/// The publish-subscribe facilities are optional, meaning that you might
+/// choose not to use publish-subscribe. In that case calling QF::psInit()
+/// and using up memory for the subscriber-lists is unnecessary.
 ///
-/// @sa QP::QSubscrList
+/// @sa
+/// QP::QSubscrList
 ///
 /// @usage
 /// The following example shows the typical initialization sequence of QF:
@@ -124,7 +126,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
     QF_CRIT_ENTRY_();
 
     QS_BEGIN_NOCRIT_(QS_QF_PUBLISH,
-        static_cast<void *>(0), static_cast<void *>(0))
+                     static_cast<void *>(0), static_cast<void *>(0))
         QS_TIME_();                      // the timestamp
         QS_OBJ_(sender);                 // the sender object
         QS_SIG_(e->sig);                 // the signal of the event
@@ -147,7 +149,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
     QPSet subscrList = QF_PTR_AT_(QF_subscrList_, e->sig);
     QF_CRIT_EXIT_();
 
-    if (subscrList.notEmpty()) {
+    if (subscrList.notEmpty()) { // any subscribers?
         uint_fast8_t p = subscrList.findMax(); // the highest-prio subscriber
         QF_SCHED_STAT_
 
@@ -191,7 +193,8 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
 /// to three signals in the initial transition:
 /// @include qf_subscribe.c
 ///
-/// @sa QP::QF::publish_(), QP::QActive::unsubscribe(), and
+/// @sa
+/// QP::QF::publish_(), QP::QActive::unsubscribe(), and
 /// QP::QActive::unsubscribeAll()
 ///
 void QActive::subscribe(enum_t const sig) const {
@@ -225,19 +228,26 @@ void QActive::subscribe(enum_t const sig) const {
 ///
 /// @param[in] sig event signal to unsubscribe
 ///
-/// @note Due to the latency of event queues, an active object should NOT
+/// @note
+/// Due to the latency of event queues, an active object should NOT
 /// assume that a given signal @p sig will never be dispatched to the
 /// state machine of the active object after un-subscribing from that signal.
 /// The event might be already in the queue, or just about to be posted
 /// and the un-subscribe operation will not flush such events.
 ///
-/// @note Un-subscribing from a signal that has never been subscribed in the
+/// @note
+/// Un-subscribing from a signal that has never been subscribed in the
 /// first place is considered an error and QF will raise an assertion.
 ///
-/// @sa QP::QF::publish_(), QP::QActive::subscribe(), and
+/// @sa
+/// QP::QF::publish_(), QP::QActive::subscribe(), and
 /// QP::QActive::unsubscribeAll()
+///
 void QActive::unsubscribe(enum_t const sig) const {
     uint_fast8_t p = static_cast<uint_fast8_t>(m_prio);
+
+    //! @pre the singal and the prioriy must be in ragne, the AO must also
+    // be registered with the framework
     Q_REQUIRE_ID(400, (Q_USER_SIG <= sig)
                       && (sig < QF_maxPubSignal_)
                       && (static_cast<uint_fast8_t>(0) < p)
@@ -266,7 +276,8 @@ void QActive::unsubscribe(enum_t const sig) const {
 /// will stop posting any published events to the event queue of the active
 /// object.
 ///
-/// @note Due to the latency of event queues, an active object should NOT
+/// @note
+/// Due to the latency of event queues, an active object should NOT
 /// assume that no events will ever be dispatched to the state machine of
 /// the active object after un-subscribing from all events.
 /// The events might be already in the queue, or just about to be posted
@@ -275,7 +286,8 @@ void QActive::unsubscribe(enum_t const sig) const {
 /// time events, can be still delivered to the event queue of the active
 /// object.
 ///
-/// @sa QP::QF::publish_(), QP::QActive::subscribe(), and
+/// @sa
+/// QP::QF::publish_(), QP::QActive::subscribe(), and
 /// QP::QActive::unsubscribe()
 ///
 void QActive::unsubscribeAll(void) const {
@@ -304,3 +316,4 @@ void QActive::unsubscribeAll(void) const {
 }
 
 } // namespace QP
+

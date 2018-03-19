@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example
-// Last updated for version 5.4.0
-// Last updated on  2015-04-29
+// Last Updated for Version: 6.1.1
+// Date of the Last Update:  2018-03-08
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,25 +28,23 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// https://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
 #include "bsp.h"
 
 //............................................................................
-int main() {
+int main(int argc, char *argv[]) {
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
-
     static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO];
-
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
 
-    DPP::BSP::init(); // initialize the BSP
+    DPP::BSP::init(argc, argv); // initialize the BSP
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(smlPoolSto);

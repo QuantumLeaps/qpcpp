@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: BSP for emWin/uC/GUI, Win32 simulation, NO Window Manager
-// Last updated for version 5.8.2
-// Last updated on  2017-01-15
+// Last updated for version 6.2.0
+// Last updated on  2018-03-16
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,10 +28,10 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
-#include "qp_port.h"
+#include "qpc.h"
 #include "dpp.h"
 #include "bsp.h"
 

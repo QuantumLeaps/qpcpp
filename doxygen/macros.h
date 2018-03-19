@@ -35,6 +35,13 @@ namespace QP {
 /// not generate any code.
 #define Q_SPY
 
+/// The preprocessor switch to activate the QUTest unit testing
+/// instrumentation in the code */
+///
+/// @note
+/// This macro requires that #Q_SPY be defined as well.
+#define Q_UTEST
+
 /// This macro defines the type of the OS-Object used for blocking
 /// the native QF event queue when the queue is empty
 ///

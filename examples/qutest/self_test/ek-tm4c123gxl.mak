@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for EK-TM4C123GXL, QUTEST, GNU-ARM
-# Last Updated for Version: 6.1.1
-# Date of the Last Update:  2018-02-18
+# Last Updated for Version: 6.2.0
+# Date of the Last Update:  2018-03-12
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -79,6 +79,7 @@ VPATH = \
 
 # list of all include directories needed by this project
 INCLUDES  = \
+	-I. \
 	-I../$(TARGET) \
 	-I$(QPCPP)/include \
 	-I$(QPCPP)/src \
@@ -100,8 +101,7 @@ C_SRCS := \
 
 # C++ source files
 CPP_SRCS := \
-	test_qutest.cpp \
-	qutest_port.cpp
+	test_qutest.cpp
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := ../$(TARGET)/test.ld
@@ -110,6 +110,7 @@ QP_SRCS := \
 	qep_hsm.cpp \
 	qep_msm.cpp \
 	qf_act.cpp \
+	qf_actq.cpp \
 	qf_defer.cpp \
 	qf_dyn.cpp \
 	qf_mem.cpp \
@@ -121,7 +122,8 @@ QP_SRCS := \
 	qs_64bit.cpp \
 	qs_rx.cpp \
 	qs_fp.cpp \
-	qutest.cpp
+	qutest.cpp \
+	qutest_port.cpp
 
 QP_ASMS :=
 
@@ -171,7 +173,7 @@ BIN   := $(GNU_ARM)/bin/arm-eabi-objcopy
 # see http://www.ti.com/tool/lmflashprogrammer
 #
 ifeq ($(LMFLASH),)
-LMFLASH = $(QTOOLS)/../LM_Flash_Programmer/LMFlash.exe
+LMFLASH := $(QTOOLS)/../LM_Flash_Programmer/LMFlash.exe
 endif
 
 # make sure that the LMFLASH tool exists...
@@ -201,8 +203,6 @@ CPP_SRCS += $(QP_SRCS) mini_cpp.cpp
 ASM_SRCS += $(QP_ASMS)
 
 BIN_DIR := $(TARGET)
-
-CPP_SRCS += $(QS_SRCS)
 
 ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 

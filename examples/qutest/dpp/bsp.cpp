@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, QUTEST
-// Last Updated for Version: 5.9.5
-// Date of the Last Update:  2017-07-20
+// Last Updated for Version: 6.2.0
+// Date of the Last Update:  2018-03-19
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -43,10 +43,10 @@ namespace DPP {
 static uint32_t l_rnd; // random seed
 
 // BSP functions =============================================================
-void BSP::init(void) {
+void BSP::init(int argc, char **argv) {
     BSP::randomSeed(1234U);
 
-    Q_ALLEGE(QS_INIT((void *)0));
+    Q_ALLEGE(QS_INIT(argc <= 1 ? (void *)0 : argv[1]));
 
     QS_FUN_DICTIONARY(&BSP::displayPaused);
     QS_FUN_DICTIONARY(&BSP::random);

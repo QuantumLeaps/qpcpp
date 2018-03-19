@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.1
-/// Last updated on  2017-08-01
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-19
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -40,7 +40,11 @@
 #include "qf_port.h"      // QF port
 #include "qf_pkg.h"       // QF package-scope interface
 #include "qassert.h"      // QP embedded systems-friendly assertions
-
+#ifdef Q_SPY              // QS software tracing enabled?
+    #include "qs_port.h"  // include QS port
+#else
+    #include "qs_dummy.h" // disable the QS software tracing
+#endif // Q_SPY
 
 namespace QP {
 
@@ -59,16 +63,29 @@ Q_DEFINE_THIS_MODULE("qf_defer")
 ///                an event from.
 /// @param[in] e   pointer to the event to be deferred
 ///
-/// @returns 'true' (success) when the event could be deferred and 'false'
+/// @returns
+/// 'true' (success) when the event could be deferred and 'false'
 /// (failure) if event deferral failed due to overflowing the queue.
 ///
 /// An active object can use multiple event queues to defer events of
 /// different kinds.
 ///
-/// @sa QP::QActive::recall(), QP::QEQueue, QP::QActive::flushDeferred()
+/// @sa
+/// QP::QActive::recall(), QP::QEQueue, QP::QActive::flushDeferred()
 ///
 bool QActive::defer(QEQueue * const eq, QEvt const * const e) const {
-    return eq->post(e, static_cast<uint_fast16_t>(0)); // non-asserting post
+    bool status = eq->post(e, static_cast<uint_fast16_t>(0));
+    QS_CRIT_STAT_
+
+    QS_BEGIN_(QS_QF_ACTIVE_DEFER, QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_TIME_();      // time stamp
+        QS_OBJ_(this);   // this active object
+        QS_OBJ_(eq);     // the deferred queue
+        QS_SIG_(e->sig); // the signal of the event
+        QS_2U8_(e->poolId_, e->refCtr_); // pool Id & ref Count
+    QS_END_()
+
+    return status;
 }
 
 //****************************************************************************
@@ -82,17 +99,22 @@ bool QActive::defer(QEQueue * const eq, QEvt const * const e) const {
 /// @param[in]  eq  pointer to a "raw" thread-safe queue to recall
 ///                 an event from.
 ///
-/// @returns 'true' if an event has been recalled and 'false' if not.
+/// @returns
+/// 'true' if an event has been recalled and 'false' if not.
 ///
-/// @note An active object can use multiple event queues to defer events of
+/// @note
+/// An active object can use multiple event queues to defer events of
 /// different kinds.
 ///
-/// @sa QP::QActive::recall(), QP::QEQueue, QP::QActive::postLIFO_()
+/// @sa
+/// QP::QActive::recall(), QP::QEQueue, QP::QActive::postLIFO_()
 ///
 bool QActive::recall(QEQueue * const eq) {
     QEvt const * const e = eq->get(); // try to get evt from deferred queue
-    bool const recalled = (e != static_cast<QEvt const *>(0));//evt available?
-    if (recalled) {
+    bool recalled;
+
+    // event available?
+    if (e != static_cast<QEvt const *>(0)) {
         this->postLIFO(e); // post it to the _front_ of the AO's queue
 
         QF_CRIT_STAT_
@@ -105,16 +127,38 @@ bool QActive::recall(QEQueue * const eq) {
             // at least twice: once in the deferred event queue (eq->get()
             // did NOT decrement the reference counter) and once in the
             // AO's event queue.
-            Q_ASSERT_ID(210, e->refCtr_ > static_cast<uint8_t>(1));
+            Q_ASSERT_ID(210, e->refCtr_ >= static_cast<uint8_t>(2));
 
             // we need to decrement the reference counter once, to account
             // for removing the event from the deferred event queue.
             QF_EVT_REF_CTR_DEC_(e); // decrement the reference counter
         }
 
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_RECALL,
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
+            QS_TIME_();      // time stamp
+            QS_OBJ_(this);   // this active object
+            QS_OBJ_(eq);     // the deferred queue
+            QS_SIG_(e->sig); // the signal of the event
+            QS_2U8_(e->poolId_, e->refCtr_); // pool Id & ref Count
+        QS_END_NOCRIT_()
+
         QF_CRIT_EXIT_();
+        recalled = true;
     }
-    return recalled; // event not recalled
+    else {
+        QS_CRIT_STAT_
+
+        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_RECALL_ATTEMPT,
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
+            QS_TIME_();      // time stamp
+            QS_OBJ_(this);   // this active object
+            QS_OBJ_(eq);     // the deferred queue
+        QS_END_()
+
+        recalled = false;
+    }
+    return recalled;
 }
 
 //****************************************************************************
@@ -125,10 +169,12 @@ bool QActive::recall(QEQueue * const eq) {
 ///
 /// @param[in]  eq  pointer to a "raw" thread-safe queue to flush.
 ///
-/// @returns the number of events actually flushed from the queue.
+/// @returns
+/// the number of events actually flushed from the queue.
 ///
 ///
-/// @sa QP::QActive::defer(), QP::QActive::recall(), QP::QEQueue
+/// @sa
+/// QP::QActive::defer(), QP::QActive::recall(), QP::QEQueue
 ///
 uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const {
     uint_fast16_t n = static_cast<uint_fast16_t>(0);
@@ -143,3 +189,4 @@ uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const {
 }
 
 } // namespace QP
+

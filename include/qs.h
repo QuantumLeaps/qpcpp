@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.1.1
-/// Last updated on  2018-02-17
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -75,7 +75,7 @@ enum QSpyRecords {
     // [0] QS session (not maskable)
     QS_EMPTY,             //!< QS record for cleanly starting a session
 
-    // [1] QEP records
+    // [1] SM records
     QS_QEP_STATE_ENTRY,   //!< a state was entered
     QS_QEP_STATE_EXIT,    //!< a state was exited
     QS_QEP_STATE_INIT,    //!< an initial transition was taken in a state
@@ -86,45 +86,64 @@ enum QSpyRecords {
     QS_QEP_DISPATCH,      //!< an event was dispatched (begin of RTC step)
     QS_QEP_UNHANDLED,     //!< an event was unhandled due to a guard
 
-    // [10] QF records
-    QS_QF_ACTIVE_ADD,     //!< an AO has been added to QF (started)
-    QS_QF_ACTIVE_REMOVE,  //!< an AO has been removed from QF (stopped)
+    // [10] AO records
+    QS_QF_ACTIVE_DEFER,   //!< AO deferred an event
+    QS_QF_ACTIVE_RECALL,  //!< AO recalled an event
     QS_QF_ACTIVE_SUBSCRIBE,  //!< an AO subscribed to an event
     QS_QF_ACTIVE_UNSUBSCRIBE,//!< an AO unsubscribed to an event
     QS_QF_ACTIVE_POST_FIFO,  //!< an event was posted (FIFO) directly to AO
     QS_QF_ACTIVE_POST_LIFO,  //!< an event was posted (LIFO) directly to AO
     QS_QF_ACTIVE_GET, //!< an AO got an event and its queue is not empty
     QS_QF_ACTIVE_GET_LAST,//!< an AO got an event and its queue is empty
-    QS_QF_EQUEUE_INIT,    //!< an event queue was initialized
+    QS_QF_ACTIVE_RECALL_ATTEMPT, //!< AO attempted to recall an event
+
+    // [19] EQ records
     QS_QF_EQUEUE_POST_FIFO,  //!< an event was posted (FIFO) to a raw queue
     QS_QF_EQUEUE_POST_LIFO,  //!< an event was posted (LIFO) to a raw queue
     QS_QF_EQUEUE_GET,     //!< get an event and queue still not empty
     QS_QF_EQUEUE_GET_LAST,//!< get the last event from the queue
-    QS_QF_MPOOL_INIT,     //!< a memory pool was initialized
+
+    QS_QF_RESERVED2,
+
+    // [24] MP records
     QS_QF_MPOOL_GET,      //!< a memory block was removed from memory pool
     QS_QF_MPOOL_PUT,      //!< a memory block was returned to memory pool
+
+    // [26] QF records
     QS_QF_PUBLISH,        //!< an event was published
-    QS_QF_RESERVED8,
+    QS_QF_NEW_REF,        //!< new event reference was created
     QS_QF_NEW,            //!< new event creation
     QS_QF_GC_ATTEMPT,     //!< garbage collection attempt
     QS_QF_GC,             //!< garbage collection
     QS_QF_TICK,           //!< QP::QF::tickX() was called
+
+    // [32] TE records
     QS_QF_TIMEEVT_ARM,    //!< a time event was armed
     QS_QF_TIMEEVT_AUTO_DISARM, //!< a time event expired and was disarmed
     QS_QF_TIMEEVT_DISARM_ATTEMPT,//!< attempt to disarm a disarmed QTimeEvt
     QS_QF_TIMEEVT_DISARM, //!< true disarming of an armed time event
     QS_QF_TIMEEVT_REARM,  //!< rearming of a time event
     QS_QF_TIMEEVT_POST,   //!< a time event posted itself directly to an AO
-    QS_QF_TIMEEVT_CTR,    //!< a time event counter was requested
+
+    // [38] QF records
+    QS_QF_DELETE_REF,     //!< an event reference is about to be deleted
     QS_QF_CRIT_ENTRY,     //!< critical section was entered
     QS_QF_CRIT_EXIT,      //!< critical section was exited
     QS_QF_ISR_ENTRY,      //!< an ISR was entered
     QS_QF_ISR_EXIT,       //!< an ISR was exited
     QS_QF_INT_DISABLE,    //!< interrupts were disabled
     QS_QF_INT_ENABLE,     //!< interrupts were enabled
+
+    // [45] AO records
     QS_QF_ACTIVE_POST_ATTEMPT, //!< attempt to post an evt to AO failed
+
+    // [46] EQ records
     QS_QF_EQUEUE_POST_ATTEMPT, //!< attempt to post an evt to QEQueue failed
+
+    // [47] MP records
     QS_QF_MPOOL_GET_ATTEMPT,   //!< attempt to get a memory block failed
+
+    // [48] SC records
     QS_MUTEX_LOCK,        //!< a mutex was locked
     QS_MUTEX_UNLOCK,      //!< a mutex was unlocked
 
@@ -135,7 +154,7 @@ enum QSpyRecords {
     QS_SCHED_IDLE,        //!< scheduler became idle
     QS_SCHED_RESUME,      //!< scheduler resumed previous task (not idle)
 
-    // [55] Additional QEP records
+    // [55] Additional SM records
     QS_QEP_TRAN_HIST,     //!< a tran to history was taken
     QS_QEP_TRAN_EP,       //!< a tran to entry point into a submachine
     QS_QEP_TRAN_XP,       //!< a tran to exit  point out of a submachine
@@ -369,6 +388,9 @@ public:
     //! callback to "massage" the test event, if neccessary
     static void onTestEvt(QEvt *e);
 
+    //! internal function to process posted events during test
+    static void processTestEvts_(void);
+
     //! callback to run the test loop
     static void onTestLoop(void);
 
@@ -444,7 +466,10 @@ public:
         QSCtr end;    //!< offset of the end of the ring buffer
         QSCtr head;   //!< offset to where next byte will be inserted
         QSCtr tail;   //!< offset of where next byte will be extracted
-        bool  inTestLoop; //!< QUTest event loop is running
+#ifdef Q_UTEST
+        QP::QPSet readySet; //!< QUTEST ready-set of active objects
+        bool  inTestLoop;   //!< QUTest event loop is running
+#endif
     } rxPriv_;
 };
 
@@ -549,10 +574,10 @@ enum QSpyRxRecords {
 /// filter is disabled by setting the active object pointer @p obj_ to NULL.@n
 /// @n
 /// The active object filter affects the following QS records:
-/// QP::QS_QF_ACTIVE_ADD, QP::QS_QF_ACTIVE_REMOVE, QP::QS_QF_ACTIVE_SUBSCRIBE,
-/// QP::QS_QF_ACTIVE_UNSUBSCRIBE, QP::QS_QF_ACTIVE_POST_FIFO,
-/// QP::QS_QF_ACTIVE_POST_LIFO, ::QS_QF_ACTIVE_GET, and
-/// QP::QS_QF_ACTIVE_GET_LAST.
+/// ::QS_QF_ACTIVE_DEFER, ::QS_QF_ACTIVE_RECALL, ::QS_QF_ACTIVE_SUBSCRIBE,
+/// ::QS_QF_ACTIVE_UNSUBSCRIBE, ::QS_QF_ACTIVE_POST, ::QS_QF_ACTIVE_POST_LIFO,
+/// ::QS_QF_ACTIVE_GET, ::QS_QF_ACTIVE_GET_LAST, and
+/// ::QS_QF_ACTIVE_RECALL_ATTEMPT.
 ///
 /// @sa Example of using QS filters in #QS_FILTER_ON documentation
 #define QS_FILTER_AO_OBJ(obj_) \
@@ -571,7 +596,7 @@ enum QSpyRxRecords {
 /// filter is disabled by setting the memory pool pointer @p obj_ to NULL.@n
 /// @n
 /// The memory pool filter affects the following QS records:
-/// QP::QS_QF_MPOOL_INIT, QP::QS_QF_MPOOL_GET, and QP::QS_QF_MPOOL_PUT.
+/// QP::QS_QF_MPOOL_GET, and QP::QS_QF_MPOOL_PUT.
 ///
 /// @sa Example of using QS filters in QS_FILTER_ON() documentation
 #define QS_FILTER_MP_OBJ(obj_) \
@@ -589,9 +614,8 @@ enum QSpyRxRecords {
 /// filter is disabled by setting the event queue pointer @p obj_ to NULL.@n
 /// @n
 /// The event queue filter affects the following QS records:
-/// QP::QS_QF_EQUEUE_INIT, QP::QS_QF_EQUEUE_POST_FIFO,
-/// QP::QS_QF_EQUEUE_POST_LIFO, QP::QS_QF_EQUEUE_GET, and
-/// QP::QS_QF_EQUEUE_GET_LAST.
+/// QP::QS_QF_EQUEUE_POST_FIFO, QP::QS_QF_EQUEUE_POST_LIFO,
+/// QP::QS_QF_EQUEUE_GET, and QP::QS_QF_EQUEUE_GET_LAST.
 ///
 /// @sa Example of using QS filters in #QS_FILTER_ON documentation
 #define QS_FILTER_EQ_OBJ(obj_) \
@@ -1045,6 +1069,7 @@ enum QSpyRxRecords {
     for (uint32_t volatile delay_ctr_ = (delay_);  \
          delay_ctr_ > static_cast<uint32_t>(0); --delay_ctr_) \
     {} \
+    QP::QS::onCleanup(); \
 } while (false)
 
 //! Flush the QS trace data to the host
@@ -1113,6 +1138,14 @@ enum QSpyRxRecords {
         QP::QS::onTestLoop(); \
     } while (false)
 
+#ifdef QP_IMPL
+    #define QACTIVE_EQUEUE_WAIT_(me_) \
+        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
+
+    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
+        (QS::rxPriv_.readySet.insert(static_cast<uint_fast8_t>((me_)->m_prio)))
+#endif // QP_IMPL
+
 #else
     // dummy definitions when not building for QUTEST
     #define QS_TEST_PROBE_DEF(fun_)
@@ -1122,3 +1155,4 @@ enum QSpyRxRecords {
 #endif // Q_UTEST
 
 #endif // qs_h
+

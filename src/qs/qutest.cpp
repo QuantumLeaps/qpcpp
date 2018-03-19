@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-08
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -60,6 +60,12 @@ void QF::init(void) {
     QF_intNest       = static_cast<uint8_t>(0);
 
     bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
+    bzero(&QS::rxPriv_.readySet,
+          static_cast<uint_fast16_t>(sizeof(QS::rxPriv_.readySet)));
+}
+//............................................................................
+void QF::stop(void) {
+    QS::onReset();
 }
 //............................................................................
 int_t QF::run(void) {
@@ -72,108 +78,6 @@ int_t QF::run(void) {
     return 0;           // return no error
 }
 
-//............................................................................
-bool QActive::post_(QEvt const * const e,
-                    uint_fast16_t const margin,
-                    void const * const sender)
-{
-    QS_TEST_PROBE_DEF(&QActive::post_)
-    bool status;
-    QF_CRIT_STAT_
-
-    /// @pre event pointer must be valid
-    Q_REQUIRE_ID(100, e != static_cast<QEvt const *>(0));
-
-    QF_CRIT_ENTRY_();
-    QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into the temporary
-
-    // test probe for reaching the margin
-    QS_TEST_PROBE(
-        nFree = static_cast<QEQueueCtr>(qs_tp_ - static_cast<uint32_t>(1));
-    )
-
-    // margin available?
-    if (((margin == QF_NO_MARGIN) && (nFree > static_cast<QEQueueCtr>(0)))
-        || (nFree > static_cast<QEQueueCtr>(margin)))
-    {
-
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
-                         QS::priv_.locFilter[QS::AO_OBJ], this)
-            QS_TIME_();               // timestamp
-            QS_OBJ_(sender);          // the sender object
-            QS_SIG_(e->sig);          // the signal of the event
-            QS_OBJ_(this);            // this active object
-            QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-            QS_EQC_(nFree);           // number of free entries
-            QS_EQC_(m_eQueue.m_nMin); // min number of free entries
-        QS_END_NOCRIT_()
-
-        // is it a dynamic event?
-        if (e->poolId_ != static_cast<uint8_t>(0)) {
-            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-        }
-
-        QF_CRIT_EXIT_();
-
-        QF::gc(e); // recycle the event to avoid a leak
-        status = true; // event "posted" successfully
-    }
-    else {
-        /// @note assert if event cannot be posted and dropping events is
-        /// not acceptable
-        Q_ASSERT_ID(110, margin != QF_NO_MARGIN);
-
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_ATTEMPT,
-                         QS::priv_.locFilter[QS::AO_OBJ], this)
-            QS_TIME_();               // timestamp
-            QS_OBJ_(sender);          // the sender object
-            QS_SIG_(e->sig);          // the signal of the event
-            QS_OBJ_(this);            // this active object
-            QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-            QS_EQC_(nFree);           // number of free entries
-            QS_EQC_(static_cast<QEQueueCtr>(margin)); // margin requested
-        QS_END_NOCRIT_()
-
-        QF_CRIT_EXIT_();
-
-        QF::gc(e); // recycle the evnet to avoid a leak
-        status = false; // event not posted
-   }
-    return status;
-}
-//............................................................................
-void QActive::postLIFO(QEvt const * const e) {
-    QS_TEST_PROBE_DEF(&QActive::postLIFO)
-    QF_CRIT_STAT_
-
-    QF_CRIT_ENTRY_();
-    QEQueueCtr nFree = m_eQueue.m_nFree;// tmp to avoid UB for volatile access
-
-    QF_CRIT_ENTRY_();
-    nFree = m_eQueue.m_nFree; // get volatile into the temporary
-
-    // test probe for queue overflow
-    QS_TEST_PROBE_ID(1,
-        Q_ERROR_ID(210);
-    )
-
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
-                     QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();                      // timestamp
-        QS_SIG_(e->sig);                 // the signal of this event
-        QS_OBJ_(this);                   // this active object
-        QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-        QS_EQC_(nFree);                  // number of free entries
-        QS_EQC_(m_eQueue.m_nMin);        // min number of free entries
-    QS_END_NOCRIT_()
-
-    // is it a dynamic event?
-    if (e->poolId_ != static_cast<uint8_t>(0)) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-    }
-
-    QF_CRIT_EXIT_();
-}
 //............................................................................
 void QActive::start(uint_fast8_t const prio,
                     QEvt const *qSto[], uint_fast16_t const qLen,
@@ -203,17 +107,8 @@ QTimeEvtCtr QTimeEvt::ctr(void) const {
 
     QF_CRIT_ENTRY_();
     ret = m_ctr;
-
-    QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_CTR, QS::priv_.locFilter[QS::TE_OBJ], this)
-        QS_TIME_();            // timestamp
-        QS_OBJ_(this);         // this time event object
-        QS_OBJ_(m_act);        // the target AO
-        QS_TEC_(ret);          // the current counter
-        QS_TEC_(m_interval);   // the interval
-        QS_U8_((uint8_t)(refCtr_ & (uint8_t)0x7F)); // tick rate
-    QS_END_NOCRIT_()
-
     QF_CRIT_EXIT_();
+
     return ret;
 }
 //............................................................................
@@ -408,16 +303,31 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender) {
 
         QF_CRIT_EXIT_(); // exit crit. section before posting
 
-        // Post to the 'act' AO (post does not actually happen)
-        // NOTE: act->POST() asserts internally if the queue overflows
-        //
         (void)act->POST(t, sender); // asserts if queue overflows
-
-        // explicitly dispatch the time event
-        act->dispatch(t);
     }
     else {
         QF_CRIT_EXIT_();
+    }
+}
+//............................................................................
+void QS::processTestEvts_(void) {
+    while (rxPriv_.readySet.notEmpty()) {
+        uint_fast8_t p = rxPriv_.readySet.findMax();
+        QActive *a = QF::active_[p];
+
+        // perform the run-to-completion (RTC) step...
+        // 1. retrieve the event from the AO's event queue, which by this
+        //    time must be non-empty and The "Vanialla" kernel asserts it.
+        // 2. dispatch the event to the AO's state machine.
+        // 3. determine if event is garbage and collect it if so
+        //
+        QEvt const *e = a->get_();
+        a->dispatch(e);
+        QF::gc(e);
+
+        if (a->m_eQueue.isEmpty()) { // empty queue?
+            rxPriv_.readySet.remove(p);
+        }
     }
 }
 
@@ -425,9 +335,16 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender) {
 
 //****************************************************************************
 void Q_onAssert(char const * const module, int_t loc) {
-    QS_ASSERTION(module, loc, (uint32_t)0); // report assertion to QSPY
+    QS_BEGIN_NOCRIT_(QP::QS_ASSERT_FAIL,
+                     static_cast<void *>(0), static_cast<void *>(0))
+        QS_TIME_();
+        QS_U16_(static_cast<uint16_t>(loc));
+        QS_STR_((module != static_cast<char_t *>(0)) ? module : "?");
+    QS_END_NOCRIT_()
+    QP::QS::onFlush(); // flush the assertion record to the host
     QP::QS::onTestLoop(); // loop to wait for commands (typically reset)
     QP::QS::onReset(); // in case the QUTEST loop ever returns, reset manually
 }
 
 #endif // Q_UTEST
+

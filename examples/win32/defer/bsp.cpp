@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: Console-based BSP, MinGW,
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last Updated for Version: 6.2.0
+// Date of the Last Update:  2018-03-19
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : https://state-machine.com
-// Email: info@state-machine.com
+// https://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "bsp.h"
@@ -62,3 +62,4 @@ extern "C" void Q_onAssert(char_t const * const file, int_t line) {
     cerr << "Assertion failed in " << file << " line " << line << endl;
     QF::stop();
 }
+

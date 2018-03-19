@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QSPY -- test-script example for qutest.tcl
-# Last updated for version 5.9.0
-# Last updated on  2017-05-16
+# Last updated for version 6.2.0
+# Last updated on  2018-03-19
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,44 +28,37 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
 
 # preamble...
 proc on_reset {} {
     expect_pause
-    glb_filter AO
-    loc_filter AO DPP::AO_Table
     continue
-    expect "%timestamp AO-Add   Obj=DPP::AO_Table,Pri=6"
-    expect "%timestamp AO-Subsc Obj=DPP::AO_Table,Sig=DONE_SIG"
-    expect "%timestamp AO-Subsc Obj=DPP::AO_Table,Sig=PAUSE_SIG"
-    expect "%timestamp AO-Subsc Obj=DPP::AO_Table,Sig=SERVE_SIG"
-    expect "%timestamp AO-Subsc Obj=DPP::AO_Table,Sig=TEST_SIG"
     glb_filter SM AO
-    loc_filter AO 0
-    current_obj SM_AO DPP::AO_Table
+    loc_filter AO l_table
+    current_obj SM_AO l_table
 }
 
 # tests...
 test "PAUSE->Table"
 dispatch PAUSE_SIG
-expect "%timestamp Disp===> Obj=DPP::AO_Table,Sig=PAUSE_SIG,State=Table::serving"
-expect "===RTC===> St-Entry Obj=DPP::AO_Table,State=Table::paused"
-expect "%timestamp ===>Tran Obj=DPP::AO_Table,Sig=PAUSE_SIG,State=Table::serving->Table::paused"
+expect "%timestamp Disp===> Obj=l_table,Sig=PAUSE_SIG,State=Table::serving"
+expect "===RTC===> St-Entry Obj=l_table,State=Table::paused"
+expect "%timestamp ===>Tran Obj=l_table,Sig=PAUSE_SIG,State=Table::serving->Table::paused"
 expect "%timestamp Trg-Done QS_RX_EVENT"
 
 test "SERVE->Table (1)"
 command 1
-expect "%timestamp Disp===> Obj=DPP::AO_Table,Sig=SERVE_SIG,State=Table::serving"
-expect "%timestamp =>Ignore Obj=DPP::AO_Table,Sig=SERVE_SIG,State=Table::serving"
+expect "%timestamp Disp===> Obj=l_table,Sig=SERVE_SIG,State=Table::serving"
+expect "%timestamp =>Ignore Obj=l_table,Sig=SERVE_SIG,State=Table::serving"
 expect "%timestamp Trg-Done QS_RX_COMMAND"
 
 test "SERVE->Table (2)" -noreset
 probe BSP::displayPaused 1
 dispatch PAUSE_SIG
-expect "%timestamp Disp===> Obj=DPP::AO_Table,Sig=PAUSE_SIG,State=Table::serving"
+expect "%timestamp Disp===> Obj=l_table,Sig=PAUSE_SIG,State=Table::serving"
 expect "%timestamp TstProbe Fun=BSP::displayPaused,Data=1"
 expect "%timestamp =ASSERT= Mod=bsp,Loc=100"
 

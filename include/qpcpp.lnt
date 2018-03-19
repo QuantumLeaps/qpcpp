@@ -2,19 +2,18 @@
 /// @brief PC-Lint 9.x option file for linting QP/C++ applications
 /// @cond
 ///===========================================================================
-/// Product: QP/C++
-/// Last Updated for Version: 6.1.1
-/// Date of the Last Update:  2018-02-17
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
-/// This program is free software: you can redistribute it and/or modify
-/// it under the terms of the GNU General Public License as published by
-/// the Free Software Foundation, either version 3 of the License, or
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
 ///
 /// Alternatively, this program may be distributed and modified under the
@@ -330,7 +329,8 @@
  QS_FUN_PTR_SIZE,
  QS_REC_DONE,
  QS_OBJ_,
- QS_FUN_)
+ QS_FUN_,
+ QS_TEST_PAUSE)
 -esym(1960,           // 16-0-4 function-like macro
  QS_INIT,
  QS_EXIT,
@@ -482,3 +482,4 @@
 // Deprecated features--provided in the backwards compatibility API of QP/C
 -estring(961,         // MISRA04-19.7(adv) function-like macro
  Q_ROM_BYTE)
+

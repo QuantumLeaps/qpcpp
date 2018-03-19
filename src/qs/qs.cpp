@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-16
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -139,28 +139,27 @@ void QS::filterOn(uint_fast8_t const rec) {
     }
     else if (rec == static_cast<uint_fast8_t>(QS_AO_RECORDS)) {
         priv_.glbFilter[1] |= static_cast<uint8_t>(0xFC);
-        priv_.glbFilter[2] |= static_cast<uint8_t>(0x03);
+        priv_.glbFilter[2] |= static_cast<uint8_t>(0x07);
         priv_.glbFilter[5] |= static_cast<uint8_t>(0x20);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_EQ_RECORDS)) {
-        priv_.glbFilter[2] |= static_cast<uint8_t>(0x7C);
+        priv_.glbFilter[2] |= static_cast<uint8_t>(0x78);
         priv_.glbFilter[5] |= static_cast<uint8_t>(0x40);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_MP_RECORDS)) {
-        priv_.glbFilter[2] |= static_cast<uint8_t>(0x80);
         priv_.glbFilter[3] |= static_cast<uint8_t>(0x03);
         priv_.glbFilter[5] |= static_cast<uint8_t>(0x80);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_QF_RECORDS)) {
         priv_.glbFilter[3] |= static_cast<uint8_t>(0xFC);
-        priv_.glbFilter[4] |= static_cast<uint8_t>(0x80);
+        priv_.glbFilter[4] |= static_cast<uint8_t>(0xC0);
         priv_.glbFilter[5] |= static_cast<uint8_t>(0x1F);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_TE_RECORDS)) {
         priv_.glbFilter[4] |= static_cast<uint8_t>(0x7F);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_SC_RECORDS)) {
-        priv_.glbFilter[6] |= static_cast<uint8_t>(0x7C);
+        priv_.glbFilter[6] |= static_cast<uint8_t>(0x7F);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_U0_RECORDS)) {
         priv_.glbFilter[8] |= static_cast<uint8_t>(0xC0);
@@ -231,28 +230,27 @@ void QS::filterOff(uint_fast8_t const rec) {
     }
     else if (rec == static_cast<uint_fast8_t>(QS_AO_RECORDS)) {
         priv_.glbFilter[1] &= static_cast<uint8_t>(~0xFCU);
-        priv_.glbFilter[2] &= static_cast<uint8_t>(~0x03U);
+        priv_.glbFilter[2] &= static_cast<uint8_t>(~0x07U);
         priv_.glbFilter[5] &= static_cast<uint8_t>(~0x20U);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_EQ_RECORDS)) {
-        priv_.glbFilter[2] &= static_cast<uint8_t>(~0x7CU);
+        priv_.glbFilter[2] &= static_cast<uint8_t>(~0x78U);
         priv_.glbFilter[5] &= static_cast<uint8_t>(~0x40U);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_MP_RECORDS)) {
-        priv_.glbFilter[2] &= static_cast<uint8_t>(~0x80U);
         priv_.glbFilter[3] &= static_cast<uint8_t>(~0x03U);
         priv_.glbFilter[5] &= static_cast<uint8_t>(~0x80U);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_QF_RECORDS)) {
         priv_.glbFilter[3] &= static_cast<uint8_t>(~0xFCU);
-        priv_.glbFilter[4] &= static_cast<uint8_t>(~0x80U);
+        priv_.glbFilter[4] &= static_cast<uint8_t>(~0xC0U);
         priv_.glbFilter[5] &= static_cast<uint8_t>(~0x1FU);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_TE_RECORDS)) {
         priv_.glbFilter[4] &= static_cast<uint8_t>(~0x7FU);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_SC_RECORDS)) {
-        priv_.glbFilter[6] &= static_cast<uint8_t>(~0x7CU);
+        priv_.glbFilter[6] &= static_cast<uint8_t>(~0x7FU);
     }
     else if (rec == static_cast<uint_fast8_t>(QS_U0_RECORDS)) {
         priv_.glbFilter[8] &= static_cast<uint8_t>(~0xC0U);
@@ -916,3 +914,4 @@ void QS::str(char_t const *s) {
 }
 
 } // namespace QP
+

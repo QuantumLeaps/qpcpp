@@ -3,14 +3,14 @@
 /// @ingroup qutest
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-04
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -118,10 +118,6 @@ extern uint8_t volatile QF_intNest;
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) ((void)0)
     #define QF_SCHED_UNLOCK_()    ((void)0)
-
-    /* QUTEST active object event queue customization (not used) */
-    #define QACTIVE_EQUEUE_WAIT_(me_)   ((void)0)
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) ((void)0)
 
     // QUTEST-specific event pool operations
     #define QF_EPOOL_TYPE_  QMPool

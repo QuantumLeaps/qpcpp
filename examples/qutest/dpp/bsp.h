@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example
-// Last Updated for Version: 5.8.1
-// Date of the Last Update:  2016-12-12
+// Last Updated for Version: 6.2.0
+// Date of the Last Update:  2018-03-19
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #ifndef bsp_h
@@ -40,7 +40,7 @@ class BSP {
 public:
     enum { TICKS_PER_SEC = 100 };
 
-    static void init(void);
+    static void init(int argc, char **argv);
     static void displayPaused(uint8_t const paused);
     static void displayPhilStat(uint8_t const n, char_t const *stat);
     static void terminate(int16_t const result);

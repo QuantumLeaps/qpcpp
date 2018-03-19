@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example
-// Last updated for version 5.9.0
-// Last updated on  2017-05-16
+// Last updated for version 6.2.0
+// Last updated on  2018-03-19
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -36,7 +36,7 @@
 #include "bsp.h"
 
 //............................................................................
-int main() {
+int main(int argc, char *argv[]) {
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
@@ -44,16 +44,10 @@ int main() {
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
 
-    DPP::BSP::init(); // initialize the BSP
+    DPP::BSP::init(argc, argv); // initialize the BSP
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(smlPoolSto);
-    QS_OBJ_DICTIONARY(DPP::AO_Table);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[0]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[1]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[2]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
     QS_TEST_PAUSE();
 
     // initialize publish-subscribe...

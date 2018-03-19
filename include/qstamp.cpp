@@ -19,3 +19,4 @@ char const BUILD_DATE[12] = __DATE__;
 char const BUILD_TIME[9] = __TIME__;
 
 } // namespace QP
+

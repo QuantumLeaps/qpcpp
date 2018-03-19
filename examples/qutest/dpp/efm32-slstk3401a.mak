@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for EMF32-SLSTK3401A, QUTEST, GNU-ARM
-# Last Updated for Version: 6.1.1
-# Date of the Last Update:  2018-02-18
+# Last Updated for Version: 6.2.0
+# Date of the Last Update:  2018-03-16
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -80,7 +80,6 @@ VPATH = \
 # list of all include directories needed by this project
 INCLUDES  = \
 	-I. \
-	-I.. \
 	-I../$(TARGET) \
 	-I$(QPCPP)/include \
 	-I$(QPCPP)/src \
@@ -110,8 +109,7 @@ CPP_SRCS := \
 	main.cpp \
 	philo.cpp \
 	table.cpp \
-	bsp.cpp \
-	qutest_port.cpp
+	bsp.cpp
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := ../$(TARGET)/test.ld
@@ -120,6 +118,7 @@ QP_SRCS := \
 	qep_hsm.cpp \
 	qep_msm.cpp \
 	qf_act.cpp \
+	qf_actq.cpp \
 	qf_defer.cpp \
 	qf_dyn.cpp \
 	qf_mem.cpp \
@@ -131,7 +130,8 @@ QP_SRCS := \
 	qs_64bit.cpp \
 	qs_rx.cpp \
 	qs_fp.cpp \
-	qutest.cpp
+	qutest.cpp \
+	qutest_port.cpp
 
 QP_ASMS :=
 
@@ -211,8 +211,6 @@ CPP_SRCS += $(QP_SRCS) mini_cpp.cpp
 ASM_SRCS += $(QP_ASMS)
 
 BIN_DIR := $(TARGET)
-
-CPP_SRCS += $(QS_SRCS)
 
 ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 

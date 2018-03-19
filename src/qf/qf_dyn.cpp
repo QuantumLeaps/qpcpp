@@ -2,14 +2,14 @@
 /// @brief QF/C++ dynamic event management
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-25
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
-/// mailo:info@state-machine.com
+/// https://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -45,7 +45,6 @@
     #include "qs_dummy.h" // disable the QS software tracing
 #endif // Q_SPY
 
-
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_dyn")
@@ -57,13 +56,7 @@ uint_fast8_t QF_maxPool_;              // number of initialized event pools
 //****************************************************************************
 /// @description
 /// This function initializes one event pool at a time and must be called
-/// exactly once for each event pool before the pool can be used.@n
-/// @n
-/// Many RTOSes provide fixed block-size heaps, a.k.a. memory pools that can
-/// be adapted for QF event pools. In case such support is missing, QF
-/// provides a native QF event pool implementation. The macro #QF_EPOOL_TYPE_
-/// determines the type of event pool used by a particular QF port. See
-/// class QP::QMPool for more information.
+/// exactly once for each event pool before the pool can be used.
 ///
 /// @param[in] poolSto  pointer to the storage for the event pool
 /// @param[in] poolSize size of the storage for the pool in bytes
@@ -114,16 +107,19 @@ void QF::poolInit(void * const poolSto,
 ///                    function will assert if allocation fails.
 /// @param[in] sig     the signal to be assigned to the allocated event
 ///
-/// @returns pointer to the newly allocated event. This pointer can be NULL
+/// @returns
+/// pointer to the newly allocated event. This pointer can be NULL
 /// only if margin!=0 and the event cannot be allocated with the specified
 /// margin still available in the given pool.
 ///
-/// @note The internal QF function QP::QF::newX_() raises an assertion when
+/// @note
+/// The internal QF function QP::QF::newX_() raises an assertion when
 /// the margin argument is QP::QF_NO_MARGIN and allocation of the event turns
 /// out to be impossible due to event pool depletion, or incorrect (too big)
 /// size of the requested event.
 ///
-/// @note The application code should not call this function directly.
+/// @note
+/// The application code should not call this function directly.
 /// The only allowed use is thorough the macros Q_NEW() or Q_NEW_X().
 ///
 QEvt *QF::newX_(uint_fast16_t const evtSize,
@@ -164,11 +160,10 @@ QEvt *QF::newX_(uint_fast16_t const evtSize,
         e->refCtr_ = static_cast<uint8_t>(0);
     }
     else {
-        // event was not allocated, assert that the caller provided non-zero
-        // margin, which means that they can tollerate bad allocation
-        Q_ASSERT_ID(320, margin != static_cast<uint_fast16_t>(0));
+        // must tolerate bad alloc.
+        Q_ASSERT_ID(320, margin != static_cast<uint_fast16_t>(QF_NO_MARGIN));
     }
-    return e;
+    return e; // can't be NULL if we can't tolerate bad allocation
 }
 
 //****************************************************************************
@@ -202,14 +197,15 @@ void QF::gc(QEvt const * const e) {
 
         // isn't this the last reference?
         if (e->refCtr_ > static_cast<uint8_t>(1)) {
-            QF_EVT_REF_CTR_DEC_(e); // decrement the ref counter
 
             QS_BEGIN_NOCRIT_(QS_QF_GC_ATTEMPT,
-                static_cast<void *>(0), static_cast<void *>(0))
+                             static_cast<void *>(0), static_cast<void *>(0))
                 QS_TIME_();        // timestamp
                 QS_SIG_(e->sig);   // the signal of the event
                 QS_2U8_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
             QS_END_NOCRIT_()
+
+            QF_EVT_REF_CTR_DEC_(e); // decrement the ref counter
 
             QF_CRIT_EXIT_();
         }
@@ -219,7 +215,7 @@ void QF::gc(QEvt const * const e) {
                                - static_cast<uint_fast8_t>(1);
 
             QS_BEGIN_NOCRIT_(QS_QF_GC,
-                static_cast<void *>(0), static_cast<void *>(0))
+                             static_cast<void *>(0), static_cast<void *>(0))
                 QS_TIME_();        // timestamp
                 QS_SIG_(e->sig);   // the signal of the event
                 QS_2U8_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
@@ -249,9 +245,11 @@ void QF::gc(QEvt const * const e) {
 /// @param[in] e       pointer to the current event
 /// @param[in] evtRef  the event reference
 ///
-/// @returns the newly created reference to the event `e`
+/// @returns
+/// the newly created reference to the event `e`
 ///
-/// @note The application code should not call this function directly.
+/// @note
+/// The application code should not call this function directly.
 /// The only allowed use is thorough the macro Q_NEW_REF().
 ///
 QEvt const *QF::newRef_(QEvt const * const e, QEvt const * const evtRef) {
@@ -263,10 +261,42 @@ QEvt const *QF::newRef_(QEvt const * const e, QEvt const * const evtRef) {
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
+
     QF_EVT_REF_CTR_INC_(e); // increments the ref counter
+
+    QS_BEGIN_NOCRIT_(QS_QF_NEW_REF,
+                     static_cast<void *>(0), static_cast<void *>(0))
+        QS_TIME_();      // timestamp
+        QS_SIG_(e->sig); // the signal of the event
+        QS_2U8_(e->poolId_, e->refCtr_); // pool Id & ref Count
+    QS_END_NOCRIT_()
+
     QF_CRIT_EXIT_();
 
     return e;
+}
+
+//****************************************************************************
+/// @description
+/// Deletes an existing reference to the event e
+///
+/// @param[in] evtRef  the event reference
+///
+/// @note
+/// The application code should not call this function directly.
+/// The only allowed use is thorough the macro Q_DELETE_REF().
+///
+void QF::deleteRef_(QEvt const * const evtRef) {
+    QS_CRIT_STAT_
+
+    QS_BEGIN_(QS_QF_DELETE_REF,
+              static_cast<void *>(0), static_cast<void *>(0))
+        QS_TIME_();           // timestamp
+        QS_SIG_(evtRef->sig); // the signal of the event
+        QS_2U8_(evtRef->poolId_, evtRef->refCtr_); // pool Id & ref Count
+    QS_END_()
+
+    gc(evtRef); // recycle the referenced event
 }
 
 //****************************************************************************
@@ -279,3 +309,4 @@ uint_fast16_t QF::poolGetMaxBlockSize(void) {
 }
 
 } // namespace QP
+

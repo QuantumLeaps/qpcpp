@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-08
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -72,18 +72,9 @@ void QF::add_(QActive * const a) {
     Q_REQUIRE_ID(100, (static_cast<uint_fast8_t>(0) < p)
                       && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
                       && (active_[p] == static_cast<QActive *>(0)));
-
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-
     active_[p] = a;  // registger the active object at this priority
-
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_ADD, QS::priv_.locFilter[QS::AO_OBJ], a)
-        QS_TIME_();   // timestamp
-        QS_OBJ_(a);   // the active object
-        QS_U8_(static_cast<uint8_t>(p)); // prio of the active object
-    QS_END_NOCRIT_()
-
     QF_CRIT_EXIT_();
 }
 
@@ -95,7 +86,8 @@ void QF::add_(QActive * const a) {
 ///
 /// @param[in]  a  pointer to the active object to remove from the framework.
 ///
-/// @note The active object that is removed from the framework can no longer
+/// @note
+/// The active object that is removed from the framework can no longer
 /// participate in the publish-subscribe event exchange.
 ///
 /// @sa QP::QF::add_()
@@ -109,16 +101,8 @@ void QF::remove_(QActive * const a) {
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-
     active_[p] = static_cast<QActive *>(0); // free-up the priority level
     a->m_state.fun = Q_STATE_CAST(0); // invalidate the state
-
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_REMOVE, QS::priv_.locFilter[QS::AO_OBJ], a)
-        QS_TIME_();   // timestamp
-        QS_OBJ_(a);   // the active object
-        QS_U8_(static_cast<uint8_t>(p)); // prio of the active object
-    QS_END_NOCRIT_()
-
     QF_CRIT_EXIT_();
 }
 
@@ -213,3 +197,4 @@ uint_fast8_t QPSet::findMax(void) const {
 #endif // QF_LOG2
 
 } // namespace QP
+

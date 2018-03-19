@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example for ThreadX
-// Last updated for version 5.6.2
-// Last updated on  2016-03-10
+// Last updated for version 6.2.0
+// Last updated on  2018-03-16
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,10 +28,10 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
-#include "qp_port.h"
+#include "qpc.h"
 #include "dpp.h"
 #include "bsp.h"
 

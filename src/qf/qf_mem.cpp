@@ -2,14 +2,14 @@
 /// @brief QF/C++ memory management services
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-08
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -86,15 +86,18 @@ QMPool::QMPool(void)
 /// @p blockSize so that it can fit an integer number of pointers.
 /// This is done to achieve proper alignment of the blocks within the pool.
 ///
-/// @note Due to the rounding of block size the actual capacity of the pool
+/// @note
+/// Due to the rounding of block size the actual capacity of the pool
 /// might be less than (@p poolSize / @p blockSize). You can check the
 /// capacity of the pool by calling the QP::QF::getPoolMin() function.
 ///
-/// @note This function is __not__ protected by a critical section, because
+/// @note
+/// This function is __not__ protected by a critical section, because
 /// it is intended to be called only during the initialization of the system,
 /// when interrupts are not allowed yet.
 ///
-/// @note Many QF ports use memory pools to implement the event pools.
+/// @note
+/// Many QF ports use memory pools to implement the event pools.
 ///
 void QMPool::init(void * const poolSto, uint_fast32_t poolSize,
                   uint_fast16_t blockSize)
@@ -149,12 +152,6 @@ void QMPool::init(void * const poolSto, uint_fast32_t poolSize,
     m_nMin     = m_nTot;  // the minimum number of free blocks
     m_start    = poolSto; // the original start this pool buffer
     m_end      = fb;      // the last block in this pool
-
-    QS_CRIT_STAT_
-    QS_BEGIN_(QS_QF_MPOOL_INIT, QS::priv_.locFilter[QS::MP_OBJ], m_start)
-        QS_OBJ_(m_start);  // the memory managed by this pool
-        QS_MPC_(m_nTot);   // the total number of blocks
-    QS_END_()
 }
 
 //****************************************************************************
@@ -167,9 +164,11 @@ void QMPool::init(void * const poolSto, uint_fast32_t poolSize,
 /// The recycled block must be allocated from the __same__ memory pool
 /// to which it is returned.
 ///
-/// @note This function can be called from any task level or ISR level.
+/// @note
+/// This function can be called from any task level or ISR level.
 ///
-/// @sa QP::QMPool::get()
+/// @sa
+/// QP::QMPool::get()
 ///
 void QMPool::put(void * const b) {
 
@@ -204,9 +203,11 @@ void QMPool::put(void * const b) {
 /// @param[in] margin  the minimum number of unused blocks still available
 ///                    in the pool after the allocation.
 ///
-/// @note This function can be called from any task level or ISR level.
+/// @note
+/// This function can be called from any task level or ISR level.
 ///
-/// @note The memory pool must be initialized before any events can
+/// @note
+/// The memory pool must be initialized before any events can
 /// be requested from it. Also, the QP::QMPool::get() function uses internally
 /// a QF critical section, so you should be careful not to call it from within
 /// a critical section when nesting of critical section is not supported.
@@ -215,7 +216,8 @@ void QMPool::put(void * const b) {
 /// An allocated block must be later returned back to the same pool
 /// from which it has been allocated.
 ///
-/// @sa QP::QMPool::put()
+/// @sa
+/// QP::QMPool::put()
 ///
 void *QMPool::get(uint_fast16_t const margin) {
     QFreeBlock *fb;
@@ -253,7 +255,7 @@ void *QMPool::get(uint_fast16_t const margin) {
             }
         }
 
-        m_free_head = fb_next; // adjust list head to the next free block
+        m_free_head = fb_next; // set the head to the next free block
 
         QS_BEGIN_NOCRIT_(QS_QF_MPOOL_GET,
                          QS::priv_.locFilter[QS::MP_OBJ], m_start)
@@ -263,6 +265,7 @@ void *QMPool::get(uint_fast16_t const margin) {
             QS_MPC_(m_nMin);   // the mninimum # free blocks in the pool
         QS_END_NOCRIT_()
     }
+    // don't have enough free blocks at this point
     else {
         fb = static_cast<QFreeBlock *>(0);
 
@@ -289,7 +292,8 @@ void *QMPool::get(uint_fast16_t const margin) {
 ///                    QF_maxPool_ is the number of event pools initialized
 ///                    with the function QP::QF::poolInit().
 ///
-/// @returns the minimum number of unused blocks in the given event pool.
+/// @returns
+/// the minimum number of unused blocks in the given event pool.
 ///
 uint_fast16_t QF::getPoolMin(uint_fast8_t const poolId) {
 
@@ -307,3 +311,4 @@ uint_fast16_t QF::getPoolMin(uint_fast8_t const poolId) {
 }
 
 } // namespace QP
+

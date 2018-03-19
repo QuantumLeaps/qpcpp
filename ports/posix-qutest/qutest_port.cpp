@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-17
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -56,12 +56,12 @@
 #include <netdb.h>
 #include <errno.h>
 #include <time.h>
-#include <termios.h>
 #include <unistd.h>
+#include <signal.h>
 
-#define QS_TX_SIZE    (4*1024)
-#define QS_RX_SIZE    1024
-#define QS_IMEOUT_MS  100
+#define QS_TX_SIZE     (4*1024)
+#define QS_RX_SIZE     1024
+#define QS_IMEOUT_MS   100
 #define INVALID_SOCKET -1
 
 namespace QP {
@@ -69,14 +69,14 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qutest_port")
 
 // local variables ...........................................................
+static void sigIntHandler(int dummy);
 static int l_sock = INVALID_SOCKET;
-static struct termios l_termios_saved; // saved terminal attributes
 
 //............................................................................
 bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
     static uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
-    char hostName[64];
+    char hostName[128];
     char const *src;
     char *dst;
 
@@ -87,7 +87,7 @@ bool QS::onStartup(void const *arg) {
     struct sockaddr_in sa_remote;
     struct hostent *host;
 
-    struct termios t;
+    struct sigaction sig_act;
 
     initBuf(qsBuf, sizeof(qsBuf));
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
@@ -107,9 +107,12 @@ bool QS::onStartup(void const *arg) {
         port_remote = (uint16_t)strtoul(src + 1, NULL, 10);
     }
 
+    //printf("<TARGET> Connecting to QSPY on Host=%s:%d...\n",
+    //       hostName, port_remote);
+
     l_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); /* TCP socket */
     if (l_sock == INVALID_SOCKET){
-        printf("<TARGET> ERROR   cannot create client socket, errno=%d\n",
+        printf("<TARGET> ERROR   cannot create client socket,errno=%d\n",
                errno);
         goto error;
     }
@@ -128,21 +131,15 @@ bool QS::onStartup(void const *arg) {
     sa_local.sin_family = AF_INET;
     sa_local.sin_port = htons(port_local);
     host = gethostbyname(""); /* local host */
-    //sa_local.sin_addr.s_addr = inet_addr(
-    //    inet_ntoa(*(struct in_addr *)*host->h_addr_list));
-    //if (bind(l_sock, &sa_local, sizeof(sa_local)) == -1) {
-    //    printf("<TARGET> Cannot bind to the local port Err=0x%08X\n",
-    //           WSAGetLastError());
-    //    /* no error */
-    //}
 
     /* remote hostName:port (QSPY server socket) */
     host = gethostbyname(hostName);
     if (host == NULL) {
-        printf("<TARGET> ERROR   cannot be resolve host name, errno=%d\n",
-               errno);
+        printf("<TARGET> ERROR   cannot resolve host Name=%s,errno=%d\n",
+               hostName, errno);
         goto error;
     }
+
     memset(&sa_remote, 0, sizeof(sa_remote));
     sa_remote.sin_family = AF_INET;
     memcpy(&sa_remote.sin_addr, host->h_addr, host->h_length);
@@ -152,28 +149,20 @@ bool QS::onStartup(void const *arg) {
     if (connect(l_sock, (struct sockaddr *)&sa_remote, sizeof(sa_remote))
         == -1)
     {
-        printf("<TARGET> ERROR   cannot be connected to QSPY, errno=%d\n",
-               errno);
+        printf("<TARGET> ERROR   cannot connect to QSPY at "
+               "Host=%s:%d,errno=%d\n",
+               hostName, port_remote, errno);
         goto error;
     }
 
-    printf("<TARGET> Connected to QSPY via TCP/IP\n"); //???
+    //printf("<TARGET> Connected to QSPY at Host=%s:%d\n",
+    //       hostName, port_remote);
+    onFlush();
 
-    /* modify the terminal attributes... */
-    /* get the original terminal settings */
-    if (tcgetattr(0, &l_termios_saved) == -1) {
-        printf("    <CONS> ERROR    getting terminal attributes\n");
-        goto error;
-    }
+    // install the SIGINT (Ctrl-C) signal handler
+    sig_act.sa_handler = &sigIntHandler;
+    sigaction(SIGINT, &sig_act, NULL);
 
-    t = l_termios_saved;
-    t.c_lflag &= ~(ICANON | ECHO); /* disable canonical mode and echo */
-    if (tcsetattr(0, TCSANOW, &t) == -1) {
-        printf("    <CONS> ERROR    setting terminal attributes");
-        goto error;
-    }
-
-    //printf("<TARGET> Connected to QSPY via TCP/IP\n");
     return true;  // success
 
 error:
@@ -185,9 +174,7 @@ void QS::onCleanup(void) {
         close(l_sock);
         l_sock = INVALID_SOCKET;
     }
-    /* restore the saved terminal settings */
-    tcsetattr(0, TCSANOW, &l_termios_saved);
-    //printf("<TARGET> Disconnected from QSPY via TCP/IP\n");
+    //printf("<TARGET> Disconnected from QSPY\n");
 }
 //............................................................................
 void QS::onReset(void) {
@@ -209,7 +196,6 @@ void QS::onTestLoop() {
         uint16_t nBytes;
         uint8_t const *block;
 
-        FD_SET(0,      &readSet);   /* console/terminal */
         FD_SET(l_sock, &readSet);   /* the socket */
 
         /* selective, timed blocking on the TCP/IP socket... */
@@ -217,7 +203,7 @@ void QS::onTestLoop() {
         nrec = select(l_sock + 1, &readSet,
                       (fd_set *)0, (fd_set *)0, &timeout);
         if (nrec < 0) {
-            printf("    <CONS> ERROR    select() errno=%d\n", errno);
+            printf("<TARGET> ERROR socket select,errno=%d\n", errno);
             onCleanup();
             exit(-2);
         }
@@ -236,20 +222,7 @@ void QS::onTestLoop() {
                     for (pb = &buf[0]; i > 0; --i, ++pb) {
                         rxPut(*pb);
                     }
-                    rxParse(); /* parse all n-bytes of data */
-                }
-            }
-            if (FD_ISSET(0, &readSet)) { /* console/terminal redy to read? */
-                char ch;
-                read(0, &ch, 1);
-                switch (ch) {
-                    case 'x':      /* 'x' pressed? */
-                    case 'X':      /* 'X' pressed? */
-                    case '\033': { /* ESC pressed? */
-                        onCleanup();
-                        exit(0);
-                        break;
-                    }
+                    rxParse(); // parse all n-bytes of data
                 }
             }
         }
@@ -279,4 +252,12 @@ void QS::onFlush(void) {
     }
 }
 
+//............................................................................
+static void sigIntHandler(int /* dummy */) {
+    QS::onCleanup();
+    printf("\n<TARGET> disconnecting from QSPY\n");
+    exit(-1);
+}
+
 } // namespace QP
+

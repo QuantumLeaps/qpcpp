@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-08
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -212,8 +212,6 @@ static void rxReportError_(uint8_t code);
 static void rxReportDone_(enum QSpyRxRecords recId);
 static void rxPoke_(void);
 
-static uint8_t const l_QS_RX = static_cast<uint8_t>(0); // QS source ID
-
 //! Internal QS-RX function to take a transition in the QS-RX FSM
 static inline void tran_(RxStateEnum const target) {
     l_rx.state = static_cast<uint8_t>(target);
@@ -260,7 +258,7 @@ void QS::rxInitBuf(uint8_t sto[], uint16_t const stoSize) {
     l_rx.chksum = static_cast<uint8_t>(0);
 
     beginRec(static_cast<uint_fast8_t>(QS_OBJ_DICT));
-        QS_OBJ_(&l_QS_RX);
+        QS_OBJ_(&rxPriv_);
         QS_STR_("QS_RX");
     endRec();
     // no QS_REC_DONE(), because QS is not running yet
@@ -836,7 +834,10 @@ static void rxHandleGoodFrame_(uint8_t state) {
         }
         case WAIT4_TICK_FRAME: {
             rxReportAck_(QS_RX_TICK);
-            QF::tickX_(l_rx.var.tick.rate, &l_QS_RX);
+            QF::tickX_(l_rx.var.tick.rate, &QS::rxPriv_);
+#ifdef Q_UTEST
+            QS::processTestEvts_(); // process all events produced
+#endif
             rxReportDone_(QS_RX_TICK);
             break;
         }
@@ -983,7 +984,7 @@ static void rxHandleGoodFrame_(uint8_t state) {
             i = static_cast<uint8_t>(0);
 
             if (l_rx.var.evt.prio == static_cast<uint8_t>(0)) { // publish
-                QF::PUBLISH(l_rx.var.evt.e, &l_QS_RX);
+                QF::PUBLISH(l_rx.var.evt.e, &QS::rxPriv_);
                 rxReportDone_(QS_RX_EVENT);
             }
             else if (l_rx.var.evt.prio < static_cast<uint8_t>(QF_MAX_ACTIVE))
@@ -991,7 +992,7 @@ static void rxHandleGoodFrame_(uint8_t state) {
                 if (!QF::active_[l_rx.var.evt.prio]->POST_X(
                                 l_rx.var.evt.e,
                                 static_cast<uint_fast16_t>(1), // margin
-                                &l_QS_RX))
+                                &QS::rxPriv_))
                 {
                     // failed QACTIVE_POST() recycles the event
                     i = static_cast<uint8_t>(0x80); // failure, no recycle
@@ -1002,6 +1003,12 @@ static void rxHandleGoodFrame_(uint8_t state) {
                 if (QS::rxPriv_.currObj[QS::SM_OBJ]
                     != static_cast<void *>(0))
                 {
+                    // increment the ref-ctr to simulate the situation
+                    // when the event is just retreived from a queue.
+                    // This is expected for the following QF::gc() call.
+                    //
+                    ++l_rx.var.evt.e->refCtr_;
+
                     static_cast<QHsm *>(QS::rxPriv_.currObj[QS::SM_OBJ])
                             ->dispatch(l_rx.var.evt.e);
                     i = static_cast<uint8_t>(0x01);  // success, recycle
@@ -1014,6 +1021,12 @@ static void rxHandleGoodFrame_(uint8_t state) {
                 // init the current SM object"
                 if (QS::rxPriv_.currObj[QS::SM_OBJ] != static_cast<void *>(0))
                 {
+                    // increment the ref-ctr to simulate the situation
+                    // when the event is just retreived from a queue.
+                    // This is expected for the following QF::gc() call.
+                    //
+                    ++l_rx.var.evt.e->refCtr_;
+
                     static_cast<QHsm *>(QS::rxPriv_.currObj[QS::SM_OBJ])
                             ->init(l_rx.var.evt.e);
                     i = static_cast<uint8_t>(0x01);  // success, recycle
@@ -1030,7 +1043,7 @@ static void rxHandleGoodFrame_(uint8_t state) {
                             QS::rxPriv_.currObj[QS::AO_OBJ])->POST_X(
                                 l_rx.var.evt.e,
                                 static_cast<uint_fast16_t>(1), // margin
-                                &l_QS_RX))
+                                &QS::rxPriv_))
                     {
                         // failed QACTIVE_POST() recycles the event
                         i = static_cast<uint8_t>(0x80); // failure, no recycle
@@ -1053,6 +1066,9 @@ static void rxHandleGoodFrame_(uint8_t state) {
                 rxReportError_(static_cast<uint8_t>(QS_RX_EVENT));
             }
             else {
+#ifdef Q_UTEST
+                QS::processTestEvts_(); // process all events produced
+#endif
                 rxReportDone_(QS_RX_EVENT);
             }
             break;
@@ -1219,3 +1235,4 @@ QSTimeCtr QS::onGetTime(void) {
 #endif // Q_UTEST
 
 } // namespace QP
+

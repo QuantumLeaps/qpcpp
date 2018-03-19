@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.4
-/// Last updated on  2018-01-10
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -563,16 +563,19 @@ public:
     //! event queue.
     static uint_fast16_t getQueueMin(uint_fast8_t const prio);
 
-    //! Internal QP implementation of the dynamic event allocator.
+    //! Internal QF implementation of creating new dynamic event.
     static QEvt *newX_(uint_fast16_t const evtSize,
                        uint_fast16_t const margin, enum_t const sig);
 
     //! Recycle a dynamic event.
     static void gc(QEvt const *e);
 
-    //! Internal QF implementation of the event reference creator
+    //! Internal QF implementation of creating new event reference.
     static QEvt const *newRef_(QEvt const * const e,
                                QEvt const * const evtRef);
+
+    //! Internal QF implementation of deleting event reference.
+    static void deleteRef_(QEvt const * const evtRef);
 
     //! Remove the active object from the framework.
     static void remove_(QActive * const a);
@@ -737,7 +740,6 @@ public:
     #define Q_NEW_X(e_, evtT_, margin_, sig_)  ((e_) = static_cast<evtT_ *>(\
         QP::QF::newX_(static_cast<uint_fast16_t>(sizeof(evtT_)),\
                       (margin_), (sig_))))
-
 #endif
 
 //! Create a new reference of the current event `e` */
@@ -777,7 +779,7 @@ public:
 /// @sa Q_NEW_REF()
 ///
 #define Q_DELETE_REF(evtRef_) do { \
-    QP::QF::gc((evtRef_)); \
+    QP::QF::deleteRef_((evtRef_)); \
     (evtRef_) = 0; \
 } while (false)
 
@@ -906,3 +908,4 @@ public:
 #define TICK(sender_) TICK_X(static_cast<uint_fast8_t>(0), (sender_))
 
 #endif // qf_h
+
