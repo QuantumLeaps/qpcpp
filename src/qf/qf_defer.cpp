@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.2.0
-/// Last updated on  2018-03-19
+/// Last updated on  2018-03-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -149,8 +149,8 @@ bool QActive::recall(QEQueue * const eq) {
     else {
         QS_CRIT_STAT_
 
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_RECALL_ATTEMPT,
-                         QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_BEGIN_(QS_QF_ACTIVE_RECALL_ATTEMPT,
+                  QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_();      // time stamp
             QS_OBJ_(this);   // this active object
             QS_OBJ_(eq);     // the deferred queue

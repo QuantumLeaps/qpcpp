@@ -2,8 +2,8 @@
 /// @brief QEP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.4.0/Qt 5.x
-/// Last updated on  2015-05-03
+/// Last Updated for Version: QP 6.2.0/Qt 5.x
+/// Last updated on  2018-03-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,16 +30,13 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// https://www.state-machine.com
+/// mailtp:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
 #ifndef qep_port_h
 #define qep_port_h
-
-// don't define QEvent to avoid conflict with Qt
-#define Q_NQEVENT     1
 
 // provide QEvt constructors
 #define Q_EVT_CTOR    1
@@ -51,3 +48,4 @@
 #include "qep.h"    // QEP platform-independent public interface
 
 #endif // qep_port_h
+

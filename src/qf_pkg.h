@@ -3,8 +3,8 @@
 /// @brief Internal (package scope) QF/C++ interface.
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.7
-/// Last updated on  2017-08-25
+/// Last updated for version 6.2.0
+/// Last updated on  2018-03-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -100,6 +100,16 @@ struct QFreeBlock {
 
 //****************************************************************************
 // internal helper inline functions
+
+//! return the Pool-ID of an event @p e
+inline uint8_t QF_EVT_POOL_ID_ (QEvt const * const e) {
+    return e->poolId_;
+}
+
+//! return the Reference Conter of an event @p e
+inline uint8_t QF_EVT_REF_CTR_ (QEvt const * const e) {
+    return e->refCtr_;
+}
 
 //! increment the refCtr_ of an event @p e
 inline void QF_EVT_REF_CTR_INC_(QEvt const * const e) {

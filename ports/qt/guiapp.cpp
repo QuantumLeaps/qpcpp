@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.4.0/Qt 5.x
-/// Last updated on  2017-09-20
+/// Last Updated for Version: QP 6.2.0/Qt 5.x
+/// Last updated on  2018-03-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -117,7 +117,13 @@ bool GuiQActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
+    // is it a dynamic event?
+    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
+        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    }
+
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                  // timestamp
         QS_OBJ_(sender);             // the sender object
         QS_SIG_(e->sig);             // the signal of the event
@@ -128,10 +134,6 @@ bool GuiQActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
         QS_EQC_(0);                  // min number of free entries (not used)
     QS_END_NOCRIT_()
 
-    // is it a dynamic event?
-    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-    }
     QF_CRIT_EXIT_();
 
     // QCoreApplication::postEvent() is thread-safe per Qt documentation
@@ -143,7 +145,13 @@ void GuiQActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
+    // is it a dynamic event?
+    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
+        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    }
+
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                  // timestamp
         QS_SIG_(e->sig);             // the signal of this event
         QS_OBJ_(this);               // this active object
@@ -153,10 +161,6 @@ void GuiQActive::postLIFO(QEvt const * const e) {
         QS_EQC_(0);                  // min number of free entries (not used)
     QS_END_NOCRIT_()
 
-    // is it a dynamic event?
-    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-    }
     QF_CRIT_EXIT_();
 
     // QCoreApplication::postEvent() is thread-safe per Qt documentation
@@ -193,7 +197,13 @@ bool GuiQMActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
+    // is it a dynamic event?
+    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
+        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    }
+
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                  // timestamp
         QS_OBJ_(sender);             // the sender object
         QS_SIG_(e->sig);             // the signal of the event
@@ -204,10 +214,6 @@ bool GuiQMActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
         QS_EQC_(0);                  // min number of free entries (not used)
     QS_END_NOCRIT_()
 
-    // is it a dynamic event?
-    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-    }
     QF_CRIT_EXIT_();
 
     // QCoreApplication::postEvent() is thread-safe per Qt documentation
@@ -219,7 +225,13 @@ void GuiQMActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO, QS::priv_.locFilter[QS::AO_OBJ], this)
+    // is it a dynamic event?
+    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
+        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    }
+
+    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
+                     QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                  // timestamp
         QS_SIG_(e->sig);             // the signal of this event
         QS_OBJ_(this);               // this active object
@@ -229,10 +241,6 @@ void GuiQMActive::postLIFO(QEvt const * const e) {
         QS_EQC_(0);                  // min number of free entries (not used)
     QS_END_NOCRIT_()
 
-    // is it a dynamic event?
-    if (QF_EVT_POOL_ID_(e) != static_cast<uint8_t>(0)) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-    }
     QF_CRIT_EXIT_();
 
     // QCoreApplication::postEvent() is thread-safe per Qt documentation
@@ -241,3 +249,4 @@ void GuiQMActive::postLIFO(QEvt const * const e) {
 }
 
 } // namespace QP
+

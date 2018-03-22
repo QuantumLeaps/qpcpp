@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: DPP-GUI exampe for Qt5
-# Last Updated for Version: QP/C++ 5.9.1/Qt 5.x
-# Date of the Last Update:  2017-05-26
+# Last Updated for Version: QP/C++ 6.2.0/Qt 5.x
+# Date of the Last Update:  2018-03-21
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,7 +28,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
 
@@ -57,7 +57,6 @@ HEADERS += \
     bsp.h
 
 FORMS += gui.ui
-
 
 RESOURCES = gui.qrc
 
@@ -99,7 +98,7 @@ SOURCES += \
     $$QPCPP/src/qf/qf_qmact.cpp \
     $$QPCPP/src/qf/qf_time.cpp
 
-INCLUDEPATH += $$QPCPP/source
+INCLUDEPATH += $$QPCPP/src
 
 
 CONFIG(debug, debug|release) {
