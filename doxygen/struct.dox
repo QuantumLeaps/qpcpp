@@ -116,7 +116,7 @@ Multiple inheritance exposes the interface of all listed base classes. This is m
 ------------------------------------------------------------------------------
 @section sm State Machines
 
-The behavior of each active object in QP/C++ is specified by means of a **hierarchical state machine** (UML statechart), which is the most effective and elegant technique of decomposing event-driven behavior. The most important innovation of UML state machines over classical finite state machines (FSMs) is the hierarchical state nesting. The value of state nesting lies in avoiding repetitions, which are inevitable in the traditional "flat" FSM formalism and are the main reason for the "state-transition explosion" in FSMs. The semantics of state nesting allow substates to define only the differences of behavior from the superstates, thus promoting sharing and reusing behavior.
+The behavior of each active object in QP/C++ is specified by means of a **hierarchical state machine** (UML statechart), which is the most effective and elegant technique of describing event-driven behavior. The most important innovation of UML state machines over classical finite state machines (FSMs) is the hierarchical state nesting. The value of state nesting lies in avoiding repetitions, which are inevitable in the traditional "flat" FSM formalism and are the main reason for the "state-transition explosion" in FSMs. The semantics of state nesting allow substates to define only the differences of behavior from the superstates, thus promoting sharing and reusing behavior.
 
 @htmlonly
 <div class="image">

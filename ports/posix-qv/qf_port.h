@@ -1,5 +1,5 @@
 /// @file
-/// @brief QF/C++ port to POSIX/P-threads
+/// @brief QF/C++ port to POSIX API with cooperative QV scheduler (posix-qv)
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.2.0
@@ -40,8 +40,8 @@
 
 // event queue and thread types
 #define QF_EQUEUE_TYPE       QEQueue
-#define QF_OS_OBJECT_TYPE    pthread_cond_t
-#define QF_THREAD_TYPE       uint8_t
+//#define QF_OS_OBJECT_TYPE  // not provided
+//#define QF_THREAD_TYPE     // not provided
 
 // The maximum number of active objects in the application
 #define QF_MAX_ACTIVE        64
@@ -65,19 +65,21 @@
 #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
 #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
+// QF_LOG2 not defined -- use the internal LOG2() implementation
+
 #include <pthread.h>   // POSIX-thread API
 #include "qep_port.h"  // QEP port
-#include "qequeue.h"   // POSIX needs event-queue
-#include "qmpool.h"    // POSIX needs memory-pool
-#include "qpset.h"     // POSIX needs priority-set
+#include "qequeue.h"   // POSIX-QV needs event-queue
+#include "qmpool.h"    // POSIX-QV needs memory-pool
+#include "qpset.h"     // POSIX-QV needs priority-set
 #include "qf.h"        // QF platform-independent public interface
 
 namespace QP {
 
-// set clock tick rate
+// set clock tick rate (NOTE: ticksPerSec==0 disables the "ticker thread"
 void QF_setTickRate(uint32_t ticksPerSec);
 
-// clock tick callback (provided in the app)
+// clock tick callback (NOTE not called when "ticker thread" is not running)
 void QF_onClockTick(void);
 
 extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
@@ -85,24 +87,23 @@ extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
 } // namespace QP
 
 //****************************************************************************
-// interface used only inside QF, but not in applications
+// interface used only inside QF implementation, but not in applications
 //
 #ifdef QP_IMPL
 
-    // POSIX-specific scheduler locking (not used at this point)
+    // scheduler locking (not needed in single-thread port)
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) ((void)0)
     #define QF_SCHED_UNLOCK_()    ((void)0)
 
-    // native event queue operations...
+    // event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) \
-            pthread_cond_wait(&(me_)->m_osObject, &QF_pThreadMutex_)
+        Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
 
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        Q_ASSERT_ID(410, QF::active_[(me_)->m_prio] \
-                         != static_cast<QActive *>(0)); \
-        pthread_cond_signal(&(me_)->m_osObject) \
+    #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
+        QV_readySet_.insert((me_)->m_prio); \
+        pthread_cond_signal(&QV_condVar_); \
+    } while (false)
 
     // event pool operations...
     #define QF_EPOOL_TYPE_  QMPool
@@ -114,6 +115,11 @@ extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
     #define QF_EPOOL_GET_(p_, e_, m_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
     #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
+
+    namespace QP {
+        extern QPSet QV_readySet_; // QV-ready set of active objects
+        extern pthread_cond_t QV_condVar_; // Cond.var. to signal events
+    } // namespace QP
 
 #endif // QP_IMPL
 
@@ -148,3 +154,4 @@ extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
 //
 
 #endif // qf_port_h
+
