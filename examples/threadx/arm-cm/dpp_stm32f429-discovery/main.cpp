@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example for ThreadX
 // Last updated for version 6.2.0
-// Last updated on  2018-03-16
+// Last updated on  2018-04-06
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -31,7 +31,7 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
-#include "qpc.h"
+#include "qpcpp.h"
 #include "dpp.h"
 #include "bsp.h"
 
