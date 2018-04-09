@@ -169,10 +169,6 @@ int_t QF::run(void) {
             while (QV_readySet_.isEmpty()) {
                 pthread_cond_wait(&QV_condVar_, &QF_pThreadMutex_);
             }
-
-            QF_INT_ENABLE();
-            // enable "interrupts" to let other threads run...
-            QF_INT_DISABLE();
         }
     }
     QF_INT_ENABLE();
