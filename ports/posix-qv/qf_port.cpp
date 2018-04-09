@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.2.0
-/// Last updated on  2018-04-05
+/// Last updated on  2018-04-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -169,6 +169,10 @@ int_t QF::run(void) {
             while (QV_readySet_.isEmpty()) {
                 pthread_cond_wait(&QV_condVar_, &QF_pThreadMutex_);
             }
+
+            QF_INT_ENABLE();
+            // enable "interrupts" to let other threads run...
+            QF_INT_DISABLE();
         }
     }
     QF_INT_ENABLE();

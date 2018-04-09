@@ -78,10 +78,10 @@ namespace QP {
 void QF_enterCriticalSection_(void);
 void QF_leaveCriticalSection_(void);
 
-// set clock tick rate
-void QF_setTickRate(uint32_t ticksPerSec);
+// set clock tick rate (NOTE ticksPerSec==0 disables the "ticker thread"
+void QF_setTickRate(uint32_t ticksPerSec); /* set clock tick rate */
 
-// clock tick callback (provided in the app)
+// clock tick callback (NOTE not called when "ticker thread" is not running)
 void QF_onClockTick(void);
 
 } // namespace QP
