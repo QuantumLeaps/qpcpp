@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.0
+/// Last updated on  2018-04-30
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -647,7 +647,7 @@ static void rxParseData_(uint8_t const b) {
             break;
         }
         case WAIT4_OBJ_KIND: {
-            if (b <= static_cast<uint8_t>(6)) {
+            if (b <= static_cast<uint8_t>(QS::SM_AO_OBJ)) {
                 l_rx.var.obj.kind = b;
                 l_rx.var.obj.addr = static_cast<QSObj>(0);
                 l_rx.var.obj.idx  = static_cast<uint8_t>(0);
@@ -936,8 +936,10 @@ static void rxHandleGoodFrame_(uint8_t state) {
                 rxReportAck_(
                     static_cast<enum QSpyRxRecords>(l_rx.var.obj.recId));
             }
-            // both SM and AO
-            else if (l_rx.var.obj.kind == static_cast<uint8_t>(6)) {
+
+            else if (l_rx.var.obj.kind
+                     == static_cast<uint8_t>(QS::SM_AO_OBJ)) // both SM and AO
+            {
                 if (l_rx.var.obj.recId
                     == static_cast<uint8_t>(QS_RX_LOC_FILTER))
                 {

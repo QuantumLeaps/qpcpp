@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.0
+/// Last updated on  2018-04-30
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -430,6 +430,7 @@ public:
         EQ_OBJ,       //!< raw queue object
         TE_OBJ,       //!< time event object
         AP_OBJ,       //!< generic Application-specific object
+        SM_AO_OBJ,    //!< state machine or active object
         MAX_OBJ
     };
 

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QMsmTst Example
-// Last Updated for Version: 5.6.0
-// Date of the Last Update:  2015-12-26
+// Last Updated for Version: 6.3.0
+// Date of the Last Update:  2018-05-07
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -50,51 +50,51 @@ static void dispatch(QP::QSignal sig);
 
 //............................................................................
 extern "C" int main(int argc, char *argv[ ]) {
-    if (argc > 1) {                                     // file name provided?
+    if (argc > 1) { // file name provided?
         l_outFile = fopen(argv[1], "w");
     }
 
-    if (l_outFile == (FILE *)0) {                      // interactive version?
+    if (l_outFile == (FILE *)0) { // interactive version?
         l_outFile = stdout;
 
         printf("QMsmTst example, built on %s at %s\n"
                "QEP: %s.\nPress ESC to quit...\n",
                __DATE__, __TIME__, QP_VERSION_STR);
 
-        the_msm->init();          // trigger the initial tran. in the test MSM
+        the_msm->init(); // trigger the initial tran. in the test MSM
 
-        for (;;) {                                               // event loop
+        for (;;) { // event loop
             printf("\n>");
 
             int c;
-            c = _getche();       // get a character from the console with echo
+            c = _getche(); // get a character from the console with echo
             printf(": ");
 
             QP::QEvt e = QEVT_INITIALIZER(0);
-            if ('a' <= c && c <= 'i') {                           // in range?
+            if ('a' <= c && c <= 'i') { // in range?
                 e.sig = (QP::QSignal)(c - 'a' + A_SIG);
             }
-            else if ('A' <= c && c <= 'I') {                      // in range?
+            else if ('A' <= c && c <= 'I') { // in range?
                 e.sig = (QP::QSignal)(c - 'A' + A_SIG);
             }
-            else if (c == '\33') {                             // the ESC key?
-                e.sig = TERMINATE_SIG;       // terminate the interactive test
+            else if (c == '\33') { // the ESC key?
+                e.sig = TERMINATE_SIG; // terminate the interactive test
             }
             else {
                 e.sig = IGNORE_SIG;
             }
 
-            the_msm->dispatch(&e);                       // dispatch the event
+            the_msm->dispatch(&e); // dispatch the event
         }
     }
-    else {                                                    // batch version
+    else { // batch version
         printf("QMsmTst, output saved to %s\n", argv[1]);
         fprintf(l_outFile,
                 "QMsmTst example, QEP %s\n", QP::QEP::getVersion());
 
-        the_msm->init();          // trigger the initial tran. in the test MSM
+        the_msm->init(); // trigger the initial tran. in the test MSM
 
-                                                        // dynamic transitions
+        // hard-coded tests...
         dispatch(A_SIG);
         dispatch(B_SIG);
         dispatch(D_SIG);
@@ -141,7 +141,7 @@ static void dispatch(QP::QSignal sig) {
     Q_REQUIRE((A_SIG <= sig) && (sig <= I_SIG));
     fprintf(l_outFile, "\n%c:", 'A' + sig - A_SIG);
     QP::QEvt e = QEVT_INITIALIZER(sig);
-    the_msm->dispatch(&e);                               // dispatch the event
+    the_msm->dispatch(&e); // dispatch the event
 }
 
 } // namespace QMSMTST
@@ -168,6 +168,9 @@ void QS::onCleanup(void) {
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {
     return static_cast<QSTimeCtr>(clock());
+}
+//............................................................................
+void QS::onFlush(void) {
 }
 
 } // namespace QP

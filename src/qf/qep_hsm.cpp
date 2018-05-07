@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-18
+/// Last updated for version 6.3.0
+/// Last updated on  2018-05-04
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -74,6 +74,9 @@
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qep_hsm")
+
+//****************************************************************************
+char_t const versionStr[6] = QP_VERSION_STR;
 
 //****************************************************************************
 enum {
