@@ -1,7 +1,7 @@
 //****************************************************************************
 // Purpose: Fixture for QUTEST
-// Last updated for version 5.9.0
-// Last updated on  2017-05-15
+// Last updated for version 6.3.0
+// Last updated on  2018-05-10
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 
@@ -98,7 +98,7 @@ void QS::onTestEvt(QEvt *e) {
 
 #else // this test is compiled for an embedded Target system
 
-void QS_onTestEvt(QEvt *e) {
+void QS::onTestEvt(QEvt *e) {
     (void)e;
 }
 

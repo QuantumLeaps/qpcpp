@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.3.0
-/// Last updated on  2018-05-03
+/// Last updated on  2018-05-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -64,10 +64,6 @@
     /// default of 1 byte is chosen.
     #define Q_SIGNAL_SIZE 2
 #endif
-
-//****************************************************************************
-//! helper macro to calculate static dimension of a 1-dim array @p array_
-#define Q_DIM(array_) (sizeof(array_) / sizeof((array_)[0]))
 
 //****************************************************************************
 // typedefs for basic numerical types; MISRA-C++ 2008 rule 3-9-2(req).

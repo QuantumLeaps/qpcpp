@@ -48,7 +48,7 @@
 #-----------------------------------------------------------------------------
 # project name, binary output directory
 #
-PROJECT := test_evt_par
+PROJECT := test_defer
 TARGET  := ek-tm4c123gxl
 
 #-----------------------------------------------------------------------------
@@ -102,8 +102,8 @@ C_SRCS := \
 
 # C++ source files
 CPP_SRCS := \
-	test_evt_par.cpp \
-	my_ao.cpp
+	test_defer.cpp \
+	defer.cpp
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := ../$(TARGET)/test.ld

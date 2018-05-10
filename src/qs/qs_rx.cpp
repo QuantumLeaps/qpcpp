@@ -936,9 +936,9 @@ static void rxHandleGoodFrame_(uint8_t state) {
                 rxReportAck_(
                     static_cast<enum QSpyRxRecords>(l_rx.var.obj.recId));
             }
-
+            // both SM and AO
             else if (l_rx.var.obj.kind
-                     == static_cast<uint8_t>(QS::SM_AO_OBJ)) // both SM and AO
+                     == static_cast<uint8_t>(QS::SM_AO_OBJ))
             {
                 if (l_rx.var.obj.recId
                     == static_cast<uint8_t>(QS_RX_LOC_FILTER))

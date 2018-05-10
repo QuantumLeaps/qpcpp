@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.3.0
-/// Last updated on  2018-04-30
+/// Last updated on  2018-05-10
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -430,8 +430,11 @@ public:
         EQ_OBJ,       //!< raw queue object
         TE_OBJ,       //!< time event object
         AP_OBJ,       //!< generic Application-specific object
-        SM_AO_OBJ,    //!< state machine or active object
         MAX_OBJ
+    };
+
+    enum OSpyObjCombnation {
+        SM_AO_OBJ = MAX_OBJ //!< combination of SM and AO
     };
 
     //! template for forcing cast of member functions for function
