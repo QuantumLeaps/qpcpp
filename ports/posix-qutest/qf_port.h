@@ -2,8 +2,8 @@
 /// @brief QF/C++ port for QUTEST Unit Test, POSIX
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-15
+/// Last updated for version 6.3.1
+/// Last updated on  2018-05-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -50,8 +50,8 @@
 #define QF_MAX_TICK_RATE     2
 
 // QF interrupt disable/enable
-#define QF_INT_DISABLE()     (++QF_intNest)
-#define QF_INT_ENABLE()      (--QF_intNest)
+#define QF_INT_DISABLE()     (++QP::QF_intNest)
+#define QF_INT_ENABLE()      (--QP::QF_intNest)
 
 // QF critical section
 // QF_CRIT_STAT_TYPE not defined

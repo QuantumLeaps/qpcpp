@@ -1,13 +1,13 @@
 //****************************************************************************
 // Purpose: Fixture for QUTEST
-// Last Updated for Version: 6.2.0
-// Date of the Last Update:  2018-03-17
+// Last Updated for Version: 6.3.1
+// Date of the Last Update:  2018-05-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -42,11 +42,10 @@ int main(int argc, char *argv[]) {
     static QF_MPOOL_EL(RequestEvt) smlPoolSto[10]; // storage for small pool
     static QEvt const *tserverQSto[10]; // event queue storage for TServer
 
-    (void)argc;  // unused parameter
-    (void)argv;  // unused parameter
+    QF::init(); // initialize the framework
 
-    QF::init(); // initialize the framework and the underlying RTOS/OS
-    Q_ALLEGE(QS_INIT((void *)0)); // initialize the QS software tracing
+    // initialize the QS software tracing
+    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : (void *)0));
 
     // dictionaries...
     QS_OBJ_DICTIONARY(smlPoolSto);
@@ -82,7 +81,6 @@ void QS::onCommand(uint8_t cmdId,
     (void)param2;
     (void)param3;
 
-    //printf("<TARGET> Command id=%d param=%d\n", (int)cmdId, (int)param);
     switch (cmdId) {
        case 0U: {
            break;

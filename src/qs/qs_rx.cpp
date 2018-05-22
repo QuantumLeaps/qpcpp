@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.0
-/// Last updated on  2018-04-30
+/// Last updated for version 6.3.1
+/// Last updated on  2018-05-22
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -1009,7 +1009,7 @@ static void rxHandleGoodFrame_(uint8_t state) {
                     // when the event is just retreived from a queue.
                     // This is expected for the following QF::gc() call.
                     //
-                    ++l_rx.var.evt.e->refCtr_;
+                    QF_EVT_REF_CTR_INC_(l_rx.var.evt.e);
 
                     static_cast<QHsm *>(QS::rxPriv_.currObj[QS::SM_OBJ])
                             ->dispatch(l_rx.var.evt.e);
@@ -1027,7 +1027,7 @@ static void rxHandleGoodFrame_(uint8_t state) {
                     // when the event is just retreived from a queue.
                     // This is expected for the following QF::gc() call.
                     //
-                    ++l_rx.var.evt.e->refCtr_;
+                    QF_EVT_REF_CTR_INC_(l_rx.var.evt.e);
 
                     static_cast<QHsm *>(QS::rxPriv_.currObj[QS::SM_OBJ])
                             ->init(l_rx.var.evt.e);

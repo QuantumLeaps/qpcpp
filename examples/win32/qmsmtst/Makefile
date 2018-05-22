@@ -1,7 +1,7 @@
 ##############################################################################
-# Product: Makefile for QP/C++, QMsmTst console, Win32, MinGW
-# Last updated for version 6.3.0
-# Last updated on  2018-05-07
+# Product: Makefile for QP/C++, QHsmTst console, Win32, MinGW
+# Last Updated for Version: 6.3.0
+# Date of the Last Update:  2018-05-07
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -87,7 +87,7 @@ RCINCLUDES = \
 C_SRCS :=
 
 # C++ source files...
-CPP_SRCS :=	 \
+CPP_SRCS := \
 	main.cpp \
 	qmsmtst.cpp
 
@@ -139,11 +139,6 @@ CPPFLAGS = -ffunction-sections -fdata-sections \
 	-Os -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
-
-# make sure that QTOOLS exists...
-ifeq ("$(wildcard $(QTOOLS))","")
-$(error QTOOLS not found. Please install Qtools and define QTOOLS env. variable)
-endif
 
 BIN_DIR := spy
 

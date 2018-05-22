@@ -1,7 +1,7 @@
 /** @page metrics Code Metrics 
 
 @code 
-                   Standard Code Metrics for QP/C++ 6.3.0 
+                   Standard Code Metrics for QP/C++ 6.3.1 
 
            Resource Standard Metrics (TM) for C, C++, C# and Java
                    Version 7.75 - mSquaredTechnologies.com
@@ -9,7 +9,7 @@
   License Type: Windows Single User License
   Licensed To : Quantum Leaps, LLC
   License No. : WS2975                          License Date: Dec 15, 2013
-  Build Date  : Sep  2 2009                         Run Date: May 08, 2018
+  Build Date  : Sep  2 2009                         Run Date: May 22, 2018
   (C)1996-2009 M Squared Technologies LLC
   ________________________________________________________________________
 
@@ -21,7 +21,7 @@
 
                           ~~ Total File Summary ~~
 
-  LOC 53       eLOC 52       lLOC 5        Comment 257      Lines      335
+  LOC 54       eLOC 53       lLOC 5        Comment 258      Lines      338
   ________________________________________________________________________
   End of File: ..\include\qassert.h
 
@@ -154,7 +154,7 @@
 
                           ~~ Total File Summary ~~
 
-  LOC 260      eLOC 228      lLOC 130      Comment 317      Lines      668
+  LOC 259      eLOC 227      lLOC 130      Comment 315      Lines      664
   ------------------------------------------------------------------------
 
                         ~~ File Functional Summary ~~
@@ -554,7 +554,7 @@
 
 
     NOTICE: The end of the source file has been reached where the
-            open brace count { 31 != 29 } close brace count 
+            open brace count { 32 != 30 } close brace count 
             This is an indication of non-compilable code within the source
             file.  RSM processes all source code including code wrapped
             with preprocessor directives.  Accurate metrics requires that
@@ -563,7 +563,7 @@
 
                           ~~ Total File Summary ~~
 
-  LOC 529      eLOC 512      lLOC 126      Comment 615      Lines     1159
+  LOC 531      eLOC 513      lLOC 127      Comment 615      Lines     1162
   ------------------------------------------------------------------------
 
                         ~~ File Functional Summary ~~
@@ -788,7 +788,7 @@
 
                           ~~ Total File Summary ~~
 
-  LOC 28       eLOC 25       lLOC 10       Comment 59       Lines       98
+  LOC 31       eLOC 28       lLOC 10       Comment 60       Lines      103
   ________________________________________________________________________
   End of File: ..\src\qs_pkg.h
 
@@ -2271,9 +2271,9 @@
 
                          ~~ Total Project Summary ~~
 
-  LOC 4981     eLOC 4406     lLOC 1948     Comment 6603     Lines    11910
+  LOC 4986     eLOC 4410     lLOC 1949     Comment 6603     Lines    11917
   Average per File, metric/35 files
-  LOC 142      eLOC 125      lLOC 55       Comment 188      Lines      340
+  LOC 142      eLOC 126      lLOC 55       Comment 188      Lines      340
 
   ------------------------------------------------------------------------
 

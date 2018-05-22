@@ -1,7 +1,7 @@
 //****************************************************************************
 // Purpose: Fixture for QUTEST
-// Last updated for version 6.3.0
-// Last updated on  2018-05-10
+// Last updated for version 6.3.1
+// Last updated on  2018-05-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -45,17 +45,19 @@ enum {
 };
 
 //----------------------------------------------------------------------------
-int main() {
+int main(int argc, char *argv[]) {
     static QF_MPOOL_EL(QEvt) smlPoolSto[10]; // small pool
 
     QF::init(); // initialize the framework and the underlying RT kernel
 
+    // initialize the QS software tracing
+    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : (void *)0));
+
     // initialize event pools...
     QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
-    Q_ALLEGE(QS_INIT((void *)0)); // initialize the QS software tracing
-
     // dictionaries...
+    QS_FUN_DICTIONARY(&QHsm::top);
     QS_OBJ_DICTIONARY(the_hsm);
     QS_USR_DICTIONARY(BSP_DISPLAY);
 

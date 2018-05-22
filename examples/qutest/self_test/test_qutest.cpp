@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-12
+/// Last Updated for Version: 6.3.1
+/// Date of the Last Update:  2018-05-21
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
 ///                    innovating embedded systems
 ///
-/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -56,7 +56,9 @@ enum {
 
 //----------------------------------------------------------------------------
 int main(int argc, char *argv[]) {
-    QF::init();  // initialize the framework and the underlying RT kernel
+    QF::init();  // initialize the framework
+
+    // initialize the QS software tracing
     Q_ALLEGE(QS_INIT(argc <= 1 ? (void *)0 : argv[1]));
 
     // global filter
@@ -69,6 +71,7 @@ int main(int argc, char *argv[]) {
     QS_USR_DICTIONARY(ON_TEST_SETUP);
     QS_USR_DICTIONARY(ON_TEST_TEARDOWN);
     QS_USR_DICTIONARY(COMMAND_X);
+    QS_USR_DICTIONARY(MY_RECORD);
 
     return QF::run(); // run the tests
 }

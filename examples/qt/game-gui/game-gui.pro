@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: Game-GUI exampe for Qt5
-# Last Updated for Version: QP/C++ 6.2.0/Qt 5.x
-# Date of the Last Update:  2018-03-21
+# Last Updated for Version: QP/C++ 6.3.1/Qt 5.x
+# Date of the Last Update:  2018-05-22
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -42,7 +42,7 @@ QPCPP = ../../..
 
 INCLUDEPATH = . \
     $$QPCPP/include \
-    $$QPCPP/ports/qt \
+    $$QPCPP/ports/qt
 
 SOURCES += \
     main.cpp \
@@ -54,7 +54,7 @@ SOURCES += \
     tunnel.cpp \
     ship.cpp
 
-HEADERS  += \
+HEADERS += \
     game.h \
     bsp.h \
     gui.h
@@ -99,7 +99,8 @@ SOURCES += \
     $$QPCPP/src/qf/qf_qact.cpp \
     $$QPCPP/src/qf/qf_qeq.cpp \
     $$QPCPP/src/qf/qf_qmact.cpp \
-    $$QPCPP/src/qf/qf_time.cpp
+    $$QPCPP/src/qf/qf_time.cpp \
+    $$QPCPP/include/qstamp.cpp
 
 INCLUDEPATH += $$QPCPP/src
 
@@ -115,7 +116,6 @@ CONFIG(debug, debug|release) {
     # QS software tracing sources
 #    SOURCES += \
 #        $$QPCPP/src/qs/qs.cpp \
-#        $$QPCPP/src/qs/qs_rx.cpp \
 #        $$QPCPP/src/qs/qs_fp.cpp \
 #        $$QPCPP/src/qs/qs_64bit.cpp
 
@@ -125,7 +125,7 @@ CONFIG(debug, debug|release) {
     # The "qspy.c" component is needed only when you perform the formatted
     # output directly in the Target. The following declarations assume that
     # the Qtools collection is installed and that the QTOOLS environment
-    # variable is set to point to this Qtools installation directory.
+    # variable is set to point to this QTools installation directory.
 
 #    INCLUDEPATH += $(QTOOLS)/qspy/include
 #    SOURCES += $(QTOOLS)/qspy/source/qspy.c

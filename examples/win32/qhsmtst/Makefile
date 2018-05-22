@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++, QHsmTst console, Win32, MinGW
-# Last updated for version 5.6.4
-# Last updated on  2016-05-04
+# Last Updated for Version: 6.3.0
+# Date of the Last Update:  2018-05-07
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,7 +28,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
@@ -139,15 +139,6 @@ CPPFLAGS = -ffunction-sections -fdata-sections \
 	-Os -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
-
-# make sure that QTOOLS exists...
-ifeq ("$(wildcard $(QTOOLS))","")
-$(error QTOOLS not found. Please install Qtools and define QTOOLS env. variable)
-endif
-
-INCLUDES +=	-I$(QTOOLS)/qspy/include
-VPATH    += $(QTOOLS)/qspy/source
-C_SRCS   += qspy.c
 
 BIN_DIR := spy
 

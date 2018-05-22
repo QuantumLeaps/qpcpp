@@ -44,21 +44,21 @@ proc on_reset {} {
 # tests...
 test "PAUSE->Table"
 dispatch PAUSE_SIG
-expect "%timestamp Disp===> Obj=l_table,Sig=PAUSE_SIG,State=Table::serving"
-expect "===RTC===> St-Entry Obj=l_table,State=Table::paused"
-expect "%timestamp ===>Tran Obj=l_table,Sig=PAUSE_SIG,State=Table::serving->Table::paused"
+expect "%timestamp Disp===> Obj=l_table,Sig=PAUSE_SIG,State=serving"
+expect "===RTC===> St-Entry Obj=l_table,State=paused"
+expect "%timestamp ===>Tran Obj=l_table,Sig=PAUSE_SIG,State=serving->paused"
 expect "%timestamp Trg-Done QS_RX_EVENT"
 
 test "SERVE->Table (1)"
 command 1
-expect "%timestamp Disp===> Obj=l_table,Sig=SERVE_SIG,State=Table::serving"
-expect "%timestamp =>Ignore Obj=l_table,Sig=SERVE_SIG,State=Table::serving"
+expect "%timestamp Disp===> Obj=l_table,Sig=SERVE_SIG,State=serving"
+expect "%timestamp =>Ignore Obj=l_table,Sig=SERVE_SIG,State=serving"
 expect "%timestamp Trg-Done QS_RX_COMMAND"
 
 test "SERVE->Table (2)" -noreset
 probe BSP::displayPaused 1
 dispatch PAUSE_SIG
-expect "%timestamp Disp===> Obj=l_table,Sig=PAUSE_SIG,State=Table::serving"
+expect "%timestamp Disp===> Obj=l_table,Sig=PAUSE_SIG,State=serving"
 expect "%timestamp TstProbe Fun=BSP::displayPaused,Data=1"
 expect "%timestamp =ASSERT= Mod=bsp,Loc=100"
 

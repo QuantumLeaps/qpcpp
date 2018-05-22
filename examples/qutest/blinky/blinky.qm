@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="4.2.1" links="0">
+ <documentation>Simple Blinky example for QP/C++, which demonstrates:
+- Active object (Blinky) with state machine
+- Board Support Package abstraction for portability
+- BSP implementation for desktop OS (Windows, Linux, Mac)
+- Platform-independent main() function
+- make.bat batch file for Windows</documentation>
+ <framework name="qpcpp"/>
+ <package name="AOs" stereotype="0x02">
+  <class name="Blinky" superclass="qpcpp::QActive">
+   <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
+   <operation name="Blinky" type="" visibility="0x00" properties="0x00">
+    <documentation>Blinky constructor</documentation>
+    <code>  : QActive(Q_STATE_CAST(&amp;Blinky::initial)),
+    m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
+   </operation>
+   <statechart properties="QS_FUN_DICT">
+    <initial target="../1">
+     <action>QS_OBJ_DICTIONARY(&amp;l_blinky);
+QS_OBJ_DICTIONARY(&amp;l_blinky.m_timeEvt);
+
+// arm the private time event to expire in 1/2s
+// and periodically every 1/2 second
+me-&gt;m_timeEvt.armX(BSP::TICKS_PER_SEC/2,
+                   BSP::TICKS_PER_SEC/2);</action>
+     <initial_glyph conn="2,3,5,1,20,4,-4">
+      <action box="0,-2,6,2"/>
+     </initial_glyph>
+    </initial>
+    <state name="off">
+     <entry>BSP::ledOff();</entry>
+     <tran trig="TIMEOUT" target="../../2">
+      <tran_glyph conn="2,13,3,1,18,6,-2">
+       <action box="0,-2,8,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,5,16,10">
+      <entry box="1,2,12,4"/>
+     </state_glyph>
+    </state>
+    <state name="on">
+     <entry>BSP::ledOn();</entry>
+     <tran trig="TIMEOUT" target="../../1">
+      <tran_glyph conn="2,25,3,1,20,-15,-4">
+       <action box="0,-2,8,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,17,16,10">
+      <entry box="1,2,12,4"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="30,29"/>
+   </statechart>
+  </class>
+ </package>
+ <directory name=".">
+  <file name="blinky.h">
+   <text>#ifndef blinky_h
+#define blinky_h
+
+enum BlinkySignals {
+    DUMMY_SIG = QP::Q_USER_SIG,
+    MAX_PUB_SIG,          // the last published signal
+
+    TIMEOUT_SIG,
+    MAX_SIG               // the last signal
+};
+
+extern QP::QActive * const AO_Blinky; // opaque pointer
+
+#endif // blinky</text>
+  </file>
+  <file name="blinky.cpp">
+   <text>#include &quot;qpcpp.h&quot;  // QP/C++ framework API
+#include &quot;blinky.h&quot; // Blinky application
+#include &quot;bsp.h&quot;    // Board Support Package interface
+
+//using namespace QP;
+
+// ask QM to declare the Blinky class ----------------------------------------
+$declare${AOs::Blinky}
+
+// instantiate the Blinky active object --------------------------------------
+static Blinky l_blinky;
+QP::QActive * const AO_Blinky = &amp;l_blinky;
+
+// ask QM to define the Blinky class (including the state machine) -----------
+$define${AOs::Blinky}</text>
+  </file>
+ </directory>
+</model>

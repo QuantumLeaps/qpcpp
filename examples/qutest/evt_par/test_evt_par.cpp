@@ -1,7 +1,7 @@
 //****************************************************************************
 // Purpose: Fixture for QUTEST
-// Last Updated for Version: 6.2.0
-// Date of the Last Update:  2018-03-17
+// Last Updated for Version: 6.3.1
+// Date of the Last Update:  2018-05-21
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -42,11 +42,10 @@ int main(int argc, char *argv[]) {
     static QF_MPOOL_EL(MyEvt3) smlPoolSto[10];
     static QEvt const *myAoQueueSto[10];
 
-    (void)argc;  // unused parameter
-    (void)argv;  // unused parameter
-
     QF::init();   // initialize the framework and the underlying RT kernel
-    Q_ALLEGE(QS_INIT((void *)0)); // initialize QS tracing system
+
+    // initialize the QS software tracing
+    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : (void *)0));
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(smlPoolSto);

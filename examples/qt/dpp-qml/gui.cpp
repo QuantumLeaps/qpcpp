@@ -1,0 +1,101 @@
+//****************************************************************************
+// Product: QP/C++ GUI example for Qt5
+// Last Updated for Version: QP/C++ 6.3.0/Qt 5.x
+// Last updated on  2018-05-16
+//
+//                    Q u a n t u m     L e a P s
+//                    ---------------------------
+//                    innovating embedded systems
+//
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+//
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Alternatively, this program may be distributed and modified under the
+// terms of Quantum Leaps commercial licenses, which expressly supersede
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Contact information:
+// https://state-machine.com
+// mailto:info@state-machine.com
+//****************************************************************************
+#include "gui.h"
+//-----------------
+#include "qpcpp.h"
+#include "dpp.h"
+#include "bsp.h"
+
+Q_DEFINE_THIS_FILE
+
+//............................................................................
+static Gui *l_instance;
+
+
+//............................................................................
+Gui::Gui(QObject *parent)
+    : QObject(parent)
+{
+    l_instance = this; // initialize the instance (Singleton)
+    engine.rootContext()->setContextProperty("gui", (QObject*)l_instance);
+
+    for(int i=0; i < N_PHILO; ++i)
+	m_State.append("res/thinking.png");
+
+    BSP_randomSeed(123U);
+}
+//............................................................................
+Gui *Gui::instance() {
+    return l_instance;
+}
+//............................................................................
+void Gui::show() {
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+}
+//............................................................................
+QList<QString> Gui::State() const {
+    return m_State;
+}
+//............................................................................
+void Gui::setState(const QList<QString> &state) {
+    m_State = state;
+    emit stateChanged();
+}
+//............................................................................
+QString Gui::Button() const {
+    return m_Button;
+}
+//............................................................................
+void Gui::setButton(const QString& button) {
+    m_Button = button;
+    emit buttonChanged();
+}
+//............................................................................
+void Gui::onPausePressed() { // slot
+    static QP::QEvt const e(DPP::PAUSE_SIG);
+    QP::QF::PUBLISH(&e, (void *)0);
+    qDebug("onPausePressed");
+}
+//............................................................................
+void Gui::onPauseReleased() { // slot
+    static QP::QEvt const e(DPP::SERVE_SIG);
+    QP::QF::PUBLISH(&e, (void *)0);
+    qDebug("onPauseReleased");
+}
+//............................................................................
+void Gui::onQuit() { // slot
+    static QP::QEvt const e(DPP::TERMINATE_SIG);
+    QP::QF::PUBLISH(&e, (void *)0);
+    qDebug("onQuit");
+}
