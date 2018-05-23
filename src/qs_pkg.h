@@ -95,9 +95,4 @@ void QS_target_info_(uint8_t const isReset);
 
 } // namespace QP
 
-// is it QP implementation and is the QF component used?
-#if (defined QP_IMPL) && (defined qf_port_h)
-#include "qf_pkg.h"
-#endif
-
 #endif // qs_pkg_h
