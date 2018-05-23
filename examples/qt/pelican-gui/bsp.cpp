@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: BSP for PELICAN crossing example for Qt5
-// Last Updated for Version: QP/C++ 5.5.0/Qt 5.x
-// Last updated on  2015-09-25
+// Last Updated for Version: QP/C++ 6.3.1/Qt 5.x
+// Last updated on  2018-05-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include <QtWidgets>
@@ -209,5 +209,4 @@ void QSPY_onPrintLn(void) {
 }
 
 #endif // Q_SPY
-
 

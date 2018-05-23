@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: BSP for DPP-GUI example with Qt5
-// Last Updated for Version: QP/C++ 5.9.0/Qt 5.x
-// Last updated on  2017-05-09
+// Last Updated for Version: QP/C++ 6.3.1/Qt 5.x
+// Last updated on  2018-05-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include <QtWidgets>
@@ -208,23 +208,6 @@ void QP::QS::onFlush(void) {
 QP::QSTimeCtr QP::QS::onGetTime(void) {
     return static_cast<QSTimeCtr>(l_time.elapsed());
 }
-//............................................................................
-//! callback function to reset the target (to be implemented in the BSP)
-void QP::QS::onReset(void) {
-    //TBD
-}
-//............................................................................
-//! callback function to execute a uesr command (to be implemented in BSP)
-void QS::onCommand(uint8_t cmdId, uint32_t param1,
-                   uint32_t param2, uint32_t param3)
-{
-    (void)cmdId;
-    (void)param1;
-    (void)param2;
-    (void)param3;
-    //TBD
-}
-
 //............................................................................
 void QP::QS_onEvent(void) {
     uint16_t nBytes = 1024;

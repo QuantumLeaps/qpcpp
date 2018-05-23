@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QP/C++ GUI example for Qt5
-// Last Updated for Version: QP/C++ 6.3.0/Qt 5.x
-// Last updated on  2018-05-16
+// Last Updated for Version: QP/C++ 6.3.1/Qt 5.x
+// Last updated on  2018-05-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -45,13 +45,14 @@ static Gui *l_instance;
 
 //............................................................................
 Gui::Gui(QObject *parent)
-    : QObject(parent)
+  : QObject(parent)
 {
     l_instance = this; // initialize the instance (Singleton)
     engine.rootContext()->setContextProperty("gui", (QObject*)l_instance);
 
-    for(int i=0; i < N_PHILO; ++i)
-	m_State.append("res/thinking.png");
+    for (int i = 0; i < N_PHILO; ++i) {
+        m_State.append("res/thinking.png");
+    }
 
     BSP_randomSeed(123U);
 }
