@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, QUTEST
-// Last Updated for Version: 6.2.0
-// Date of the Last Update:  2018-03-19
+// Last Updated for Version: 6.3.1
+// Date of the Last Update:  2018-05-24
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -42,19 +42,22 @@ namespace DPP {
 
 static uint32_t l_rnd; // random seed
 
+enum {
+    BSP_CALL = QP::QS_USER,
+};
+
 // BSP functions =============================================================
 void BSP::init(int argc, char **argv) {
-    BSP::randomSeed(1234U);
-
     Q_ALLEGE(QS_INIT(argc <= 1 ? (void *)0 : argv[1]));
 
     QS_FUN_DICTIONARY(&BSP::displayPaused);
+    QS_FUN_DICTIONARY(&BSP::displayPhilStat);
     QS_FUN_DICTIONARY(&BSP::random);
-}
-//............................................................................
-void BSP::displayPhilStat(uint8_t n, char const *stat) {
-    (void)n;
-    (void)stat;
+    QS_FUN_DICTIONARY(&BSP::randomSeed);
+
+    QS_USR_DICTIONARY(BSP_CALL);
+
+    BSP::randomSeed(1234U);
 }
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
@@ -63,25 +66,45 @@ void BSP::displayPaused(uint8_t paused) {
     QS_TEST_PROBE(
         Q_ASSERT_ID(100, 0);
     )
-    (void)paused;
+    QS_BEGIN(BSP_CALL, 0) // application-specific record
+        QS_FUN(&BSP::displayPaused);
+        QS_U8(0, paused);
+    QS_END()
 }
 //............................................................................
-uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
-    // Some flating point code is to exercise the VFP...
-    float volatile x = 3.1415926F;
-    x = x + 2.7182818F;
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
+    QS_BEGIN(BSP_CALL, 0) // application-specific record
+        QS_FUN(&BSP::displayPhilStat);
+        QS_U8(0, n);
+        QS_STR(stat);
+    QS_END()
+}
+//............................................................................
+uint32_t BSP::random(void) {
+    QS_TEST_PROBE_DEF(&BSP::random)
+    uint32_t rnd = 123U;
 
-    // "Super-Duper" Linear Congruential Generator (LCG)
-    // LCG(2^32, 3*7*11*13*23, 0, seed)
-    //
-    uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
-    l_rnd = rnd; // set for the next time
-
-    return (rnd >> 8);
+    QS_TEST_PROBE(
+        rnd = qs_tp_;
+    )
+    QS_BEGIN(BSP_CALL, 0) // application-specific record
+        QS_FUN(&BSP::random);
+        QS_U32(0, rnd);
+    QS_END()
+    return rnd;
 }
 //............................................................................
 void BSP::randomSeed(uint32_t seed) {
+    QS_TEST_PROBE_DEF(&BSP::randomSeed)
+
+    QS_TEST_PROBE(
+        seed = qs_tp_;
+    )
     l_rnd = seed;
+    QS_BEGIN(BSP_CALL, 0) // application-specific record
+        QS_FUN(&BSP::randomSeed);
+        QS_U32(0, seed);
+    QS_END()
 }
 
 //............................................................................

@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.3.1
-/// Last updated on  2018-05-22
+/// Last updated on  2018-05-24
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -911,7 +911,7 @@ static void rxHandleGoodFrame_(uint8_t state) {
             l_rx.var.gFlt.data[7] |= static_cast<uint8_t>(0xFC);
             l_rx.var.gFlt.data[8] |= static_cast<uint8_t>(0x3F);
 
-            // never disable the last 3 records on (0x7D, 0x7E, 0x7F)
+            // never enable the last 3 records (0x7D, 0x7E, 0x7F)
             l_rx.var.gFlt.data[15] &= static_cast<uint8_t>(0xE0);
 
             for (i = static_cast<uint8_t>(0);
