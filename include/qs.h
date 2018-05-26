@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.0
-/// Last updated on  2018-05-10
+/// Last updated for version 6.3.1
+/// Last updated on  2018-05-24
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -948,32 +948,65 @@ enum QSpyRxRecords {
 
 
 #if (QS_OBJ_PTR_SIZE == 1)
-    #define QS_OBJ(obj_)        (QP::QS::u8(QP::QS::OBJ_T, (uint8_t)(obj_)))
+    #define QS_OBJ(obj_) \
+        (QP::QS::u8(QP::QS::OBJ_T, reinterpret_cast<uint8_t>(obj_)))
 #elif (QS_OBJ_PTR_SIZE == 2)
-    #define QS_OBJ(obj_)        (QP::QS::u16(QP::QS::OBJ_T, (uint16_t)(obj_)))
+    #define QS_OBJ(obj_) \
+        (QP::QS::u16(QP::QS::OBJ_T, reinterpret_cast<uint16_t>(obj_)))
 #elif (QS_OBJ_PTR_SIZE == 4)
-    #define QS_OBJ(obj_)        (QP::QS::u32(QP::QS::OBJ_T, (uint32_t)(obj_)))
+    #define QS_OBJ(obj_) \
+        (QP::QS::u32(QP::QS::OBJ_T, reinterpret_cast<uint32_t>(obj_)))
 #elif (QS_OBJ_PTR_SIZE == 8)
-    #define QS_OBJ(obj_)        (QP::QS::u64(QP::QS::OBJ_T, (uint64_t)(obj_)))
+    #define QS_OBJ(obj_) \
+        (QP::QS::u64(QP::QS::OBJ_T, reinterpret_cast<uint64_t>(obj_)))
 #else
     //! Output formatted object pointer to the QS record
-    #define QS_OBJ(obj_)        (QP::QS::u32(QP::QS::OBJ_T, (uint32_t)(obj_)))
+    #define QS_OBJ(obj_) \
+        (QP::QS::u32(QP::QS::OBJ_T, reinterpret_cast<uint32_t>(obj_)))
 #endif
 
 
 #if (QS_FUN_PTR_SIZE == 1)
-    #define QS_FUN(fun_)        (QP::QS::u8(QP::QS::FUN_T, (uint8_t)(fun_)))
+    #define QS_FUN(fun_) \
+        (QP::QS::u8(QP::QS::FUN_T, reinterpret_cast<uint8_t>(fun_)))
 #elif (QS_FUN_PTR_SIZE == 2)
-    #define QS_FUN(fun_)        (QP::QS::u16(QP::QS::FUN_T, (uint16_t)(fun_)))
+    #define QS_FUN(fun_) \
+        (QP::QS::u16(QP::QS::FUN_T, reinterpret_cast<uint16_t>(fun_)))
 #elif (QS_FUN_PTR_SIZE == 4)
-    #define QS_FUN(fun_)        (QP::QS::u32(QP::QS::FUN_T, (uint32_t)(fun_)))
+    #define QS_FUN(fun_) \
+        (QP::QS::u32(QP::QS::FUN_T, reinterpret_cast<uint32_t>(fun_)))
 #elif (QS_FUN_PTR_SIZE == 8)
-    #define QS_FUN(fun_)        (QP::QS::u64(QP::QS::FUN_T, (uint64_t)(fun_)))
+    #define QS_FUN(fun_) \
+        (QP::QS::u64(QP::QS::FUN_T, reinterpret_cast<uint64_t>(fun_)))
 #else
     //! Output formatted function pointer to the QS record
-    #define QS_FUN(fun_)        (QP::QS::u32(QP::QS::FUN_T, (uint32_t)(fun_)))
+    #define QS_FUN(fun_) \
+        (QP::QS::u32(QP::QS::FUN_T, reinterpret_cast<uint32_t>(fun_)))
 #endif
 
+
+#if (Q_SIGNAL_SIZE == 1)
+    #define QS_SIG(sig_, obj_) \
+        QP::QS::u8(QP::QS::SIG_T, static_cast<uint8_t>(sig_)); \
+        QS_OBJ_(obj_)
+#elif (Q_SIGNAL_SIZE == 2)
+    #define QS_SIG(sig_, obj_) \
+        QP::QS::u16(QP::QS::SIG_T, static_cast<uint16_t>(sig_)); \
+        QS_OBJ_(obj_)
+#elif (Q_SIGNAL_SIZE == 4)
+    #define QS_SIG(sig_, obj_) \
+        QP::QS::u32(QP::QS::SIG_T, static_cast<uint32_t>(sig_)); \
+        QS_OBJ_(obj_)
+#else
+    //! Output formatted event signal (of type ::QSignal) and
+    //! the state machine object to the user QS record
+    #define QS_SIG(sig_, obj_) \
+        QP::QS::u16(QP::QS::SIG_T, static_cast<uint16_t>(sig_)); \
+        QS_OBJ_(obj_)
+#endif
+
+
+//////////////////////////////////////////////////////////////////////////////
 
 //! Output signal dictionary record
 ///

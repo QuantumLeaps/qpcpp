@@ -5,6 +5,8 @@ namespace QP {
 @section qpcpp_6_3_1 Version 6.3.1, 2018-05-24
 This release migrates the [QUTest](https://www.state-machine.com/qtools/qutest.html) examples to [QM 4.2.1](https://www.state-machine.com/qm/history.html#qm_4_2_1), which now can generate QS_FUN_DICTIONARY() records automatically. This release also adds a generic, simple blinky example for QUTest located in `examples/qutest/blinky`. Also, this release fixes the QF_INT_DISABLE() / QF_INT_ENABLE() macros in the QUTest ports to use the QP namespace. Without this fix, the code fails to compile when the directive "using namespace QP" is not used.
 
+Also, this release adds the missing QS macro QS_SIG() to produce symbolic signal output from [application specific QS records](https://www.state-machine.com/qtools/qs.html#qs_app).
+
 Finally, this release adjusts the code in qs_rx.cpp to use QF_EVT_REF_CTR_INC_() instead of accessing the event's reference counter directly. This direct access fails in case, when event constructors are configured (Q_EVT_CTOR is defined). In that case, the QP::QEvt class protects the reference counter, so it cannot be accessed directly. This option is currently used only in the QP/C++ port to Qt.
 
 
