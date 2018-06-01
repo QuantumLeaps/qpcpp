@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for DPP on EK-TM4C123GXL, uC/OS-II kernel, GNU-ARM
-# Last Updated for Version: 6.1.0
-# Date of the Last Update:  2018-02-07
+# Last Updated for Version: 6.3.1
+# Date of the Last Update:  2018-05-31
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -94,7 +94,7 @@ INCLUDES  = \
 #
 
 # assembler source files
-ASM_SRCS :=	\
+ASM_SRCS := \
 	os_cpu_a.s
 
 # C source files
@@ -125,7 +125,7 @@ QP_SRCS := \
 	qf_time.cpp \
 	qf_port.cpp
 
-RTOS_SRC = \
+RTOS_SRCS := \
 	os_core.c \
 	os_flag.c \
 	os_mbox.c \
@@ -147,7 +147,7 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DTARGET_IS_TM4C123_RB1
+DEFINES   := -DTARGET_IS_TM4C123_RB1 -D__FPU_PRESENT
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -159,6 +159,7 @@ ARM_CPU   := -mcpu=cortex-m4
 ARM_ARCH  := 7   # NOTE: must match the ARM_CPU!
 ARM_FPU   := -mfpu=vfp
 FLOAT_ABI := -mfloat-abi=softfp
+ASM_FPU   := -defsym=__FPU_PRESENT=1
 
 #-----------------------------------------------------------------------------
 # GNU-ARM toolset (NOTE: You need to adjust to your machine)
@@ -195,7 +196,7 @@ RM    := rm
 # combine all the soruces...
 VPATH    += $(QPCPP)/3rd_party/gnu_cpp
 CPP_SRCS += $(QP_SRCS) mini_cpp.cpp
-C_SRCS   += $(RTOS_SRC)
+C_SRCS   += $(RTOS_SRCS)
 
 ifeq (rel, $(CONF)) # Release configuration ..................................
 

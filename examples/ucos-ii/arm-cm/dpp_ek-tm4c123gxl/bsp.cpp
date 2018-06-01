@@ -206,6 +206,7 @@ void BSP::init(void) {
     }
     QS_OBJ_DICTIONARY(&l_tickHook);
     QS_OBJ_DICTIONARY(&l_GPIOPortA_IRQHandler);
+    QS_USR_DICTIONARY(PHILO_STAT);
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -250,7 +251,7 @@ void BSP::randomSeed(uint32_t seed) {
       INT8U err;
 
     l_rnd = seed;
-      l_rndMutex = OSMutexCreate(N_PHILO, &err);
+    l_rndMutex = OSMutexCreate(N_PHILO, &err);
 }
 //............................................................................
 void BSP::terminate(int16_t result) {
@@ -334,17 +335,8 @@ bool QS::onStartup(void const *arg) {
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
     // setup the QS filters...
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_ON(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_ON(QS_QEP_UNHANDLED);
-
-    QS_FILTER_ON(DPP::PHILO_STAT);
+    QS_FILTER_ON(QS_SM_RECORDS);
+    QS_FILTER_ON(QS_UA_RECORDS);
 
     return true; // return success
 }

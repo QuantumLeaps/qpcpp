@@ -68,6 +68,10 @@ int main() {
                      sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
     // start the active objects...
+    // CAUTION:
+    // Make sure to configure **SUFFICIENT** number of uC/OS-II tasks and
+    // message queues in "os_cfg.h" for all your active objects!!!
+    //
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         // NOTE: provide uC/OS-II task attributes for the AO's task
         DPP::AO_Philo[n]->setAttr(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK, 0);
@@ -90,3 +94,4 @@ int main() {
 
     return QP::QF::run(); // run the QF application
 }
+
