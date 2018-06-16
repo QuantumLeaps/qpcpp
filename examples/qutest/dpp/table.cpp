@@ -96,8 +96,6 @@ QP::QState Table::initial(Table * const me, QP::QEvt const * const e) {
     //${AOs::Table::SM::initial}
     (void)e; // suppress the compiler warning about unused parameter
 
-    QS_OBJ_DICTIONARY(&l_table);
-
     QS_SIG_DICTIONARY(DONE_SIG,  (void *)0); // global signals
     QS_SIG_DICTIONARY(EAT_SIG,   (void *)0);
     QS_SIG_DICTIONARY(PAUSE_SIG, (void *)0);

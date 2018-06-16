@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, POSIX-QV
-// Last Updated for Version: 6.2.0
-// Date of the Last Update:  2018-04-05
+// Last Updated for Version: 6.3.2
+// Date of the Last Update:  2018-06-16
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -127,7 +127,7 @@ void QF::onStartup(void) { // QS startup callback
     tio.c_lflag &= ~(ICANON | ECHO); // disable the canonical mode & echo
     tcsetattr(0, TCSANOW, &tio); // set the new attributes
 
-    QF_setTickRate(DPP::BSP::TICKS_PER_SEC); // set the desired tick rate
+    QF_setTickRate(DPP::BSP::TICKS_PER_SEC, 30); // desired tick rate/prio
 }
 //............................................................................
 void QF::onCleanup(void) {  // cleanup callback

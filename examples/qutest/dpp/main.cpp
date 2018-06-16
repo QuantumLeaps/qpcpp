@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example
-// Last updated for version 6.2.0
-// Last updated on  2018-03-19
+// Last Updated for Version: 6.3.2
+// Date of the Last Update:  2018-06-16
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,19 +35,29 @@
 #include "dpp.h"
 #include "bsp.h"
 
+using namespace DPP;
+
 //............................................................................
 int main(int argc, char *argv[]) {
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
-    static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
-    static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO];
+    static QP::QSubscrList subscrSto[MAX_PUB_SIG];
+    static QF_MPOOL_EL(TableEvt) smlPoolSto[2*N_PHILO];
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
 
-    DPP::BSP::init(argc, argv); // initialize the BSP
+    BSP::init(argc, argv); // initialize the BSP
 
     // object dictionaries...
+    QS_OBJ_DICTIONARY(AO_Table);
+    QS_OBJ_DICTIONARY(AO_Philo[0]);
+    QS_OBJ_DICTIONARY(AO_Philo[1]);
+    QS_OBJ_DICTIONARY(AO_Philo[2]);
+    QS_OBJ_DICTIONARY(AO_Philo[3]);
+    QS_OBJ_DICTIONARY(AO_Philo[4]);
     QS_OBJ_DICTIONARY(smlPoolSto);
+
+    // pause execution of the test and wait for the test script to continue
     QS_TEST_PAUSE();
 
     // initialize publish-subscribe...
@@ -59,12 +69,12 @@ int main(int argc, char *argv[]) {
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
+        AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
                            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
                            (void *)0, 0U);
     }
 
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 1U), // priority
+    AO_Table->start((uint_fast8_t)(N_PHILO + 1U), // priority
                     tableQueueSto, Q_DIM(tableQueueSto),
                     (void *)0, 0U);
 

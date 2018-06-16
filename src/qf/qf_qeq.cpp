@@ -2,8 +2,8 @@
 /// @brief QP::QEQueue implementation
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.2
+/// Last updated on  2018-06-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -170,7 +170,7 @@ bool QEQueue::post(QEvt const * const e, uint_fast16_t const margin) {
     else {
         /// @note assert if event cannot be posted and dropping events is
         /// not acceptable
-        Q_ASSERT_ID(210, margin != QF_NO_MARGIN);
+        Q_ASSERT_CRIT_(210, margin != QF_NO_MARGIN);
 
         QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_ATTEMPT,
                          QS::priv_.locFilter[QS::EQ_OBJ], this)
@@ -217,7 +217,7 @@ void QEQueue::postLIFO(QEvt const * const e) {
     QEQueueCtr nFree = m_nFree; // temporary to avoid UB for volatile access
 
     /// @pre the queue must be able to accept the event (cannot overflow)
-    Q_REQUIRE_ID(300, nFree != static_cast<QEQueueCtr>(0));
+    Q_REQUIRE_CRIT_(300, nFree != static_cast<QEQueueCtr>(0));
 
     // is it a dynamic event?
     if (e->poolId_ != static_cast<uint8_t>(0)) {
@@ -304,7 +304,7 @@ QEvt const *QEQueue::get(void) {
             m_frontEvt = static_cast<QEvt const *>(0); // queue becomes empty
 
             // all entries in the queue must be free (+1 for fronEvt)
-            Q_ASSERT_ID(410, nFree == (m_end + static_cast<QEQueueCtr>(1)));
+            Q_ASSERT_CRIT_(410, nFree == (m_end + static_cast<QEQueueCtr>(1)));
 
             QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_GET_LAST,
                              QS::priv_.locFilter[QS::EQ_OBJ],

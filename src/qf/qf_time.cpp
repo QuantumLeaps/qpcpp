@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.2
+/// Last updated on  2018-06-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -99,7 +99,7 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender)
             if (timeEvtHead_[tickRate].m_act != static_cast<void *>(0)) {
 
                 // sanity check
-                Q_ASSERT_ID(110, prev != static_cast<QTimeEvt *>(0));
+                Q_ASSERT_CRIT_(110, prev != static_cast<QTimeEvt *>(0));
                 prev->m_next = QF::timeEvtHead_[tickRate].toTimeEvt();
                 timeEvtHead_[tickRate].m_act = static_cast<void *>(0);
                 t = prev->m_next; // switch to the new list
@@ -199,9 +199,6 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender)
 /// This function should be called in critical section.
 ///
 bool QF::noTimeEvtsActiveX(uint_fast8_t const tickRate) {
-    /// @pre the tick rate must be in range
-    Q_REQUIRE_ID(200, tickRate < static_cast<uint_fast8_t>(QF_MAX_TICK_RATE));
-
     bool inactive;
     if (timeEvtHead_[tickRate].m_next == static_cast<QTimeEvt *>(0)) {
         inactive = false;

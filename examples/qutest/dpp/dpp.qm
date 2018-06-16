@@ -21,12 +21,6 @@
 if (!registered) {
     registered = true;
 
-    QS_OBJ_DICTIONARY(&amp;l_philo[0]);
-    QS_OBJ_DICTIONARY(&amp;l_philo[1]);
-    QS_OBJ_DICTIONARY(&amp;l_philo[2]);
-    QS_OBJ_DICTIONARY(&amp;l_philo[3]);
-    QS_OBJ_DICTIONARY(&amp;l_philo[4]);
-
     QS_OBJ_DICTIONARY(&amp;l_philo[0].m_timeEvt);
     QS_OBJ_DICTIONARY(&amp;l_philo[1].m_timeEvt);
     QS_OBJ_DICTIONARY(&amp;l_philo[2].m_timeEvt);
@@ -138,8 +132,6 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
    <statechart properties="QS_FUN_DICT">
     <initial target="../1/2">
      <action>(void)e; // suppress the compiler warning about unused parameter
-
-QS_OBJ_DICTIONARY(&amp;l_table);
 
 QS_SIG_DICTIONARY(DONE_SIG,  (void *)0); // global signals
 QS_SIG_DICTIONARY(EAT_SIG,   (void *)0);

@@ -3,8 +3,8 @@
 /// @cond
 ///===========================================================================
 /// Product: QP/C++
-/// Last Updated for Version: 6.1.1
-/// Date of the Last Update:  2018-02-17
+/// Last Updated for Version: 6.3.2
+/// Date of the Last Update:  2018-06-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -108,6 +108,9 @@ qpcpp.lnt         // QP/C++ options
  QF_EVT_REF_CTR_,
  QF_CRIT_ENTRY_,
  QF_CRIT_EXIT_,
+ Q_ASSERT_CRIT_,
+ Q_REQUIRE_CRIT_,
+ Q_ERROR_CRIT_,
  QF_SCHED_LOCK_,
  QF_SCHED_UNLOCK_,
  QF_PTR_AT_,
@@ -126,7 +129,10 @@ qpcpp.lnt         // QP/C++ options
  *QMActive::stop)
 -efunc(1762,                // 9-3-3 function could be made const
  *QMActive::stop)
--emacro(717, QACTIVE_EQUEUE_SIGNAL_) // do ... while(0);
+-emacro(717,                // do ... while(0);
+ Q_ASSERT_CRIT_,
+ Q_ERROR_CRIT_,
+ QACTIVE_EQUEUE_SIGNAL_)
 -efunc(529, *QF::tick)      // Symbol 'dummy' not accessed
 -efunc(438, *QF::tick)      // Value assigned to 'dummy' not used
 -esym(613,                  // warning Possible use of null pointer

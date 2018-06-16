@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-04-05
+/// Last updated for version 6.3.2
+/// Last updated on  2018-06-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -74,8 +74,8 @@
 
 namespace QP {
 
-// set clock tick rate
-void QF_setTickRate(uint32_t ticksPerSec);
+// set clock tick rate and p-thread priority
+void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio);
 
 // clock tick callback (provided in the app)
 void QF_onClockTick(void);

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX API with cooperative QV scheduler (posix-qv)
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-04-09
+/// Last updated for version 6.3.2
+/// Last updated on  2018-06-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -57,6 +57,7 @@ pthread_cond_t QV_condVar_; // Cond.var. to signal events
 // Local objects *************************************************************
 static bool l_isRunning;    // flag indicating when QF is running
 static struct timespec l_tick;
+static int_t l_tickPrio;
 enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 
 static void *ticker_thread(void *arg);
@@ -80,6 +81,7 @@ void QF::init(void) {
 
     l_tick.tv_sec = 0;
     l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC/100L; // default clock tick
+    l_tickPrio = sched_get_priority_min(SCHED_FIFO); // default tick prio
 }
 
 //****************************************************************************
@@ -87,9 +89,9 @@ int_t QF::run(void) {
 
     onStartup(); // application-specific startup callback
 
-    // try to maximize the priority of this thread, see NOTE01
+    // try to set the priority of the ticker thread
     struct sched_param sparam;
-    sparam.sched_priority = sched_get_priority_max(SCHED_FIFO);
+    sparam.sched_priority = l_tickPrio;
     if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &sparam) == 0) {
         // success, this application has sufficient privileges
     }
@@ -181,13 +183,14 @@ int_t QF::run(void) {
     return static_cast<int_t>(0);
 }
 //****************************************************************************
-void QF_setTickRate(uint32_t ticksPerSec) {
+void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
     if (ticksPerSec != static_cast<uint32_t>(0)) {
         l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
     }
     else {
         l_tick.tv_nsec = 0; /* means NO system clock tick */
     }
+    l_tickPrio = tickPrio;
 }
 //****************************************************************************
 void QF::stop(void) {

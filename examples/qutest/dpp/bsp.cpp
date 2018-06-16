@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, QUTEST
-// Last Updated for Version: 6.3.1
-// Date of the Last Update:  2018-05-24
+// Last Updated for Version: 6.3.2
+// Date of the Last Update:  2018-06-16
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -54,6 +54,7 @@ void BSP::init(int argc, char **argv) {
     QS_FUN_DICTIONARY(&BSP::displayPhilStat);
     QS_FUN_DICTIONARY(&BSP::random);
     QS_FUN_DICTIONARY(&BSP::randomSeed);
+    QS_FUN_DICTIONARY(&QP::QHsm::top);
 
     QS_USR_DICTIONARY(BSP_CALL);
 

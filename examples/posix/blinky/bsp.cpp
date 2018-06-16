@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Simple Blinky example, POSIX
-// Last updated for version 5.6.0
-// Last updated on  2015-12-26
+// Last updated for version 6.3.2
+// Last updated on  2018-06-16
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -77,7 +77,7 @@ void QF::onStartup(void) {
     tio.c_lflag &= ~(ICANON | ECHO); // disable the canonical mode & echo
     tcsetattr(0, TCSANOW, &tio);     // set the new attributes
 
-    QF_setTickRate(BSP_TICKS_PER_SEC); // set the desired tick rate
+    QF_setTickRate(BSP_TICKS_PER_SEC, 30); // desired tick rate/prio
 }
 //............................................................................
 void QF::onCleanup(void) {

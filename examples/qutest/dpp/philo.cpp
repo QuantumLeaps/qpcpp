@@ -104,12 +104,6 @@ QP::QState Philo::initial(Philo * const me, QP::QEvt const * const e) {
     if (!registered) {
         registered = true;
 
-        QS_OBJ_DICTIONARY(&l_philo[0]);
-        QS_OBJ_DICTIONARY(&l_philo[1]);
-        QS_OBJ_DICTIONARY(&l_philo[2]);
-        QS_OBJ_DICTIONARY(&l_philo[3]);
-        QS_OBJ_DICTIONARY(&l_philo[4]);
-
         QS_OBJ_DICTIONARY(&l_philo[0].m_timeEvt);
         QS_OBJ_DICTIONARY(&l_philo[1].m_timeEvt);
         QS_OBJ_DICTIONARY(&l_philo[2].m_timeEvt);

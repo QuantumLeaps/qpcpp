@@ -4,8 +4,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.2
+/// Last updated on  2018-06-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -312,6 +312,9 @@ void QActive::unsubscribeAll(void) const {
 
         }
         QF_CRIT_EXIT_();
+
+        // prevent merging critical sections
+        QF_CRIT_EXIT_NOP();
     }
 }
 

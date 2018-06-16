@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-21
+/// Last updated for version 6.3.2
+/// Last updated on  2018-06-16
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -127,7 +127,7 @@ bool QActive::recall(QEQueue * const eq) {
             // at least twice: once in the deferred event queue (eq->get()
             // did NOT decrement the reference counter) and once in the
             // AO's event queue.
-            Q_ASSERT_ID(210, e->refCtr_ >= static_cast<uint8_t>(2));
+            Q_ASSERT_CRIT_(210, e->refCtr_ >= static_cast<uint8_t>(2));
 
             // we need to decrement the reference counter once, to account
             // for removing the event from the deferred event queue.
