@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.2.1" links="0">
+<model version="4.3.0" links="0">
  <documentation>Simple Blinky example for QP/C++, which demonstrates:
 - Active object (Blinky) with state machine
 - Board Support Package abstraction for portability
@@ -53,6 +53,10 @@ me-&gt;m_timeEvt.armX(BSP::TICKS_PER_SEC/2,
     <state_diagram size="30,29"/>
    </statechart>
   </class>
+  <attribute name="AO_Blinky" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <documentation>// global &quot;opaque&quot; pointer to the Blinky AO</documentation>
+   <code>= &amp;l_blinky;</code>
+  </attribute>
  </package>
  <directory name=".">
   <file name="blinky.h">
@@ -67,7 +71,7 @@ enum BlinkySignals {
     MAX_SIG               // the last signal
 };
 
-extern QP::QActive * const AO_Blinky; // opaque pointer
+$declare${AOs::AO_Blinky}
 
 #endif // blinky</text>
   </file>
@@ -83,7 +87,8 @@ $declare${AOs::Blinky}
 
 // instantiate the Blinky active object --------------------------------------
 static Blinky l_blinky;
-QP::QActive * const AO_Blinky = &amp;l_blinky;
+
+$define${AOs::AO_Blinky}
 
 // ask QM to define the Blinky class (including the state machine) -----------
 $define${AOs::Blinky}</text>

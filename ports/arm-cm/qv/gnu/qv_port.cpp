@@ -3,8 +3,8 @@
 * @brief QV/C++ port to ARM Cortex-M, GNU-ARM toolset
 * @cond
 ******************************************************************************
-* Last Updated for Version: 6.1.1
-* Date of the Last Update:  2018-03-06
+* Last Updated for Version: 6.3.2
+* Date of the Last Update:  2018-06-22
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -40,7 +40,7 @@
 
 extern "C" {
 
-#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 ? */
+#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
 
 /*
 * Hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction)
@@ -50,7 +50,7 @@ extern "C" {
 * but for Cortex-M0/M0+/M1 the mnemonics MOV, LSR and ADD always set the
 * condition flags in the PSR.
 */
-__attribute__ ((naked))
+__attribute__ ((naked, optimize("-fno-stack-protector")))
 uint_fast8_t QF_qlog2(uint32_t x) {
 __asm volatile (
     "  MOV     r1,#0            \n"

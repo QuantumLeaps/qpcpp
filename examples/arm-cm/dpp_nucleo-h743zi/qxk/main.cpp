@@ -1,7 +1,7 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 6.0.4
-// Last updated on  2018-01-07
+// Last updated for version 6.3.3
+// Last updated on  2018-06-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -67,6 +67,14 @@ int main() {
     // configures and starts SysTick.
     //
     DPP::BSP::init();
+
+    // object dictionaries...
+    QS_OBJ_DICTIONARY(DPP::AO_Table);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[0]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[1]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[2]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(smlPoolSto);

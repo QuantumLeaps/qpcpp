@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example
-// Last updated for version 5.6.0
-// Last updated on  2015-12-26
+// Last updated for version 6.3.3
+// Last updated on  2018-06-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,25 +28,34 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// https://state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
 #include "dpp.h"
 #include "bsp.h"
+
+static QP::QTicker l_ticker0(0); // ticker for tick rate 0
+QP::QActive *DPP::the_Ticker0 = &l_ticker0;
 
 //............................................................................
 int main() {
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
-
     static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO];
-
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
 
     DPP::BSP::init(); // initialize the BSP
+
+    // object dictionaries...
+    QS_OBJ_DICTIONARY(DPP::AO_Table);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[0]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[1]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[2]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(smlPoolSto);
@@ -65,12 +74,17 @@ int main() {
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U),
+        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
                            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
                            (void *)0, 0U);
     }
-    // leave the priority level (N_PHILO + 1) free for the mutex in BSP
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 2U),
+
+    // example of prioritizing the Ticker0 active object
+    DPP::the_Ticker0->start((uint_fast8_t)(N_PHILO + 1U), // priority
+                            0, 0,
+                            0, 0);
+
+    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 2U), // priority
                     tableQueueSto, Q_DIM(tableQueueSto),
                     (void *)0, 0U);
 

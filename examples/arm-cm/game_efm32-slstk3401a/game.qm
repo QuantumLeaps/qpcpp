@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.0.0" links="0">
+<model version="4.3.0" links="0">
  <documentation>&quot;Fly 'n' Shoot&quot; game model from Chapters 1 &amp; 9 of PSiCC2
 
-NOTE: Requries QP5.</documentation>
+NOTE: Requries QP6.</documentation>
  <framework name="qpcpp"/>
  <package name="Events" stereotype="0x01" namespace="GAME::">
   <class name="ObjectPosEvt" superclass="qpcpp::QEvt">
@@ -154,7 +154,7 @@ if ((m_last_mine_x + GAME_MINES_DIST_MIN &lt; GAME_TUNNEL_WIDTH)
     }
 }</code>
    </operation>
-   <statechart>
+   <statechart properties="QS_FUN_DICT">
     <initial target="../1/2">
      <action>for (uint8_t n = 0; n &lt; GAME_MINES_MAX; ++n) {
    me-&gt;m_mine1_pool[n]-&gt;init(); // take the initial tran. for Mine1
@@ -168,30 +168,18 @@ me-&gt;subscribe(PLAYER_TRIGGER_SIG);
 me-&gt;subscribe(PLAYER_QUIT_SIG);
 
 // object dictionary for Tunnel object...
-QS_OBJ_DICTIONARY(&amp;l_tunnel);
 QS_OBJ_DICTIONARY(&amp;l_tunnel.m_blinkTimeEvt);
 QS_OBJ_DICTIONARY(&amp;l_tunnel.m_screenTimeEvt);
 
-// function dictionaries for Tunnel SM...
-QS_FUN_DICTIONARY(&amp;Tunnel::initial);
-QS_FUN_DICTIONARY(&amp;Tunnel::final);
-QS_FUN_DICTIONARY(&amp;Tunnel::active);
-QS_FUN_DICTIONARY(&amp;Tunnel::playing);
-QS_FUN_DICTIONARY(&amp;Tunnel::demo);
-QS_FUN_DICTIONARY(&amp;Tunnel::game_over);
-QS_FUN_DICTIONARY(&amp;Tunnel::screen_saver);
-QS_FUN_DICTIONARY(&amp;Tunnel::screen_saver_hide);
-QS_FUN_DICTIONARY(&amp;Tunnel::screen_saver_show);
-
 // local signals...
-QS_SIG_DICTIONARY(BLINK_TIMEOUT_SIG,  &amp;l_tunnel);
-QS_SIG_DICTIONARY(SCREEN_TIMEOUT_SIG, &amp;l_tunnel);
-QS_SIG_DICTIONARY(SHIP_IMG_SIG,       &amp;l_tunnel);
-QS_SIG_DICTIONARY(MISSILE_IMG_SIG,    &amp;l_tunnel);
-QS_SIG_DICTIONARY(MINE_IMG_SIG,       &amp;l_tunnel);
-QS_SIG_DICTIONARY(MINE_DISABLED_SIG,  &amp;l_tunnel);
-QS_SIG_DICTIONARY(EXPLOSION_SIG,      &amp;l_tunnel);
-QS_SIG_DICTIONARY(SCORE_SIG,          &amp;l_tunnel);
+QS_SIG_DICTIONARY(BLINK_TIMEOUT_SIG,  me);
+QS_SIG_DICTIONARY(SCREEN_TIMEOUT_SIG, me);
+QS_SIG_DICTIONARY(SHIP_IMG_SIG,       me);
+QS_SIG_DICTIONARY(MISSILE_IMG_SIG,    me);
+QS_SIG_DICTIONARY(MINE_IMG_SIG,       me);
+QS_SIG_DICTIONARY(MINE_DISABLED_SIG,  me);
+QS_SIG_DICTIONARY(EXPLOSION_SIG,      me);
+QS_SIG_DICTIONARY(SCORE_SIG,          me);
 
 (void)e; // unused parameter</action>
      <initial_glyph conn="3,2,5,1,26,15,-3">
@@ -510,24 +498,17 @@ QP::QF::stop(); // stop QF and cleanup</entry>
     m_x(GAME_SHIP_X),
     m_y(GAME_SHIP_Y &lt;&lt; 2)</code>
    </operation>
-   <statechart>
+   <statechart properties="QS_FUN_DICT">
     <initial target="../1">
      <action>me-&gt;subscribe(TIME_TICK_SIG);
 me-&gt;subscribe(PLAYER_TRIGGER_SIG);
-// object dictionaries...
-QS_OBJ_DICTIONARY(&amp;l_ship);
-// function dictionaries for Ship HSM...
-QS_FUN_DICTIONARY(&amp;Ship::initial);
-QS_FUN_DICTIONARY(&amp;Ship::active);
-QS_FUN_DICTIONARY(&amp;Ship::parked);
-QS_FUN_DICTIONARY(&amp;Ship::flying);
-QS_FUN_DICTIONARY(&amp;Ship::exploding);
+
 // local signals...
-QS_SIG_DICTIONARY(PLAYER_SHIP_MOVE_SIG, &amp;l_ship);
-QS_SIG_DICTIONARY(TAKE_OFF_SIG,         &amp;l_ship);
-QS_SIG_DICTIONARY(HIT_WALL_SIG,         &amp;l_ship);
-QS_SIG_DICTIONARY(HIT_MINE_SIG,         &amp;l_ship);
-QS_SIG_DICTIONARY(DESTROYED_MINE_SIG,   &amp;l_ship);
+QS_SIG_DICTIONARY(PLAYER_SHIP_MOVE_SIG, me);
+QS_SIG_DICTIONARY(TAKE_OFF_SIG,         me);
+QS_SIG_DICTIONARY(HIT_WALL_SIG,         me);
+QS_SIG_DICTIONARY(HIT_MINE_SIG,         me);
+QS_SIG_DICTIONARY(DESTROYED_MINE_SIG,   me);
 
 (void)e; // unused parameter</action>
      <initial_glyph conn="3,2,5,1,36,4,-3">
@@ -659,23 +640,14 @@ AO_Tunnel-&gt;POST(gameOver, me);</action>
    <operation name="Missile" type="" visibility="0x00" properties="0x00">
     <code>  : QActive(Q_STATE_CAST(&amp;Missile::initial))</code>
    </operation>
-   <statechart>
+   <statechart properties="QS_FUN_DICT">
     <initial target="../1">
      <action>me-&gt;subscribe( TIME_TICK_SIG);
 
-// object dictionary for Missile object
-QS_OBJ_DICTIONARY(&amp;l_missile);
-
-// dictionaries for Missile SM...
-QS_FUN_DICTIONARY(&amp;Missile::initial);
-QS_FUN_DICTIONARY(&amp;Missile::armed);
-QS_FUN_DICTIONARY(&amp;Missile::flying);
-QS_FUN_DICTIONARY(&amp;Missile::exploding);
-
 // local signals...
-QS_SIG_DICTIONARY(MISSILE_FIRE_SIG,   &amp;l_missile);
-QS_SIG_DICTIONARY(HIT_WALL_SIG,       &amp;l_missile);
-QS_SIG_DICTIONARY(DESTROYED_MINE_SIG, &amp;l_missile);
+QS_SIG_DICTIONARY(MISSILE_FIRE_SIG,   me);
+QS_SIG_DICTIONARY(HIT_WALL_SIG,       me);
+QS_SIG_DICTIONARY(DESTROYED_MINE_SIG, me);
 
 (void)e; // unused parameter</action>
      <initial_glyph conn="3,3,5,1,35,4,-2">
@@ -1084,9 +1056,18 @@ AO_Missile-&gt;POST(&amp;mine2_destroyed, me);</action>
     <state_diagram size="53,68"/>
    </statechart>
   </class>
-  <attribute name="AO_Tunnel" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
-  <attribute name="AO_Ship" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
-  <attribute name="AO_Missile" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_Tunnel" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <documentation>// opaque pointer</documentation>
+   <code>= &amp;l_tunnel;</code>
+  </attribute>
+  <attribute name="AO_Ship" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <documentation>// opaque pointer</documentation>
+   <code>= &amp;l_ship;</code>
+  </attribute>
+  <attribute name="AO_Missile" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <documentation>// opaque pointer</documentation>
+   <code>= &amp;l_missile;</code>
+  </attribute>
  </package>
  <directory name=".">
   <file name="game.h">
@@ -1156,15 +1137,15 @@ QP::QHsm *Mine2_getInst(uint8_t id);
 
 } // namespace GAME
 
-$declare(Events::ObjectPosEvt)
-$declare(Events::ObjectImageEvt)
-$declare(Events::MineEvt)
-$declare(Events::ScoreEvt)
+$declare${Events::ObjectPosEvt}
+$declare${Events::ObjectImageEvt}
+$declare${Events::MineEvt}
+$declare${Events::ScoreEvt}
 
 // opaque pointers to active objects in the application
-$declare(AOs::AO_Tunnel)
-$declare(AOs::AO_Ship)
-$declare(AOs::AO_Missile)
+$declare${AOs::AO_Tunnel}
+$declare${AOs::AO_Ship}
+$declare${AOs::AO_Missile}
 
 #endif  // game_h</text>
   </file>
@@ -1175,20 +1156,20 @@ $declare(AOs::AO_Missile)
 
 //Q_DEFINE_THIS_FILE
 
-$declare(AOs::Missile)
+$declare${AOs::Missile}
 
 namespace GAME {
 
 // local objects -------------------------------------------------------------
 static Missile l_missile; // the sole instance of the Missile active object
 
-// Public-scope objects ------------------------------------------------------
-QP::QActive * const AO_Missile = &amp;l_missile; // opaque pointer
-
 } // namespace GAME
 
+// Public-scope objects ------------------------------------------------------
+$define${AOs::AO_Missile}
+
 // Active object definition --------------------------------------------------
-$define(AOs::Missile)</text>
+$define${AOs::Missile}</text>
   </file>
   <file name="ship.cpp">
    <text>#include &quot;qpcpp.h&quot;
@@ -1201,20 +1182,20 @@ $define(AOs::Missile)</text>
 #define SHIP_HEIGHT 3U
 
 // encapsulated delcaration of the Ship active object ------------------------
-$declare(AOs::Ship)
+$declare${AOs::Ship}
 
 namespace GAME {
 
 // local objects -------------------------------------------------------------
 static Ship l_ship; // the sole instance of the Ship active object
 
-// Public-scope objects ------------------------------------------------------
-QP::QActive * const AO_Ship = &amp;l_ship; // opaque pointer
-
 } // namespace GAME
 
+// Public-scope objects ------------------------------------------------------
+$define${AOs::AO_Ship}
+
 // Active object definition --------------------------------------------------
-$define(AOs::Ship)</text>
+$define${AOs::Ship}</text>
   </file>
   <file name="tunnel.cpp">
    <text>#include &quot;qpcpp.h&quot;
@@ -1225,20 +1206,20 @@ $define(AOs::Ship)</text>
 Q_DEFINE_THIS_FILE
 
 // declaration of the Tunnel AO ----------------------------------------------
-$declare(AOs::Tunnel)
+$declare${AOs::Tunnel}
 
 namespace GAME {
 
 // local objects -------------------------------------------------------------
 static Tunnel l_tunnel; // the sole instance of the Tunnel active object
 
-// Public-scope objects ------------------------------------------------------
-QP::QActive * const AO_Tunnel = &amp;l_tunnel; // opaque pointer
-
 } // namespace GAME
 
+// Public-scope objects ------------------------------------------------------
+$define${AOs::AO_Tunnel}
+
 // Active object definition ==================================================
-$define(AOs::Tunnel)</text>
+$define${AOs::Tunnel}</text>
   </file>
   <file name="mine1.cpp">
    <text>#include &quot;qpcpp.h&quot;
