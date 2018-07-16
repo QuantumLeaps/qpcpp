@@ -1,5 +1,5 @@
 ##############################################################################
-# Product: Makefile for EK-TM4C123GXL, QUTEST, GNU-ARM
+# Product: Makefile for EMF32-SLSTK3401A, QUTEST, GNU-ARM
 # Last Updated for Version: 6.3.3
 # Date of the Last Update:  2018-07-10
 #
@@ -33,12 +33,12 @@
 ##############################################################################
 #
 # examples of invoking this Makefile:
-# make -fek-tm4c123gxl.mak  # make and run the tests in the current directory
-# make -fek-tm4c123gxl.mak TESTS=philo*.tcl  # make and run the selected tests
-# make -fek-tm4c123gxl.mak SCRIPT=py # make and run the Python tests
-# make -fek-tm4c123gxl.mak HOST=localhost:7705 # connect to host:port
-# make -fek-tm4c123gxl.mak norun  # only make but not run the tests
-# make -fek-tm4c123gxl.mak clean  # cleanup the build
+# make -fefm32-slstk3401a.mak  # make and run the tests in the current directory
+# make -fefm32-slstk3401a.mak TESTS=philo*.tcl  # make and run the selected tests
+# make -fefm32-slstk3401a.mak SCRIPT=py # make and run the Python tests
+# make -fefm32-slstk3401a.mak HOST=localhost:7705 # connect to host:port
+# make -fefm32-slstk3401a.mak norun  # only make but not run the tests
+# make -fefm32-slstk3401a.mak clean  # cleanup the build
 #
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
@@ -49,8 +49,8 @@
 #-----------------------------------------------------------------------------
 # project name, binary output directory
 #
-PROJECT := test_qutest
-TARGET  := ek-tm4c123gxl
+PROJECT := test_blinky
+TARGET  := efm32-slstk3401a
 
 #-----------------------------------------------------------------------------
 # project directories
@@ -76,8 +76,8 @@ VPATH = \
 	$(QPCPP)/src/qf \
 	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
-	$(QPCPP)/3rd_party/ek-tm4c123gxl \
-	$(QPCPP)/3rd_party/ek-tm4c123gxl/gnu
+	$(QPCPP)/3rd_party/efm32pg1b \
+	$(QPCPP)/3rd_party/efm32pg1b/gnu
 
 # list of all include directories needed by this project
 INCLUDES  = \
@@ -87,7 +87,7 @@ INCLUDES  = \
 	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
-	-I$(QPCPP)/3rd_party/ek-tm4c123gxl
+	-I$(QPCPP)/3rd_party/efm32pg1b
 
 #-----------------------------------------------------------------------------
 # files
@@ -98,12 +98,18 @@ ASM_SRCS :=
 
 # C source files
 C_SRCS := \
-	system_TM4C123GH6PM.c \
-	startup_TM4C123GH6PM.c
+	startup_efm32pg1b.c \
+	system_efm32pg1b.c \
+	em_cmu.c \
+	em_emu.c \
+	em_gpio.c \
+	em_usart.c
 
 # C++ source files
 CPP_SRCS := \
-	test_qutest.cpp
+	bsp.cpp \
+	blinky.cpp \
+	test_blinky.cpp
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := ../$(TARGET)/test.ld
@@ -133,7 +139,7 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DTARGET_IS_TM4C123_RB1
+DEFINES   := -DEFM32PG1B200F256GM48=1
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -166,14 +172,11 @@ LINK  := $(GNU_ARM)/bin/arm-eabi-g++
 BIN   := $(GNU_ARM)/bin/arm-eabi-objcopy
 
 #-----------------------------------------------------------------------------
-# NOTE: The following symbol LMFLASH assumes that LMFlash.exe can
-# be found on the PATH. You might need to adjust this symbol to the
-# location of the LMFlash utility on your machine
+# FLASH tool (NOTE: Requires the JLINK utility)
+# see ../efm32-slstk3401a/flash.bat
 #
-ifeq ($(LMFLASH),)
-LMFLASH := LMFlash.exe
-endif
 
+FLASH := ..\efm32-slstk3401a\flash.bat
 
 ##############################################################################
 # Typically you should not need to change anything below this line
@@ -258,22 +261,22 @@ endif
 
 $(TARGET_BIN) : $(TARGET_ELF)
 	$(BIN) -O binary $< $@
-	$(LMFLASH) -q ek-tm4c123gxl $@
+	$(FLASH) $(TARGET_BIN)
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
 	$(CPP) $(CPPFLAGS) -c $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 flash :
-	$(LMFLASH) -q ek-tm4c123gxl $(TARGET_BIN)
+	$(FLASH) $(TARGET_BIN)
 
 ifeq ($(SCRIPT),py)
 run : $(TARGET_BIN)
-	$(LMFLASH) -q ek-tm4c123gxl -c $(TARGET_BIN)
+	$(FLASH) $(TARGET_BIN)
 	$(PYTHON) $(QUTEST) $(TESTS) "" $(HOST)
 else
 run : $(TARGET_BIN)
-	$(LMFLASH) -q ek-tm4c123gxl -c $(TARGET_BIN)
+	$(FLASH) $(TARGET_BIN)
 	$(TCLSH) $(QUTEST) $(TESTS) "" $(HOST)
 endif
 

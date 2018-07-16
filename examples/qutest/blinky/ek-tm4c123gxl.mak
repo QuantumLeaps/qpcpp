@@ -49,7 +49,7 @@
 #-----------------------------------------------------------------------------
 # project name, binary output directory
 #
-PROJECT := test_qutest
+PROJECT := test_blinky
 TARGET  := ek-tm4c123gxl
 
 #-----------------------------------------------------------------------------
@@ -103,7 +103,9 @@ C_SRCS := \
 
 # C++ source files
 CPP_SRCS := \
-	test_qutest.cpp
+	bsp.cpp \
+	blinky.cpp \
+	test_blinky.cpp
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := ../$(TARGET)/test.ld
