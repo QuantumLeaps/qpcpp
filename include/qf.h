@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.4
+/// Last updated on  2018-08-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -63,7 +63,10 @@
 
 #ifndef QF_MAX_TICK_RATE
     //! Default value of the macro configurable value in qf_port.h
+    //! Valid values: [0..15]; default 1
     #define QF_MAX_TICK_RATE     1
+#elif (QF_MAX_TICK_RATE > 15)
+    #error "QF_MAX_TICK_RATE exceeds the maximum of 15"
 #endif
 
 #ifndef QF_TIMEEVT_CTR_SIZE
@@ -427,6 +430,9 @@ public:
 
     //! Rearm a time event.
     bool rearm(QTimeEvtCtr const nTicks);
+
+    //! Check the "was disarmed" status of a time event.
+    bool wasDisarmed(void);
 
     //! Get the current value of the down-counter of a time event.
     QTimeEvtCtr ctr(void) const;

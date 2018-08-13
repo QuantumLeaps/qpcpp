@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.4
+/// Last updated on  2018-08-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -72,6 +72,7 @@ int_t QF::run(void) {
     // function dictionaries for the standard API
     QS_FUN_DICTIONARY(&QActive::post_);
     QS_FUN_DICTIONARY(&QActive::postLIFO);
+    QS_FUN_DICTIONARY(&QS::processTestEvts_);
 
     QS::onTestLoop();   // run the unit test
     QS::onCleanup();    // application cleanup
@@ -101,6 +102,18 @@ void QActive::stop(void) {
 }
 
 //****************************************************************************
+// The following flags and bitmasks are for the fields of the @c refCtr_
+// attribute of the QP::QTimeEvt class (inherited from QEvt). This attribute
+// is NOT used for reference counting in time events, because the @c poolId_
+// attribute is zero ("static events").
+//
+enum {
+    TE_IS_LINKED    = static_cast<uint8_t>(1U << 7), // flag
+    TE_WAS_DISARMED = static_cast<uint8_t>(1U << 6), // flag
+    TE_TICK_RATE    = static_cast<uint8_t>(0x0F)     // bitmask
+};
+
+//............................................................................
 QTimeEvtCtr QTimeEvt::ctr(void) const {
     QTimeEvtCtr ret;
     QF_CRIT_STAT_
@@ -137,17 +150,15 @@ QTimeEvt::QTimeEvt(QActive * const act,
     //
     poolId_ = static_cast<uint8_t>(0);
 
-    // The reference counter attribute is not used in static events,
-    // so for the Time Events it is reused to hold the tickRate in the
-    // bits [0..6] and the linkedFlag in the MSB (bit [7]). The linkedFlag
-    // is 0 for time events unlinked from any list and 1 otherwise.
+    // The refCtr_ attribute is not used in time events, so it is
+    // reused to hold the tickRate as well as other information
     //
     refCtr_ = static_cast<uint8_t>(tickRate);
 }
 //............................................................................
 void QTimeEvt::armX(QTimeEvtCtr const nTicks, QTimeEvtCtr const interval) {
     uint_fast8_t tickRate = static_cast<uint_fast8_t>(refCtr_)
-                            & static_cast<uint_fast8_t>(0x7F);
+                            & static_cast<uint_fast8_t>(TE_TICK_RATE);
     QTimeEvtCtr cntr = m_ctr;  // temporary to hold volatile
     QF_CRIT_STAT_
 
@@ -184,31 +195,33 @@ bool QTimeEvt::disarm(void) {
     // is the time event actually armed?
     if (m_ctr != static_cast<QTimeEvtCtr>(0)) {
         wasArmed = true;
+        refCtr_ |= static_cast<uint8_t>(TE_WAS_DISARMED);
 
         QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_DISARM,
                          QS::priv_.locFilter[QS::TE_OBJ], this)
-            QS_TIME_();          // timestamp
-            QS_OBJ_(this);       // this time event object
-            QS_OBJ_(m_act);      // the target AO
-            QS_TEC_(m_ctr);      // the number of ticks
-            QS_TEC_(m_interval); // the interval
-            // tick rate
-            QS_U8_(static_cast<uint8_t>(refCtr_& static_cast<uint8_t>(0x7F)));
+            QS_TIME_();            // timestamp
+            QS_OBJ_(this);         // this time event object
+            QS_OBJ_(m_act);        // the target AO
+            QS_TEC_(m_ctr);        // the number of ticks
+            QS_TEC_(m_interval);   // the interval
+            QS_U8_(static_cast<uint8_t>(
+                       refCtr_& static_cast<uint8_t>(TE_TICK_RATE)));
         QS_END_NOCRIT_()
 
         m_ctr = static_cast<QTimeEvtCtr>(0); // schedule removal from the list
     }
-    else { // the time event was already not running
+    else { // the time event was already disarmed automatically
         wasArmed = false;
 
         QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_DISARM_ATTEMPT,
                          QS::priv_.locFilter[QS::TE_OBJ], this)
-            QS_TIME_();          // timestamp
-            QS_OBJ_(this);       // this time event object
-            QS_OBJ_(m_act);      // the target AO
-            // tick rate
-            QS_U8_(static_cast<uint8_t>(refCtr_& static_cast<uint8_t>(0x7F)));
+            QS_TIME_();            // timestamp
+            QS_OBJ_(this);         // this time event object
+            QS_OBJ_(m_act);        // the target AO
+            QS_U8_(static_cast<uint8_t>( // tick rate
+                       refCtr_& static_cast<uint8_t>(TE_TICK_RATE)));
         QS_END_NOCRIT_()
+
     }
     QF_CRIT_EXIT_();
     return wasArmed;
@@ -216,7 +229,7 @@ bool QTimeEvt::disarm(void) {
 //............................................................................
 bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
     uint_fast8_t tickRate = static_cast<uint_fast8_t>(refCtr_)
-                            & static_cast<uint_fast8_t>(0x7F);
+                            & static_cast<uint_fast8_t>(TE_TICK_RATE);
     QF_CRIT_STAT_
 
     /// @pre AO must be valid, tick rate must be in range, nTicks must not
@@ -228,11 +241,11 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
                  && (static_cast<enum_t>(sig) >= Q_USER_SIG));
 
     QF_CRIT_ENTRY_();
-    bool isArmed;
+    bool wasArmed;
 
     // is the time evt not running?
     if (m_ctr == static_cast<QTimeEvtCtr>(0)) {
-        isArmed = false;
+        wasArmed = false;
 
         // is the time event unlinked?
         // NOTE: For a duration of a single clock tick of the specified
@@ -240,15 +253,15 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
         // the list, because unlinking is performed exclusively in the
         // QF::tickX() function.
         //
-        if ((refCtr_ & static_cast<uint8_t>(0x80))
+        if ((refCtr_ & static_cast<uint8_t>(TE_IS_LINKED))
             == static_cast<uint8_t>(0))
         {
-            refCtr_ |= static_cast<uint8_t>(0x80); // mark as linked
+            refCtr_ |= static_cast<uint8_t>(TE_IS_LINKED); // mark as linked
         }
     }
     // the time event is armed
     else {
-        isArmed = true;
+        wasArmed = true;
     }
     m_ctr = nTicks; // re-load the tick counter (shift the phasing)
 
@@ -260,7 +273,7 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
         QS_TEC_(m_ctr);      // the number of ticks
         QS_TEC_(m_interval); // the interval
         QS_U8_(static_cast<uint8_t>(tickRate)); // the tick rate
-        if (isArmed) {
+        if (wasArmed) {
             QS_U8_(static_cast<uint8_t>(1)); // status: armed
         }
         else {
@@ -269,7 +282,13 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();
-    return isArmed;
+    return wasArmed;
+}
+//............................................................................
+bool QTimeEvt::wasDisarmed(void) {
+    uint8_t isDisarmed = (refCtr_ & static_cast<uint8_t>(TE_WAS_DISARMED));
+    refCtr_ |= static_cast<uint8_t>(TE_WAS_DISARMED); // set the flag
+    return isDisarmed != static_cast<uint8_t>(0);
 }
 //............................................................................
 void QF::tickX_(uint_fast8_t const tickRate, void const * const sender) {
@@ -282,7 +301,8 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender) {
         if (t->m_interval == (QTimeEvtCtr)0) { // single-shot TE?
             t->m_ctr = (QTimeEvtCtr)0; // auto-disarm
             // mark as unlinked
-            t->refCtr_ &= static_cast<uint8_t>(0x7F);
+            t->refCtr_ &=
+                static_cast<uint8_t>(~static_cast<uint8_t>(TE_IS_LINKED));
 
             QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_AUTO_DISARM,
                              QS::priv_.locFilter[QS::TE_OBJ], t)
@@ -311,6 +331,11 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender) {
 }
 //............................................................................
 void QS::processTestEvts_(void) {
+    QS_TEST_PROBE_DEF(&QS::processTestEvts_)
+
+    // return immediately (do nothing) for Test Probe != 0
+    QS_TEST_PROBE(return;)
+
     while (rxPriv_.readySet.notEmpty()) {
         uint_fast8_t p = rxPriv_.readySet.findMax();
         QActive *a = QF::active_[p];

@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.2
-/// Last updated on  2018-06-16
+/// Last updated for version 6.3.4
+/// Last updated on  2018-08-09
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -53,19 +53,31 @@ Q_DEFINE_THIS_MODULE("qf_time")
 // Package-scope objects *****************************************************
 QTimeEvt QF::timeEvtHead_[QF_MAX_TICK_RATE]; // heads of time event lists
 
+// The following flags and bitmasks are for the fields of the @c refCtr_
+// attribute of the QP::QTimeEvt class (inherited from QEvt). This attribute
+// is NOT used for reference counting in time events, because the @c poolId_
+// attribute is zero ("static events").
+//
+enum {
+    TE_IS_LINKED    = static_cast<uint8_t>(1U << 7), // flag
+    TE_WAS_DISARMED = static_cast<uint8_t>(1U << 6), // flag
+    TE_TICK_RATE    = static_cast<uint8_t>(0x0F)     // bitmask
+};
+
+
 //****************************************************************************
 /// @description
 /// This function must be called periodically from a time-tick ISR or from
 /// a task so that QF can manage the timeout events assigned to the given
 /// system clock tick rate.
 ///
-/// @param[in]  tickRate  system clock tick rate serviced in this call.
+/// @param[in] tickRate  system clock tick rate serviced in this call [1..15].
 ///
 /// @note
 /// this function should be called only via the macro TICK_X()
 ///
 /// @note
-/// the calls to QP::QF::tickX_() with different tick rate argument can
+/// the calls to QP::QF::tickX_() with different @p tickRate parameter can
 /// preempt each other. For example, higher clock tick rates might be
 /// serviced from interrupts while others from tasks (active objects).
 ///
@@ -112,7 +124,9 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender)
         // time event scheduled for removal?
         if (t->m_ctr == static_cast<QTimeEvtCtr>(0)) {
             prev->m_next = t->m_next;
-            t->refCtr_ &= static_cast<uint8_t>(0x7F); // mark as unlinked
+            // mark time event 't' as NOT linked
+            t->refCtr_ &= static_cast<uint8_t>(
+                              ~static_cast<uint8_t>(TE_IS_LINKED));
             // do NOT advance the prev pointer
             QF_CRIT_EXIT_(); // exit crit. section to reduce latency
 
@@ -135,8 +149,9 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender)
                 else {
                     prev->m_next = t->m_next;
 
-                    // mark as unlinked
-                    t->refCtr_ &= static_cast<uint8_t>(0x7F);
+                    // mark time event 't' as NOT linked
+                    t->refCtr_ &= static_cast<uint8_t>(
+                                      ~static_cast<uint8_t>(TE_IS_LINKED));
                     // do NOT advance the prev pointer
 
                     QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_AUTO_DISARM,
@@ -248,10 +263,8 @@ QTimeEvt::QTimeEvt(QActive * const act,
     //
     poolId_ = static_cast<uint8_t>(0);
 
-    // The reference counter attribute is not used in static events,
-    // so for the Time Events it is reused to hold the tickRate in the
-    // bits [0..6] and the linkedFlag in the MSB (bit [7]). The linkedFlag
-    // is 0 for time events unlinked from any list and 1 otherwise.
+    // The refCtr_ attribute is not used in time events, so it is
+    // reused to hold the tickRate as well as other information
     //
     refCtr_ = static_cast<uint8_t>(tickRate);
 }
@@ -281,10 +294,8 @@ QTimeEvt::QTimeEvt()
     //
     poolId_ = static_cast<uint8_t>(0); // not from any event pool
 
-    // The reference counter attribute is not used in static events,
-    // so for the Time Events it is reused to hold the tickRate in the
-    // bits [0..6] and the linkedFlag in the MSB (bit [7]). The linkedFlag
-    // is 0 for time events unlinked from any list and 1 otherwise.
+    // The refCtr_ attribute is not used in time events, so it is
+    // reused to hold the tickRate as well as other information
     //
     refCtr_ = static_cast<uint8_t>(0); // default rate 0
 }
@@ -317,7 +328,7 @@ QTimeEvt::QTimeEvt()
 ///
 void QTimeEvt::armX(QTimeEvtCtr const nTicks, QTimeEvtCtr const interval) {
     uint_fast8_t tickRate = static_cast<uint_fast8_t>(refCtr_)
-                            & static_cast<uint_fast8_t>(0x7F);
+                            & static_cast<uint_fast8_t>(TE_TICK_RATE);
     QTimeEvtCtr cntr = m_ctr;  // temporary to hold volatile
     QF_CRIT_STAT_
 
@@ -339,8 +350,10 @@ void QTimeEvt::armX(QTimeEvtCtr const nTicks, QTimeEvtCtr const interval) {
     // rate a time event can be disarmed and yet still linked into the list,
     // because un-linking is performed exclusively in the QF_tickX() function.
     //
-    if ((refCtr_ & static_cast<uint8_t>(0x80)) == static_cast<uint8_t>(0)) {
-        refCtr_ |= static_cast<uint8_t>(0x80);  // mark as linked
+    if ((refCtr_ & static_cast<uint8_t>(TE_IS_LINKED))
+         == static_cast<uint8_t>(0))
+    {
+        refCtr_ |= static_cast<uint8_t>(TE_IS_LINKED);  // mark as linked
 
         // The time event is initially inserted into the separate
         // "freshly armed" link list based on QF::timeEvtHead_[tickRate].act.
@@ -390,6 +403,7 @@ bool QTimeEvt::disarm(void) {
     // is the time event actually armed?
     if (m_ctr != static_cast<QTimeEvtCtr>(0)) {
         wasArmed = true;
+        refCtr_ |= static_cast<uint8_t>(TE_WAS_DISARMED);
 
         QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_DISARM,
                          QS::priv_.locFilter[QS::TE_OBJ], this)
@@ -398,14 +412,13 @@ bool QTimeEvt::disarm(void) {
             QS_OBJ_(m_act);        // the target AO
             QS_TEC_(m_ctr);        // the number of ticks
             QS_TEC_(m_interval);   // the interval
-            // tick rate
-            QS_U8_(static_cast<uint8_t>(refCtr_& static_cast<uint8_t>(0x7F)));
+            QS_U8_(static_cast<uint8_t>(
+                       refCtr_& static_cast<uint8_t>(TE_TICK_RATE)));
         QS_END_NOCRIT_()
 
         m_ctr = static_cast<QTimeEvtCtr>(0); // schedule removal from the list
     }
-    // the time event was already not running
-    else {
+    else { // the time event was already disarmed automatically
         wasArmed = false;
 
         QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_DISARM_ATTEMPT,
@@ -413,9 +426,10 @@ bool QTimeEvt::disarm(void) {
             QS_TIME_();            // timestamp
             QS_OBJ_(this);         // this time event object
             QS_OBJ_(m_act);        // the target AO
-            // tick rate
-            QS_U8_(static_cast<uint8_t>(refCtr_& static_cast<uint8_t>(0x7F)));
+            QS_U8_(static_cast<uint8_t>( // tick rate
+                       refCtr_& static_cast<uint8_t>(TE_TICK_RATE)));
         QS_END_NOCRIT_()
+
     }
     QF_CRIT_EXIT_();
     return wasArmed;
@@ -424,7 +438,7 @@ bool QTimeEvt::disarm(void) {
 //****************************************************************************
 ///
 /// @description
-/// Rearms  a time event with a new number of clock ticks. This function can
+/// Rearms a time event with a new number of clock ticks. This function can
 /// be used to adjust the current period of a periodic time event or to
 /// prevent a one-shot time event from expiring (e.g., a watchdog time event).
 /// Rearming a periodic timer leaves the interval unchanged and is a convenient
@@ -443,7 +457,7 @@ bool QTimeEvt::disarm(void) {
 ///
 bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
     uint_fast8_t tickRate = static_cast<uint_fast8_t>(refCtr_)
-                            & static_cast<uint_fast8_t>(0x7F);
+                            & static_cast<uint_fast8_t>(TE_TICK_RATE);
     QF_CRIT_STAT_
 
     /// @pre AO must be valid, tick rate must be in range, nTicks must not
@@ -455,11 +469,11 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
                  && (static_cast<enum_t>(sig) >= Q_USER_SIG));
 
     QF_CRIT_ENTRY_();
-    bool isArmed;
+    bool wasArmed;
 
-    // is the time evt not running? */
+    // is the time evt not running?
     if (m_ctr == static_cast<QTimeEvtCtr>(0)) {
-        isArmed = false;
+        wasArmed = false;
 
         // is the time event unlinked?
         // NOTE: For a duration of a single clock tick of the specified
@@ -467,26 +481,25 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
         // the list, because unlinking is performed exclusively in the
         // QF::tickX() function.
         //
-        if ((refCtr_ & static_cast<uint8_t>(0x80))
+        if ((refCtr_ & static_cast<uint8_t>(TE_IS_LINKED))
             == static_cast<uint8_t>(0))
         {
-            refCtr_ |= static_cast<uint8_t>(0x80); // mark as linked
+            refCtr_ |= static_cast<uint8_t>(TE_IS_LINKED); // mark as linked
 
             // The time event is initially inserted into the separate
             // "freshly armed" list based on QF_timeEvtHead_[tickRate].act.
             // Only later, inside the QF_tickX() function, the "freshly armed"
             // list is appended to the main list of armed time events based on
             // QF_timeEvtHead_[tickRate].next. Again, this is to keep any
-            // changes to the main list exclusively inside the QF_tickX()
+            // changes to the main list exclusively inside the QF::tickX()
             // function.
             //
             m_next = QF::timeEvtHead_[tickRate].toTimeEvt();
             QF::timeEvtHead_[tickRate].m_act = this;
         }
     }
-    // the time event is armed
-    else {
-        isArmed = true;
+    else { // the time event is being disarmed
+        wasArmed = true;
     }
     m_ctr = nTicks; // re-load the tick counter (shift the phasing)
 
@@ -497,17 +510,39 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
         QS_OBJ_(m_act);      // the target AO
         QS_TEC_(m_ctr);      // the number of ticks
         QS_TEC_(m_interval); // the interval
-        QS_U8_(static_cast<uint8_t>(tickRate)); // the tick rate
-        if (isArmed) {
-            QS_U8_(static_cast<uint8_t>(1)); // status: armed
-        }
-        else {
-            QS_U8_(static_cast<uint8_t>(0)); // status: disarmed
-        }
+        QS_2U8_(static_cast<uint8_t>(tickRate),
+                (wasArmed ? static_cast<uint8_t>(1)
+                            : static_cast<uint8_t>(0)));
     QS_END_NOCRIT_()
 
     QF_CRIT_EXIT_();
-    return isArmed;
+    return wasArmed;
+}
+
+//****************************************************************************
+///
+/// @description
+/// Useful for checking whether a one-shot time event was disarmed in the
+/// QTimeEvt_disarm() operation.
+///
+/// @returns
+/// 'true' if the time event was truly disarmed in the last QTimeEvt::disarm()
+/// operation. The 'false' return means that the time event was not truly
+/// disarmed, because it was not running at that time. The 'false' return is
+/// only possible for one-shot time events that have been automatically disarmed
+/// upon expiration. In this case the 'false' return means that the time event
+/// has already been posted or published and should be expected in the active
+/// object's event queue.
+///
+/// @note
+/// This function has a **side effect** of setting the "was disarmed" status,
+/// which means that the second and subsequent times this function is called
+/// the function will return 'true'.
+///
+bool QTimeEvt::wasDisarmed(void) {
+    uint8_t isDisarmed = (refCtr_ & static_cast<uint8_t>(TE_WAS_DISARMED));
+    refCtr_ |= static_cast<uint8_t>(TE_WAS_DISARMED); // set the flag
+    return isDisarmed != static_cast<uint8_t>(0);
 }
 
 //****************************************************************************
