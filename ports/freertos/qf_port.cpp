@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.4
-/// Last updated on  2018-01-10
+/// Last updated for version 6.3.4
+/// Last updated on  2018-08-27
 ///
 ///                    Q u a n t u m     L e a P s
 ///                    ---------------------------
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -205,7 +205,7 @@ bool QActive::postFromISR_(QEvt const * const e,
             taskEXIT_CRITICAL_FROM_ISR(uxSavedInterruptState);
 
             // signal the event queue
-            vTaskNotifyGiveFromISR(static_cast<TaskHandle_t>(&m_thread),
+            vTaskNotifyGiveFromISR(reinterpret_cast<TaskHandle_t>(&m_thread),
                                    static_cast<BaseType_t *>(par));
         }
         // queue is not empty, insert event into the ring-buffer
