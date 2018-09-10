@@ -3,12 +3,12 @@
 /// @ingroup qutest
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.1
-/// Last updated on  2018-05-21
+/// Last Updated for Version: 6.3.4
+/// Date of the Last Update:  2018-09-04
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
 /// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
@@ -71,8 +71,14 @@ namespace QP {
 extern uint8_t volatile QF_intNest;
 }
 
-// portable "safe" facilities from <stdio.h> and <string.h> ...
-#ifdef _MSC_VER // Microsoft C/C++ compiler?
+// portable "safe" facilities from <stdio.h> and <string.h>
+#ifdef _MSC_VER // Microsoft Visual C++
+
+#if (_MSC_VER < 1900) // before Visual Studio 2015
+
+#define snprintf _snprintf
+
+#endif
 
 #define SNPRINTF_S(buf_, len_, format_, ...) \
     _snprintf_s(buf_, len_, _TRUNCATE, format_, ##__VA_ARGS__)
@@ -107,14 +113,14 @@ extern uint8_t volatile QF_intNest;
 #define SSCANF_S(buf_, format_, ...) \
     sscanf(buf_, format_, ##__VA_ARGS__)
 
-#endif // _MSC_VER
+#endif
 
 //****************************************************************************
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
 
-    /* QUTEST scheduler locking (not used) */
+    // QUTEST scheduler locking (not used)
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) ((void)0)
     #define QF_SCHED_UNLOCK_()    ((void)0)

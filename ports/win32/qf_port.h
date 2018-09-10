@@ -1,15 +1,16 @@
 /// @file
 /// @brief QF/C++ port to Win32 API
+/// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.2
-/// Last updated on  2016-12-22
+/// Last Updated for Version: 6.3.4
+/// Date of the Last Update:  2018-09-04
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,7 +31,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -99,8 +100,14 @@ void QF_onClockTick(void);
     int_t main_gui(); // prototype of the GUI application entry point
 #endif
 
-// portable "safe" facilities from <stdio.h> and <string.h> ...
-#ifdef _MSC_VER // Microsoft C/C++ compiler?
+// portable "safe" facilities from <stdio.h> and <string.h>
+#ifdef _MSC_VER // Microsoft Visual C++
+
+#if (_MSC_VER < 1900) // before Visual Studio 2015
+
+#define snprintf _snprintf
+
+#endif
 
 #define SNPRINTF_S(buf_, len_, format_, ...) \
     _snprintf_s(buf_, len_, _TRUNCATE, format_, ##__VA_ARGS__)
@@ -135,7 +142,7 @@ void QF_onClockTick(void);
 #define SSCANF_S(buf_, format_, ...) \
     sscanf(buf_, format_, ##__VA_ARGS__)
 
-#endif // _MSC_VER
+#endif
 
 //****************************************************************************
 // interface used only inside QF, but not in applications
