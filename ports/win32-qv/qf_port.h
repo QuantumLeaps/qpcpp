@@ -1,10 +1,10 @@
 /// @file
-/// @brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
+/// @brief QF/C++ port to Win32 API (single-threaded, like the QV kernel)
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.3.4
-/// Date of the Last Update:  2018-09-04
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -35,7 +35,7 @@
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
-
+///
 #ifndef qf_port_h
 #define qf_port_h
 
@@ -62,7 +62,7 @@
 #define QF_INT_ENABLE()      (QP::QF_leaveCriticalSection_())
 
 // Win32 critical section
-// QF_CRIT_STAT_TYPE -- not defined
+// QF_CRIT_STAT_TYPE not defined
 #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
 #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
@@ -79,11 +79,17 @@ namespace QP {
 void QF_enterCriticalSection_(void);
 void QF_leaveCriticalSection_(void);
 
-// set clock tick rate (NOTE ticksPerSec==0 disables the "ticker thread"
-void QF_setTickRate(uint32_t ticksPerSec); /* set clock tick rate */
+// set clock tick rate (NOTE ticksPerSec==0 disables the "ticker thread")
+void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio);
 
 // clock tick callback (NOTE not called when "ticker thread" is not running)
 void QF_onClockTick(void);
+
+// abstractions for console access...
+void QF_consoleSetup(void);
+void QF_consoleCleanup(void);
+int QF_consoleGetKey(void);
+int QF_consoleWaitForKey(void);
 
 } // namespace QP
 
@@ -99,9 +105,7 @@ void QF_onClockTick(void);
 #ifdef _MSC_VER // Microsoft Visual C++
 
 #if (_MSC_VER < 1900) // before Visual Studio 2015
-
 #define snprintf _snprintf
-
 #endif
 
 #define SNPRINTF_S(buf_, len_, format_, ...) \
@@ -137,7 +141,7 @@ void QF_onClockTick(void);
 #define SSCANF_S(buf_, format_, ...) \
     sscanf(buf_, format_, ##__VA_ARGS__)
 
-#endif
+#endif // _MSC_VER
 
 //****************************************************************************
 // interface used only inside QF, but not in applications
@@ -153,7 +157,8 @@ void QF_onClockTick(void);
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QV_readySet_.insert((me_)->m_prio))
+        (QV_readySet_.insert((me_)->m_prio)); \
+        (void)SetEvent(QV_win32Event_)
 
     // Win32-QV specific event pool operations
     #define QF_EPOOL_TYPE_  QMPool
@@ -167,7 +172,7 @@ void QF_onClockTick(void);
     #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
 
     #define WIN32_LEAN_AND_MEAN
-    #include <windows.h>  // Win32 API
+    #include <windows.h> // Win32 API
 
     namespace QP {
         extern QPSet  QV_readySet_;   // QV-ready set of active objects

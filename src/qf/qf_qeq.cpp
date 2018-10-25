@@ -2,14 +2,14 @@
 /// @brief QP::QEQueue implementation
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.2
-/// Last updated on  2018-06-16
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-04
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -134,6 +134,12 @@ bool QEQueue::post(QEvt const * const e, uint_fast16_t const margin) {
             QF_EVT_REF_CTR_INC_(e); // increment the reference counter
         }
 
+        --nFree; // one free entry just used up
+        m_nFree = nFree; // update the volatile
+        if (m_nMin > nFree) {
+            m_nMin = nFree; // update minimum so far
+        }
+
         QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_FIFO,
                          QS::priv_.locFilter[QS::EQ_OBJ], this)
             QS_TIME_();                      // timestamp
@@ -143,12 +149,6 @@ bool QEQueue::post(QEvt const * const e, uint_fast16_t const margin) {
             QS_EQC_(nFree);                  // number of free entries
             QS_EQC_(m_nMin);                 // min number of free entries
         QS_END_NOCRIT_()
-
-        --nFree; // one free entry just used up
-        m_nFree = nFree; // update the volatile
-        if (m_nMin > nFree) {
-            m_nMin = nFree; // update minimum so far
-        }
 
         // is the queue empty?
         if (m_frontEvt == static_cast<QEvt const *>(0)) {
@@ -224,6 +224,12 @@ void QEQueue::postLIFO(QEvt const * const e) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
+    --nFree; // one free entry just used up
+    m_nFree = nFree; // update the volatile
+    if (m_nMin > nFree) {
+        m_nMin = nFree; // update minimum so far
+    }
+
     QS_BEGIN_NOCRIT_(QS_QF_EQUEUE_POST_LIFO,
                      QS::priv_.locFilter[QS::EQ_OBJ], this)
         QS_TIME_();                      // timestamp
@@ -233,12 +239,6 @@ void QEQueue::postLIFO(QEvt const * const e) {
         QS_EQC_(nFree);                  // number of free entries
         QS_EQC_(m_nMin);                 // min number of free entries
     QS_END_NOCRIT_()
-
-    --nFree; // one free entry just used up
-    m_nFree = nFree; // update the volatile
-    if (m_nMin > nFree) {
-        m_nMin = nFree; // update minimum so far
-    }
 
     QEvt const *frontEvt = m_frontEvt; // read volatile into temporary
     m_frontEvt = e; // deliver event directly to the front of the queue

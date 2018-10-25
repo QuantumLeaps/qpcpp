@@ -164,10 +164,10 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 @image html bd_EK-TM4C123GXL.jpg EK-TM4C123GXL board
 
 
-The Blinky example is located in the directory <span class="img folder">qpc/examples/arm-cm/blinky_ek-tm4c123gxl</span>, which is organized as follows:
+The Blinky example is located in the directory <span class="img folder">qpcpp/examples/arm-cm/blinky_ek-tm4c123gxl</span>, which is organized as follows:
 
 @code{.x}
- qpc/                - QP/C++ installation directory
+ qpcpp/              - QP/C++ installation directory
   +-examples/        - QP/C++ examples directory (application)
   | +-arm-cm/        - QP/C++ examples for ARM Cortex-M
   | | +-blinky_ek-tm4c123gxl/ - Blinky example on the EK-TM4C123GLX board
@@ -235,10 +235,10 @@ The Windows emulation is a simple console application that produces the followin
 
 @image html bd_EFM32-SLSTK3401A.jpg EFM32-SLSTK3401A board
 
-The Blinky example is located in the directory <span class="img folder">qpc/examples/arm-cm/blinky_efm32-slstk3401a</span>, which is organized as follows:
+The Blinky example is located in the directory <span class="img folder">qpcpp/examples/arm-cm/blinky_efm32-slstk3401a</span>, which is organized as follows:
 
 @code{.x}
- qpc/                - QP/C++ installation directory
+ qpcpp/              - QP/C++ installation directory
   +-examples/        - QP/C++ examples directory (application)
   | +-arm-cm/        - QP/C++ examples for ARM Cortex-M
   | | +-blinky_efm32-slstk3401a/ - Blinky example on the EFM32-SLSTK3401A board
@@ -304,10 +304,10 @@ The Windows emulation is a simple console application that produces the followin
 
 @image html bd_EK-TM4C123GXL.jpg EK-TM4C123GXL board
 
-The DPP example is located in the directory <span class="img folder">qpc/examples/arm-cm/dpp_ek-tm4c123gxl</span>, which is organized as follows:
+The DPP example is located in the directory <span class="img folder">qpcpp/examples/arm-cm/dpp_ek-tm4c123gxl</span>, which is organized as follows:
 
 @code{.x}
- qpc/                - QP/C++ installation directory
+ qpcpp/              - QP/C++ installation directory
   +-examples/        - QP/C++ examples directory (applications)
   | +-arm-cm/        - QP/C++ examples for ARM Cortex-M
   | | +-dpp_ek-tm4c123gxl/ - DPP example on the EK-TM4C123GLX board
@@ -392,7 +392,7 @@ The examples demonstrates the QUTest unit tests for the application.
 
 ------------------------------------------------------------------------------
 @section arm-cm_dpp_ek-tm4c123gxl_spy QP/Spy Software Tracing
-The application also demonstrates <a href="https://state-machine.com/qtools/qpspy.html" target="_blank" class="extern">QP/Spy</a> software tracing output and input. To exercise this feature, you need to build and upload the Spy build configuration into the board.
+The application also demonstrates <a href="https://www.state-machine.com/qtools/qpspy.html" target="_blank" class="extern">QP/Spy</a> software tracing output and input. To exercise this feature, you need to build and upload the Spy build configuration into the board.
 
 */
 /*##########################################################################*/
@@ -405,10 +405,10 @@ The application also demonstrates <a href="https://state-machine.com/qtools/qpsp
 
 @image html bd_EFM32-SLSTK3401A.jpg EFM32-SLSTK3401A board
 
-The DPP example is located in the directory <span class="img folder">qpc/examples/arm-cm/dpp_efm32-slstk3401a</span> and includes versions for @ref qv "cooperative QV kernel", the  @ref qk "preemptive QK kernel", and the @ref qxk "preemptive dual mode QXK RTOS kernel"  each provided for the ARM-KEIL, GNU-ARM, and IAR-ARM. The following annotated directory listing describes the contents of the example folder:
+The DPP example is located in the directory <span class="img folder">qpcpp/examples/arm-cm/dpp_efm32-slstk3401a</span> and includes versions for @ref qv "cooperative QV kernel", the  @ref qk "preemptive QK kernel", and the @ref qxk "preemptive dual mode QXK RTOS kernel"  each provided for the ARM-KEIL, GNU-ARM, and IAR-ARM. The following annotated directory listing describes the contents of the example folder:
 
 @code{.x}
- qpc/                - QP/C++ installation directory
+ qpcpp/              - QP/C++ installation directory
   +-examples/        - QP/C++ examples directory (application)
   | +-arm-cm/        - QP/C++ examples for ARM Cortex-M
   | | +-dpp_efm32-slstk3401a/ - DPP example on the EK-TM4C123GLX board
@@ -477,7 +477,7 @@ Once programmed into the board, the example rapidly toggles the LED1 from the id
 
 ------------------------------------------------------------------------------
 @section arm-cm_dpp_efm32-slstk3401a_spy QP/Spy Software Tracing
-The application also demonstrates <a href="https://state-machine.com/qtools/qpspy.html" target="_blank" class="extern">QP/Spy</a> software tracing output and input. To exercise this feature, you need to build and upload the Spy build configuration into the board.
+The application also demonstrates <a href="https://www.state-machine.com/qtools/qpspy.html" target="_blank" class="extern">QP/Spy</a> software tracing output and input. To exercise this feature, you need to build and upload the Spy build configuration into the board.
 
 */
 /*##########################################################################*/

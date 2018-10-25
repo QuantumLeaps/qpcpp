@@ -177,6 +177,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="qf_port.cpp" />
+    <ClCompile Include="qs_port.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='QSpy|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="qwin_gui.c" />
   </ItemGroup>
   <ItemGroup>

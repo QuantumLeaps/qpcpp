@@ -73,6 +73,7 @@
     <ClCompile Include="..\..\src\qf\qep_hsm.cpp" />
     <ClCompile Include="..\..\src\qf\qep_msm.cpp" />
     <ClCompile Include="..\..\src\qf\qf_act.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_actq.cpp" />
     <ClCompile Include="..\..\src\qf\qf_defer.cpp" />
     <ClCompile Include="..\..\src\qf\qf_dyn.cpp" />
     <ClCompile Include="..\..\src\qf\qf_mem.cpp" />
@@ -80,6 +81,7 @@
     <ClCompile Include="..\..\src\qf\qf_qact.cpp" />
     <ClCompile Include="..\..\src\qf\qf_qeq.cpp" />
     <ClCompile Include="..\..\src\qf\qf_qmact.cpp" />
+    <ClCompile Include="..\..\src\qf\qf_time.cpp" />
     <ClCompile Include="..\..\src\qs\qs.cpp" />
     <ClCompile Include="..\..\src\qs\qs_64bit.cpp" />
     <ClCompile Include="..\..\src\qs\qs_fp.cpp" />

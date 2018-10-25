@@ -1,15 +1,16 @@
-/// \file
-/// \brief QS/C++ port to QUTEST, Win32 API
-/// \cond
+/// @file
+/// @brief QS/C++ port to QUTEST, Win32 API
+/// @ingroup qf
+/// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-16
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-20
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,20 +31,20 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
-/// \endcond
-
+/// @endcond
+///
 #ifndef qs_port_h
 #define qs_port_h
 
 #define QS_TIME_SIZE        4
 
-#if defined(__LP64__) || defined(_LP64) // 64-bit architecture?
+#ifdef _WIN64 // 64-bit architecture?
     #define QS_OBJ_PTR_SIZE 8
     #define QS_FUN_PTR_SIZE 8
-#else                                   // 32-bit architecture
+#else         // 32-bit architecture
     #define QS_OBJ_PTR_SIZE 4
     #define QS_FUN_PTR_SIZE 4
 #endif
@@ -52,12 +53,14 @@
 #define QS_REC_DONE()  QP::QS::onFlush()
 
 //****************************************************************************
-// NOTE: QS might be used with or without other QP components, in which case
-// the separate definitions of the macros QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY,
-// and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
-// the QF framework, by simply including "qf_port.h" *before* "qs.h".
+// NOTE: QS might be used with or without other QP components, in which
+// case the separate definitions of the macros QF_CRIT_STAT_TYPE,
+// QF_CRIT_ENTRY, and QF_CRIT_EXIT are needed. In this port QS is configured
+// to be used with the other QP component, by simply including "qf_port.h"
+// *before* "qs.h".
 //
 #include "qf_port.h" // use QS with QF
 #include "qs.h"      // QS platform-independent public interface
 
 #endif // qs_port_h
+

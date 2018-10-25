@@ -31,7 +31,7 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
-#include "qpc.h"
+#include "qpcpp.h"
 #include "dpp.h"
 #include "bsp.h"
 
@@ -122,7 +122,7 @@ void BSP_init(void) {
         SIM_HARDKEY_SetCallback(n, &simHardKey);
     }
 
-    QF_setTickRate(BSP_TICKS_PER_SEC); // set the desired tick rate
+    QF_setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
 
 #ifdef Q_SPY
     {

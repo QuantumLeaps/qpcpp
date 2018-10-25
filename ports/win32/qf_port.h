@@ -1,10 +1,10 @@
 /// @file
-/// @brief QF/C++ port to Win32 API
+/// @brief QF/C++ port to Win32 API (multi-threaded)
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.3.4
-/// Date of the Last Update:  2018-09-04
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -35,7 +35,7 @@
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
-
+///
 #ifndef qf_port_h
 #define qf_port_h
 
@@ -62,7 +62,7 @@
 #define QF_INT_ENABLE()      (QP::QF_leaveCriticalSection_())
 
 // Win32 critical section
-// QF_CRIT_STAT_TYPE -- not defined
+// QF_CRIT_STAT_TYPE not defined
 #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
 #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
@@ -84,11 +84,17 @@ void QF_leaveCriticalSection_(void);
 //
 void QF_setWin32Prio(QActive *act, int_t win32Prio);
 
-// set clock tick rate
-void QF_setTickRate(uint32_t ticksPerSec);
+// set clock tick rate and priority
+void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio);
 
 // clock tick callback (provided in the app)
 void QF_onClockTick(void);
+
+// abstractions for console access...
+void QF_consoleSetup(void);
+void QF_consoleCleanup(void);
+int QF_consoleGetKey(void);
+int QF_consoleWaitForKey(void);
 
 } // namespace QP
 
@@ -104,9 +110,7 @@ void QF_onClockTick(void);
 #ifdef _MSC_VER // Microsoft Visual C++
 
 #if (_MSC_VER < 1900) // before Visual Studio 2015
-
 #define snprintf _snprintf
-
 #endif
 
 #define SNPRINTF_S(buf_, len_, format_, ...) \
@@ -142,7 +146,7 @@ void QF_onClockTick(void);
 #define SSCANF_S(buf_, format_, ...) \
     sscanf(buf_, format_, ##__VA_ARGS__)
 
-#endif
+#endif // _MSC_VER
 
 //****************************************************************************
 // interface used only inside QF, but not in applications
@@ -179,7 +183,7 @@ void QF_onClockTick(void);
     #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
 
     #define WIN32_LEAN_AND_MEAN
-    #include <windows.h>  // Win32 API
+    #include <windows.h> // Win32 API
 
 #endif  // QP_IMPL
 

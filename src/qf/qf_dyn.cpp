@@ -2,14 +2,14 @@
 /// @brief QF/C++ dynamic event management
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-04
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -94,6 +94,15 @@ void QF::poolInit(void * const poolSto,
 
     QF_EPOOL_INIT_(QF_pool_[QF_maxPool_], poolSto, poolSize, evtSize);
     ++QF_maxPool_; // one more pool
+
+#ifdef Q_SPY
+    // generate the object-dictionary entry for the initialized pool
+    char_t obj_name[9] = "EvtPool?";
+    obj_name[7] = static_cast<char_t>(
+        static_cast<int8_t>('0') + static_cast<int8_t>(QF_maxPool_));
+    QS::obj_dict(&QF_pool_[QF_maxPool_ - static_cast<uint_fast8_t>(1)],
+                 &obj_name[0]);
+#endif // Q_SPY
 }
 
 //****************************************************************************

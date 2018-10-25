@@ -1,11 +1,11 @@
 ##############################################################################
 # Product: Makefile for QUTEST, QP/C++, Win32, MinGW toolset
-# Last Updated for Version: 6.2.0
-# Date of the Last Update:  2018-03-16
+# Last Updated for Version: 6.3.6
+# Date of the Last Update:  2018-10-20
 #
-#                    Q u a n t u m     L e a P s
-#                    ---------------------------
-#                    innovating embedded systems
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
 #
 # Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 #
@@ -40,7 +40,7 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    http://sourceforge.net/projects/QPCPP/files/Qtools/
+#    http://sourceforge.net/projects/qpc/files/Qtools/
 #
 
 #-----------------------------------------------------------------------------
@@ -91,6 +91,7 @@ CPP_SRCS := \
 	qf_qact.cpp \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
+	qf_time.cpp \
 	qs.cpp \
 	qs_64bit.cpp \
 	qs_rx.cpp \

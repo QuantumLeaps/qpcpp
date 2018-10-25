@@ -1,17 +1,18 @@
-namespace QP {
-
+/*##########################################################################*/
 /*! @page ports_os Ports to Third-Party OS
 
-- @subpage posix (Linux, embedded-Linux, BSD, etc.)
-- @subpage qt (Windows, Linux, Mac OS-X, Android, etc.)
-- @subpage win32 API (Windows)
-- @subpage win32-qv (Windows with QV)
+- @subpage posix-qv (single-threadedLinux, embedded-Linux, BSD, etc.)
+- @subpage posix (multi-threaded Linux, embedded-Linux, BSD, etc.)
+- @subpage win32-qv (single-threaded Windows, like the QV kernel)
+- @subpage win32 API (multi-threaded Windows, Windows embedded)
 
 */
-/*##########################################################################*/
-/*! @page posix POSIX
 
-The Quantum Leaps Application Note <a class="pdf" target="_blank" href="https://www.state-machine.com/doc/AN_QP_and_POSIX.pdf"><strong>QP and POSIX</strong></a> describes the QP port to the POSIX 1003.1cn1995 standard.
+/*##########################################################################*/
+/*! @page posix-qv POSIX-QV
+
+<p>The QP/C/C++ ports and examples for POSIX-QV (e.g., Embedded Linux, BSD, VxWorks, QNX, etc.) are described in the Quantum Leaps Application Note <a class="extern" target="_blank" href="https://www.state-machine.com/doc/AN_QP_and_POSIX.pdf"><strong>QP and POSIX</strong></a>.
+</p>
 
 @htmlonly
 <div class="image">
@@ -22,63 +23,62 @@ Application Note: QP and POSIX
 </div>
 @endhtmlonly
 
-The standard QP/C++ distribution contains the POSIX port and @ref exa_posix "Example Projects for POSIX".
+The standard QP/C++ distribution contains the POSIX-QV port and @ref exa_os.
 
 */
-/*##########################################################################*/
-/*! @page qt Qt GUI Framework
 
-<p>The QP/C++ ports and examples for [Qt](https://www.qt.io/) are described in the Quantum Leaps Application Note <a class="extern" target="_blank" href="https://state-machine.com/doc/AN_QP_and_Qt.pdf"><strong>QP and the Qt GUI Framework</strong></a>.
+/*##########################################################################*/
+/*! @page posix POSIX
+
+<p>The QP/C/C++ ports and examples for POSIX (e.g., Embedded Linux, BSD, VxWorks, QNX, etc.) are described in the Quantum Leaps Application Note <a class="extern" target="_blank" href="https://www.state-machine.com/doc/AN_QP_and_POSIX.pdf"><strong>QP and POSIX</strong></a>.
 </p>
 
 @htmlonly
 <div class="image">
-<a target="_blank" href="https://state-machine.com/doc/AN_QP_and_Qt.pdf"><img border="0" src="img/AN.jpg" title="Download PDF"></a>
+<a target="_blank" href="https://www.state-machine.com/doc/AN_QP_and_POSIX.pdf"><img border="0" src="img/AN.jpg" title="Download PDF"></a>
 <div class="caption">
-Application Note: QP and the Qt GUI Framework
+Application Note: QP and POSIX
 </div>
 </div>
 @endhtmlonly
 
-The standard QP/C++ distribution contains the Qt port and @ref exa_qt "Example Projects for the Qt Framework".
+The standard QP/C++ distribution contains the POSIX port and @ref exa_os.
+
+*/
+
+/*##########################################################################*/
+/*! @page win32-qv Win32-QV (Windows with QV)
+
+<p>The QP/C/C++ ports and examples for Windows with single-thread (like the @ref qv "QV cooperative kernel") are described in the Quantum Leaps Application Note <a class="extern" target="_blank" href="https://www.state-machine.com/doc/AN_QP_and_Win32.pdf"><strong>QP and Win32 (Windows)</strong></a>.
+</p>
+
+@htmlonly
+<div class="image">
+<a target="_blank" href="https://www.state-machine.com/doc/AN_QP_and_Win32.pdf"><img border="0" src="img/AN.jpg" title="Download PDF"></a>
+<div class="caption">
+Application Note: QP and Win32 (Windows)
+</div>
+</div>
+@endhtmlonly
+
+The standard QP/C++ distribution contains the Win32-QV port and @ref exa_os.
 
 */
 /*##########################################################################*/
 /*! @page win32 Win32 API (Windows)
 
-<p>The QP/C/C++ ports and examples for Windows (e.g., Windows Embedded, WindowsCE etc.) are described in the Quantum Leaps Application Note <a class="extern" target="_blank" href="https://state-machine.com/doc/AN_QP_and_Win32.pdf"><strong>QP and Win32 (Windows)</strong></a>.
+<p>The QP/C/C++ ports and examples for Windows (e.g., Windows Embedded, WindowsCE etc.) are described in the Quantum Leaps Application Note <a class="extern" target="_blank" href="https://www.state-machine.com/doc/AN_QP_and_Win32.pdf"><strong>QP and Win32 (Windows)</strong></a>.
 </p>
 
 @htmlonly
 <div class="image">
-<a target="_blank" href="https://state-machine.com/doc/AN_QP_and_Win32.pdf"><img border="0" src="img/AN.jpg" title="Download PDF"></a>
+<a target="_blank" href="https://www.state-machine.com/doc/AN_QP_and_Win32.pdf"><img border="0" src="img/AN.jpg" title="Download PDF"></a>
 <div class="caption">
 Application Note: QP and Win32 (Windows)
 </div>
 </div>
 @endhtmlonly
 
-The standard QP/C++ distribution contains the Win32 (Windows) port and @ref exa_win32 "Example Projects for Win32 (Windows)".
+The standard QP/C++ distribution contains the Win32 (Windows) port and @ref exa_os.
 
 */
-/*##########################################################################*/
-/*! @page win32-qv Win32-QV (Windows with QV)
-
-<p>The QP/C/C++ ports and examples for Windows with single-thread (like the @ref qv "QV cooperative kernel") are described in the Quantum Leaps Application Note <a class="extern" target="_blank" href="https://state-machine.com/doc/AN_QP_and_Win32.pdf"><strong>QP and Win32 (Windows)</strong></a>.
-</p>
-
-@htmlonly
-<div class="image">
-<a target="_blank" href="https://state-machine.com/doc/AN_QP_and_Win32.pdf"><img border="0" src="img/AN.jpg" title="Download PDF"></a>
-<div class="caption">
-Application Note: QP and Win32 (Windows)
-</div>
-</div>
-@endhtmlonly
-
-The standard QP/C++ distribution contains the Win32-QV port and @ref exa_win32-qv "Example Projects for Win32-QV".
-
-*/
-
-} // namespace QP
-

@@ -2,12 +2,12 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.2
-/// Last updated on  2018-06-16
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-20
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
 /// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
@@ -47,6 +47,15 @@
 
 #include <limits.h>       // for PTHREAD_STACK_MIN
 #include <sys/mman.h>     // for mlockall()
+#include <sys/select.h>
+#include <sys/ioctl.h>
+#include <string.h>       // for memcpy() and memset()
+#include <stdlib.h>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <signal.h>
+
 
 namespace QP {
 
@@ -56,15 +65,18 @@ Q_DEFINE_THIS_MODULE("qf_port")
 pthread_mutex_t QF_pThreadMutex_;
 
 // Local objects *************************************************************
-static bool l_isRunning;    // flag indicating when QF is running
 static pthread_mutex_t l_startupMutex;
+static bool l_isRunning;      // flag indicating when QF is running
+static struct termios l_tsav; // structure with saved terminal attributes
 static struct timespec l_tick;
 static int_t l_tickPrio;
 enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 
+static void sigIntHandler(int /* dummy */);
 static void *ao_thread(void *arg); // thread routine for all AOs
 
-//****************************************************************************
+
+// QF functions ==============================================================
 void QF::init(void) {
     // lock memory so we're never swapped out to disk
     //mlockall(MCL_CURRENT | MCL_FUTURE); // uncomment when supported
@@ -91,13 +103,18 @@ void QF::init(void) {
     l_tick.tv_sec = 0;
     l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC/100L; // default clock tick
     l_tickPrio = sched_get_priority_min(SCHED_FIFO); // default tick prio
+
+    // install the SIGINT (Ctrl-C) signal handler
+    struct sigaction sig_act;
+    sig_act.sa_handler = &sigIntHandler;
+    sigaction(SIGINT, &sig_act, NULL);
 }
 
 //****************************************************************************
 int_t QF::run(void) {
     onStartup(); // invoke startup callback
 
-    // try to set the priority of the ticker thread
+    // try to set the priority of the ticker thread, see NOTE01
     struct sched_param sparam;
     sparam.sched_priority = l_tickPrio;
     if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &sparam) == 0) {
@@ -148,6 +165,36 @@ void QF::thread_(QActive *act) {
     QF::remove_(act); // remove this object from the framework
     pthread_cond_destroy(&act->m_osObject); // cleanup the condition variable
 }
+
+//............................................................................
+void QF_consoleSetup(void) {
+    struct termios tio;   // modified terminal attributes
+
+    tcgetattr(0, &l_tsav); // save the current terminal attributes
+    tcgetattr(0, &tio);    // obtain the current terminal attributes
+    tio.c_lflag &= ~(ICANON | ECHO); // disable the canonical mode & echo
+    tcsetattr(0, TCSANOW, &tio);     // set the new attributes
+}
+//............................................................................
+void QF_consoleCleanup(void) {
+    tcsetattr(0, TCSANOW, &l_tsav); // restore the saved attributes
+}
+//............................................................................
+int QF_consoleGetKey(void) {
+    int byteswaiting;
+    ioctl(0, FIONREAD, &byteswaiting);
+    if (byteswaiting > 0) {
+        char ch;
+        read(0, &ch, 1);
+        return (int)ch;
+    }
+    return 0; // no input at this time
+}
+/*..........................................................................*/
+int QF_consoleWaitForKey(void) {
+    return getchar();
+}
+
 //............................................................................
 void QActive::start(uint_fast8_t prio,
                     QEvt const *qSto[], uint_fast16_t qLen,
@@ -182,7 +229,8 @@ void QActive::start(uint_fast8_t prio,
 
     // stack size not provided?
     if (stkSize == 0U) {
-        stkSize = (uint_fast16_t)PTHREAD_STACK_MIN; // the minimum
+        // set the allowed minimum
+        stkSize = (uint_fast16_t)PTHREAD_STACK_MIN;
     }
     pthread_t thread;
     if (pthread_create(&thread, &attr, &ao_thread, this) != 0) {
@@ -195,7 +243,8 @@ void QActive::start(uint_fast8_t prio,
         pthread_attr_setschedpolicy(&attr, SCHED_OTHER);
         param.sched_priority = 0;
         pthread_attr_setschedparam(&attr, &param);
-        Q_ALLEGE(pthread_create(&thread, &attr, &ao_thread, this)== 0);
+        Q_ALLEGE_ID(601,
+            pthread_create(&thread, &attr, &ao_thread, this) == 0);
     }
     pthread_attr_destroy(&attr);
     m_thread = static_cast<uint8_t>(1);
@@ -210,6 +259,12 @@ void QActive::stop(void) {
 static void *ao_thread(void *arg) { // the expected POSIX signature
     QF::thread_(static_cast<QActive *>(arg));
     return static_cast<void *>(0); // return success
+}
+
+//****************************************************************************
+static void sigIntHandler(int /* dummy */) {
+    QP::QF::onCleanup();
+    exit(-1);
 }
 
 } // namespace QP

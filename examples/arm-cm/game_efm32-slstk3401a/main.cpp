@@ -64,15 +64,6 @@ int main() {
     QS_OBJ_DICTIONARY(GAME::AO_Ship);
     QS_OBJ_DICTIONARY(GAME::AO_Tunnel);
 
-    // object dictionaries for event queues...
-    QS_OBJ_DICTIONARY(missileQueueSto);
-    QS_OBJ_DICTIONARY(shipQueueSto);
-    QS_OBJ_DICTIONARY(tunnelQueueSto);
-
-    // object dictionaries for event pools...
-    QS_OBJ_DICTIONARY(smlPoolSto);
-    QS_OBJ_DICTIONARY(medPoolSto);
-
     // signal dictionaries for globally published events...
     QS_SIG_DICTIONARY(GAME::TIME_TICK_SIG,      static_cast<void *>(0));
     QS_SIG_DICTIONARY(GAME::PLAYER_TRIGGER_SIG, static_cast<void *>(0));

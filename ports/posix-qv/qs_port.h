@@ -2,14 +2,14 @@
 /// \brief QS/C++ port to GNU compiler
 /// \cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-04-05
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-20
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -47,6 +47,11 @@
     #define QS_OBJ_PTR_SIZE 4
     #define QS_FUN_PTR_SIZE 4
 #endif
+
+namespace QP {
+void QS_output(void);    // handle the QS output
+void QS_rx_input(void);  // handle the QS-RX input
+}
 
 //****************************************************************************
 // NOTE: QS might be used with or without other QP components, in which case

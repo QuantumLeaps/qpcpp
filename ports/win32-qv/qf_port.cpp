@@ -1,13 +1,14 @@
-/// \file
-/// \brief QF/C++ port to Win32 API with cooperative QV scheduler (win32-qv)
-/// \cond
+/// @file
+/// @brief QF/C++ port to Win32 API (single-threaded, like the QV kernel)
+/// @ingroup ports
+/// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-04-09
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-20
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
 /// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
@@ -33,8 +34,8 @@
 /// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
-/// \endcond
-
+/// @endcond
+///
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.h"      // QF port
 #include "qf_pkg.h"       // QF package-scope interface
@@ -46,6 +47,7 @@
 #endif // Q_SPY
 
 #include <limits.h>       // limits of dynamic range for integers
+#include <conio.h>        // console input/output
 
 namespace QP {
 
@@ -58,6 +60,7 @@ HANDLE QV_win32Event_; // Win32 event to signal events
 // Local objects *************************************************************
 static CRITICAL_SECTION l_win32CritSect;
 static DWORD l_tickMsec = 10U; // clock tick in msec (argument for Sleep())
+static int_t l_tickPrio = 50;  // default priority of the "ticker" thread
 static bool  l_isRunning;      // flag indicating when QF is running
 
 static DWORD WINAPI ticker_thread(LPVOID arg);
@@ -65,6 +68,7 @@ static DWORD WINAPI ticker_thread(LPVOID arg);
 //****************************************************************************
 void QF::init(void) {
     InitializeCriticalSection(&l_win32CritSect);
+    QV_win32Event_ = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     // clear the internal QF variables, so that the framework can (re)start
     // correctly even if the startup code is not called to clear the
@@ -107,7 +111,7 @@ int_t QF::run(void) {
     // the combined event-loop and background-loop of the QV kernel */
     QF_INT_DISABLE();
     while (l_isRunning) {
-
+        // find the maximum priority AO ready to run
         if (QV_readySet_.notEmpty()) {
             uint_fast8_t p = QV_readySet_.findMax();
             QActive *a = active_[p];
@@ -155,30 +159,48 @@ int_t QF::run(void) {
     return static_cast<int_t>(0);
 }
 //****************************************************************************
-void QF_setTickRate(uint32_t ticksPerSec) {
+void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
     if (ticksPerSec != static_cast<uint32_t>(0)) {
         l_tickMsec = 1000UL / ticksPerSec;
     }
     else {
         l_tickMsec = static_cast<uint32_t>(0); // means NO system clock tick
     }
+    l_tickPrio = tickPrio;
 }
+
+//............................................................................
+void QF_consoleSetup(void) {
+}
+//............................................................................
+void QF_consoleCleanup(void) {
+}
+//............................................................................
+int QF_consoleGetKey(void) {
+    if (_kbhit()) { /* any key pressed? */
+        return _getch();
+    }
+    return 0;
+}
+//............................................................................
+int QF_consoleWaitForKey(void) {
+    return _getch();
+}
+
 //****************************************************************************
 void QActive::start(uint_fast8_t prio,
                     QEvt const *qSto[], uint_fast16_t qLen,
                     void *stkSto, uint_fast16_t /*stkSize*/,
                     QEvt const *ie)
 {
-    Q_REQUIRE_ID(700, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
+    Q_REQUIRE_ID(600, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
         && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*... in range */
         && (stkSto == static_cast<void *>(0)));    /* statck storage must NOT...
                                                     * ... be provided */
 
-    m_prio = prio;  // set the QF priority of this AO
-    QF::add_(this); // make QF aware of this AO
-
     m_eQueue.init(qSto, qLen);
-
+    m_prio = prio;  // set the QF priority of this AO before adding it to QF
+    QF::add_(this); // make QF aware of this AO
 
     this->init(ie); // execute initial transition (virtual call)
     QS_FLUSH();     // flush the QS trace buffer to the host
@@ -191,11 +213,19 @@ void QActive::stop(void) {
 
 //****************************************************************************
 static DWORD WINAPI ticker_thread(LPVOID /*arg*/) { // for CreateThread()
-    // set the ticker thread priority below normal to prevent
-    // flooding other threads with time events when the machine
-    // is very busy.
+    int threadPrio = THREAD_PRIORITY_NORMAL;
+
+    // set the ticker thread priority according to selection made in
+    // QF_setTickRate()
     //
-    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+    if (l_tickPrio < 33) {
+        threadPrio = THREAD_PRIORITY_BELOW_NORMAL;
+    }
+    else if (l_tickPrio > 66) {
+        threadPrio = THREAD_PRIORITY_ABOVE_NORMAL;
+    }
+
+    SetThreadPriority(GetCurrentThread(), threadPrio);
 
     while (l_isRunning) {
         Sleep(l_tickMsec); // wait for the tick interval

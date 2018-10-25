@@ -3,12 +3,12 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.1
-/// Last updated on  2018-05-24
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-20
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
 /// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
@@ -169,7 +169,7 @@ enum QSpyRecords {
     QS_TARGET_INFO,       //!< reports the Target information
     QS_TARGET_DONE,       //!< reports completion of a user callback
     QS_RX_STATUS,         //!< reports QS data receive status
-    QS_MSC_RESERVED1,
+    QS_QUERY_DATA,        //!< reports the data from "current object" query
     QS_PEEK_DATA,         //!< reports the data from the PEEK query
     QS_ASSERT_FAIL,       //!< assertion failed in the code
 
@@ -200,7 +200,8 @@ enum QSpyUserRecords {
     QS_USER0 = QS_USER,       //!< offset for User Group 0
     QS_USER1 = QS_USER0 + 10, //!< offset for User Group 1
     QS_USER2 = QS_USER1 + 10, //!< offset for User Group 2
-    QS_USER3 = QS_USER2 + 10  //!< offset for User Group 3
+    QS_USER3 = QS_USER2 + 10, //!< offset for User Group 3
+    QS_USER4 = QS_USER3 + 10  //!< offset for User Group 4
 };
 
 #if (QS_TIME_SIZE == 1)
@@ -378,6 +379,9 @@ public:
     static void onCommand(uint8_t cmdId,
                           uint32_t param1, uint32_t param2, uint32_t param3);
 
+    //! internal function to handle incoming (QS-RX) packet
+    static void rxHandleGoodFrame_(uint8_t state);
+
 #ifdef Q_UTEST
     //! callback to setup a unit test inside the Target
     static void onTestSetup(void);
@@ -385,14 +389,21 @@ public:
     //! callback to teardown after a unit test inside the Target
     static void onTestTeardown(void);
 
-    //! callback to "massage" the test event, if neccessary
+    //! callback to "massage" the test event before dispatching/posting it
     static void onTestEvt(QEvt *e);
+
+    // callback to examine an event that is about to be posted
+    static void onTestPost(void const *sender, QActive *recipient,
+                           QEvt const *e, bool status);
+
+    //! callback to run the test loop
+    static void onTestLoop(void);
 
     //! internal function to process posted events during test
     static void processTestEvts_(void);
 
-    //! callback to run the test loop
-    static void onTestLoop(void);
+    //! internal function to process armed time events during test
+    static void tickX_(uint_fast8_t const tickRate, void const * const sender);
 
     //! internal function to get the Test-Probe for a given API
     static uint32_t getTestProbe_(void (* const api)(void));
@@ -496,9 +507,40 @@ enum QSpyRxRecords {
     QS_RX_AO_FILTER,  //!< set local AO filter in the Target
     QS_RX_CURR_OBJ,   //!< set the "current-object" in the Target
     QS_RX_TEST_CONTINUE, //!< continue a test after QS_RX_TEST_WAIT()
-    QS_RX_RESERVED1,  //!< reserved for future use
+    QS_RX_QUERY_CURR,    //!< query the "current object" in the Target
     QS_RX_EVENT       //!< inject an event to the Target (post/publish)
 };
+
+
+//****************************************************************************
+#ifdef Q_UTEST
+
+//! Dummy Active Object class
+/// @description
+/// QActiveDummy is a test double for the role of collaborating active
+/// objects in QUTest unit testing.
+///
+class QActiveDummy : public QActive {
+public:
+    QActiveDummy(void); // ctor
+
+    virtual void start(uint_fast8_t const prio,
+                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       void * const stkSto, uint_fast16_t const stkSize,
+                       QEvt const * const ie);
+    virtual void init(QEvt const * const e);
+    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
+    virtual void dispatch(QEvt const * const e);
+    virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
+                       void const * const sender);
+    virtual void postLIFO(QEvt const * const e);
+};
+
+enum QUTestUserRecords {
+    QUTEST_ON_POST = 124
+};
+
+#endif // Q_UTEST
 
 } // namespace QP
 
@@ -839,6 +881,9 @@ enum QSpyRxRecords {
 //! Internal QS macro to output an unformatted uint32_t data element
 #define QS_U32_(data_)       (QP::QS::u32_(static_cast<uint32_t>(data_)))
 
+//! Internal QS macro to output a zero-terminated ASCII string
+/// data element
+#define QS_STR_(msg_)        (QP::QS::str_(msg_))
 
 #if (QS_OBJ_PTR_SIZE == 1)
     #define QS_OBJ_(obj_)    (QP::QS::u8_(reinterpret_cast<uint8_t>(obj_)))
@@ -876,10 +921,6 @@ enum QSpyRxRecords {
     /// If the size is not defined the size of pointer is assumed 4-bytes.
     #define QS_FUN_(fun_)    (QP::QS::u32_(reinterpret_cast<uint32_t>(fun_)))
 #endif
-
-//! Internal QS macro to output a zero-terminated ASCII string
-/// data element
-#define QS_STR_(msg_)        (QP::QS::str_(msg_))
 
 
 //****************************************************************************
@@ -1154,6 +1195,18 @@ enum QSpyRxRecords {
 //! Execute an action that is only necessary for QS output
 #define QF_QS_ACTION(act_)      (act_)
 
+//! macro to handle the QS output from the application
+//! NOTE: if this macro is used, the application must define QS_output().
+#define QS_OUTPUT()   (QS_output())
+
+//! macro to handle the QS-RX input to the application
+//! NOTE: if this macro is used, the application must define QS_rx_input().
+#define QS_RX_INPUT() (QS_rx_input())
+
+
+//****************************************************************************
+// Macros for use in QUTest only
+
 #ifdef Q_UTEST
     //! QS macro to define the Test-Probe for a given @p fun_
     #define QS_TEST_PROBE_DEF(fun_) \
@@ -1174,14 +1227,6 @@ enum QSpyRxRecords {
         QP::QS::endRec(); \
         QP::QS::onTestLoop(); \
     } while (false)
-
-#ifdef QP_IMPL
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
-
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QS::rxPriv_.readySet.insert(static_cast<uint_fast8_t>((me_)->m_prio)))
-#endif // QP_IMPL
 
 #else
     // dummy definitions when not building for QUTEST

@@ -60,6 +60,10 @@
     <ClCompile Include="qutest_port.cpp">
       <Filter>QP_port</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_time.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\qf\qf_actq.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qep_port.h">

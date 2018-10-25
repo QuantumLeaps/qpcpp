@@ -8,14 +8,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.2
-/// Last updated on  2018-06-16
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-04
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -122,11 +122,17 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         status = false; // cannot post, but don't assert
     }
 
+    // is it a dynamic event?
+    if (e->poolId_ != static_cast<uint8_t>(0)) {
+        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    }
+
     if (status) { // can post the event?
 
-        // is it a dynamic event?
-        if (e->poolId_ != static_cast<uint8_t>(0)) {
-            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+        --nFree;  // one free entry just used up
+        m_eQueue.m_nFree = nFree; // update the volatile
+        if (m_eQueue.m_nMin > nFree) {
+            m_eQueue.m_nMin = nFree; // update minimum so far
         }
 
         QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
@@ -141,27 +147,19 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
         QS_END_NOCRIT_()
 
 #ifdef Q_UTEST
-    // in QUTest the event is posted under the following conditions:
-    // 1. the test-probe#2 is provided; OR
-    // 2. the 'sender' is 'me' (self-posting); OR
-    // 3. the AO-local-filter is set and is 'me'; OR
-    // 4. the AO-local-filter is not set AND the 'sender' is QS_RX
-    //
-    if ((qs_tp_ == static_cast<uint32_t>(2))
-        || (sender == this)
-        || (QS::priv_.locFilter[QS::AO_OBJ] == this)
-        || ((QS::priv_.locFilter[QS::AO_OBJ] == static_cast<void *>(0))
-            && (sender == &QS::rxPriv_)))
-    {
+        // callback to examine the posted event under the the same conditions
+        // as producing the QS_QF_ACTIVE_POST_FIFO trace record, which are:
+        // 1. the local AO-filter is not set (zero) OR
+        // 2. the local AO-filter is set to this AO ('me')
+        //
+        if ((QS::priv_.locFilter[QS::AO_OBJ] == static_cast<QActive *>(0))
+            || (QS::priv_.locFilter[QS::AO_OBJ] == this))
+        {
+            QS::onTestPost(sender, this, e, status);
+        }
 #endif
 
-        --nFree;  // one free entry just used up
-        m_eQueue.m_nFree = nFree;     // update the volatile
-        if (m_eQueue.m_nMin > nFree) {
-            m_eQueue.m_nMin = nFree;  // update minimum so far
-        }
-
-        // is the queue empty?
+        // empty queue?
         if (m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) {
             m_eQueue.m_frontEvt = e;      // deliver event directly
             QACTIVE_EQUEUE_SIGNAL_(this); // signal the event queue
@@ -177,9 +175,7 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
             }
             --m_eQueue.m_head; // advance the head (counter clockwise)
         }
-#ifdef Q_UTEST
-    }
-#endif
+
         QF_CRIT_EXIT_();
     }
     else { // cannot post the event
@@ -195,9 +191,22 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
             QS_EQC_(static_cast<QEQueueCtr>(margin)); // margin requested
         QS_END_NOCRIT_()
 
+#ifdef Q_UTEST
+        // callback to examine the posted event under the the same conditions
+        // as producing the QS_QF_ACTIVE_POST_ATTEMPT trace record, which are:
+        // 1. the local AO-filter is not set (zero) OR
+        // 2. the local AO-filter is set to this AO ('me')
+        //
+        if ((QS::priv_.locFilter[QS::AO_OBJ] == static_cast<QActive *>(0))
+            || (QS::priv_.locFilter[QS::AO_OBJ] == this))
+        {
+            QS::onTestPost(sender, this, e, status);
+        }
+#endif
+
         QF_CRIT_EXIT_();
 
-        QF::gc(e); // recycle the evnet to avoid a leak
+        QF::gc(e); // recycle the event to avoid a leak
     }
 
     return status;
@@ -236,6 +245,12 @@ void QActive::postLIFO(QEvt const * const e) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
+    --nFree;  // one free entry just used up
+    m_eQueue.m_nFree = nFree; // update the volatile
+    if (m_eQueue.m_nMin > nFree) {
+        m_eQueue.m_nMin = nFree; // update minimum so far
+    }
+
     QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_();                      // timestamp
@@ -246,11 +261,18 @@ void QActive::postLIFO(QEvt const * const e) {
         QS_EQC_(m_eQueue.m_nMin);        // min number of free entries
     QS_END_NOCRIT_()
 
-    --nFree;  // one free entry just used up
-    m_eQueue.m_nFree = nFree; // update the volatile
-    if (m_eQueue.m_nMin > nFree) {
-        m_eQueue.m_nMin = nFree; // update minimum so far
+#ifdef Q_UTEST
+    // callback to examine the posted event under the the same conditions
+    // as producing the QS_QF_ACTIVE_POST_ATTEMPT trace record, which are:
+    // 1. the local AO-filter is not set (zero) OR
+    // 2. the local AO-filter is set to this AO ('me')
+    //
+    if ((QS::priv_.locFilter[QS::AO_OBJ] == static_cast<QActive *>(0))
+        || (QS::priv_.locFilter[QS::AO_OBJ] == this))
+    {
+        QS::onTestPost(static_cast<QActive *>(0), this, e, true);
     }
+#endif
 
     QEvt const *frontEvt = m_eQueue.m_frontEvt;// read volatile into temporary
     m_eQueue.m_frontEvt = e; // deliver the event directly to the front
@@ -259,7 +281,7 @@ void QActive::postLIFO(QEvt const * const e) {
     if (frontEvt == static_cast<QEvt const *>(0)) {
         QACTIVE_EQUEUE_SIGNAL_(this); // signal the event queue
     }
-    // queue is not empty, leave event in the ring-buffer
+    // queue was not empty, leave the event in the ring-buffer
     else {
         ++m_eQueue.m_tail;
         if (m_eQueue.m_tail == m_eQueue.m_end) { // need to wrap the tail?

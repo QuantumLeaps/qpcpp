@@ -2,14 +2,14 @@
 /// @brief QF/C++ port for QUTEST Unit Test, POSIX
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.1
-/// Last updated on  2018-05-21
+/// Last Updated for Version: 6.3.6
+/// Date of the Last Update:  2018-10-04
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -70,18 +70,23 @@ namespace QP {
 extern uint8_t volatile QF_intNest;
 }
 
-
-//****************************************************************************
+//***************************************************************************
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
 
-    /* QUTEST scheduler locking (not used) */
+    // QUTEST scheduler locking (not used)
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) ((void)0)
     #define QF_SCHED_UNLOCK_()    ((void)0)
 
-    // QUTEST-specific event pool operations
+    // native event queue operations
+    #define QACTIVE_EQUEUE_WAIT_(me_) \
+        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
+    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
+        (QS::rxPriv_.readySet.insert(static_cast<uint_fast8_t>((me_)->m_prio)))
+
+    // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool
 
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
@@ -92,12 +97,8 @@ extern uint8_t volatile QF_intNest;
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
     #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
 
-#endif // QP_IMPL
+    #include "qf_pkg.h" // internal QF interface
 
-//****************************************************************************
-// NOTE1:
-// This QF "port" provides dummy declaration for the QF stub that provides
-// empty definitions of the QF facilities.
-//
+#endif // QP_IMPL
 
 #endif // qf_port_h

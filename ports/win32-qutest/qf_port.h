@@ -3,8 +3,8 @@
 /// @ingroup qutest
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.3.4
-/// Date of the Last Update:  2018-09-04
+/// Last Updated for Version: 6.3.6
+/// Date of the Last Update:  2018-10-04
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -125,7 +125,13 @@ extern uint8_t volatile QF_intNest;
     #define QF_SCHED_LOCK_(dummy) ((void)0)
     #define QF_SCHED_UNLOCK_()    ((void)0)
 
-    // QUTEST-specific event pool operations
+    // native event queue operations
+    #define QACTIVE_EQUEUE_WAIT_(me_) \
+        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
+    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
+        (QS::rxPriv_.readySet.insert(static_cast<uint_fast8_t>((me_)->m_prio)))
+
+    // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool
 
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
@@ -136,12 +142,8 @@ extern uint8_t volatile QF_intNest;
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
     #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
 
-#endif // QP_IMPL
+    #include "qf_pkg.h" // internal QF interface
 
-//****************************************************************************
-// NOTE1:
-// This QF "port" provides dummy declaration for the QF stub that provides
-// empty definitions of the QF facilities.
-//
+#endif // QP_IMPL
 
 #endif // qf_port_h

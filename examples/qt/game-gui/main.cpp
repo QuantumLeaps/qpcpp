@@ -61,11 +61,7 @@ int main(int argc, char *argv[]) {
 
     QP::QF::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
 
-    // send object dictionaries for event pools...
-    QS_OBJ_DICTIONARY(smlPoolSto);
-    QS_OBJ_DICTIONARY(medPoolSto);
-
-                  // send signal dictionaries for globally published events...
+    // send signal dictionaries for globally published events...
     QS_SIG_DICTIONARY(GAME::TIME_TICK_SIG,      static_cast<void *>(0));
     QS_SIG_DICTIONARY(GAME::PLAYER_TRIGGER_SIG, static_cast<void *>(0));
     QS_SIG_DICTIONARY(GAME::PLAYER_QUIT_SIG,    static_cast<void *>(0));

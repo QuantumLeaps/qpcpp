@@ -4,14 +4,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.6
+/// Last updated on  2018-10-20
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -92,33 +92,39 @@
 #define QS_TEST_PROBE_ID(id_, code_)
 #define QS_TEST_PAUSE()                 ((void)0)
 
+#define QS_OUTPUT()                     ((void)0)
+#define QS_RX_INPUT()                   ((void)0)
+
 //****************************************************************************
 // internal QS macros used only in the QP components
-#define QS_CRIT_STAT_
-#define QS_BEGIN_(rec_, refObj_, obj_)  if (false) {
-#define QS_END_()                       }
-#define QS_BEGIN_NOCRIT_(rec_, refObj_, obj_) if (false) {
-#define QS_END_NOCRIT_()                }
-#define QS_U8_(data_)                   ((void)0)
-#define QS_2U8_(data1_, data2_)         ((void)0)
-#define QS_U16_(data_)                  ((void)0)
-#define QS_U32_(data_)                  ((void)0)
-#define QS_U64_(data_)                  ((void)0)
-#define QS_TIME_()                      ((void)0)
-#define QS_SIG_(sig_)                   ((void)0)
-#define QS_EVS_(size_)                  ((void)0)
-#define QS_OBJ_(obj_)                   ((void)0)
-#define QS_FUN_(fun_)                   ((void)0)
-#define QS_EQC_(ctr_)                   ((void)0)
-#define QS_MPC_(ctr_)                   ((void)0)
-#define QS_MPS_(size_)                  ((void)0)
-#define QS_TEC_(ctr_)                   ((void)0)
 
-#define QF_QS_CRIT_ENTRY()              ((void)0)
-#define QF_QS_CRIT_EXIT()               ((void)0)
-#define QF_QS_ISR_ENTRY(isrnest_, prio_) ((void)0)
-#define QF_QS_ISR_EXIT(isrnest_, prio_) ((void)0)
-#define QF_QS_ACTION(act_)              ((void)0)
+#ifdef QP_IMPL
+    #define QS_CRIT_STAT_
+    #define QS_BEGIN_(rec_, refObj_, obj_)  if (false) {
+    #define QS_END_()                   }
+    #define QS_BEGIN_NOCRIT_(rec_, refObj_, obj_) if (false) {
+    #define QS_END_NOCRIT_()            }
+    #define QS_U8_(data_)               ((void)0)
+    #define QS_2U8_(data1_, data2_)     ((void)0)
+    #define QS_U16_(data_)              ((void)0)
+    #define QS_U32_(data_)              ((void)0)
+    #define QS_U64_(data_)              ((void)0)
+    #define QS_TIME_()                  ((void)0)
+    #define QS_SIG_(sig_)               ((void)0)
+    #define QS_EVS_(size_)              ((void)0)
+    #define QS_OBJ_(obj_)               ((void)0)
+    #define QS_FUN_(fun_)               ((void)0)
+    #define QS_EQC_(ctr_)               ((void)0)
+    #define QS_MPC_(ctr_)               ((void)0)
+    #define QS_MPS_(size_)              ((void)0)
+    #define QS_TEC_(ctr_)               ((void)0)
+
+    #define QF_QS_CRIT_ENTRY()          ((void)0)
+    #define QF_QS_CRIT_EXIT()           ((void)0)
+    #define QF_QS_ISR_ENTRY(isrnest_, prio_) ((void)0)
+    #define QF_QS_ISR_EXIT(isrnest_, prio_)  ((void)0)
+    #define QF_QS_ACTION(act_)          ((void)0)
+#endif // QP_IMPL
 
 #endif // qs_dummy_h
 
