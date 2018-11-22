@@ -3,12 +3,12 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-09
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
 /// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
@@ -123,8 +123,10 @@ public:
     virtual void postLIFO(QEvt const * const e);
 
     //! get the blocking object for this thread (NULL if not blocked)
-    void const *getBlockingObj(void) const {
-        return m_temp.obj;
+    bool isBlockedOn(void const * const obj
+                     = static_cast<void const *>(0)) const
+    {
+        return reinterpret_cast<void const *>(m_temp.obj) == obj;
     }
 
 private:

@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-20
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -57,14 +57,10 @@
 #define QF_MPOOL_CTR_SIZE    4
 #define QF_TIMEEVT_CTR_SIZE  4
 
-// QF interrupt disable/enable, see NOTE1
-#define QF_INT_DISABLE()     (QP::QF_enterCriticalSection_())
-#define QF_INT_ENABLE()      (QP::QF_leaveCriticalSection_())
-
-// Win32 critical section
+// Win32 critical section, see NOTE1
 // QF_CRIT_STAT_TYPE not defined
-#define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
-#define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
+#define QF_CRIT_ENTRY(dummy) QP::QF_enterCriticalSection_()
+#define QF_CRIT_EXIT(dummy)  QP::QF_leaveCriticalSection_()
 
 // QF_LOG2 not defined -- use the internal LOG2() implementation
 
@@ -171,6 +167,17 @@ int QF_consoleWaitForKey(void);
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
     #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
 
+    // Minimum required Windows version is Windows-XP or newer (0x0501)
+    #ifdef WINVER
+    #undef WINVER
+    #endif
+    #ifdef _WIN32_WINNT
+    #undef _WIN32_WINNT
+    #endif
+
+    #define WINVER _WIN32_WINNT_WINXP
+    #define _WIN32_WINNT _WIN32_WINNT_WINXP
+
     #define WIN32_LEAN_AND_MEAN
     #include <windows.h> // Win32 API
 
@@ -185,24 +192,27 @@ int QF_consoleWaitForKey(void);
 //
 // NOTE1:
 // QF, like all real-time frameworks, needs to execute certain sections of
-// code indivisibly to avoid data corruption. The most straightforward way of
-// protecting such critical sections of code is disabling and enabling
-// interrupts, which Win32 does not allow.
+// code exclusively, meaning that only one thread can execute the code at
+// the time. Such sections of code are called "critical sections"
 //
-// This QF port uses therefore a single package-scope Win32 critical section
-// object QF_win32CritSect_ to protect all critical sections.
+// This port uses a pair of functions QF_enterCriticalSection_() /
+// QF_leaveCriticalSection_() to enter/leave the cirtical section,
+// respectively.
 //
-// Using the single critical section object for all crtical section guarantees
-// that only one thread at a time can execute inside a critical section. This
-// prevents race conditions and data corruption.
+// These functions are implemented in the qf_port.c module, where they
+// manipulate the file-scope Win32 critical section object l_win32CritSect
+// to protect all critical sections. Using the single critical section
+// object for all crtical section guarantees that only one thread at a time
+// can execute inside a critical section. This prevents race conditions and
+// data corruption.
 //
 // Please note, however, that the Win32 critical section implementation
-// behaves differently than interrupt locking. A common Win32 critical section
-// ensures that only one thread at a time can execute a critical section, but
-// it does not guarantee that a context switch cannot occur within the
-// critical section. In fact, such context switches probably will happen, but
-// they should not cause concurrency hazards because the critical section
-// eliminates all race conditionis.
+// behaves differently than interrupt disabling. A common Win32 critical
+// section ensures that only one thread at a time can execute a critical
+// section, but it does not guarantee that a context switch cannot occur
+// within the critical section. In fact, such context switches probably
+// will happen, but they should not cause concurrency hazards because the
+// critical section eliminates all race conditionis.
 //
 // Unlinke simply disabling and enabling interrupts, the critical section
 // approach is also subject to priority inversions. Various versions of

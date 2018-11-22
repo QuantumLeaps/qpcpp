@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-20
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -109,13 +109,14 @@ int_t QF::run(void) {
     }
 
     // the combined event-loop and background-loop of the QV kernel */
-    QF_INT_DISABLE();
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
     while (l_isRunning) {
         // find the maximum priority AO ready to run
         if (QV_readySet_.notEmpty()) {
             uint_fast8_t p = QV_readySet_.findMax();
             QActive *a = active_[p];
-            QF_INT_ENABLE();
+            QF_CRIT_EXIT_();
 
             // the active object 'a' must still be registered in QF
             // (e.g., it must not be stopped)
@@ -131,7 +132,7 @@ int_t QF::run(void) {
             a->dispatch(e);
             gc(e);
 
-            QF_INT_DISABLE();
+            QF_CRIT_ENTRY_();
 
             if (a->m_eQueue.isEmpty()) { /* empty queue? */
                 QV_readySet_.remove(p);
@@ -142,21 +143,22 @@ int_t QF::run(void) {
             // callback. However, the Win32-QV port does not do busy-waiting
             // for events. Instead, the Win32-QV port efficiently waits until
             // QP events become available.
-            QF_INT_ENABLE();
+            QF_CRIT_EXIT_();
 
-            (void)WaitForSingleObject(QV_win32Event_, (DWORD)INFINITE);
+            (void)WaitForSingleObject(QV_win32Event_,
+                                      static_cast<DWORD>(INFINITE));
 
-            QF_INT_DISABLE();
+            QF_CRIT_ENTRY_();
         }
     }
-    QF_INT_ENABLE();
+    QF_CRIT_EXIT_();
     onCleanup();  // cleanup callback
     QS_EXIT();    // cleanup the QSPY connection
 
     //CloseHandle(QV_win32Event_);
     //DeleteCriticalSection(&l_win32CritSect);
     //free all "fudged" event pools...
-    return static_cast<int_t>(0);
+    return static_cast<int_t>(0); // return success
 }
 //****************************************************************************
 void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
@@ -235,3 +237,4 @@ static DWORD WINAPI ticker_thread(LPVOID /*arg*/) { // for CreateThread()
 }
 
 } // namespace QP
+

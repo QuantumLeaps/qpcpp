@@ -1,7 +1,7 @@
 ##############################################################################
-# Product: Makefile for QP/C++ port to Win32 API, MinGW toolset
-# Last updated for version 6.3.7
-# Last updated on  2018-11-09
+# Product: Makefile for QP/C++ port to VxWorks, MinGW toolset
+# Last updated for version 6.3.6
+# Last updated on  2018-10-13
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -74,15 +74,15 @@ VPATH = \
 INCLUDES  = \
 	-I$(QPCPP)/include \
 	-I$(QPCPP)/src \
-	-I$(QP_PORT_DIR)
+	-I$(QP_PORT_DIR) \
+	-I$(QPCPP)/3rd_party/vxworks
 
 #-----------------------------------------------------------------------------
 # files
 #
 
 # C source files
-C_SRCS := \
-	qwin_gui.c
+C_SRCS :=
 
 # C++ source files
 CPP_SRCS := \
@@ -109,7 +109,7 @@ CPP_QS_SRCS := \
 	qs_port.cpp
 
 # defines
-DEFINES  := -DQWIN_GUI
+DEFINES  :=
 
 #-----------------------------------------------------------------------------
 # MinGW toolset (NOTE: assumed to be on your PATH)
@@ -144,10 +144,10 @@ BIN_DIR := rel
 
 # gcc options
 CFLAGS = -c -ffunction-sections -fdata-sections \
-	-Os $(INCLUDES) $(DEFINES) -Wall -Wextra
+	-Os $(INCLUDES) $(DEFINES) -Wall -W
 
 CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-Os $(INCLUDES) $(DEFINES) -Wall -Wextra
+	-Os $(INCLUDES) $(DEFINES) -Wall -W
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
@@ -155,10 +155,10 @@ BIN_DIR = spy
 
 # gcc options
 CFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -Wextra -DQ_SPY
+	-O $(INCLUDES) $(DEFINES) -Wall -W -DQ_SPY
 
 CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -Wextra -DQ_SPY
+	-O $(INCLUDES) $(DEFINES) -Wall -W -DQ_SPY
 
 # add the QS sources...
 CPP_SRCS += $(CPP_QS_SRCS)
@@ -169,10 +169,10 @@ BIN_DIR = dbg
 
 # gcc options
 CFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -Wextra
+	-O $(INCLUDES) $(DEFINES) -Wall -W
 
 CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -Wextra
+	-O $(INCLUDES) $(DEFINES) -Wall -W
 
 endif
 

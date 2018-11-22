@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-20
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      636U
+#define QP_VERSION      637U
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "6.3.6"
+#define QP_VERSION_STR  "6.3.7"
 
-//! Tamperproof current QP release (6.3.6) and date (2018-10-20)
-#define QP_RELEASE      0x941A87C3U
+//! Tamperproof current QP release (6.3.7) and date (2018-11-09)
+#define QP_RELEASE      0x940CF332U
 
 
 //****************************************************************************
@@ -469,12 +469,10 @@ private:
     friend class QMActive;
     friend class QF;
     friend class QS;
-#ifdef qxk_h
     friend class QXK;
     friend class QXThread;
     friend class QXMutex;
     friend class QXSemaphore;
-#endif // qxk_h
 #ifdef Q_UTEST
     friend class QActiveDummy;
 #endif // Q_UTEST

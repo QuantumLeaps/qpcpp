@@ -144,10 +144,10 @@ BIN_DIR := rel
 
 # gcc options
 CFLAGS = -c -ffunction-sections -fdata-sections \
-	-Os $(INCLUDES) $(DEFINES) -Wall -W
+	-Os $(INCLUDES) $(DEFINES) -Wall -Wextra
 
 CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-Os $(INCLUDES) $(DEFINES) -Wall -W
+	-Os $(INCLUDES) $(DEFINES) -Wall -Wextra
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
@@ -155,10 +155,10 @@ BIN_DIR = spy
 
 # gcc options
 CFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -W -DQ_SPY
+	-O $(INCLUDES) $(DEFINES) -Wall -Wextra -DQ_SPY
 
 CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -W -DQ_SPY
+	-O $(INCLUDES) $(DEFINES) -Wall -Wextra -DQ_SPY
 
 # add the QS sources...
 CPP_SRCS += $(CPP_QS_SRCS)
@@ -169,10 +169,10 @@ BIN_DIR = dbg
 
 # gcc options
 CFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -W
+	-O $(INCLUDES) $(DEFINES) -Wall -Wextra
 
 CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -W
+	-O $(INCLUDES) $(DEFINES) -Wall -Wextra
 
 endif
 

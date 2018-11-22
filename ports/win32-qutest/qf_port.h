@@ -3,8 +3,8 @@
 /// @ingroup qutest
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.3.6
-/// Date of the Last Update:  2018-10-04
+/// Last Updated for Version: 6.3.7
+/// Date of the Last Update:  2018-11-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -77,7 +77,6 @@ extern uint8_t volatile QF_intNest;
 #if (_MSC_VER < 1900) // before Visual Studio 2015
 
 #define snprintf _snprintf
-
 #endif
 
 #define SNPRINTF_S(buf_, len_, format_, ...) \
@@ -113,14 +112,14 @@ extern uint8_t volatile QF_intNest;
 #define SSCANF_S(buf_, format_, ...) \
     sscanf(buf_, format_, ##__VA_ARGS__)
 
-#endif
+#endif // _MSC_VER
 
 //****************************************************************************
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
 
-    // QUTEST scheduler locking (not used)
+    // QUTest scheduler locking (not used)
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) ((void)0)
     #define QF_SCHED_UNLOCK_()    ((void)0)

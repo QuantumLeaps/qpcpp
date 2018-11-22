@@ -3,15 +3,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Product: QK/C++
-/// Last updated for version 6.1.1
-/// Last updated on  2018-02-22
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-08
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -145,7 +144,7 @@ bool QXMutex::lock(uint_fast16_t const nTicks) {
         && ((m_ceiling == static_cast<uint8_t>(0)) /* below ceiling */
             || (curr->m_startPrio < m_ceiling))
         && (QXK_attr_.lockHolder != curr->m_prio) /* not holding a lock */
-        && (curr->m_temp.obj == static_cast<QMState *>(0))); // not blocked
+        && curr->isBlockedOn()); // not blocked
 
     // is the mutex available?
     if (m_lockNest == static_cast<uint8_t>(0)) {
@@ -209,8 +208,7 @@ bool QXMutex::lock(uint_fast16_t const nTicks) {
 
         QF_CRIT_ENTRY_();
         // the blocking object of the current thread must be this mutex
-        Q_ASSERT_ID(240,
-            curr->m_temp.obj == reinterpret_cast<QMState *>(this));
+        Q_ASSERT_ID(240, curr->isBlockedOn(this));
 
         curr->m_temp.obj = static_cast<QMState *>(0); // clear blocking obj.
     }
@@ -394,7 +392,7 @@ void QXMutex::unlock(void) {
                 && (thr != static_cast<QXThread *>(0)) /* extended thread */
                 && (!QXK_attr_.readySet.hasElement(p))
                 && (thr->m_prio == thr->m_startPrio)
-                && (thr->m_temp.obj == reinterpret_cast<QMState *>(this)));
+                && thr->isBlockedOn(this)); // not blocked
 
             // disarm the internal time event
             (void)thr->teDisarm_();

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-20
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -62,7 +62,7 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qf_port")
 
 /* Global objects ==========================================================*/
-pthread_mutex_t QF_pThreadMutex_;
+pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
 
 // Local objects *************************************************************
 static pthread_mutex_t l_startupMutex;
@@ -108,6 +108,15 @@ void QF::init(void) {
     struct sigaction sig_act;
     sig_act.sa_handler = &sigIntHandler;
     sigaction(SIGINT, &sig_act, NULL);
+}
+
+/****************************************************************************/
+void QF_enterCriticalSection_(void) {
+    pthread_mutex_lock(&QF_pThreadMutex_);
+}
+/****************************************************************************/
+void QF_leaveCriticalSection_(void) {
+    pthread_mutex_unlock(&QF_pThreadMutex_);
 }
 
 //****************************************************************************

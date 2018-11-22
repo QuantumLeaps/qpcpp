@@ -158,7 +158,6 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
             QS::onTestPost(sender, this, e, status);
         }
 #endif
-
         // empty queue?
         if (m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) {
             m_eQueue.m_frontEvt = e;      // deliver event directly

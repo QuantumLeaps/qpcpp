@@ -2,12 +2,12 @@
 /// @brief PC-Lint 9.x option file for linting QP/C++ applications
 /// @cond
 ///===========================================================================
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-08
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
 /// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
@@ -32,7 +32,7 @@
 /// Contact information:
 /// https://www.state-machine.com
 /// mailto:info@state-machine.com
-///============================================================================
+///===========================================================================
 /// @endcond
 
 // General
@@ -295,6 +295,8 @@
 // QXK
 -esym(1960,           // 3-2-3(req) type previously declared
  QP::QActive)
+-efunc(925,           // 5-2-8, 5-2-9 cast from pointer to pointer
+ isBlockedOn)
 -estring(1960,        // 11-0-1(req) non-private data member
  m_startPrio)
 -estring(1960,        // 11-0-1(req) non-private data member
@@ -373,7 +375,9 @@
  QS_FLUSH,
  QS_STR_ROM,
  QS_MEM,
- QS_SIG)
+ QS_SIG,
+ QS_OUTPUT,
+ QS_RX_INPUT)
 -esym(1960,           // 16-0-4 function-like macro
  QS_CRIT_ENTRY_,
  QS_CRIT_EXIT_,

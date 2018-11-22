@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-20
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -61,11 +61,11 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qf_port")
 
 /* Global objects ==========================================================*/
-pthread_mutex_t QF_pThreadMutex_;
 QPSet  QV_readySet_;        // QV-ready set of active objects
 pthread_cond_t QV_condVar_; // Cond.var. to signal events
 
 // Local objects *************************************************************
+static pthread_mutex_t l_pThreadMutex; // POSIX mutex for the QF crit. section
 static bool l_isRunning;    // flag indicating when QF is running
 static struct termios l_tsav; // structure with saved terminal attributes
 static struct timespec l_tick;
@@ -81,7 +81,7 @@ void QF::init(void) {
     //mlockall(MCL_CURRENT | MCL_FUTURE); // uncomment when supported
 
     // init the global mutex with the default non-recursive initializer
-    pthread_mutex_init(&QF_pThreadMutex_, NULL);
+    pthread_mutex_init(&l_pThreadMutex, NULL);
 
     // init the global condition variable with the default initializer
     pthread_cond_init(&QV_condVar_, NULL);
@@ -106,11 +106,20 @@ void QF::init(void) {
 }
 
 //****************************************************************************
+void QF_enterCriticalSection_(void) {
+    pthread_mutex_lock(&l_pThreadMutex);
+}
+//****************************************************************************
+void QF_leaveCriticalSection_(void) {
+    pthread_mutex_unlock(&l_pThreadMutex);
+}
+
+//****************************************************************************
 int_t QF::run(void) {
 
     onStartup(); // application-specific startup callback
 
-    // try to set the priority of the ticker thread
+    // try to set the priority of the ticker thread, see NOTE01
     struct sched_param sparam;
     sparam.sched_priority = l_tickPrio;
     if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &sparam) == 0) {
@@ -155,13 +164,14 @@ int_t QF::run(void) {
     }
 
     // the combined event-loop and background-loop of the QV kernel */
-    QF_INT_DISABLE();
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
     while (l_isRunning) {
 
         if (QV_readySet_.notEmpty()) {
             uint_fast8_t p = QV_readySet_.findMax();
             QActive *a = active_[p];
-            QF_INT_ENABLE();
+            QF_CRIT_EXIT_();
 
             // the active object 'a' must still be registered in QF
             // (e.g., it must not be stopped)
@@ -177,7 +187,7 @@ int_t QF::run(void) {
             a->dispatch(e);
             gc(e);
 
-            QF_INT_DISABLE();
+            QF_CRIT_ENTRY_();
 
             if (a->m_eQueue.isEmpty()) { /* empty queue? */
                 QV_readySet_.remove(p);
@@ -190,16 +200,16 @@ int_t QF::run(void) {
             // QP events become available.
             //
             while (QV_readySet_.isEmpty()) {
-                pthread_cond_wait(&QV_condVar_, &QF_pThreadMutex_);
+                pthread_cond_wait(&QV_condVar_, &l_pThreadMutex);
             }
         }
     }
-    QF_INT_ENABLE();
+    QF_CRIT_EXIT_();
     onCleanup();  // cleanup callback
     QS_EXIT();    // cleanup the QSPY connection
 
     pthread_cond_destroy(&QV_condVar_);       // cleanup the condition variable
-    pthread_mutex_destroy(&QF_pThreadMutex_); // cleanup the global mutex
+    pthread_mutex_destroy(&l_pThreadMutex); // cleanup the global mutex
 
     return static_cast<int_t>(0);
 }

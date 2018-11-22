@@ -3,12 +3,12 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-08
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
 /// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
 ///
@@ -118,7 +118,7 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) /* can't block inside an ISR */
         && (curr != static_cast<QXThread *>(0)) /* curr must be extended */
         && (QXK_attr_.lockHolder != curr->m_prio) /* not holding a lock */
-        && (curr->m_temp.obj == static_cast<QMState *>(0))); // not blocked
+        && curr->isBlockedOn()); // not blocked
 
     if (m_count > static_cast<uint16_t>(0)) {
         --m_count;
@@ -136,8 +136,7 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
 
         QF_CRIT_ENTRY_();
         // the blocking object must be this semaphore
-        Q_ASSERT_ID(210, curr->m_temp.obj
-                         == reinterpret_cast<QMState *>(this));
+        Q_ASSERT_ID(210, curr->isBlockedOn(this));
         curr->m_temp.obj = static_cast<QMState *>(0); // clear
     }
     QF_CRIT_EXIT_();
@@ -219,7 +218,7 @@ bool QXSemaphore::signal(void) {
         // the semaphore count must be zero (semaphore not signaled)
         Q_ASSERT_ID(410, (thr != static_cast<QXThread *>(0)) /* registered */
             && (thr->m_osObject != static_cast<void *>(0)) /* extended */
-            && (thr->m_temp.obj == reinterpret_cast<QMState const *>(this))
+            && thr->isBlockedOn(this) /* not blocked */
             && (m_count == static_cast<uint16_t>(0))); // not signaled
 
         // disarm the internal time event

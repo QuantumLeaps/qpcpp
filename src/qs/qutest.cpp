@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-04
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-07
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -51,10 +51,6 @@ Q_DEFINE_THIS_MODULE("qutest")
 
 // Global objects ============================================================
 uint8_t volatile QF_intNest;
-
-enum {
-    TE_IS_LINKED = 1U << 7 // flag
-};
 
 // QF functions ==============================================================
 void QF::init(void) {

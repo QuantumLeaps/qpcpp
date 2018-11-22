@@ -1,0 +1,198 @@
+/// @file
+/// @brief QF/C++ port to VxWorks API
+/// @ingroup ports
+/// @cond
+///***************************************************************************
+/// Last updated for version 6.3.7
+/// Last updated on  2018-11-02
+///
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
+///
+/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+///
+/// Contact information:
+/// https://www.state-machine.com
+/// mailto:info@state-machine.com
+///***************************************************************************
+/// @endcond
+///
+#define QP_IMPL           // this is QP implementation
+#include "qf_port.h"      // QF port
+#include "qf_pkg.h"
+#include "qassert.h"
+#ifdef Q_SPY              // QS software tracing enabled?
+    #include "qs_port.h"  // include QS port
+#else
+    #include "qs_dummy.h" // disable the QS software tracing
+#endif // Q_SPY
+
+#include "tickLib.h"      // for tickAnnounce()
+
+// locals ====================================================================
+extern "C" {
+    static int task_function(
+        int a1,
+        int a2,
+        int a3,
+        int a4,
+        int a5,
+        int a6,
+        int a7,
+        int a8,
+        int a9,
+        int a10);
+
+    static void usrClockHook(TASK_ID tid);
+}
+
+// namespace QP ==============================================================
+namespace QP {
+
+Q_DEFINE_THIS_MODULE("qf_port")
+
+#ifdef Q_SPY
+    static uint8_t const l_clock_tick = 0U;
+#endif
+
+//............................................................................
+void QF::init(void) {
+}
+//............................................................................
+int_t QF::run(void) {
+    int_t result = -1;
+    if (tickAnnounceHookAdd(reinterpret_cast<FUNCPTR>(&usrClockHook)) == OK)
+    {
+        onStartup(); // the startup callback
+        result = 0;  // success
+    }
+    return result;
+}
+//............................................................................
+void QF::stop(void) {
+    onCleanup(); // the cleanup callback
+}
+//............................................................................
+void QF::thread_(QActive *act) {
+    // event loop of the active object thread
+    act->m_osObject = 1;
+    while (act->m_osObject) {
+        QEvt const *e = act->get_(); // wait for event
+        act->dispatch(e); // dispatch to the active object's state machine
+        gc(e); // check if the event is garbage, and collect it if so
+    }
+    act->unsubscribeAll(); // unsubscribe from all events
+    QF::remove_(act); // remove this active object from QF
+
+    taskDelete(act->m_thread);
+}
+//............................................................................
+void QActive::start(uint_fast8_t prio,
+                    QEvt const *qSto[], uint_fast16_t qLen,
+                    void *stkSto, uint_fast16_t stkSize,
+                    QEvt const *ie)
+{
+    Q_REQUIRE_ID(200, (prio <= QF_MAX_ACTIVE) /* not exceeding max */
+        && (qSto != static_cast<QEvt const **>(0)) /* queue storage */
+        && (qLen > static_cast<uint_fast16_t>(0))  /* queue size */
+        && (stkSto == static_cast<void *>(0))      /* NO stack storage */
+        && (stkSize > static_cast<uint_fast16_t>(0))); // stack size
+
+    // create the event queue for the AO
+    m_eQueue.init(qSto, qLen);
+
+    m_prio = prio;  // save the QF priority
+    QF::add_(this); // make QF aware of this active object
+    init(ie);       // thake the top-most initial tran.
+    QS_FLUSH();     // flush the trace buffer to the host
+
+    // synthesize task name of the form tAOxx,
+    // where xx is the two-digit QP priority number
+    char tname[] = "tAOxx";
+    tname[3] = '0' + (m_prio / 10U);
+    tname[4] = '0' + (m_prio % 10U);
+
+    // convert the QP-priority to VxWorks priority
+    int vx_prio = QF_VX_PRIO_OFFSET + QF_MAX_ACTIVE - prio;
+
+    // spawn a VxWorks thread for the active object
+    m_thread = taskSpawn(tname,      // task name
+        vx_prio,                     // VxWorks priority
+        reinterpret_cast<int>(ie),   // VxWorks taks options, see NOTE1
+        static_cast<size_t>(stkSize),
+        reinterpret_cast<FUNCPTR>(&task_function),
+        reinterpret_cast<int>(this), 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    // VxWorks task must be created successfully
+    Q_ASSERT_ID(210, m_thread != TASK_ID_NULL);
+}
+//............................................................................
+void QActive::stop(void) {
+    // active object must stop itself and cannot be stopped by any other AO
+    Q_REQUIRE_ID(300, m_thread == taskIdSelf());
+
+    m_osObject = 0; // stop the thread loop
+}
+
+} // namespace QP
+
+// VxWorks stuff in C ========================================================
+extern "C" {
+//............................................................................
+// use exactly the VxWorks task signature
+static int task_function(
+    int a1,
+    int /*a2*/,
+    int /*a3*/,
+    int /*a4*/,
+    int /*a5*/,
+    int /*a6*/,
+    int /*a7*/,
+    int /*a8*/,
+    int /*a9*/,
+    int /*a10*/)
+{
+    QP::QF::thread_(reinterpret_cast<QP::QActive *>(a1));
+    return 0;
+}
+
+//............................................................................
+static void usrClockHook(TASK_ID /*tid*/) {
+    QP::QF::TICK_X(0U, &QP::l_clock_tick);
+}
+
+} // extern "C"
+
+// NOTES: ====================================================================
+//
+// NOTE1:
+// The last parameter of QActive::start() is used to supply the VxWorks task
+// options (VX_FP_TASK, VX_PRIVATE_ENV, VX_NO_STACK_FILL, VX_UNBREAKABLE)
+// to the AO task. Here is an example of usage:
+//
+// AO_Table->start(
+//      static_cast<uint_fast8_t>(N_PHILO + 1),
+//      l_tableQueueSto, Q_DIM(l_tableQueueSto),
+//      (void *)0, sizeof(l_tableStk),
+//      reinterpret_cast<QEvt *>(VX_FP_TASK | VX_NO_STACK_FILL));
+//
+

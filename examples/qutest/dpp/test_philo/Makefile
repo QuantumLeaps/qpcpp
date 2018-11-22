@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QUTEST-QP/C++ for Windows and POSIX *HOSTS*
-# Last updated for version 6.3.6
-# Last updated on  2018-10-20
+# Last updated for version 6.3.7
+# Last updated on  2018-11-12
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -33,9 +33,9 @@
 ##############################################################################
 #
 # examples of invoking this Makefile:
-# make         # make and run the tests in the current directory
-# make TESTS=test*.tcl  # make and run the selected tests in the curr. dir.
-# make SCRIPT=py # make and run the Python tests
+# make         # make and run the Python tests in the current directory
+# make TESTS=test*.py  # make and run the selected tests in the curr. dir.
+# make SCRIPT=tcl # make and run the Tcl tests
 # make HOST=localhost:7705 # connect to host:port
 # make norun   # only make but not run the tests
 # make clean   # cleanup the build
@@ -43,7 +43,7 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    http://sourceforge.net/projects/QPCPP/files/QTools/
+#    http://sourceforge.net/projects/qpc/files/QTools/
 #
 
 #-----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ DEFINES   := -DQP_API_VERSION=9999
 ifeq ($(OS),Windows_NT)
 	QP_PORT_DIR := $(QPCPP)/ports/win32-qutest
 	LIB_DIRS += -L$(QP_PORT_DIR)/mingw
-	LIBS     += -lqp -lwsock32
+	LIBS     += -lqp -lws2_32
 else
 	QP_PORT_DIR := $(QPCPP)/ports/posix-qutest
 	CPP_SRCS += \
@@ -144,10 +144,10 @@ CPP   := g++
 #LINK  := gcc    # for C programs
 LINK  := g++   # for C++ programs
 
-ifeq ($(SCRIPT),py)
-QUTEST := qutest
-else
+ifeq ($(SCRIPT),tcl)
 QUTEST := tclsh $(QTOOLS)/qspy/tcl/qutest.tcl
+else # default
+QUTEST := python $(QTOOLS)/qspy/py/qutest.py
 endif
 
 #-----------------------------------------------------------------------------
@@ -172,10 +172,10 @@ endif
 
 BIN_DIR := build
 
-CFLAGS = -c -g -O -Wall -Wstrict-prototypes -W $(INCLUDES) $(DEFINES) \
+CFLAGS = -c -g -O -Wall -Wextra -W $(INCLUDES) $(DEFINES) \
 	-DQ_SPY -DQ_UTEST -DQ_HOST
 
-CPPFLAGS = -c -g -O -Wall -W -fno-rtti -fno-exceptions $(INCLUDES) $(DEFINES) \
+CPPFLAGS = -c -g -O -Wall -Wextra -fno-rtti -fno-exceptions $(INCLUDES) $(DEFINES) \
 	-DQ_SPY -DQ_UTEST -DQ_HOST
 
 LINKFLAGS :=
@@ -209,10 +209,10 @@ all : $(TARGET_EXE) run
 endif
 
 ifeq (, $(TESTS))
-ifeq ($(SCRIPT),py)
-TESTS := *.py
-else
+ifeq ($(SCRIPT),tcl)
 TESTS := *.tcl
+else
+TESTS := *.py
 endif
 endif
 
@@ -263,5 +263,6 @@ show :
 	@echo DEFINES      = $(DEFINES)
 	@echo QTOOLS       = $(QTOOLS)
 	@echo QUTEST       = $(QUTEST)
+	@echo HOST         = $(HOST)
 	@echo TESTS        = $(TESTS)
 

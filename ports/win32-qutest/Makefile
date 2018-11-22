@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QUTEST, QP/C++, Win32, MinGW toolset
-# Last Updated for Version: 6.3.6
-# Date of the Last Update:  2018-10-20
+# Last Updated for Version: 6.3.7
+# Date of the Last Update:  2018-11-09
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -129,10 +129,10 @@ RM    := rm
 
 BIN_DIR = mingw
 
-CFLAGS = -c -g -O -Wall -Wstrict-prototypes -W $(INCLUDES) $(DEFINES) \
+CFLAGS = -c -g -O -Wall -Wextra -W $(INCLUDES) $(DEFINES) \
 	-DQ_SPY -DQ_UTEST -DQ_HOST
 
-CPPFLAGS = -c -g -O -Wall -W -fno-rtti -fno-exceptions $(INCLUDES) $(DEFINES) \
+CPPFLAGS = -c -g -O -Wall -Wextra -fno-rtti -fno-exceptions $(INCLUDES) $(DEFINES) \
 	-DQ_SPY -DQ_UTEST -DQ_HOST
 
 LIBFLAGS := rs
