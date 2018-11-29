@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.3.7
-/// Last updated on  2018-11-09
+/// Last updated on  2018-11-29
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -189,18 +189,40 @@ void QS::onFlush(void) {
     uint16_t nBytes;
     uint8_t const *data;
 
-    if (l_sock == INVALID_SOCKET) { // socket initialized?
+    if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
+        fprintf(stderr, "<TARGET> ERROR   invalid TCP socket\n");
         return;
     }
 
     nBytes = QS_TX_CHUNK;
     while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
-        int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
-        // the driver buffers the output, so it should accept all the bytes
-        if (nSent < (int)nBytes) {
-            fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
-                   "WASErr=%d\n", WSAGetLastError());
+        for (;;) { // for-ever until break or return
+            int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
+            if (nSent == SOCKET_ERROR) { // sending failed?
+                int err = WSAGetLastError();
+                if (err == WSAEWOULDBLOCK) {
+                    // sleep for 10ms and then loop back
+                    // to send() the SAME data again
+                    //
+                    Sleep(10);
+                }
+                else { // some other socket error...
+                    fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
+                           "WASErr=%d\n", err);
+                    return;
+                }
+            }
+            else if (nSent < (int)nBytes) { // sent fewer than requested?
+                Sleep(10); // sleep for 10ms
+                // adjust the data and loop back to send() the rest
+                data   += nSent;
+                nBytes -= (uint16_t)nSent;
+            }
+            else {
+                break;
+            }
         }
+        // set nBytes for the next call to QS::getBlock()
         nBytes = QS_TX_CHUNK;
     }
 }
@@ -216,19 +238,39 @@ void QS_output(void) {
     uint16_t nBytes;
     uint8_t const *data;
 
-    if (l_sock == INVALID_SOCKET) { // socket initialized?
+    if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
+        fprintf(stderr, "<TARGET> ERROR   invalid TCP socket\n");
         return;
     }
 
     nBytes = QS_TX_CHUNK;
     if ((data = QS::getBlock(&nBytes)) != (uint8_t *)0) {
-        int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
-        // the driver buffers the output, so it should accept all the bytes
-        if (nSent < (int)nBytes) {
-            fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
-                "WASErr=%d\n", WSAGetLastError());
+        for (;;) { // for-ever until break or return
+            int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
+            if (nSent == SOCKET_ERROR) { // sending failed?
+                int err = WSAGetLastError();
+                if (err == WSAEWOULDBLOCK) {
+                    // sleep for 10ms and then loop back
+                    // to send() the SAME data again
+                    //
+                    Sleep(10);
+                }
+                else { // some other socket error...
+                    fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
+                           "WASErr=%d\n", err);
+                    return;
+                }
+            }
+            else if (nSent < (int)nBytes) { // sent fewer than requested?
+                Sleep(10); // sleep for 10ms
+                // adjust the data and loop back to send() the rest
+                data   += nSent;
+                nBytes -= (uint16_t)nSent;
+            }
+            else {
+                break;
+            }
         }
-        nBytes = QS_TX_CHUNK;
     }
 }
 //............................................................................
