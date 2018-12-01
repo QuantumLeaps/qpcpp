@@ -1,11 +1,11 @@
 //****************************************************************************
 // Product: "Blinky" example on MSP-EXP430F5529LP board, preemptive QK kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 6.3.7
+// Last updated on  2018-11-30
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -45,7 +45,7 @@
 Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
-// 1MHz clock setting, see BSP_init()
+// 1MHz clock setting, see BSP::init()
 #define BSP_MCK     1000000U
 #define BSP_SMCLK   1000000U
 
@@ -59,21 +59,25 @@ extern "C" {
 
 //............................................................................
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
-    __interrupt void TIMER0_A0_ISR (void); // prototype
+    __interrupt void TIMER0_A0_ISR(void); // prototype
     #pragma vector=TIMER0_A0_VECTOR
     __interrupt void TIMER0_A0_ISR(void)
 #elif defined(__GNUC__)
     __attribute__ ((interrupt(TIMER0_A0_VECTOR)))
     void TIMER0_A0_ISR (void)
 #else
-    #error Compiler not supported!
+    #error MSP430 compiler not supported!
 #endif
 {
     QK_ISR_ENTRY();    // inform QK about entering the ISR
 
-    QF::TICK_X(0U, (void *)0); // process time events for rate 0
+    QF::TICK_X(0U, (void *)0); // process all time events at rate 0
 
     QK_ISR_EXIT();     // inform QK about exiting the ISR
+
+#ifdef NDEBUG
+    __low_power_mode_off_on_exit(); //  turn the low-power mode OFF, NOTE1
+#endif
 }
 
 } // extern "C"
@@ -84,6 +88,7 @@ void BSP_init(void) {
 
     // leave the MCK and SMCLK at default DCO setting
 
+    // configure pins for LEDs
     P1DIR |= LED1;  // set LED1 pin to output
     P4DIR |= LED2;  // set LED2 pin to output
 }
@@ -99,19 +104,19 @@ void BSP_ledOn(void) {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    TA0CCTL0 = CCIE;                          // CCR0 interrupt enabled
+    TA0CCTL0 = CCIE;  // CCR0 interrupt enabled
     TA0CCR0 = BSP_MCK / BSP_TICKS_PER_SEC;
-    TA0CTL = TASSEL_2 + MC_1 + TACLR;         // SMCLK, upmode, clear TAR
+    TA0CTL = TASSEL_2 | MC_1 | TACLR; // SMCLK, upmode, clear TAR
 }
 //............................................................................
 void QF::onCleanup(void) {
 }
 //............................................................................
 void QK::onIdle(void) {
-    // toggle LED2 on and then off, see NOTE1
+    // toggle LED2 on and then off, see NOTE2
     QF_INT_DISABLE();
-    P4OUT |=  LED2;        // turn LED2 on
-    P4OUT &= ~LED2;        // turn LED2 off
+    P4OUT |=  LED2;  // turn LED2 on
+    P4OUT &= ~LED2;  // turn LED2 off
     QF_INT_ENABLE();
 
 #ifdef NDEBUG
@@ -119,7 +124,7 @@ void QK::onIdle(void) {
     // you might need to customize the clock management for your application,
     // see the datasheet for your particular MSP430 MCU.
     //
-    __low_power_mode_1(); // Enter LPM1; also ENABLES interrupts
+    __low_power_mode_1(); // enter LPM1; also ENABLES interrupts, see NOTE1
 #endif
 }
 
@@ -129,14 +134,17 @@ extern "C" void Q_onAssert(char const *module, int loc) {
     QF_INT_DISABLE(); // disable all interrupts
     QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
 
-    // cause the reset of the CPU...
-    WDTCTL = WDTPW | WDTHOLD;
-    __asm("    push &0xFFFE");
-    // return from function does the reset
+    // write invalid password to WDT: cause a password-validation RESET
+    WDTCTL = 0xDEAD;
 }
 
 //****************************************************************************
 // NOTE1:
+// With the preemptive QK kernel for MSP430, the idle callback QK::onIdle()
+// will execute only ONCE, if the low-power mode is not explicitly turned OFF
+// in the interrupt. This might or might not be what you want.
+//
+// NOTE2:
 // One of the LEDs is used to visualize the idle loop activity. The brightness
 // of the LED is proportional to the frequency of invcations of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt

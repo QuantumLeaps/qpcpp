@@ -1,11 +1,11 @@
 //****************************************************************************
 // Product: "Blinky" example on MSP-EXP430F5529LP board, cooperative QV kernel
-// Last updated for version 5.5.0
-// Last updated on  2015-09-23
+// Last updated for version 6.3.7
+// Last updated on  2018-11-30
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -117,7 +117,7 @@ void QV::onIdle(void) { // NOTE: called with interrutps DISABLED, see NOTE1
     // you might need to customize the clock management for your application,
     // see the datasheet for your particular MSP430 MCU.
     //
-    __low_power_mode_1(); // Enter LPM1; also ENABLES interrupts
+    __low_power_mode_1(); // enter LPM1; also ENABLES interrupts, see NOTE1
 #else
     QF_INT_ENABLE(); // just enable interrupts
 #endif
