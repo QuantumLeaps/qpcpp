@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.3.0" links="1">
+<model version="4.3.1" links="1">
  <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -400,7 +400,8 @@ $declare(AOs::XT_Test1)
 $declare(AOs::XT_Test2)
 #endif // qxk_h
 
-#endif // dpp_h</text>
+#endif // dpp_h
+</text>
   </file>
   <!--${.::philo.cpp}-->
   <file name="philo.cpp">
@@ -492,7 +493,8 @@ QP::QActive * const AO_Table = &amp;l_table; // &quot;opaque&quot; AO pointer
 } // namespace DPP
 
 //............................................................................
-$define(AOs::Table)</text>
+$define(AOs::Table)
+</text>
   </file>
  </directory>
 </model>
