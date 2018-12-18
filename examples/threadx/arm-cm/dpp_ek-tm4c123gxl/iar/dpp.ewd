@@ -44,7 +44,7 @@
                 </option>
                 <option>
                     <name>MemFile</name>
-                    <state>$TOOLKIT_DIR$\CONFIG\debugger\ST\STM32F407VG.ddf</state>
+                    <state>$TOOLKIT_DIR$\CONFIG\debugger\TexasInstruments\TM4C123GH6PM.ddf</state>
                 </option>
                 <option>
                     <name>RunToEnable</name>
@@ -84,7 +84,7 @@
                 </option>
                 <option>
                     <name>OCDynDriverList</name>
-                    <state>STLINK_ID</state>
+                    <state>LMIFTDI_ID</state>
                 </option>
                 <option>
                     <name>OCLastSavedByProductVersion</name>
@@ -112,7 +112,7 @@
                 </option>
                 <option>
                     <name>FlashLoadersV3</name>
-                    <state>$TOOLKIT_DIR$\config\flashloader\ST\FlashSTM32F4xxx.board</state>
+                    <state>$TOOLKIT_DIR$\config\flashloader\TexasInstruments\FlashTC4_H6_o.board</state>
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck1</name>
@@ -937,7 +937,7 @@
                 </option>
                 <option>
                     <name>CCLmiFtdiInterfaceRadio</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCLmiFtdiInterfaceCmdLine</name>
@@ -983,7 +983,7 @@
                 </option>
                 <option>
                     <name>CCSTLinkInterfaceRadio</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCSTLinkInterfaceCmdLine</name>
@@ -1447,7 +1447,7 @@
                 </option>
                 <option>
                     <name>MemFile</name>
-                    <state>$TOOLKIT_DIR$\CONFIG\debugger\ST\STM32F407VG.ddf</state>
+                    <state>$TOOLKIT_DIR$\CONFIG\debugger\TexasInstruments\TM4C123GH6PM.ddf</state>
                 </option>
                 <option>
                     <name>RunToEnable</name>
@@ -1487,11 +1487,11 @@
                 </option>
                 <option>
                     <name>OCDynDriverList</name>
-                    <state>STLINK_ID</state>
+                    <state>LMIFTDI_ID</state>
                 </option>
                 <option>
                     <name>OCLastSavedByProductVersion</name>
-                    <state>7.40.3.8937</state>
+                    <state>7.40.2.8567</state>
                 </option>
                 <option>
                     <name>UseFlashLoader</name>
@@ -1515,7 +1515,7 @@
                 </option>
                 <option>
                     <name>FlashLoadersV3</name>
-                    <state>$TOOLKIT_DIR$\config\flashloader\ST\FlashSTM32F4xxx.board</state>
+                    <state>$TOOLKIT_DIR$\config\flashloader\TexasInstruments\FlashTC4_H6_o.board</state>
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck1</name>
@@ -2386,7 +2386,7 @@
                 </option>
                 <option>
                     <name>CCSTLinkInterfaceRadio</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCSTLinkInterfaceCmdLine</name>
@@ -2850,7 +2850,7 @@
                 </option>
                 <option>
                     <name>MemFile</name>
-                    <state>$TOOLKIT_DIR$\CONFIG\debugger\ST\STM32F407VG.ddf</state>
+                    <state>$TOOLKIT_DIR$\CONFIG\debugger\TexasInstruments\TM4C123GH6PM.ddf</state>
                 </option>
                 <option>
                     <name>RunToEnable</name>
@@ -2890,11 +2890,11 @@
                 </option>
                 <option>
                     <name>OCDynDriverList</name>
-                    <state>STLINK_ID</state>
+                    <state>LMIFTDI_ID</state>
                 </option>
                 <option>
                     <name>OCLastSavedByProductVersion</name>
-                    <state>7.40.3.8937</state>
+                    <state>8.11.1.13270</state>
                 </option>
                 <option>
                     <name>UseFlashLoader</name>
@@ -2918,7 +2918,7 @@
                 </option>
                 <option>
                     <name>FlashLoadersV3</name>
-                    <state>$TOOLKIT_DIR$\config\flashloader\ST\FlashSTM32F4xxx.board</state>
+                    <state>$TOOLKIT_DIR$\config\flashloader\TexasInstruments\FlashTC4_H6_o.board</state>
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck1</name>
@@ -3743,7 +3743,7 @@
                 </option>
                 <option>
                     <name>CCLmiFtdiInterfaceRadio</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCLmiFtdiInterfaceCmdLine</name>
@@ -3789,7 +3789,7 @@
                 </option>
                 <option>
                     <name>CCSTLinkInterfaceRadio</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCSTLinkInterfaceCmdLine</name>
