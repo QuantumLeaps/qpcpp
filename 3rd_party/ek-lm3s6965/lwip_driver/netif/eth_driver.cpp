@@ -42,7 +42,7 @@
 // interface driver for lwIP.
 //
 
-#include "qpc.h"
+#include "qpcpp.h"
 
 #include "lwip/opt.h"
 #include "lwip/init.h"
@@ -60,7 +60,7 @@
 
 #include "LM3S6965.h"
 
-#include <string.h>                                         /* for memcpy() */
+#include <string.h> /* for memcpy() */
 
 /**
  * Sanity Check:  This interface driver will NOT work if the following defines
