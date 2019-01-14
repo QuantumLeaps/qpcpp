@@ -4,13 +4,13 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.3.8
-/// Last updated on  2018-12-27
+/// Last updated on  2019-01-31
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XYZ, where X is a 1-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      638U
+#define QP_VERSION      640U
 
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
 #define QP_VERSION_STR  "6.3.8"
 
-//! Tamperproof current QP release (6.3.8) and date (2018-12-31)
-#define QP_RELEASE      0x93FA5591U
+//! Tamperproof current QP release (6.3.8) and date (2019-01-31)
+#define QP_RELEASE      0x8EAC4D4FU
 
 
 //****************************************************************************

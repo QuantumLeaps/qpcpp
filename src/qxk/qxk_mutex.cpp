@@ -3,14 +3,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-08
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -139,6 +139,7 @@ bool QXMutex::lock(uint_fast16_t const nTicks) {
     ///   - the thread priority must be below the ceiling of the mutex;
     /// - the thread must NOT be holding a scheduler lock;
     /// - the thread must NOT be already blocked on any object.
+    ///
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) /* don't call from an ISR! */
         && (curr != static_cast<QXThread *>(0)) /* curr must be extended */
         && ((m_ceiling == static_cast<uint8_t>(0)) /* below ceiling */
@@ -182,6 +183,7 @@ bool QXMutex::lock(uint_fast16_t const nTicks) {
         ++m_lockNest;
     }
     else { // the mutex is alredy locked by a different thread
+        uint_fast8_t p = static_cast<uint_fast8_t>(curr->m_prio);
 
         // the ceiling holder priority must be valid
         Q_ASSERT_ID(230, m_holderPrio != static_cast<uint8_t>(0));
@@ -192,24 +194,26 @@ bool QXMutex::lock(uint_fast16_t const nTicks) {
                         QF::active_[m_ceiling] != static_cast<QActive *>(0));
         }
 
-        // remove this thr prio from the ready set (block)
-        // and insert to the waiting set on this mutex
-        QXK_attr_.readySet.remove(static_cast<uint_fast8_t>(curr->m_prio));
-        m_waitSet.insert(static_cast<uint_fast8_t>(curr->m_prio));
-
-        // store the blocking object (this mutex)
+        // remember the blocking object (this mutex)
         curr->m_temp.obj = reinterpret_cast<QMState *>(this);
         curr->teArm_(static_cast<enum_t>(QXK_SEMA_SIG), nTicks);
 
-        // schedule the next thread if multitasking started
-        (void)QXK_sched_();
+        m_waitSet.insert(p);          // add to wait-set
+        QXK_attr_.readySet.remove(p); // remove from ready-set
+
+        (void)QXK_sched_(); // schedule the next thread
         QF_CRIT_EXIT_();
         QF_CRIT_EXIT_NOP(); // BLOCK here
 
         QF_CRIT_ENTRY_();
-        // the blocking object of the current thread must be this mutex
-        Q_ASSERT_ID(240, curr->isBlockedOn(this));
+        // after unblocking:
+        // - the thread must be waiting on this mutex
+        // - the blocking object must be this mutex
+        //
+        Q_ASSERT_ID(240, m_waitSet.hasElement(p)
+            && curr->isBlockedOn(this));
 
+        m_waitSet.remove(p); // remove the unblocked thread
         curr->m_temp.obj = static_cast<QMState *>(0); // clear blocking obj.
     }
     QF_CRIT_EXIT_();
@@ -342,6 +346,7 @@ void QXMutex::unlock(void) {
     /// - the ceiling must not be used or
     ///    - the current thread must have priority equal to the mutex ceiling;
     /// - the mutex must be already locked at least once.
+    ///
     Q_REQUIRE_ID(400, (!QXK_ISR_CONTEXT_()) /* don't call from an ISR! */
         && (curr != static_cast<QActive *>(0)) /* curr must be valid */
         && (curr->m_startPrio == static_cast<uint8_t>(m_holderPrio))
@@ -380,12 +385,12 @@ void QXMutex::unlock(void) {
             QXThread *thr = static_cast<QXThread *>(QF::active_[p]);
 
             // the waiting thread must:
-            // (1) the ceiling must not be used; or if used
-            //     the thread must have priority below the ceiling
-            // (2) be extended
-            // (3) not be redy to run
-            // (4) have still the start priority
-            // (5) be blocked on this mutex
+            // - the ceiling must not be used; or if used
+            //   - the thread must have priority below the ceiling
+            // - be extended
+            // - NOT be redy to run
+            // - have still the start priority
+            // - be blocked on this mutex
             Q_ASSERT_ID(410,
                 ((m_ceiling == static_cast<uint8_t>(0)) /* below ceiling */
                    || (p < static_cast<uint_fast8_t>(m_ceiling)))
@@ -396,9 +401,6 @@ void QXMutex::unlock(void) {
 
             // disarm the internal time event
             (void)thr->teDisarm_();
-
-            // this thread is no longer waiting for the mutex
-            m_waitSet.remove(p);
 
             if (m_ceiling != static_cast<uint8_t>(0)) {
                 // switch the priority of this thread to the mutex ceiling

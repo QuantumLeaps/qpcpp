@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ARM Cortex-M, dual-mode QXK kernel, ARM-KEIL toolset
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.3.7
-/// Date of the Last Update:  2018-12-12
+/// Last Updated for Version: 6.3.8
+/// Date of the Last Update:  2019-01-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -38,14 +38,14 @@
 #ifndef qf_port_h
 #define qf_port_h
 
-// The maximum number of active objects in the application, see NOTE1
-#define QF_MAX_ACTIVE           32
-
 // The maximum number of system clock tick rates
 #define QF_MAX_TICK_RATE        2
 
 // QF interrupt disable/enable and log2()...
 #if (__TARGET_ARCH_THUMB == 3) // Cortex-M0/M0+/M1(v6-M, v6S-M)?
+
+    // The maximum number of active objects in the application, see NOTE1
+    #define QF_MAX_ACTIVE       16
 
     // Cortex-M0/M0+/M1(v6-M, v6S-M) interrupt disabling policy, see NOTE2
     #define QF_INT_DISABLE()    __disable_irq()
@@ -63,7 +63,7 @@
     #define QF_AWARE_ISR_CMSIS_PRI 0
 
     // hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
-    #define QF_LOG2(n_) QF_qlog2((n_))
+    #define QF_LOG2(n_) QF_qlog2(static_cast<uint32_t>(n_))
 
     // inline function for getting the PRIMASK register
     static __inline unsigned QF_get_PRIMASK(void) {
@@ -78,6 +78,9 @@
     }
 
 #else // Cortex-M3/M4/M7
+
+    // The maximum number of active objects in the application, see NOTE1
+    #define QF_MAX_ACTIVE       32
 
     // Cortex-M3/M4/M7 alternative interrupt disabling with PRIMASK
     #define QF_PRIMASK_DISABLE() __disable_irq()
@@ -106,7 +109,8 @@
     #define QF_AWARE_ISR_CMSIS_PRI (QF_BASEPRI >> (8 - __NVIC_PRIO_BITS))
 
     // Cortex-M3/M4/M7 provide the CLZ instruction for fast LOG2
-    #define QF_LOG2(n_) (static_cast<uint_fast8_t>(32U - __clz(n_)))
+    #define QF_LOG2(n_) \
+        (static_cast<uint_fast8_t>(32U - __clz(static_cast<unsigned>(n_))))
 
     // inline function for getting the BASEPRI register
     static __inline unsigned QF_get_BASEPRI(void) {
@@ -133,7 +137,7 @@
 
 #include "qxk_port.h" // QXK dual-mode kernel port
 #include "qf.h"       // QF platform-independent public interface
-#include "qxthread.h" // QXK extended thread
+#include "qxthread.h" // QXK extended thread interface
 
 //****************************************************************************
 // NOTE1:

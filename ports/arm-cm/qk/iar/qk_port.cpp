@@ -3,14 +3,14 @@
 * @brief QK/C++ port to ARM Cortex-M, IAR-ARM toolset
 * @cond
 ******************************************************************************
-* Last Updated for Version: 6.1.1
-* Date of the Last Update:  2018-03-06
+* Last updated for version 6.3.8
+* Last updated on  2019-01-10
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
-* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -243,11 +243,10 @@ __asm volatile (
     );
 }
 
-#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 ? */
+/****************************************************************************/
+#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
 
-/*****************************************************************************
-* hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
-*****************************************************************************/
+/* hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction) */
 uint_fast8_t QF_qlog2(uint32_t x) {
     static uint8_t const log2LUT[16] = {
         (uint8_t)0, (uint8_t)1, (uint8_t)2, (uint8_t)2,
@@ -258,16 +257,20 @@ uint_fast8_t QF_qlog2(uint32_t x) {
     uint_fast8_t n;
     __asm (
         "MOVS    %[n],#0\n"
+#if (QF_MAX_ACTIVE > 16)
         "LSRS    r2,r0,#16\n"
         "BEQ.N   QF_qlog2_1\n"
         "MOVS    %[n],#16\n"
         "MOVS    r0,r2\n"
     "QF_qlog2_1:\n"
+#endif
+#if (QF_MAX_ACTIVE > 8)
         "LSRS    r2,r0,#8\n"
         "BEQ.N   QF_qlog2_2\n"
         "ADDS    %[n],%[n],#8\n"
         "MOVS    r0,r2\n"
     "QF_qlog2_2:\n"
+#endif
         "LSRS    r2,r0,#4\n"
         "BEQ.N   QF_qlog2_3\n"
         "ADDS    %[n],%[n],#4\n"

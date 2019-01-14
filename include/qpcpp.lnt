@@ -2,14 +2,14 @@
 /// @brief PC-Lint 9.x option file for linting QP/C++ applications
 /// @cond
 ///===========================================================================
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-08
+/// Last updated for version 6.4.0
+/// Last updated on  2019-01-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -99,6 +99,7 @@
  Q_ENSURE_ID,
  Q_INVARIANT,
  Q_INVARIANT_ID,
+ Q_ASSERT_STATIC,
  Q_ASSERT_COMPILE,
  Q_DEFINE_THIS_MODULE)
 -emacro(522,          // Highest operation lacks side-effects

@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-11
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -137,64 +137,57 @@ void QF::bzero(void * const start, uint_fast16_t len) {
     }
 }
 
+} // namespace QP
+
 // Log-base-2 calculations ...
 #ifndef QF_LOG2
 
-//! function that returns (log2(x) + 1), where @p x is a 32-bit bitmask */
+//! function that returns (log2(x) + 1), where @p x is a 32-bit bitmask
 ///
 /// @description
 /// This function returns the 1-based number of the most significant 1-bit
 /// of a 32-bit bitmask. This function can be replaced in the QP ports, if
 /// the CPU has special instructions, such as CLZ (count leading zeros).
 ///
-uint_fast8_t QPSet::findMax(void) const {
-    static uint8_t const log2LUT[16] = {
-        static_cast<uint8_t>(0), static_cast<uint8_t>(1),
-        static_cast<uint8_t>(2), static_cast<uint8_t>(2),
-        static_cast<uint8_t>(3), static_cast<uint8_t>(3),
-        static_cast<uint8_t>(3), static_cast<uint8_t>(3),
-        static_cast<uint8_t>(4), static_cast<uint8_t>(4),
-        static_cast<uint8_t>(4), static_cast<uint8_t>(4),
-        static_cast<uint8_t>(4), static_cast<uint8_t>(4),
-        static_cast<uint8_t>(4), static_cast<uint8_t>(4)
-    };
-#if (QF_MAX_ACTIVE <= 32)
-    uint32_t x = m_bits;
-    uint_fast8_t n = static_cast<uint_fast8_t>(0);
-#else
-    uint32_t x;
-    uint_fast8_t n;
-    if (m_bits[1] != static_cast<uint32_t>(0)) {
-        x = m_bits[1];
-        n = static_cast<uint_fast8_t>(32);
-    }
-    else {
-        x = m_bits[0];
-        n = static_cast<uint_fast8_t>(0);
-    }
-#endif
-    if (x != static_cast<uint32_t>(0)) {
-        uint32_t t = (x >> 16);
-        if (t != static_cast<uint32_t>(0)) {
-            x = t;
+extern "C" {
+
+    uint_fast8_t QF_LOG2(QP::QPSetBits x) {
+        static uint8_t const log2LUT[16] = {
+            static_cast<uint8_t>(0), static_cast<uint8_t>(1),
+            static_cast<uint8_t>(2), static_cast<uint8_t>(2),
+            static_cast<uint8_t>(3), static_cast<uint8_t>(3),
+            static_cast<uint8_t>(3), static_cast<uint8_t>(3),
+            static_cast<uint8_t>(4), static_cast<uint8_t>(4),
+            static_cast<uint8_t>(4), static_cast<uint8_t>(4),
+            static_cast<uint8_t>(4), static_cast<uint8_t>(4),
+            static_cast<uint8_t>(4), static_cast<uint8_t>(4)
+        };
+        uint_fast8_t n = static_cast<uint_fast8_t>(0);
+        QP::QPSetBits t;
+
+#if (QF_MAX_ACTIVE > 16)
+        t = static_cast<QP::QPSetBits>(x >> 16);
+        if (t != static_cast<QP::QPSetBits>(0)) {
             n += static_cast<uint_fast8_t>(16);
+            x = t;
         }
+#endif
+#if (QF_MAX_ACTIVE > 8)
         t = (x >> 8);
-        if (t != static_cast<uint32_t>(0)) {
-            x = t;
+        if (t != static_cast<QP::QPSetBits>(0)) {
             n += static_cast<uint_fast8_t>(8);
-        }
-        t = (x >> 4);
-        if (t != static_cast<uint32_t>(0)) {
             x = t;
-            n += static_cast<uint_fast8_t>(4);
         }
-        n += static_cast<uint_fast8_t>(log2LUT[x]);
+#endif
+        t = (x >> 4);
+        if (t != static_cast<QP::QPSetBits>(0)) {
+            n += static_cast<uint_fast8_t>(4);
+            x = t;
+        }
+        return n + static_cast<uint_fast8_t>(log2LUT[x]);
     }
-    return n;
-}
+
+} // extern "C"
 
 #endif // QF_LOG2
-
-} // namespace QP
 

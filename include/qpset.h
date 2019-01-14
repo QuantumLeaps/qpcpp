@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-11
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -39,11 +39,24 @@
 #ifndef qpset_h
 #define qpset_h
 
-#if (QF_MAX_ACTIVE < 1) || (64 < QF_MAX_ACTIVE)
+namespace QP {
+
+#if (!defined QF_MAX_ACTIVE) || (QF_MAX_ACTIVE < 1) || (64 < QF_MAX_ACTIVE)
     #error "QF_MAX_ACTIVE not defined or out of range. Valid range is 1..64"
+#elif (QF_MAX_ACTIVE <= 8)
+    typedef uint8_t QPSetBits;
+#elif (QF_MAX_ACTIVE <= 16)
+    typedef uint16_t QPSetBits;
+#else
+    //! bitmask for the internal representation of QPSet elements
+    typedef uint32_t QPSetBits;
 #endif
 
-namespace QP {
+//****************************************************************************
+// Log-base-2 calculations ...
+#ifndef QF_LOG2
+    extern "C" uint_fast8_t QF_LOG2(QPSetBits x);
+#endif // QF_LOG2
 
 //****************************************************************************
 #if (QF_MAX_ACTIVE <= 32)
@@ -55,54 +68,47 @@ namespace QP {
 ///
 class QPSet {
 
-    uint32_t volatile m_bits;  //!< bitmask with a bit for each element
+    QPSetBits volatile m_bits;  //!< bitmask with a bit for each element
 
 public:
 
     //! Makes the priority set @p me_ empty.
     void setEmpty(void) {
-        m_bits = static_cast<uint32_t>(0);
+        m_bits = static_cast<QPSetBits>(0);
     }
 
     //! Evaluates to true if the priority set is empty
     bool isEmpty(void) const {
-        return (m_bits == static_cast<uint32_t>(0));
+        return (m_bits == static_cast<QPSetBits>(0));
     }
 
     //! Evaluates to true if the priority set is not empty
     bool notEmpty(void) const {
-        return (m_bits != static_cast<uint32_t>(0));
+        return (m_bits != static_cast<QPSetBits>(0));
     }
 
     //! the function evaluates to TRUE if the priority set has the element n.
     bool hasElement(uint_fast8_t const n) const {
-        return (m_bits & (static_cast<uint32_t>(1)
+        return (m_bits & (static_cast<QPSetBits>(1)
                           << (n - static_cast<uint_fast8_t>(1))))
-               != static_cast<uint32_t>(0);
+               != static_cast<QPSetBits>(0);
     }
 
-    //! insert element @p n into the set, n = 1..8
+    //! insert element @p n into the set, n = 1..QF_MAX_ACTIVE
     void insert(uint_fast8_t const n) {
-        m_bits |= static_cast<uint32_t>(
-            static_cast<uint32_t>(1) << (n - static_cast<uint_fast8_t>(1)));
+        m_bits |= static_cast<QPSetBits>(
+            static_cast<QPSetBits>(1) << (n - static_cast<uint_fast8_t>(1)));
     }
 
-    //! remove element @p n from the set, n = 1..8
+    //! remove element @p n from the set, n = 1..QF_MAX_ACTIVE
     void remove(uint_fast8_t const n) {
-        m_bits &= static_cast<uint32_t>(
-           ~(static_cast<uint32_t>(1) << (n - static_cast<uint_fast8_t>(1))));
+        m_bits &= static_cast<QPSetBits>(
+           ~(static_cast<QPSetBits>(1) << (n - static_cast<uint_fast8_t>(1))));
     }
 
-#ifdef QF_LOG2
-    //! find the maximum element in the set, returns zero if the set is empty
-    //! inline definition
     uint_fast8_t findMax(void) const {
         return QF_LOG2(m_bits);
     }
-#else
-    //! find the maximum element in the set, returns zero if the set is empty
-    uint_fast8_t findMax(void) const;
-#endif
 };
 
 #else // QF_MAX_ACTIVE > 32
@@ -115,7 +121,7 @@ public:
 ///
 class QPSet {
 
-    uint32_t volatile m_bits[2]; //!< two bitmasks with a bit for each element
+    uint32_t volatile m_bits[2]; //!< 2 bitmasks with a bit for each element
 
 public:
 
@@ -176,17 +182,13 @@ public:
         }
     }
 
-#ifdef QF_LOG2
     //! find the maximum element in the set, returns zero if the set is empty
     uint_fast8_t findMax(void) const {
         return (m_bits[1] != static_cast<uint32_t>(0))
-            ? (QF_LOG2(m_bits[1]) + static_cast<uint_fast8_t>(32)) \
+            ? (QF_LOG2(m_bits[1])
+              + static_cast<uint_fast8_t>(32)) \
             : (QF_LOG2(m_bits[0]));
     }
-#else
-    //! find the maximum element in the set, returns zero if the set is empty
-    uint_fast8_t findMax(void) const;
-#endif
 };
 
 #endif // QF_MAX_ACTIVE

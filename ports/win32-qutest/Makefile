@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QUTEST, QP/C++, Win32, MinGW toolset
-# Last Updated for Version: 6.3.7
-# Date of the Last Update:  2018-11-09
+# Last Updated for Version: 6.3.8
+# Date of the Last Update:  2019-01-09
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -40,16 +40,16 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    http://sourceforge.net/projects/qpc/files/Qtools/
+#    https://sourceforge.net/projects/qpc/files/QTools/
 #
 
 #-----------------------------------------------------------------------------
-# project name
+# project name:
 #
-PROJECT     := qp
+PROJECT := qp
 
 #-----------------------------------------------------------------------------
-# project directories
+# project directories:
 #
 
 # location of the QP/C++ framework
@@ -99,8 +99,8 @@ CPP_SRCS := \
 	qutest.cpp \
 	qutest_port.cpp
 
-# defines
-DEFINES  :=
+# defines:
+DEFINES  := -DQ_SPY -DQ_UTEST -DQ_HOST
 
 #-----------------------------------------------------------------------------
 # MinGW toolset (NOTE: assumed to be on your PATH)
@@ -124,18 +124,22 @@ MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build options
+# build options:
 #
+
+LIBFLAGS := rs
 
 BIN_DIR = mingw
 
-CFLAGS = -c -g -O -Wall -Wextra -W $(INCLUDES) $(DEFINES) \
-	-DQ_SPY -DQ_UTEST -DQ_HOST
+# gcc options:
+CFLAGS := -c -ffunction-sections -fdata-sections \
+	-std=c99 -pedantic  -Wall -Wextra \
+	-O $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -c -g -O -Wall -Wextra -fno-rtti -fno-exceptions $(INCLUDES) $(DEFINES) \
-	-DQ_SPY -DQ_UTEST -DQ_HOST
+CPPFLAGS := -c -ffunction-sections -fdata-sections \
+	-std=c++11 -pedantic -fno-rtti -fno-exceptions  -Wall -Wextra \
+	-O $(INCLUDES) $(DEFINES)
 
-LIBFLAGS := rs
 
 C_OBJS       := $(patsubst %.c,%.o,  $(notdir $(C_SRCS)))
 CPP_OBJS     := $(patsubst %.cpp,%.o,$(notdir $(CPP_SRCS)))

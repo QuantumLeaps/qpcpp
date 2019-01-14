@@ -1,13 +1,13 @@
 ##############################################################################
-# Product: Makefile for QP/C++ port to Win32 API, MinGW toolset
-# Last updated for version 6.3.7
-# Last updated on  2018-11-09
+# Product: Makefile for QP/C++ port to Win32, MinGW toolset
+# Last Updated for Version: 6.3.8
+# Date of the Last Update:  2019-01-09
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -45,16 +45,16 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    http://sourceforge.net/projects/qpc/files/Qtools/
+#    https://sourceforge.net/projects/qpc/files/QTools/
 #
 
 #-----------------------------------------------------------------------------
-# project name
+# project name:
 #
-PROJECT     := qp
+PROJECT := qp
 
 #-----------------------------------------------------------------------------
-# project directories
+# project directories:
 #
 
 # location of the QP/C++ framework
@@ -142,37 +142,43 @@ ifeq (rel, $(CONF))  # Release configuration .................................
 
 BIN_DIR := rel
 
-# gcc options
-CFLAGS = -c -ffunction-sections -fdata-sections \
-	-Os $(INCLUDES) $(DEFINES) -Wall -Wextra
+# gcc options:
+CFLAGS := -c -ffunction-sections -fdata-sections \
+	-std=c99 -pedantic  -Wall -Wextra \
+	-Os $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-Os $(INCLUDES) $(DEFINES) -Wall -Wextra
+CPPFLAGS := -c -ffunction-sections -fdata-sections \
+	-std=c++11 -pedantic -fno-rtti -fno-exceptions  -Wall -Wextra \
+	-Os $(INCLUDES) $(DEFINES)
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
-BIN_DIR = spy
-
-# gcc options
-CFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -Wextra -DQ_SPY
-
-CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -Wextra -DQ_SPY
+BIN_DIR := spy
 
 # add the QS sources...
 CPP_SRCS += $(CPP_QS_SRCS)
 
-else   # default Debug configuration .........................................
+# gcc options:
+CFLAGS := -c -ffunction-sections -fdata-sections \
+	-std=c99 -pedantic  -Wall -Wextra \
+	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
-BIN_DIR = dbg
+CPPFLAGS := -c -ffunction-sections -fdata-sections \
+	-std=c++11 -pedantic -fno-rtti -fno-exceptions  -Wall -Wextra \
+	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
-# gcc options
-CFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -Wextra
+else # default Debug configuration .........................................
 
-CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-O $(INCLUDES) $(DEFINES) -Wall -Wextra
+BIN_DIR := dbg
+
+# gcc options:
+CFLAGS := -c -ffunction-sections -fdata-sections \
+	-std=c99 -pedantic  -Wall -Wextra \
+	-O $(INCLUDES) $(DEFINES)
+
+CPPFLAGS := -c -ffunction-sections -fdata-sections \
+	-std=c++11 -pedantic -fno-rtti -fno-exceptions  -Wall -Wextra \
+	-O $(INCLUDES) $(DEFINES)
 
 endif
 
