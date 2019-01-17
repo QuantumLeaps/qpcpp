@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-09
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-16
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -64,9 +64,9 @@ typedef void (*QXThreadHandler)(QXThread * const me);
 /// @sa QP::QActive
 ///
 /// @usage
-/// The following example illustrates how to instantiate a "naked" thread
-/// in your application.
-/// @include qf_qxthread.cpp
+/// The following example illustrates how to instantiate and use an extended
+/// thread in your application.
+/// @include qxk_thread.cpp
 ///
 class QXThread : public QActive {
 public:
@@ -136,7 +136,7 @@ private:
     bool teDisarm_(void);
 
     // attributes...
-    QTimeEvt m_timeEvt;
+    QTimeEvt m_timeEvt; //!< time event to handle blocking timeouts
 
     // friendships...
     friend class QXSemaphore;
@@ -154,9 +154,9 @@ private:
 /// counting semaphore when the maximum count is > 1.
 ///
 /// @usage
-/// The following example illustrates how to instantiate the semaphore
+/// The following example illustrates how to instantiate and use the semaphore
 /// in your application.
-/// @include qf_qxsema.cpp
+/// @include qxk_sema.cpp
 ///
 class QXSemaphore {
 public:
@@ -176,8 +176,8 @@ public:
 
 private:
     QPSet m_waitSet; //!< set of extended threads waiting on this semaphore
-    uint16_t volatile m_count;
-    uint16_t m_max_count;
+    uint16_t volatile m_count;  //!< semaphore up-down counter
+    uint16_t m_max_count; //!< maximum value of the semaphore counter
 };
 
 //****************************************************************************
@@ -211,9 +211,9 @@ private:
 /// among all these threads.
 ///
 /// @usage
-/// The following example illustrates how to instantiate the mutex
+/// The following example illustrates how to instantiate and use the mutex
 /// in your application.
-/// @include qf_mutex.cpp
+/// @include qxk_mutex.cpp
 ///
 class QXMutex {
 public:
@@ -231,9 +231,9 @@ public:
 
 private:
     QPSet m_waitSet; //!< set of extended-threads waiting on this mutex
-    uint8_t volatile m_lockNest;
-    uint8_t volatile m_holderPrio;
-    uint8_t m_ceiling;
+    uint8_t volatile m_lockNest; //!< lock-nesting up-down counter
+    uint8_t volatile m_holderPrio; //!< priority of the lock holder thread
+    uint8_t m_ceiling; //< prioirty ceiling of this mutex
 };
 
 } // namespace QP

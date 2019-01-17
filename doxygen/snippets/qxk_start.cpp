@@ -28,7 +28,7 @@ int main() {
     QP::QF::poolInit(smlPoolSto,
                      sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
-    // start the active objects...
+    // start the active objects (basic-threads)...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start(
             static_cast<uint_fast8_t>(n + 1), // QP priority of the AO
@@ -38,18 +38,8 @@ int main() {
             sizeof(philoStackSto[n]),  // stack size [bytes]
             static_cast<QP::QEvt *>(0));   // initialization event
     }
-
-    // leave the priority level (N_PHILO + 1) free for the mutex in BSP
-
-    DPP::AO_Table->start(
-            static_cast<uint_fast8_t>(N_PHILO + 2), // QP priority of the AO
-            tableQueueSto,           // event queue storage
-            Q_DIM(tableQueueSto),    // queue length [events]
-            tableStackSto,           // stack storage
-            sizeof(tableStackSto),   // stack size [bytes]
-            static_cast<QP::QEvt *>(0)); // initialization event
-
-    // start the "naked" test thread
+    . . .
+    // start the extended-threads...
     DPP::XT_Test->start(
             static_cast<uint_fast8_t>(10), // QP priority of the AO
             testQueueSto,            // event queue storage
@@ -57,6 +47,6 @@ int main() {
             testStackSto,            // stack storage
             sizeof(testStackSto),    // stack size [bytes]
             static_cast<QP::QEvt *>(0)); // initialization event
-
+    . . .
     return QP::QF::run(); // run the QF application
 }

@@ -4,7 +4,7 @@
 /// @cond
 ////**************************************************************************
 /// Last updated for version 6.3.8
-/// Last updated on  2019-01-14
+/// Last updated on  2019-01-16
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -106,9 +106,10 @@ void QXSemaphore::init(uint_fast16_t const count,
 /// Multiple extended threads can wait for a given semahpre.
 ///
 bool QXSemaphore::wait(uint_fast16_t const nTicks) {
+    bool signaled = true; // assume that the semaphore will be signaled
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
 
+    QF_CRIT_ENTRY_();
     QXThread *curr = static_cast<QXThread *>(QXK_attr_.curr);
 
     /// @pre this function must:
@@ -121,41 +122,57 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) /* can't wait inside an ISR */
         && (m_max_count > static_cast<uint16_t>(0)) /* initialized */
         && (curr != static_cast<QXThread *>(0)) /* curr must be extended */
-        && (QXK_attr_.lockHolder != curr->m_prio) /* not holding a lock */
-        && curr->isBlockedOn()); // not blocked
+        && (QXK_attr_.lockHolder != curr->m_prio) /* NOT holding a lock */
+        && curr->isBlockedOn()); // NOT blocked
 
     if (m_count > static_cast<uint16_t>(0)) {
         --m_count;
-        curr->m_timeEvt.sig = static_cast<QSignal>(QXK_SEMA_SIG); // non-zero
     }
     else {
         uint_fast8_t p = static_cast<uint_fast8_t>(curr->m_prio);
 
-        // remember the blocking object
+        // remember the blocking object (this semaphore)
         curr->m_temp.obj = reinterpret_cast<QMState *>(this);
         curr->teArm_(static_cast<enum_t>(QXK_SEMA_SIG), nTicks);
+
+        // remove this curr prio from the ready set (block)
+        // and insert to the waiting set on this mutex
         m_waitSet.insert(p);          // add to waiting-set
         QXK_attr_.readySet.remove(p); // remove from ready-set
 
-        (void)QXK_sched_(); // schedule the next thread
+        // schedule the next thread if multitasking started
+        (void)QXK_sched_();
         QF_CRIT_EXIT_();
-        QF_CRIT_EXIT_NOP(); // BLOCK here
+        QF_CRIT_EXIT_NOP(); // BLOCK here !!!
 
-        QF_CRIT_ENTRY_();
-        // after unblocking:
-        // - the thread must be waiting on this semaphore
-        // - the blocking object must be this semaphore
-        //
-        Q_ASSERT_ID(210, m_waitSet.hasElement(p)
-            && curr->isBlockedOn(this));
+        QF_CRIT_ENTRY_();   // AFTER unblocking...
+        // the blocking object must be this semaphore
+        Q_ASSERT_ID(240, curr->isBlockedOn(this));
 
-        m_waitSet.remove(p); // remove the unblocked thread
+        // did the blocking time-out? (signal of zero means that it did)
+        if (curr->m_timeEvt.sig != static_cast<QSignal>(0)) {
+            if (m_waitSet.hasElement(p)) { // still waiting?
+                m_waitSet.remove(p); // remove the unblocked thread
+                signaled = false; // the semaphore was NOT signaled
+                // semaphore NOT taken: do NOT decrement the count
+            }
+            else { // semaphore was both signaled and timed out
+                --m_count; // semaphore signaled: decrement the count
+            }
+        }
+        else { // blocking did NOT time out
+            // the semaphore count must be positive and
+            // the thread must NOT be waiting on this semaphore
+            Q_ASSERT_ID(250, (m_count > static_cast<uint16_t>(0))
+                && (!m_waitSet.hasElement(p)));
+
+            --m_count; // semaphore signaled: decrement the count
+        }
         curr->m_temp.obj = static_cast<QMState *>(0); // clear blocked obj.
     }
     QF_CRIT_EXIT_();
 
-    // signal of non-zero means that the time event has NOT expired
-    return (curr->m_timeEvt.sig != static_cast<QSignal>(0));
+    return signaled;
 }
 
 //****************************************************************************
@@ -218,42 +235,39 @@ bool QXSemaphore::signal(void) {
     Q_REQUIRE_ID(400, m_max_count > static_cast<uint16_t>(0));
 
     QF_CRIT_ENTRY_();
-    if (m_waitSet.notEmpty()) {
-        uint_fast8_t p = m_waitSet.findMax();
+    if (m_count < m_max_count) {
 
-        // is this thread already ready-to-run?
-        if (QXK_attr_.readySet.hasElement(p)) {
-            signaled = false; // semaphore NOT signaled
-        }
-        else {
+        ++m_count; // increment the semaphore count
+
+        if (m_waitSet.notEmpty()) {
+
+            // find the highest-priority thread waiting on this semaphore
+            uint_fast8_t p = m_waitSet.findMax();
+            QXThread *thr = static_cast<QXThread *>(QF::active_[p]);
+
+            // assert that:
+            // - the thread must be registered in QF;
+            // - the thread must be extended; and
+            // - must be blocked on this semaphore;
+            //
+            Q_ASSERT_ID(410, (thr != static_cast<QXThread *>(0)) /* registered */
+                && (thr->m_osObject != static_cast<void *>(0)) /* extended */
+                && thr->isBlockedOn(this)); // blocked on this sema
+
+            // disarm the internal time event
+            (void)thr->teDisarm_();
+
+            // make the thread ready to run and remove from the wait-list
             QXK_attr_.readySet.insert(p);
-        }
-        QXThread *thr = static_cast<QXThread *>(QF::active_[p]);
+            m_waitSet.remove(p);
 
-        // assert that:
-        // - the thread must be registered in QF;
-        // - the thread must be extended;
-        // - must be blocked on this semaphore; and
-        // - the semaphore count must be zero (semaphore not signaled)
-        Q_ASSERT_ID(410, (thr != static_cast<QXThread *>(0)) /* registered */
-            && (thr->m_osObject != static_cast<void *>(0)) /* extended */
-            && thr->isBlockedOn(this) /* blocked on this sema */
-            && (m_count == static_cast<uint16_t>(0))); // not signaled yet
-
-        // disarm the internal time event
-        (void)thr->teDisarm_();
-
-        if (!QXK_ISR_CONTEXT_()) { // not inside ISR?
-            (void)QXK_sched_(); // schedule the next thread
+            if (!QXK_ISR_CONTEXT_()) { // not inside ISR?
+                (void)QXK_sched_(); // schedule the next thread
+            }
         }
     }
     else {
-        if (m_count < m_max_count) {
-            ++m_count;
-        }
-        else {
-            signaled = false; // semaphore NOT signaled
-        }
+        signaled = false; // semaphore NOT signaled
     }
     QF_CRIT_EXIT_();
 
