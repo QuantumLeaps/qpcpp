@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-07
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -317,17 +317,20 @@ QTimeEvt::QTimeEvt()
 void QTimeEvt::armX(QTimeEvtCtr const nTicks, QTimeEvtCtr const interval) {
     uint_fast8_t tickRate = static_cast<uint_fast8_t>(refCtr_)
                             & static_cast<uint_fast8_t>(TE_TICK_RATE);
-    QTimeEvtCtr cntr = m_ctr;  // temporary to hold volatile
+    QTimeEvtCtr ctr = m_ctr;  // temporary to hold volatile
     QF_CRIT_STAT_
 
     /// @pre the host AO must be valid, time evnet must be disarmed,
     /// number of clock ticks cannot be zero, and the signal must be valid.
     ///
     Q_REQUIRE_ID(400, (m_act != static_cast<void *>(0))
-                 && (cntr == static_cast<QTimeEvtCtr>(0))
+                 && (ctr == static_cast<QTimeEvtCtr>(0))
                  && (nTicks != static_cast<QTimeEvtCtr>(0))
                  && (tickRate < static_cast<uint_fast8_t>(QF_MAX_TICK_RATE))
                  && (static_cast<enum_t>(sig) >= Q_USER_SIG));
+#ifdef Q_NASSERT
+    (void)ctr; // avoid compiler warning about unused variable
+#endif
 
     QF_CRIT_ENTRY_();
     m_ctr = nTicks;

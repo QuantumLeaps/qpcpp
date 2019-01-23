@@ -3,14 +3,14 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.0
-/// Last updated on  2018-05-04
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-23
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -541,6 +541,9 @@ QMState const *QMsm::childStateObj(QMState const * const parent) const {
 
     /// @post the child must be found
     Q_ENSURE_ID(810, isFound);
+#ifdef Q_NASSERT
+    (void)isFound; // avoid compiler warning about unused variable
+#endif
 
     return child; // return the child
 }
