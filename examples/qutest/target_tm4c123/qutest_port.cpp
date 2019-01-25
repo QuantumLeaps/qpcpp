@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-17
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-24
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -223,19 +223,19 @@ void QS::onTestLoop() {
 
         rxParse();  // parse all the received bytes
 
-       if ((UART0->FR & UART_FR_TXFE) != 0U) {  // TX done?
-           uint16_t fifo = UART_TXFIFO_DEPTH;   // max bytes we can accept
-           uint8_t const *block;
+        if ((UART0->FR & UART_FR_TXFE) != 0U) {  // TX done?
+            uint16_t fifo = UART_TXFIFO_DEPTH;   // max bytes we can accept
+            uint8_t const *block;
 
 
-           block = getBlock(&fifo);  // try to get next block to transmit
+            block = getBlock(&fifo);  // try to get next block to transmit
 
-           while (fifo-- != 0) {     // any bytes in the block?
-               UART0->DR = *block++; // put into the FIFO
-           }
-       }
+            while (fifo-- != 0) {     // any bytes in the block?
+                UART0->DR = *block++; // put into the FIFO
+            }
+        }
     }
     // set inTestLoop to true in case calls to QS_onTestLoop() nest,
-    // which can happen through the calls to QS_TEST_WAIT().
+    // which can happen through the calls to QS_TEST_PAUSE().
     rxPriv_.inTestLoop = true;
 }

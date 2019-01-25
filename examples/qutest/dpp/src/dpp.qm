@@ -388,7 +388,8 @@ $declare(AOs::XT_Test1)
 $declare(AOs::XT_Test2)
 #endif // qxk_h
 
-#endif // dpp_h</text>
+#endif // dpp_h
+</text>
   </file>
   <!--${.::philo.cpp}-->
   <file name="philo.cpp">

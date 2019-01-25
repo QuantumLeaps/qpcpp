@@ -1,15 +1,15 @@
 /// @file
-/// @brief QK/C++ port to  MSP430, CCS-430 compiler
+/// @brief QEP/C++ port, generic C++ compiler
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.8.2
-/// Last updated on  2017-01-07
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-24
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,30 +30,16 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
-#ifndef qk_port_h
-#define qk_port_h
+#ifndef qep_port_h
+#define qep_port_h
 
-// QK interrupt entry and exit...
-#define QK_ISR_ENTRY()    (++QK_attr_.intNest)
+#include <stdint.h>  // Exact-width types. WG14/N843 C99 Standard
 
-#define QK_ISR_EXIT()     do { \
-    --QK_attr_.intNest; \
-    if (QK_attr_.intNest == static_cast<uint_fast8_t>(0)) { \
-        if (QK_sched_() != static_cast<uint_fast8_t>(0)) { \
-            QK_activate_(); \
-        } \
-    } \
-    else { \
-        Q_ERROR(); \
-    } \
-} while (false)
+#include "qep.h"     // QEP platform-independent public interface
 
-#include "qk.h"  // QK platform-independent public interface
-
-#endif // qk_port_h
-
+#endif // qep_port_h

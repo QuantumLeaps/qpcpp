@@ -1,13 +1,13 @@
 //****************************************************************************
-// Product: DPP example on MSP-EXP430G2 board, cooperative QV kernel
-// Last updated for version 6.3.7
-// Last updated on  2018-11-30
+// Product: DPP example on MSP-EXP430F5529LP board, cooperative QV kernel
+// Last updated for version 6.3.8
+// Last updated on  2019-01-24
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -63,7 +63,7 @@ static uint32_t l_rnd;
 
     QP::QSTimeCtr QS_tickTime_;
 
-    static uint8_t const l_timerA_ISR = 0U;
+    static uint8_t const l_timer0_ISR = 0U;
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,
@@ -81,7 +81,8 @@ extern "C" {
     #pragma vector=TIMER0_A0_VECTOR
     __interrupt void TIMER0_A0_ISR(void)
 #elif defined(__GNUC__)
-    void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) TIMER0_A0_ISR (void)
+    __attribute__ ((interrupt(TIMER0_A0_VECTOR)))
+    void TIMER0_A0_ISR (void)
 #else
     #error MSP430 compiler not supported!
 #endif
@@ -96,7 +97,8 @@ extern "C" {
        / DPP::BSP::TICKS_PER_SEC) + 1;
 #endif
 
-    QP::QF::TICK_X(0U, &l_timerA_ISR); // process all time events at rate 0
+    QP::QF::TICK_X(0U, &l_timer0_ISR); // process all time events at rate 0
+
 }
 
 } // extern "C"
@@ -114,7 +116,7 @@ void BSP::init(void) {
     if (QS_INIT((void *)0) == 0) { // initialize the QS software tracing
         Q_ERROR();
     }
-    QS_OBJ_DICTIONARY(&l_timerA_ISR);
+    QS_OBJ_DICTIONARY(&l_timer0_ISR);
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
 }
@@ -245,22 +247,23 @@ bool QS::onStartup(void const *arg) {
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     // USCI setup code...
-    P4SEL |= (RXD | TXD);  // select the UART function for the pins */
-    UCA1CTL1 |= UCSWRST;   // reset USCI state machine */
-    UCA1CTL1 |= UCSSEL_2;  // choose the SMCLK clock */
-#if 0 // 9600 baud rate */
-    UCA0BR0 = 6; // 1MHz 9600 (see User's Guide) */
-    UCA0BR1 = 0; // 1MHz 9600 */
-    UCA0MCTL = UCBRS_0 | UCBRF_13 | UCOS16; /* modulationUCBRSx=0, UCBRFx=0, oversampling */
-#else // 115200 baud rate */
-    UCA1BR0 = 9;           // 1MHz 115200 (see User's Guide) */
-    UCA1BR1 = 0;           // 1MHz 115200 */
-    UCA1MCTL |= UCBRS_1 | UCBRF_0; // modulation UCBRSx=1, UCBRFx=0 */
+    P4SEL |= (RXD | TXD);  // select the UART function for the pins
+    UCA1CTL1 |= UCSWRST;   // reset USCI state machine
+    UCA1CTL1 |= UCSSEL_2;  // choose the SMCLK clock
+#if 1 // 9600 baud rate
+    UCA1BR0 = 6; // 1MHz 9600 (see User's Guide)
+    UCA1BR1 = 0; // 1MHz 9600 */
+    // modulationUCBRSx=0, UCBRFx=0, oversampling
+    UCA1MCTL = UCBRS_0 | UCBRF_13 | UCOS16;
+#else // 115200 baud rate
+    UCA1BR0 = 9;           // 1MHz 115200 (see User's Guide)
+    UCA1BR1 = 0;           // 1MHz 115200
+    UCA1MCTL |= UCBRS_1 | UCBRF_0; // modulation UCBRSx=1, UCBRFx=0
 #endif
-    UCA1CTL1 &= ~UCSWRST;  // initialize USCI state machine */
-    UCA1IE |= UCRXIE;      // Enable USCI_A1 RX interrupt */
+    UCA1CTL1 &= ~UCSWRST;  // initialize USCI state machine
+    UCA1IE |= UCRXIE;      // Enable USCI_A1 RX interrupt
 
-    // setup the QS filters... */
+    // setup the QS filters...
     QS_FILTER_ON(QS_SM_RECORDS);
     //QS_FILTER_ON(QS_AO_RECORDS);
     QS_FILTER_ON(QS_UA_RECORDS);

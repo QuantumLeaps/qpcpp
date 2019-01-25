@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-20
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-24
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -528,6 +528,16 @@ public:
                        QEvt const *qSto[], uint_fast16_t const qLen,
                        void * const stkSto, uint_fast16_t const stkSize,
                        QEvt const * const ie);
+
+    //! Overloaded start function (no initialization event)
+    virtual void start(uint_fast8_t const prio,
+                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       void * const stkSto, uint_fast16_t const stkSize)
+    {
+        this->start(prio, qSto, qLen, stkSto, stkSize,
+                    static_cast<QEvt const *>(0));
+    }
+
     virtual void init(QEvt const * const e);
     virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
     virtual void dispatch(QEvt const * const e);

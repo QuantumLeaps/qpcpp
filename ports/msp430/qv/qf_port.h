@@ -1,15 +1,15 @@
 /// @file
-/// @brief QF/C++ port to MSP430, preemptive QK kernel, IAR-430 compiler
+/// @brief QF/C++ port to MSP430, cooperative QV kernel
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-05-04
+/// Last updated for version 6.3.8
+/// Last updated on  2019-01-24
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com.
+/// Copyright (C) 2005-2019 Quantum Leaps, All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,8 +30,8 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com
-/// Email: info@state-machine.com
+/// https://www.state-machine.com
+/// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
 
@@ -51,8 +51,8 @@
 #define QF_INT_DISABLE()     __disable_interrupt()
 #define QF_INT_ENABLE()      __enable_interrupt()
 
-/* QF critical section entry/exit... */
-#define QF_CRIT_STAT_TYPE    istate_t
+// QF critical section entry/exit...
+#define QF_CRIT_STAT_TYPE    unsigned short
 #define QF_CRIT_ENTRY(stat_) do { \
     (stat_) =  __get_interrupt_state(); \
     __disable_interrupt(); \
@@ -60,16 +60,16 @@
 #define QF_CRIT_EXIT(stat_)  __set_interrupt_state(stat_)
 
 
-#include <intrinsics.h> // IAR intrinsic functions
+#include <intrinsics.h> // intrinsic functions
 
 #include "qep_port.h"   // QEP port
-#include "qk_port.h"    // QK preemptive kernel port
+#include "qv_port.h"    // QV cooperative kernel port
 #include "qf.h"         // QF platform-independent public interface
 
 //****************************************************************************
 // NOTE01:
 // The maximum number of active objects QF_MAX_ACTIVE can be increased
-// up to 63, if necessary. Here it is set to a lower level to save some RAM.
+// up to 64, if necessary. Here it is set to a lower level to save some RAM.
 //
 
-#endif  // qf_port_h
+#endif // qf_port_h

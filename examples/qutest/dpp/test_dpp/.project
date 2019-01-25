@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>dpp-qv_msp-exp430f5529lp</name>
+	<name>test_dpp</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -28,57 +28,62 @@
 		<link>
 			<name>QP</name>
 			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/src/qf</locationURI>
+			<locationURI>PARENT-4-PROJECT_LOC/src/qf</locationURI>
 		</link>
 		<link>
 			<name>QP_include</name>
 			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/include</locationURI>
+			<locationURI>PARENT-4-PROJECT_LOC/include</locationURI>
 		</link>
 		<link>
 			<name>QP_port</name>
 			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/ports/msp430/qv</locationURI>
+			<locationURI>PARENT-4-PROJECT_LOC/ports/msp430/qutest</locationURI>
 		</link>
 		<link>
 			<name>QS</name>
 			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/src/qs</locationURI>
-		</link>
-		<link>
-			<name>QV</name>
-			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/src/qv</locationURI>
-		</link>
-		<link>
-			<name>dpp.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/dpp.h</locationURI>
-		</link>
-		<link>
-			<name>philo.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/philo.cpp</locationURI>
-		</link>
-		<link>
-			<name>table.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/table.cpp</locationURI>
+			<locationURI>PARENT-4-PROJECT_LOC/src/qs</locationURI>
 		</link>
 		<link>
 			<name>bsp.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/bsp.cpp</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/src/bsp.cpp</locationURI>
 		</link>
 		<link>
 			<name>bsp.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/bsp.h</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/src/bsp.h</locationURI>
 		</link>
 		<link>
-			<name>main.cpp</name>
+			<name>dpp.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/main.cpp</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/src/dpp.h</locationURI>
+		</link>
+		<link>
+			<name>dpp.qm</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/dpp.qm</locationURI>
+		</link>
+		<link>
+			<name>philo.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/philo.cpp</locationURI>
+		</link>
+		<link>
+			<name>qk</name>
+			<type>2</type>
+			<locationURI>PARENT-5-PROJECT_LOC/src/qk</locationURI>
+		</link>
+		<link>
+			<name>qutest_port.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/target_exp430f55/qutest_port.cpp</locationURI>
+		</link>
+		<link>
+			<name>table.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/table.cpp</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
