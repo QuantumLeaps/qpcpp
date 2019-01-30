@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, TI-RTOS kernel (SYS/BIOS)
-// Last updated for version 5.9.5
-// Last updated on  2017-07-20
+// Last updated for version 6.3.8
+// Last updated on  2019-01-30
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -165,6 +165,11 @@ void QF::onStartup(void) {
 
     Clock_Params_init(&clkParams);
     clkParams.startFlag = TRUE;
+
+    // NOTE:
+    // The conversion constant 1000 must be consistent with Clock.tickPeriod
+    // in the .cfg file for this TI-RTOS application!
+    //
     clkParams.period = 1000U/DPP::BSP::TICKS_PER_SEC;
 
     // Construct a periodic Clock Instance

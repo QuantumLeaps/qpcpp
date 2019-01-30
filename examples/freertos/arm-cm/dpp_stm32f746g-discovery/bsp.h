@@ -1,5 +1,5 @@
 //****************************************************************************
-// Product: DPP example
+// Product: BSP for DPP with FreeRTOS
 // Last Updated for Version: 6.3.8
 // Date of the Last Update:  2019-01-30
 //
