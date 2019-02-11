@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-04
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -220,10 +220,6 @@ public:
 
     //! Un-subscribes from the delivery of all signals to the active object.
     void unsubscribeAll(void) const;
-
-    //! Stops execution of an active object and removes it from the
-    //! framework's supervision.
-    void stop(void);
 
     //! Subscribes for delivery of signal @p sig to the active object
     void subscribe(enum_t const sig) const;

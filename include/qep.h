@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.8
-/// Last updated on  2019-01-31
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -48,10 +48,10 @@
 //! The current QP version number string of the form X.Y.Z, where X is
 // a 1-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "6.3.8"
+#define QP_VERSION_STR  "6.4.0"
 
-//! Tamperproof current QP release (6.3.8) and date (2019-01-31)
-#define QP_RELEASE      0x8EAC4D4FU
+//! Tamperproof current QP release (6.4.0) and date (2019-02-10)
+#define QP_RELEASE      0x8EA03F5FU
 
 
 //****************************************************************************

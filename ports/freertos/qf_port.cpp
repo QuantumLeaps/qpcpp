@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.4
-/// Last updated on  2018-08-27
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -110,10 +110,6 @@ void QActive::start(uint_fast8_t prio,
     Q_ENSURE_ID(210, thr != static_cast<TaskHandle_t>(0)); // must be created
 }
 //............................................................................
-void QActive::stop(void) {
-    m_prio = static_cast<uint8_t>(0); // stop the thread loop
-}
-//............................................................................
 void QActive::setAttr(uint32_t attr1, void const *attr2) {
     // this function must be called before QACTIVE_START(),
     // which implies that me->thread.pxDummy1 must not be used yet;
@@ -132,13 +128,12 @@ static void task_function(void *pvParameters) { // FreeRTOS task signature
 }
 // thread for active objects -------------------------------------------------
 void QF::thread_(QActive *act) {
-    while (act->m_prio != static_cast<uint8_t>(0)) {
+    // event-loop
+    for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
-    remove_(act); // remove this object from QF
-    vTaskDelete(static_cast<TaskHandle_t>(0)); // delete this FreeRTOS task
 }
 
 /*==========================================================================*/

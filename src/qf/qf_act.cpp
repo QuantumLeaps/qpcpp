@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.8
-/// Last updated on  2019-01-11
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -81,8 +81,7 @@ void QF::add_(QActive * const a) {
 //****************************************************************************
 /// @description
 /// This function removes a given active object from the active objects
-/// managed by the QF framework. It should not be called by the application
-/// directly, only through the function QP::QActive::stop().
+/// managed by the QF framework. It should not be called by the QP ports.
 ///
 /// @param[in]  a  pointer to the active object to remove from the framework.
 ///

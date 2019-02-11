@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-20
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-08
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -97,16 +97,12 @@ void QF::thread_(QActive *act) {
     EnterCriticalSection(&l_startupCritSect);
     LeaveCriticalSection(&l_startupCritSect);
 
-    // loop until m_thread is cleared in QActive::stop()
-    do {
+    // event-loop
+    for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
-    } while (act->m_thread != NULL);
-
-    act->unsubscribeAll(); // make sure that no events are subscribed
-    QF::remove_(act);  // remove this object from the framework
-    CloseHandle(act->m_osObject); // cleanup the OS event
+    }
 }
 //****************************************************************************
 // helper function to match the signature expeced by CreateThread() Win32 API
@@ -221,10 +217,6 @@ void QActive::start(uint_fast8_t prio,
     if (win32Prio != 0) {
         SetThreadPriority(m_thread, win32Prio);
     }
-}
-//****************************************************************************
-void QActive::stop(void) {
-    m_thread = static_cast<HANDLE>(0);  // stop the QActive::run() loop
 }
 
 } // namespace QP

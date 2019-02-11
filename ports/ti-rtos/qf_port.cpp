@@ -1,15 +1,15 @@
 /// @file
 /// @brief QF/C++ port to TI-RTOS kernel, all supported compilers
 /// @cond
-////**************************************************************************
-/// Last updated for version 5.8.0
-/// Last updated on  2016-11-19
+///**************************************************************************
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,9 +30,9 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
-////**************************************************************************
+///**************************************************************************
 /// @endcond
 
 #define QP_IMPL           // this is QP implementation
@@ -103,10 +103,6 @@ void QActive::start(uint_fast8_t prio,
 
     // TI-RTOS Swi must be created correctly
     Q_ENSURE_ID(490, m_thread != 0);
-}
-//............................................................................
-void QActive::stop() {
-    QF::remove_(this); // remove the AO from the framework
 }
 
 //............................................................................

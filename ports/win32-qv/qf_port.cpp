@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-09
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -206,11 +206,6 @@ void QActive::start(uint_fast8_t prio,
 
     this->init(ie); // execute initial transition (virtual call)
     QS_FLUSH();     // flush the QS trace buffer to the host
-}
-//****************************************************************************
-void QActive::stop(void) {
-    unsubscribeAll();
-    QF::remove_(this);
 }
 
 //****************************************************************************

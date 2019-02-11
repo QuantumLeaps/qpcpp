@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-09
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -34,6 +34,10 @@
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
+///
+
+// expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
+#define _POSIX_C_SOURCE 200809L
 
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.h"      // QF port
@@ -164,15 +168,12 @@ void QF::thread_(QActive *act) {
     pthread_mutex_lock(&l_startupMutex);
     pthread_mutex_unlock(&l_startupMutex);
 
-    // loop until m_thread is cleared in QActive::stop()
-    do {
+    // event-loop
+    for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
-    } while (act->m_thread != static_cast<uint8_t>(0));
-
-    QF::remove_(act); // remove this object from the framework
-    pthread_cond_destroy(&act->m_osObject); // cleanup the condition variable
+    }
 }
 
 //............................................................................
@@ -257,11 +258,6 @@ void QActive::start(uint_fast8_t prio,
     }
     pthread_attr_destroy(&attr);
     m_thread = static_cast<uint8_t>(1);
-}
-//............................................................................
-void QActive::stop(void) {
-    unsubscribeAll();
-    m_thread = static_cast<uint8_t>(0); // stop the QF::thread_() loop
 }
 
 //............................................................................

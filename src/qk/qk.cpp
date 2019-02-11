@@ -3,14 +3,14 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -186,33 +186,6 @@ void QActive::start(uint_fast8_t const prio,
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
     if (QK_sched_() != static_cast<uint_fast8_t>(0)) { // activation needed?
-        QK_activate_();
-    }
-    QF_CRIT_EXIT_();
-}
-
-//****************************************************************************
-/// @description
-/// This function must be called from within the AO that needs to stop.
-/// In other words, an AO should stop itself rather than being stopped by
-/// someone else. This policy works best, because only the AO itself "knows"
-/// when it has reached the appropriate state for the shutdown.
-///
-/// @note
-/// By the time the AO calls QP::QActive::stop(), it should have unsubscribed
-/// from all events and no more events should be directly-posted to it.
-///
-void QActive::stop(void) {
-
-    //! @pre QP::QActive::stop() must be called from the AO that wants to stop.
-    Q_REQUIRE_ID(400, (this == QF::active_[QK_attr_.actPrio]));
-
-    QF::remove_(this);  // remove this active object from the QF
-
-    QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
-    QK_attr_.readySet.remove(static_cast<uint_fast8_t>(m_prio));
-    if (QK_sched_() != static_cast<uint_fast8_t>(0)) {
         QK_activate_();
     }
     QF_CRIT_EXIT_();

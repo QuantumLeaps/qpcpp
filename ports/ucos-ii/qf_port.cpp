@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.4
-/// Last updated on  2018-01-10
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-08
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// https://www.state-machine.com
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
@@ -109,10 +109,6 @@ void QActive::start(uint_fast8_t prio,
     Q_ENSURE_ID(220, err == OS_ERR_NONE);
 }
 //............................................................................
-void QActive::stop() {
-    m_thread = static_cast<uint32_t>(0); // stop the thread loop
-}
-//............................................................................
 // NOTE: This function must be called BEFORE starting an active object
 void QActive::setAttr(uint32_t attr1, void const * /*attr2*/) {
     m_thread = attr1; // use as temporary
@@ -120,17 +116,12 @@ void QActive::setAttr(uint32_t attr1, void const * /*attr2*/) {
 
 // thread for active objects -------------------------------------------------
 void QF::thread_(QActive *act) {
-    // enable thread-loop, see NOTE2
-    act->m_thread = static_cast<uint32_t>(1);  // set event-loop control
-    do {
+    // event-loop
+    for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
-    } while (act->m_thread != static_cast<uint32_t>(0));
-    act->unsubscribeAll();
-    INT8U err;
-    OSQDel(act->m_eQueue, OS_DEL_ALWAYS, &err); // cleanup the uC/OS-II queue
-    Q_ENSURE_ID(300, err == OS_ERR_NONE); // must be cleaned up correctly
+    }
 }
 //............................................................................
 static void task_function(void *pdata) { // uC/OS-II task signature
@@ -280,9 +271,5 @@ QEvt const *QActive::get_(void) {
 // The member QActive.thread is set to the uC/OS-II task options in the
 // function QF_setUCosTaskAttr(), which must be called **before**
 // QActive::start().
-//
-// NOTE2:
-// The member QActive.thread is reused as the loop control variable,
-// because the task options are alredy applied.
 //
 

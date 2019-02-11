@@ -144,10 +144,10 @@ BIN_DIR := rel
 
 # gcc options
 CFLAGS = -c -ffunction-sections -fdata-sections \
-	-Os $(INCLUDES) $(DEFINES) -Wall -W
+	-O3 $(INCLUDES) $(DEFINES) -Wall -W
 
 CPPFLAGS = -c -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections \
-	-Os $(INCLUDES) $(DEFINES) -Wall -W
+	-O3 $(INCLUDES) $(DEFINES) -Wall -W
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 

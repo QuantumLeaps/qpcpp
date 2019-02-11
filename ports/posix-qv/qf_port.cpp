@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-09
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -34,6 +34,10 @@
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
+///
+
+// expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
+#define _POSIX_C_SOURCE 200809L
 
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.h"      // QF port
@@ -208,7 +212,7 @@ int_t QF::run(void) {
     onCleanup();  // cleanup callback
     QS_EXIT();    // cleanup the QSPY connection
 
-    pthread_cond_destroy(&QV_condVar_);       // cleanup the condition variable
+    pthread_cond_destroy(&QV_condVar_); // cleanup the condition variable
     pthread_mutex_destroy(&l_pThreadMutex); // cleanup the global mutex
 
     return static_cast<int_t>(0);
@@ -275,11 +279,6 @@ void QActive::start(uint_fast8_t prio,
     m_prio = static_cast<uint8_t>(prio); // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
     this->init(ie); // execute initial transition (virtual call)
-}
-//****************************************************************************
-void QActive::stop(void) {
-    unsubscribeAll();
-    QF::remove_(this);
 }
 
 //****************************************************************************

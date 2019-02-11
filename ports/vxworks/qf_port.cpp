@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-02
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -94,16 +94,11 @@ void QF::stop(void) {
 //............................................................................
 void QF::thread_(QActive *act) {
     // event loop of the active object thread
-    act->m_osObject = 1;
-    while (act->m_osObject) {
+    for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
-    act->unsubscribeAll(); // unsubscribe from all events
-    QF::remove_(act); // remove this active object from QF
-
-    taskDelete(act->m_thread);
 }
 //............................................................................
 void QActive::start(uint_fast8_t prio,
@@ -144,13 +139,6 @@ void QActive::start(uint_fast8_t prio,
 
     // VxWorks task must be created successfully
     Q_ASSERT_ID(210, m_thread != TASK_ID_NULL);
-}
-//............................................................................
-void QActive::stop(void) {
-    // active object must stop itself and cannot be stopped by any other AO
-    Q_REQUIRE_ID(300, m_thread == taskIdSelf());
-
-    m_osObject = 0; // stop the thread loop
 }
 
 } // namespace QP

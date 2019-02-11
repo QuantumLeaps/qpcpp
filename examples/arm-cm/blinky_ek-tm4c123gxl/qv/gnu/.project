@@ -7,6 +7,7 @@
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -29,11 +30,6 @@
 			<name>GNU_CPP</name>
 			<type>2</type>
 			<locationURI>PARENT-5-PROJECT_LOC/3rd_party/gnu_cpp</locationURI>
-		</link>
-		<link>
-			<name>qv</name>
-			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/src/qv</locationURI>
 		</link>
 		<link>
 			<name>QP</name>
@@ -89,6 +85,11 @@
 			<name>qstamp.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-5-PROJECT_LOC/include/qstamp.cpp</locationURI>
+		</link>
+		<link>
+			<name>qv</name>
+			<type>2</type>
+			<locationURI>PARENT-5-PROJECT_LOC/src/qv</locationURI>
 		</link>
 		<link>
 			<name>rom.h</name>

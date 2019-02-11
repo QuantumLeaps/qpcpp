@@ -1,15 +1,15 @@
 /// @file
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
-////**************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-04-06
+///**************************************************************************
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 /// Contact information:
 /// https://www.state-machine.com
 /// mailto:info@state-machine.com
-////**************************************************************************
+///**************************************************************************
 /// @endcond
 
 #define QP_IMPL           // this is QP implementation
@@ -68,27 +68,11 @@ void QF::stop(void) {
 //............................................................................
 void QF::thread_(QActive *act) {
     // event loop of the active object thread
-    act->m_osObject = true; // enable the thread event-loop
-    while (act->m_osObject) {
+    for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
-    act->unsubscribeAll(); // unsubscribe from all events
-    QF::remove_(act); // remove this active object from QF
-
-    // cleanup of the queue and thread must succeed
-    Q_ALLEGE_ID(110, tx_queue_delete(&act->m_eQueue) == TX_SUCCESS);
-
-    // NOTE:
-    // The internal resources allocated for the task by the ThreadX RTOS
-    // cannot be reclaimed at this point, because ThreadX prohibits calling
-    // tx_thread_delete() from the task itself. Therefore, the burden of
-    // cleaning up after the task is left to the application to call
-    // tx_thread_delete(&act->m_thread) before the application can reuse
-    // the stack allocated to this thread or create a new thread
-    // to replace this one.
-    //
 }
 //............................................................................
 static void thread_function(ULONG thread_input) { // ThreadX signature
@@ -131,13 +115,6 @@ void QActive::start(uint_fast8_t prio,
             TX_NO_TIME_SLICE,
             TX_AUTO_START)
         == TX_SUCCESS);
-}
-//............................................................................
-void QActive::stop(void) {
-    // active object must stop itself and cannot be stopped by any other AO
-    Q_REQUIRE_ID(300, &m_thread == tx_thread_identify());
-
-    m_osObject = false; // stop the thread loop
 }
 //............................................................................
 #ifndef Q_SPY

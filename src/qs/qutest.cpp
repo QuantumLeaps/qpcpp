@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-07
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-10
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -96,10 +96,6 @@ void QActive::start(uint_fast8_t const prio,
 
     this->init(ie); // take the top-most initial tran. (virtual)
     //QS_FLUSH();     // flush the trace buffer to the host
-}
-//............................................................................
-void QActive::stop(void) {
-    QF::remove_(this); // remove this active object from the framework
 }
 
 //****************************************************************************
