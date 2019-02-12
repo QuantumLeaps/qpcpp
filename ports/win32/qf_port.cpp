@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.4.0
-/// Last updated on  2019-02-08
+/// Last updated on  2019-02-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -151,12 +151,11 @@ void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
 }
 //****************************************************************************
 void QF_setWin32Prio(QActive *act, int_t win32Prio) {
-    if (act->getThread() == (HANDLE)0) {  // thread not created yet?
-        act->getOsObject() = (void *)win32Prio; // store the priority for later
-    }
-    else {
-        SetThreadPriority(act->getThread(), win32Prio);
-    }
+    HANDLE win32thread = static_cast<HANDLE>(act->getThread());
+
+    // thread must be already created, see QActive::start()
+    Q_REQUIRE_ID(700, win32thread != static_cast<HANDLE>(0));
+    SetThreadPriority(win32thread, win32Prio);
 }
 
 //............................................................................
@@ -183,19 +182,18 @@ void QActive::start(uint_fast8_t prio,
                     void *stkSto, uint_fast16_t stkSize,
                     QEvt const *ie)
 {
-    Q_REQUIRE_ID(700, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
-        && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*... in range */
-        && (stkSto == static_cast<void *>(0)));    /* statck storage must NOT...
-                                                    * ... be provided */
-
+    Q_REQUIRE_ID(800, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
+        && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*...in range */
+        && (stkSto == static_cast<void *>(0))); // statck storage must NOT...
+                                                // ... be provided
     m_eQueue.init(qSto, qLen);
     m_prio = prio;  // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
 
     // save osObject as integer, in case it contains the Win32 priority
-    int win32Prio = (m_osObject != static_cast<void *>(0))
-                    ? reinterpret_cast<int>(m_osObject)
-                    : THREAD_PRIORITY_NORMAL;
+    //int win32Prio = (m_osObject != static_cast<void *>(0))
+    //    ? reinterpret_cast<intptr_t>(m_osObject)
+    //    : THREAD_PRIORITY_NORMAL;
 
     // create the Win32 "event" to throttle the AO's event queue
     m_osObject = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -211,12 +209,7 @@ void QActive::start(uint_fast8_t prio,
     // create a Win32 thread for the AO;
     // The thread is created with THREAD_PRIORITY_NORMAL
     m_thread = CreateThread(NULL, stkSize, &ao_thread, this, 0, NULL);
-    Q_ASSERT_ID(730, m_thread != static_cast<HANDLE>(0)); // must succeed
-
-    // was the thread priority provided?
-    if (win32Prio != 0) {
-        SetThreadPriority(m_thread, win32Prio);
-    }
+    Q_ENSURE_ID(830, m_thread != static_cast<HANDLE>(0)); // must succeed
 }
 
 } // namespace QP

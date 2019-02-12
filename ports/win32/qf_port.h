@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-14
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -75,8 +75,9 @@ namespace QP {
 void QF_enterCriticalSection_(void);
 void QF_leaveCriticalSection_(void);
 
-// set Win32 thread priority;
-// can be called either before or after QActive::START()
+// set Win32 thread priority for an active object;
+// see: Microsoft documentation for SetThreadPriority()
+// NOTE: must be called *after* QActive::START()
 //
 void QF_setWin32Prio(QActive *act, int_t win32Prio);
 
@@ -106,6 +107,7 @@ int QF_consoleWaitForKey(void);
 #ifdef _MSC_VER // Microsoft Visual C++
 
 #if (_MSC_VER < 1900) // before Visual Studio 2015
+
 #define snprintf _snprintf
 #endif
 

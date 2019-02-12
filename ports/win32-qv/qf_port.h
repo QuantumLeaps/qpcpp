@@ -101,6 +101,7 @@ int QF_consoleWaitForKey(void);
 #ifdef _MSC_VER // Microsoft Visual C++
 
 #if (_MSC_VER < 1900) // before Visual Studio 2015
+
 #define snprintf _snprintf
 #endif
 
