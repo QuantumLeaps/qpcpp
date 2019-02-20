@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.8
-/// Last updated on  2019-01-23
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -203,10 +203,10 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender)
 ///
 bool QF::noTimeEvtsActiveX(uint_fast8_t const tickRate) {
     bool inactive;
-    if (timeEvtHead_[tickRate].m_next == static_cast<QTimeEvt *>(0)) {
+    if (timeEvtHead_[tickRate].m_next != static_cast<QTimeEvt *>(0)) {
         inactive = false;
     }
-    else if (timeEvtHead_[tickRate].m_act == static_cast<void *>(0)) {
+    else if (timeEvtHead_[tickRate].m_act != static_cast<void *>(0)) {
         inactive = false;
     }
     else {
