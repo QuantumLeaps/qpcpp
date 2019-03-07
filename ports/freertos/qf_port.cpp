@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated on  2019-02-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -46,7 +46,11 @@
 #endif // Q_SPY
 
 #if ( configSUPPORT_STATIC_ALLOCATION == 0 )
-    #error "This QP/C++ port to FreeRTOS requires configSUPPORT_STATIC_ALLOCATION "
+    #error "This QP/C++ port to FreeRTOS requires configSUPPORT_STATIC_ALLOCATION"
+#endif
+
+#if ( configMAX_PRIORITIES < QF_MAX_ACTIVE )
+    #error "FreeRTOS configMAX_PRIORITIES must not be less than QF_MAX_ACTIVE"
 #endif
 
 // namespace QP ==============================================================
@@ -84,11 +88,12 @@ void QActive::start(uint_fast8_t prio,
                              ? static_cast<char_t const *>(m_thread.pxDummy1)
                              : static_cast<char_t const *>("AO");
 
-    Q_REQUIRE_ID(200, (prio < configMAX_PRIORITIES) /* not exceeding max */
+    Q_REQUIRE_ID(200, (static_cast<uint_fast8_t>(0) < prio)
+        && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /* in range */
         && (qSto != static_cast<QEvt const **>(0)) /* queue storage */
         && (qLen > static_cast<uint_fast16_t>(0))  /* queue size */
         && (stkSto != static_cast<void *>(0))      /* stack storage */
-        && (stkSize > static_cast<uint_fast16_t>(0)));// stack size
+        && (stkSize > static_cast<uint_fast16_t>(0))); // stack size
 
     // create the event queue for the AO
     m_eQueue.init(qSto, qLen);

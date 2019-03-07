@@ -221,7 +221,7 @@ CPPFLAGS = -c -g -O -fno-pie -std=c++11 -pedantic -Wall -Wextra \
 
 endif  # .....................................................................
 
-LINKFLAGS := -fno-pie
+LINKFLAGS := -no-pie
 
 #-----------------------------------------------------------------------------
 C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
@@ -245,7 +245,7 @@ endif
 all: $(TARGET_EXE)
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CC) $(CFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.c

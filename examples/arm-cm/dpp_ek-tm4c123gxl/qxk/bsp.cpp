@@ -187,13 +187,15 @@ void BSP::init(void) {
     // but SystemCoreClock needs to be updated
     SystemCoreClockUpdate();
 
-    /* NOTE: The VFP (hardware Floating Point) unit is configured by QXK */
-    FPU->FPCCR |= (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos); //???
+    // FPU ( Floating Point Unit) configuration for QXK
+    // Use the automatic FPU state preservation and the FPU lazy stacking.
+    //
+    FPU->FPCCR |= (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
 
     // enable clock for to the peripherals used by this application...
     SYSCTL->RCGCGPIO |= (1U << 5); // enable Run mode for GPIOF
 
-    // configure the LEDs and push buttons
+    // configure the LEDs
     GPIOF->DIR |= (LED_RED | LED_GREEN | LED_BLUE); // set as output
     GPIOF->DEN |= (LED_RED | LED_GREEN | LED_BLUE); // digital enable
     GPIOF->DATA_Bits[LED_RED]   = 0U; // turn the LED off

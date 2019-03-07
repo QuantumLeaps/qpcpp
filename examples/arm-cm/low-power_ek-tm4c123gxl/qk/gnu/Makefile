@@ -1,13 +1,13 @@
 ##############################################################################
-# Product: Makefile for QP/C++, DPP on NUCLEO-L053R8, QXK kernel, LLVM-ARM
-# Last Updated for Version: 6.1.0
-# Date of the Last Update:  2018-02-07
+# Product: Makefile for QP/C++ on EK-TM4C123GXL, QK kernel, GNU-ARM
+# Last Updated for Version: 6.4.0
+# Date of the Last Update:  2019-02-23
 #
-#                    Q u a n t u m     L e a P s
-#                    ---------------------------
-#                    innovating embedded systems
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
 #
-# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2010 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -45,13 +45,13 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    http://sourceforge.net/projects/qpc/files/Qtools/
+#    https://sourceforge.net/projects/qpc/files/QTools/
 #
 
 #-----------------------------------------------------------------------------
 # project name
 #
-PROJECT     := dpp-qxk
+PROJECT     := low-power-qk
 
 #-----------------------------------------------------------------------------
 # project directories
@@ -63,18 +63,18 @@ QPCPP := ../../../../..
 endif
 
 # QP port used in this project
-QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qxk/llvm
+QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qk/gnu
 
 # list of all source directories used by this project
 VPATH = \
 	.. \
 	../.. \
 	$(QPCPP)/src/qf \
-	$(QPCPP)/src/qxk \
+	$(QPCPP)/src/qk \
 	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
-	$(QPCPP)/3rd_party/nucleo-l053r8 \
-	$(QPCPP)/3rd_party/nucleo-l053r8/llvm
+	$(QPCPP)/3rd_party/ek-tm4c123gxl \
+	$(QPCPP)/3rd_party/ek-tm4c123gxl/gnu
 
 # list of all include directories needed by this project
 INCLUDES  = \
@@ -83,7 +83,7 @@ INCLUDES  = \
 	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
-	-I$(QPCPP)/3rd_party/nucleo-l053r8
+	-I$(QPCPP)/3rd_party/ek-tm4c123gxl
 
 #-----------------------------------------------------------------------------
 # files
@@ -94,16 +94,15 @@ ASM_SRCS :=
 
 # C source files
 C_SRCS := \
-	system_stm32l0xx.c \
-	startup_stm32l053xx.c
+	system_TM4C123GH6PM.c \
+	startup_TM4C123GH6PM.c
 
 # C++ source files
 CPP_SRCS := \
 	bsp.cpp \
 	main.cpp \
-	philo.cpp \
-	table.cpp \
-	test.cpp
+	blinky0.cpp \
+	blinky1.cpp
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := $(PROJECT).ld
@@ -121,11 +120,8 @@ QP_SRCS := \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
 	qf_time.cpp \
-	qxk.cpp \
-	qxk_mutex.cpp \
-	qxk_sema.cpp \
-	qxk_xthr.cpp \
-	qxk_port.cpp
+	qk.cpp \
+	qk_port.cpp
 
 QP_ASMS :=
 
@@ -138,37 +134,38 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   :=
+DEFINES   := -DTARGET_IS_TM4C123_RB1
 
-# ARM CPU, TARGET, ARCH, FPU, and Float-ABI types...
+# ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
 # ARM_ARCH:  [6 | 7] (NOTE: must match ARM_CPU!)
 # ARM_FPU:   [ | vfp]
 # FLOAT_ABI: [ | soft | softfp | hard]
 #
-ARM_CPU    := -mcpu=cortex-m0plus
-ARM_TARGET := -target armv6m-none-eabi
-ARM_ARCH   := 6   # NOTE: must match the ARM_CPU!
-ARM_FPU    :=
-FLOAT_ABI  := -mfloat-abi=soft
+ARM_CPU   := -mcpu=cortex-m4
+ARM_ARCH  := 7   # NOTE: must match the ARM_CPU!
+ARM_FPU   := -mfpu=vfp
+FLOAT_ABI := -mfloat-abi=softfp
 
 #-----------------------------------------------------------------------------
-# LLVM-ARM toolset (NOTE: You need to adjust to your machine)
+# GNU-ARM toolset (NOTE: You need to adjust to your machine)
+# see https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
 #
-ifeq ($(LLVM_ARM),)
-LLVM_ARM := C:/tools/Snapdragon-llvm-3.9.9-windows64
+ifeq ($(GNU_ARM),)
+GNU_ARM := $(QTOOLS)/gnu_arm-none-eabi
 endif
 
-# make sure that the LLVM-ARM toolset exists...
-ifeq ("$(wildcard $(LLVM_ARM))","")
-$(error LLVM_ARM toolset not found. Please adjust the Makefile)
+# make sure that the GNU-ARM toolset exists...
+ifeq ("$(wildcard $(GNU_ARM))","")
+$(error GNU_ARM toolset not found. Please adjust the Makefile)
 endif
 
-CC    := $(LLVM_ARM)/bin/clang
-CPP   := $(LLVM_ARM)/bin/clang++
-AS    := $(LLVM_ARM)/bin/llvm-mc
-LINK  := $(LLVM_ARM)/bin/clang++
-BIN   := $(LLVM_ARM)/bin/arm-eabi-objcopy
+CC    := $(GNU_ARM)/bin/arm-none-eabi-gcc
+CPP   := $(GNU_ARM)/bin/arm-none-eabi-g++
+AS    := $(GNU_ARM)/bin/arm-none-eabi-as
+LINK  := $(GNU_ARM)/bin/arm-none-eabi-g++
+BIN   := $(GNU_ARM)/bin/arm-none-eabi-objcopy
+
 
 ##############################################################################
 # Typically, you should not need to change anything below this line
@@ -184,8 +181,7 @@ RM    := rm
 #
 
 # combine all the soruces...
-VPATH    += $(QPCPP)/3rd_party/gnu_cpp
-CPP_SRCS += $(QP_SRCS) mini_cpp.cpp
+CPP_SRCS += $(QP_SRCS)
 ASM_SRCS += $(QP_ASMS)
 
 ifeq (rel, $(CONF)) # Release configuration ..................................
@@ -198,10 +194,9 @@ CFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
 	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
 
-CPPFLAGS = -c $(ARM_CPU) $(ARM_TARGET) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-fuse-baremetal-sysroot -fshort-enums -fno-common \
-	-ffunction-sections -fdata-sections \
-	-O2 $(INCLUDES) $(DEFINES)
+CPPFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
+	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
+	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
@@ -211,13 +206,11 @@ CPP_SRCS += $(QS_SRCS)
 
 ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
-CFLAGS = -c -g $(ARM_CPU) $(ARM_TARGET) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-fuse-baremetal-sysroot -fshort-enums -fno-common \
+CFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
-CPPFLAGS = -c -g $(ARM_CPU) $(ARM_TARGET) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-std=c++11 -fuse-baremetal-sysroot -fshort-enums -fno-common \
+CPPFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
 	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
@@ -227,21 +220,19 @@ BIN_DIR := dbg
 
 ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
-CFLAGS = -c -g $(ARM_CPU) $(ARM_TARGET) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-fuse-baremetal-sysroot -fshort-enums -fno-common \
+CFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
 	-O $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -c -g $(ARM_CPU) $(ARM_TARGET) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
-	-std=c++11 -fuse-baremetal-sysroot -fshort-enums -fno-common \
+CPPFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
 	-O $(INCLUDES) $(DEFINES)
 
 endif # ......................................................................
 
-LINKFLAGS = $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb \
-	-static -fuse-ld=qcld -fuse-baremetal-sysroot -fno-use-baremetal-crt \
-	-Wl,-T,$(LD_SCRIPT) \
+
+LINKFLAGS = -T$(LD_SCRIPT) $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb \
+	-specs=nosys.specs \
 	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
 
 

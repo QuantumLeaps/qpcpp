@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-04
+/// Last updated for version 6.4.0
+/// Last updated on  2019-02-25
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -736,7 +736,7 @@ static void rxParseData_(uint8_t const b) {
                     l_rx.var.evt.e = QF::newX_(
                         (static_cast<uint_fast16_t>(l_rx.var.evt.len)
                          + static_cast<uint_fast16_t>(sizeof(QEvt))),
-                        static_cast<uint_fast16_t>(1), // margin
+                        static_cast<uint_fast16_t>(0), // margin
                         static_cast<enum_t>(l_rx.var.evt.sig));
                     // event allocated?
                     if (l_rx.var.evt.e != static_cast<QEvt *>(0)) {
@@ -1063,7 +1063,7 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
             {
                 if (!QF::active_[l_rx.var.evt.prio]->POST_X(
                                 l_rx.var.evt.e,
-                                static_cast<uint_fast16_t>(1), // margin
+                                static_cast<uint_fast16_t>(0), // margin
                                 &QS::rxPriv_))
                 {
                     // failed QACTIVE_POST() recycles the event
@@ -1114,7 +1114,7 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
                     if (!static_cast<QActive *>(
                             QS::rxPriv_.currObj[QS::AO_OBJ])->POST_X(
                                 l_rx.var.evt.e,
-                                static_cast<uint_fast16_t>(1), // margin
+                                static_cast<uint_fast16_t>(0), // margin
                                 &QS::rxPriv_))
                     {
                         // failed QACTIVE_POST() recycles the event

@@ -1,7 +1,7 @@
 /*****************************************************************************
-* Product: Linker script for for STM32L053R8, GNU-ARM linker
-* Last Updated for Version: 6.0.2
-* Date of the Last Update:  2017-12-02
+* Product: Linker script for EK-TM4C123GXL, GNU-ARM linker
+* Last Updated for Version: 5.9.8
+* Date of the Last Update:  2017-09-13
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -28,16 +28,16 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* http://www.state-machine.com
-* email:info@state-machine.com
+* Web  : http://www.state-machine.com
+* Email: info@state-machine.com
 *****************************************************************************/
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(Reset_Handler) /* entry Point */
 
-MEMORY { /* memory map of STM32L053R8 */
-    ROM (rx)  : ORIGIN = 0x08000000, LENGTH = 64K
-    RAM (xrw) : ORIGIN = 0x20000000, LENGTH = 8K
+MEMORY { /* memory map of Tiva TM4C123GH6PM */
+    ROM (rx)  : ORIGIN = 0x00000000, LENGTH = 256K
+    RAM (xrw) : ORIGIN = 0x20000000, LENGTH = 32K
 }
 
 /* The size of the stack used by the application. NOTE: you need to adjust  */

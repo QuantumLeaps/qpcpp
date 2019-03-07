@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QUTEST-QP/C++ for Windows and POSIX *HOSTS*
 # Last updated for version 6.4.0
-# Last updated on  2019-01-09
+# Last updated on  2019-02-24
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -177,7 +177,7 @@ CPPFLAGS := -c -g -O -fno-pie -std=c++11 -pedantic -Wall -Wextra \
 	-fno-rtti -fno-exceptions \
 	$(INCLUDES) $(DEFINES) -DQ_SPY -DQ_UTEST -DQ_HOST
 
-LINKFLAGS := -fno-pie
+LINKFLAGS := -no-pie
 
 #-----------------------------------------------------------------------------
 C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
@@ -216,7 +216,7 @@ endif
 endif
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 run : $(TARGET_EXE)
