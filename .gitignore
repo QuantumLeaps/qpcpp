@@ -36,6 +36,7 @@ lint*.txt
 *.qlc
 JLink*.*
 
+./version-*
 eclipse/
 test_priv/
 dbg/
@@ -53,7 +54,6 @@ QSpy/
 lib/
 obj/
 output/
-
 
 doxygen/html/
 lint/*.txt

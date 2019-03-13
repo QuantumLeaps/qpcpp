@@ -2,9 +2,9 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 5.8.0/Qt 5.x
+/// Last Updated for Version: QP 6.4.0/Qt 5.x
 /// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated on  2019-03-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -156,11 +156,6 @@ void QActive::start(uint_fast8_t const prio,
     AOThread *thread = static_cast<AOThread *>(m_thread);
     thread->setStackSize(stkSize);
     thread->start();
-}
-//............................................................................
-void QActive::stop(void) {
-    Q_REQUIRE(m_thread != 0);
-    static_cast<AOThread *>(m_thread)->m_isRunning = false;
 }
 
 } // namespace QP
