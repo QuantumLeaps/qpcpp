@@ -2,29 +2,30 @@
 <package name="Comp" stereotype="0x02" namespace="DPP::">
  <class name="Philo" superclass="qpcpp::QHsm">
   <attribute name="m_timeEvt" type="CompTimeEvt" visibility="0x02" properties="0x00"/>
+  <attribute name="class Table" type="friend" visibility="0x02" properties="0x00"/>
   <operation name="Philo" type="" visibility="0x00" properties="0x00">
-   <code>  : QHsm(Q_STATE_CAST(&amp;Philo::initial)),
+   <code>  : QHsm(&amp;initial),
     m_timeEvt(AO_Table, this, TIMEOUT_SIG, 0U)</code>
   </operation>
-  <statechart>
+  <statechart properties="0x00">
    <initial target="../1">
     <action>static bool registered = false; // starts off with 0, per C-standard
 (void)e; // suppress the compiler warning about unused parameter
 if (!registered) {
     registered = true;
-    QS_FUN_DICTIONARY(&amp;Philo::initial);
-    QS_FUN_DICTIONARY(&amp;Philo::thinking);
-    QS_FUN_DICTIONARY(&amp;Philo::hungry);
-    QS_FUN_DICTIONARY(&amp;Philo::eating);
+    QS_FUN_DICTIONARY(&amp;initial);
+    QS_FUN_DICTIONARY(&amp;thinking);
+    QS_FUN_DICTIONARY(&amp;hungry);
+    QS_FUN_DICTIONARY(&amp;eating);
 }
-QS_SIG_DICTIONARY(HUNGRY_SIG, me);  // signal for each Philos</action>
+QS_SIG_DICTIONARY(HUNGRY_SIG, this);  // signal for each Philo</action>
     <initial_glyph conn="2,3,5,1,20,5,-4">
      <action box="0,-2,6,2"/>
     </initial_glyph>
    </initial>
    <state name="thinking">
-    <entry>me-&gt;m_timeEvt.armX(think_time(), 0U);</entry>
-    <exit>(void)me-&gt;m_timeEvt.disarm();</exit>
+    <entry>m_timeEvt.armX(think_time(), 0U);</entry>
+    <exit>(void)m_timeEvt.disarm();</exit>
     <tran trig="TIMEOUT" target="../../2">
      <tran_glyph conn="2,14,3,1,20,12,-4">
       <action box="0,-2,10,2"/>
@@ -42,7 +43,7 @@ QS_SIG_DICTIONARY(HUNGRY_SIG, me);  // signal for each Philos</action>
    </state>
    <state name="hungry">
     <entry>TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
-pe-&gt;philo = me;
+pe-&gt;philo = this;
 AO_Table-&gt;postLIFO(pe);</entry>
     <tran trig="EAT" target="../../3">
      <tran_glyph conn="2,31,3,1,19,9,-3">
@@ -54,12 +55,12 @@ AO_Table-&gt;postLIFO(pe);</entry>
     </state_glyph>
    </state>
    <state name="eating">
-    <entry>me-&gt;m_timeEvt.armX(eat_time(), 0U);</entry>
-    <exit>(void)me-&gt;m_timeEvt.disarm();
+    <entry>m_timeEvt.armX(eat_time(), 0U);</entry>
+    <exit>(void)m_timeEvt.disarm();
 
 // asynchronously post event to the Container
 TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
-pe-&gt;philo = me;
+pe-&gt;philo = this;
 AO_Table-&gt;postLIFO(pe);</exit>
     <tran trig="TIMEOUT" target="../../1">
      <tran_glyph conn="2,48,3,1,22,-38,-6">

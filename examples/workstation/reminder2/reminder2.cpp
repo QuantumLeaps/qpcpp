@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: Reminder2 state pattern example
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-14
+// Last Updated for Version: 6.5.0
+// Date of the Last Update:  2019-03-25
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -58,31 +58,31 @@ private:
 
 public:
     Cruncher()
-        : QActive(Q_STATE_CAST(&Cruncher::initial))
+        : QActive(&initial)
     {}
 
 private:
     // state machine ...
-    static QState initial   (Cruncher * const me, QEvt const * const e);
-    static QState processing(Cruncher * const me, QEvt const * const e);
-    static QState final     (Cruncher * const me, QEvt const * const e);
+    Q_STATE_DECL(initial);
+    Q_STATE_DECL(processing);
+    Q_STATE_DECL(final);
 };
 
 // HSM definition ------------------------------------------------------------
-QState Cruncher::initial(Cruncher * const me, QEvt const * const e) {
+Q_STATE_DEF(Cruncher, initial) {
     (void)e; // unused parameter
-    return Q_TRAN(&Cruncher::processing);
+    return tran(&processing);
 }
 //............................................................................
-QState Cruncher::processing(Cruncher * const me, QEvt const * const e) {
+Q_STATE_DEF(Cruncher, processing) {
     QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             ReminderEvt *reminder = Q_NEW(ReminderEvt, CRUNCH_SIG);
             reminder->iter = 0;
-            me->POST(reminder, me);
-            me->m_sum = 0.0;
-            status = Q_HANDLED();
+            POST(reminder, me);
+            m_sum = 0.0;
+            status = Q_RET_HANDLED;
             break;
         }
         case CRUNCH_SIG: {
@@ -91,51 +91,51 @@ QState Cruncher::processing(Cruncher * const me, QEvt const * const e) {
             i += 100U;
             for (; n < i; ++n) {
                 if ((n & 1) == 0) {
-                    me->m_sum += 1.0/(2*n + 1);
+                    m_sum += 1.0/(2*n + 1);
                 }
                 else {
-                    me->m_sum -= 1.0/(2*n + 1);
+                    m_sum -= 1.0/(2*n + 1);
                 }
             }
             if (i < 0x07000000U) {
                 ReminderEvt *reminder = Q_NEW(ReminderEvt, CRUNCH_SIG);
                 reminder->iter = i;
-                me->POST(reminder, me);
-                status = Q_HANDLED();
+                POST(reminder, me);
+                status = Q_RET_HANDLED;
             }
             else {
-                printf("pi=%16.14f\n", 4.0*me->m_sum);
-                status = Q_TRAN(&Cruncher::processing);
+                printf("pi=%16.14f\n", 4.0*m_sum);
+                status = tran(&processing);
             }
             break;
         }
         case ECHO_SIG: {
-            printf("Echo! pi=%16.14f\n", 4.0*me->m_sum);
-            status = Q_HANDLED();
+            printf("Echo! pi=%16.14f\n", 4.0*m_sum);
+            status = Q_RET_HANDLED;
             break;
         }
         case TERMINATE_SIG: {
-            status = Q_TRAN(&Cruncher::final);
+            status = tran(&final);
             break;
         }
         default: {
-            status = Q_SUPER(&QHsm::top);
+            status = super(&QHsm::top);
             break;
         }
     }
     return status;
 }
 //............................................................................
-QState Cruncher::final(Cruncher * const me, QEvt const * const e) {
+Q_STATE_DEF(Cruncher, final) {
     QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             QF::stop(); // terminate the application
-            status = Q_HANDLED();
+            status = Q_RET_HANDLED;
             break;
         }
         default: {
-            status = Q_SUPER(&QHsm::top);
+            status = super(&QHsm::top);
             break;
         }
     }

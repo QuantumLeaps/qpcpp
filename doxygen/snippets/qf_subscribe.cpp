@@ -1,11 +1,11 @@
-QState Table::initial(Table * const me, QEvt const *) {
+Q_State_DEF(Table, initial) {
     uint8_t n;
-    me->subscribe(HUNGRY_SIG);    // subscribe to HUNGRY
-    me->subscribe(DONE_SIG);      // subscribe to DONE
-    me->subscribe(TERMINATE_SIG); // subscribe to TERMINATE
+    subscribe(HUNGRY_SIG);    // subscribe to HUNGRY
+    subscribe(DONE_SIG);      // subscribe to DONE
+    subscribe(TERMINATE_SIG); // subscribe to TERMINATE
     for (n = 0; n < N; ++n) {
-        me->fork_[n] = FREE;
-        me->isHungry_[n] = 0;
+        m_fork_[n] = FREE;
+        m_isHungry_[n] = 0;
     }
-    return Q_TRAN(&Table::serving);
+    return tran(&serving);
 }

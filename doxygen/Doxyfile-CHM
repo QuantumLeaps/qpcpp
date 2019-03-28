@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "QP/C++"
-PROJECT_NUMBER         = "6.4.0"
+PROJECT_NUMBER         = "6.5.0"
 PROJECT_BRIEF          =
 PROJECT_LOGO           = images/header_logo_ql.png
 OUTPUT_DIRECTORY       =
@@ -114,6 +114,7 @@ INPUT = \
     main.dox \
     gs.dox \
     struct.dox \
+    sm.dox \
     api.dox \
     exa.dox \
     exa_apps.dox \
@@ -347,6 +348,7 @@ MSCGEN_PATH            =
 DIA_PATH               =
 HIDE_UNDOC_RELATIONS   = YES
 HAVE_DOT               = YES
+#HAVE_DOT               = NO
 DOT_NUM_THREADS        = 0
 DOT_FONTNAME           = Helvetica
 DOT_FONTSIZE           = 10

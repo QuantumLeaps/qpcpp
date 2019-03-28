@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: Reminder state pattern example
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-14
+// Last Updated for Version: 6.5.0
+// Date of the Last Update:  2019-03-25
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -57,123 +57,123 @@ private:
 
 public:
     Sensor()
-        : QActive(Q_STATE_CAST(&Sensor::initial)),
+        : QActive(&initial),
           m_timeEvt(this, TIMEOUT_SIG, 0U)
     {}
 
 private:
     // hierarchical state machine ...
-    static QState initial   (Sensor * const me, QEvt const * const e);
-    static QState polling   (Sensor * const me, QEvt const * const e);
-    static QState processing(Sensor * const me, QEvt const * const e);
-    static QState idle      (Sensor * const me, QEvt const * const e);
-    static QState busy      (Sensor * const me, QEvt const * const e);
-    static QState final     (Sensor * const me, QEvt const * const e);
+    Q_STATE_DECL(initial);
+    Q_STATE_DECL(polling);
+    Q_STATE_DECL(processing);
+    Q_STATE_DECL(idle);
+    Q_STATE_DECL(busy);
+    Q_STATE_DECL(final);
 };
 
 // HSM definition ------------------------------------------------------------
-QState Sensor::initial(Sensor * const me, QEvt const *) {
-    me->m_pollCtr = 0;
-    me->m_procCtr = 0;
+Q_STATE_DEF(Sensor, initial) {
+    m_pollCtr = 0;
+    m_procCtr = 0;
 
     // NOTE: don't forget to subscribe to any signals of interest,
     // if you're using publish-subscribe...
     //
     // subscribe(...);
-
-    return Q_TRAN(&Sensor::polling);
+    (void)e; // unused parameter
+    return tran(&polling);
 }
 //............................................................................
-QState Sensor::final(Sensor * const me, QEvt const * const e) {
+Q_STATE_DEF(Sensor, final) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             printf("-> final\n");
             QF::stop(); // stop QF and cleanup
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return super(&QHsm::top);
 }
 //............................................................................
-QState Sensor::polling(Sensor * const me, QEvt const * const e) {
+Q_STATE_DEF(Sensor, polling) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             // periodic timeout in 1/2 second and every 1/2 second
-            me->m_timeEvt.armX(BSP_TICKS_PER_SEC/2, BSP_TICKS_PER_SEC/2);
-            return Q_HANDLED();
+            m_timeEvt.armX(BSP_TICKS_PER_SEC/2, BSP_TICKS_PER_SEC/2);
+            return Q_RET_HANDLED;
         }
         case Q_EXIT_SIG: {
-            me->m_timeEvt.disarm();
-            return Q_HANDLED();
+            m_timeEvt.disarm();
+            return Q_RET_HANDLED;
         }
         case Q_INIT_SIG: {
-            return Q_TRAN(&Sensor::processing);
+            return tran(&processing);
         }
         case TIMEOUT_SIG: {
             // NOTE: this constant event is statically pre-allocated.
             // It can be posted/published as any other event.
             static const QEvt dataReadyEvt = { DATA_READY_SIG, 0U, 0U };
 
-            ++me->m_pollCtr;
-            printf("poll %3d\n", me->m_pollCtr);
-            if ((me->m_pollCtr & 0x3U) == 0U) { // modulo 4
-                me->POST(&dataReadyEvt, me);
+            ++m_pollCtr;
+            printf("poll %3d\n", m_pollCtr);
+            if ((m_pollCtr & 0x3U) == 0U) { // modulo 4
+                POST(&dataReadyEvt, me);
             }
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case TERMINATE_SIG: {
-            return Q_TRAN(&Sensor::final);
+            return tran(&final);
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return super(&QHsm::top);
 }
 //............................................................................
-QState Sensor::processing(Sensor * const me, QEvt const * const e) {
+Q_STATE_DEF(Sensor, processing) {
     switch (e->sig) {
         case Q_INIT_SIG: {
-            return Q_TRAN(&Sensor::idle);
+            return tran(&idle);
         }
     }
-    return Q_SUPER(&Sensor::polling);
+    return super(&polling);
 }
 //............................................................................
-QState Sensor::idle(Sensor * const me, QEvt const * const e) {
+Q_STATE_DEF(Sensor, idle) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             printf("-> idle\n");
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case DATA_READY_SIG: {
-            return Q_TRAN(&Sensor::busy);
+            return tran(&busy);
         }
     }
-    return Q_SUPER(&Sensor::processing);
+    return super(&processing);
 }
 //............................................................................
-QState Sensor::busy(Sensor * const me, QEvt const * const e) {
+Q_STATE_DEF(Sensor, busy) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             printf("-> busy\n");
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case TIMEOUT_SIG: {
-            ++me->m_procCtr;
-            printf("process %3d\n", me->m_procCtr);
-            if ((me->m_procCtr & 0x1U) == 0U) { // modulo 2
-                return Q_TRAN(&Sensor::idle);
+            ++m_procCtr;
+            printf("process %3d\n", m_procCtr);
+            if ((m_procCtr & 0x1U) == 0U) { // modulo 2
+                return tran(&idle);
             }
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
     }
-    return Q_SUPER(&Sensor::processing);
+    return super(&processing);
 }
 
 // test harness ==============================================================
 
 // Local-scope objects -------------------------------------------------------
 static Sensor l_sensor; // the Sensor active object
-static QEvt const *l_sensorQSto[10]; // Event queue storage for Sensor
-static void *l_regPoolSto[100/sizeof(void *)]; // 100 bytes for the event pool
+static QEvt const *l_sensorQSto[10]; // storage for event queue for Sensor
+static void *l_regPoolSto[100/sizeof(void *)]; // storage for the event pool
 
 //............................................................................
 int main(int argc, char *argv[]) {
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
 //............................................................................
 void BSP_onKeyboardInput(uint8_t key) {
     switch (key) {
-        case '\33': {                                          // ESC pressed?
+        case '\33': { // ESC pressed?
             l_sensor.POST(Q_NEW(QEvt, TERMINATE_SIG), (void *)0);
             break;
         }

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-26
+/// Last updated for version 6.5.0
+/// Last updated on  2019-03-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -115,6 +115,13 @@ void QActive::start(uint_fast8_t prio,
     Q_ENSURE_ID(210, thr != static_cast<TaskHandle_t>(0)); // must be created
 }
 //............................................................................
+#ifdef QF_ACTIVE_STOP
+void QActive::stop(void) {
+    unsubscribeAll(); // unsubscribe from all events
+    m_osObject = false; // stop the thread loop (see QF::thread_)
+}
+#endif
+//............................................................................
 void QActive::setAttr(uint32_t attr1, void const *attr2) {
     // this function must be called before QACTIVE_START(),
     // which implies that me->thread.pxDummy1 must not be used yet;
@@ -133,12 +140,21 @@ static void task_function(void *pvParameters) { // FreeRTOS task signature
 }
 // thread for active objects -------------------------------------------------
 void QF::thread_(QActive *act) {
-    // event-loop
-    for (;;) { // for-ever
+#ifdef QF_ACTIVE_STOP
+    act->m_osObject = true;
+    while (act->m_osObject)
+#else
+    for (;;) // for-ever
+#endif
+    {
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
+#ifdef QF_ACTIVE_STOP
+    remove_(act); // remove this object from QF
+    vTaskDelete(static_cast<TaskHandle_t>(0)); // delete this FreeRTOS task
+#endif
 }
 
 /*==========================================================================*/

@@ -37,8 +37,8 @@
 
 //............................................................................
 int main() {
-    static QP::QEvt const *tableQueueSto[N_PHILO];
-    static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
+    static QP::QEvt const *tableQueueSto[10];
+    static QP::QEvt const *philoQueueSto[N_PHILO][10];
     static StackType_t philoStack[N_PHILO][configMINIMAL_STACK_SIZE];
     static StackType_t tableStack[configMINIMAL_STACK_SIZE];
 

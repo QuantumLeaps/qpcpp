@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, FreeRTOS kernel
-// Last Updated for Version: 6.0.4
-// Date of the Last Update:  2018-01-10
+// Last Updated for Version: 6.5.0
+// Date of the Last Update:  2019-03-22
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -267,7 +267,7 @@ void BSP::init(void) {
     // but SystemCoreClock needs to be updated
     SystemCoreClockUpdate();
 
-    // NOTE: The VFP (hardware Floating Point) unit is configured by FreeRTOS */
+    // NOTE: The VFP (hardware Floating Point) unit is configured by FreeRTOS
 
     // enable clock for to the peripherals used by this application...
     SYSCTL->RCGCGPIO |= (1U << 5); // enable Run mode for GPIOF
@@ -361,11 +361,7 @@ void QF::onStartup(void) {
     // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
     //SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC); // done in FreeRTOS
 
-    // assing all priority bits for preemption-prio. and none to sub-prio.
-    NVIC_SetPriorityGrouping(0U);
-
-
-    // assingn all priority bits for preemption-prio. and none to sub-prio.
+    // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE00

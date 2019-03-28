@@ -258,6 +258,8 @@ QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that e
 - QXK_current()
 - QXK_TLS()
 
+
+@next{exa}
 */
 
 } // namespace QP

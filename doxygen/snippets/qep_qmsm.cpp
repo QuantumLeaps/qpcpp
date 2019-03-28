@@ -6,18 +6,19 @@ private:
     uint8_t m_opKey;
 
 public:
-    Calc() : QMsm(Q_STATE_CAST(&Calc::initial)) {  // ctor
+    Calc()                 // constructor
+      : QMsm(&initial)) {  // superclass' constructor
     }
 
 protected:
     // NOTE: QMsm state machine code is not intended for manual
     // coding but rather needs to be generated automatically by
     // the QM modeling tool
-    static QState initial(Calc * const me, QEvt const *e);
-    static QState on     (Calc * const me, QEvt const *e);
-    static QState error  (Calc * const me, QEvt const *e);
-    static QState ready  (Calc * const me, QEvt const *e);
-    static QState result (Calc * const me, QEvt const *e);
-    static QState begin  (Calc * const me, QEvt const *e);
+    QM_STATE_DECL(initial);
+    QM_STATE_DECL( on);
+    QM_ACTION_DECL(on_e);
+    QM_STATE_DECL(ready);
+    QM_STATE_DECL(result);
+    QM_STATE_DECL(begin);
     . . .
 };

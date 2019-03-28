@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.1.0
-/// Date of the Last Update:  2018-02-10
+/// Last Updated for Version: 6.5.0
+/// Date of the Last Update:  2019-03-22
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -39,9 +39,19 @@
 #ifndef qf_port_h
 #define qf_port_h
 
-/* FreeRTOS event queue and thread types */
+// Activate the QF ISR API required for FreeRTOS
+#define QF_ISR_API            1
+
+// Activate the QF QActive::stop() API
+#define QF_ACTIVE_STOP        1
+
+// FreeRTOS event queue and thread types
 #define QF_EQUEUE_TYPE        QEQueue
 #define QF_THREAD_TYPE        StaticTask_t
+
+#ifdef QF_ACTIVE_STOP
+    #define QF_OS_OBJECT_TYPE bool
+#endif
 
 // The maximum number of active objects in the application, see NOTE1
 #define QF_MAX_ACTIVE         32
@@ -54,9 +64,6 @@
 // #define QF_CRIT_STAT_TYPE not defined
 #define QF_CRIT_ENTRY(stat_)  taskENTER_CRITICAL()
 #define QF_CRIT_EXIT(stat_)   taskEXIT_CRITICAL()
-
-// Activate the QF ISR API
-#define QF_ISR_API    1
 
 #include "FreeRTOS.h"  // FreeRTOS master include file, see NOTE4/
 #include "task.h"      // FreeRTOS task  management

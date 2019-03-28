@@ -358,9 +358,6 @@ namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    // assing all priority bits for preemption-prio. and none to sub-prio.
-    NVIC_SetPriorityGrouping(0U);
-
     // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
     //SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC); // done in FreeRTOS
 

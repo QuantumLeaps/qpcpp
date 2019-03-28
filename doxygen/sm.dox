@@ -1,0 +1,307 @@
+namespace QP {
+
+/*! @page sm Coding State Machines in QP/C++
+
+@tableofcontents
+
+<p>This section describes how to implement <a class="extern" href="https://www.state-machine.com/doc/concepts#HSM">hierarchical state machines</a> with the QP/C++ real-time embedded framework, which is quite a mechanical process consisting of just a few simple rules. (In fact, the process of coding state machines in QP/C++ has been automated by the QM model-based design and code-generating tool.)
+</p>
+
+To focus this discussion, this section uses the Calculator example, located in the directory <span class="img folder">qpcpp/examples/workstation/calc</span>. This example has been used in the <a class="extern" href="https://www.state-machine.com/psicc2">PSiCC2 book</a> (Section 4.6 "Summary of Steps for Implementing HSMs with QEP")
+
+This section explains how to code the following (marked) elements of a hierarchical state machine:
+
+![Fragment of the Calculator hierarchical state machine](hsm.png)
+
+<ul class="tag">
+  <li><span class="tag">1</span> The top-most initial pseudo-state
+  </li>
+  <li><span class="tag">2</span> A state (nested in the implicit `top` state)
+  </li>
+  <li><span class="tag">3</span> An entry action to a state
+  </li>
+  <li><span class="tag">4</span> An exit action from a state
+  </li>
+  <li><span class="tag">5</span> An initial transition nested in a state
+  </li>
+  <li><span class="tag">6</span> A regular state transition
+  </li>
+  <li><span class="tag">7</span> A state (substate) nested in another state (superstate)
+  </li>
+  <li><span class="tag">8</span> Even more deeply nested substate
+  </li>
+  <li><span class="tag">9</span> A choice point with a guard
+  </li>
+</ul>
+
+@attention
+This section describes the <b>"no me-> pointer"</b> state machine implementation introduced in QP/C++ 6.5.0, where the state-handlers are regular **member** functions of the state machine class. This means that the state-handlers have direct access to all other members of the state machine class via the implicit `this` pointer, without the need for the `me` pointer. This "no me-> pointer" state machine implementation is supported in the <a class="extern" target="_blank" href="https://www.state-machine.com/qm">QM modeling tool</a> starting from version <b>4.5.0</b>.
+
+
+@note
+This section describes the @ref sm_qhsm_strategy "QHsm state machine implementation strategy", suitable for **manual coding** of hierarchical state machines in QP/C++. The alternative @ref sm_qmsm_strategy "QMsm state machine implementation strategy", which QP/C++ also supports, is not covered in this section, as the code needs to be generated automatically by the <a class="extern" target="_blank" href="https://www.state-machine.com/qm">QM modeling tool</a>.
+
+
+@par <b>Historical Notes</b>
+The previous implementation (from QP/C++ version 3.x through 6.4.x) used state-handlers that were `static` members of the state machine class, which don't have the `this` pointer and therefore needed to use the specially supplied <b>"me-> pointer"</b> to access the members of the state machine class. That previous "me-> pointer" state machine implementation style is still supported in QP/C++ for backwards compatibility with the existing code, but it is <b>not</b> recommended for new designs.@n
+@n
+An even earlier QP/C++ state machine implementation strategy, used in QP/C++ version 2.x and published in the first edition of the <a class="extern" href="https://www.state-machine.com/psicc">PSiCC book</a>, also implemented state handlers as regular *members* of the state machine class. However, this earlier implementation relied internally on pointers to *member* functions, which turned out to be a problematic in practice, because some embedded C++ compilers at the time didn't implement pointers to *member* functions efficiently. Therefore, the implementation published in the second edition of the <a class="extern" href="https://www.state-machine.com/psicc2">PSiCC2 book</a>, switched to *static* state-handler functions (without the `this` pointer), which allowed it to use internally the simple pointers to functions that are very efficient.@n
+@n
+This latest "no me-> pointer" state machine implementation style in QP/C++ applies a hybrid approach. Internally, it represents states as simple and efficient pointers to "state-caller" functions. But these "state-caller" functions call "state-handlers" as regular members of the state machine class, which have the `this` pointer and therefore can access all members of the state machine class naturally (without the need for the "me-> pointer").
+
+
+------------------------------------------------------------------------------
+@section sm_decl State Machine Declaration
+Hierarchical state machines are represented in QP/C++ as subclasses of the @ref classes "QHsm abstract base class", which is defined in the header file <span class="img folder">qpcpp\include\qep.h</span>. Please note that abstract classes like QP::QMsm, QP::QActive and QP::QMActive are also subclasses of QP::QHsm, so their subclasses also can have state machines.
+
+@code{cpp}
+ [1] class Calc : public QP::QHsm {
+     private:
+ [2]    double m_operand1;
+        uint8_t m_operator;
+
+     public:
+ [3]     Calc() // constructor
+ [4]      : QHsm(&initial) // superclass' constructor
+         {}
+     protected:
+ [5]     Q_STATE_DECL(initial);
+ [6]     Q_STATE_DECL(on);
+         Q_STATE_DECL(ready);
+         Q_STATE_DECL(result);
+         Q_STATE_DECL(begin);
+         . . .
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> Class `Calc` (Calculator) derives from QP::QHsm, so it can have a state machine
+  </li>
+  <li><span class="tag">2</span> The class can have data members (typically private), which will be accessible inside the state machine as the "extended-state variables".
+  </li>
+
+@anchor sm_ctor
+  <li><span class="tag">3</span> The class needs to provide a **constructor**, typically without any parameters.
+  </li>
+  <li><span class="tag">4</span> The constructor must call the appropriate superclass' constructor. The superclass' constructor takes the top-most a pointer to the `initial` pseudo-state (see step [5]), which binds the state-machine to the class.
+  </li>
+  <li><span class="tag">5</span> Each state machine must have exactly one initial pseudo-state, which by convention should be always called **initial**. The initial pseudo-state is declared with the macro Q_STATE_DECL(initial).
+  </li>
+  <li><span class="tag">6</span> The same Q_STATE_DECL() macro is also used to declare all other states in the state machine.
+  </li>
+</ul>
+
+
+<div class="separate"></div>
+@subsection sm_state_decl The Q_STATE_DECL() Macro
+The Q_STATE_DECL() macro declares **two** functions for every state: the "state-caller" **static member** function and the"state-handler" **regular member**  function. So, for example, the declaration of the "on" state Q_STATE_DECL(on) expands to the following two declarations within the `Calc` class:
+
+@code{cpp}
+[1] QP::QState on_h(QP::QEvt const * const e); // "state-handler"
+[2] static QP::QState on(void * const me, QP::QEvt const * const e); // "state-caller"
+@endcode
+
+The two functions have each a different purpose.
+
+<ul class="tag">
+  <li><span class="tag">1</span> The "state-caller" **static member** function is used as a unique "handle" for a state. Internally, the QEP event processor uses **function pointers** to state-callers, which are simple objects (e.g. 32-bit addresses in ARM Cortex-M CPUs). These simple function pointers can be compared quickly and stored efficiently inside the state machine objects.
+  </li>
+  <li><span class="tag">2</span> The "state-handler" **regular member** function is used to implement the state behavior. As a regular class member, it has convenient, direct access to the state machine class attributes. The "state-handler" is called by the "state-caller".
+  </li>
+</ul>
+
+@sa
+@ref sm_call
+
+@remark
+Because the state-handler functions are regular members of the state machine class, they can be `virtual`, which allows them to be overridden in the subclasses of a given state machine class. Such **inheritance of entire sate machines** is an advanced feature, which should be used only in very special circumstances and with great caution. To declare a `virtual` state-handler, you simply prepend `virtual` in front of the Q_STATE_DECL() macro, as in the following examples:
+@code{cpp}
+virtual Q_STATE_DECL(on);
+virtual Q_STATE_DECL(ready);
+. . .
+@endcode
+
+
+-----------------------------------------------------------------------------
+@section sm_def State Machine Definition
+The definition of the state machine class is the actual code for your state machine. You need to define (i.e., write the code for) all "state-handler" member functions you declared in the @ref sm_decl "state machine class declaration". You don't need to explicitly define the "state-caller" static functions, because they are synthesized implicitly in the macro Q_STATE_DEF()).
+
+One important aspect to realize about coding "state-handler" functions is that they are always called from the @ref comp_qep "QEP event processor". The purpose of the "state-handlers" is to perform *your* specific actions and then to *tell* the event processor what needs to be done with the state machine. For example, if your "state-handler" performs a state transition, it executes some actions and then it calls the special @ref QP::QHsm::tran() "tran(<target>)" function, where it specifies the `<target>` state of this state transition. The state-handler then **returns** the status from the `tran()` function, and through this return value it informs the @ref comp_qep "QEP event processor" what needs to be done with the state machine. Based on this information, the event-processor might decide to call this or other state-handler functions to process the same current event. The following code examples should make all this clearer.
+
+
+<div class="separate"></div>
+@subsection sm_state_def The Q_STATE_DEF() Macro
+Every state that has been declared with the @ref sm_decl "Q_STATE_DECL()" macro in the state machine class needs to be defined with the Q_STATE_DEF() macro. For example, the state "ready" in the Calculator state machines, the Q_STATE_DEF(Calc, ready) macro expands into the following code:
+
+@code{cpp}
+[1] QP::QState Calc::ready(void * const me, QP::QEvt const * const e) {
+        return static_cast<Calc *>(me)->on_h(e);
+    }
+[2] QP::QState Calc::ready_h(QP::QEvt const * const e)
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> The static `Calc::on()` state-caller function is fully defined to call the "state-handler" function on the provided `me` pointer, which is explicitly cast to the class instance.
+  </li>
+  <li><span class="tag">2</span> The signature of the `Calc::on_h()` "state-handler" member function is provided, which needs to be followed by the body (`{...}`) of the "state-handler" member function.
+  </li>
+</ul>
+
+
+<div class="separate"></div>
+@subsection sm_def_init Top-Most Initial Pseudostate
+Every state machine must have exactly one top-most initial pseudo-state, which is assumed when the state machine is instantiated in the @ref sm_ctor "constructor" of the state machine class. By convention, the initial pseudo-state should be always called **initial**.
+
+This top-most initial pseudo-state has one transition, which points to the state that will become active after the state machine is initialized (through the QHsm::init() function). The following code the definition of the `initial` pseudo-state for the `Calc` class:
+
+@code{cpp}
+[1] Q_STATE_DEF(Calc, initial) {
+[2]      . . . // initialize the members of the state machine class
+[3]      (void)e; // unused parameter
+[4]      return tran(&on);
+    }
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> The initial pseudo-state is defined by means of the macro Q_STATE_DEF(), which takes two parameters: the class name and the state name (`initial` in this case).
+  </li>
+  <li><span class="tag">2</span> The function body following the macro Q_STATE_DEF() provides the definition of the "state-handler" member function, so it can access all class members via the implicit `this` pointer.
+  </li>
+  <li><span class="tag">3</span> The initial pseudo-state receives the "initialization event" `e`, which is often not used. If the event is not used, this line of code avoids the compiler warning about unused parameter.
+  </li>
+  <li><span class="tag">4</span> The top-most initial transition from the initial pseudo-state is coded with the function @ref QP::QHsm::tran() "tran()". The single parameter to the `tran()` function is the pointer to the target state of the transition. The top-most initial pseudo-state must return the value from the `tran()` function.
+  </li>
+</ul>
+
+
+<div class="separate"></div>
+@subsection sm_def_state State-Handler Member Functions
+Every regular state (including states nested in other states) is also coded with the Q_STATE_DEF() macro. The function body, following the macro, consists of the `switch` statement that discriminates based on the event signal (`e->sig`). The following code shows the complete definition of the Calculator "on" state. The explanation section below the code clarifies the main points.
+
+@code{cpp}
+[1] Q_STATE_DEF(Calc, ready) {
+[2]     QP::QState status_;
+[3]     switch (e->sig) {
+[4]         case Q_ENTRY_SIG: {
+[5]             BSP_message("ready-ENTRY;");
+[6]             status_ = Q_RET_HANDLED;
+[7]             break;
+            }
+[8]         case Q_EXIT_SIG: {
+                BSP_message("ready-EXIT;");
+[9]             status_ = Q_RET_HANDLED;
+                break;
+            }
+[10]        case Q_INIT_SIG: {
+                BSP_message("ready-INIT;");
+[11]            status_ = tran(&begin);
+                break;
+            }
+            case DIGIT_0_SIG: {
+                BSP_clear();
+                status_ = tran(&zero1);
+                break;
+            }
+[12]        case DIGIT_1_9_SIG: {
+                BSP_clear();
+[13]            BSP_insert(Q_EVT_CAST(CalcEvt)->key_code);
+[14]            status_ = tran(&int1);
+                break;
+            }
+            case POINT_SIG: {
+                BSP_clear();
+                BSP_insert((int)'0');
+                BSP_insert((int)'.');
+                status_ = tran(&frac1);
+                break;
+            }
+            case OPER_SIG: {
+[15]            m_operand1 = BSP_get_value();
+[16]            m_operator = Q_EVT_CAST(CalcEvt)->key_code;
+                status_ = tran(&opEntered);
+                break;
+            }
+            case CE_SIG: {
+                BSP_clear();
+                status_ = tran(&ready);
+                break;
+            }
+[17]        default: {
+[18]            status_ = super(&on);
+                break;
+            }
+        }
+[19]    return status_;
+    }
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> The state is defined by means of the macro Q_STATE_DEF(), which takes two parameters: the class name and the state name (`on` in this case).
+  </li>
+  <li><span class="tag">2</span> The automatic variable `status_` will hold the status of what will happen in the state-handler. This status will be eventually returned from the state-handler to the QEP event processor.
+  </li>
+  <li><span class="tag">3</span> Generally, every state handler is structured as a single switch that discriminates based on the signal of the **current event** `e->sig`, which is passed to the state-handler as parameter.
+  </li>
+  <li><span class="tag">4</span> The special, reserved event signal @ref QP::QHsm::Q_ENTRY_SIG "Q_ENTRY_SIG" is generated by the QEP event processor to let the state-handler process an **entry action** to the state.@n
+<span class="highlight"><b>NOTE:</b> By convention, all event signals end with the `_SIG` suffix. The `_SIG` suffix is omitted in the QM state machine diagrams.</span>
+  </li>
+
+  <li><span class="tag">5</span> You place your own code, which might contain references to the members of the state machine class (via the implicit `this` pointer)
+  </li>
+  <li><span class="tag">6</span> After your *entry action* code, you inform the QEP event processor that the state entry has been handled by setting `status_` to @ref QP::QHsm::Q_RET_HANDLED "Q_RET_HANDLED".
+  </li>
+  <li><span class="tag">7</span> Finally, you close each `case` with the `break` statement.
+  </li>
+  <li><span class="tag">8</span> The special, reserved event signal @ref QP::QHsm::Q_EXIT_SIG "Q_EXIT_SIG" is generated by the QEP event processor to let the state-handler process an **exit action** from the state.
+  </li>
+  <li><span class="tag">9</span> Again, after your *exit action* code, you inform the QEP event processor that the state exit has been handled by setting `status_` to @ref QP::QHsm::Q_RET_HANDLED "Q_RET_HANDLED".
+  </li>
+  <li><span class="tag">10</span> The special, reserved event signal @ref QP::QHsm::Q_INIT_SIG "Q_INIT_SIG" is generated by the QEP event processor to let the state-handler process an **initial transition** nested in the state.
+  </li>
+  <li><span class="tag">11</span> After your *initial action* code, you inform the QEP event processor to complete the initial transition and to go to the specified target state indicated as the parameter of the @ref QP::QHsm::tran() "tran()" function. You set `status_` to the value returned from `tran()`.
+  </li>
+  <li><span class="tag">12</span> A user-defined event, like `DIGIT_1_9_SIG` is handled in its own `case` statement.
+  </li>
+  <li><span class="tag">13</span> The state-handler code has access to the **current event `e`**. The macro Q_EVT_CAST() encapsulates **downcasting** the event pointer `e` to the specific event type (`CalcEvt` in this case).
+  </li>
+  <li><span class="tag">14</span> The `DIGIT_1_9_SIG` event triggers a state transition to state "int1", which you code with the @ref QP::QHsm::tran() "tran(&int1)" function.
+  </li>
+  <li><span class="tag">15-16</span> The state-handler function has direct access to the data members of the `Calc` class.@n
+<span class="highlight"><b>NOTE:</b> The previous implementation would require the use of "me->" pointer to access the data members.</span>
+  </li>
+
+  <li><span class="tag">17</span> The `default` case handles the situation when this state does not prescribe how to handle the given event. This is where you define the **superstate** of the given state.
+  </li>
+  <li><span class="tag">18</span> The **superstate** of the given state is specified by calling the @ref QP::QHsm::super() "super()" function.@n
+<span class="highlight"><b>NOTE:</b> A state that does not explicitly nest in any state, such as the "on" state in the Calculator, calls **super(&top)**</span>
+  </li>
+
+  <li><span class="tag">19</span> The state-handler ends by returning the status to the QEP event processor.
+  </li>
+</ul>
+
+@note
+The `switch` statement code and the single `return` from the state-handler function is compliant with the MISRA standards.
+
+
+------------------------------------------------------------------------------
+@section sm_call State-Handler Call Overhead
+For embedded system applications, it is always interesting to know the overhead of the implementation used. It turns out that the chosen "state-caller"/"state-handler" implementation is very efficient. The following dis-assembly listing shows the code generated for invocation of a state-handler from the QEP code. The compiler used is IAR C/C++ EWARM 8.32 with Cortex-M target CPU and Medium level of optimization.
+
+@code{asm}
+        r = (*s)(this, e); // invoke state handler s
+[1] MOV       R1, R7       // place `e` pointer in R1
+[2] MOV       R0, R6       // place `this` pointer in R0
+[3] BLX       R4           // branch to the state-caller
+
+        state-caller:
+[4] B.W       MyHsm::state_h() ; branch to state-handler member
+@endcode
+
+The machine code instructions [1-3] are the minimum code to call a function with two parameters via a function pointer (in R4).
+The single branch instruction [4] represents the only overhead of using the "state-caller" indirection layer. This instruction takes about 4 CPU clock cycles, which is minuscule and typically much better than using a pointer to a C++ *member* function.
+
+@next{api}
+*/
+
+} // namespace QP
+

@@ -2,14 +2,14 @@
 /// @brief QF/C++ port for QUTEST Unit Test, POSIX
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.3.6
-/// Date of the Last Update:  2018-10-04
+/// Last Updated for Version: 6.5.0
+/// Date of the Last Update:  2019-03-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -48,6 +48,9 @@
 
 // The number of system clock tick rates
 #define QF_MAX_TICK_RATE     2
+
+// Activate the QF QActive::stop() API
+#define QF_ACTIVE_STOP       1
 
 // QF interrupt disable/enable
 #define QF_INT_DISABLE()     (++QP::QF_intNest)

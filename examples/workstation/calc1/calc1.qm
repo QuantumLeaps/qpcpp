@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.3.1" links="0">
- <documentation>Calc is the model of the Calculator described in Chapter 4 of PSiCC2</documentation>
+<model version="4.5.0" links="0">
+ <documentation>Improved model of the Calculator described in Chapter 4 of PSiCC2. Improvements include:
+
+- using &quot;no me-&gt;&quot; pointer implementation
+- placing the &quot;negated1&quot; state inside &quot;operand1&quot; superstate
+- placing the &quot;negated2&quot; state inside &quot;operand2&quot; superstate
+- adding handling of operator precedence '*','/' before '+','-'</documentation>
  <framework name="qpcpp"/>
  <package name="Events" stereotype="0x01">
   <class name="CalcEvt" superclass="qpcpp::QEvt">
@@ -10,13 +15,110 @@
  <package name="SMs" stereotype="0x02">
   <class name="Calc" superclass="qpcpp::QHsm">
    <documentation>Calculator state machine</documentation>
-   <attribute name="op1" type="double" visibility="0x02" properties="0x00"/>
-   <attribute name="oper" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="inst" type="Calc" visibility="0x00" properties="0x01">
+    <documentation>The only inst of the Calc object (Singleton pattern).</documentation>
+   </attribute>
+   <attribute name="m_op1" type="double" visibility="0x02" properties="0x00"/>
+   <attribute name="m_op2" type="double" visibility="0x02" properties="0x00"/>
+   <attribute name="m_oper1" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_oper2" type="uint8_t" visibility="0x02" properties="0x00"/>
    <operation name="Calc" type="" visibility="0x00" properties="0x00">
     <documentation>constructor</documentation>
     <code> : QHsm(Q_STATE_CAST(&amp;Calc::initial))</code>
    </operation>
-   <statechart properties="QS_FUN_DICT">
+   <operation name="eval" type="bool" visibility="0x00" properties="0x00">
+    <documentation>// guard function to evaluate the current expression
+// taking into account the precedence of operands.
+// return: true if evaluation successfull
+// false when error encountered</documentation>
+    <parameter name="op" type="double"/>
+    <parameter name="oper" type="uint8_t"/>
+    <code>double result;
+if ((oper == KEY_NULL) || (oper == KEY_PLUS) || (oper == KEY_MINUS)) {
+    switch (m_oper2) {
+        case KEY_MULT: {
+            m_op2 *= op;
+            break;
+        }
+        case KEY_DIVIDE: {
+            if ((-1e-30 &lt; op) &amp;&amp; (op &lt; 1e-30)) {
+                BSP_display_error(&quot; Error 0 &quot;); // divide by zero
+                return false;
+            }
+            m_op2 /= op;
+            break;
+         }
+         default: { /* no op2 yet */
+            m_op2 = op;
+            m_oper2 = oper;
+            break;
+         }
+    }
+    switch (m_oper1) {
+        case KEY_PLUS: {
+            m_op1 += m_op2;
+            break;
+        }
+        case KEY_MINUS: {
+            m_op1 -= m_op2;
+            break;
+        }
+        case KEY_MULT: {
+            m_op1 *= m_op2;
+            break;
+        }
+        case KEY_DIVIDE: {
+            if ((-1e-30 &lt; m_op2) &amp;&amp; (m_op2 &lt; 1e-30)) {
+                BSP_display_error(&quot; Error 0 &quot;); // divide by zero
+                return false;
+            }
+            m_op1 /= m_op2;
+            break;
+        }
+        default: {
+            Q_ERROR();
+            break;
+        }
+    }
+    m_oper1 = oper;
+    m_oper2 = KEY_NULL;
+    result = m_op1;
+}
+else { // (oper == KEY_MULT) || (oper == KEY_DIV)
+    switch (m_oper2) {
+        case KEY_MULT: {
+            m_op2 *= op;
+            break;
+        }
+        case KEY_DIVIDE: {
+            if ((-1e-30 &lt; op) &amp;&amp; (op &lt; 1e-30)) {
+                BSP_display_error(&quot; Error 0 &quot;); // divide by zero
+                return false;
+            }
+            m_op2 /= op;
+            break;
+        }
+        default: { // oper2 not provided yet
+            m_op2 = op;
+            break;
+        }
+    }
+    m_oper2 = oper;
+    result = m_op2;
+}
+
+if ((result &lt; -99999999.0) || (99999999.0 &lt; result)) {
+    BSP_display_error(&quot; Error 1 &quot;); // out of range
+    return false;
+}
+if ((-0.0000001 &lt; result) &amp;&amp; (result &lt; 0.0000001)) {
+    result = 0.0;
+}
+BSP_display(result);
+
+return true;</code>
+   </operation>
+   <statechart properties="0x02">
     <initial target="../1">
      <action>BSP_clear();
 (void)e; /* unused parameter */</action>
@@ -27,7 +129,7 @@
     <state name="on">
      <entry>BSP_message(&quot;on-ENTRY;&quot;);</entry>
      <exit>BSP_message(&quot;on-EXIT;&quot;);</exit>
-     <initial target="../4">
+     <initial target="../3">
       <action>BSP_message(&quot;on-INIT;&quot;);</action>
       <initial_glyph conn="15,9,5,1,45,9,-2">
        <action box="1,0,5,2"/>
@@ -44,37 +146,30 @@
        <action box="0,0,5,2"/>
       </tran_glyph>
      </tran>
-     <state name="error">
-      <entry>BSP_message(&quot;error-ENTRY;&quot;);</entry>
-      <exit>BSP_message(&quot;error-EXIT;&quot;);</exit>
-      <state_glyph node="11,68,9,8">
-       <entry box="1,2,5,2"/>
-       <exit box="1,4,5,2"/>
-      </state_glyph>
-     </state>
      <state name="ready">
-      <entry>BSP_message(&quot;ready-ENTRY;&quot;);</entry>
+      <entry>BSP_message(&quot;ready-ENTRY;&quot;);
+m_oper2 = KEY_NULL;</entry>
       <exit>BSP_message(&quot;ready-EXIT;&quot;);</exit>
-      <initial target="../6">
+      <initial target="../5">
        <action>BSP_message(&quot;ready-INIT;&quot;);</action>
        <initial_glyph conn="18,20,5,0,20,2">
         <action box="0,-2,6,2"/>
        </initial_glyph>
       </initial>
-      <tran trig="DIGIT_0" target="../../5/3">
+      <tran trig="DIGIT_0" target="../../4/3">
        <action>BSP_clear();</action>
        <tran_glyph conn="18,34,2,0,11">
         <action box="1,0,6,2"/>
        </tran_glyph>
       </tran>
-      <tran trig="DIGIT_1_9" target="../../5/4">
+      <tran trig="DIGIT_1_9" target="../../4/4">
        <action>BSP_clear();
 BSP_insert(Q_EVT_CAST(CalcEvt)-&gt;key_code);</action>
        <tran_glyph conn="32,34,2,0,11">
         <action box="1,0,9,2"/>
        </tran_glyph>
       </tran>
-      <tran trig="POINT" target="../../5/5">
+      <tran trig="POINT" target="../../4/5">
        <action>BSP_clear();
 BSP_insert((int)'0');
 BSP_insert((int)'.');</action>
@@ -82,26 +177,18 @@ BSP_insert((int)'.');</action>
         <action box="0,0,6,2"/>
        </tran_glyph>
       </tran>
-      <tran trig="OPER" target="../../6">
-       <action>me-&gt;op1  = BSP_get_value();
-me-&gt;oper = Q_EVT_CAST(CalcEvt)-&gt;key_code;</action>
+      <tran trig="OPER" target="../../5">
+       <action>m_op1  = BSP_get_value();
+m_oper1 = Q_EVT_CAST(CalcEvt)-&gt;key_code;</action>
        <tran_glyph conn="58,24,1,1,32,48,-32">
         <action box="0,-2,6,2"/>
        </tran_glyph>
       </tran>
-      <state name="result">
-       <entry>BSP_message(&quot;result-ENTRY;&quot;);</entry>
-       <exit>BSP_message(&quot;result-EXIT;&quot;);</exit>
-       <state_glyph node="14,22,10,10">
-        <entry box="1,2,5,2"/>
-        <exit box="1,4,5,2"/>
-       </state_glyph>
-      </state>
       <state name="begin">
        <entry>BSP_message(&quot;begin-ENTRY;&quot;);</entry>
        <exit>BSP_message(&quot;begin-EXIT;&quot;);</exit>
        <tran trig="OPER">
-        <choice target="../../../../5/6">
+        <choice target="../../../../4/6">
          <guard brief="e-&gt;key == '-'">Q_EVT_CAST(CalcEvt)-&gt;key_code == KEY_MINUS</guard>
          <choice_glyph conn="40,30,5,0,34,15">
           <action box="1,0,11,2"/>
@@ -122,6 +209,14 @@ me-&gt;oper = Q_EVT_CAST(CalcEvt)-&gt;key_code;</action>
         <exit box="1,4,5,2"/>
        </state_glyph>
       </state>
+      <state name="result">
+       <entry>BSP_message(&quot;result-ENTRY;&quot;);</entry>
+       <exit>BSP_message(&quot;result-EXIT;&quot;);</exit>
+       <state_glyph node="14,22,10,10">
+        <entry box="1,2,5,2"/>
+        <exit box="1,4,5,2"/>
+       </state_glyph>
+      </state>
       <state_glyph node="8,16,50,18">
        <entry box="1,2,5,2"/>
        <exit box="1,4,5,2"/>
@@ -130,20 +225,20 @@ me-&gt;oper = Q_EVT_CAST(CalcEvt)-&gt;key_code;</action>
      <state name="operand1">
       <entry>BSP_message(&quot;operand1-ENTRY;&quot;);</entry>
       <exit>BSP_message(&quot;operand1-EXIT;&quot;);</exit>
-      <tran trig="CE" target="../../4/6">
+      <tran trig="CE" target="../../3/5">
        <action>BSP_clear();</action>
        <tran_glyph conn="26,38,0,3,-14,4">
         <action box="0,-2,6,2"/>
        </tran_glyph>
       </tran>
-      <tran trig="OPER" target="../../6">
-       <action>me-&gt;op1  = BSP_get_value();
-me-&gt;oper = Q_EVT_CAST(CalcEvt)-&gt;key_code;</action>
+      <tran trig="OPER" target="../../5">
+       <action>m_op1  = BSP_get_value();
+m_oper1 = Q_EVT_CAST(CalcEvt)-&gt;key_code;</action>
        <tran_glyph conn="60,64,2,1,6,-2">
         <action box="1,0,6,2"/>
        </tran_glyph>
       </tran>
-      <tran trig="EQUALS" target="../../4/5">
+      <tran trig="EQUALS" target="../../3/6">
        <tran_glyph conn="10,38,0,3,-12,4">
         <action box="0,-2,6,2"/>
        </tran_glyph>
@@ -268,20 +363,20 @@ BSP_negate();</entry>
      <state name="opEntered">
       <entry>BSP_message(&quot;opEntered-ENTRY;&quot;);</entry>
       <exit>BSP_message(&quot;opEntered-EXIT;&quot;);</exit>
-      <tran trig="DIGIT_0" target="../../7/3">
+      <tran trig="DIGIT_0" target="../../6/3">
        <action>BSP_clear();</action>
        <tran_glyph conn="27,82,2,0,2,-5,9">
         <action box="1,0,6,2"/>
        </tran_glyph>
       </tran>
-      <tran trig="DIGIT_1_9" target="../../7/4">
+      <tran trig="DIGIT_1_9" target="../../6/4">
        <action>BSP_clear();
 BSP_insert(Q_EVT_CAST(CalcEvt)-&gt;key_code);</action>
        <tran_glyph conn="34,82,2,0,11">
         <action box="1,0,9,2"/>
        </tran_glyph>
       </tran>
-      <tran trig="POINT" target="../../7/5">
+      <tran trig="POINT" target="../../6/5">
        <action>BSP_clear();
 BSP_insert((int)'0');
 BSP_insert((int)'.');</action>
@@ -290,7 +385,7 @@ BSP_insert((int)'.');</action>
        </tran_glyph>
       </tran>
       <tran trig="OPER">
-       <choice target="../../../7/6">
+       <choice target="../../../6/6">
         <guard brief="e-&gt;key == '-'">Q_EVT_CAST(CalcEvt)-&gt;key_code == KEY_MINUS</guard>
         <choice_glyph conn="34,78,5,0,40,15">
          <action box="1,0,11,2"/>
@@ -314,21 +409,21 @@ BSP_insert((int)'.');</action>
      <state name="operand2">
       <entry>BSP_message(&quot;operand2-ENTRY;&quot;);</entry>
       <exit>BSP_message(&quot;operand2-EXIT;&quot;);</exit>
-      <tran trig="CE" target="../../6">
+      <tran trig="CE" target="../../5">
        <action>BSP_clear();</action>
        <tran_glyph conn="16,86,0,3,-5,8,-5,2">
         <action box="0,-4,6,2"/>
        </tran_glyph>
       </tran>
       <tran trig="EQUALS">
-       <choice target="../../../3">
-        <guard>else</guard>
+       <choice target="../../../7">
+        <guard brief="else"/>
         <choice_glyph conn="4,70,5,3,7">
          <action box="1,0,6,2"/>
         </choice_glyph>
        </choice>
-       <choice target="../../../4/5">
-        <guard brief="BSP_eval()">BSP_eval(me-&gt;op1, me-&gt;oper, BSP_get_value())</guard>
+       <choice target="../../../3/6">
+        <guard brief="eval()">eval(BSP_get_value(), KEY_NULL)</guard>
         <choice_glyph conn="4,70,4,3,-46,10">
          <action box="0,-4,10,2"/>
         </choice_glyph>
@@ -338,16 +433,16 @@ BSP_insert((int)'.');</action>
        </tran_glyph>
       </tran>
       <tran trig="OPER">
-       <choice target="../../../3">
-        <guard>else</guard>
+       <choice target="../../../7">
+        <guard brief="else"/>
         <choice_glyph conn="6,79,4,3,-5,5">
-         <action box="0,-4,6,2"/>
+         <action box="0,-5,6,2"/>
         </choice_glyph>
        </choice>
-       <choice target="../../../6">
-        <guard brief="BSP_eval()">BSP_eval(me-&gt;op1, me-&gt;oper, BSP_get_value())</guard>
+       <choice target="../../../5">
+        <guard brief="eval()">eval(BSP_get_value(), Q_EVT_CAST(CalcEvt)-&gt;key_code)</guard>
         <choice_glyph conn="6,79,5,3,16,-5,4">
-         <action box="1,1,10,2"/>
+         <action box="1,0,12,2"/>
         </choice_glyph>
        </choice>
        <tran_glyph conn="8,98,3,-1,-2,-19">
@@ -471,6 +566,14 @@ BSP_negate();</entry>
        <exit box="1,4,5,2"/>
       </state_glyph>
      </state>
+     <state name="error">
+      <entry>BSP_message(&quot;error-ENTRY;&quot;);</entry>
+      <exit>BSP_message(&quot;error-EXIT;&quot;);</exit>
+      <state_glyph node="11,68,9,8">
+       <entry box="1,2,5,2"/>
+       <exit box="1,4,5,2"/>
+      </state_glyph>
+     </state>
      <state_glyph node="2,4,90,110">
       <entry box="1,2,5,2"/>
       <exit box="1,4,5,2"/>
@@ -486,6 +589,10 @@ BSP_exit();</entry>
     <state_diagram size="96,124"/>
    </statechart>
   </class>
+  <attribute name="the_calc" type="QP::QHsm * const" visibility="0x00" properties="0x00">
+   <documentation>Global opaque pointer to the Calc inst</documentation>
+   <code>= &amp;Calc::inst;</code>
+  </attribute>
  </package>
  <directory name=".">
   <file name="calc1.h">
@@ -503,24 +610,29 @@ enum CalcSignals {
     OFF_SIG
 };
 
-$declare(Events::CalcEvt)
+$declare${Events::CalcEvt}
 
-extern QP::QHsm * const the_calc; // &quot;opaque&quot; pointer to calculator HSM
+$declare${SMs::the_calc}
 
-#endif // calc1_h</text>
+#endif // calc1_h
+</text>
   </file>
   <file name="calc1.cpp">
    <text>#include &quot;qpcpp.h&quot; // QP/C++
 #include &quot;bsp.h&quot;   // board support package
 #include &quot;calc1.h&quot; // application
 
-$declare(SMs::Calc)
+Q_DEFINE_THIS_FILE
 
-static Calc l_calc;    // the only instance of the Calc class
+#define KEY_NULL    '\0'
+#define KEY_PLUS    '+'
+#define KEY_MINUS   '-'
+#define KEY_MULT    '*'
+#define KEY_DIVIDE  '/'
 
-// global-scope definitions -----------------------------------
-QP::QHsm * const the_calc = &amp;l_calc; // &quot;opaque&quot; pointer to HSM
+$declare${SMs::Calc}
 
+$define${SMs::the_calc}
 $define(SMs::Calc)</text>
   </file>
  </directory>

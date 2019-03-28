@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-20
+/// Last updated for version 6.5.0
+/// Last updated on  2019-03-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -549,7 +549,7 @@ bool QTimeEvt::wasDisarmed(void) {
 /// @note
 /// The function is thread-safe.
 ///
-QTimeEvtCtr QTimeEvt::ctr(void) const {
+QTimeEvtCtr QTimeEvt::currCtr(void) const {
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();

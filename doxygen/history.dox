@@ -2,6 +2,27 @@ namespace QP {
 
 /** @page history Revision History
 
+@section qpcpp_6_5_0 Version 6.5.0, 2019-03-30
+This release brings new, much more natural and convenient way of @ref sm "implementing state machines" in QP/C++, in which state-handler functions are regular **members** of the state machine class. This means that state-handlers have direct access to all class members via the implicit `this` pointer, **without the need to use the "me->" pointer**.
+
+@note
+The previous "me-> pointer" state machine implementation style is still supported in QP/C++ for backwards compatibility with the existing code, but it is **not** recommended for new designs.
+
+
+@remark
+This "no me-> pointer" state machine implementation is supported in the [QM model-based design tool](https://www.state-machine.com/qm/) starting from **QM 4.5.0**.
+
+
+This release comes with several models for **QM 4.5.0**, which demonstrate how to use this state-machine implementation style from QM.
+
+Additionally, this release changes the API `QTimeEvt::ctr()` to QP::QTimeEvt::currCtr(). This is to avoid name shadowing with the `ctr` variables, which is not compliant with MISRA.
+
+Additionally, the examples for `calc1` and `calc1_sub` (with QM 4.5.0 models) have been extended to properly handle the operator precedence (multiplication and division have higher precedence than addition and subtraction).
+
+Finally, this release adds the example `start-stop` located in the directory `qpcpp/examples/freertos/arm-cm/start-stop_nucleo-h743zi/` for the @ref freertos "QP port to FreeRTOS", which demonstrates how to dynamically start and stop active objects multiple times during the lifetime of the application. (NOTE: Starting and stopping active objects dynamically is generally not recommended, but the example has been requested by a commercial customer.)
+
+
+------------------------------------------------------------------------------
 @section qpcpp_6_4_0 Version 6.4.0, 2019-02-10
 This release brings the following changes:
 

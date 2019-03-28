@@ -3,14 +3,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.8
-/// Last updated on  2019-01-16
+/// Last updated for version 6.5.0
+/// Last updated on  2019-03-24
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2002-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -147,10 +147,10 @@ private:
 //! Counting Semaphore of the QXK preemptive kernel
 ///
 /// @description
-/// ::QXSemaphore is a blocking mechanism intended primarily for signaling
-/// @ref ::QXThread "extended threads". The semaphore is initialized with
-/// the maximum count (see QXSemaphore::init()), which allows you to create
-/// a binary semaphore (when the maximum count is 1) and
+/// QP::QXSemaphore is a blocking mechanism intended primarily for signaling
+/// @ref QP::QXThread "extended threads". The semaphore is initialized with
+/// the maximum count (see QP::QXSemaphore::init()), which allows you to
+/// create a binary semaphore (when the maximum count is 1) and
 /// counting semaphore when the maximum count is > 1.
 ///
 /// @usage
@@ -184,31 +184,32 @@ private:
 //! Priority Ceiling Mutex the QXK preemptive kernel
 ///
 /// @description
-/// ::QXMutex is a blocking mutual exclusion mechanism that can also apply
+/// QP::QXMutex is a blocking mutual exclusion mechanism that can also apply
 /// the **priority ceiling protocol** to avoid unbounded priority inversion
-/// (if initialized with a non-zero ceiling priority, see QXMutex::init()).
-/// In that case, ::QXMutex requires its own uinque QP priority level, which
-/// cannot be used by any thread or any other ::QXMutex.
-/// If initialzied with zero ceiling priority, ::QXMutex does **not** use the
-/// priority ceiling protocol and does not require a unique QP priority
-/// (see QXMutex::init()).
-/// ::QXMutex is **recursive** (reentrant), which means that it can be locked
-/// mutiliple times (up to 255 levels) by the *same* thread without causing
-/// deadlock.
-/// ::QXMutex is primarily intended for the @ref ::QXThread
-/// "extened (blocking) threads", but can also be used by the @ref ::QActive
-/// "basic threads" through the non-blocking QXMutex::tryLock() API.
+/// (if initialized with a non-zero ceiling priority, see QP::QXMutex::init()).
+/// In that case, QP::QXMutex requires its own uinque QP priority level, which
+/// cannot be used by any thread or any other QP::QXMutex.
+/// If initialzied with zero ceiling priority, QP::QXMutex does **not** use
+/// the priority ceiling protocol and does not require a unique QP priority
+/// (see QP::QXMutex::init()).
+/// QP::QXMutex is **recursive** (reentrant), which means that it can be
+/// locked mutiliple times (up to 255 levels) by the *same* thread without
+/// causing deadlock.
+/// QP::QXMutex is primarily intended for the @ref QP::QXThread
+/// "extened (blocking) threads", but can also be used by the @ref QP::QActive
+/// "basic threads" through the non-blocking QP::QXMutex::tryLock() API.
 ///
 /// @note
-/// ::QXMutex should be used in situations when at least one of the extended
+/// QP::QXMutex should be used in situations when at least one of the extended
 /// threads contending for the mutex blocks while holding the mutex (between
-/// the QXMutex::lock() and QXMutex::unlock() operations). If no blocking is
-/// needed while holding the mutex, the more efficient non-blocking mechanism
-/// of @ref QXK_schedLock() "selective QXK scheduler locking" should be used
-/// instead. @ref QXK_schedLock() "Selective scheduler locking" is available
-/// for both @ref ::QActive "basic threads" and @ref ::QXThread "extended
-/// threads", so it is applicable to situations where resources are shared
-/// among all these threads.
+/// the QP::QXMutex::lock() and QP::QXMutex::unlock() operations). If no
+/// blocking is needed while holding the mutex, the more efficient
+/// non-blocking mechanism of @ref QP::QXK::schedLock() "selective QXK
+/// scheduler locking" should be used instead. @ref QP::QXK::schedLock()
+/// "Selective scheduler locking" is available for both @ref QP::QActive
+/// "basic threads" and @ref QP::QXThread "extended threads", so it is
+/// applicable to situations where resources are shared among all
+/// these threads.
 ///
 /// @usage
 /// The following example illustrates how to instantiate and use the mutex

@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product:  Calculator Example
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-14
+// Last Updated for Version: 6.5.0
+// Date of the Last Update:  2019-03-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -64,7 +64,7 @@ int main() {
     for (;;) { // event loop
         CalcEvt e; // Calculator event
 
-        BSP_display(); // show the display
+        BSP_show_display(); // show the display
 
         cout << ": ";
         cout.flush();

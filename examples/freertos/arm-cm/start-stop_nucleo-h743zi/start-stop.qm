@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="4.5.0" links="0">
+ <documentation>Start-stop application that demonstrates staring and stopping active objects multiple times during the runtime, as opposed to starting AOs only at the beginning.</documentation>
+ <framework name="qpcpp"/>
+ <package name="AOs" stereotype="0x02">
+  <class name="Launcher" superclass="qpcpp::QActive">
+   <attribute name="inst" type="Launcher" visibility="0x00" properties="0x01">
+    <documentation>The only instance of the Launcher AO (Singleton pattern)</documentation>
+   </attribute>
+   <attribute name="m_worker" type="Worker *" visibility="0x00" properties="0x00"/>
+   <attribute name="m_te" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
+   <operation name="Launcher" type="" visibility="0x00" properties="0x00">
+    <code>  : QActive(initial),
+    m_worker(0),
+    m_te(this, TIMEOUT_SIG, 0U)</code>
+   </operation>
+   <statechart properties="0x02">
+    <initial target="../1">
+     <action>(void)e; // unused parameter
+
+subscribe(DONE_SIG);
+
+QS_OBJ_DICTIONARY(&amp;Launcher::inst);
+QS_OBJ_DICTIONARY(&amp;Launcher::inst.m_te);
+
+QS_SIG_DICTIONARY(DONE_SIG,    (void *)0);
+QS_SIG_DICTIONARY(TIMEOUT_SIG, (void *)0);</action>
+     <initial_glyph conn="2,2,5,1,38,6,0">
+      <action box="0,0,4,2"/>
+     </initial_glyph>
+    </initial>
+    <state name="inactive">
+     <entry>m_te.armX(BSP::TICKS_PER_SEC / 5U, 0);</entry>
+     <exit>m_te.disarm();</exit>
+     <tran trig="TIMEOUT" target="../../2">
+      <tran_glyph conn="2,22,3,1,40,14,-2">
+       <action box="0,-2,7,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,6,38,22">
+      <entry box="1,2,37,6"/>
+      <exit box="1,8,37,5"/>
+     </state_glyph>
+    </state>
+    <state name="active">
+     <entry>// placement new to execute the Worker ctor
+m_worker = new (&amp;Worker::inst) Worker;
+m_worker-&gt;start(
+    1U,                          // QP priority of the AO
+    l_workerQueueSto,           // event queue storage
+    Q_DIM(l_workerQueueSto),    // queue length [events]
+    l_workerStackSto,           // stack storage
+    sizeof(l_workerStackSto),   // stack size [bytes]
+    static_cast&lt;QP::QEvt *&gt;(0)); // initialization event (not used)</entry>
+     <exit>m_worker-&gt;~Worker(); // explicit destructor call
+m_worker = 0;</exit>
+     <tran trig="DONE">
+      <action brief="wait for Worker to stop">// arm a timer for at least one tick
+m_te.armX(2, 0);
+// wait for Worker to stop...</action>
+      <tran_glyph conn="2,46,3,-1,26">
+       <action box="0,-2,25,2"/>
+      </tran_glyph>
+     </tran>
+     <tran trig="TIMEOUT" target="../../1">
+      <tran_glyph conn="2,50,3,1,42,-34,-4">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,30,38,22">
+      <entry box="1,2,37,6"/>
+      <exit box="1,8,37,6"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="46,54"/>
+   </statechart>
+  </class>
+  <class name="Worker" superclass="qpcpp::QActive">
+   <documentation>&quot;Worker&quot; active object that will be started, perform its job, and then stop itself.</documentation>
+   <attribute name="inst" type="Worker" visibility="0x00" properties="0x01">
+    <documentation>The only instance of the Worker AO (Singleton pattern)</documentation>
+   </attribute>
+   <attribute name="m_te" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
+   <attribute name="m_counter" type="uint8_t" visibility="0x00" properties="0x00">
+    <documentation>blink down-counter</documentation>
+   </attribute>
+   <operation name="Worker" type="" visibility="0x00" properties="0x00">
+    <code>  : QActive(&amp;initial),
+    m_te(this, TIMEOUT_SIG, 0U)</code>
+   </operation>
+   <operation name="~Worker" type="" visibility="0x00" properties="0x04">
+    <documentation>virtual destructor</documentation>
+    <code>BSP::led2Off();</code>
+   </operation>
+   <statechart properties="0x02">
+    <initial target="../1/0">
+     <action>(void)e; // unused parameter
+
+QS_OBJ_DICTIONARY(&amp;Worker::inst);
+QS_OBJ_DICTIONARY(&amp;Worker::inst.m_te);</action>
+     <initial_glyph conn="3,2,5,1,37,24,-18">
+      <action box="0,0,25,2"/>
+     </initial_glyph>
+    </initial>
+    <state name="active">
+     <entry>m_counter = 5U; // number of blinks
+m_te.armX(BSP::TICKS_PER_SEC / 5U,
+          BSP::TICKS_PER_SEC / 5U);</entry>
+     <exit>m_te.disarm();</exit>
+     <state name="off">
+      <tran trig="TIMEOUT" target="../../1">
+       <tran_glyph conn="4,30,3,1,20,6,-2">
+        <action box="0,-2,18,6"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="4,24,18,8"/>
+     </state>
+     <state name="on">
+      <entry>BSP::ledOn();</entry>
+      <exit>BSP::ledOff();</exit>
+      <tran trig="TIMEOUT">
+       <action>--m_counter;</action>
+       <choice target="../../../0">
+        <guard brief="else"/>
+        <choice_glyph conn="26,48,4,1,-20,-4">
+         <action box="0,-5,10,2"/>
+        </choice_glyph>
+       </choice>
+       <choice target="../../../../2">
+        <guard>m_counter == 0U</guard>
+        <choice_glyph conn="26,48,5,1,14,8,-4">
+         <action box="1,0,16,2"/>
+        </choice_glyph>
+       </choice>
+       <tran_glyph conn="4,48,3,-1,22">
+        <action box="0,-2,21,4"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="4,34,18,16">
+       <entry box="1,2,16,4"/>
+       <exit box="1,6,16,5"/>
+      </state_glyph>
+     </state>
+     <state_glyph node="2,6,34,46">
+      <entry box="1,2,31,9"/>
+      <exit box="1,11,31,5"/>
+     </state_glyph>
+    </state>
+    <state name="final">
+     <entry>BSP::led2On();
+static QEvt const doneEvt = { DONE_SIG, 0 };
+QF::PUBLISH(&amp;doneEvt, this);
+stop(); // stop this active object</entry>
+     <state_glyph node="2,54,34,14">
+      <entry box="1,2,33,9"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="42,70"/>
+   </statechart>
+  </class>
+  <attribute name="AO_Launcher" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <code>= &amp;Launcher::inst; // opaque pointer</code>
+  </attribute>
+ </package>
+ <directory name=".">
+  <file name="worker.h">
+   <text>#ifndef worker_h
+#define worker_h
+
+using namespace QP;
+
+enum DPPSignals {
+    DONE_SIG = Q_USER_SIG, // to signal when Worker is done
+    // ...
+    MAX_PUB_SIG,    // the last published signal
+
+    TIMEOUT_SIG,    // for timeouts
+    // ...
+    MAX_SIG         // the last signal
+};
+
+$declare${AOs::Worker}
+$declare${AOs::AO_Launcher}
+
+#endif // worker_h
+</text>
+  </file>
+  <file name="worker.cpp">
+   <text>#include &quot;qpcpp.h&quot;
+#include &quot;Worker.h&quot;
+#include &quot;bsp.h&quot;
+
+//Q_DEFINE_THIS_FILE
+
+$define${AOs::Worker}</text>
+  </file>
+  <file name="launcher.cpp">
+   <text>#include &quot;qpcpp.h&quot;
+#include &quot;worker.h&quot;
+#include &quot;bsp.h&quot;
+#include &lt;new&gt;  // for placement new
+
+//Q_DEFINE_THIS_FILE
+
+static QP::QEvt const *l_workerQueueSto[10];
+static StackType_t l_workerStackSto[configMINIMAL_STACK_SIZE];
+
+$declare${AOs::Launcher}
+
+$define${AOs::AO_Launcher}
+$define${AOs::Launcher}</text>
+  </file>
+ </directory>
+</model>

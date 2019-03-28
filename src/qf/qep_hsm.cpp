@@ -3,14 +3,14 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.8
-/// Last updated on  2019-01-23
+/// Last updated for version 6.5.0
+/// Last updated on  2019-03-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -76,7 +76,7 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qep_hsm")
 
 //****************************************************************************
-char_t const versionStr[6] = QP_VERSION_STR;
+char_t const versionStr[7] = QP_VERSION_STR;
 
 //****************************************************************************
 enum {
@@ -118,7 +118,7 @@ static QEvt const QEP_reservedEvt_[4] = {
 ///
 QHsm::QHsm(QStateHandler const initial) {
     m_state.fun = Q_STATE_CAST(&top);
-    m_temp.fun = initial;
+    m_temp.fun  = initial;
 }
 
 //****************************************************************************
@@ -142,7 +142,7 @@ void QHsm::init(QEvt const * const e) {
 
     /// @pre ctor must have been executed and initial tran NOT taken
     Q_REQUIRE_ID(200, (m_temp.fun != Q_STATE_CAST(0))
-                      && (t == Q_STATE_CAST(&QHsm::top)));
+                      && (t == Q_STATE_CAST(&top)));
 
     // execute the top-most initial transition
     QState r = (*m_temp.fun)(this, e);

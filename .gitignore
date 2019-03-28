@@ -35,8 +35,8 @@ lint*.txt
 *.bak
 *.qlc
 JLink*.*
+version-*
 
-./version-*
 eclipse/
 test_priv/
 dbg/

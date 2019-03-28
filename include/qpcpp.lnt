@@ -2,8 +2,8 @@
 /// @brief PC-Lint 9.x option file for linting QP/C++ applications
 /// @cond
 ///===========================================================================
-/// Last updated for version 6.3.8
-/// Last updated on  2019-01-11
+/// Last updated for version 6.5.0
+/// Last updated on  2019-03-24
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -43,13 +43,6 @@
  enum_t,
  float32_t,
  float64_t)
--estring(1960,        // 11-0-1(req) non-private data member
- sig,
- poolId_,
- refCtr_)
--estring(1927,        // 8-5-1(req) not in the ctor initializer
- QP::QEvt::poolId_,
- QP::QEvt::refCtr_)
 -estring(1923,        // 16-2-2(req) could become const variable
  QP_API_VERSION,
  QP_VERSION_STR,
@@ -59,18 +52,10 @@
  QP_VERSION)
 -emacro(923,          // 5-2-7, 5-2-8 cast from int to pointer
  Q_UINT2PTR_CAST)
--emacro(930,          // 5-2-7, 5-2-8 cast from enum to unsigned
- QEVT_INITIALIZER)
 -estring(1960,        // 16-0-4(req) function-like macro
  Q_DIM,
  Q_UINT2PTR_CAST,
  QEVT_INITIALIZER)
--esym(1790,           // Base class has no virtual functions
- QP::QEvt)
--estring(1712, QEvt)  // default constructor not defined
--estring(1401,        // member not initialized in the ctor
- QP::QEvt::poolId_,
- QP::QEvt::refCtr_)
 -emacro(866, Q_DIM)   // Unusual use of 'SYM' in argument to sizeof
 -estring(970,bool)    // Use of 'bool' outside of a typedef
 
@@ -122,10 +107,25 @@
 
 
 // QEP
+-estring(1960,        // 11-0-1(req) non-private data member
+ sig,
+ poolId_,
+ refCtr_)
+-emacro(930,          // 5-2-7, 5-2-8 cast from enum to unsigned
+ QEVT_INITIALIZER)
+-esym(1790,           // Base class has no virtual functions
+ QP::QEvt)
+-estring(1712, QEvt)  // default constructor not defined
+-estring(1401,        // member not initialized in the ctor
+ QP::QEvt::poolId_,
+ QP::QEvt::refCtr_)
+-estring(1927,        // 8-5-1(req) not in the ctor initializer
+ QP::QEvt::poolId_,
+ QP::QEvt::refCtr_)
 -emacro(929,          // 5-2-7(req) cast pointer to pointer
+ Q_EVT_CAST,
  Q_STATE_CAST,
- Q_ACTION_CAST,
- Q_EVT_CAST)
+ Q_ACTION_CAST)
 -emacro(1939,         // 5-2-2, Down cast detected
  Q_EVT_CAST,
  Q_NEW,
@@ -134,13 +134,22 @@
 -estring(1960,        // 9-5-1 declaration of union
  QP::QHsmAttr)
 -esym(1960,           // 16-0-4 function-like macro
+ Q_STATE_DECL,
+ Q_STATE_DEF,
+ Q_HANDLED,
+ Q_UNHANDLED,
  Q_TRAN,
  Q_TRAN_HIST,
  Q_SUPER,
+ Q_EVT_CAST,
  Q_STATE_CAST,
- Q_ACTION_CAST,
- Q_EVT_CAST)
+ Q_ACTION_CAST)
 -esym(1960,           // 16-0-4 function-like macro
+ QM_STATE_DECL,
+ QM_STATE_DEF,
+ QM_SM_STATE_DECL,
+ QM_ACTION_DECL,
+ QM_ACTION_DEF,
  QM_ENTRY,
  QM_EXIT,
  QM_SM_EXIT,
@@ -156,6 +165,16 @@
 -esym(1712,           // default constructor not defined
  QMsm,
  QHsm)
+-esym(1963,           // 16-3-2, '#/##' operator used
+ Q_STATE_DECL,
+ Q_STATE_DEF,
+ QM_STATE_DECL,
+ QM_STATE_DEF,
+ QM_SM_STATE_DECL,
+ QM_ACTION_DECL,
+ QM_ACTION_DEF)
+-efunc(925,           // 5-2-8, 5-2-9 cast from pointer to pointer
+ QP::QHsm::qm_tran*)
 -esym(1511,           // 2-10-2 Member hides non-virtual member
  QP::QHsm::isIn,
  QP::QHsm::state,
@@ -170,7 +189,6 @@
 -efunc(925,           // 5-2-8, 5-2-9 cast from pointer to pointer
  *toActive,
  *toTimeEvt)
-
 -esym(1927,           // 8-5-1 Symbol not in the ctor initializer list
  QP::QActive::m_prio,
  QP::QActive::m_eQueue,

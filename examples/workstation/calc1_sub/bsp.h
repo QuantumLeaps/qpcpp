@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product:  Board Support Package (BSP) for the Calculator example
-// Last Updated for Version: 5.4.2
-// Date of the Last Update:  2015-06-05
+// Last Updated for Version: 6.5.0
+// Date of the Last Update:  2019-03-21
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,25 +28,21 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : https://state-machine.com
-// Email: info@state-machine.com
+// https://www.state-machine.com
+// mailto:info@state-machine.com
 //****************************************************************************
 #ifndef bsp_h
 #define bsp_h
 
-#define KEY_PLUS    '+'
-#define KEY_MINUS   '-'
-#define KEY_MULT    '*'
-#define KEY_DIVIDE  '/'
-
-void BSP_clear (void);
+void BSP_clear(void);
 void BSP_negate(void);
 void BSP_insert(int keyId);
 double BSP_get_value(void);
-int  BSP_eval(double operand1, int oper, double operand2);
+void BSP_display(double value);
+void BSP_display_error(char const *err);
 void BSP_exit(void);
 
-void BSP_display(void);
-void BSP_message(char const *state);
+void BSP_show_display(void);
+void BSP_message(char const *msg);
 
 #endif // bsp_h

@@ -37,6 +37,19 @@ for ARM Cortex-M4/M7 projects, due to the support for the hardware FPU
 ***
 
 
+Programming the NUCLEO Board
+============================
+The NUCLEO boards appear as a USB-flash drive in the file system.
+Programming of the board is done by simply copying the binary into
+thy flash drive letter.
+
+For example, assuming that the NUCLEO board appears as drive E:, 
+you program it with the following command:
+
+copy dbg\dpp.bin E:
+
+
+
 Adjusting Stack and Heap Sizes
 ==============================
 The stack and heap sizes are determined in this project by the GCC linker

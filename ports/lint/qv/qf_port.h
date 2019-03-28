@@ -2,8 +2,8 @@
 /// \brief QF/C++ port to Lint, Generic C++ compiler
 /// \cond
 ///***************************************************************************
-/// Last updated for version 6.3.8
-/// Last updated on  2019-01-11
+/// Last updated for version 6.5.0
+/// Last updated on  2019-03-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -60,7 +60,7 @@
 /// and your own application code. The consistency is guaranteed if you define
 /// this macro only once in the qf_port.h header file and henceforth include
 /// this header file in all builds.
-#define QF_MAX_ACTIVE               14
+#define QF_MAX_ACTIVE               32
 
 /// \brief The maximum number of event pools in the application.
 ///

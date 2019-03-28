@@ -7,15 +7,16 @@ private:
     uint8_t m_opKey;
 
 public:
-    Calc() : QHsm(Q_STATE_CAST(&Calc::initial)) {  // ctor
+    Calc()             // constructor
+      : QHsm(Calc)) {  // superclass' constructor
     }
 
 protected:
-    static QState initial(Calc * const me, QEvt const *e);
-    static QState on     (Calc * const me, QEvt const *e);
-    static QState error  (Calc * const me, QEvt const *e);
-    static QState ready  (Calc * const me, QEvt const *e);
-    static QState result (Calc * const me, QEvt const *e);
-    static QState begin  (Calc * const me, QEvt const *e);
+    Q_STATE_DECL(initial);
+    Q_STATE_DECL(on);
+    Q_STATE_DECL(error);
+    Q_STATE_DECL(ready);
+    Q_STATE_DECL(result);
+    Q_STATE_DECL(begin);
     . . .
 };

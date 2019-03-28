@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.3.0" links="0">
+<model version="4.5.0" links="0">
  <documentation>Simple Blinky example for QP/C++, which demonstrates:
 - Active object (Blinky) with state machine
 - Board Support Package abstraction for portability
@@ -12,18 +12,19 @@
    <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
    <operation name="Blinky" type="" visibility="0x00" properties="0x00">
     <documentation>Blinky constructor</documentation>
-    <code>  : QActive(Q_STATE_CAST(&amp;Blinky::initial)),
+    <code>  : QActive(&amp;initial),
     m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
    </operation>
-   <statechart properties="QS_FUN_DICT">
+   <statechart properties="0x02">
     <initial target="../1">
      <action>QS_OBJ_DICTIONARY(&amp;l_blinky);
 QS_OBJ_DICTIONARY(&amp;l_blinky.m_timeEvt);
 
 // arm the private time event to expire in 1/2s
 // and periodically every 1/2 second
-me-&gt;m_timeEvt.armX(BSP::TICKS_PER_SEC/2,
-                   BSP::TICKS_PER_SEC/2);</action>
+m_timeEvt.armX(BSP::TICKS_PER_SEC/2,
+               BSP::TICKS_PER_SEC/2);
+(void)e; // unused parameter</action>
      <initial_glyph conn="2,3,5,1,20,4,-4">
       <action box="0,-2,6,2"/>
      </initial_glyph>
@@ -58,7 +59,7 @@ me-&gt;m_timeEvt.armX(BSP::TICKS_PER_SEC/2,
    <code>= &amp;l_blinky;</code>
   </attribute>
  </package>
- <directory name=".">
+ <directory name="src">
   <file name="blinky.h">
    <text>#ifndef blinky_h
 #define blinky_h

@@ -86,6 +86,8 @@ The QP/C examples for FreeRTOS are as follows:
 - ARM Cortex-M
     - @subpage freertos_dpp_ek-tm4c123gxl (Cortex-M4F) <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a><br>(ARM-KEIL, GNU-ARM and IAR EWARM toolchains)
     - @subpage freertos_dpp_stm32f746g-disco (Cortex-M7) <a class="preview board" href="bd_STM32F746G-Disco.jpg" title="STM32F746G-Discovery"></a><br>(ARM-KEIL, GNU-ARM and IAR EWARM toolchains)
+    - @subpage freertos_dpp_nucleo-h743zi (Cortex-M7) <a class="preview board" href="bd_NUCLEO-H743ZI.jpg" title="NUCLEO-H743ZI"></a><br>(ARM-KEIL, GNU-ARM and IAR EWARM toolchains)
+    - @subpage freertos_start-stop_nucleo-h743zi (Cortex-M7) <a class="preview board" href="bd_NUCLEO-H743ZI.jpg" title="NUCLEO-H743ZI"></a><br>(ARM-KEIL, GNU-ARM and IAR EWARM toolchains)
 
 @note
 You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; icon in the list below to see the picture of the board.
@@ -139,6 +141,92 @@ Demonstrated features:
 - QP/Spy output over the virtual COM port (Spy build configuration)
 - QP/Spy input over the virtual COM port (bi-directional Spy) (Spy build configuration)
 
+
+@next{freertos_dpp_nucleo-h743zi}
+*/
+/*##########################################################################*/
+/*! @page freertos_dpp_nucleo-h743zi DPP on NUCLEO-H743ZI
+
+@image html bd_NUCLEO-H743ZI.jpg NUCLEO-H743ZI
+
+@ref dpp "Dining Philosophers Problem (DPP)" example for NUCLEO-H743ZI MCU (Cortex-M7).
+
+Features:
+- multiple active objects, including 5 instances of the same AO class (Philo)
+- [QP/Spy software tracing](https://www.state-machine.com/qtools/qpspy.html) using the virtual COM-port
+- bi-directional [QP/Spy](https://www.state-machine.com/qtools/qs.html#qs_rx) (sending commands to the target)
+
+@next{freertos_start-stop_nucleo-h743zi}
+*/
+/*##########################################################################*/
+/*! @page freertos_start-stop_nucleo-h743zi Start-Stop on NUCLEO-H743ZI
+
+@image html bd_NUCLEO-H743ZI.jpg NUCLEO-H743ZI
+
+Start-Stop example for NUCLEO-H743ZI MCU (Cortex-M7) demonstrates staring and stopping active objects multiple times
+during the runtime, as opposed to starting AOs only at the beginning.
+
+The code for the example is generated automatically by the [QM Model-Based Design tool](https://www.state-machine.com/qm/) (QM version 4.5.0 or higher).
+
+The start-stop application consists of two AOs:
+
+- the Launcher AO is started at the beginning and its job is to periodically (re)start another AO
+
+- the Worker AO is NOT started at the beginning, but instead it is instantiated and started by the Launcher AO.
+
+![Launcher and Worker state machines](start-stop.png)
+
+
+The actual visible work is performed by the Worker AO, which blinks the yellow LED (LD1) on the NUCLEO-H743ZI board. After blinking the LED five times, the Worker AO publishes turns the blue LED (LD2), publishes the DONE event and stops itself (by calling QP::QActive::stop() on itself).
+
+The Launcher AO subscribes to the DONE event. Upon reception of this event, The Launcher AO gives the Worker a bit of time (at least one clock tick) to cleanly terminate and then it explicitly destroys the Worker. The Worker destructor turns the blue LED (LD2) off.
+
+Next the Launcher instantiates the Worker AO by means of the placement new operator and then it starts it again to repeat the cycle, which goes no forever.
+
+
+@remarks
+Because this application is intended for embedded real-time systems, it does not use the dynamic memory (heap). Instead it uses statically allocated memory (static mode of FreeRTOS) as well as **placement-new** and explicit destructor call.
+
+
+It is possible to use the standard **new** and **delete** operators with the standard heap, or some customized memory allocation (overloaded new/delete). This goes beyond the scope of this example.
+
+
+**Supported Toolchains** @n
+This example contains sub-directories for building it with various toolchains. The following toolchains are supported:
+
+- ARM-Keil MDK
+- GNU-ARM
+- IAR EWARM
+
+Please refer to the README.txt files in these sub-directories for more information about building and running the examples.
+
+
+**QP/Spy Support** @n
+This example demonstrates the [QP/Spy software tracing](https://www.state-machine.com/qtools/qpspy.html) in the **Spy build configuration**. The QP/Spy uses the virtual COM port provided by the NUCLEO-H743ZI board. To see the QP/Spy output, you need to launch the qspy host utility, as follows (Windows command prompt):
+
+@verbatim
+qspy -u -c COM4
+@endverbatim
+
+where COM4 is the particular virtual serial port registered by your NUCLEO board. You need to adjust the COM port number for your machine.
+
+
+**Programming the NUCLEO Board** @n
+The NUCLEO boards appear as a USB-flash drive in the file system. Programming of the board is done by simply copying the binary into
+thy flash drive letter.
+
+For example, assuming that the NUCLEO board appears as drive E:, you program it with the following command:
+
+@verbatim
+copy dbg\start-stop.bin E:
+@endverbatim
+
+
+**Demonstrated Features** @n
+- multiple active objects (Launcher and Worker)
+- instantiating, starting and stopping active objects multiple times
+- [QP/Spy software tracing](https://www.state-machine.com/qtools/qpspy.html) using the virtual COM-port
+- bi-directional [QP/Spy](https://www.state-machine.com/qtools/qs.html#qs_rx) (sending commands to the target)
 
 @next{exa_threadx examples}
 */

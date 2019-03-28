@@ -162,12 +162,12 @@ The figure below shows the main classes introduced in the QXK kernel and their r
   <li><span class="tag">1</span> The QP::QXThread class represents the extended (blocking) threads of the QXK kernel. It inherits QP::QActive, so that extended-threads can be treated as active objects internally in the framework. However, the extended-threads do not implement state machines. Instead, the data fields used for storing the current state in active objects are re-used to store the private stack of the extended-thread. The QP::QXThread class also contains the @c timeEvt object (see QP::QTimeEvt) for generating timeouts when the extended-thread is blocked.
   </li>
 
-  <li><span class="tag">2</span> The QP::QXMutex class represents the @ref qxk_mutex "priority-ceiling mutex" of the QXK kernel. The mutex can block and can be used only in the extended-threads  and the QXK kernel would assert if an active object (basic thread) would attempt to lock a mutex. The mutex is recursive, meaning that it can be locked multiple times from the same extended thread (but it needs to be unlocked equal number of times).
+  <li><span class="tag">2</span> The QP::QXMutex class represents the @ref QP::QXMutex "priority-ceiling mutex" of the QXK kernel. The mutex can block and can be used only in the extended-threads  and the QXK kernel would assert if an active object (basic thread) would attempt to lock a mutex. The mutex is recursive, meaning that it can be locked multiple times from the same extended thread (but it needs to be unlocked equal number of times).
   </li>
 
 > **NOTE:** Both active objects and extended threads can use the non-blocking, @ref QP::QXK::schedLock() "selective QXK scheduler locking" to protect shared resources.
 
-  <li><span class="tag">3</span> The QP::QXSemaphore class represents the @ref qxk_sema "counting semaphore" of the QXK kernel. The semaphore can be waited on only in the extended threads and the QXK kernel would assert if an active object thread would attempt to wait on a semaphore. On the other hand, a semaphore can be signaled from anywhere in the code, including active objects and ISRs.
+  <li><span class="tag">3</span> The QP::QXSemaphore class represents the @ref QP::QXSemaphore "counting semaphore" of the QXK kernel. The semaphore can be waited on only in the extended threads and the QXK kernel would assert if an active object thread would attempt to wait on a semaphore. On the other hand, a semaphore can be signaled from anywhere in the code, including active objects and ISRs.
   </li>
 </ul>
 

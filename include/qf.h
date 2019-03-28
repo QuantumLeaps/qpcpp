@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated for version 6.5.0
+/// Last updated on  2019-03-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -204,6 +204,12 @@ public:
         this->start(prio, qSto, qLen, stkSto, stkSize,
                     static_cast<QEvt const *>(0));
     }
+
+#ifdef QF_ACTIVE_STOP
+    //! Stops execution of an active object and removes it from the
+    //! framework's supervision.
+    void stop(void);
+#endif
 
 #ifndef Q_SPY
     //! Posts an event @p e directly to the event queue of the active
@@ -434,7 +440,7 @@ public:
     bool wasDisarmed(void);
 
     //! Get the current value of the down-counter of a time event.
-    QTimeEvtCtr ctr(void) const;
+    QTimeEvtCtr currCtr(void) const;
 
 #if (!defined QP_IMPL) && (QP_API_VERSION < 500)
     //! @deprecated TimeEvt ctor provided for backwards compatibility.

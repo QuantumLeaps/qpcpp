@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated for version 6.5.0
+/// Last updated on  2019-03-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -97,10 +97,17 @@ void QActive::start(uint_fast8_t const prio,
     this->init(ie); // take the top-most initial tran. (virtual)
     //QS_FLUSH();     // flush the trace buffer to the host
 }
+//............................................................................
+#ifdef QF_ACTIVE_STOP
+void QActive::stop(void) {
+    unsubscribeAll(); // unsubscribe from all events
+    QF::remove_(this); // remove this object from QF
+}
+#endif
 
 //****************************************************************************
 QActiveDummy::QActiveDummy(void)
-  : QActive(Q_STATE_CAST(0))
+  : QActive(static_cast<QStateHandler>(0))
 {}
 //............................................................................
 void QActiveDummy::start(uint_fast8_t const prio,
