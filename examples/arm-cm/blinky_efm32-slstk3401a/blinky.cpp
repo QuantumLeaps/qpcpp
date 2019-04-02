@@ -46,9 +46,9 @@ public:
     Blinky();
 
 protected:
-    Q_STATE_DCL(initial);
-    Q_STATE_DCL(off);
-    Q_STATE_DCL(on);
+    Q_STATE_DECL(initial);
+    Q_STATE_DECL(off);
+    Q_STATE_DECL(on);
 };
 
 // local bjects --------------------------------------------------------------

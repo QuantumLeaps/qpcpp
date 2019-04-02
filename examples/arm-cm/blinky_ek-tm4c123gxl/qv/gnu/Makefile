@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on EK-TM4C123GXL, QV kernel, GNU-ARM
-# Last Updated for Version: 6.3.8
-# Date of the Last Update:  2018-12-26
+# Last Updated for Version: 6.5.0
+# Date of the Last Update:  2019-03-31
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -191,11 +191,11 @@ ASFLAGS = $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
 CFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
-	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O3 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
-	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O3 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 

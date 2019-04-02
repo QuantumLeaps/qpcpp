@@ -1,13 +1,13 @@
 //****************************************************************************
-// Product: Simple Blinky example
-// Last Updated for Version: 5.8.0
-// Date of the Last Update:  2016-11-30
+// Product: BSP for Blinky
+// Last Updated for Version: 6.5.0
+// Date of the Last Update:  2019-03-24
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -46,9 +46,9 @@ public:
     Blinky();
 
 protected:
-    static QState initial(Blinky * const me, QEvt const * const e);
-    static QState off(Blinky * const me, QEvt const * const e);
-    static QState on(Blinky * const me, QEvt const * const e);
+    Q_STATE_DECL(initial);
+    Q_STATE_DECL(off);
+    Q_STATE_DECL(on);
 };
 
 // local bjects --------------------------------------------------------------
@@ -59,55 +59,55 @@ QActive * const AO_Blinky = &l_blinky; // opaque pointer
 
 //............................................................................
 Blinky::Blinky()
-  : QActive(Q_STATE_CAST(&Blinky::initial)),
+  : QActive(&initial),
     m_timeEvt(this, TIMEOUT_SIG, 0U)
 {
     // empty
 }
 
 // HSM definition ------------------------------------------------------------
-QState Blinky::initial(Blinky * const me, QEvt const * const e) {
+Q_STATE_DEF(Blinky, initial) {
     (void)e; // unused parameter
 
     // arm the time event to expire in half a second and every half second
-    me->m_timeEvt.armX(BSP_TICKS_PER_SEC/2U, BSP_TICKS_PER_SEC/2U);
-    return Q_TRAN(&Blinky::off);
+    m_timeEvt.armX(BSP_TICKS_PER_SEC/2U, BSP_TICKS_PER_SEC/2U);
+    return tran(&off);
 }
 //............................................................................
-QState Blinky::off(Blinky * const me, QEvt const * const e) {
+Q_STATE_DEF(Blinky, off) {
     QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             BSP_ledOff();
-            status = Q_HANDLED();
+            status = Q_RET_HANDLED;
             break;
         }
         case TIMEOUT_SIG: {
-            status = Q_TRAN(&Blinky::on);
+            status = tran(&on);
             break;
         }
         default: {
-            status = Q_SUPER(&QHsm::top);
+            status = super(&top);
             break;
         }
     }
     return status;
 }
 //............................................................................
-QState Blinky::on(Blinky * const me, QEvt const * const e) {
+Q_STATE_DEF(Blinky, on) {
     QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             BSP_ledOn();
-            status = Q_HANDLED();
+            status = Q_RET_HANDLED;
             break;
         }
         case TIMEOUT_SIG: {
-            status = Q_TRAN(&Blinky::off);
+            status = tran(&off);
             break;
         }
         default: {
-            status = Q_SUPER(&QHsm::top);
+            status = super(&top);
             break;
         }
     }
