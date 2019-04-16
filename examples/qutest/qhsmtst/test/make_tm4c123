@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for TM4C123, QUTEST, GNU-ARM
-# Last Updated for Version: 6.4.0
-# Date of the Last Update:  2019-02-24
+# Last Updated for Version: 6.5.0
+# Date of the Last Update:  2019-04-15
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -215,7 +215,7 @@ CPPFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 
 
 LINKFLAGS = -T$(LD_SCRIPT) $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb \
-	-specs=nosys.specs \
+	-specs=nosys.specs -specs=nano.specs \
 	-Wl,-Map,$(BIN_DIR)/$(OUTPUT).map,--cref,--gc-sections $(LIB_DIRS)
 
 ASM_OBJS     := $(patsubst %.s,%.o,  $(notdir $(ASM_SRCS)))

@@ -93,7 +93,7 @@ Hierarchical state machines are represented in QP/C++ as subclasses of the @ref 
 
 <div class="separate"></div>
 @subsection sm_state_decl The Q_STATE_DECL() Macro
-The Q_STATE_DECL() macro declares **two** functions for every state: the "state-caller" **static member** function and the"state-handler" **regular member**  function. So, for example, the declaration of the "on" state Q_STATE_DECL(on) expands to the following two declarations within the `Calc` class:
+The Q_STATE_DECL() macro declares **two** functions for every state: the "state-handler" **regular member**  function and the "state-caller" **static member** function. So, for example, the declaration of the "on" state Q_STATE_DECL(on) expands to the following two declarations within the `Calc` class:
 
 @code{cpp}
 [1] QP::QState on_h(QP::QEvt const * const e); // "state-handler"
@@ -103,9 +103,9 @@ The Q_STATE_DECL() macro declares **two** functions for every state: the "state-
 The two functions have each a different purpose.
 
 <ul class="tag">
-  <li><span class="tag">1</span> The "state-caller" **static member** function is used as a unique "handle" for a state. Internally, the QEP event processor uses **function pointers** to state-callers, which are simple objects (e.g. 32-bit addresses in ARM Cortex-M CPUs). These simple function pointers can be compared quickly and stored efficiently inside the state machine objects.
+  <li><span class="tag">1</span> The "state-handler" `on_h()` is a **regular member** function used to implement the state behavior. As a regular class member, it has convenient, direct access to the state machine class attributes. The "state-handler" is called by the "state-caller".
   </li>
-  <li><span class="tag">2</span> The "state-handler" **regular member** function is used to implement the state behavior. As a regular class member, it has convenient, direct access to the state machine class attributes. The "state-handler" is called by the "state-caller".
+  <li><span class="tag">2</span> The "state-caller" `on()` is a **static member** function that has a simple job to call the state-handler member function on the specified instance of the class. Internally, the QEP event processor uses "state-callers" as unique "handles" for the states. Specifically, the QEP event processor uses the simple **function pointers** to these `state-callers`, which are simple objects (e.g. 32-bit addresses in ARM Cortex-M CPUs), because they don't use the `this` calling convention. These simple function pointers can be stored very efficiently inside the state machine objects and can be compared quickly inside the QEP algorithm that implements the UML semantics of hierarchical state machines.
   </li>
 </ul>
 
@@ -113,7 +113,7 @@ The two functions have each a different purpose.
 @ref sm_call
 
 @remark
-Because the state-handler functions are regular members of the state machine class, they can be `virtual`, which allows them to be overridden in the subclasses of a given state machine class. Such **inheritance of entire sate machines** is an advanced feature, which should be used only in very special circumstances and with great caution. To declare a `virtual` state-handler, you simply prepend `virtual` in front of the Q_STATE_DECL() macro, as in the following examples:
+Because the state-handler functions are regular members of the state machine class, they can be `virtual`, which allows them to be overridden in the subclasses of a given state machine class. Such **inheritance of entire sate machines** is an advanced concept, which should be used only in very special circumstances and with great caution. To declare a `virtual` state-handler, you simply prepend `virtual` in front of the Q_STATE_DECL() macro, as in the following examples:
 @code{cpp}
 virtual Q_STATE_DECL(on);
 virtual Q_STATE_DECL(ready);
@@ -134,15 +134,15 @@ Every state that has been declared with the @ref sm_decl "Q_STATE_DECL()" macro 
 
 @code{cpp}
 [1] QP::QState Calc::ready(void * const me, QP::QEvt const * const e) {
-        return static_cast<Calc *>(me)->on_h(e);
+        return static_cast<Calc *>(me)->ready_h(e);
     }
 [2] QP::QState Calc::ready_h(QP::QEvt const * const e)
 @endcode
 
 <ul class="tag">
-  <li><span class="tag">1</span> The static `Calc::on()` state-caller function is fully defined to call the "state-handler" function on the provided `me` pointer, which is explicitly cast to the class instance.
+  <li><span class="tag">1</span> The static `Calc::ready()` state-caller function is fully defined to call the "state-handler" function on the provided `me` pointer, which is explicitly cast to the class instance.
   </li>
-  <li><span class="tag">2</span> The signature of the `Calc::on_h()` "state-handler" member function is provided, which needs to be followed by the body (`{...}`) of the "state-handler" member function.
+  <li><span class="tag">2</span> The signature of the `Calc::ready_h()` "state-handler" member function is provided, which needs to be followed by the body (`{...}`) of the "state-handler" member function.
   </li>
 </ul>
 
