@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.0.0" links="0">
+<model version="4.5.0" links="0">
  <documentation>Dining Philosopher Problem example for Qt with GUI</documentation>
  <framework name="qpcpp"/>
  <package name="Qt-port" stereotype="0x00" namespace="QP::">
@@ -47,7 +47,7 @@ int main() {
 }</code>
    </operation>
    <operation name="postFIFO" type="void" visibility="0x00" properties="0x00">
-    <documentation>Posts an event e directly to the event queue of the acitve object me using the First-In-First-Out (FIFO) policy.
+    <documentation>Posts an event e directly to the event queue of the acitve object this using the First-In-First-Out (FIFO) policy.
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
@@ -59,12 +59,12 @@ extern QActive *AO_Table;
 
 . . .
 pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
-pe-&gt;philNum = me-&gt;num;
+pe-&gt;philNum = num;
 
 AO_Table-&gt;postFIFO(pe); // &lt;==</code>
    </operation>
    <operation name="postLIFO" type="void" visibility="0x00" properties="0x00">
-    <documentation>Posts an event e directly to the event queue of the acitve object me using the Last-In-First-Out (LIFO) policy.
+    <documentation>Posts an event e directly to the event queue of the acitve object this using the Last-In-First-Out (LIFO) policy.
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
@@ -75,9 +75,9 @@ NOTE: Direct event posting should not be confused with direct event dispatching.
     <code>// Example:
 . . .
 pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
-pe-&gt;philNum = me-&gt;num;
+pe-&gt;philNum = num;
 . . .
-me-&gt;postLIFO(pe); // &lt;==</code>
+postLIFO(pe); // &lt;==</code>
    </operation>
   </class>
   <class name="GuiQMActive" superclass="qpcpp::QMActive">
@@ -124,7 +124,7 @@ int main() {
 }</code>
    </operation>
    <operation name="postFIFO" type="void" visibility="0x00" properties="0x00">
-    <documentation>Posts an event e directly to the event queue of the acitve object me using the First-In-First-Out (FIFO) policy.
+    <documentation>Posts an event e directly to the event queue of the acitve object this using the First-In-First-Out (FIFO) policy.
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
@@ -136,12 +136,12 @@ extern QActive *AO_Table;
 
 . . .
 pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
-pe-&gt;philNum = me-&gt;num;
+pe-&gt;philNum = num;
 
 AO_Table-&gt;postFIFO(pe); // &lt;==</code>
    </operation>
    <operation name="postLIFO" type="void" visibility="0x00" properties="0x00">
-    <documentation>Posts an event e directly to the event queue of the acitve object me using the Last-In-First-Out (LIFO) policy.
+    <documentation>Posts an event e directly to the event queue of the acitve object this using the Last-In-First-Out (LIFO) policy.
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
@@ -152,9 +152,9 @@ NOTE: Direct event posting should not be confused with direct event dispatching.
     <code>// Example:
 . . .
 pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
-pe-&gt;philNum = me-&gt;num;
+pe-&gt;philNum = num;
 . . .
-me-&gt;postLIFO(pe); // &lt;==</code>
+postLIFO(pe); // &lt;==</code>
    </operation>
   </class>
  </package>
@@ -174,7 +174,7 @@ me-&gt;postLIFO(pe); // &lt;==</code>
     <code> : QActive(Q_STATE_CAST(&amp;Philo::initial)),
    m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
    </operation>
-   <statechart>
+   <statechart properties="0x02">
     <initial target="../1">
      <action>static bool registered = false; // starts off with 0, per C-standard
 (void)e; // suppress the compiler warning about unused parameter
@@ -197,17 +197,17 @@ if (!registered) {
     QS_FUN_DICTIONARY(&amp;Philo::hungry);
     QS_FUN_DICTIONARY(&amp;Philo::eating);
 }
-QS_SIG_DICTIONARY(HUNGRY_SIG, me);  // signal for each Philos
-QS_SIG_DICTIONARY(TIMEOUT_SIG, me); // signal for each Philos
+QS_SIG_DICTIONARY(HUNGRY_SIG, this);  // signal for each Philos
+QS_SIG_DICTIONARY(TIMEOUT_SIG, this); // signal for each Philos
 
-me-&gt;subscribe(EAT_SIG);</action>
+subscribe(EAT_SIG);</action>
      <initial_glyph conn="2,3,5,1,20,5,-3">
       <action box="0,-2,6,2"/>
      </initial_glyph>
     </initial>
     <state name="thinking">
-     <entry>me-&gt;m_timeEvt.postIn(me, think_time());</entry>
-     <exit>(void)me-&gt;m_timeEvt.disarm();</exit>
+     <entry>m_timeEvt.postIn(this, think_time());</entry>
+     <exit>(void)m_timeEvt.disarm();</exit>
      <tran trig="TIMEOUT" target="../../2">
       <tran_glyph conn="2,14,3,1,20,11,-3">
        <action box="0,-2,6,2"/>
@@ -215,7 +215,7 @@ me-&gt;subscribe(EAT_SIG);</action>
      </tran>
      <tran trig="EAT, DONE">
       <action>/* EAT or DONE must be for other Philos than this one */
-Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
+Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
       <tran_glyph conn="2,18,3,-1,13">
        <action box="0,-2,14,2"/>
       </tran_glyph>
@@ -226,10 +226,10 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
      </state_glyph>
     </state>
     <state name="hungry">
-     <entry>AO_Table-&gt;POST(Q_NEW(TableEvt, HUNGRY_SIG, PHILO_ID(me)), me);</entry>
+     <entry>AO_Table-&gt;POST(Q_NEW(TableEvt, HUNGRY_SIG, PHILO_ID(this)), this);</entry>
      <tran trig="EAT">
       <choice target="../../../3">
-       <guard>Q_EVT_CAST(TableEvt)-&gt;philoNum == PHILO_ID(me)</guard>
+       <guard>Q_EVT_CAST(TableEvt)-&gt;philoNum == PHILO_ID(this)</guard>
        <choice_glyph conn="15,30,5,1,7,13,-3">
         <action box="1,0,19,4"/>
        </choice_glyph>
@@ -240,7 +240,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
      </tran>
      <tran trig="DONE">
       <action>/* DONE must be for other Philos than this one */
-Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
+Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
       <tran_glyph conn="2,36,3,-1,14">
        <action box="0,-2,14,2"/>
       </tran_glyph>
@@ -250,9 +250,9 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
      </state_glyph>
     </state>
     <state name="eating">
-     <entry>me-&gt;m_timeEvt.postIn(me, think_time());</entry>
-     <exit>QP::QF::PUBLISH(Q_NEW(TableEvt, DONE_SIG, PHILO_ID(me)), me);
-(void)me-&gt;m_timeEvt.disarm();</exit>
+     <entry>m_timeEvt.postIn(this, think_time());</entry>
+     <exit>QP::QF::PUBLISH(Q_NEW(TableEvt, DONE_SIG, PHILO_ID(this)), this);
+(void)m_timeEvt.disarm();</exit>
      <tran trig="TIMEOUT" target="../../1">
       <tran_glyph conn="2,51,3,1,22,-41,-5">
        <action box="0,-2,6,2"/>
@@ -260,7 +260,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
      </tran>
      <tran trig="EAT, DONE">
       <action>/* EAT or DONE must be for other Philos than this one */
-Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(me));</action>
+Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
       <tran_glyph conn="2,55,3,-1,13">
        <action box="0,-2,14,2"/>
       </tran_glyph>
@@ -284,7 +284,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     m_isHungry[n] = false;
 }</code>
    </operation>
-   <statechart>
+   <statechart properties="0x02">
     <initial target="../1/2">
      <action>(void)e; // suppress the compiler warning about unused parameter
 
@@ -300,15 +300,15 @@ QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
 QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
 QS_SIG_DICTIONARY(TERMINATE_SIG, (void *)0);
 
-QS_SIG_DICTIONARY(HUNGRY_SIG,    me); // signal just for Table
+QS_SIG_DICTIONARY(HUNGRY_SIG,    this); // signal just for Table
 
-me-&gt;subscribe(DONE_SIG);
-me-&gt;subscribe(PAUSE_SIG);
-me-&gt;subscribe(TERMINATE_SIG);
+subscribe(DONE_SIG);
+subscribe(PAUSE_SIG);
+subscribe(TERMINATE_SIG);
 
 for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
-    me-&gt;m_fork[n] = FREE;
-    me-&gt;m_isHungry[n] = false;
+    m_fork[n] = FREE;
+    m_isHungry[n] = false;
     BSP_displayPhilStat(n, THINKING);
 }</action>
      <initial_glyph conn="3,3,5,1,44,18,-9">
@@ -330,29 +330,29 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
      </tran>
      <state name="serving">
       <entry brief="give pending permitions to eat">for (uint8_t n = 0U; n &lt; N_PHILO; ++n) { // give permissions to eat...
-    if (me-&gt;m_isHungry[n]
-        &amp;&amp; (me-&gt;m_fork[LEFT(n)] == FREE)
-        &amp;&amp; (me-&gt;m_fork[n] == FREE))
+    if (m_isHungry[n]
+        &amp;&amp; (m_fork[LEFT(n)] == FREE)
+        &amp;&amp; (m_fork[n] == FREE))
     {
-        me-&gt;m_fork[LEFT(n)] = USED;
-        me-&gt;m_fork[n] = USED;
-        QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, n), me);
-        me-&gt;m_isHungry[n] = false;
+        m_fork[LEFT(n)] = USED;
+        m_fork[n] = USED;
+        QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, n), this);
+        m_isHungry[n] = false;
         BSP_displayPhilStat(n, EATING);
     }
 }</entry>
       <tran trig="HUNGRY">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // phil ID must be in range and he must be not hungry
-Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!me-&gt;m_isHungry[n]));
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
 
 BSP_displayPhilStat(n, HUNGRY);
 uint8_t m = LEFT(n);</action>
        <choice>
-        <guard brief="both free">(me-&gt;m_fork[m] == FREE) &amp;&amp; (me-&gt;m_fork[n] == FREE)</guard>
-        <action>me-&gt;m_fork[m] = USED;
-me-&gt;m_fork[n] = USED;
-QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, n), me);
+        <guard brief="both free">(m_fork[m] == FREE) &amp;&amp; (m_fork[n] == FREE)</guard>
+        <action>m_fork[m] = USED;
+m_fork[n] = USED;
+QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, n), this);
 BSP_displayPhilStat(n, EATING);</action>
         <choice_glyph conn="19,26,5,-1,10">
          <action box="1,0,10,2"/>
@@ -360,7 +360,7 @@ BSP_displayPhilStat(n, EATING);</action>
        </choice>
        <choice>
         <guard>else</guard>
-        <action>me-&gt;m_isHungry[n] = true;</action>
+        <action>m_isHungry[n] = true;</action>
         <choice_glyph conn="19,26,4,-1,5,10">
          <action box="1,5,6,2"/>
         </choice_glyph>
@@ -372,31 +372,31 @@ BSP_displayPhilStat(n, EATING);</action>
       <tran trig="DONE">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // phil ID must be in range and he must be not hungry
-Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!me-&gt;m_isHungry[n]));
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
 
 BSP_displayPhilStat(n, THINKING);
 uint8_t m = LEFT(n);
 // both forks of Phil[n] must be used
-Q_ASSERT((me-&gt;m_fork[n] == USED) &amp;&amp; (me-&gt;m_fork[m] == USED));
+Q_ASSERT((m_fork[n] == USED) &amp;&amp; (m_fork[m] == USED));
 
-me-&gt;m_fork[m] = FREE;
-me-&gt;m_fork[n] = FREE;
+m_fork[m] = FREE;
+m_fork[n] = FREE;
 m = RIGHT(n); // check the right neighbor
 
-if (me-&gt;m_isHungry[m] &amp;&amp; (me-&gt;m_fork[m] == FREE)) {
-    me-&gt;m_fork[n] = USED;
-    me-&gt;m_fork[m] = USED;
-    me-&gt;m_isHungry[m] = false;
-    QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, m), me);
+if (m_isHungry[m] &amp;&amp; (m_fork[m] == FREE)) {
+    m_fork[n] = USED;
+    m_fork[m] = USED;
+    m_isHungry[m] = false;
+    QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, m), this);
     BSP_displayPhilStat(m, EATING);
 }
 m = LEFT(n); // check the left neighbor
 n = LEFT(m); // left fork of the left neighbor
-if (me-&gt;m_isHungry[m] &amp;&amp; (me-&gt;m_fork[n] == FREE)) {
-    me-&gt;m_fork[m] = USED;
-    me-&gt;m_fork[n] = USED;
-    me-&gt;m_isHungry[m] = false;
-    QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, m), me);
+if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
+    m_fork[m] = USED;
+    m_fork[n] = USED;
+    m_isHungry[m] = false;
+    QP::QF::PUBLISH(Q_NEW(TableEvt, EAT_SIG, m), this);
     BSP_displayPhilStat(m, EATING);
 }</action>
        <tran_glyph conn="4,34,3,-1,15">
@@ -429,8 +429,8 @@ if (me-&gt;m_isHungry[m] &amp;&amp; (me-&gt;m_fork[n] == FREE)) {
       <tran trig="HUNGRY">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // philo ID must be in range and he must be not hungry
-Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!me-&gt;m_isHungry[n]));
-me-&gt;m_isHungry[n] = true;
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
+m_isHungry[n] = true;
 BSP_displayPhilStat(n, HUNGRY);</action>
        <tran_glyph conn="4,60,3,-1,15">
         <action box="0,-2,6,2"/>
@@ -439,15 +439,15 @@ BSP_displayPhilStat(n, HUNGRY);</action>
       <tran trig="DONE">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // phil ID must be in range and he must be not hungry
-Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!me-&gt;m_isHungry[n]));
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
 
 BSP_displayPhilStat(n, THINKING);
 uint8_t m = LEFT(n);
 /* both forks of Phil[n] must be used */
-Q_ASSERT((me-&gt;m_fork[n] == USED) &amp;&amp; (me-&gt;m_fork[m] == USED));
+Q_ASSERT((m_fork[n] == USED) &amp;&amp; (m_fork[m] == USED));
 
-me-&gt;m_fork[m] = FREE;
-me-&gt;m_fork[n] = FREE;</action>
+m_fork[m] = FREE;
+m_fork[n] = FREE;</action>
        <tran_glyph conn="4,63,3,-1,15">
         <action box="0,-2,6,2"/>
        </tran_glyph>
@@ -523,7 +523,7 @@ inline QP::QTimeEvtCtr eat_time() {
                                         + BSP_TICKS_PER_SEC);
 }
 
-// helper function to provide the ID of Philo &quot;me&quot;
+// helper function to provide the ID of Philo &quot;this&quot;
 inline uint8_t PHILO_ID(Philo const * const me) {
     return static_cast&lt;uint8_t&gt;(me - l_philo);
 }
