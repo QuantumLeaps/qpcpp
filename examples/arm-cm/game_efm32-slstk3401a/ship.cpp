@@ -148,10 +148,14 @@ Q_STATE_DEF(Ship, flying) {
     switch (e->sig) {
         //${AOs::Ship::SM::active::flying}
         case Q_ENTRY_SIG: {
-            m_score = 0U; /* reset the score */
+            m_score = 0U; // reset the score
             ScoreEvt *sev = Q_NEW(ScoreEvt, SCORE_SIG);
             sev->score = m_score;
             AO_Tunnel->POST(sev, this);
+
+            // lauch the ship from the initial position
+            m_x = GAME_SHIP_X;
+            m_y = (GAME_SHIP_Y << 2);
             status_ = Q_RET_HANDLED;
             break;
         }

@@ -530,10 +530,14 @@ QS_SIG_DICTIONARY(DESTROYED_MINE_SIG,   this);
       <state_glyph node="4,10,26,8"/>
      </state>
      <state name="flying">
-      <entry>m_score = 0U; /* reset the score */
+      <entry>m_score = 0U; // reset the score
 ScoreEvt *sev = Q_NEW(ScoreEvt, SCORE_SIG);
 sev-&gt;score = m_score;
-AO_Tunnel-&gt;POST(sev, this);</entry>
+AO_Tunnel-&gt;POST(sev, this);
+
+// lauch the ship from the initial position
+m_x = GAME_SHIP_X;
+m_y = (GAME_SHIP_Y &lt;&lt; 2);</entry>
       <tran trig="TIME_TICK">
        <action>if (BSP_isThrottle()) {
     if (m_y &gt; 0U) {
