@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, STM32F4-Discovery board, preemptive QK kernel
-// Last Updated for Version: 5.9.7
-// Date of the Last Update:  2017-08-20
+// Last Updated for Version: 6.5.0
+// Date of the Last Update:  2019-05-09
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
 #include "qpcpp.h"
@@ -46,26 +46,6 @@ Q_DEFINE_THIS_FILE
 
 // namespace DPP *************************************************************
 namespace DPP {
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-// DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-//
-enum KernelUnawareISRs { // see NOTE00
-    USART2_PRIO,
-    // ...
-    MAX_KERNEL_UNAWARE_CMSIS_PRI  // keep always last
-};
-// "kernel-unaware" interrupts can't overlap "kernel-aware" interrupts
-Q_ASSERT_COMPILE(MAX_KERNEL_UNAWARE_CMSIS_PRI <= QF_AWARE_ISR_CMSIS_PRI);
-
-enum KernelAwareISRs {
-    SYSTICK_PRIO = QF_AWARE_ISR_CMSIS_PRI, // see NOTE00
-    // ...
-    MAX_KERNEL_AWARE_CMSIS_PRI // keep always last
-};
-// "kernel-aware" interrupts should not overlap the PendSV priority
-Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 
 // Local-scope objects -------------------------------------------------------
 #define LED_GPIO_PORT     GPIOD
@@ -200,14 +180,6 @@ void BSP::init(void) {
 
     GPIO_InitTypeDef GPIO_struct;
 
-    // NOTE: SystemInit() already called from the startup code
-    //  but SystemCoreClock needs to be updated
-    SystemCoreClockUpdate();
-
-    // Explictily Disable the automatic FPU state preservation as well as
-    // the FPU lazy stacking
-    FPU->FPCCR &= ~((1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos));
-
     // Initialize thr port for the LEDs
     RCC_AHB1PeriphClockCmd(LED_GPIO_CLK , ENABLE);
 
@@ -268,7 +240,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
         LED_GPIO_PORT->BSRRL = LED5_PIN; // turn LED on
     }
     else {
-        LED_GPIO_PORT->BSRRH = LED5_PIN; // turn LED on
+        LED_GPIO_PORT->BSRRH = LED5_PIN; // turn LED off
     }
 
     QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
@@ -282,12 +254,12 @@ void BSP::displayPaused(uint8_t paused) {
         LED_GPIO_PORT->BSRRL = LED4_PIN; // turn LED on
     }
     else {
-        LED_GPIO_PORT->BSRRH = LED4_PIN; // turn LED on
+        LED_GPIO_PORT->BSRRH = LED4_PIN; // turn LED off
     }
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
-    // The flating point code is to exercise the FPU
+    // Some flating point code is to exercise the FPU...
     float volatile x = 3.1415926F;
     x = x + 2.7182818F;
 
@@ -323,17 +295,19 @@ void QF::onStartup(void) {
     // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
     SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
 
-    // assing all priority bits for preemption-prio. and none to sub-prio.
+    // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
-    // set priorities of ALL ISRs used in the system, see NOTE00
-    //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // Assign a priority to EVERY ISR explicitly, see NOTE00.
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     //
-    NVIC_SetPriority(USART2_IRQn,    DPP::USART2_PRIO);
-    NVIC_SetPriority(SysTick_IRQn,   DPP::SYSTICK_PRIO);
+    // kernel UNAWARE interrupts, see NOTE00
+    NVIC_SetPriority(USART2_IRQn,    0U);
+    // ...
+
+    // kernel AWARE interrupts, see NOTE00
+    NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI);
     // ...
 
     // enable IRQs...
@@ -373,7 +347,7 @@ void QK::onIdle(void) {
 #elif defined NDEBUG
     // Put the CPU and peripherals to the low-power mode.
     // you might need to customize the clock management for your application,
-    // see the datasheet for your particular Cortex-M3 MCU.
+    // see the datasheet for your particular Cortex-M MCU.
     //
     // !!!CAUTION!!!
     // The WFI instruction stops the CPU clock, which unfortunately disables
@@ -382,7 +356,7 @@ void QK::onIdle(void) {
     //
     // NOTE: If you find your board "frozen" like this, strap BOOT0 to VDD and
     // reset the board, then connect with ST-Link Utilities and erase the part.
-    // The trick with BOOT(0) is it gets the part to run the System Loader
+    // The trick with BOOT(0) is that it gets the part to run the System Loader
     // instead of your broken code. When done disconnect BOOT0, and start over.
     //
     //__WFI();  // Wait-For-Interrupt
