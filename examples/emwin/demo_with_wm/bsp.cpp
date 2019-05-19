@@ -167,5 +167,25 @@ void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY // define QS callbacks
+
+//............................................................................
+//! callback function to execute a user command (to be implemented in BSP)
+void QS::onCommand(uint8_t cmdId,
+    uint32_t param1, uint32_t param2, uint32_t param3)
+{
+    switch (cmdId) {
+    case 0U: {
+        break;
+    }
+    default:
+        break;
+    }
+
+    // unused parameters
+    (void)param1;
+    (void)param2;
+    (void)param3;
+}
+
 #endif // Q_SPY
 //----------------------------------------------------------------------------
