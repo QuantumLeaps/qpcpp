@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.5.0
-/// Last updated on  2019-03-26
+/// Last updated for version 6.5.1
+/// Last updated on  2019-05-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -850,6 +850,9 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
             rxReportAck_(QS_RX_COMMAND);
             QS::onCommand(l_rx.var.cmd.cmdId, l_rx.var.cmd.param1,
                          l_rx.var.cmd.param2, l_rx.var.cmd.param3);
+#ifdef Q_UTEST
+            QS::processTestEvts_(); // process all events produced
+#endif
             rxReportDone_(QS_RX_COMMAND);
             break;
         }
@@ -1057,7 +1060,6 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
 
             if (l_rx.var.evt.prio == static_cast<uint8_t>(0)) { // publish
                 QF::PUBLISH(l_rx.var.evt.e, &QS::rxPriv_);
-                rxReportDone_(QS_RX_EVENT);
             }
             else if (l_rx.var.evt.prio < static_cast<uint8_t>(QF_MAX_ACTIVE))
             {

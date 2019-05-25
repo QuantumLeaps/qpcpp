@@ -13,7 +13,6 @@ def on_reset():
     current_obj(OBJ_SM_AO,"l_blinky")
     current_obj(OBJ_TE,"l_blinky.m_timeEvt")
 
-
 test("TIMEOUT_SIG->l_blinky")
 query_curr(OBJ_SM)
 expect("@timestamp Query-SM Obj=l_blinky,State=off")
