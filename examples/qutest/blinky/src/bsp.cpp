@@ -37,7 +37,7 @@
 
 using namespace QP;
 
-Q_DEFINE_THIS_FILE
+//Q_DEFINE_THIS_FILE
 
 enum {
    LED = QS_USER
@@ -60,3 +60,4 @@ void BSP::ledOn(void) {
        QS_U8(1, 1);
     QS_END()
 }
+
