@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-29
+/// Last updated for version 6.5.1
+/// Last updated on  2019-05-31
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -247,7 +247,7 @@ void QS::onTestLoop() {
 
     rxPriv_.inTestLoop = true;
     while (rxPriv_.inTestLoop) {
-        static struct timeval const timeout = {
+        struct timeval timeout = {
             (long)0, (long)(QS_IMEOUT_MS * 1000)
         };
         int status;

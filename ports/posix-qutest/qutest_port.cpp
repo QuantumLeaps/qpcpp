@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated for version 6.5.1
+/// Last updated on  2019-05-31
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -253,7 +253,7 @@ void QS::onTestLoop() {
 
     rxPriv_.inTestLoop = true;
     while (rxPriv_.inTestLoop) {
-        static struct timeval timeout = {
+        struct timeval timeout = {
             (long)0, (long)(QS_IMEOUT_MS * 1000)
         };
         int nrec;
