@@ -1,13 +1,13 @@
-//***************************************************************************
-// Product: BSP for "Blinky" example
-// Last updated for version 6.3.1
-// Last updated on  2018-05-21
+//****************************************************************************
+// Product: Simple Blinky example
+// Last Updated for Version: 5.8.0
+// Date of the Last Update:  2016-11-30
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,36 +28,22 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://www.state-machine.com
+// https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"  // QP/C++ framework API
-#include "blinky.h" // Blinky application
-#include "bsp.h"    // Board Support Package interface
+#ifndef blinky_h
+#define blinky_h
 
 using namespace QP;
 
-//Q_DEFINE_THIS_FILE
+enum BlinkySignals {
+    DUMMY_SIG = Q_USER_SIG,
+    MAX_PUB_SIG,  // the last published signal
 
-enum {
-   LED = QS_USER
+    TIMEOUT_SIG,
+    MAX_SIG       // the last signal
 };
 
-//............................................................................
-void BSP::init() {
-    QS_FUN_DICTIONARY(&QHsm::top);
-    QS_USR_DICTIONARY(LED);
-}
-//............................................................................
-void BSP::ledOff(void) {
-    QS_BEGIN(LED, AO_Blinky)
-       QS_U8(1, 0);
-    QS_END()
-}
-//............................................................................
-void BSP::ledOn(void) {
-    QS_BEGIN(LED, AO_Blinky)
-       QS_U8(1, 1);
-    QS_END()
-}
+extern QActive * const AO_Blinky; // opaque pointer
 
+#endif // blinky_h

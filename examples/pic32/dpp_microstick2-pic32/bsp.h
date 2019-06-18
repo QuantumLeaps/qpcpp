@@ -1,7 +1,7 @@
-//***************************************************************************
-// Product: BSP for "Blinky" example
-// Last updated for version 6.3.1
-// Last updated on  2018-05-21
+//****************************************************************************
+// Product: DPP example
+// Last Updated for Version: 5.8.1
+// Date of the Last Update:  2016-12-12
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,36 +28,34 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://www.state-machine.com
+// https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"  // QP/C++ framework API
-#include "blinky.h" // Blinky application
-#include "bsp.h"    // Board Support Package interface
+#ifndef bsp_h
+#define bsp_h
 
-using namespace QP;
+namespace DPP {
 
-//Q_DEFINE_THIS_FILE
+class BSP {
+public:
+    enum { TICKS_PER_SEC = 100 };
 
-enum {
-   LED = QS_USER
+    static void init(void);
+    static void displayPaused(uint8_t const paused);
+    static void displayPhilStat(uint8_t const n, char_t const *stat);
+    static void terminate(int16_t const result);
+
+    static void randomSeed(uint32_t const seed); // random seed
+    static uint32_t random(void); // pseudo-random generator
+
+    // for testing...
+    static void wait4SW1(void);
+    static void ledOn(void);
+    static void ledOff(void);
 };
 
-//............................................................................
-void BSP::init() {
-    QS_FUN_DICTIONARY(&QHsm::top);
-    QS_USR_DICTIONARY(LED);
-}
-//............................................................................
-void BSP::ledOff(void) {
-    QS_BEGIN(LED, AO_Blinky)
-       QS_U8(1, 0);
-    QS_END()
-}
-//............................................................................
-void BSP::ledOn(void) {
-    QS_BEGIN(LED, AO_Blinky)
-       QS_U8(1, 1);
-    QS_END()
-}
+extern QP::QActive *the_Ticker0;
 
+} // namespace DPP
+
+#endif // bsp_h

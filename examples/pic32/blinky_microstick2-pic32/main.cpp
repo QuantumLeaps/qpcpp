@@ -1,13 +1,13 @@
-//***************************************************************************
-// Product: BSP for "Blinky" example
-// Last updated for version 6.3.1
-// Last updated on  2018-05-21
+//****************************************************************************
+// Product: Simple Blinky example
+// Last Updated for Version: 5.4.0
+// Date of the Last Update:  2015-05-04
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,36 +28,26 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://www.state-machine.com
-// mailto:info@state-machine.com
+// Web  : https://state-machine.com
+// Email: info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"  // QP/C++ framework API
-#include "blinky.h" // Blinky application
-#include "bsp.h"    // Board Support Package interface
+#include "qpcpp.h"
+#include "bsp.h"
+#include "blinky.h"
 
-using namespace QP;
+int main() {
+    static QEvt const *blinkyQSto[10]; // Event queue storage for Blinky
 
-//Q_DEFINE_THIS_FILE
+    BSP_init(); // initialize the Board Support Package
+    QF::init(); // initialize the framework and the underlying RT kernel
 
-enum {
-   LED = QS_USER
-};
+    // publish-subscribe not used, no call to QF::psInit()
+    // dynamic event allocation not used, no call to QF::poolInit()
 
-//............................................................................
-void BSP::init() {
-    QS_FUN_DICTIONARY(&QHsm::top);
-    QS_USR_DICTIONARY(LED);
+    // instantiate and start the active objects...
+    AO_Blinky->start(1U,                            // priority
+                     blinkyQSto, Q_DIM(blinkyQSto), // event queue
+                     (void *)0, 0U);                // stack (unused)
+
+    return QF::run(); // run the QF application
 }
-//............................................................................
-void BSP::ledOff(void) {
-    QS_BEGIN(LED, AO_Blinky)
-       QS_U8(1, 0);
-    QS_END()
-}
-//............................................................................
-void BSP::ledOn(void) {
-    QS_BEGIN(LED, AO_Blinky)
-       QS_U8(1, 1);
-    QS_END()
-}
-
