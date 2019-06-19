@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.5.1
-/// Last updated on  2019-05-31
+/// Last Updated for Version: 6.5.1
+/// Date of the Last Update:  2019-06-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -38,7 +38,7 @@
 ///
 
 #ifndef Q_SPY
-    #error "Q_SPY must be defined for QTEST application"
+    #error "Q_SPY must be defined for QUTest application"
 #endif // Q_SPY
 
 #define QP_IMPL       // this is QP implementation
@@ -67,7 +67,7 @@
 #define QS_TX_SIZE     (8*1024)
 #define QS_RX_SIZE     (2*1024)
 #define QS_TX_CHUNK    QS_TX_SIZE
-#define QS_IMEOUT_MS   100
+#define QS_TIMEOUT_MS  10
 
 namespace QP {
 
@@ -81,7 +81,7 @@ bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
     static uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
     char hostName[128];
-    char const *serviceName = "6601";  // default QSPY server port
+    char const *serviceName = "6601";   // default QSPY server port
     char const *src;
     char *dst;
     int status;
@@ -215,10 +215,10 @@ void QS::onFlush(void) {
             if (nSent == SOCKET_ERROR) { // sending failed?
                 int err = WSAGetLastError();
                 if (err == WSAEWOULDBLOCK) {
-                    // sleep for 10ms and then loop back
+                    // sleep for the timeout and then loop back
                     // to send() the SAME data again
                     //
-                    Sleep(10);
+                    Sleep(QS_TIMEOUT_MS);
                 }
                 else { // some other socket error...
                     fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
@@ -227,7 +227,7 @@ void QS::onFlush(void) {
                 }
             }
             else if (nSent < (int)nBytes) { // sent fewer than requested?
-                Sleep(10); // sleep for 10ms
+                Sleep(QS_TIMEOUT_MS); // sleep for the timeout
                 // adjust the data and loop back to send() the rest
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
@@ -247,16 +247,13 @@ void QS::onTestLoop() {
 
     rxPriv_.inTestLoop = true;
     while (rxPriv_.inTestLoop) {
-        struct timeval timeout = {
-            (long)0, (long)(QS_IMEOUT_MS * 1000)
-        };
-        int status;
-        int ch;
-
         FD_SET(l_sock, &readSet);
 
         // selective, timed blocking on the TCP/IP socket...
-        status = select(0, &readSet, (fd_set *)0, (fd_set *)0, &timeout);
+        struct timeval timeout = {
+            (long)0, (long)(QS_TIMEOUT_MS * 1000)
+        };
+        int status = select(0, &readSet, (fd_set *)0, (fd_set *)0, &timeout);
         if (status == SOCKET_ERROR) {
             fprintf(stderr,
                 "<TARGET> ERROR socket select,WSAErr=%d",
@@ -264,7 +261,7 @@ void QS::onTestLoop() {
             onCleanup();
             exit(-2);
         }
-        else if (FD_ISSET(l_sock, &readSet)) {
+        else if (FD_ISSET(l_sock, &readSet)) { // socket ready?
             uint8_t buf[QS_RX_SIZE];
             int status = recv(l_sock, (char *)buf, (int)sizeof(buf), 0);
             while (status > 0) { // any data received?
@@ -285,7 +282,7 @@ void QS::onTestLoop() {
         // flush the QS TX buffer
         onFlush();
 
-        ch = 0;
+        int ch = 0;
         while (_kbhit()) { // any key pressed?
             ch = _getch();
         }

@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-29
+/// Last Updated for Version: 6.5.1
+/// Date of the Last Update:  2019-06-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -36,6 +36,7 @@
 ///***************************************************************************
 /// @endcond
 ///
+
 #ifndef Q_SPY
     #error "Q_SPY must be defined to compile qs_port.cpp"
 #endif // Q_SPY
@@ -49,11 +50,24 @@
 #include <stdlib.h>
 #include <time.h>
 #include <conio.h>
-#include <ws2tcpip.h> // for Windows sockets
+
+// Minimum required Windows version is Windows-XP or newer (0x0501)
+#ifdef WINVER
+#undef WINVER
+#endif
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif
+
+#define WINVER _WIN32_WINNT_WINXP
+#define _WIN32_WINNT _WIN32_WINNT_WINXP
+
+#include <ws2tcpip.h>
 
 #define QS_TX_SIZE     (8*1024)
 #define QS_RX_SIZE     (2*1024)
 #define QS_TX_CHUNK    QS_TX_SIZE
+#define QS_TIMEOUT_MS  10
 
 namespace QP {
 
@@ -188,6 +202,7 @@ void QS::onReset(void) {
 void QS::onFlush(void) {
     uint16_t nBytes;
     uint8_t const *data;
+    QS_CRIT_STAT_
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         fprintf(stderr, "<TARGET> ERROR   invalid TCP socket\n");
@@ -195,16 +210,18 @@ void QS::onFlush(void) {
     }
 
     nBytes = QS_TX_CHUNK;
+    QS_CRIT_ENTRY_();
     while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
+        QS_CRIT_EXIT_();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
                 int err = WSAGetLastError();
                 if (err == WSAEWOULDBLOCK) {
-                    // sleep for 10ms and then loop back
+                    // sleep for the timeout and then loop back
                     // to send() the SAME data again
                     //
-                    Sleep(10);
+                    Sleep(QS_TIMEOUT_MS);
                 }
                 else { // some other socket error...
                     fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
@@ -213,7 +230,7 @@ void QS::onFlush(void) {
                 }
             }
             else if (nSent < (int)nBytes) { // sent fewer than requested?
-                Sleep(10); // sleep for 10ms
+                Sleep(QS_TIMEOUT_MS); // sleep for the timeout
                 // adjust the data and loop back to send() the rest
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
@@ -224,7 +241,9 @@ void QS::onFlush(void) {
         }
         // set nBytes for the next call to QS::getBlock()
         nBytes = QS_TX_CHUNK;
+        QS_CRIT_ENTRY_();
     }
+    QS_CRIT_EXIT_();
 }
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {
@@ -237,6 +256,7 @@ QSTimeCtr QS::onGetTime(void) {
 void QS_output(void) {
     uint16_t nBytes;
     uint8_t const *data;
+    QS_CRIT_STAT_
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         fprintf(stderr, "<TARGET> ERROR   invalid TCP socket\n");
@@ -244,16 +264,18 @@ void QS_output(void) {
     }
 
     nBytes = QS_TX_CHUNK;
+    QS_CRIT_ENTRY_();
     if ((data = QS::getBlock(&nBytes)) != (uint8_t *)0) {
+        QS_CRIT_EXIT_();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
                 int err = WSAGetLastError();
                 if (err == WSAEWOULDBLOCK) {
-                    // sleep for 10ms and then loop back
+                    // sleep for the timeout and then loop back
                     // to send() the SAME data again
                     //
-                    Sleep(10);
+                    Sleep(QS_TIMEOUT_MS);
                 }
                 else { // some other socket error...
                     fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
@@ -262,7 +284,7 @@ void QS_output(void) {
                 }
             }
             else if (nSent < (int)nBytes) { // sent fewer than requested?
-                Sleep(10); // sleep for 10ms
+                Sleep(QS_TIMEOUT_MS); // sleep for the timeout
                 // adjust the data and loop back to send() the rest
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
@@ -271,6 +293,9 @@ void QS_output(void) {
                 break;
             }
         }
+    }
+    else {
+        QS_CRIT_EXIT_();
     }
 }
 //............................................................................
