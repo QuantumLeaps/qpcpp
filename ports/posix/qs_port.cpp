@@ -2,8 +2,8 @@
 /// @brief QS/C++ port to POSIX API
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last Updated for Version: 6.5.1
+/// Date of the Last Update:  2019-06-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -81,7 +81,7 @@ bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
     static uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
     char hostName[128];
-    char const *serviceName = "6601";  /* default QSPY server port */
+    char const *serviceName = "6601";  // default QSPY server port
     char const *src;
     char *dst;
     int status;
@@ -108,7 +108,7 @@ bool QS::onStartup(void const *arg) {
     }
     *dst = '\0'; // zero-terminate hostName
 
-    // extract port_remote from 'arg' (hostName:port_remote)...
+    // extract serviceName from 'arg' (hostName:serviceName)...
     if (*src == ':') {
         serviceName = src + 1;
     }
@@ -166,11 +166,11 @@ bool QS::onStartup(void const *arg) {
         goto error;
     }
 
-    /* configure the socket to reuse the address and not to linger */
+    // configure the socket to reuse the address and not to linger
     sockopt_bool = 1;
     setsockopt(l_sock, SOL_SOCKET, SO_REUSEADDR,
                &sockopt_bool, sizeof(sockopt_bool));
-    sockopt_bool = 0; /* negative option */
+    sockopt_bool = 0; // negative option
     setsockopt(l_sock, SOL_SOCKET, SO_LINGER,
                &sockopt_bool, sizeof(sockopt_bool));
 
@@ -207,10 +207,13 @@ void QS::onFlush(void) {
     }
 
     nBytes = QS_TX_CHUNK;
+    QS_CRIT_STAT_
+    QS_CRIT_ENTRY_();
     while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
+        QS_CRIT_EXIT_();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
-            if (nSent == SOCKET_ERROR) { /* sending failed? */
+            if (nSent == SOCKET_ERROR) { // sending failed?
                 if ((errno == EWOULDBLOCK) || (errno == EAGAIN)) {
                     // sleep for 10ms and then loop back
                     // to send() the SAME data again
@@ -224,7 +227,7 @@ void QS::onFlush(void) {
                 }
             }
             else if (nSent < (int)nBytes) { // sent fewer than requested?
-                nanosleep(&c_10ms, NULL); // sleep for 10ms */
+                nanosleep(&c_10ms, NULL); // sleep for 10ms
                 // adjust the data and loop back to send() the rest
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
@@ -235,7 +238,9 @@ void QS::onFlush(void) {
         }
         // set nBytes for the next call to QS::getBlock()
         nBytes = QS_TX_CHUNK;
+        QS_CRIT_ENTRY_();
     }
+    QS_CRIT_EXIT_();
 }
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {
@@ -259,10 +264,12 @@ void QS_output(void) {
     }
 
     nBytes = QS_TX_CHUNK;
+    QS_CRIT_STAT_
     if ((data = QS::getBlock(&nBytes)) != (uint8_t *)0) {
+        QS_CRIT_EXIT_();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
-            if (nSent == SOCKET_ERROR) { /* sending failed? */
+            if (nSent == SOCKET_ERROR) { // sending failed?
                 if ((errno == EWOULDBLOCK) || (errno == EAGAIN)) {
                     // sleep for 10ms and then loop back
                     // to send() the SAME data again
@@ -276,7 +283,7 @@ void QS_output(void) {
                 }
             }
             else if (nSent < (int)nBytes) { // sent fewer than requested?
-                nanosleep(&c_10ms, NULL); // sleep for 10ms */
+                nanosleep(&c_10ms, NULL); // sleep for 10ms
                 // adjust the data and loop back to send() the rest
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
@@ -287,6 +294,9 @@ void QS_output(void) {
         }
         // set nBytes for the next call to QS::getBlock()
         nBytes = QS_TX_CHUNK;
+    }
+    else {
+        QS_CRIT_EXIT_();
     }
 }
 //............................................................................
