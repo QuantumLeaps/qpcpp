@@ -31,9 +31,9 @@
 // https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "bsp.h"
-#include "dpp.h"
+#include "qpcpp.hpp"
+#include "bsp.hpp"
+#include "dpp.hpp"
 
 namespace QP {
 

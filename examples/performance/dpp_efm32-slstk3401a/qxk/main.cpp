@@ -31,10 +31,10 @@
 // https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "dpp.h"
+#include "qpcpp.hpp"
+#include "dpp.hpp"
 #include "test.h"
-#include "bsp.h"
+#include "bsp.hpp"
 
 //............................................................................
 int main() {

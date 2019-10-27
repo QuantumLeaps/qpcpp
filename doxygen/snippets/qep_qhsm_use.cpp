@@ -1,4 +1,4 @@
-#include "qep.h"    // QEP public interface
+#include "qep.hpp"    // QEP public interface
 #include "calc.h"   // Calc HSM derived from QHsm
 
 static Calc l_calc; // an instance of Calc HSM

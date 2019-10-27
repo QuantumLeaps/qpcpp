@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h" // QP API
-#include "bsp.h"   // board support package
-#include "calc.h"
+#include "qpcpp.hpp" // QP API
+#include "bsp.hpp"   // board support package
+#include "calc.hpp"
 
 #include <iostream>
 

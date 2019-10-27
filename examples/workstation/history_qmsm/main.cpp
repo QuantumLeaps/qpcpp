@@ -31,8 +31,8 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"   // QP API
-#include "history.h"
+#include "qpcpp.hpp"   // QP API
+#include "history.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

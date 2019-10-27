@@ -36,7 +36,7 @@
 ///***************************************************************************
 /// @endcond
 
-#include "qpcpp.h" // for QUTEST
+#include "qpcpp.hpp" // for QUTEST
 
 using namespace QP;
 

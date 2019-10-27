@@ -31,8 +31,8 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "qmsmtst.h"
+#include "qpcpp.hpp"
+#include "qmsmtst.hpp"
 
 #include <stdlib.h>
 #include <stdio.h>

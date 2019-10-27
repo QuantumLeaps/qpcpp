@@ -29,10 +29,10 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "bsp.h"
-#include "alarm.h"
-#include "clock.h"
+#include "qpcpp.hpp"
+#include "bsp.hpp"
+#include "alarm.hpp"
+#include "clock.hpp"
 
 #include <stdio.h>
 

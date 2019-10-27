@@ -1,5 +1,5 @@
-#include "qpcpp.h"
-#include "my_app.h"
+#include "qpcpp.hpp"
+#include "my_app.hpp"
 
 Q_DEFINE_THIS_FILE
 

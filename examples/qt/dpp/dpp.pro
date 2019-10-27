@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------------
 # Product: DPP console exampe for Qt (console)
-# Last Updated for Version: QP/C++ 6.3.1/Qt 5.x
-# Date of the Last Update:  2018-05-22
+# Last updated for version 6.6.0
+# Last updated on  2019-07-30
 #
-#                    Q u a n t u m     L e a P s
-#                    ---------------------------
-#                    innovating embedded systems
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
 #
-# Copyright (C) Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -25,11 +25,11 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <www.gnu.org/licenses>.
 #
 # Contact information:
-# https://www.state-machine.com
-# mailto:info@state-machine.com
+# <www.state-machine.com>
+# <info@state-machine.com>
 #-----------------------------------------------------------------------------
 
 TEMPLATE = app
@@ -48,8 +48,8 @@ INCLUDEPATH = . \
     $$QPCPP/ports/qt
 
 HEADERS += \
-    dpp.h \
-    bsp.h
+    dpp.hpp \
+    bsp.hpp
 
 SOURCES += \
     main.cpp \
@@ -69,11 +69,11 @@ SOURCES += \
 
 # QP-Qt port headers/sources
 HEADERS +=  \
-    $$QPCPP/ports/qt/tickerthread.h \
-    $$QPCPP/ports/qt/aothread.h \
-#    $$QPCPP/ports/qt/guiapp.h \
-#    $$QPCPP/ports/qt/guiactive.h \
-#    $$QPCPP/ports/qt/pixellabel.h
+    $$QPCPP/ports/qt/tickerthread.hpp \
+    $$QPCPP/ports/qt/aothread.hpp \
+#    $$QPCPP/ports/qt/guiapp.hpp \
+#    $$QPCPP/ports/qt/guiactive.hpp \
+#    $$QPCPP/ports/qt/pixellabel.hpp
 
 SOURCES += \
     $$QPCPP/ports/qt/qf_port.cpp \
@@ -114,12 +114,12 @@ CONFIG(debug, debug|release) {
 #        $$QPCPP/src/qs/qs_fp.cpp \
 #        $$QPCPP/src/qs/qs_64bit.cpp
 
-#    HEADERS += $$QPCPP/ports/qt/qs_port.h
+#    HEADERS += $$QPCPP/ports/qt/qs_port.hpp
 
     # NOTE:
     # The "qspy.c" component is needed only when you perform the formatted
     # output directly in the Target. The following declarations assume that
-    # the Qtools collection is installed and that the QTOOLS environment
+    # the QTools collection is installed and that the QTOOLS environment
     # variable is set to point to this QTools installation directory.
 
 #    INCLUDEPATH += $(QTOOLS)/qspy/include

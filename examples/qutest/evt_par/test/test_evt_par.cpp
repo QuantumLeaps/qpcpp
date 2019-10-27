@@ -31,8 +31,8 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "my_app.h" // My Application
+#include "qpcpp.hpp"
+#include "my_app.hpp" // My Application
 
 Q_DEFINE_THIS_FILE
 

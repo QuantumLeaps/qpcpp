@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.5.0
-/// Last updated on  2019-03-09
+/// Last updated for version 6.6.0
+/// Last updated on  2019-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -28,22 +28,22 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qep_port.h"     // QEP port
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qep_port.hpp"     // QEP port
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
-#include "qassert.h"      // QP embedded systems-friendly assertions
+#include "qassert.h"        // QP embedded systems-friendly assertions
 
 
 //! helper macro to trigger internal event in an HSM
@@ -132,12 +132,12 @@ QHsm::~QHsm() {
 /// @description
 /// Executes the top-most initial transition in a HSM.
 ///
-/// @param[in] e  pointer to the initialization event (might be NULL)
+/// @param[in] par pointer to an extra parameter (might be NULL)
 ///
 /// @note
 /// Must be called exactly __once__ before the QP::QHsm::dispatch().
 ///
-void QHsm::init(QEvt const * const e) {
+void QHsm::init(void const * const par) {
     QStateHandler t = m_state.fun;
 
     /// @pre ctor must have been executed and initial tran NOT taken
@@ -145,7 +145,7 @@ void QHsm::init(QEvt const * const e) {
                       && (t == Q_STATE_CAST(&top)));
 
     // execute the top-most initial transition
-    QState r = (*m_temp.fun)(this, e);
+    QState r = (*m_temp.fun)(this, static_cast<QEvt const *>(par));
 
     // the top-most initial transition must be taken
     Q_ASSERT_ID(210, r == Q_RET_TRAN);

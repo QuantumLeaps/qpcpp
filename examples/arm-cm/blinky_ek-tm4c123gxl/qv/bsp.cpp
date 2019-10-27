@@ -31,9 +31,9 @@
 // https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "blinky.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "blinky.hpp"
+#include "bsp.hpp"
 
 #include "TM4C123GH6PM.h"        // the device specific header (TI)
 #include "rom.h"                 // the built-in ROM functions (TI)

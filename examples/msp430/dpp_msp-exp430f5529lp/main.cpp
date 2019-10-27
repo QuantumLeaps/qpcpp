@@ -31,9 +31,9 @@
 // Web:   www.state-machine.com
 // Email: info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "dpp.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "dpp.hpp"
+#include "bsp.hpp"
 
 //............................................................................
 int main() {

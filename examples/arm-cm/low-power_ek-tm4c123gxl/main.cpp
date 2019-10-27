@@ -31,16 +31,16 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "low_power.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "low_power.hpp"
+#include "bsp.hpp"
 
 //............................................................................
 int main() {
     static QP::QSubscrList subscrSto[MAX_PUB_SIG];
 
     static QP::QEvt const *blinky0QueueSto[10]; // queue storage for Blinky0
-#ifdef qxk_h // QXK kernel?
+#ifdef QXK_HPP // QXK kernel?
     static uint32_t const *xblinky1Stack[64]; // stack for XBlinky1
 #else
     static QP::QEvt const *blinky1QueueSto[10]; // queue storage for Blinky1
@@ -61,7 +61,7 @@ int main() {
                       blinky0QueueSto, Q_DIM(blinky0QueueSto),
                       0, 0U, 0);
 
-#ifdef qxk_h // QXK kernel?
+#ifdef QXK_HPP // QXK kernel?
     XSEM_sw1.init(0U, 1U); /* binary signaling semaphore */
     XT_Blinky1.start(2U,     /* unique QP priority of the AO */
                   0, 0U, /* event queue (not used) */

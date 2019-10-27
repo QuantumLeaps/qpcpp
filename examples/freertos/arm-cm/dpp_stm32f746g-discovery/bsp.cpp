@@ -31,9 +31,9 @@
 // https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "dpp.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "dpp.hpp"
+#include "bsp.hpp"
 
 // STM32CubeF7 include files
 #include "stm32f7xx_hal.h"

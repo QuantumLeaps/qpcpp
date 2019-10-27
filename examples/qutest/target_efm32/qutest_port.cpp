@@ -36,7 +36,7 @@
 ///***************************************************************************
 /// @endcond
 
-#include "qpcpp.h"
+#include "qpcpp.hpp"
 
 #include "em_device.h"  // the device specific header (SiLabs)
 #include "em_cmu.h"     // Clock Management Unit (SiLabs)

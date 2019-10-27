@@ -60,9 +60,9 @@ m_timeEvt.armX(BSP::TICKS_PER_SEC/2,
   </attribute>
  </package>
  <directory name="src">
-  <file name="blinky.h">
-   <text>#ifndef blinky_h
-#define blinky_h
+  <file name="blinky.hpp">
+   <text>#ifndef BLINKY_HPP
+#define BLINKY_HPP
 
 enum BlinkySignals {
     DUMMY_SIG = QP::Q_USER_SIG,
@@ -74,13 +74,13 @@ enum BlinkySignals {
 
 $declare${AOs::AO_Blinky}
 
-#endif // blinky
+#endif // BLINKY_HPP
 </text>
   </file>
   <file name="blinky.cpp">
-   <text>#include &quot;qpcpp.h&quot;  // QP/C++ framework API
-#include &quot;blinky.h&quot; // Blinky application
-#include &quot;bsp.h&quot;    // Board Support Package interface
+   <text>#include &quot;qpcpp.hpp&quot;  // QP/C++ framework API
+#include &quot;blinky.hpp&quot; // Blinky application
+#include &quot;bsp.hpp&quot;    // Board Support Package interface
 
 //using namespace QP;
 

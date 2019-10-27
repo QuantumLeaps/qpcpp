@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated for version 6.6.0
+/// Last updated on  2019-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -28,25 +28,25 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 ///
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"
 #include "qassert.h"
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-#include "tickLib.h"      // for tickAnnounce()
+#include "tickLib.h"        // for tickAnnounce()
 
 // locals ====================================================================
 extern "C" {
@@ -104,7 +104,7 @@ void QF::thread_(QActive *act) {
 void QActive::start(uint_fast8_t prio,
                     QEvt const *qSto[], uint_fast16_t qLen,
                     void *stkSto, uint_fast16_t stkSize,
-                    QEvt const *ie)
+                    void const * const par)
 {
     Q_REQUIRE_ID(200, (prio <= QF_MAX_ACTIVE) /* not exceeding max */
         && (qSto != static_cast<QEvt const **>(0)) /* queue storage */
@@ -117,7 +117,8 @@ void QActive::start(uint_fast8_t prio,
 
     m_prio = prio;  // save the QF priority
     QF::add_(this); // make QF aware of this active object
-    init(ie);       // thake the top-most initial tran.
+
+    init(par);      // thake the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
     // synthesize task name of the form tAOxx,

@@ -16,7 +16,7 @@
 // for more details.
 //
 //$endhead${.::qhsmtst.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#include "qpcpp.h"
+#include "qpcpp.hpp"
 #include "qhsmtst.h"
 
 //$declare${HSMs::QHsmTst} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

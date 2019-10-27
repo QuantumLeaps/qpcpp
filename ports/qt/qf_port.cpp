@@ -2,9 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: QP 6.4.0/Qt 5.x
-/// Last updated for version 6.4.0
-/// Last updated on  2019-03-12
+/// Last updated for version 6.6.0 / Qt 5.x
+/// Last updated on  2019-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -28,26 +27,26 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
 #include <QCoreApplication>
-#include "aothread.h"
-#include "tickerthread.h"
+#include "aothread.hpp"
+#include "tickerthread.hpp"
 //-----------------
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"       // QF package-scope interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
 Q_DEFINE_THIS_MODULE("qf_port")
@@ -139,7 +138,7 @@ void QF_setTickRate(unsigned ticksPerSec) {
 void QActive::start(uint_fast8_t const prio,
                      QEvt const **qSto, uint_fast16_t qLen,
                      void * const stkSto, uint_fast16_t const stkSize,
-                     QEvt const * const ie)
+                     void const * const par)
 {
     Q_REQUIRE(stkSto == static_cast<void *>(0)); // no per-task stack
 
@@ -149,8 +148,8 @@ void QActive::start(uint_fast8_t const prio,
     m_prio = prio;
 
     QF::add_(this); // make QF aware of this active object
-    init(ie);       // execute the initial transition
 
+    init(par);      // execute the initial transition
     QS_FLUSH();     // flush the trace buffer to the host
 
     AOThread *thread = static_cast<AOThread *>(m_thread);

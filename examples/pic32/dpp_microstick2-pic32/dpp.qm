@@ -365,10 +365,10 @@ m_fork[n] = FREE;</action>
  </package>
  <!--${.}-->
  <directory name=".">
-  <!--${.::dpp.h}-->
-  <file name="dpp.h">
-   <text>#ifndef dpp_h
-#define dpp_h
+  <!--${.::dpp.hpp}-->
+  <file name="dpp.hpp">
+   <text>#ifndef DPP_HPP
+#define DPP_HPP
 
 namespace DPP {
 
@@ -395,19 +395,19 @@ $declare(AOs::AO_Philo[N_PHILO])
 
 $declare(AOs::AO_Table)
 
-#ifdef qxk_h
+#ifdef QXK_HPP
 $declare(AOs::XT_Test1)
 $declare(AOs::XT_Test2)
-#endif // qxk_h
+#endif // QXK_HPP
 
-#endif // dpp_h
+#endif // DPP_HPP
 </text>
   </file>
   <!--${.::philo.cpp}-->
   <file name="philo.cpp">
-   <text>#include &quot;qpcpp.h&quot;
-#include &quot;dpp.h&quot;
-#include &quot;bsp.h&quot;
+   <text>#include &quot;qpcpp.hpp&quot;
+#include &quot;dpp.hpp&quot;
+#include &quot;bsp.hpp&quot;
 
 Q_DEFINE_THIS_FILE
 
@@ -456,9 +456,9 @@ $define(AOs::Philo)</text>
   </file>
   <!--${.::table.cpp}-->
   <file name="table.cpp">
-   <text>#include &quot;qpcpp.h&quot;
-#include &quot;dpp.h&quot;
-#include &quot;bsp.h&quot;
+   <text>#include &quot;qpcpp.hpp&quot;
+#include &quot;dpp.hpp&quot;
+#include &quot;bsp.hpp&quot;
 
 Q_DEFINE_THIS_FILE
 

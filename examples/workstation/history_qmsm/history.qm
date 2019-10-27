@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.5.0" links="0">
+<model version="4.5.1" links="0">
  <documentation>Transition to history in a subclass of QMsm, no &quot;me-&gt;&quot; pointer</documentation>
  <framework name="qpcpp" license="../../../QPCPP-EVAL.qlc"/>
  <package name="SMs" stereotype="0x02">
@@ -117,9 +117,9 @@ exit(0);</entry>
   </class>
  </package>
  <directory name=".">
-  <file name="history.h">
-   <text>#ifndef history_h
-#define history_h
+  <file name="history.hpp">
+   <text>#ifndef HISTORY_HPP
+#define HISTORY_HPP
 
 enum ToastOvenSignals {
     OPEN_SIG = QP::Q_USER_SIG,
@@ -132,11 +132,11 @@ enum ToastOvenSignals {
 
 extern QP::QMsm * const the_oven; // opaque pointer to the oven MSM
 
-#endif // history_h</text>
+#endif // HISTORY_HPP</text>
   </file>
   <file name="history.cpp">
-   <text>#include &quot;qpcpp.h&quot;
-#include &quot;history.h&quot;
+   <text>#include &quot;qpcpp.hpp&quot;
+#include &quot;history.hpp&quot;
 
 #include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;

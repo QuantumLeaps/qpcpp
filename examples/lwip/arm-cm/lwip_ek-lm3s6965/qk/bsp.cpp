@@ -31,9 +31,9 @@
 // https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"    // QP port header file
-#include "dpp.h"      // application events and active objects
-#include "bsp.h"      // Board Support Package header file
+#include "qpcpp.hpp"    // QP port header file
+#include "dpp.hpp"      // application events and active objects
+#include "bsp.hpp"      // Board Support Package header file
 
 #include "LM3S6965.h" // the device specific header (TI)
 

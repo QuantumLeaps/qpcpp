@@ -77,9 +77,9 @@ AO_Table-&gt;postLIFO(pe);</exit>
  </class>
  <directory name=".">
   <file name="philo.cpp">
-   <text>#include &quot;qpcpp.h&quot;
-#include &quot;dpp.h&quot;
-#include &quot;bsp.h&quot;
+   <text>#include &quot;qpcpp.hpp&quot;
+#include &quot;dpp.hpp&quot;
+#include &quot;bsp.hpp&quot;
 
 Q_DEFINE_THIS_FILE
 

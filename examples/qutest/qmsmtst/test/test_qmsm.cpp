@@ -32,7 +32,7 @@
 // mailto:info@state-machine.com
 //****************************************************************************
 
-#include "qpcpp.h"
+#include "qpcpp.hpp"
 #include "qmsmtst.h"
 
 Q_DEFINE_THIS_FILE

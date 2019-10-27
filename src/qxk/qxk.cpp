@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated for version 6.6.0
+/// Last updated on  2019-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -29,28 +29,28 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qxk_pkg.h"      // QXK package-scope internal interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qxk_pkg.hpp"      // QXK package-scope internal interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
 // protection against including this source file in a wrong project
-#ifndef qxk_h
+#ifndef QXK_HPP
     #error "Source file included in a project NOT based on the QXK kernel"
-#endif // qxk_h
+#endif // QXK_HPP
 
 Q_DEFINE_THIS_MODULE("qxk")
 
@@ -168,13 +168,12 @@ int_t QF::run(void) {
 // @param[in] stkSto  pointer to the stack storage (used only when
 //                    per-AO stack is needed)
 // @param[in] stkSize stack size [bytes]
-// @param[in] ie      pointer to the optional initialization event
-//                    (might be NULL).
+// @param[in] par     pointer to an extra parameter (might be NULL)
 //
 void QActive::start(uint_fast8_t const prio,
                      QEvt const *qSto[], uint_fast16_t const qLen,
                      void * const stkSto, uint_fast16_t const stkSize,
-                     QEvt const * const ie)
+                     void const * const par)
 {
     /// @pre AO cannot be started:
     /// - from an ISR;
@@ -193,8 +192,8 @@ void QActive::start(uint_fast8_t const prio,
     m_startPrio = static_cast<uint8_t>(prio); // set start QF prio of this AO
     QF::add_(this);   // make QF aware of this AO
 
-    this->init(ie); // take the top-most initial tran. (virtual)
-    QS_FLUSH();     // flush the trace buffer to the host
+    this->init(par); // take the top-most initial tran. (virtual)
+    QS_FLUSH(); // flush the trace buffer to the host
 
     // see if this AO needs to be scheduled in case QXK is running
     QF_CRIT_STAT_

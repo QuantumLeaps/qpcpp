@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "blinky.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "blinky.hpp"
+#include "bsp.hpp"
 
 #include <msp430f5529.h>  // MSP430 variant used
 // add other drivers if necessary...

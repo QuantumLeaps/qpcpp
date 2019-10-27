@@ -16,9 +16,9 @@
 // for more details.
 //
 //$endhead${.::table.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#include "qpcpp.h"
-#include "dpp.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "dpp.hpp"
+#include "bsp.hpp"
 
 Q_DEFINE_THIS_FILE
 

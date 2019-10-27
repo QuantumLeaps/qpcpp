@@ -31,7 +31,7 @@ Purpose : BSP for the ST STM32F429 Discovery eval board
 --------  END-OF-HEADER  ---------------------------------------------
 */
 
-#include "BSP.h"
+#include "bsp.hpp"
 
 /*********************************************************************
 *

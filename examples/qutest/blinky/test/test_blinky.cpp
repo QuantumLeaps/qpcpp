@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"  // QP/C++ framework API
-#include "blinky.h" // Blinky application
-#include "bsp.h"    // Board Support Package interface
+#include "qpcpp.hpp"  // QP/C++ framework API
+#include "blinky.hpp" // Blinky application
+#include "bsp.hpp"    // Board Support Package interface
 
 using namespace QP;
 

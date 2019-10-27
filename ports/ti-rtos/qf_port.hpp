@@ -1,0 +1,114 @@
+/// @file
+/// @brief QF/C++ port to TI-RTOS kernel (SYS/BIOS), all supported compilers
+/// @cond
+///***************************************************************************
+/// Last updated for version 6.6.0
+/// Last updated on  2019-07-30
+///
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
+///
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, this program may be distributed and modified under the
+/// terms of Quantum Leaps commercial licenses, which expressly supersede
+/// the GNU General Public License and are specifically designed for
+/// licensees interested in retaining the proprietary status of their code.
+///
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+/// GNU General Public License for more details.
+///
+/// You should have received a copy of the GNU General Public License
+/// along with this program. If not, see <www.gnu.org/licenses>.
+///
+/// Contact information:
+/// <www.state-machine.com>
+/// <info@state-machine.com>
+///***************************************************************************
+/// @endcond
+
+#ifndef QF_PORT_HPP
+#define QF_PORT_HPP
+
+// TI-RTOS-specific event queue and thread types, see NOTE1
+#define QF_EQUEUE_TYPE       QEQueue
+#define QF_OS_OBJECT_TYPE    Swi_Struct
+#define QF_THREAD_TYPE       Swi_Handle
+
+// The maximum number of active objects in the application, see NOTE2
+#define QF_MAX_ACTIVE        32
+
+// TI-RTOS-specific critical section operations, NOTE3
+#define QF_CRIT_STAT_TYPE    UInt
+#define QF_CRIT_ENTRY(key_)  ((key_) = Hwi_disable())
+#define QF_CRIT_EXIT(key_)   (Hwi_restore((key_)))
+
+#include <ti/sysbios/hal/Hwi.h> // TI-RTOS Hwi package
+#include <ti/sysbios/knl/Swi.h> // TI-RTOS Swi package
+
+#include "qep_port.hpp" // QEP port
+#include "qequeue.hpp"  // this QF port uses the native QF event queue
+#include "qmpool.hpp"   // this QF port uses the native QF memory pool
+#include "qf.hpp"       // QF platform-independent public interface
+
+
+//****************************************************************************
+// interface used only inside QF, but not in applications
+//
+#ifdef QP_IMPL
+
+    // TI-RTOS-specific scheduler locking, see NOTE4
+    #define QF_SCHED_STAT_        UInt key_;
+    #define QF_SCHED_LOCK_(dummy) (key_ = Swi_disable())
+    #define QF_SCHED_UNLOCK_()    (Swi_restore(key_))
+
+    // TI-RTOS-specific native event queue operations...
+    #define QACTIVE_EQUEUE_WAIT_(me_) \
+        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
+    #define QACTIVE_EQUEUE_SIGNAL_(me_) Swi_post((me_)->m_thread)
+
+    // TI-RTOS native QF event pool operations...
+    #define QF_EPOOL_TYPE_  QMPool
+    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+        (p_).init((poolSto_), (poolSize_), (evtSize_))
+    #define QF_EPOOL_EVENT_SIZE_(p_) \
+        static_cast<uint_fast16_t>((p_).getBlockSize())
+    #define QF_EPOOL_GET_(p_, e_, m_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_))))
+    #define QF_EPOOL_PUT_(p_, e_) ((p_).put(e_))
+
+#endif // ifdef QP_IMPL
+
+#endif // QF_PORT_HPP
+
+//****************************************************************************
+//
+// NOTE1:
+// This QP port uses the TI-RTOS Swis ("Software Interrupts") to provide the
+// thread context to run QP active objects. The TI-RTOS Swis are a perfect
+// match to execute the run-to-completion (RTC) event-processing in active
+// objects and requre far less resources (no private stacks) than regular
+// blocking threads.
+//
+// NOTE2:
+// The maximum number of active objects in the application cannot exceed the
+// number of Swis available in TI-RTOS. On 32-bit CPUs, such as ARM Cortex-M,
+// the maximum number of Swis is 32.
+//
+// NOTE3:
+// The QF critical section is implemented with the TI-RTOS Hwi disable/enable.
+// The type of critical section preserves the interrupt status and allows
+// critical sections to nest.
+//
+// NOTE4:
+// TI-RTOS provides only global disabling of Swis. Therefore, locking the
+// scheduler only up to the specified lock priority is not supported.
+//

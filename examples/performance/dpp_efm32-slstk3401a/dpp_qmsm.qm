@@ -327,9 +327,9 @@ m_fork[n] = FREE;</action>
   <attribute name="XT_Test2" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
  </package>
  <directory name=".">
-  <file name="dpp.h">
-   <text>#ifndef dpp_h
-#define dpp_h
+  <file name="dpp.hpp">
+   <text>#ifndef DPP_HPP
+#define DPP_HPP
 
 namespace DPP {
 
@@ -356,17 +356,17 @@ $declare(AOs::AO_Philo[N_PHILO])
 
 $declare(AOs::AO_Table)
 
-#ifdef qxk_h
+#ifdef QXK_HPP
 $declare(AOs::XT_Test1)
 $declare(AOs::XT_Test2)
-#endif // qxk_h
+#endif // QXK_HPP
 
-#endif // dpp_h</text>
+#endif // DPP_HPP</text>
   </file>
   <file name="philo.cpp">
-   <text>#include &quot;qpcpp.h&quot;
-#include &quot;dpp.h&quot;
-#include &quot;bsp.h&quot;
+   <text>#include &quot;qpcpp.hpp&quot;
+#include &quot;dpp.hpp&quot;
+#include &quot;bsp.hpp&quot;
 
 Q_DEFINE_THIS_FILE
 
@@ -414,9 +414,9 @@ QP::QActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Phil
 $define(AOs::Philo)</text>
   </file>
   <file name="table.cpp">
-   <text>#include &quot;qpcpp.h&quot;
-#include &quot;dpp.h&quot;
-#include &quot;bsp.h&quot;
+   <text>#include &quot;qpcpp.hpp&quot;
+#include &quot;dpp.hpp&quot;
+#include &quot;bsp.hpp&quot;
 
 Q_DEFINE_THIS_FILE
 

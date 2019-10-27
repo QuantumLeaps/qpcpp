@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated for version 6.6.0
+/// Last updated on  2019-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -28,22 +28,22 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 ///
 #define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope interface
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"       // QF package-scope interface
 #include "qassert.h"      // QP embedded systems-friendly assertions
 #ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
 #include <limits.h>       // limits of dynamic range for integers
@@ -193,7 +193,7 @@ int QF_consoleWaitForKey(void) {
 void QActive::start(uint_fast8_t prio,
                     QEvt const *qSto[], uint_fast16_t qLen,
                     void *stkSto, uint_fast16_t /*stkSize*/,
-                    QEvt const *ie)
+                    void const * const par)
 {
     Q_REQUIRE_ID(600, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
         && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*... in range */
@@ -204,8 +204,8 @@ void QActive::start(uint_fast8_t prio,
     m_prio = prio;  // set the QF priority of this AO before adding it to QF
     QF::add_(this); // make QF aware of this AO
 
-    this->init(ie); // execute initial transition (virtual call)
-    QS_FLUSH();     // flush the QS trace buffer to the host
+    this->init(par); // execute initial transition (virtual call)
+    QS_FLUSH(); // flush the QS trace buffer to the host
 }
 
 //****************************************************************************

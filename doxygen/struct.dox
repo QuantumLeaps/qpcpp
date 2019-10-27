@@ -111,13 +111,6 @@ QP::QHsm is also the base class for the QP::QMsm state machine, which provides a
   </li>
 </ul>
 
-@anchor sm_MI
-@attention
-The QP/C++ implementation of state machines is <strong>not compatible with Multiple Inheritance (MI) in C++</strong>. In other words, all subclasses of QP::QHsm (which includes subclasses of QP::QMsm, QP::QActive, and QP::QMActive) should use only *single inheritance*.
-
-@remark
-Multiple inheritance exposes the interface of all listed base classes. This is most likely <strong>incorrect</strong> with respect to state machine classes, because they should be used exclusively through the event-driven state machine interface (<em>init()</em>, <em>dispatch()</em>). State machines should only be known to the outside clients as opaque state machines and NOT as any other "mix-in" class. This is because interacting with state machines, and especially with active objects (<em>encapsulated</em> state machines), by any other means than events breaks the <a href="https://www.state-machine.com/doc/concepts#Encapsulation" class="extern">encapsulation for concurrency</a>.
-
 
 ------------------------------------------------------------------------------
 @section hsm Hierarchical State Machines

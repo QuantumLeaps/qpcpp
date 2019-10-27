@@ -32,15 +32,15 @@
 *                          https://state-machine.com
 * e-mail:                  info@quantum-leaps.com
 *****************************************************************************/
-#ifndef lwip_h
-#define lwip_h
+#ifndef LWIP_H
+#define LWIP_H
 
-               /* protection against including lwIP in unauthorized modules */
+/* protection against including lwIP in unauthorized modules */
 #ifndef LWIP_ALLOWED
 #error "The lwIP code is not reentrant and is not allowed in this module."
 #endif
 
-#include "lwip/opt.h"                            /* lwIP options come first */
+#include "lwip/opt.h"       /* lwIP options come first */
 #include "lwip/stats.h"
 #include "lwip/tcp.h"
 #include "lwip/tcp_impl.h"
@@ -51,8 +51,9 @@
 #include "lwip/dhcp.h"
 
 #include "netif/etharp.h"
-#include "netif/eth_driver.h"
-                                                /* utilities added by QL... */
+#include "netif/eth_driver.hpp"
+
+/* utilities added by QL... */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -71,4 +72,4 @@ struct pbuf *pbuf_new(u8_t *data, u16_t len);
 }
 #endif
 
-#endif                                                            /* lwip_h */
+#endif /* LWIP_H */

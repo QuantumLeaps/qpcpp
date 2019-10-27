@@ -31,9 +31,9 @@
 // Web  : https://state-machine.com
 // Email: info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "bsp.h"
-#include "blinky.h"
+#include "qpcpp.hpp"
+#include "bsp.hpp"
+#include "blinky.hpp"
 
 int main() {
     static QEvt const *blinkyQSto[10]; // Event queue storage for Blinky

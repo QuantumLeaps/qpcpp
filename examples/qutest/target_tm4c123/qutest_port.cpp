@@ -36,7 +36,7 @@
 ///***************************************************************************
 /// @endcond
 
-#include "qpcpp.h"
+#include "qpcpp.hpp"
 
 #include "TM4C123GH6PM.h"  // the device specific header (TI)
 #include "rom.h"           // the built-in ROM functions (TI)

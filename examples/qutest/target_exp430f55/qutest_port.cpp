@@ -68,7 +68,7 @@
 /// mailto:info@state-machine.com
 ///***************************************************************************
 /// @endcond
-#include "qpcpp.h"
+#include "qpcpp.hpp"
 
 #include <msp430f5529.h>  // MSP430 variant used
 // add other drivers if necessary...

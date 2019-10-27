@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.5.0
-/// Last updated on  2019-03-22
+/// Last updated for version 6.6.0
+/// Last updated on  2019-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -39,11 +39,11 @@
 // only build when Q_UTEST is defined
 #ifdef Q_UTEST
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#include "qs_port.h"      // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"       // QF package-scope interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#include "qs_port.hpp"      // include QS port
 
 namespace QP {
 
@@ -83,7 +83,7 @@ int_t QF::run(void) {
 void QActive::start(uint_fast8_t const prio,
                     QEvt const *qSto[], uint_fast16_t const qLen,
                     void * const, uint_fast16_t const,
-                    QEvt const * const ie)
+                    void const * const par)
 {
     // priority must be in range
     Q_REQUIRE_ID(200, (static_cast<uint_fast8_t>(0) < prio)
@@ -94,8 +94,8 @@ void QActive::start(uint_fast8_t const prio,
 
     QF::add_(this); // make QF aware of this AO
 
-    this->init(ie); // take the top-most initial tran. (virtual)
-    //QS_FLUSH();     // flush the trace buffer to the host
+    this->init(par); // take the top-most initial tran. (virtual)
+    //QS_FLUSH(); // flush the trace buffer to the host
 }
 //............................................................................
 #ifdef QF_ACTIVE_STOP
@@ -113,7 +113,7 @@ QActiveDummy::QActiveDummy(void)
 void QActiveDummy::start(uint_fast8_t const prio,
         QEvt const * qSto[], uint_fast16_t const qLen,
         void * const stkSto, uint_fast16_t const stkSize,
-        QEvt const * const ie)
+        void const * const par)
 {
     // priority must be in range
     // queue must NOT be provided
@@ -125,17 +125,17 @@ void QActiveDummy::start(uint_fast8_t const prio,
         && (qLen == static_cast<uint_fast16_t>(0))
         && (stkSto == static_cast<void *>(0))
         && (stkSize == static_cast<uint_fast16_t>(0))
-        && (ie == static_cast<QEvt const *>(0)));
+        && (par == static_cast<QEvt const *>(0)));
 
     m_prio = static_cast<uint8_t>(prio); // set the QF prio of this AO
 
     QF::add_(this); // make QF aware of this AO
 
-    this->init(ie); // take the top-most initial tran. (virtual)
-    //QS_FLUSH();     // flush the trace buffer to the host
+    this->init(par); // take the top-most initial tran. (virtual)
+    //QS_FLUSH(); // flush the trace buffer to the host
 }
 //............................................................................
-void QActiveDummy::init(QEvt const * const /*e*/) {
+void QActiveDummy::init(void const * const /*par*/) {
     QS_CRIT_STAT_
     QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.locFilter[QS::SM_OBJ], this)
         QS_OBJ_(this);        // this state machine object

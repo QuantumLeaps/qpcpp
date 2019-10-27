@@ -31,9 +31,9 @@
 // https://state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "dpp.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "dpp.hpp"
+#include "bsp.hpp"
 
 #include "LPC17xx.h"  // CMSIS-compliant header file for the MCU used
 // add other drivers if necessary...

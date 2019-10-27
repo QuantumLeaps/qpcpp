@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QP/C++ example for DPP-console example with Qt5
-// Last Updated for Version: QP/C++ 5.5.0/Qt 5.x
-// Last updated on  2015-09-21
+// Last updated for version 6.6.0
+// Last updated on  2019-07-30
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,17 +25,17 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// <www.state-machine.com>
+// <info@state-machine.com>
 //****************************************************************************
 #include <QCoreApplication>
 //-----------------
-#include "qpcpp.h"
-#include "dpp.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "dpp.hpp"
+#include "bsp.hpp"
 
 //............................................................................
 static QP::QEvt const *l_philoQueueSto[N_PHILO][N_PHILO];

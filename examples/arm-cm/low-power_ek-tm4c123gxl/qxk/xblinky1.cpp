@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "low_power.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "low_power.hpp"
+#include "bsp.hpp"
 
 //Q_DEFINE_THIS_FILE
 

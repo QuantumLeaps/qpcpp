@@ -36,7 +36,7 @@
 ******************************************************************************
 * @endcond
 */
-#include "qf_port.h"
+#include "qf_port.hpp"
 
 extern "C" {
 
@@ -155,22 +155,22 @@ void QXK_stackInit_(void *act, QP::QActionHandler thread,
     }
 }
 
-/* NOTE: keep in synch with the QXK_Attr struct in "qxk.h" !!! */
+/* NOTE: keep in synch with the QXK_Attr struct in "qxk.hpp" !!! */
 #define QXK_CURR       0
 #define QXK_NEXT       4
 #define QXK_ACT_PRIO   8
 #define QXK_IDLE_THR   12
 
-/* NOTE: keep in synch with the QXK_Attr struct in "qxk.h" !!! */
+/* NOTE: keep in synch with the QXK_Attr struct in "qxk.hpp" !!! */
 /*Q_ASSERT_COMPILE(QXK_CURR == offsetof(QXK_Attr, curr));*/
 /*Q_ASSERT_COMPILE(QXK_NEXT == offsetof(QXK_Attr, next));*/
 /*Q_ASSERT_COMPILE(QXK_ACT_PRIO == offsetof(QXK_Attr, actPrio));*/
 
-/* NOTE: keep in synch with the QMActive struct in "qf.h/qxk.h" !!! */
+/* NOTE: keep in synch with the QMActive struct in "qf.hpp/qxk.hpp" !!! */
 #define QMACTIVE_OSOBJ 28
 #define QMACTIVE_PRIO  36
 
-/* NOTE: keep in synch with the QActive struct in "qf.h/qxk.h" !!! */
+/* NOTE: keep in synch with the QActive struct in "qf.hpp/qxk.hpp" !!! */
 /*Q_ASSERT_COMPILE(QMACTIVE_OSOBJ == offsetof(QActive, osObject));*/
 /*Q_ASSERT_COMPILE(QMACTIVE_PRIO == offsetof(QActive, prio));*/
 

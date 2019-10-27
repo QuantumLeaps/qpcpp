@@ -3,14 +3,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-08
+/// Last updated for version 6.6.0
+/// Last updated on  2019-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -28,28 +28,28 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qxk_pkg.h"      // QXK package-scope internal interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qxk_pkg.hpp"      // QXK package-scope internal interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
 // protection against including this source file in a wrong project
-#ifndef qxk_h
+#ifndef QXK_HPP
     #error "Source file included in a project NOT based on the QXK kernel"
-#endif // qxk_h
+#endif // QXK_HPP
 
 namespace QP {
 
@@ -83,7 +83,7 @@ QXThread::QXThread(QXThreadHandler const handler, uint_fast8_t const tickRate)
 
 //****************************************************************************
 // QXThread virtual function implementations...
-void QXThread::init(QEvt const * const /*e*/) {
+void QXThread::init(void const * const /*par*/) {
     Q_ERROR_ID(110);
 }
 
@@ -107,7 +107,7 @@ void QXThread::dispatch(QEvt const * const /*e*/) {
 ///                        or zero if queue not used
 /// @param[in]     stkSto  pointer to the stack storage (must be provided)
 /// @param[in]     stkSize stack size [in bytes] (must not be zero)
-/// @param[in]     ie      pointer to the initial event (not used).
+// @param[in] par     pointer to an extra parameter (might be NULL)
 ///
 /// @usage
 /// The following example shows starting an extended thread:
@@ -116,7 +116,7 @@ void QXThread::dispatch(QEvt const * const /*e*/) {
 void QXThread::start(uint_fast8_t const prio,
                      QEvt const *qSto[], uint_fast16_t const qLen,
                      void * const stkSto, uint_fast16_t const stkSize,
-                     QEvt const * const /*ie*/)
+                     void const * const /*par*/)
 {
     /// @pre this function must:
     /// - NOT be called from an ISR;

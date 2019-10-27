@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.5.1
-/// Last updated on  2019-05-22
+/// Last updated for version 6.6.0
+/// Last updated on  2019-07-30
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -28,15 +28,15 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#include "qf_port.h"
+#include "qf_port.hpp"
 
 //............................................................................
 void QK_init(void) {

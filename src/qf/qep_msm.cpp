@@ -3,14 +3,14 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.8
-/// Last updated on  2019-01-23
+/// Last updated for version 6.6.0
+/// Last updated on  2019-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -28,22 +28,22 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qep_port.h"     // QEP port
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qep_port.hpp"     // QEP port
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
-#include "qassert.h"      // QP embedded systems-friendly assertions
+#include "qassert.h"        // QP embedded systems-friendly assertions
 
 //! Internal macro to increment the given action table @p act_
 /// @note Incrementing a pointer violates the MISRA-C 2004 Rule 17.4(req),
@@ -90,13 +90,13 @@ QMsm::QMsm(QStateHandler const initial)
 /// @description
 /// Executes the top-most initial transition in a MSM.
 ///
-/// @param[in] e  a constant pointer to QP::QEvt or a subclass of QP::QEvt
+/// @param[in] par pointer to an extra parameter (might be NULL)
 ///
 /// @attention
 /// QP::QMsm::init() must be called exactly __once__ before
 /// QP::QMsm::dispatch()
 ///
-void QMsm::init(QEvt const * const e) {
+void QMsm::init(void const * const par) {
     QS_CRIT_STAT_
 
     /// @pre the top-most initial transition must be initialized, and the
@@ -104,7 +104,8 @@ void QMsm::init(QEvt const * const e) {
     Q_REQUIRE_ID(200, (m_temp.fun != Q_STATE_CAST(0))
                       && (m_state.obj == &msm_top_s));
 
-    QState r = (*m_temp.fun)(this, e); // execute the top-most initial tran.
+    // execute the top-most initial tran.
+    QState r = (*m_temp.fun)(this, static_cast<QEvt const *>(par));
 
     // initial tran. must be taken
     Q_ASSERT_ID(210, r == Q_RET_TRAN_INIT);
@@ -458,7 +459,7 @@ QState QMsm::enterHistory_(QMState const * const hist) {
     // retrace the entry path in reverse (desired) order...
     while (i > static_cast<uint_fast8_t>(0)) {
         --i;
-        r = (*epath[i]->entryAction)(this); // run entry action in epath[i]
+        (void)(*epath[i]->entryAction)(this); // run entry action in epath[i]
 
         QS_BEGIN_(QS_QEP_STATE_ENTRY, QS::priv_.locFilter[QS::SM_OBJ], this)
             QS_OBJ_(this);

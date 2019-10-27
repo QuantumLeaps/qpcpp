@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated for version 6.6.0
+/// Last updated on  2019-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -27,11 +27,11 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 ///
@@ -39,21 +39,21 @@
 // expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
 #define _POSIX_C_SOURCE 200809L
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"       // QF package-scope interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-#include <limits.h>       // for PTHREAD_STACK_MIN
-#include <sys/mman.h>     // for mlockall()
+#include <limits.h>         // for PTHREAD_STACK_MIN
+#include <sys/mman.h>       // for mlockall()
 #include <sys/select.h>
 #include <sys/ioctl.h>
-#include <string.h>       // for memcpy() and memset()
+#include <string.h>         // for memcpy() and memset()
 #include <stdlib.h>
 #include <stdio.h>
 #include <termios.h>
@@ -268,7 +268,7 @@ int QF_consoleWaitForKey(void) {
 void QActive::start(uint_fast8_t prio,
                     QEvt const *qSto[], uint_fast16_t qLen,
                     void *stkSto, uint_fast16_t /*stkSize*/,
-                    QEvt const *ie)
+                    void const * const par)
 {
     Q_REQUIRE_ID(600, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
         && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*.. in range */
@@ -278,7 +278,9 @@ void QActive::start(uint_fast8_t prio,
     m_eQueue.init(qSto, qLen);
     m_prio = static_cast<uint8_t>(prio); // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
-    this->init(ie); // execute initial transition (virtual call)
+
+    this->init(par); // execute initial transition (virtual call)
+    QS_FLUSH(); // flush the QS trace buffer to the host
 }
 
 //****************************************************************************

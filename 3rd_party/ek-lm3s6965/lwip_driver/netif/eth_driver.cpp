@@ -42,7 +42,7 @@
 // interface driver for lwIP.
 //
 
-#include "qpcpp.h"
+#include "qpcpp.hpp"
 
 #include "lwip/opt.h"
 #include "lwip/init.h"
@@ -56,7 +56,7 @@
 #include "lwip/autoip.h"
 
 #include "netif/etharp.h"
-#include "netif/eth_driver.h"
+#include "netif/eth_driver.hpp"
 
 #include "LM3S6965.h"
 

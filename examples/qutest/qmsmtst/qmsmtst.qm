@@ -287,7 +287,7 @@ void BSP_terminate(int16_t const result);
 #endif // qmsmtst_h</text>
   </file>
   <file name="qmsmtst.cpp">
-   <text>#include &quot;qpcpp.h&quot;
+   <text>#include &quot;qpcpp.hpp&quot;
 #include &quot;qmsmtst.h&quot;
 
 namespace QMSMTST {

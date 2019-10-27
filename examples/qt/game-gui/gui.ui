@@ -154,7 +154,7 @@
   <customwidget>
    <class>PixelLabel</class>
    <extends>QLabel</extends>
-   <header>pixellabel.h</header>
+   <header>pixellabel.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

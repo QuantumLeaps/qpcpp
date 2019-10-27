@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "clock.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "clock.hpp"
+#include "bsp.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

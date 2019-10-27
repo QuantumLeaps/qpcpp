@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "bsp.h"
-#include "game.h"
+#include "qpcpp.hpp"
+#include "bsp.hpp"
+#include "game.hpp"
 
 static QP::QTicker l_ticker0(0); // ticker for tick rate 0
 QP::QActive *GAME::the_Ticker0 = &l_ticker0;

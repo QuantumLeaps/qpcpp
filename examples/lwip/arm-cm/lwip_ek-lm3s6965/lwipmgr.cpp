@@ -33,9 +33,9 @@
 //****************************************************************************
 #define LWIP_ALLOWED
 
-#include "qpcpp.h"  // QP/C++ API
-#include "dpp.h"    // application events and active objects
-#include "bsp.h"    // Board Support Package
+#include "qpcpp.hpp"  // QP/C++ API
+#include "dpp.hpp"    // application events and active objects
+#include "bsp.hpp"    // Board Support Package
 
 #include "lwip.h"   // lwIP stack
 #include "httpd.h"  // lwIP application

@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
-#include "qpcpp.h"
-#include "dpp.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "dpp.hpp"
+#include "bsp.hpp"
 
 extern "C" {
     #include "GUI.h"
@@ -225,13 +225,9 @@ bool QS::onStartup(void const *arg) {
     }
 
     // only after successful opeing of the socket turn on QS global filters
-    QS_FILTER_ON(QS_ALL_RECORDS);
-    QS_FILTER_OFF(QS_QF_CRIT_ENTRY);
-    QS_FILTER_OFF(QS_QF_CRIT_EXIT);
-    QS_FILTER_OFF(QS_QF_ISR_ENTRY);
-    QS_FILTER_OFF(QS_QF_ISR_EXIT);
-    QS_FILTER_OFF(QS_QF_TICK);
-    QS_FILTER_OFF(QS_QK_SCHEDULE);
+    QS_FILTER_ON(QS_SM_RECORDS);
+	QS_FILTER_ON(QS_AO_RECORDS);
+	QS_FILTER_ON(QS_UA_RECORDS);
 
     return true; // success
 }

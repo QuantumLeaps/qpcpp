@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "bsp.h"
-#include "blinky.h"
+#include "qpcpp.hpp"
+#include "bsp.hpp"
+#include "blinky.hpp"
 
 Q_DEFINE_THIS_FILE
 

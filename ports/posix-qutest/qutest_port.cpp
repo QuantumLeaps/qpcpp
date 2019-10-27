@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.5.1
-/// Date of the Last Update:  2019-06-18
+/// Last updated for version 6.6.0
+/// Last updated on  2019-07-30
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -28,11 +28,11 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 ///
@@ -45,9 +45,9 @@
 #endif // Q_SPY
 
 #define QP_IMPL       // this is QP implementation
-#include "qf_port.h"  // QF port
+#include "qf_port.hpp"  // QF port
 #include "qassert.h"  // QP embedded systems-friendly assertions
-#include "qs_port.h"  // include QS port
+#include "qs_port.hpp"  // include QS port
 
 #include <stdio.h>
 #include <stdlib.h>

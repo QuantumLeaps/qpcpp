@@ -31,9 +31,9 @@
 // Web  : https://state-machine.com
 // Email: info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"  // QP/C++ API
-#include "dpp.h"    // application events and active objects
-#include "bsp.h"    // Board Support Package header file
+#include "qpcpp.hpp"  // QP/C++ API
+#include "dpp.hpp"    // application events and active objects
+#include "bsp.hpp"    // Board Support Package header file
 
 extern "C" {
     #include "rit128x96x4.h" // RITEK 128x96x4 OLED used in Rev C-D boards

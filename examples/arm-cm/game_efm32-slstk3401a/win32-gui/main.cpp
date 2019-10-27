@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //****************************************************************************
-#include "qpcpp.h"
-#include "bsp.h"
-#include "game.h"
+#include "qpcpp.hpp"
+#include "bsp.hpp"
+#include "game.hpp"
 
 // "fudge factor" for Windows, see NOTE1
 enum { WIN_FUDGE_FACTOR = 10 };

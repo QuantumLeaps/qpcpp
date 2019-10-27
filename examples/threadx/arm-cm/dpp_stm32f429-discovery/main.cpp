@@ -31,9 +31,9 @@
 // https://www.state-machine.com
 // mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
-#include "qpcpp.h"
-#include "dpp.h"
-#include "bsp.h"
+#include "qpcpp.hpp"
+#include "dpp.hpp"
+#include "bsp.hpp"
 
 // Local-scope objects -------------------------------------------------------
 static QP::QEvt const *l_tableQueueSto[N_PHILO];
