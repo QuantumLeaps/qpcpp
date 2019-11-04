@@ -226,8 +226,8 @@ bool QS::onStartup(void const *arg) {
 
     // only after successful opeing of the socket turn on QS global filters
     QS_FILTER_ON(QS_SM_RECORDS);
-	QS_FILTER_ON(QS_AO_RECORDS);
-	QS_FILTER_ON(QS_UA_RECORDS);
+    QS_FILTER_ON(QS_AO_RECORDS);
+    QS_FILTER_ON(QS_UA_RECORDS);
 
     return true; // success
 }

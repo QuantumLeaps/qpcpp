@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.6.0
-/// Last updated on  2019-09-12
+/// Last updated on  2019-11-04
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -60,7 +60,6 @@
 #include <unistd.h>
 #include <signal.h>
 
-
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
@@ -78,7 +77,6 @@ enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 
 static void sigIntHandler(int /* dummy */);
 static void *ao_thread(void *arg); // thread routine for all AOs
-
 
 // QF functions ==============================================================
 void QF::init(void) {
@@ -114,18 +112,18 @@ void QF::init(void) {
     sigaction(SIGINT, &sig_act, NULL);
 }
 
-/****************************************************************************/
+//****************************************************************************
 void QF_enterCriticalSection_(void) {
     pthread_mutex_lock(&QF_pThreadMutex_);
 }
-/****************************************************************************/
+//****************************************************************************
 void QF_leaveCriticalSection_(void) {
     pthread_mutex_unlock(&QF_pThreadMutex_);
 }
 
 //****************************************************************************
 int_t QF::run(void) {
-    onStartup(); // invoke startup callback
+    onStartup(); // application-specific startup callback
 
     // try to set the priority of the ticker thread, see NOTE01
     struct sched_param sparam;
@@ -147,9 +145,10 @@ int_t QF::run(void) {
 
         nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
     }
-    onCleanup(); // invoke cleanup callback
+    onCleanup(); // cleanup callback
     pthread_mutex_destroy(&l_startupMutex);
     pthread_mutex_destroy(&QF_pThreadMutex_);
+
     return static_cast<int_t>(0); // return success
 }
 //****************************************************************************
@@ -158,7 +157,7 @@ void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
     l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
     l_tickPrio = tickPrio;
 }
-//****************************************************************************
+//............................................................................
 void QF::stop(void) {
     l_isRunning = false; // stop the loop in QF::run()
 }
@@ -195,7 +194,7 @@ int QF_consoleGetKey(void) {
     ioctl(0, FIONREAD, &byteswaiting);
     if (byteswaiting > 0) {
         char ch;
-        read(0, &ch, 1);
+        (void)read(0, &ch, 1);
         return (int)ch;
     }
     return 0; // no input at this time
@@ -205,7 +204,7 @@ int QF_consoleWaitForKey(void) {
     return getchar();
 }
 
-//............................................................................
+//****************************************************************************
 void QActive::start(uint_fast8_t prio,
                     QEvt const *qSto[], uint_fast16_t qLen,
                     void *stkSto, uint_fast16_t stkSize,
@@ -270,7 +269,7 @@ static void *ao_thread(void *arg) { // the expected POSIX signature
 
 //****************************************************************************
 static void sigIntHandler(int /* dummy */) {
-    QP::QF::onCleanup();
+    QF::onCleanup();
     exit(-1);
 }
 

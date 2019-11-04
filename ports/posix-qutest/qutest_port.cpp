@@ -44,21 +44,21 @@
     #error "Q_SPY must be defined for QUTest application"
 #endif // Q_SPY
 
-#define QP_IMPL       // this is QP implementation
+#define QP_IMPL         // this is QP implementation
 #include "qf_port.hpp"  // QF port
-#include "qassert.h"  // QP embedded systems-friendly assertions
+#include "qassert.h"    // QP embedded systems-friendly assertions
 #include "qs_port.hpp"  // include QS port
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <errno.h>
+#include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -93,6 +93,7 @@ bool QS::onStartup(void const *arg) {
     struct addrinfo *rp = NULL;
     struct addrinfo hints;
     int sockopt_bool;
+
     struct sigaction sig_act;
 
     // initialize the QS transmit and receive buffers
@@ -170,11 +171,11 @@ bool QS::onStartup(void const *arg) {
         goto error;
     }
 
-    /* configure the socket to reuse the address and not to linger */
+    // configure the socket to reuse the address and not to linger
     sockopt_bool = 1;
     setsockopt(l_sock, SOL_SOCKET, SO_REUSEADDR,
                &sockopt_bool, sizeof(sockopt_bool));
-    sockopt_bool = 0; /* negative option */
+    sockopt_bool = 0; // negative option
     setsockopt(l_sock, SOL_SOCKET, SO_LINGER,
                &sockopt_bool, sizeof(sockopt_bool));
 

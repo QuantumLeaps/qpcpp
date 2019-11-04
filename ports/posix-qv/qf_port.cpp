@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.6.0
-/// Last updated on  2019-09-12
+/// Last updated on  2019-11-04
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -120,7 +120,6 @@ void QF_leaveCriticalSection_(void) {
 
 //****************************************************************************
 int_t QF::run(void) {
-
     onStartup(); // application-specific startup callback
 
     // try to set the priority of the ticker thread, see NOTE01
@@ -215,7 +214,7 @@ int_t QF::run(void) {
     pthread_cond_destroy(&QV_condVar_); // cleanup the condition variable
     pthread_mutex_destroy(&l_pThreadMutex); // cleanup the global mutex
 
-    return static_cast<int_t>(0);
+    return static_cast<int_t>(0); // return success
 }
 //****************************************************************************
 void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
@@ -254,7 +253,7 @@ int QF_consoleGetKey(void) {
     ioctl(0, FIONREAD, &byteswaiting);
     if (byteswaiting > 0) {
         char ch;
-        read(0, &ch, 1);
+        (void)read(0, &ch, 1);
         return (int)ch;
     }
     return 0; // no input at this time
