@@ -1,12 +1,12 @@
 @echo off
 :: ===========================================================================
-:: Product: QP/C++ build script for PC-Lint(TM)
-:: Last Updated for Version: 5.9.7
-:: Date of the Last Update:  2017-08-31
+:: Product: QP/C build script for PC-Lint-Plus, "Standard" C++ compiler
+:: Last Updated for Version: 6.7.0
+:: Date of the Last Update:  2019-12-29
 ::
-::                    Q u a n t u m     L e a P s
-::                    ---------------------------
-::                    innovating embedded systems
+::                    Q u a n t u m  L e a P s
+::                    ------------------------
+::                    Modern Embedded Software
 ::
 :: Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ::
@@ -26,30 +26,34 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http://www.gnu.org/licenses/>.
+:: along with this program. If not, see <www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: Web  : https://state-machine.com
-:: Email: info@state-machine.com
+:: <www.state-machine.com/licensing>
+:: <info@state-machine.com>
 :: ===========================================================================
 setlocal
 
 :: Options for calling lin.bat
-::
-:: -DQ_SPY  // for linting the Spy configuration (default for QS)
-:: up to 4 other options, if needed
 
-:: NOTE: adjust to for your installation directory of PC-Lint
-:: 
-set PC_LINT_DIR=C:\tools\lint
+:: NOTE: adjust to for your installation directory of PC-Lint-Plus
+set PCLP_DIR=C:\tools\lint-plus
+set PCLP=%PCLP_DIR%\pclp32.exe
 
+if NOT exist "%PCLP%" (
+    @echo The PC-Lint-Plus toolset not found. Please adjust lin.bat
+    goto end
+)
+
+:: set the QP/C directory
 set QPCPP=..\..\..\..
+set QPCPP_LINT=%QPCPP%\ports\lint-plus
 
-set LINTFLAGS=-i%PC_LINT_DIR%\lnt %QPCPP%\include\std.lnt options.lnt %1 %2 %3 %4
-
+set LINTFLAGS=%QPCPP%\ports\lint-plus\std.lnt options.lnt %1 %2 %3 %4
 set PROJ_DIR=..
 
 :: linting -------------------------------------------------------------------
-%PC_LINT_DIR%\lint-nt -os(lint_out.log) %LINTFLAGS% %PROJ_DIR%\philo.cpp %PROJ_DIR%\table.cpp
+%PCLP% -os(lint_out.log) %LINTFLAGS% %PROJ_DIR%\calc1_sub.cpp
 
+:end
 endlocal

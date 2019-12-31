@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -42,7 +42,7 @@
 #define QV_CPU_SLEEP() do { \
     __wfi(); \
     QF_INT_ENABLE(); \
-} while (0)
+} while (false)
 
 #include "qv.hpp" // QV platform-independent public interface
 

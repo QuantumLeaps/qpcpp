@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 5.9.7
-// Last updated on  2017-08-20
+// Last updated for version 6.7.0
+// Last updated on  2019-12-26
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// https://state-machine.com
-// mailto:info@state-machine.com
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
 #include "dpp.hpp"
@@ -65,7 +65,10 @@ static void lib_fun(uint32_t x) {
 //............................................................................
 static void Thread1_run(QP::QXThread * const me) {
 
-    me->m_thread = &l_tls1; // initialize the TLS for Thread1
+    QS_OBJ_DICTIONARY(&l_test1);
+
+    // initialize the TLS for Thread1
+    me->m_thread = &l_tls1;
 
     for (;;) {
         l_mutex.lock(QXTHREAD_NO_TIMEOUT); // lock the mutex
@@ -100,6 +103,8 @@ static void Thread1_run(QP::QXThread * const me) {
 //............................................................................
 static void Thread2_run(QP::QXThread * const me) {
 
+    QS_OBJ_DICTIONARY(&l_test2);
+
     // initialize the semaphore before using it
     // NOTE: Here the semaphore is initialized in the highest-priority thread
     // that uses it. Alternatively, the semaphore can be initialized
@@ -108,14 +113,16 @@ static void Thread2_run(QP::QXThread * const me) {
                 1U); // max_count==1 (binary semaphore)
 
     // initialize the mutex before using it
-    // NOTE: Here the semaphore is initialized in the highest-priority thread
-    // that uses it. Alternatively, the semaphore can be initialized
+    // NOTE: Here the mutex is initialized in the highest-priority thread
+    // that uses it. Alternatively, the mutex can be initialized
     // before any thread runs.
-    l_mutex.init(N_PHILO + 6U);
+    l_mutex.init(N_PHILO + 6U); // priority-ceiling protocol used
+    //l_mutex.init(0U); // alternatively: priority-ceiling NOT used
 
-    me->m_thread = &l_tls2; // initialize the TLS for Thread2
+    // initialize the TLS for Thread2
+    me->m_thread = &l_tls2;
 
-    // subscribe to the test signal */
+    // subscribe to the test signal
     me->subscribe(TEST_SIG);
 
     for (;;) {

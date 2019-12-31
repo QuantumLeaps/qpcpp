@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -158,7 +158,7 @@ int QF_consoleWaitForKey(void);
 
     // Win32-specific event queue customization
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) { \
+        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt *>(0)) { \
             QF_CRIT_EXIT_(); \
             (void)WaitForSingleObject((me_)->m_osObject, (DWORD)INFINITE); \
             QF_CRIT_ENTRY_(); \

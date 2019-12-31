@@ -18,7 +18,8 @@
 #define STDINT_H
 
 /*lint -save */
-/*lint -e1960    MISRA-C++:2008 Rule 17-0-2, Re-use of C++ identifier */
+/*lint -e9141 MC++R7-3-1  global declaration of symbol */
+/*lint -e9093 MC++R17-0-2 the name is reserved to the compiler */
 
 /* Exact-width types. WG14/N843 C99 Standard, Section 7.18.1.1 */
 typedef signed char        int8_t;    /*!< exact-width  8-bit signed   int  */
@@ -39,7 +40,8 @@ typedef unsigned int  uint_fast16_t; /*!< fast at-least 16-bit unsigned int */
 typedef signed   long int_fast32_t;  /*!< fast at-least 32-bit signed   int */
 typedef unsigned long uint_fast32_t; /*!< fast at-least 32-bit unsigned int */
 
-/*lint -e961     MISRA-C:2004 Rule 19.7, Function-like macro defined */
+/*lint -e9071    MISRA 2012 Rul 21.1, req, macro matches a pattern reserved to the compiler */
+/*lint -e9026    MISRA 2012 Dir  4.9, adv, function-like macro */
 #ifndef UINT8_C
 #define UINT8_C(x_)        ((uint8_t)(x_))
 #endif

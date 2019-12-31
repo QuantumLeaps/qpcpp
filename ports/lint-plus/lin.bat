@@ -1,12 +1,12 @@
 @echo off
 :: ===========================================================================
-:: Product: QP/C++ build script for PC-Lint(TM), Standard C++ compiler
-:: Last Updated for Version: 6.2.0
-:: Date of the Last Update:  2018-03-16
+:: Product: QP/C build script for PC-Lint-Plus, "Standard" C++ compiler
+:: Last Updated for Version: 6.7.0
+:: Date of the Last Update:  2019-12-29
 ::
-::                    Q u a n t u m     L e a P s
-::                    ---------------------------
-::                    innovating embedded systems
+::                    Q u a n t u m  L e a P s
+::                    ------------------------
+::                    Modern Embedded Software
 ::
 :: Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ::
@@ -26,36 +26,39 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http://www.gnu.org/licenses/>.
+:: along with this program. If not, see <www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: https://www.state-machine.com
-:: mailto:info@state-machine.com
+:: <www.state-machine.com/licensing>
+:: <info@state-machine.com>
 :: ===========================================================================
 setlocal
 
 :: Options for calling lin.bat
 
-:: NOTE: adjust to for your installation directory of PC-Lint
-set PC_LINT=C:\tools\lint
+:: NOTE: adjust to for your installation directory of PC-Lint-Plus
+set PCLP_DIR=C:\tools\lint-plus
+set PCLP=%PCLP_DIR%\pclp32.exe
 
-if NOT exist "%PC_LINT%" (
-    @echo The PC_LINT toolset not found. Please adjust lin.bat 
+if NOT exist "%PCLP%" (
+    @echo The PC-Lint-Plus toolset not found. Please adjust lin.bat
     goto end
 )
 
-set LINTFLAGS=..\..\include\std.lnt options.lnt -DQ_SPY %1 %2
+:: set the QP/C++ directory
+set QPCPP=..\..
+set LINTFLAGS=std.lnt options.lnt %1 %2 %3 %4
 
-:: do the linting...
-%PC_LINT%\lint-nt -os(lint_qf.log)  %LINTFLAGS% -iqv  ..\..\src\qf\*.cpp 
+:: linting -------------------------------------------------------------------
+%PCLP% -os(lint_qf.log)  %LINTFLAGS% -iqv  ..\..\src\qf\*.cpp 
 
-%PC_LINT%\lint-nt -os(lint_qv.log)  %LINTFLAGS% -iqv  ..\..\src\qv\*.cpp
+%PCLP% -os(lint_qv.log)  %LINTFLAGS% -iqv  ..\..\src\qv\*.cpp
 
-%PC_LINT%\lint-nt -os(lint_qk.log)  %LINTFLAGS% -iqk  ..\..\src\qk\*.cpp
+%PCLP% -os(lint_qk.log)  %LINTFLAGS% -iqk  ..\..\src\qk\*.cpp
 
-%PC_LINT%\lint-nt -os(lint_qxk.log) %LINTFLAGS% -iqxk ..\..\src\qxk\*.cpp
+%PCLP% -os(lint_qxk.log) %LINTFLAGS% -iqxk ..\..\src\qxk\*.cpp
 
-%PC_LINT%\lint-nt -os(lint_qs.log)  %LINTFLAGS% -iqv  ..\..\src\qs\*.cpp
+%PCLP% -os(lint_qs.log)  %LINTFLAGS% -iqv  ..\..\src\qs\*.cpp
 
 :end
 endlocal

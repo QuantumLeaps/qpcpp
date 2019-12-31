@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -65,13 +65,13 @@
 #define QF_CRIT_ENTRY(status_) do { \
     (status_) = _get_CPSR(); \
     QF_INT_DISABLE(); \
-} while (0)
+} while (false)
 //#define QF_CRIT_EXIT(status_)  _set_CPSR((status_))
 #define QF_CRIT_EXIT(status_)  do { \
     if (((status_) & (1U << 7)) == 0) { \
         QF_INT_ENABLE(); \
     } \
-} while (0)
+} while (false)
 #define QF_CRIT_EXIT_NOP()     __asm(" ISB")
 
 #include "qep_port.hpp"   // QEP port

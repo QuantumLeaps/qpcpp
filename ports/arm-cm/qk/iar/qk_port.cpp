@@ -28,11 +28,11 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://www.state-machine.com
-* mailto:info@state-machine.com
+* <www.state-machine.com/licensing/>
+* <info@state-machine.com/>
 ******************************************************************************
 * @endcond
 */
@@ -42,7 +42,6 @@ extern "C" {
 
 void PendSV_Handler(void);
 void NMI_Handler(void);
-void Thread_ret(void);
 
 #define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004)
 #define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED14)

@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://www.state-machine.com
-// mailto:info@state-machine.com
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //////////////////////////////////////////////////////////////////////////////
 #include "qpcpp.hpp"
 #include "dpp.hpp"
@@ -145,7 +145,7 @@ static void onDialogGUI(WM_MESSAGE * pMsg) {
                     switch (WM_GetId(pMsg->hWinSrc)) {
                         case GUI_ID_BUTTON0: {
                                         // static PAUSE event for the Table AO */
-                            static QEvent const pauseEvt = { PAUSE_SIG, 0 };
+                            static QEvt const pauseEvt = { PAUSE_SIG, 0 };
                             AO_Table->POST(&pauseEvt, &l_onDialogGUI);
                             break;
                         }

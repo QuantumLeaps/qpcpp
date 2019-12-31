@@ -1,23 +1,23 @@
 About this Example
 ==================
 This directory contains the facilities for "linting" the application with
-PC-Lint.
+PC-Lint-Plus.
 
 To "lint" the application, invoke the batch "lin.bat"  without parameters.
-Optionally, you can supply the parameter -DQ_SPY to include the QS
+Optionally, you can supply the parameter -dQ_SPY to include the QS
 instrumentation in the "linting" process. 
 
 The output from the "linting" is saved in the fle "lin_out.log".
 
 ***
-NOTE: You need to adjust the symbol PC_LINT_DIR at the top of the
-lin.bat file, to point to the directory where PC-Lint is installed
-on you machine.
+NOTE: You need to adjust the symbol PCLP_DIR at the top of the lin.bat
+file, to point to the directory where PC-Lint-Plus is installed on your
+machine.
 ***
 
 
-The PC-Lint Options File
-========================
+The PC-Lint-Plus Options File
+=============================
 The "options.lnt" file specifies the linting options. You might need
 to modify this file to suit your needs.
 

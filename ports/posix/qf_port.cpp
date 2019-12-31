@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-11-04
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-28
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -205,9 +205,9 @@ int QF_consoleWaitForKey(void) {
 }
 
 //****************************************************************************
-void QActive::start(uint_fast8_t prio,
-                    QEvt const *qSto[], uint_fast16_t qLen,
-                    void *stkSto, uint_fast16_t stkSize,
+void QActive::start(uint_fast8_t const prio,
+                    QEvt const * * const qSto, uint_fast16_t const qLen,
+                    void * const stkSto, uint_fast16_t const stkSize,
                     void const * const par)
 {
     // p-threads allocate stack internally

@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -96,7 +96,7 @@ bool QS::onStartup(void const *arg) {
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     // extract hostName from 'arg' (hostName:port_remote)...
-    src = (arg != static_cast<void const *>(0))
+    src = (arg != static_cast<void *>(0))
           ? static_cast<char const *>(arg)
           : "localhost"; // default QSPY host
     dst = hostName;

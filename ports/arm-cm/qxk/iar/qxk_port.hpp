@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated on  2019-11-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -61,6 +61,9 @@
 // initialization of the QXK kernel
 #define QXK_INIT() QXK_init()
 extern "C" void QXK_init(void);
+
+// prototype needed for IAR "Multi-file Compilation"
+extern "C" void Thread_ret(void);
 
 #include "qxk.hpp" // QXK platform-independent public interface
 

@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : https://state-machine.com
-// Email: info@state-machine.com
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //****************************************************************************
 #define LWIP_ALLOWED
 
@@ -119,7 +119,7 @@ static void udp_rx_handler(void *arg, struct udp_pcb *upcb,
 //............................................................................
 LwIPMgr::LwIPMgr()
     : QActive((QStateHandler)&LwIPMgr::initial),
-      m_te_LWIP_SLOW_TICK(LWIP_SLOW_TICK_SIG)
+      m_te_LWIP_SLOW_TICK(this, LWIP_SLOW_TICK_SIG)
 {}
 //............................................................................
 QState LwIPMgr::initial(LwIPMgr *me, QEvt const *e) {
@@ -182,7 +182,7 @@ QState LwIPMgr::initial(LwIPMgr *me, QEvt const *e) {
 QState LwIPMgr::running(LwIPMgr *me, QEvt const *e) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            me->m_te_LWIP_SLOW_TICK.postEvery((QActive *)me,
+            me->m_te_LWIP_SLOW_TICK.armX(
                 (LWIP_SLOW_TICK_MS * BSP_TICKS_PER_SEC) / 1000);
             return Q_HANDLED();
         }

@@ -1,4 +1,4 @@
-SET PATH=C:\tools\Keil_v5\ARM\ARMCC\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\ProgramData\Oracle\Java\javapath;C:\qp\qtools\bin;C:\utils;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\tools\Python\Scripts;C:\tools\Python;
+SET PATH=C:\tools\Keil_v5\ARM\ARMCC\Bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\ProgramData\Oracle\Java\javapath;C:\utils;C:\tools\Git\cmd;C:\qp\qtools\bin;C:\qp\qtools\MinGW\bin
 SET CPU_TYPE=STM32F746NGHx
 SET CPU_VENDOR=STMicroelectronics
 SET UV2_TARGET=dpp-spy

@@ -1,13 +1,13 @@
 //****************************************************************************
-// Product: BSP for Blinky
-// Last Updated for Version: 6.5.0
-// Date of the Last Update:  2019-03-24
+// Product: Blinky AO
+// Last updated for version 6.6.0
+// Last updated on  2019-10-14
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// https://www.state-machine.com
-// mailto:info@state-machine.com
+// <www.state-machine.com>
+// <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
 #include "bsp.hpp"
@@ -44,6 +44,7 @@ private:
 
 public:
     Blinky();
+    static Blinky inst; // the single instance of Blinky (Singleton)
 
 protected:
     Q_STATE_DECL(initial);
@@ -51,11 +52,11 @@ protected:
     Q_STATE_DECL(on);
 };
 
-// local bjects --------------------------------------------------------------
-Blinky l_blinky;
-
 // global objects ------------------------------------------------------------
-QActive * const AO_Blinky = &l_blinky; // opaque pointer
+QActive * const AO_Blinky = &Blinky::inst; // opaque pointer
+
+// Blinky class definition ---------------------------------------------------
+Blinky Blinky::inst;
 
 //............................................................................
 Blinky::Blinky()
@@ -65,7 +66,7 @@ Blinky::Blinky()
     // empty
 }
 
-// HSM definition ------------------------------------------------------------
+// HSM definition ............................................................
 Q_STATE_DEF(Blinky, initial) {
     (void)e; // unused parameter
 

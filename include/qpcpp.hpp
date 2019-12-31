@@ -3,8 +3,8 @@
 /// @ingroup qep qf qv qk qxk qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -48,8 +48,8 @@
 //! Macro that specifies the backwards compatibility with the
 //! QP/C++ API version.
 /// @description
-/// For example, QP_API_VERSION=450 will cause generating the compatibility
-/// layer with QP/C++ version 4.5.0 and newer, but not older than 4.5.0.
+/// For example, QP_API_VERSION=540 will cause generating the compatibility
+/// layer with QP/C++ version 5.4.0 and newer, but not older than 5.4.0.
 /// QP_API_VERSION=0 causes generation of the compatibility layer "from the
 /// begining of time", which is the maximum backwards compatibilty. This is
 /// the default.@n
@@ -68,60 +68,6 @@
 #else
     #include "qs_dummy.hpp" // QS/C++ dummy (inactive) interface
 #endif
-
-
-/****************************************************************************/
-#if (QP_API_VERSION < 540)
-
-/*! @deprecated QFsm state machine;
-* instead use: QP::QHsm. Legacy state machines coded in the "QFsm-style" will
-* continue to work, but will use the QP::QHsm implementation internally.
-* There is no longer any efficiency advantage in using the "QFsm-style"
-* state machines.
-*
-* @note
-* For efficiency, the recommended migration path is to use the QP::QMsm
-* state machine and the QM modeling tool.
-*/
-#define QFsm  QHsm
-
-/*! deprecated macro to call in QFsm state-handler when it
-* ignores (does not handle) an event (instead use Q_SUPER())
-*/
-#define Q_IGNORED() (Q_SUPER(&QHsm::top))
-
-// QP API compatibility layer ************************************************
-#if (QP_API_VERSION < 500)
-
-//! @deprecated macro for odd 8-bit CPUs.
-#define Q_ROM
-
-//! @deprecated macro for odd 8-bit CPUs.
-#define Q_ROM_BYTE(rom_var_)   (rom_var_)
-
-//! @deprecated macro for odd 8-bit CPUs.
-#define Q_ROM_VAR
-
-#ifdef Q_SPY
-
-    //! @deprecated call to QActive post FIFO operation
-    #define postFIFO(e_, sender_) POST((e_), (sender_))
-
-    //! @deprecated call of QF system clock tick (for rate 0)
-    #define tick(sender_) TICK_X(static_cast<uint8_t>(0), (sender_))
-
-#else
-
-    #define postFIFO(e_)  POST((e_), dummy)
-    #define tick()        TICK_X(static_cast<uint8_t>(0), dummy)
-
-#endif  // Q_SPY
-
-//! @deprecated macro for generating QS-Reset trace record.
-#define QS_RESET() ((void)0)
-
-#endif // QP_API_VERSION < 500
-#endif // QP_API_VERSION < 540
 
 #endif // qpcpp_h
 

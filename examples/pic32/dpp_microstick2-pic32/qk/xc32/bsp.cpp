@@ -25,21 +25,17 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://www.state-machine.com
-// mailto:info@state-machine.com
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "dpp.hpp"
 
 Q_DEFINE_THIS_FILE
-
-#ifdef Q_SPY
-    #error Simple Blinky Application does not provide Spy build configuration
-#endif
 
 #pragma config  FNOSC    = FRCPLL    // 8 MHz
 #pragma config  FPLLIDIV = DIV_2     // 4 MHz
@@ -68,6 +64,16 @@ namespace DPP {
 // Local-scope objects -------------------------------------------------------
 static uint32_t l_rnd; // random seed
 
+#ifdef Q_SPY
+    static uint8_t const l_tickISR = 0U;
+    static uint8_t const l_testISR = 0U;
+
+    enum AppRecords { // application-specific trace records
+        PHILO_STAT = QP::QS_USER
+    };
+
+#endif
+
 // ISRs used in this project =================================================
 extern "C" {
 
@@ -76,20 +82,20 @@ void __ISR(_TIMER_2_VECTOR, IPL4SOFT) tickISR(void) {
 
     IFS0CLR = _IFS0_T2IF_MASK; // clear the interrupt source
 
-    QP::QF::TICK_X(0U, (void *)0); // handle armed time events at tick rate 0
+    QP::QF::TICK_X(0U, &l_tickISR); // handle armed time events at tick rate 0
 
     QK_ISR_EXIT();  // inform QK about the ISR exit
 }
 //............................................................................
 // for testing interrupt nesting and active object preemption
 void __ISR(_EXTERNAL_0_VECTOR, IPL6SOFT) testISR(void) {
-    static QP::QEvt const tout_evt = { TIMEOUT_SIG, 0U, 0U };
+    static QP::QEvt const eat_evt = { EAT_SIG, 0U, 0U };
 
     QK_ISR_ENTRY(); // inform QK about the ISR entry
 
     IFS0CLR = _IFS0_INT0IF_MASK; // clear the interrupt source
 
-    AO_Blinky->POST(&tout_evt, (void *)0);
+    AO_Table->POST(&eat_evt, &l_testISR);
 
     QK_ISR_EXIT();  // inform QK about the ISR exit
 }
@@ -102,34 +108,58 @@ void BSP::init(void) {
     PORTA = 0x00; // set LED drive state low
 
     randomSeed(1234U);
+
+    Q_ALLEGE(QS_INIT((void *)0)); // initialize the QS software tracing
+    QS_OBJ_DICTIONARY(&l_tickISR);
+    QS_OBJ_DICTIONARY(&l_testISR);
 }
 //............................................................................
 void BSP::terminate(int16_t result) {
     (void)result;
 }
 //............................................................................
-void BSP::ledOn(void) {
-    LED_ON();
+void BSP::displayPhilStat(uint8_t const n, char_t const *stat) {
+    (void)n;
+    (void)stat;
+    LED_TOGGLE();
+
+    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
+        QS_U8(1, n);  // Philosopher number
+        QS_STR(stat); // Philosopher status
+    QS_END()
 }
 //............................................................................
-void BSP::ledOff(void) {
-    LED_OFF();
+void BSP::displayPaused(uint8_t const paused) {
+    (void)paused;
 }
+//............................................................................
+uint32_t BSP::random(void) { // a cheap pseudo-random-number generator
+    // "Super-Duper" Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    l_rnd = l_rnd * (3U*7U*11U*13U*23U);
+    return l_rnd >> 8;
+}
+//............................................................................
+void BSP::randomSeed(uint32_t seed) {
+    l_rnd = seed;
+}
+
+} // namespace DPP
+
 //............................................................................
 // NOTE: this implementation of the assertion handler is intended only for
 // debugging and MUST be changed for deployment of the application (assuming
 // that you ship your production code with assertions enabled).
 //
 extern "C"
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
+void Q_onAssert(char const * const file, int loc) {
     (void)file;       // unused parameter
-    (void)line;       // unused parameter
+    (void)loc;        // unused parameter
     QF_INT_DISABLE(); // make sure that interrupts are disabled
     for (;;) {
     }
 }
-
-} // namespace DPP
 
 // namespace QP **************************************************************
 namespace QP {
@@ -165,10 +195,92 @@ void QK::onIdle(void) {
     //LED_ON (); /* blink the IDLE LED
     //LED_OFF();
 
-#ifdef NDEBUG
+#ifdef Q_SPY
+    while (U2STAbits.UTXBF == 0) { // TX Buffer not full?
+        QF_INT_DISABLE();
+        uint16_t b = QS::getByte();
+        QF_INT_ENABLE();
+
+        if (b == QS_EOD) { // End-Of-Data reached?
+            break; // break out of the loop
+        }
+        U2TXREG = (uint8_t)b; // stick the byte to TXREG for transmission
+    }
+#elif defined NDEBUG
     _wait();   // execute the WAIT instruction to stop the CPU
 #endif
 }
 
-} // namespace QP
+// QS callbacks ==============================================================
+#ifdef Q_SPY
 
+#define QS_BUF_SIZE   4096
+#define QS_BAUD_RATE  115200
+
+//............................................................................
+bool QS::onStartup(void const *arg) {
+    static uint8_t qsBuf[QS_BUF_SIZE]; // buffer for Quantum Spy
+
+    initBuf(qsBuf, sizeof(qsBuf)); // initialize the QS trace buffer
+
+    // initialize the UART2 for transmitting the QS trace data
+    U2RXRbits.U2RXR = 3;    // Set U2RX to RPB11, pin 22, J6-5
+    RPB10Rbits.RPB10R = 2;  // Set U2TX to RPB10, pin 21, J6-4
+
+    U2STA  = 0x0000U;       // use default settings of 8N1
+    U2MODE = 0x0008U;       // enable high baud rate
+    U2BRG  = (uint16_t)((PER_HZ / (4.0 * QS_BAUD_RATE)) - 1.0 + 0.5);
+    U2MODEbits.UARTEN = 1;
+    U2STAbits.UTXEN   = 1;
+    // setup the QS filters...
+    QS_FILTER_ON(QS_SM_RECORDS);
+    //QS_FILTER_ON(QS_AO_RECORDS);
+    QS_FILTER_ON(QS_UA_RECORDS);
+
+    return true; // indicate successful QS initialization
+}
+//............................................................................
+void QS::onCleanup(void) {
+}
+//............................................................................
+void QS::onFlush(void) {
+    uint16_t b;
+    while ((b = getByte()) != QS_EOD) { // next QS trace byte available?
+        while (U2STAbits.UTXBF) { // TX Buffer full?
+        }
+        U2TXREG = (uint8_t)b; // stick the byte to TXREG for transmission
+    }
+}
+//............................................................................
+// NOTE: works properly with interrupts enabled or disabled
+QSTimeCtr QS::onGetTime(void) {
+    return __builtin_mfc0(_CP0_COUNT, _CP0_COUNT_SELECT);
+}
+//............................................................................
+//! callback function to reset the target (to be implemented in the BSP)
+void QS::onReset(void) {
+    // perform a system unlock sequence ,starting critical sequence
+    SYSKEY = 0x00000000; //write invalid key to force lock
+    SYSKEY = 0xAA996655; //write key1 to SYSKEY
+    SYSKEY = 0x556699AA; //write key2 to SYSKEY
+    // set SWRST bit to arm reset
+    RSWRSTSET = 1;
+    // read RSWRST register to trigger reset
+    uint32_t volatile dummy = RSWRST;
+    // prevent any unwanted code execution until reset occurs
+}
+//............................................................................
+//! callback function to execute a user command (to be implemented in BSP)
+void QS::onCommand(uint8_t cmdId,
+                   uint32_t param1, uint32_t param2, uint32_t param3)
+{
+    (void)cmdId;
+    (void)param1;
+    (void)param2;
+    (void)param3;
+}
+
+#endif // Q_SPY
+//----------------------------------------------------------------------------
+
+} // namespace QP

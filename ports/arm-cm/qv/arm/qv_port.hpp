@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -44,7 +44,7 @@
     #define QV_CPU_SLEEP() do { \
         __wfi(); \
         QF_INT_ENABLE(); \
-    } while (0)
+    } while (false)
 
 #else // Cortex-M3/M4/M4F
 
@@ -54,7 +54,7 @@
         QF_INT_ENABLE(); \
         __wfi(); \
         QF_PRIMASK_ENABLE(); \
-    } while (0)
+    } while (false)
 
     // initialization of the QV kernel for Cortex-M3/M4/M4F
     #define QV_INIT() QV_init()

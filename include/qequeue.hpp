@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -250,7 +250,7 @@ public:
     ///
     /// @sa QP::QMActive::defer(), QP::QMActive::recall()
     bool isEmpty(void) const {
-        return m_frontEvt == static_cast<QEvt const *>(0);
+        return m_frontEvt == static_cast<QEvt *>(0);
     }
 
 private:

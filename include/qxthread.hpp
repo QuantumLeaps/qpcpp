@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-09-12
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-29
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -43,11 +43,6 @@
 #define QXTHREAD_NO_TIMEOUT  (static_cast<uint_fast16_t>(0))
 
 namespace QP {
-
-class QXThread; // forward declaration
-
-//! Thread handler pointer-to-function
-typedef void (*QXThreadHandler)(QXThread * const me);
 
 //****************************************************************************
 //! Extended (blocking) thread of the QXK preemptive kernel
@@ -87,8 +82,8 @@ public:
 
     // virtual function overrides...
     //! Executes the top-most initial transition in QP::QMsm.
-    virtual void init(void const * const par);
-    virtual void init(void) { this->init(static_cast<QEvt const *>(0)); }
+    virtual void init(void const * const e);
+    virtual void init(void) { this->init(static_cast<QEvt *>(0)); }
 
     //! Dispatches an event to QMsm
     virtual void dispatch(QEvt const * const e);
@@ -96,17 +91,17 @@ public:
     //! Starts execution of an extended thread and registers the thread
     //! with the framework.
     virtual void start(uint_fast8_t const prio,
-                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       QEvt const * * const qSto, uint_fast16_t const qLen,
                        void * const stkSto, uint_fast16_t const stkSize,
                        void const * const par);
 
     //! Overloaded start function (no initialization event)
     virtual void start(uint_fast8_t const prio,
-                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       QEvt const * * const qSto, uint_fast16_t const qLen,
                        void * const stkSto, uint_fast16_t const stkSize)
     {
         this->start(prio, qSto, qLen, stkSto, stkSize,
-                    static_cast<QEvt const *>(0));
+                    static_cast<QEvt *>(0));
     }
 
 #ifndef Q_SPY
@@ -121,13 +116,6 @@ public:
     //! Posts an event directly to the event queue of the active object
     //! using the Last-In-First-Out (LIFO) policy.
     virtual void postLIFO(QEvt const * const e);
-
-    //! get the blocking object for this thread (NULL if not blocked)
-    bool isBlockedOn(void const * const obj
-                     = static_cast<void const *>(0)) const
-    {
-        return reinterpret_cast<void const *>(m_temp.obj) == obj;
-    }
 
 private:
     void block_(void) const;

@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -49,7 +49,7 @@ namespace QP {
 /// @note This function is only to be used through macros, never in the
 /// client code directly.
 ///
-void QS::u64_(uint64_t d) {
+void QS::u64_raw_(uint64_t d) {
     uint8_t chksum_ = priv_.chksum;
     uint8_t *buf_   = priv_.buf;
     QSCtr   head_   = priv_.head;
@@ -61,7 +61,7 @@ void QS::u64_(uint64_t d) {
          --i)
     {
         uint8_t b = static_cast<uint8_t>(d);
-        QS_INSERT_ESC_BYTE(b)
+        QS_INSERT_ESC_BYTE_(b)
         d >>= 8;
     }
 
@@ -73,21 +73,21 @@ void QS::u64_(uint64_t d) {
 /// @note This function is only to be used through macros, never in the
 /// client code directly.
 ///
-void QS::u64(uint8_t format, uint64_t d) {
+void QS::u64_fmt_(uint8_t format, uint64_t d) {
     uint8_t chksum_ = priv_.chksum;
     uint8_t *buf_   = priv_.buf;
     QSCtr   head_   = priv_.head;
     QSCtr   end_    = priv_.end;
 
     priv_.used += static_cast<QSCtr>(9); // 9 bytes are about to be added
-    QS_INSERT_ESC_BYTE(format)  // insert the format byte
+    QS_INSERT_ESC_BYTE_(format)  // insert the format byte
 
     for (int_fast8_t i = static_cast<int_fast8_t>(8);
          i != static_cast<int_fast8_t>(0);
          --i)
     {
         format = static_cast<uint8_t>(d);
-        QS_INSERT_ESC_BYTE(format)
+        QS_INSERT_ESC_BYTE_(format)
         d >>= 8;
     }
 

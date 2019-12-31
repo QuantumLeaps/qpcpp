@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: "Blinky" on EFM32-SLSTK3401A board, cooperative QV kernel
-// Last Updated for Version: 5.6.5
-// Date of the Last Update:  2016-05-02
+// Last updated for version 6.6.0
+// Last updated on  2019-10-14
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// https://state-machine.com
-// mailto:info@state-machine.com
+// <www.state-machine.com>
+// <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
 #include "blinky.hpp"
@@ -45,25 +45,6 @@
 #endif
 
 //Q_DEFINE_THIS_FILE
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-// DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-//
-enum KernelUnawareISRs { // see NOTE00
-    // ...
-    MAX_KERNEL_UNAWARE_CMSIS_PRI  // keep always last
-};
-// "kernel-unaware" interrupts can't overlap "kernel-aware" interrupts
-Q_ASSERT_COMPILE(MAX_KERNEL_UNAWARE_CMSIS_PRI <= QF_AWARE_ISR_CMSIS_PRI);
-
-enum KernelAwareISRs {
-    SYSTICK_PRIO = QF_AWARE_ISR_CMSIS_PRI, // see NOTE00
-    // ...
-    MAX_KERNEL_AWARE_CMSIS_PRI // keep always last
-};
-// "kernel-aware" interrupts should not overlap the PendSV priority
-Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 
 // Local-scope objects -------------------------------------------------------
 #define LED0_PIN    4
@@ -145,12 +126,7 @@ void QF::onStartup(void) {
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE00
-    //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-    // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-    //
-    NVIC_SetPriority(SysTick_IRQn,   SYSTICK_PRIO);
+    NVIC_SetPriority(SysTick_IRQn,  QF_AWARE_ISR_CMSIS_PRI);
     // ...
 
     // enable IRQs...

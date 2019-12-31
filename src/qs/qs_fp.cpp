@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -46,24 +46,24 @@ namespace QP {
 /// @note This function is only to be used through macros, never in the
 /// client code directly.
 ///
-void QS::f32(uint8_t format, float32_t const d) {
+void QS::f32_fmt_(uint8_t format, float32_t const d) {
     union F32Rep {
         float32_t f;
         uint32_t  u;
     } fu32; // the internal binary representation
-    uint8_t chksum_ = priv_.chksum;  // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;     // put in a temporary (register)
-    QSCtr   head_   = priv_.head;    // put in a temporary (register)
-    QSCtr   end_    = priv_.end;     // put in a temporary (register)
+    uint8_t chksum_  = priv_.chksum;  // put in a temporary (register)
+    uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
+    QSCtr   head_    = priv_.head;    // put in a temporary (register)
+    QSCtr const end_ = priv_.end;     // put in a temporary (register)
 
     fu32.f = d; // assign the binary representation
 
     priv_.used += static_cast<QSCtr>(5); // 5 bytes about to be added
-    QS_INSERT_ESC_BYTE(format)  // insert the format byte
+    QS_INSERT_ESC_BYTE_(format)  // insert the format byte
 
     for (int_t i = static_cast<int_t>(4); i != static_cast<int_t>(0); --i) {
         format = static_cast<uint8_t>(fu32.u);
-        QS_INSERT_ESC_BYTE(format)
+        QS_INSERT_ESC_BYTE_(format)
         fu32.u >>= 8;
     }
 
@@ -75,7 +75,7 @@ void QS::f32(uint8_t format, float32_t const d) {
 /// @note This function is only to be used through macros, never in the
 /// client code directly.
 ///
-void QS::f64(uint8_t format, float64_t const d) {
+void QS::f64_fmt_(uint8_t format, float64_t const d) {
     union F64Rep {
         float64_t d;
         struct UInt2 {
@@ -83,10 +83,10 @@ void QS::f64(uint8_t format, float64_t const d) {
             uint32_t u2;
         } i;
     } fu64;  // the internal binary representation
-    uint8_t chksum_ = priv_.chksum;
-    uint8_t *buf_   = priv_.buf;
-    QSCtr   head_   = priv_.head;
-    QSCtr   end_    = priv_.end;
+    uint8_t chksum_  = priv_.chksum;
+    uint8_t * const buf_ = priv_.buf;
+    QSCtr   head_    = priv_.head;
+    QSCtr const end_ = priv_.end;
     uint32_t i;
     // static constant untion to detect endianness of the machine
     static union U32Rep {
@@ -97,7 +97,7 @@ void QS::f64(uint8_t format, float64_t const d) {
     fu64.d = d;  // assign the binary representation
 
     priv_.used += static_cast<QSCtr>(9); // 9 bytes about to be added
-    QS_INSERT_ESC_BYTE(format)  // insert the format byte
+    QS_INSERT_ESC_BYTE_(format)  // insert the format byte
 
     // is this a big-endian machine?
     if (endian.u8 == static_cast<uint8_t>(0)) {
@@ -110,14 +110,14 @@ void QS::f64(uint8_t format, float64_t const d) {
     // output 4 bytes from fu64.i.u1 ...
     for (i = static_cast<uint32_t>(4); i != static_cast<uint32_t>(0); --i) {
         format = static_cast<uint8_t>(fu64.i.u1);
-        QS_INSERT_ESC_BYTE(format)
+        QS_INSERT_ESC_BYTE_(format)
         fu64.i.u1 >>= 8;
     }
 
     // output 4 bytes from fu64.i.u2 ...
     for (i = static_cast<uint32_t>(4); i != static_cast<uint32_t>(0); --i) {
         format = static_cast<uint8_t>(fu64.i.u2);
-        QS_INSERT_ESC_BYTE(format)
+        QS_INSERT_ESC_BYTE_(format)
         fu64.i.u2 >>= 8;
     }
 

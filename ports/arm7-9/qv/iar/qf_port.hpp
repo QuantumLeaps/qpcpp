@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -65,7 +65,7 @@
     #define QF_CRIT_ENTRY(stat_)    do { \
         (stat_) = __get_CPSR(); \
         QF_INT_DISABLE(); \
-    } while (0)
+    } while (false)
     #define QF_CRIT_EXIT(stat_)     __set_CPSR(stat_)
 
     #include <intrinsics.h> // for  __get_CPSR()/__set_CPSR()

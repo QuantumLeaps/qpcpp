@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -85,7 +85,7 @@
         __asm volatile ("mrs %0,BASEPRI" : "=r" (basepri_) :: ); \
         __asm volatile ("cpsid i\n msr BASEPRI,%0\n cpsie i" \
                         :: "r" (QF_BASEPRI) : ); \
-    } while (0)
+    } while (false)
     #define QF_CRIT_EXIT(basepri_) \
         __asm volatile ("msr BASEPRI,%0" :: "r" (basepri_) : )
 

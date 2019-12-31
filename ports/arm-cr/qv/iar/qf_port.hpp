@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -57,7 +57,7 @@
 #define QF_CRIT_ENTRY(status_) do { \
     (status_) = __get_CPSR(); \
     QF_INT_DISABLE(); \
-} while (0)
+} while (false)
 #define QF_CRIT_EXIT(status_)  __set_CPSR((status_))
 #define QF_CRIT_EXIT_NOP()     __ISB()
 

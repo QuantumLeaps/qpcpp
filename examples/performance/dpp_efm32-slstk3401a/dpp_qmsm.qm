@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.5.0" links="0">
+<model version="4.6.0" links="1">
  <documentation>Dining Philosopher Problem example with MSM state machines.</documentation>
+ <!--${qpcpp}-->
  <framework name="qpcpp" license="../../../QPCPP-EVAL.qlc"/>
+ <!--${Events}-->
  <package name="Events" stereotype="0x01" namespace="DPP::">
+  <!--${Events::TableEvt}-->
   <class name="TableEvt" superclass="qpcpp::QEvt">
+   <!--${Events::TableEvt::philoNum}-->
    <attribute name="philoNum" type="uint8_t" visibility="0x00" properties="0x00"/>
   </class>
  </package>
+ <!--${AOs}-->
  <package name="AOs" stereotype="0x02" namespace="DPP::">
+  <!--${AOs::Philo}-->
   <class name="Philo" superclass="qpcpp::QMActive">
+   <!--${AOs::Philo::m_timeEvt}-->
    <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Philo::Philo}-->
    <operation name="Philo" type="" visibility="0x00" properties="0x00">
     <code>  : QMActive(Q_STATE_CAST(&amp;Philo::initial)),
     m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
    </operation>
+   <!--${AOs::Philo::SM}-->
    <statechart properties="0x02">
+    <!--${AOs::Philo::SM::initial}-->
     <initial target="../1">
      <action>static bool registered = false; // starts off with 0, per C-standard
 (void)e; // suppress the compiler warning about unused parameter
@@ -46,14 +56,17 @@ subscribe(TEST_SIG);</action>
       <action box="0,-2,6,2"/>
      </initial_glyph>
     </initial>
+    <!--${AOs::Philo::SM::thinking}-->
     <state name="thinking">
      <entry>m_timeEvt.armX(think_time(), 0U);</entry>
      <exit>(void)m_timeEvt.disarm();</exit>
+     <!--${AOs::Philo::SM::thinking::TIMEOUT}-->
      <tran trig="TIMEOUT" target="../../2">
       <tran_glyph conn="2,13,3,1,20,12,-3">
        <action box="0,-2,6,2"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Philo::SM::thinking::EAT, DONE}-->
      <tran trig="EAT, DONE">
       <action>/* EAT or DONE must be for other Philos than this one */
 Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
@@ -61,6 +74,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
        <action box="0,-2,14,2"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Philo::SM::thinking::TEST}-->
      <tran trig="TEST">
       <tran_glyph conn="2,19,3,-1,13">
        <action box="0,-2,11,4"/>
@@ -71,11 +85,14 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
       <exit box="1,4,5,2"/>
      </state_glyph>
     </state>
+    <!--${AOs::Philo::SM::hungry}-->
     <state name="hungry">
      <entry>TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
 pe-&gt;philoNum = PHILO_ID(this);
 AO_Table-&gt;POST(pe, this);</entry>
+     <!--${AOs::Philo::SM::hungry::EAT}-->
      <tran trig="EAT">
+      <!--${AOs::Philo::SM::hungry::EAT::[Q_EVT_CAST(TableEvt)->philoNum=~}-->
       <choice target="../../../3">
        <guard>Q_EVT_CAST(TableEvt)-&gt;philoNum == PHILO_ID(this)</guard>
        <choice_glyph conn="15,30,5,1,7,13,-3">
@@ -86,6 +103,7 @@ AO_Table-&gt;POST(pe, this);</entry>
        <action box="0,-2,14,2"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Philo::SM::hungry::DONE}-->
      <tran trig="DONE">
       <action>/* DONE must be for other Philos than this one */
 Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
@@ -97,17 +115,20 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
       <entry box="1,2,5,2"/>
      </state_glyph>
     </state>
+    <!--${AOs::Philo::SM::eating}-->
     <state name="eating">
      <entry>m_timeEvt.armX(eat_time(), 0U);</entry>
      <exit>TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
 pe-&gt;philoNum = PHILO_ID(this);
 QP::QF::PUBLISH(pe, this);
 (void)m_timeEvt.disarm();</exit>
+     <!--${AOs::Philo::SM::eating::TIMEOUT}-->
      <tran trig="TIMEOUT" target="../../1">
       <tran_glyph conn="2,51,3,1,22,-41,-5">
        <action box="0,-2,6,2"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Philo::SM::eating::EAT, DONE}-->
      <tran trig="EAT, DONE">
       <action>/* EAT or DONE must be for other Philos than this one */
 Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
@@ -123,9 +144,13 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
     <state_diagram size="36,61"/>
    </statechart>
   </class>
+  <!--${AOs::Table}-->
   <class name="Table" superclass="qpcpp::QMActive">
+   <!--${AOs::Table::m_fork[N_PHILO]}-->
    <attribute name="m_fork[N_PHILO]" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Table::m_isHungry[N_PHILO]}-->
    <attribute name="m_isHungry[N_PHILO]" type="bool" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Table::Table}-->
    <operation name="Table" type="" visibility="0x00" properties="0x00">
     <code>  : QMActive(Q_STATE_CAST(&amp;Table::initial))
 
@@ -134,7 +159,9 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     m_isHungry[n] = false;
 }</code>
    </operation>
+   <!--${AOs::Table::SM}-->
    <statechart properties="0x02">
+    <!--${AOs::Table::SM::initial}-->
     <initial target="../1/2">
      <action>(void)e; // suppress the compiler warning about unused parameter
 
@@ -167,18 +194,22 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
       <action box="0,-2,6,2"/>
      </initial_glyph>
     </initial>
+    <!--${AOs::Table::SM::active}-->
     <state name="active">
+     <!--${AOs::Table::SM::active::TEST}-->
      <tran trig="TEST">
       <tran_glyph conn="2,11,3,-1,14">
        <action box="0,-2,11,4"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Table::SM::active::EAT}-->
      <tran trig="EAT">
       <action>Q_ERROR();</action>
       <tran_glyph conn="2,15,3,-1,14">
        <action box="0,-2,10,4"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Table::SM::active::serving}-->
      <state name="serving">
       <entry brief="give pending permitions to eat">for (uint8_t n = 0U; n &lt; N_PHILO; ++n) { // give permissions to eat...
     if (m_isHungry[n]
@@ -194,6 +225,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
         BSP::displayPhilStat(n, EATING);
     }
 }</entry>
+      <!--${AOs::Table::SM::active::serving::HUNGRY}-->
       <tran trig="HUNGRY">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // phil ID must be in range and he must be not hungry
@@ -201,6 +233,7 @@ Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
 
 BSP::displayPhilStat(n, HUNGRY);
 uint8_t m = LEFT(n);</action>
+       <!--${AOs::Table::SM::active::serving::HUNGRY::[bothfree]}-->
        <choice>
         <guard brief="both free">(m_fork[m] == FREE) &amp;&amp; (m_fork[n] == FREE)</guard>
         <action>m_fork[m] = USED;
@@ -213,6 +246,7 @@ BSP::displayPhilStat(n, EATING);</action>
          <action box="1,0,10,2"/>
         </choice_glyph>
        </choice>
+       <!--${AOs::Table::SM::active::serving::HUNGRY::[else]}-->
        <choice>
         <guard>else</guard>
         <action>m_isHungry[n] = true;</action>
@@ -224,6 +258,7 @@ BSP::displayPhilStat(n, EATING);</action>
         <action box="0,-2,8,2"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::serving::DONE}-->
       <tran trig="DONE">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // phil ID must be in range and he must be not hungry
@@ -262,12 +297,14 @@ if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
         <action box="0,-2,6,2"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::serving::EAT}-->
       <tran trig="EAT">
        <action>Q_ERROR();</action>
        <tran_glyph conn="4,37,3,-1,15">
         <action box="0,-2,12,4"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::serving::PAUSE}-->
       <tran trig="PAUSE" target="../../3">
        <tran_glyph conn="4,41,3,1,37,6,-3">
         <action box="0,-2,7,2"/>
@@ -277,14 +314,17 @@ if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
        <entry box="1,2,27,2"/>
       </state_glyph>
      </state>
+     <!--${AOs::Table::SM::active::paused}-->
      <state name="paused">
       <entry>BSP::displayPaused(1U);</entry>
       <exit>BSP::displayPaused(0U);</exit>
+      <!--${AOs::Table::SM::active::paused::SERVE}-->
       <tran trig="SERVE" target="../../2">
        <tran_glyph conn="4,57,3,1,39,-29,-5">
         <action box="0,-2,7,2"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::paused::HUNGRY}-->
       <tran trig="HUNGRY">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // philo ID must be in range and he must be not hungry
@@ -295,6 +335,7 @@ BSP::displayPhilStat(n, HUNGRY);</action>
         <action box="0,-2,6,2"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::paused::DONE}-->
       <tran trig="DONE">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // phil ID must be in range and he must be not hungry
@@ -321,12 +362,18 @@ m_fork[n] = FREE;</action>
     <state_diagram size="50,69"/>
    </statechart>
   </class>
+  <!--${AOs::AO_Philo[N_PHILO]}-->
   <attribute name="AO_Philo[N_PHILO]" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
+  <!--${AOs::AO_Table}-->
   <attribute name="AO_Table" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
+  <!--${AOs::XT_Test1}-->
   <attribute name="XT_Test1" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
+  <!--${AOs::XT_Test2}-->
   <attribute name="XT_Test2" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
  </package>
+ <!--${.}-->
  <directory name=".">
+  <!--${.::dpp.hpp}-->
   <file name="dpp.hpp">
    <text>#ifndef DPP_HPP
 #define DPP_HPP
@@ -363,6 +410,7 @@ $declare(AOs::XT_Test2)
 
 #endif // DPP_HPP</text>
   </file>
+  <!--${.::philo.cpp}-->
   <file name="philo.cpp">
    <text>#include &quot;qpcpp.hpp&quot;
 #include &quot;dpp.hpp&quot;
@@ -413,6 +461,7 @@ QP::QActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Phil
 // Philo definition ----------------------------------------------------------
 $define(AOs::Philo)</text>
   </file>
+  <!--${.::table.cpp}-->
   <file name="table.cpp">
    <text>#include &quot;qpcpp.hpp&quot;
 #include &quot;dpp.hpp&quot;

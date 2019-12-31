@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.5.1" links="1">
+<model version="4.6.0" links="1">
  <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -389,7 +389,7 @@ enum DPPSignals {
 $declare(Events::TableEvt)
 
 // number of philosophers
-#define N_PHILO ((uint8_t)5)
+#define N_PHILO (static_cast&lt;uint8_t&gt;(5))
 
 $declare(AOs::AO_Philo[N_PHILO])
 
@@ -409,12 +409,12 @@ $declare(AOs::XT_Test2)
 #include &quot;dpp.hpp&quot;
 #include &quot;bsp.hpp&quot;
 
-Q_DEFINE_THIS_FILE
-
 // Active object class -------------------------------------------------------
 $declare(AOs::Philo)
 
 namespace DPP {
+
+Q_DEFINE_THIS_FILE
 
 // Local objects -------------------------------------------------------------
 static Philo l_philo[N_PHILO];   // storage for all Philos
@@ -460,12 +460,12 @@ $define(AOs::Philo)</text>
 #include &quot;dpp.hpp&quot;
 #include &quot;bsp.hpp&quot;
 
-Q_DEFINE_THIS_FILE
-
 // Active object class -------------------------------------------------------
 $declare(AOs::Table)
 
 namespace DPP {
+
+Q_DEFINE_THIS_FILE
 
 // helper function to provide the RIGHT neighbour of a Philo[n]
 inline uint8_t RIGHT(uint8_t const n) {

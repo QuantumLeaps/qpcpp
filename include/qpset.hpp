@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -41,8 +41,13 @@
 
 namespace QP {
 
-#if (!defined QF_MAX_ACTIVE) || (QF_MAX_ACTIVE < 1) || (64 < QF_MAX_ACTIVE)
-    #error "QF_MAX_ACTIVE not defined or out of range. Valid range is 1..64"
+#ifndef QF_MAX_ACTIVE
+    // default value when NOT defined
+    #define QF_MAX_ACTIVE 32
+#endif
+
+#if (QF_MAX_ACTIVE < 1) || (64 < QF_MAX_ACTIVE)
+    #error "QF_MAX_ACTIVE out of range. Valid range is 1..64"
 #elif (QF_MAX_ACTIVE <= 8)
     typedef uint8_t QPSetBits;
 #elif (QF_MAX_ACTIVE <= 16)
@@ -64,13 +69,13 @@ namespace QP {
 ///
 /// The priority set represents the set of active objects that are ready to
 /// run and need to be considered by the scheduling algorithm. The set is
-/// capable of storing up to 32 priority levels.
+/// capable of storing up to 32 priority levels. QP::QPSet is specifically
+/// declared as a POD (Plain Old Data) for ease of initialization and
+/// interfacing with plain "C" code.
 ///
-class QPSet {
+struct QPSet {
 
     QPSetBits volatile m_bits;  //!< bitmask with a bit for each element
-
-public:
 
     //! Makes the priority set @p me_ empty.
     void setEmpty(void) {
@@ -101,7 +106,10 @@ public:
     }
 
     //! remove element @p n from the set, n = 1..QF_MAX_ACTIVE
-    void remove(uint_fast8_t const n) {
+    /// @note
+    /// intentionally misspelled ("rmove") to avoid collision with
+    /// the C++ standard library facility "remove"
+    void rmove(uint_fast8_t const n) {
         m_bits &= static_cast<QPSetBits>(
            ~(static_cast<QPSetBits>(1) << (n - static_cast<uint_fast8_t>(1))));
     }
@@ -117,13 +125,13 @@ public:
 ///
 /// The priority set represents the set of active objects that are ready to
 /// run and need to be considered by the scheduling algorithm. The set is
-/// capable of storing up to 64 priority levels.
+/// capable of storing up to 64 priority levels. QP::QPSet is specifically
+/// declared as a POD (Plain Old Data) for ease of initialization and
+/// interfacing with plain "C" code.
 ///
-class QPSet {
+struct QPSet {
 
     uint32_t volatile m_bits[2]; //!< 2 bitmasks with a bit for each element
-
-public:
 
     //! Makes the priority set @p me_ empty.
     void setEmpty(void) {
@@ -171,7 +179,10 @@ public:
     }
 
     //! remove element @p n from the set, n = 1..64
-    void remove(uint_fast8_t const n) {
+    /// @note
+    /// intentionally misspelled ("rmove") to avoid collision with
+    /// the C++ standard library facility "remove"
+    void rmove(uint_fast8_t const n) {
         if (n <= static_cast<uint_fast8_t>(32)) {
             (m_bits[0] &= ~(static_cast<uint32_t>(1)
                             << (n - static_cast<uint_fast8_t>(1))));

@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.5.1" links="0">
+<model version="4.6.0" links="1">
  <documentation>PEdestrian LIghto CONtrolled (PELICA) crossing for Qt with GUI</documentation>
+ <!--${qpcpp}-->
  <framework name="qpcpp"/>
+ <!--${Qt-port}-->
  <package name="Qt-port" stereotype="0x00" namespace="QP::">
+  <!--${Qt-port::GuiQActive}-->
   <class name="GuiQActive" superclass="qpcpp::QActive">
+   <!--${Qt-port::GuiQActive::GuiQActive}-->
    <operation name="GuiQActive" type="QActive(initial)" visibility="0x00" properties="0x00">
+    <!--${Qt-port::GuiQActive::GuiQActive::initial}-->
     <parameter name="initial" type="QStateHandler"/>
    </operation>
+   <!--${Qt-port::GuiQActive::start}-->
    <operation name="start" type="void" visibility="0x00" properties="0x00">
     <documentation>Starts execution of an active object and registers the object with the framework. This function is strongly OS-dependent and must be defined in the QP port to a particular platform.
 
@@ -19,11 +25,17 @@ The function takes six arguments:
 'stkSto' and 'stkSize' are the stack storage and size in bytes. Please note that a per-active object stack is used only when the underlying OS requies it. If the stack is not required, or the underlying OS allocates the stack internally, the stkSto should be NULL and/or stkSize should be 0.
 
 'ie' is an optional initialization event that can be used to pass additional startup data to the active object. (Pass NULL if your active object does not expect the initialization event).</documentation>
+    <!--${Qt-port::GuiQActive::start::prio}-->
     <parameter name="prio" type="uint8_t"/>
+    <!--${Qt-port::GuiQActive::start::qSto[]}-->
     <parameter name="qSto[]" type="QEvt const *"/>
+    <!--${Qt-port::GuiQActive::start::qLen}-->
     <parameter name="qLen" type="uint32_t"/>
+    <!--${Qt-port::GuiQActive::start::stkSto}-->
     <parameter name="stkSto" type="void *"/>
+    <!--${Qt-port::GuiQActive::start::stkSize}-->
     <parameter name="stkSize" type="uint32_t"/>
+    <!--${Qt-port::GuiQActive::start::ie}-->
     <parameter name="ie" type="QEvt const *"/>
     <code>// Example:
 
@@ -46,12 +58,14 @@ int main() {
     . . .
 }</code>
    </operation>
-   <operation name="postFIFO" type="void" visibility="0x00" properties="0x00">
+   <!--${Qt-port::GuiQActive::post}-->
+   <operation name="post" type="void" visibility="0x00" properties="0x00">
     <documentation>Posts an event e directly to the event queue of the acitve object this using the First-In-First-Out (FIFO) policy.
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
 NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <!--${Qt-port::GuiQActive::post::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
 
@@ -61,8 +75,9 @@ extern QActive *AO_Table;
 pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
 pe-&gt;philNum = num;
 
-AO_Table-&gt;postFIFO(pe); // &lt;==</code>
+AO_Table-&gt;post(pe); // &lt;==</code>
    </operation>
+   <!--${Qt-port::GuiQActive::postLIFO}-->
    <operation name="postLIFO" type="void" visibility="0x00" properties="0x00">
     <documentation>Posts an event e directly to the event queue of the acitve object this using the Last-In-First-Out (LIFO) policy.
 
@@ -71,6 +86,7 @@ Direct event posting is the simplest asynchronous communication method available
 NOTE: You should be very careful with the LIFO (Last In First Out) policy, because it *reverses* the order of events in the queue. Typically, the QActive_postLIFO() operation shuould be only used for self-posting of events as reminders (see the &quot;Reminder&quot; state pattern) for continuing a processing. The postLIFO() operation is also used in the QActive::recall() operation.
 
 NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <!--${Qt-port::GuiQActive::postLIFO::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
 . . .
@@ -80,10 +96,14 @@ pe-&gt;philNum = num;
 postLIFO(pe); // &lt;==</code>
    </operation>
   </class>
+  <!--${Qt-port::GuiQMActive}-->
   <class name="GuiQMActive" superclass="qpcpp::QMActive">
+   <!--${Qt-port::GuiQMActive::GuiQMActive}-->
    <operation name="GuiQMActive" type="QMActive(initial)" visibility="0x00" properties="0x00">
+    <!--${Qt-port::GuiQMActive::GuiQMActive::initial}-->
     <parameter name="initial" type="QStateHandler"/>
    </operation>
+   <!--${Qt-port::GuiQMActive::start}-->
    <operation name="start" type="void" visibility="0x00" properties="0x00">
     <documentation>Starts execution of an active object and registers the object with the framework. This function is strongly OS-dependent and must be defined in the QP port to a particular platform.
 
@@ -96,11 +116,17 @@ The function takes six arguments:
 'stkSto' and 'stkSize' are the stack storage and size in bytes. Please note that a per-active object stack is used only when the underlying OS requies it. If the stack is not required, or the underlying OS allocates the stack internally, the stkSto should be NULL and/or stkSize should be 0.
 
 'ie' is an optional initialization event that can be used to pass additional startup data to the active object. (Pass NULL if your active object does not expect the initialization event).</documentation>
+    <!--${Qt-port::GuiQMActive::start::prio}-->
     <parameter name="prio" type="uint8_t"/>
+    <!--${Qt-port::GuiQMActive::start::qSto[]}-->
     <parameter name="qSto[]" type="QEvt const *"/>
+    <!--${Qt-port::GuiQMActive::start::qLen}-->
     <parameter name="qLen" type="uint32_t"/>
+    <!--${Qt-port::GuiQMActive::start::stkSto}-->
     <parameter name="stkSto" type="void *"/>
+    <!--${Qt-port::GuiQMActive::start::stkSize}-->
     <parameter name="stkSize" type="uint32_t"/>
+    <!--${Qt-port::GuiQMActive::start::ie}-->
     <parameter name="ie" type="QEvt const *"/>
     <code>// Example:
 
@@ -123,12 +149,14 @@ int main() {
     . . .
 }</code>
    </operation>
-   <operation name="postFIFO" type="void" visibility="0x00" properties="0x00">
+   <!--${Qt-port::GuiQMActive::post}-->
+   <operation name="post" type="void" visibility="0x00" properties="0x00">
     <documentation>Posts an event e directly to the event queue of the acitve object this using the First-In-First-Out (FIFO) policy.
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
 NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <!--${Qt-port::GuiQMActive::post::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
 
@@ -138,8 +166,9 @@ extern QActive *AO_Table;
 pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
 pe-&gt;philNum = num;
 
-AO_Table-&gt;postFIFO(pe); // &lt;==</code>
+AO_Table-&gt;post(pe); // &lt;==</code>
    </operation>
+   <!--${Qt-port::GuiQMActive::postLIFO}-->
    <operation name="postLIFO" type="void" visibility="0x00" properties="0x00">
     <documentation>Posts an event e directly to the event queue of the acitve object this using the Last-In-First-Out (LIFO) policy.
 
@@ -148,6 +177,7 @@ Direct event posting is the simplest asynchronous communication method available
 NOTE: You should be very careful with the LIFO (Last In First Out) policy, because it *reverses* the order of events in the queue. Typically, the QActive_postLIFO() operation shuould be only used for self-posting of events as reminders (see the &quot;Reminder&quot; state pattern) for continuing a processing. The postLIFO() operation is also used in the QActive::recall() operation.
 
 NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <!--${Qt-port::GuiQMActive::postLIFO::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
 . . .
@@ -158,17 +188,24 @@ postLIFO(pe); // &lt;==</code>
    </operation>
   </class>
  </package>
+ <!--${components}-->
  <package name="components" stereotype="0x02" namespace="PELICAN::">
+  <!--${components::Pelican}-->
   <class name="Pelican" superclass="Qt-port::GuiQActive">
    <documentation>PEdestrian LIght CONtrolled (PELICAN) crossing</documentation>
+   <!--${components::Pelican::m_timeout}-->
    <attribute name="m_timeout" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
+   <!--${components::Pelican::m_flashCtr}-->
    <attribute name="m_flashCtr" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <!--${components::Pelican::Pelican}-->
    <operation name="Pelican" type="" visibility="0x00" properties="0x02">
     <documentation>constructor</documentation>
     <code> : GuiQActive(Q_STATE_CAST(&amp;Pelican::initial)),
    m_timeout(this, TIMEOUT_SIG)</code>
    </operation>
+   <!--${components::Pelican::SM}-->
    <statechart properties="0x02">
+    <!--${components::Pelican::SM::initial}-->
     <initial target="../1">
      <action>subscribe(PEDS_WAITING_SIG);
 subscribe(TERMINATE_SIG);
@@ -201,48 +238,59 @@ QS_SIG_DICTIONARY(TIMEOUT_SIG,      &amp;l_Pelican); // just for Pelican
       <action box="1,-2,27,4"/>
      </initial_glyph>
     </initial>
+    <!--${components::Pelican::SM::operational}-->
     <state name="operational">
      <entry brief="CARS_RED; PEDS_DONT_WALK">BSP_signalCars(CARS_RED);
 BSP_signalPeds(PEDS_DONT_WALK);</entry>
+     <!--${components::Pelican::SM::operational::initial}-->
      <initial target="../3">
       <initial_glyph conn="3,9,5,1,34,8,-2">
        <action box="1,-2,6,2"/>
       </initial_glyph>
      </initial>
+     <!--${components::Pelican::SM::operational::OFF}-->
      <tran trig="OFF" target="../../2">
       <tran_glyph conn="2,14,3,1,72,66,-2">
        <action box="0,-2,5,2"/>
       </tran_glyph>
      </tran>
+     <!--${components::Pelican::SM::operational::TERMINATE}-->
      <tran trig="TERMINATE">
       <action>BSP_terminate(0);</action>
       <tran_glyph conn="2,12,3,-1,30">
        <action box="0,-2,10,2"/>
       </tran_glyph>
      </tran>
+     <!--${components::Pelican::SM::operational::carsEnabled}-->
      <state name="carsEnabled">
       <exit brief="CARS_RED">BSP_signalCars(CARS_RED);</exit>
+      <!--${components::Pelican::SM::operational::carsEnabled::initial}-->
       <initial target="../1">
        <initial_glyph conn="5,21,5,1,26,4,-2">
         <action box="1,-2,6,2"/>
        </initial_glyph>
       </initial>
+      <!--${components::Pelican::SM::operational::carsEnabled::carsGreen}-->
       <state name="carsGreen">
        <entry brief="CARS_GREEN">BSP_signalCars(CARS_GREEN);
 m_timeout.armX(CARS_GREEN_MIN_TOUT);</entry>
        <exit>(void)m_timeout.disarm();</exit>
+       <!--${components::Pelican::SM::operational::carsEnabled::carsGreen::initial}-->
        <initial target="../1">
         <initial_glyph conn="7,31,5,1,17,3,-2">
          <action box="0,-2,6,2"/>
         </initial_glyph>
        </initial>
+       <!--${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenNoPed}-->
        <state name="carsGreenNoPed">
         <entry>BSP_showState(&quot;carsGreenNoPed&quot;);</entry>
+        <!--${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenNoPed::PEDS_WAITING}-->
         <tran trig="PEDS_WAITING" target="../../3">
          <tran_glyph conn="8,38,3,1,19,15,-5">
           <action box="0,-2,11,2"/>
          </tran_glyph>
         </tran>
+        <!--${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenNoPed::TIMEOUT}-->
         <tran trig="TIMEOUT" target="../../2">
          <tran_glyph conn="8,41,3,1,17,4,-3">
           <action box="0,-2,10,2"/>
@@ -252,8 +300,10 @@ m_timeout.armX(CARS_GREEN_MIN_TOUT);</entry>
          <entry box="1,2,5,2"/>
         </state_glyph>
        </state>
+       <!--${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenInt}-->
        <state name="carsGreenInt">
         <entry>BSP_showState(&quot;carsGreenInt&quot;);</entry>
+        <!--${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenInt::PEDS_WAITING}-->
         <tran trig="PEDS_WAITING" target="../../../2">
          <tran_glyph conn="8,49,3,1,25,20,-4">
           <action box="0,-2,11,2"/>
@@ -263,8 +313,10 @@ m_timeout.armX(CARS_GREEN_MIN_TOUT);</entry>
          <entry box="1,2,5,2"/>
         </state_glyph>
        </state>
+       <!--${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenPedWait}-->
        <state name="carsGreenPedWait">
         <entry>BSP_showState(&quot;carsGreenPedWait&quot;);</entry>
+        <!--${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenPedWait::TIMEOUT}-->
         <tran trig="TIMEOUT" target="../../../2">
          <tran_glyph conn="8,57,3,1,23,9,-2">
           <action box="0,-2,10,2"/>
@@ -279,11 +331,13 @@ m_timeout.armX(CARS_GREEN_MIN_TOUT);</entry>
         <exit box="1,4,5,2"/>
        </state_glyph>
       </state>
+      <!--${components::Pelican::SM::operational::carsEnabled::carsYellow}-->
       <state name="carsYellow">
        <entry brief="CARS_YELLOW">BSP_showState(&quot;carsYellow&quot;);
 BSP_signalCars(CARS_YELLOW);
 m_timeout.armX(CARS_YELLOW_TOUT);</entry>
        <exit>(void)m_timeout.disarm();</exit>
+       <!--${components::Pelican::SM::operational::carsEnabled::carsYellow::TIMEOUT}-->
        <tran trig="TIMEOUT" target="../../../4">
         <tran_glyph conn="6,71,3,3,33">
          <action box="0,-2,8,2"/>
@@ -298,18 +352,22 @@ m_timeout.armX(CARS_YELLOW_TOUT);</entry>
        <exit box="1,2,5,2"/>
       </state_glyph>
      </state>
+     <!--${components::Pelican::SM::operational::pedsEnabled}-->
      <state name="pedsEnabled">
       <exit brief="PEDS_DONT_WALK">BSP_signalPeds(PEDS_DONT_WALK);</exit>
+      <!--${components::Pelican::SM::operational::pedsEnabled::initial}-->
       <initial target="../1">
        <initial_glyph conn="40,21,5,1,21,4,-2">
         <action box="0,-2,6,2"/>
        </initial_glyph>
       </initial>
+      <!--${components::Pelican::SM::operational::pedsEnabled::pedsWalk}-->
       <state name="pedsWalk">
        <entry brief="PEDS_WALK">BSP_showState(&quot;pedsWalk&quot;);
 BSP_signalPeds(PEDS_WALK);
 m_timeout.armX(PEDS_WALK_TOUT);</entry>
        <exit>(void)m_timeout.disarm();</exit>
+       <!--${components::Pelican::SM::operational::pedsEnabled::pedsWalk::TIMEOUT}-->
        <tran trig="TIMEOUT" target="../../2">
         <tran_glyph conn="41,31,3,1,27,7,-2">
          <action box="0,-2,8,2"/>
@@ -320,15 +378,19 @@ m_timeout.armX(PEDS_WALK_TOUT);</entry>
         <exit box="1,4,5,2"/>
        </state_glyph>
       </state>
+      <!--${components::Pelican::SM::operational::pedsEnabled::pedsFlash}-->
       <state name="pedsFlash">
        <entry>BSP_showState(&quot;pedsFlash&quot;);
 m_timeout.armX(PEDS_FLASH_TOUT, PEDS_FLASH_TOUT);
 m_flashCtr = PEDS_FLASH_NUM*2 + 1;</entry>
        <exit>(void)m_timeout.disarm();</exit>
+       <!--${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT}-->
        <tran trig="TIMEOUT">
+        <!--${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[m_flashCtr!=0U]}-->
         <choice>
          <guard>m_flashCtr != 0U</guard>
          <action>--m_flashCtr;</action>
+         <!--${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[m_flashCtr!=0U]::[(m_flashCtr&1U)==0U]}-->
          <choice>
           <guard>(m_flashCtr &amp; 1U) == 0U</guard>
           <action>BSP_signalPeds(PEDS_DONT_WALK);</action>
@@ -336,6 +398,7 @@ m_flashCtr = PEDS_FLASH_NUM*2 + 1;</entry>
            <action box="-7,9,26,5"/>
           </choice_glyph>
          </choice>
+         <!--${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[m_flashCtr!=0U]::[else]}-->
          <choice>
           <guard>else</guard>
           <action>BSP_signalPeds(PEDS_BLANK);</action>
@@ -347,6 +410,7 @@ m_flashCtr = PEDS_FLASH_NUM*2 + 1;</entry>
           <action box="1,0,16,4"/>
          </choice_glyph>
         </choice>
+        <!--${components::Pelican::SM::operational::pedsEnabled::pedsFlash::TIMEOUT::[else]}-->
         <choice target="../../../../3">
          <guard>else</guard>
          <choice_glyph conn="49,45,4,1,3,-14">
@@ -370,13 +434,16 @@ m_flashCtr = PEDS_FLASH_NUM*2 + 1;</entry>
       <entry box="1,2,28,2"/>
      </state_glyph>
     </state>
+    <!--${components::Pelican::SM::offline}-->
     <state name="offline">
      <entry>BSP_showState(&quot;offline&quot;);
 m_timeout.armX(OFF_FLASH_TOUT, OFF_FLASH_TOUT);
 m_flashCtr = 0U;</entry>
      <exit>(void)m_timeout.disarm();</exit>
+     <!--${components::Pelican::SM::offline::TIMEOUT}-->
      <tran trig="TIMEOUT">
       <action>m_flashCtr ^= 1U;</action>
+      <!--${components::Pelican::SM::offline::TIMEOUT::[(m_flashCtr&1U)==0U]}-->
       <choice>
        <guard>(m_flashCtr &amp; 1U) == 0U</guard>
        <action brief="\CARS_RED; PEDS_DONT_WALK;">BSP_signalCars(CARS_RED);
@@ -385,6 +452,7 @@ BSP_signalPeds(PEDS_DONT_WALK);</action>
         <action box="1,0,23,4"/>
        </choice_glyph>
       </choice>
+      <!--${components::Pelican::SM::offline::TIMEOUT::[else]}-->
       <choice>
        <guard>else</guard>
        <action brief="CARS_BLANK; PEDS_BLANK;">BSP_signalCars(CARS_BLANK);
@@ -397,11 +465,13 @@ BSP_signalPeds(PEDS_BLANK);</action>
        <action box="0,-2,16,4"/>
       </tran_glyph>
      </tran>
+     <!--${components::Pelican::SM::offline::ON}-->
      <tran trig="ON" target="../../1">
       <tran_glyph conn="2,86,3,2,63,-10">
        <action box="0,-2,6,2"/>
       </tran_glyph>
      </tran>
+     <!--${components::Pelican::SM::offline::TERMINATE}-->
      <tran trig="TERMINATE">
       <action>BSP_terminate(0);</action>
       <tran_glyph conn="2,93,3,-1,23">
@@ -416,9 +486,12 @@ BSP_signalPeds(PEDS_BLANK);</action>
     <state_diagram size="76,99"/>
    </statechart>
   </class>
+  <!--${components::AO_Pelican}-->
   <attribute name="AO_Pelican" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
  </package>
+ <!--${.}-->
  <directory name=".">
+  <!--${.::pelican.hpp}-->
   <file name="pelican.hpp">
    <text>#ifndef PELICAN_HPP
 #define PELICAN_HPP
@@ -444,6 +517,7 @@ $declare(components::AO_Pelican)  // opaque pointer to Pelican AO
 
 #endif // PELICAN_HPP</text>
   </file>
+  <!--${.::pelican.cpp}-->
   <file name="pelican.cpp">
    <text>#include &quot;qpcpp.hpp&quot;
 #include &quot;bsp.hpp&quot;

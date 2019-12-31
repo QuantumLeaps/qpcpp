@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -68,7 +68,7 @@
     #define QF_CRIT_ENTRY(stat_)    do { \
         __asm volatile ("MRS %0,cpsr" : "=r" (stat_) :: "cc"); \
         QF_INT_DISABLE(); \
-    } while (0)
+    } while (false)
     #define QF_CRIT_EXIT(stat_) \
         __asm volatile ("MSR cpsr_c,%0" :: "r" (stat_) : "cc")
 

@@ -57,7 +57,6 @@ static QTextStream l_stdOutStream(stdout, QIODevice::WriteOnly);
 //............................................................................
 void BSP_init(void) {
     Q_ALLEGE(QS_INIT((char *)0));
-    QS_RESET();
     QS_OBJ_DICTIONARY(&l_time_tick);
     QS_USR_DICTIONARY(PHILO_STAT);
 

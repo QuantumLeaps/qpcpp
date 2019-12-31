@@ -1,9 +1,9 @@
 /// @file
-/// @brief QEP/C++ port, generic C++ compiler
+/// @brief QS/C++ port to a 32-bit CPU, generic compiler
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated on  2019-12-10
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -30,17 +30,25 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#ifndef QEP_PORT_HPPPP
-#define QEP_PORT_HPPPP
+#ifndef QS_PORT_HPP
+#define QS_PORT_HPP
 
-// Exact-width types. WG14/N843 C99 Standard, Section 7.18.1.1
-#include <stdint.h>
+#define QS_TIME_SIZE        4
+#define QS_OBJ_PTR_SIZE     4
+#define QS_FUN_PTR_SIZE     4
 
-#include "qep.hpp" // QEP platform-independent public interface
+//****************************************************************************
+// NOTE: QS might be used with or without other QP components, in which case
+// the separate definitions of the macros QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY,
+// and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
+// the QF framework, by simply including "qf_port.hpp" *before* "qs.hpp".
+//
+#include "qf_port.hpp" // use QS with QF
+#include "qs.hpp"      // QS platform-independent public interface
 
-#endif // QEP_PORT_HPPPP
+#endif // QS_PORT_HPP

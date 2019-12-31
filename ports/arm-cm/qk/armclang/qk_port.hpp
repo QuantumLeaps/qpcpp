@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -58,7 +58,7 @@ static inline uint32_t QK_get_IPSR(void) {
             static_cast<uint32_t>(1U << 28))); \
     } \
     QF_INT_ENABLE(); \
-} while (0)
+} while (false)
 
 // initialization of the QK kernel
 #define QK_INIT() QK_init()

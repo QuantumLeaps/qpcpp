@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-10-14
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-27
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XXYZ, where XX is a 2-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      660U
+#define QP_VERSION      670U
 
 //! The current QP version number string of the form XX.Y.Z, where XX is
 // a 2-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "6.6.0"
+#define QP_VERSION_STR  "6.7.0"
 
-//! Encrypted  current QP release (6.6.0) and date (2019-10-31)
-#define QP_RELEASE      0x8E22F8FBU
+//! Encrypted  current QP release (6.7.0) and date (2019-12-30)
+#define QP_RELEASE      0x8E049B81U
 
 
 //****************************************************************************
@@ -215,29 +215,33 @@ extern char_t const versionStr[7];
 
 #endif // Q_EVT_CTOR
 
+// forward declarations...
+struct QMState;
+struct QMTranActTable;
+class QXThread;
 
 //! Type returned from state-handler functions
 typedef uint_fast8_t QState;
 
-//! pointer to state-handler function
+//! Pointer to state-handler function
 typedef QState (*QStateHandler)(void * const me, QEvt const * const e);
 
-//! pointer to an action-handler function
+//! Pointer to an action-handler function
 typedef QState (*QActionHandler)(void * const me);
 
-// forward declarations...
-struct QMState;
-struct QMTranActTable;
+//! Pointer to a thread-handler function
+typedef void (*QXThreadHandler)(QXThread * const me);
 
 //! Attribute of for the QHsm class (Hierarchical State Machine).
 /// @description
 /// This union represents possible values stored in the 'state' and 'temp'
 /// attributes of the QHsm and QMsm classes.
 union QHsmAttr {
-    QStateHandler  fun;           //!< pointer to a state handler function
-    QActionHandler act;           //!< pointer to an action-handler function
-    QMState        const *obj;    //!< pointer to QMState object
-    QMTranActTable const *tatbl;  //!< transition-action table
+    QStateHandler   fun;          //!< pointer to a state handler function
+    QActionHandler  act;          //!< pointer to an action-handler function
+    QXThreadHandler thr;          //!< pointer to an thread-handler function
+    QMState         const *obj;   //!< pointer to QMState object
+    QMTranActTable  const *tatbl; //!< transition-action table
 };
 
 
@@ -272,30 +276,30 @@ public:
     virtual ~QHsm();
 
     //! Executes the top-most initial transition in QP::QHsm
-    virtual void init(void) { this->init(static_cast<void const *>(0)); }
+    virtual void init(void) { this->init(static_cast<void *>(0)); }
 
     //! @overload init(void)
-    virtual void init(void const * const par);
+    virtual void init(void const * const e);
 
     //! Dispatches an event to QHsm
     virtual void dispatch(QEvt const * const e);
 
     //! Tests if a given state is part of the current active state
     //! configuration
-    bool isIn(QStateHandler const s);
-
-    //! the top-state.
-    static QState top(void * const me, QEvt const * const e);
+    virtual bool isIn(QStateHandler const s);
 
     //! Obtain the current state (state handler function)
     //! @note used in the QM code generation
-    QStateHandler state(void) const {
+    virtual QStateHandler state(void) const {
         return m_state.fun;
     }
 
     //! Obtain the current active child state of a given parent
     //! @note used in the QM code generation
-    QStateHandler childState(QStateHandler const parent);
+    virtual QStateHandler childState(QStateHandler const parent);
+
+    //! the top-state.
+    static QState top(void * const me, QEvt const * const e);
 
 protected:
     //! Protected constructor of QHsm.
@@ -422,12 +426,14 @@ protected:
     }
 #else
     //! Helper function to specify a state entry in a QM state-handler
-    QState qm_entry(QMState const * const) {
+    QState qm_entry(QMState const * const s) {
+        (void)s;
         return Q_RET_ENTRY;
     }
 
     //! Helper function to specify a state exit in a QM state-handler
-    QState qm_exit(QMState const * const) {
+    QState qm_exit(QMState const * const s) {
+        (void)s;
         return Q_RET_EXIT;
     }
 #endif
@@ -489,14 +495,14 @@ class QMsm : public QHsm {
 public:
     //! Performs the second step of SM initialization by triggering
     /// the top-most initial transition.
-    virtual void init(void const * const par);
-    virtual void init(void) { this->init(static_cast<void const *>(0)); }
+    virtual void init(void const * const e);
+    virtual void init(void) { this->init(static_cast<void *>(0)); }
 
     //! Dispatches an event to a HSM
     virtual void dispatch(QEvt const * const e);
 
     //! Tests if a given state is part of the active state configuration
-    bool isInState(QMState const *st) const;
+    bool isInState(QMState const * const st) const;
 
     //! Return the current active state object (read only)
     QMState const *stateObj(void) const {
@@ -710,7 +716,7 @@ enum_t const Q_USER_SIG = static_cast<enum_t>(4);
 
 //! Macro to provide strictly-typed zero-state to use for submachines.
 //! Applicable to suclasses of QP::QMsm.
-#define QM_STATE_NULL         (static_cast<QP::QMState const *>(0))
+#define QM_STATE_NULL         (static_cast<QP::QMState *>(0))
 
 #endif // QEP_HPP
 

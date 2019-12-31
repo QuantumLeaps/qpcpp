@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -118,7 +118,7 @@
         if ((e_) != static_cast<evtT_ *>(0)) { \
             new((e_)) evtT_((sig_),  ##__VA_ARGS__); \
         } \
-     } while (0)
+     } while (false)
 
 #else // QEvt is a POD (Plain Old Datatype)
     #define Q_NEW_FROM_ISR(evtT_, sig_) \
@@ -175,7 +175,7 @@ extern "C" {
         QF_CRIT_EXIT_(); \
         xTaskNotifyGive((TaskHandle_t)&(me_)->m_thread); \
         QF_CRIT_ENTRY_(); \
-    } while (0)
+    } while (false)
 
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) vTaskSuspendAll()

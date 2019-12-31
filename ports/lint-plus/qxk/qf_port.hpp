@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -199,7 +199,7 @@ extern "C" void intEnable(void);
 /// status" policy. Conversely, if this macro is not defined, the simple
 /// "unconditional critical section exit" is used.
 ///
-#define QF_CRIT_STAT_TYPE           crit_stat_t
+#define QF_CRIT_STAT_TYPE           int_t
 
 //! Define the critical section entry policy.
 ///
@@ -230,15 +230,16 @@ extern "C" void intEnable(void);
 ///
 #define QF_CRIT_EXIT(stat_)         critExit(stat_)
 
-typedef unsigned int crit_stat_t;
-extern "C" QF_CRIT_STAT_TYPE critEntry(void);
-extern "C" void critExit(QF_CRIT_STAT_TYPE stat);
-
 //lint -restore
 
 #include "qep_port.hpp"   // QEP port
 #include "qxk_port.hpp"   // QXK port
 #include "qf.hpp"         // QF platform-independent public interface
 #include "qxthread.hpp"   // QXK naked thread
+
+extern "C" {
+    QF_CRIT_STAT_TYPE critEntry(void);
+    void critExit(QF_CRIT_STAT_TYPE stat);
+}
 
 #endif // QF_PORT_HPP

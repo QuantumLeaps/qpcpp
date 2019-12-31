@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -98,7 +98,7 @@
 
     // event queue customization
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) { \
+        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt *>(0)) { \
             UINT32 eventsReceived; \
             QF_CRIT_EXIT_(); \
             Q_ALLEGE_ID(405, eventReceive(QF_EQUEUE_EVT, EVENTS_WAIT_ANY, \

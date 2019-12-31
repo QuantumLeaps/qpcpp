@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -74,16 +74,16 @@ Q_DEFINE_THIS_MODULE("qf_defer")
 /// QP::QActive::recall(), QP::QEQueue, QP::QActive::flushDeferred()
 ///
 bool QActive::defer(QEQueue * const eq, QEvt const * const e) const {
-    bool status = eq->post(e, static_cast<uint_fast16_t>(0));
+    bool const status = eq->post(e, static_cast<uint_fast16_t>(0));
     QS_CRIT_STAT_
 
-    QS_BEGIN_(QS_QF_ACTIVE_DEFER, QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();      // time stamp
-        QS_OBJ_(this);   // this active object
-        QS_OBJ_(eq);     // the deferred queue
-        QS_SIG_(e->sig); // the signal of the event
-        QS_2U8_(e->poolId_, e->refCtr_); // pool Id & ref Count
-    QS_END_()
+    QS_BEGIN_PRE_(QS_QF_ACTIVE_DEFER, QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_TIME_PRE_();      // time stamp
+        QS_OBJ_PRE_(this);   // this active object
+        QS_OBJ_PRE_(eq);     // the deferred queue
+        QS_SIG_PRE_(e->sig); // the signal of the event
+        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
+    QS_END_PRE_()
 
     return status;
 }
@@ -114,8 +114,8 @@ bool QActive::recall(QEQueue * const eq) {
     bool recalled;
 
     // event available?
-    if (e != static_cast<QEvt const *>(0)) {
-        this->postLIFO(e); // post it to the _front_ of the AO's queue
+    if (e != static_cast<QEvt *>(0)) {
+        QActive::postLIFO(e); // post it to the _front_ of the AO's queue
 
         QF_CRIT_STAT_
         QF_CRIT_ENTRY_();
@@ -134,14 +134,14 @@ bool QActive::recall(QEQueue * const eq) {
             QF_EVT_REF_CTR_DEC_(e); // decrement the reference counter
         }
 
-        QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_RECALL,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_RECALL,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
-            QS_TIME_();      // time stamp
-            QS_OBJ_(this);   // this active object
-            QS_OBJ_(eq);     // the deferred queue
-            QS_SIG_(e->sig); // the signal of the event
-            QS_2U8_(e->poolId_, e->refCtr_); // pool Id & ref Count
-        QS_END_NOCRIT_()
+            QS_TIME_PRE_();      // time stamp
+            QS_OBJ_PRE_(this);   // this active object
+            QS_OBJ_PRE_(eq);     // the deferred queue
+            QS_SIG_PRE_(e->sig); // the signal of the event
+            QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
+        QS_END_NOCRIT_PRE_()
 
         QF_CRIT_EXIT_();
         recalled = true;
@@ -149,12 +149,12 @@ bool QActive::recall(QEQueue * const eq) {
     else {
         QS_CRIT_STAT_
 
-        QS_BEGIN_(QS_QF_ACTIVE_RECALL_ATTEMPT,
+        QS_BEGIN_PRE_(QS_QF_ACTIVE_RECALL_ATTEMPT,
                   QS::priv_.locFilter[QS::AO_OBJ], this)
-            QS_TIME_();      // time stamp
-            QS_OBJ_(this);   // this active object
-            QS_OBJ_(eq);     // the deferred queue
-        QS_END_()
+            QS_TIME_PRE_();      // time stamp
+            QS_OBJ_PRE_(this);   // this active object
+            QS_OBJ_PRE_(eq);     // the deferred queue
+        QS_END_PRE_()
 
         recalled = false;
     }
@@ -179,7 +179,7 @@ bool QActive::recall(QEQueue * const eq) {
 uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const {
     uint_fast16_t n = static_cast<uint_fast16_t>(0);
     for (QEvt const *e = eq->get();
-         e != static_cast<QEvt const *>(0);
+         e != static_cast<QEvt *>(0);
          e = eq->get())
     {
         QF::gc(e); // garbage collect

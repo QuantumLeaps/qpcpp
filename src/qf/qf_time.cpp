@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -83,10 +83,12 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender)
 
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_TICK, static_cast<void*>(0), static_cast<void*>(0))
-        QS_TEC_(static_cast<QTimeEvtCtr>(++prev->m_ctr)); // tick ctr
-        QS_U8_(static_cast<uint8_t>(tickRate));           // tick rate
-    QS_END_NOCRIT_()
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_TICK, static_cast<void*>(0),
+                         static_cast<void*>(0))
+        ++prev->m_ctr;
+        QS_TEC_PRE_(static_cast<QTimeEvtCtr>(prev->m_ctr)); // tick ctr
+        QS_U8_PRE_(static_cast<uint8_t>(tickRate)); // tick rate
+    QS_END_NOCRIT_PRE_()
 
     // scan the linked-list of time events at this rate...
     for (;;) {
@@ -126,7 +128,7 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender)
 
             // is time evt about to expire?
             if (t->m_ctr == static_cast<QTimeEvtCtr>(0)) {
-                QActive *act = t->toActive(); // temporary for volatile
+                QActive * const act = t->toActive(); // temporary for volatile
 
                 // periodic time evt?
                 if (t->m_interval != static_cast<QTimeEvtCtr>(0)) {
@@ -142,22 +144,22 @@ void QF::tickX_(uint_fast8_t const tickRate, void const * const sender)
                                       ~static_cast<uint8_t>(TE_IS_LINKED));
                     // do NOT advance the prev pointer
 
-                    QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_AUTO_DISARM,
+                    QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_AUTO_DISARM,
                                      QS::priv_.locFilter[QS::TE_OBJ], t)
-                        QS_OBJ_(t);        // this time event object
-                        QS_OBJ_(act);      // the target AO
-                        QS_U8_(static_cast<uint8_t>(tickRate)); // tick rate
-                    QS_END_NOCRIT_()
+                        QS_OBJ_PRE_(t);        // this time event object
+                        QS_OBJ_PRE_(act);      // the target AO
+                        QS_U8_PRE_(static_cast<uint8_t>(tickRate)); // tick rate
+                    QS_END_NOCRIT_PRE_()
                 }
 
-                QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_POST,
+                QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_POST,
                                  QS::priv_.locFilter[QS::TE_OBJ], t)
-                    QS_TIME_();            // timestamp
-                    QS_OBJ_(t);            // the time event object
-                    QS_SIG_(t->sig);       // signal of this time event
-                    QS_OBJ_(act);          // the target AO
-                    QS_U8_(static_cast<uint8_t>(tickRate)); // tick rate
-                QS_END_NOCRIT_()
+                    QS_TIME_PRE_();            // timestamp
+                    QS_OBJ_PRE_(t);            // the time event object
+                    QS_SIG_PRE_(t->sig);       // signal of this time event
+                    QS_OBJ_PRE_(act);          // the target AO
+                    QS_U8_PRE_(static_cast<uint8_t>(tickRate)); // tick rate
+                QS_END_NOCRIT_PRE_()
 
                 QF_CRIT_EXIT_(); // exit crit. section before posting
 
@@ -231,6 +233,8 @@ QTimeEvt::QTimeEvt(QActive * const act,
     :
 #ifdef Q_EVT_CTOR
     QEvt(static_cast<QSignal>(sgnl)),
+#else
+    QEvt(),
 #endif
     m_next(static_cast<QTimeEvt *>(0)),
     m_act(act),
@@ -265,8 +269,9 @@ QTimeEvt::QTimeEvt()
     :
 #ifdef Q_EVT_CTOR
     QEvt(static_cast<QSignal>(0)),
+#else
+    QEvt(),
 #endif // Q_EVT_CTOR
-
     m_next(static_cast<QTimeEvt *>(0)),
     m_act(static_cast<QActive *>(0)),
     m_ctr(static_cast<QTimeEvtCtr>(0)),
@@ -315,9 +320,9 @@ QTimeEvt::QTimeEvt()
 /// @include qf_state.cpp
 ///
 void QTimeEvt::armX(QTimeEvtCtr const nTicks, QTimeEvtCtr const interval) {
-    uint_fast8_t tickRate = static_cast<uint_fast8_t>(refCtr_)
-                            & static_cast<uint_fast8_t>(TE_TICK_RATE);
-    QTimeEvtCtr ctr = m_ctr;  // temporary to hold volatile
+    uint_fast8_t const tickRate = static_cast<uint_fast8_t>(refCtr_)
+                                  & static_cast<uint_fast8_t>(TE_TICK_RATE);
+    QTimeEvtCtr const ctr = m_ctr;  // temporary to hold volatile
     QF_CRIT_STAT_
 
     /// @pre the host AO must be valid, time evnet must be disarmed,
@@ -358,14 +363,14 @@ void QTimeEvt::armX(QTimeEvtCtr const nTicks, QTimeEvtCtr const interval) {
         QF::timeEvtHead_[tickRate].m_act = this;
     }
 
-    QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_ARM, QS::priv_.locFilter[QS::TE_OBJ], this)
-        QS_TIME_();        // timestamp
-        QS_OBJ_(this);     // this time event object
-        QS_OBJ_(m_act);    // the active object
-        QS_TEC_(nTicks);   // the number of ticks
-        QS_TEC_(interval); // the interval
-        QS_U8_(static_cast<uint8_t>(tickRate)); // tick rate
-    QS_END_NOCRIT_()
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_ARM, QS::priv_.locFilter[QS::TE_OBJ], this)
+        QS_TIME_PRE_();        // timestamp
+        QS_OBJ_PRE_(this);     // this time event object
+        QS_OBJ_PRE_(m_act);    // the active object
+        QS_TEC_PRE_(nTicks);   // the number of ticks
+        QS_TEC_PRE_(interval); // the interval
+        QS_U8_PRE_(static_cast<uint8_t>(tickRate)); // tick rate
+    QS_END_NOCRIT_PRE_()
 
     QF_CRIT_EXIT_();
 }
@@ -396,30 +401,30 @@ bool QTimeEvt::disarm(void) {
         wasArmed = true;
         refCtr_ |= static_cast<uint8_t>(TE_WAS_DISARMED);
 
-        QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_DISARM,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_DISARM,
                          QS::priv_.locFilter[QS::TE_OBJ], this)
-            QS_TIME_();            // timestamp
-            QS_OBJ_(this);         // this time event object
-            QS_OBJ_(m_act);        // the target AO
-            QS_TEC_(m_ctr);        // the number of ticks
-            QS_TEC_(m_interval);   // the interval
-            QS_U8_(static_cast<uint8_t>(
+            QS_TIME_PRE_();            // timestamp
+            QS_OBJ_PRE_(this);         // this time event object
+            QS_OBJ_PRE_(m_act);        // the target AO
+            QS_TEC_PRE_(m_ctr);        // the number of ticks
+            QS_TEC_PRE_(m_interval);   // the interval
+            QS_U8_PRE_(static_cast<uint8_t>(
                        refCtr_& static_cast<uint8_t>(TE_TICK_RATE)));
-        QS_END_NOCRIT_()
+        QS_END_NOCRIT_PRE_()
 
         m_ctr = static_cast<QTimeEvtCtr>(0); // schedule removal from the list
     }
     else { // the time event was already disarmed automatically
         wasArmed = false;
 
-        QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_DISARM_ATTEMPT,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_DISARM_ATTEMPT,
                          QS::priv_.locFilter[QS::TE_OBJ], this)
-            QS_TIME_();            // timestamp
-            QS_OBJ_(this);         // this time event object
-            QS_OBJ_(m_act);        // the target AO
-            QS_U8_(static_cast<uint8_t>( // tick rate
+            QS_TIME_PRE_();            // timestamp
+            QS_OBJ_PRE_(this);         // this time event object
+            QS_OBJ_PRE_(m_act);        // the target AO
+            QS_U8_PRE_(static_cast<uint8_t>( // tick rate
                        refCtr_& static_cast<uint8_t>(TE_TICK_RATE)));
-        QS_END_NOCRIT_()
+        QS_END_NOCRIT_PRE_()
 
     }
     QF_CRIT_EXIT_();
@@ -447,8 +452,8 @@ bool QTimeEvt::disarm(void) {
 /// published and should be expected in the active object's state machine.
 ///
 bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
-    uint_fast8_t tickRate = static_cast<uint_fast8_t>(refCtr_)
-                            & static_cast<uint_fast8_t>(TE_TICK_RATE);
+    uint_fast8_t const tickRate = static_cast<uint_fast8_t>(refCtr_)
+                                  & static_cast<uint_fast8_t>(TE_TICK_RATE);
     QF_CRIT_STAT_
 
     /// @pre AO must be valid, tick rate must be in range, nTicks must not
@@ -494,17 +499,17 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
     }
     m_ctr = nTicks; // re-load the tick counter (shift the phasing)
 
-    QS_BEGIN_NOCRIT_(QS_QF_TIMEEVT_REARM,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_REARM,
                      QS::priv_.locFilter[QS::TE_OBJ], this)
-        QS_TIME_();          // timestamp
-        QS_OBJ_(this);       // this time event object
-        QS_OBJ_(m_act);      // the target AO
-        QS_TEC_(m_ctr);      // the number of ticks
-        QS_TEC_(m_interval); // the interval
-        QS_2U8_(static_cast<uint8_t>(tickRate),
+        QS_TIME_PRE_();          // timestamp
+        QS_OBJ_PRE_(this);       // this time event object
+        QS_OBJ_PRE_(m_act);      // the target AO
+        QS_TEC_PRE_(m_ctr);      // the number of ticks
+        QS_TEC_PRE_(m_interval); // the interval
+        QS_2U8_PRE_(static_cast<uint8_t>(tickRate),
                 (wasArmed ? static_cast<uint8_t>(1)
                             : static_cast<uint8_t>(0)));
-    QS_END_NOCRIT_()
+    QS_END_NOCRIT_PRE_()
 
     QF_CRIT_EXIT_();
     return wasArmed;
@@ -531,7 +536,8 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) {
 /// the function will return 'true'.
 ///
 bool QTimeEvt::wasDisarmed(void) {
-    uint8_t isDisarmed = (refCtr_ & static_cast<uint8_t>(TE_WAS_DISARMED));
+    uint8_t const isDisarmed = refCtr_
+                               & static_cast<uint8_t>(TE_WAS_DISARMED);
     refCtr_ |= static_cast<uint8_t>(TE_WAS_DISARMED); // set the flag
     return isDisarmed != static_cast<uint8_t>(0);
 }
@@ -553,7 +559,7 @@ QTimeEvtCtr QTimeEvt::currCtr(void) const {
     QF_CRIT_STAT_
 
     QF_CRIT_ENTRY_();
-    QTimeEvtCtr ret = m_ctr;
+    QTimeEvtCtr const ret = m_ctr;
     QF_CRIT_EXIT_();
 
     return ret;

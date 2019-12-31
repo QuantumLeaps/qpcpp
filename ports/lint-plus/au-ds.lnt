@@ -15,7 +15,7 @@
 +e1933  // turn on "virtual call from member detection"
 
 // The rationale for the following two options are fully described
-// in Dan Sak's article "const T vs. T const".  Visit his web site
+// in Dan Saks' article "const T vs. T const".  Visit his web site
 // at www.dansaks.com and click "Published Articles".
 //
 -fqb +e963  // require T const rather than const T

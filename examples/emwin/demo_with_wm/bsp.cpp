@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://www.state-machine.com
-// mailto:info@state-machine.com
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //////////////////////////////////////////////////////////////////////////////
 #include "qpcpp.hpp"
 #include "dpp.hpp"
@@ -59,7 +59,7 @@ Q_DEFINE_THIS_FILE
 
 //............................................................................
 static void simHardKey(int keyIndex, int keyState) {
-    static const QEvent keyEvt[] = {
+    static const QEvt keyEvt[] = {
         { KEY_UP_REL_SIG,       0 },  // hardkey UP released
         { KEY_UP_PRESS_SIG,     0 },  // hardkey UP pressed
         { KEY_RIGHT_REL_SIG,    0 },  // hardkey RIGHT released
@@ -156,11 +156,11 @@ void QP::QF_onClockTick(void) {
 }
 
 //............................................................................
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
+void Q_onAssert(char const * const file, int loc) {
     char str[256];
 
     QF_CRIT_ENTRY(dummy); // make sure nothing else is running
-    sprintf(str, "%s:%d", file, line);
+    sprintf(str, "%s:%d", file, loc);
     MessageBox(NULL, str, "Assertion Failure", MB_TASKMODAL | MB_OK);
     QF::stop(); // terminate the QF, causes termination of the MainTask()
 }

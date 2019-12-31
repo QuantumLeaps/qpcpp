@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.5.1" links="0">
+<model version="4.6.0" links="1">
  <documentation>Dining Philosopher Problem example for Qt with GUI</documentation>
+ <!--${qpcpp}-->
  <framework name="qpcpp"/>
+ <!--${Qt-port}-->
  <package name="Qt-port" stereotype="0x00" namespace="QP::">
+  <!--${Qt-port::GuiQActive}-->
   <class name="GuiQActive" superclass="qpcpp::QActive">
+   <!--${Qt-port::GuiQActive::GuiQActive}-->
    <operation name="GuiQActive" type="QActive(initial)" visibility="0x00" properties="0x00">
+    <!--${Qt-port::GuiQActive::GuiQActive::initial}-->
     <parameter name="initial" type="QStateHandler"/>
    </operation>
+   <!--${Qt-port::GuiQActive::start}-->
    <operation name="start" type="void" visibility="0x00" properties="0x00">
     <documentation>Starts execution of an active object and registers the object with the framework. This function is strongly OS-dependent and must be defined in the QP port to a particular platform.
 
@@ -19,11 +25,17 @@ The function takes six arguments:
 'stkSto' and 'stkSize' are the stack storage and size in bytes. Please note that a per-active object stack is used only when the underlying OS requies it. If the stack is not required, or the underlying OS allocates the stack internally, the stkSto should be NULL and/or stkSize should be 0.
 
 'ie' is an optional initialization event that can be used to pass additional startup data to the active object. (Pass NULL if your active object does not expect the initialization event).</documentation>
+    <!--${Qt-port::GuiQActive::start::prio}-->
     <parameter name="prio" type="uint8_t"/>
+    <!--${Qt-port::GuiQActive::start::qSto[]}-->
     <parameter name="qSto[]" type="QEvt const *"/>
+    <!--${Qt-port::GuiQActive::start::qLen}-->
     <parameter name="qLen" type="uint32_t"/>
+    <!--${Qt-port::GuiQActive::start::stkSto}-->
     <parameter name="stkSto" type="void *"/>
+    <!--${Qt-port::GuiQActive::start::stkSize}-->
     <parameter name="stkSize" type="uint32_t"/>
+    <!--${Qt-port::GuiQActive::start::ie}-->
     <parameter name="ie" type="QEvt const *"/>
     <code>// Example:
 
@@ -46,12 +58,14 @@ int main() {
     . . .
 }</code>
    </operation>
-   <operation name="postFIFO" type="void" visibility="0x00" properties="0x00">
+   <!--${Qt-port::GuiQActive::post}-->
+   <operation name="post" type="void" visibility="0x00" properties="0x00">
     <documentation>Posts an event e directly to the event queue of the acitve object this using the First-In-First-Out (FIFO) policy.
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
 NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <!--${Qt-port::GuiQActive::post::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
 
@@ -61,8 +75,9 @@ extern QActive *AO_Table;
 pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
 pe-&gt;philNum = num;
 
-AO_Table-&gt;postFIFO(pe); // &lt;==</code>
+AO_Table-&gt;post(pe); // &lt;==</code>
    </operation>
+   <!--${Qt-port::GuiQActive::postLIFO}-->
    <operation name="postLIFO" type="void" visibility="0x00" properties="0x00">
     <documentation>Posts an event e directly to the event queue of the acitve object this using the Last-In-First-Out (LIFO) policy.
 
@@ -71,6 +86,7 @@ Direct event posting is the simplest asynchronous communication method available
 NOTE: You should be very careful with the LIFO (Last In First Out) policy, because it *reverses* the order of events in the queue. Typically, the QActive_postLIFO() operation shuould be only used for self-posting of events as reminders (see the &quot;Reminder&quot; state pattern) for continuing a processing. The postLIFO() operation is also used in the QActive::recall() operation.
 
 NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <!--${Qt-port::GuiQActive::postLIFO::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
 . . .
@@ -80,10 +96,14 @@ pe-&gt;philNum = num;
 postLIFO(pe); // &lt;==</code>
    </operation>
   </class>
+  <!--${Qt-port::GuiQMActive}-->
   <class name="GuiQMActive" superclass="qpcpp::QMActive">
+   <!--${Qt-port::GuiQMActive::GuiQMActive}-->
    <operation name="GuiQMActive" type="QMActive(initial)" visibility="0x00" properties="0x00">
+    <!--${Qt-port::GuiQMActive::GuiQMActive::initial}-->
     <parameter name="initial" type="QStateHandler"/>
    </operation>
+   <!--${Qt-port::GuiQMActive::start}-->
    <operation name="start" type="void" visibility="0x00" properties="0x00">
     <documentation>Starts execution of an active object and registers the object with the framework. This function is strongly OS-dependent and must be defined in the QP port to a particular platform.
 
@@ -96,11 +116,17 @@ The function takes six arguments:
 'stkSto' and 'stkSize' are the stack storage and size in bytes. Please note that a per-active object stack is used only when the underlying OS requies it. If the stack is not required, or the underlying OS allocates the stack internally, the stkSto should be NULL and/or stkSize should be 0.
 
 'ie' is an optional initialization event that can be used to pass additional startup data to the active object. (Pass NULL if your active object does not expect the initialization event).</documentation>
+    <!--${Qt-port::GuiQMActive::start::prio}-->
     <parameter name="prio" type="uint8_t"/>
+    <!--${Qt-port::GuiQMActive::start::qSto[]}-->
     <parameter name="qSto[]" type="QEvt const *"/>
+    <!--${Qt-port::GuiQMActive::start::qLen}-->
     <parameter name="qLen" type="uint32_t"/>
+    <!--${Qt-port::GuiQMActive::start::stkSto}-->
     <parameter name="stkSto" type="void *"/>
+    <!--${Qt-port::GuiQMActive::start::stkSize}-->
     <parameter name="stkSize" type="uint32_t"/>
+    <!--${Qt-port::GuiQMActive::start::ie}-->
     <parameter name="ie" type="QEvt const *"/>
     <code>// Example:
 
@@ -123,12 +149,14 @@ int main() {
     . . .
 }</code>
    </operation>
-   <operation name="postFIFO" type="void" visibility="0x00" properties="0x00">
+   <!--${Qt-port::GuiQMActive::post}-->
+   <operation name="post" type="void" visibility="0x00" properties="0x00">
     <documentation>Posts an event e directly to the event queue of the acitve object this using the First-In-First-Out (FIFO) policy.
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
 NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <!--${Qt-port::GuiQMActive::post::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
 
@@ -138,8 +166,9 @@ extern QActive *AO_Table;
 pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
 pe-&gt;philNum = num;
 
-AO_Table-&gt;postFIFO(pe); // &lt;==</code>
+AO_Table-&gt;post(pe); // &lt;==</code>
    </operation>
+   <!--${Qt-port::GuiQMActive::postLIFO}-->
    <operation name="postLIFO" type="void" visibility="0x00" properties="0x00">
     <documentation>Posts an event e directly to the event queue of the acitve object this using the Last-In-First-Out (LIFO) policy.
 
@@ -148,6 +177,7 @@ Direct event posting is the simplest asynchronous communication method available
 NOTE: You should be very careful with the LIFO (Last In First Out) policy, because it *reverses* the order of events in the queue. Typically, the QActive_postLIFO() operation shuould be only used for self-posting of events as reminders (see the &quot;Reminder&quot; state pattern) for continuing a processing. The postLIFO() operation is also used in the QActive::recall() operation.
 
 NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() or QFsm::dispatch() function.</documentation>
+    <!--${Qt-port::GuiQMActive::postLIFO::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
 . . .
@@ -158,23 +188,35 @@ postLIFO(pe); // &lt;==</code>
    </operation>
   </class>
  </package>
+ <!--${Events}-->
  <package name="Events" stereotype="0x01" namespace="DPP::">
+  <!--${Events::TableEvt}-->
   <class name="TableEvt" superclass="qpcpp::QEvt">
+   <!--${Events::TableEvt::philoNum}-->
    <attribute name="philoNum" type="uint8_t" visibility="0x00" properties="0x00"/>
+   <!--${Events::TableEvt::TableEvt}-->
    <operation name="TableEvt" type="QEvt(sig), philoNum(n)" visibility="0x00" properties="0x02">
+    <!--${Events::TableEvt::TableEvt::sig}-->
     <parameter name="sig" type="QP::QSignal"/>
+    <!--${Events::TableEvt::TableEvt::n}-->
     <parameter name="n" type="uint8_t"/>
    </operation>
   </class>
  </package>
+ <!--${AOs}-->
  <package name="AOs" stereotype="0x02" namespace="DPP::">
+  <!--${AOs::Philo}-->
   <class name="Philo" superclass="qpcpp::QActive">
+   <!--${AOs::Philo::m_timeEvt}-->
    <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Philo::Philo}-->
    <operation name="Philo" type="" visibility="0x00" properties="0x00">
     <code> : QActive(Q_STATE_CAST(&amp;Philo::initial)),
    m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
    </operation>
+   <!--${AOs::Philo::SM}-->
    <statechart properties="0x02">
+    <!--${AOs::Philo::SM::initial}-->
     <initial target="../1">
      <action>static bool registered = false; // starts off with 0, per C-standard
 (void)e; // suppress the compiler warning about unused parameter
@@ -205,14 +247,17 @@ subscribe(EAT_SIG);</action>
       <action box="0,-2,6,2"/>
      </initial_glyph>
     </initial>
+    <!--${AOs::Philo::SM::thinking}-->
     <state name="thinking">
-     <entry>m_timeEvt.postIn(this, think_time());</entry>
+     <entry>m_timeEvt.armX(think_time());</entry>
      <exit>(void)m_timeEvt.disarm();</exit>
+     <!--${AOs::Philo::SM::thinking::TIMEOUT}-->
      <tran trig="TIMEOUT" target="../../2">
       <tran_glyph conn="2,14,3,1,20,11,-3">
        <action box="0,-2,6,2"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Philo::SM::thinking::EAT, DONE}-->
      <tran trig="EAT, DONE">
       <action>/* EAT or DONE must be for other Philos than this one */
 Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
@@ -225,9 +270,12 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
       <exit box="1,4,5,2"/>
      </state_glyph>
     </state>
+    <!--${AOs::Philo::SM::hungry}-->
     <state name="hungry">
      <entry>AO_Table-&gt;POST(Q_NEW(TableEvt, HUNGRY_SIG, PHILO_ID(this)), this);</entry>
+     <!--${AOs::Philo::SM::hungry::EAT}-->
      <tran trig="EAT">
+      <!--${AOs::Philo::SM::hungry::EAT::[Q_EVT_CAST(TableEvt)->philoNum=~}-->
       <choice target="../../../3">
        <guard>Q_EVT_CAST(TableEvt)-&gt;philoNum == PHILO_ID(this)</guard>
        <choice_glyph conn="15,30,5,1,7,13,-3">
@@ -238,6 +286,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
        <action box="0,-2,14,2"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Philo::SM::hungry::DONE}-->
      <tran trig="DONE">
       <action>/* DONE must be for other Philos than this one */
 Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
@@ -249,15 +298,18 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
       <entry box="1,2,5,2"/>
      </state_glyph>
     </state>
+    <!--${AOs::Philo::SM::eating}-->
     <state name="eating">
-     <entry>m_timeEvt.postIn(this, think_time());</entry>
+     <entry>m_timeEvt.armX(think_time());</entry>
      <exit>QP::QF::PUBLISH(Q_NEW(TableEvt, DONE_SIG, PHILO_ID(this)), this);
 (void)m_timeEvt.disarm();</exit>
+     <!--${AOs::Philo::SM::eating::TIMEOUT}-->
      <tran trig="TIMEOUT" target="../../1">
       <tran_glyph conn="2,51,3,1,22,-41,-5">
        <action box="0,-2,6,2"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Philo::SM::eating::EAT, DONE}-->
      <tran trig="EAT, DONE">
       <action>/* EAT or DONE must be for other Philos than this one */
 Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
@@ -273,9 +325,13 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
     <state_diagram size="37,61"/>
    </statechart>
   </class>
+  <!--${AOs::Table}-->
   <class name="Table" superclass="Qt-port::GuiQActive">
+   <!--${AOs::Table::m_fork[N_PHILO]}-->
    <attribute name="m_fork[N_PHILO]" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Table::m_isHungry[N_PHILO]}-->
    <attribute name="m_isHungry[N_PHILO]" type="bool" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Table::Table}-->
    <operation name="Table" type="" visibility="0x00" properties="0x00">
     <code> : GuiQActive(Q_STATE_CAST(&amp;Table::initial))
 
@@ -284,7 +340,9 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     m_isHungry[n] = false;
 }</code>
    </operation>
+   <!--${AOs::Table::SM}-->
    <statechart properties="0x02">
+    <!--${AOs::Table::SM::initial}-->
     <initial target="../1/2">
      <action>(void)e; // suppress the compiler warning about unused parameter
 
@@ -315,19 +373,23 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
       <action box="0,-2,6,2"/>
      </initial_glyph>
     </initial>
+    <!--${AOs::Table::SM::active}-->
     <state name="active">
+     <!--${AOs::Table::SM::active::TERMINATE}-->
      <tran trig="TERMINATE">
       <action>BSP_terminate(0);</action>
       <tran_glyph conn="2,11,3,-1,14">
        <action box="0,-2,11,4"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Table::SM::active::EAT}-->
      <tran trig="EAT">
       <action>Q_ERROR();</action>
       <tran_glyph conn="2,15,3,-1,14">
        <action box="0,-2,10,4"/>
       </tran_glyph>
      </tran>
+     <!--${AOs::Table::SM::active::serving}-->
      <state name="serving">
       <entry brief="give pending permitions to eat">for (uint8_t n = 0U; n &lt; N_PHILO; ++n) { // give permissions to eat...
     if (m_isHungry[n]
@@ -341,6 +403,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
         BSP_displayPhilStat(n, EATING);
     }
 }</entry>
+      <!--${AOs::Table::SM::active::serving::HUNGRY}-->
       <tran trig="HUNGRY">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // phil ID must be in range and he must be not hungry
@@ -348,6 +411,7 @@ Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
 
 BSP_displayPhilStat(n, HUNGRY);
 uint8_t m = LEFT(n);</action>
+       <!--${AOs::Table::SM::active::serving::HUNGRY::[bothfree]}-->
        <choice>
         <guard brief="both free">(m_fork[m] == FREE) &amp;&amp; (m_fork[n] == FREE)</guard>
         <action>m_fork[m] = USED;
@@ -358,6 +422,7 @@ BSP_displayPhilStat(n, EATING);</action>
          <action box="1,0,10,2"/>
         </choice_glyph>
        </choice>
+       <!--${AOs::Table::SM::active::serving::HUNGRY::[else]}-->
        <choice>
         <guard>else</guard>
         <action>m_isHungry[n] = true;</action>
@@ -369,6 +434,7 @@ BSP_displayPhilStat(n, EATING);</action>
         <action box="0,-2,8,2"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::serving::DONE}-->
       <tran trig="DONE">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // phil ID must be in range and he must be not hungry
@@ -403,12 +469,14 @@ if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
         <action box="0,-2,6,2"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::serving::EAT}-->
       <tran trig="EAT">
        <action>Q_ERROR();</action>
        <tran_glyph conn="4,37,3,-1,15">
         <action box="0,-2,12,4"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::serving::PAUSE}-->
       <tran trig="PAUSE" target="../../3">
        <tran_glyph conn="4,41,3,1,37,6,-3">
         <action box="0,-2,7,2"/>
@@ -418,14 +486,17 @@ if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
        <entry box="1,2,27,2"/>
       </state_glyph>
      </state>
+     <!--${AOs::Table::SM::active::paused}-->
      <state name="paused">
       <entry>BSP_displayPaused(1U);</entry>
       <exit>BSP_displayPaused(0U);</exit>
+      <!--${AOs::Table::SM::active::paused::PAUSE}-->
       <tran trig="PAUSE" target="../../2">
        <tran_glyph conn="4,57,3,1,39,-20,-5">
         <action box="0,-2,7,2"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::paused::HUNGRY}-->
       <tran trig="HUNGRY">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // philo ID must be in range and he must be not hungry
@@ -436,6 +507,7 @@ BSP_displayPhilStat(n, HUNGRY);</action>
         <action box="0,-2,6,2"/>
        </tran_glyph>
       </tran>
+      <!--${AOs::Table::SM::active::paused::DONE}-->
       <tran trig="DONE">
        <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
 // phil ID must be in range and he must be not hungry
@@ -462,10 +534,14 @@ m_fork[n] = FREE;</action>
     <state_diagram size="49,69"/>
    </statechart>
   </class>
+  <!--${AOs::AO_Philo[N_PHILO]}-->
   <attribute name="AO_Philo[N_PHILO]" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
+  <!--${AOs::AO_Table}-->
   <attribute name="AO_Table" type="QP::QActive * const" visibility="0x00" properties="0x00"/>
  </package>
+ <!--${.}-->
  <directory name=".">
+  <!--${.::dpp.hpp}-->
   <file name="dpp.hpp">
    <text>#ifndef DPP_HPP
 #define DPP_HPP
@@ -496,6 +572,7 @@ $declare(AOs::AO_Table)
 
 #endif // DPP_HPP</text>
   </file>
+  <!--${.::philo.cpp}-->
   <file name="philo.cpp">
    <text>#include &quot;qpcpp.hpp&quot;
 #include &quot;dpp.hpp&quot;
@@ -546,6 +623,7 @@ QP::QActive * const AO_Philo[N_PHILO] = { // &quot;opaque&quot; pointers to Phil
 // Philo definition ----------------------------------------------------------
 $define(AOs::Philo)</text>
   </file>
+  <!--${.::table.cpp}-->
   <file name="table.cpp">
    <text>#include &quot;qpcpp.hpp&quot;
 #include &quot;dpp.hpp&quot;

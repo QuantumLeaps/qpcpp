@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-09-12
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -57,7 +57,7 @@ Q_DEFINE_THIS_MODULE("qep_msm")
 
 //****************************************************************************
 QMState const QMsm::msm_top_s = {
-    static_cast<QMState const *>(0),
+    static_cast<QMState *>(0),
     Q_STATE_CAST(0),
     Q_ACTION_CAST(0),
     Q_ACTION_CAST(0),
@@ -90,13 +90,13 @@ QMsm::QMsm(QStateHandler const initial)
 /// @description
 /// Executes the top-most initial transition in a MSM.
 ///
-/// @param[in] par pointer to an extra parameter (might be NULL)
+/// @param[in] e   pointer to an extra parameter (might be NULL)
 ///
 /// @attention
 /// QP::QMsm::init() must be called exactly __once__ before
 /// QP::QMsm::dispatch()
 ///
-void QMsm::init(void const * const par) {
+void QMsm::init(void const * const e) {
     QS_CRIT_STAT_
 
     /// @pre the top-most initial transition must be initialized, and the
@@ -105,16 +105,16 @@ void QMsm::init(void const * const par) {
                       && (m_state.obj == &msm_top_s));
 
     // execute the top-most initial tran.
-    QState r = (*m_temp.fun)(this, static_cast<QEvt const *>(par));
+    QState r = (*m_temp.fun)(this, Q_EVT_CAST(QEvt));
 
     // initial tran. must be taken
     Q_ASSERT_ID(210, r == Q_RET_TRAN_INIT);
 
-    QS_BEGIN_(QS_QEP_STATE_INIT, QS::priv_.locFilter[QS::SM_OBJ], this)
-        QS_OBJ_(this);  // this state machine object
-        QS_FUN_(m_state.obj->stateHandler);          // source state handler
-        QS_FUN_(m_temp.tatbl->target->stateHandler); // target state handler
-    QS_END_()
+    QS_BEGIN_PRE_(QS_QEP_STATE_INIT, QS::priv_.locFilter[QS::SM_OBJ], this)
+        QS_OBJ_PRE_(this);  // this state machine object
+        QS_FUN_PRE_(m_state.obj->stateHandler);          // source state handler
+        QS_FUN_PRE_(m_temp.tatbl->target->stateHandler); // target state handler
+    QS_END_PRE_()
 
     // set state to the last tran. target
     m_state.obj = m_temp.tatbl->target;
@@ -124,11 +124,11 @@ void QMsm::init(void const * const par) {
         r = execTatbl_(m_temp.tatbl); // execute the transition-action table
     } while (r >= Q_RET_TRAN_INIT);
 
-    QS_BEGIN_(QS_QEP_INIT_TRAN, QS::priv_.locFilter[QS::SM_OBJ], this)
-        QS_TIME_();                         // time stamp
-        QS_OBJ_(this);                      // this state machine object
-        QS_FUN_(m_state.obj->stateHandler); // the new current state
-    QS_END_()
+    QS_BEGIN_PRE_(QS_QEP_INIT_TRAN, QS::priv_.locFilter[QS::SM_OBJ], this)
+        QS_TIME_PRE_();                         // time stamp
+        QS_OBJ_PRE_(this);                      // this state machine object
+        QS_FUN_PRE_(m_state.obj->stateHandler); // the new current state
+    QS_END_PRE_()
 }
 
 //****************************************************************************
@@ -148,14 +148,14 @@ void QMsm::dispatch(QEvt const * const e) {
     QS_CRIT_STAT_
 
     /// @pre current state must be initialized
-    Q_REQUIRE_ID(300, s != static_cast<QMState const *>(0));
+    Q_REQUIRE_ID(300, s != static_cast<QMState *>(0));
 
-    QS_BEGIN_(QS_QEP_DISPATCH, QS::priv_.locFilter[QS::SM_OBJ], this)
-        QS_TIME_();               // time stamp
-        QS_SIG_(e->sig);          // the signal of the event
-        QS_OBJ_(this);            // this state machine object
-        QS_FUN_(s->stateHandler); // the current state handler
-    QS_END_()
+    QS_BEGIN_PRE_(QS_QEP_DISPATCH, QS::priv_.locFilter[QS::SM_OBJ], this)
+        QS_TIME_PRE_();               // time stamp
+        QS_SIG_PRE_(e->sig);          // the signal of the event
+        QS_OBJ_PRE_(this);            // this state machine object
+        QS_FUN_PRE_(s->stateHandler); // the current state handler
+    QS_END_PRE_()
 
     // scan the state hierarchy up to the top state...
     do {
@@ -176,11 +176,11 @@ void QMsm::dispatch(QEvt const * const e) {
         // event unhandled due to a guard?
         else if (r == Q_RET_UNHANDLED) {
 
-            QS_BEGIN_(QS_QEP_UNHANDLED, QS::priv_.locFilter[QS::SM_OBJ], this)
-                QS_SIG_(e->sig);    // the signal of the event
-                QS_OBJ_(this);      // this state machine object
-                QS_FUN_(t->stateHandler); // the current state
-            QS_END_()
+            QS_BEGIN_PRE_(QS_QEP_UNHANDLED, QS::priv_.locFilter[QS::SM_OBJ], this)
+                QS_SIG_PRE_(e->sig);    // the signal of the event
+                QS_OBJ_PRE_(this);      // this state machine object
+                QS_FUN_PRE_(t->stateHandler); // the current state
+            QS_END_PRE_()
 
             t = t->superstate; // advance to the superstate
         }
@@ -188,20 +188,20 @@ void QMsm::dispatch(QEvt const * const e) {
             // no other return value should be produced
             Q_ERROR_ID(310);
         }
-    } while (t != static_cast<QMState const *>(0));
+    } while (t != static_cast<QMState *>(0));
 
     // any kind of transition taken?
     if (r >= Q_RET_TRAN) {
 #ifdef Q_SPY
-        QMState const *ts = t; // transition source for QS tracing
+        QMState const * const ts = t; // transition source for QS tracing
 
         // the transition source state must not be NULL
-        Q_ASSERT_ID(320, ts != static_cast<QMState const *>(0));
+        Q_ASSERT_ID(320, ts != static_cast<QMState *>(0));
 #endif // Q_SPY
 
         do {
             // save the transition-action table before it gets clobbered
-            QMTranActTable const *tatbl = m_temp.tatbl;
+            QMTranActTable const * const tatbl = m_temp.tatbl;
             QHsmAttr tmp; // temporary to save intermediate values
 
             // was TRAN, TRAN_INIT, or TRAN_EP taken?
@@ -265,38 +265,38 @@ void QMsm::dispatch(QEvt const * const e) {
 
         } while (r >= Q_RET_TRAN);
 
-        QS_BEGIN_(QS_QEP_TRAN, QS::priv_.locFilter[QS::SM_OBJ], this)
-            QS_TIME_();                // time stamp
-            QS_SIG_(e->sig);           // the signal of the event
-            QS_OBJ_(this);             // this state machine object
-            QS_FUN_(ts->stateHandler); // the transition source
-            QS_FUN_(s->stateHandler);  // the new active state
-        QS_END_()
+        QS_BEGIN_PRE_(QS_QEP_TRAN, QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_TIME_PRE_();                // time stamp
+            QS_SIG_PRE_(e->sig);           // the signal of the event
+            QS_OBJ_PRE_(this);             // this state machine object
+            QS_FUN_PRE_(ts->stateHandler); // the transition source
+            QS_FUN_PRE_(s->stateHandler);  // the new active state
+        QS_END_PRE_()
     }
 
 #ifdef Q_SPY
     // was the event handled?
     else if (r == Q_RET_HANDLED) {
         // internal tran. source can't be NULL
-        Q_ASSERT_ID(340, t != static_cast<QMState const *>(0));
+        Q_ASSERT_ID(340, t != static_cast<QMState *>(0));
 
-        QS_BEGIN_(QS_QEP_INTERN_TRAN, QS::priv_.locFilter[QS::SM_OBJ], this)
-            QS_TIME_();               // time stamp
-            QS_SIG_(e->sig);          // the signal of the event
-            QS_OBJ_(this);            // this state machine object
-            QS_FUN_(t->stateHandler); // the source state
-        QS_END_()
+        QS_BEGIN_PRE_(QS_QEP_INTERN_TRAN, QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_TIME_PRE_();               // time stamp
+            QS_SIG_PRE_(e->sig);          // the signal of the event
+            QS_OBJ_PRE_(this);            // this state machine object
+            QS_FUN_PRE_(t->stateHandler); // the source state
+        QS_END_PRE_()
 
     }
     // event bubbled to the 'top' state?
-    else if (t == static_cast<QMState const *>(0)) {
+    else if (t == static_cast<QMState *>(0)) {
 
-        QS_BEGIN_(QS_QEP_IGNORED, QS::priv_.locFilter[QS::SM_OBJ], this)
-            QS_TIME_();               // time stamp
-            QS_SIG_(e->sig);          // the signal of the event
-            QS_OBJ_(this);            // this state machine object
-            QS_FUN_(s->stateHandler); // the current state
-        QS_END_()
+        QS_BEGIN_PRE_(QS_QEP_IGNORED, QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_TIME_PRE_();               // time stamp
+            QS_SIG_PRE_(e->sig);          // the signal of the event
+            QS_OBJ_PRE_(this);            // this state machine object
+            QS_FUN_PRE_(s->stateHandler); // the current state
+        QS_END_PRE_()
 
     }
 #endif // Q_SPY
@@ -325,51 +325,51 @@ QState QMsm::execTatbl_(QMTranActTable const * const tatbl) {
     QS_CRIT_STAT_
 
     /// @pre the transition-action table pointer must not be NULL
-    Q_REQUIRE_ID(400, tatbl != static_cast<QMTranActTable const *>(0));
+    Q_REQUIRE_ID(400, tatbl != static_cast<QMTranActTable *>(0));
 
     for (a = &tatbl->act[0]; *a != Q_ACTION_CAST(0); QEP_ACT_PTR_INC_(a)) {
         r = (*(*a))(this); // call the action through the 'a' pointer
 #ifdef Q_SPY
         if (r == Q_RET_ENTRY) {
 
-            QS_BEGIN_(QS_QEP_STATE_ENTRY,
+            QS_BEGIN_PRE_(QS_QEP_STATE_ENTRY,
                       QS::priv_.locFilter[QS::SM_OBJ], this)
-                QS_OBJ_(this); // this state machine object
-                QS_FUN_(m_temp.obj->stateHandler); // entered state handler
-            QS_END_()
+                QS_OBJ_PRE_(this); // this state machine object
+                QS_FUN_PRE_(m_temp.obj->stateHandler); // entered state handler
+            QS_END_PRE_()
         }
         else if (r == Q_RET_EXIT) {
 
-            QS_BEGIN_(QS_QEP_STATE_EXIT,
+            QS_BEGIN_PRE_(QS_QEP_STATE_EXIT,
                       QS::priv_.locFilter[QS::SM_OBJ], this)
-                QS_OBJ_(this); // this state machine object
-                QS_FUN_(m_temp.obj->stateHandler); // exited state handler
-            QS_END_()
+                QS_OBJ_PRE_(this); // this state machine object
+                QS_FUN_PRE_(m_temp.obj->stateHandler); // exited state handler
+            QS_END_PRE_()
         }
         else if (r == Q_RET_TRAN_INIT) {
 
-            QS_BEGIN_(QS_QEP_STATE_INIT,
+            QS_BEGIN_PRE_(QS_QEP_STATE_INIT,
                       QS::priv_.locFilter[QS::SM_OBJ], this)
-                QS_OBJ_(this); // this state machine object
-                QS_FUN_(tatbl->target->stateHandler);        // source
-                QS_FUN_(m_temp.tatbl->target->stateHandler); // target
-            QS_END_()
+                QS_OBJ_PRE_(this); // this state machine object
+                QS_FUN_PRE_(tatbl->target->stateHandler);        // source
+                QS_FUN_PRE_(m_temp.tatbl->target->stateHandler); // target
+            QS_END_PRE_()
         }
         else if (r == Q_RET_TRAN_EP) {
 
-            QS_BEGIN_(QS_QEP_TRAN_EP, QS::priv_.locFilter[QS::SM_OBJ], this)
-                QS_OBJ_(this); // this state machine object
-                QS_FUN_(tatbl->target->stateHandler);        // source
-                QS_FUN_(m_temp.tatbl->target->stateHandler); // target
-            QS_END_()
+            QS_BEGIN_PRE_(QS_QEP_TRAN_EP, QS::priv_.locFilter[QS::SM_OBJ], this)
+                QS_OBJ_PRE_(this); // this state machine object
+                QS_FUN_PRE_(tatbl->target->stateHandler);        // source
+                QS_FUN_PRE_(m_temp.tatbl->target->stateHandler); // target
+            QS_END_PRE_()
         }
         else if (r == Q_RET_TRAN_XP) {
 
-            QS_BEGIN_(QS_QEP_TRAN_XP, QS::priv_.locFilter[QS::SM_OBJ], this)
-                QS_OBJ_(this); // this state machine object
-                QS_FUN_(tatbl->target->stateHandler);        // source
-                QS_FUN_(m_temp.tatbl->target->stateHandler); // target
-            QS_END_()
+            QS_BEGIN_PRE_(QS_QEP_TRAN_XP, QS::priv_.locFilter[QS::SM_OBJ], this)
+                QS_OBJ_PRE_(this); // this state machine object
+                QS_FUN_PRE_(tatbl->target->stateHandler);        // source
+                QS_FUN_PRE_(m_temp.tatbl->target->stateHandler); // target
+            QS_END_PRE_()
         }
         else {
             // empty
@@ -402,19 +402,19 @@ void QMsm::exitToTranSource_(QMState const *s,
             (void)(*s->exitAction)(this); // execute the exit action
 
             QS_CRIT_STAT_
-            QS_BEGIN_(QS_QEP_STATE_EXIT,
+            QS_BEGIN_PRE_(QS_QEP_STATE_EXIT,
                       QS::priv_.locFilter[QS::SM_OBJ], this)
-                QS_OBJ_(this);            // this state machine object
-                QS_FUN_(s->stateHandler); // the exited state handler
-            QS_END_()
+                QS_OBJ_PRE_(this);            // this state machine object
+                QS_FUN_PRE_(s->stateHandler); // the exited state handler
+            QS_END_PRE_()
         }
 
         s = s->superstate; // advance to the superstate
 
         // reached the top of a submachine?
-        if (s == static_cast<QMState const *>(0)) {
+        if (s == static_cast<QMState *>(0)) {
             s = m_temp.obj; // the superstate from QM_SM_EXIT()
-            Q_ASSERT_ID(510, s != static_cast<QMState const *>(0));
+            Q_ASSERT_ID(510, s != static_cast<QMState *>(0));
         }
     }
 }
@@ -438,11 +438,11 @@ QState QMsm::enterHistory_(QMState const * const hist) {
     uint_fast8_t i = static_cast<uint_fast8_t>(0);  // entry path index
     QS_CRIT_STAT_
 
-    QS_BEGIN_(QS_QEP_TRAN_HIST, QS::priv_.locFilter[QS::SM_OBJ], this)
-        QS_OBJ_(this);               // this state machine object
-        QS_FUN_(ts->stateHandler);   // source state handler
-        QS_FUN_(hist->stateHandler); // target state handler
-    QS_END_()
+    QS_BEGIN_PRE_(QS_QEP_TRAN_HIST, QS::priv_.locFilter[QS::SM_OBJ], this)
+        QS_OBJ_PRE_(this);               // this state machine object
+        QS_FUN_PRE_(ts->stateHandler);   // source state handler
+        QS_FUN_PRE_(hist->stateHandler); // target state handler
+    QS_END_PRE_()
 
     while (s != ts) {
         if (s->entryAction != static_cast<QActionHandler>(0)) {
@@ -451,7 +451,7 @@ QState QMsm::enterHistory_(QMState const * const hist) {
             Q_ASSERT_ID(620, i <= static_cast<uint_fast8_t>(Q_DIM(epath)));
         }
         s = s->superstate;
-        if (s == 0) {
+        if (s == static_cast<QMState *>(0)) {
             ts = s; /* force exit from the for-loop */
         }
     }
@@ -461,10 +461,11 @@ QState QMsm::enterHistory_(QMState const * const hist) {
         --i;
         (void)(*epath[i]->entryAction)(this); // run entry action in epath[i]
 
-        QS_BEGIN_(QS_QEP_STATE_ENTRY, QS::priv_.locFilter[QS::SM_OBJ], this)
-            QS_OBJ_(this);
-            QS_FUN_(epath[i]->stateHandler); // entered state handler
-        QS_END_()
+        QS_BEGIN_PRE_(QS_QEP_STATE_ENTRY,
+                      QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_OBJ_PRE_(this);
+            QS_FUN_PRE_(epath[i]->stateHandler); // entered state handler
+        QS_END_PRE_()
     }
 
     m_state.obj = hist; // set current state to the transition target
@@ -496,7 +497,7 @@ bool QMsm::isInState(QMState const * const st) const {
     bool inState = false; // assume that this MSM is not in 'state'
 
     for (QMState const *s = m_state.obj;
-         s != static_cast<QMState const *>(0);
+         s != static_cast<QMState *>(0);
          s = s->superstate)
     {
         if (s == st) {
@@ -528,7 +529,7 @@ QMState const *QMsm::childStateObj(QMState const * const parent) const {
     QMState const *s;
 
     for (s = m_state.obj;
-         s != static_cast<QMState const *>(0);
+         s != static_cast<QMState *>(0);
          s = s->superstate)
     {
         if (s == parent) {

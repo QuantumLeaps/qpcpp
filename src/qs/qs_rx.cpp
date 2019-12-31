@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.6
-/// Last updated on  2019-08-27
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses/>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -259,10 +259,10 @@ void QS::rxInitBuf(uint8_t sto[], uint16_t const stoSize) {
     l_rx.seq    = static_cast<uint8_t>(0);
     l_rx.chksum = static_cast<uint8_t>(0);
 
-    beginRec(static_cast<uint_fast8_t>(QS_OBJ_DICT));
-        QS_OBJ_(&rxPriv_);
-        QS_STR_("QS_RX");
-    endRec();
+    beginRec_(static_cast<uint_fast8_t>(QS_OBJ_DICT));
+        QS_OBJ_PRE_(&rxPriv_);
+        QS_STR_PRE_("QS_RX");
+    endRec_();
     // no QS_REC_DONE(), because QS is not running yet
 
 #ifdef Q_UTEST
@@ -871,29 +871,29 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
         }
         case WAIT4_PEEK_FRAME: {
             // no need to report Ack or Done
-            QS::beginRec(static_cast<uint_fast8_t>(QS_PEEK_DATA));
+            QS::beginRec_(static_cast<uint_fast8_t>(QS_PEEK_DATA));
                 ptr = (static_cast<uint8_t *>(QS::rxPriv_.currObj[QS::AP_OBJ])
                        + l_rx.var.peek.offs);
-                QS_TIME_();                  // timestamp
-                QS_U16_(l_rx.var.peek.offs); // data offset
-                QS_U8_(l_rx.var.peek.size);  // data size
-                QS_U8_(l_rx.var.peek.num);   // number of data items
+                QS_TIME_PRE_();                  // timestamp
+                QS_U16_PRE_(l_rx.var.peek.offs); // data offset
+                QS_U8_PRE_(l_rx.var.peek.size);  // data size
+                QS_U8_PRE_(l_rx.var.peek.num);   // number of data items
                 for (i =static_cast<uint8_t>(0); i < l_rx.var.peek.num; ++i) {
                     switch (l_rx.var.peek.size) {
                         case 1:
-                            QS_U8_(*(ptr + i));
+                            QS_U8_PRE_(*(ptr + i));
                             break;
                         case 2:
-                            QS_U16_(*(reinterpret_cast<uint16_t *>(ptr) + i));
+                            QS_U16_PRE_(*(reinterpret_cast<uint16_t *>(ptr) + i));
                             break;
                         case 4:
-                            QS_U32_(*(reinterpret_cast<uint32_t *>(ptr) + i));
+                            QS_U32_PRE_(*(reinterpret_cast<uint32_t *>(ptr) + i));
                             break;
                         default:
                             break;
                     }
                 }
-            QS::endRec();
+            QS::endRec_();
             QS_REC_DONE();
             break;
         }
@@ -993,41 +993,41 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
             i = l_rx.var.obj.kind;
             ptr = reinterpret_cast<uint8_t *>(QS::rxPriv_.currObj[i]);
             if (ptr != static_cast<void *>(0)) {
-                QS::beginRec(static_cast<uint_fast8_t>(QS_QUERY_DATA));
-                    QS_TIME_(); // timestamp
-                    QS_U8_(i);  // object kind
-                    QS_OBJ_(ptr);
+                QS::beginRec_(static_cast<uint_fast8_t>(QS_QUERY_DATA));
+                    QS_TIME_PRE_(); // timestamp
+                    QS_U8_PRE_(i);  // object kind
+                    QS_OBJ_PRE_(ptr);
                     switch (i) {
                         case QS::SM_OBJ:
-                            QS_FUN_(reinterpret_cast<QHsm *>(ptr)->m_state.fun);
+                            QS_FUN_PRE_(reinterpret_cast<QHsm *>(ptr)->m_state.fun);
                             break;
 
 #ifdef Q_UTEST
                         case QS::AO_OBJ:
-                            QS_EQC_(reinterpret_cast<QActive *>(ptr)->m_eQueue.m_nFree);
-                            QS_EQC_(reinterpret_cast<QActive *>(ptr)->m_eQueue.m_nMin);
+                            QS_EQC_PRE_(reinterpret_cast<QActive *>(ptr)->m_eQueue.m_nFree);
+                            QS_EQC_PRE_(reinterpret_cast<QActive *>(ptr)->m_eQueue.m_nMin);
                             break;
                         case QS::MP_OBJ:
-                            QS_MPC_(reinterpret_cast<QMPool *>(ptr)->m_nFree);
-                            QS_MPC_(reinterpret_cast<QMPool *>(ptr)->m_nMin);
+                            QS_MPC_PRE_(reinterpret_cast<QMPool *>(ptr)->m_nFree);
+                            QS_MPC_PRE_(reinterpret_cast<QMPool *>(ptr)->m_nMin);
                             break;
                         case QS::EQ_OBJ:
-                            QS_EQC_(reinterpret_cast<QEQueue *>(ptr)->m_nFree);
-                            QS_EQC_(reinterpret_cast<QEQueue *>(ptr)->m_nMin);
+                            QS_EQC_PRE_(reinterpret_cast<QEQueue *>(ptr)->m_nFree);
+                            QS_EQC_PRE_(reinterpret_cast<QEQueue *>(ptr)->m_nMin);
                             break;
                         case QS::TE_OBJ:
-                            QS_OBJ_(reinterpret_cast<QTimeEvt *>(ptr)->m_act);
-                            QS_TEC_(reinterpret_cast<QTimeEvt *>(ptr)->m_ctr);
-                            QS_TEC_(reinterpret_cast<QTimeEvt *>(ptr)->m_interval);
-                            QS_SIG_(reinterpret_cast<QTimeEvt *>(ptr)->sig);
-                            QS_U8_ (reinterpret_cast<QTimeEvt *>(ptr)->refCtr_);
+                            QS_OBJ_PRE_(reinterpret_cast<QTimeEvt *>(ptr)->m_act);
+                            QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(ptr)->m_ctr);
+                            QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(ptr)->m_interval);
+                            QS_SIG_PRE_(reinterpret_cast<QTimeEvt *>(ptr)->sig);
+                            QS_U8_PRE_ (reinterpret_cast<QTimeEvt *>(ptr)->refCtr_);
                             break;
 #endif // Q_UTEST
 
                         default:
                             break;
                     }
-                QS::endRec();
+                QS::endRec_();
                 QS_REC_DONE();
             }
             else {
@@ -1210,26 +1210,26 @@ static void rxHandleBadFrame_(uint8_t state) {
 
 /****************************************************************************/
 static void rxReportAck_(enum QSpyRxRecords recId) {
-    QS::beginRec(static_cast<uint_fast8_t>(QS_RX_STATUS));
-        QS_U8_(recId); // record ID
-    QS::endRec();
+    QS::beginRec_(static_cast<uint_fast8_t>(QS_RX_STATUS));
+        QS_U8_PRE_(recId); // record ID
+    QS::endRec_();
     QS_REC_DONE();
 }
 
 //****************************************************************************
 static void rxReportError_(uint8_t const code) {
-    QS::beginRec(static_cast<uint_fast8_t>(QS_RX_STATUS));
-        QS_U8_(static_cast<uint8_t>(static_cast<uint8_t>(0x80) | code));
-    QS::endRec();
+    QS::beginRec_(static_cast<uint_fast8_t>(QS_RX_STATUS));
+        QS_U8_PRE_(static_cast<uint8_t>(static_cast<uint8_t>(0x80) | code));
+    QS::endRec_();
     QS_REC_DONE();
 }
 
 /****************************************************************************/
 static void rxReportDone_(enum QSpyRxRecords recId) {
-    QS::beginRec(static_cast<uint_fast8_t>(QS_TARGET_DONE));
-        QS_TIME_();    // timestamp
-        QS_U8_(recId); // record ID
-    QS::endRec();
+    QS::beginRec_(static_cast<uint_fast8_t>(QS_TARGET_DONE));
+        QS_TIME_PRE_();    // timestamp
+        QS_U8_PRE_(recId); // record ID
+    QS::endRec_();
     QS_REC_DONE();
 }
 
@@ -1290,11 +1290,11 @@ uint32_t QS::getTestProbe_(void (* const api)(void)) {
                     l_testData.tpBuf[i + static_cast<uint_fast8_t>(1)];
             }
             // i == l_testData.tpNum, which terminates the top loop
-            QS::beginRec(static_cast<uint_fast8_t>(QS_TEST_PROBE_GET));
-                QS_TIME_();    // timestamp
-                QS_FUN_(api);  // the calling API
-                QS_U32_(data); // the Test-Probe data
-            QS::endRec();
+            QS::beginRec_(static_cast<uint_fast8_t>(QS_TEST_PROBE_GET));
+                QS_TIME_PRE_();    // timestamp
+                QS_FUN_PRE_(api);  // the calling API
+                QS_U32_PRE_(data); // the Test-Probe data
+            QS::endRec_();
             QS_REC_DONE();
         }
     }

@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: "Low-Power" example, dual-mode QXK kernel
-// Last Updated for Version: 6.4.0
-// Date of the Last Update:  2019-02-24
+// Last Updated for Version: 6.7.0
+// Date of the Last Update:  2019-12-27
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://www.state-machine.com
-// mailto:info@state-machine.com
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
 #include "low_power.hpp"
@@ -46,7 +46,8 @@ QP::QXThread XT_Blinky1(&XBlinky1_run, // thread routine
 QP::QXSemaphore XSEM_sw1;
 
 //............................................................................
-static void XBlinky1_run(QP::QXThread * const /* me */) {
+static void XBlinky1_run(QP::QXThread * const me) {
+    (void)me; // unused parameter
     bool isActive = false;
     for (;;) {
         if (!isActive) {

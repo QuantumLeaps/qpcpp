@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-09-12
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-28
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -177,11 +177,13 @@ int QF_consoleWaitForKey(void) {
 }
 
 //****************************************************************************
-void QActive::start(uint_fast8_t prio,
-                    QEvt const *qSto[], uint_fast16_t qLen,
-                    void *stkSto, uint_fast16_t stkSize,
+void QActive::start(uint_fast8_t const prio,
+                    QEvt const * * const qSto, uint_fast16_t const qLen,
+                    void * const stkSto, uint_fast16_t const stkSize,
                     void const * const par)
 {
+    (void)stkSize; // unused paramteter in the Win32 port
+
     Q_REQUIRE_ID(800, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
         && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*...in range */
         && (stkSto == static_cast<void *>(0))); // statck storage must NOT...
@@ -202,13 +204,14 @@ void QActive::start(uint_fast8_t prio,
     QS_FLUSH(); // flush the QS trace buffer to the host
 
     // stack size not provided?
-    if (stkSize == 0U) {
-        stkSize = 1024U; // NOTE: will be rounded up to the nearest page
+    SIZE_T thrStackSize = stkSize;
+    if (thrStackSize == 0U) {
+        thrStackSize = 1024U; // NOTE: will be rounded up to the nearest page
     }
 
     // create a Win32 thread for the AO;
     // The thread is created with THREAD_PRIORITY_NORMAL
-    m_thread = CreateThread(NULL, stkSize, &ao_thread, this, 0, NULL);
+    m_thread = CreateThread(NULL, thrStackSize, &ao_thread, this, 0, NULL);
     Q_ENSURE_ID(830, m_thread != static_cast<HANDLE>(0)); // must succeed
 }
 

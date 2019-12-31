@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -90,7 +90,7 @@ bool GuiApp::event(QEvent *e) {
 
 //............................................................................
 void GuiQActive::start(uint_fast8_t const prio,
-                       QEvt const *qSto[], uint_fast16_t const /*qLen*/,
+                       QEvt const * * const qSto, uint_fast16_t const /*qLen*/,
                        void * const stkSto, uint_fast16_t const /*stkSize*/,
                        void const * const par)
 {
@@ -122,17 +122,17 @@ bool GuiQActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();                  // timestamp
-        QS_OBJ_(sender);             // the sender object
-        QS_SIG_(e->sig);             // the signal of the event
-        QS_OBJ_(this);               // this active object
-        QS_2U8_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
+        QS_TIME_PRE_();                  // timestamp
+        QS_OBJ_PRE_(sender);             // the sender object
+        QS_SIG_PRE_(e->sig);             // the signal of the event
+        QS_OBJ_PRE_(this);               // this active object
+        QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
                 QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
-        QS_EQC_(0);                  // number of free entries (not used)
-        QS_EQC_(0);                  // min number of free entries (not used)
-    QS_END_NOCRIT_()
+        QS_EQC_PRE_(0);                  // number of free entries (not used)
+        QS_EQC_PRE_(0);                  // min number of free entries (not used)
+    QS_END_NOCRIT_PRE_()
 
     QF_CRIT_EXIT_();
 
@@ -150,16 +150,16 @@ void GuiQActive::postLIFO(QEvt const * const e) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();                  // timestamp
-        QS_SIG_(e->sig);             // the signal of this event
-        QS_OBJ_(this);               // this active object
-        QS_2U8_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
+        QS_TIME_PRE_();                  // timestamp
+        QS_SIG_PRE_(e->sig);             // the signal of this event
+        QS_OBJ_PRE_(this);               // this active object
+        QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
                 QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
-        QS_EQC_(0);                  // number of free entries (not used)
-        QS_EQC_(0);                  // min number of free entries (not used)
-    QS_END_NOCRIT_()
+        QS_EQC_PRE_(0);                  // number of free entries (not used)
+        QS_EQC_PRE_(0);                  // min number of free entries (not used)
+    QS_END_NOCRIT_PRE_()
 
     QF_CRIT_EXIT_();
 
@@ -202,17 +202,17 @@ bool GuiQMActive::post_(QEvt const * const e, uint_fast16_t const /*margin*/,
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_FIFO,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();                  // timestamp
-        QS_OBJ_(sender);             // the sender object
-        QS_SIG_(e->sig);             // the signal of the event
-        QS_OBJ_(this);               // this active object
-        QS_2U8_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
+        QS_TIME_PRE_();                  // timestamp
+        QS_OBJ_PRE_(sender);             // the sender object
+        QS_SIG_PRE_(e->sig);             // the signal of the event
+        QS_OBJ_PRE_(this);               // this active object
+        QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
                 QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
-        QS_EQC_(0);                  // number of free entries (not used)
-        QS_EQC_(0);                  // min number of free entries (not used)
-    QS_END_NOCRIT_()
+        QS_EQC_PRE_(0);                  // number of free entries (not used)
+        QS_EQC_PRE_(0);                  // min number of free entries (not used)
+    QS_END_NOCRIT_PRE_()
 
     QF_CRIT_EXIT_();
 
@@ -230,16 +230,16 @@ void GuiQMActive::postLIFO(QEvt const * const e) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_POST_LIFO,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();                  // timestamp
-        QS_SIG_(e->sig);             // the signal of this event
-        QS_OBJ_(this);               // this active object
-        QS_2U8_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
+        QS_TIME_PRE_();                  // timestamp
+        QS_SIG_PRE_(e->sig);             // the signal of this event
+        QS_OBJ_PRE_(this);               // this active object
+        QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
                 QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
-        QS_EQC_(0);                  // number of free entries (not used)
-        QS_EQC_(0);                  // min number of free entries (not used)
-    QS_END_NOCRIT_()
+        QS_EQC_PRE_(0);                  // number of free entries (not used)
+        QS_EQC_PRE_(0);                  // min number of free entries (not used)
+    QS_END_NOCRIT_PRE_()
 
     QF_CRIT_EXIT_();
 

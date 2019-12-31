@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://www.state-machine.com
-// mailto:info@state-machine.com
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
 #include "bsp.hpp"
@@ -102,7 +102,6 @@ void BSP::init(void) {
     randomSeed(1234U);
 
     Q_ALLEGE(QS_INIT((void *)0)); // initialize the QS software tracing
-    QS_RESET();
     QS_OBJ_DICTIONARY(&l_tickISR);
     QS_OBJ_DICTIONARY(&l_testISR);
 }
@@ -137,21 +136,22 @@ uint32_t BSP::random(void) { // a cheap pseudo-random-number generator
 void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
+
+} // namespace DPP
+
 //............................................................................
 // NOTE: this implementation of the assertion handler is intended only for
 // debugging and MUST be changed for deployment of the application (assuming
 // that you ship your production code with assertions enabled).
 //
 extern "C"
-void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
+void Q_onAssert(char const * const file, int loc) {
     (void)file;       // unused parameter
-    (void)line;       // unused parameter
+    (void)loc;        // unused parameter
     QF_INT_DISABLE(); // make sure that interrupts are disabled
     for (;;) {
     }
 }
-
-} // namespace DPP
 
 // namespace QP **************************************************************
 namespace QP {
@@ -191,10 +191,8 @@ void QV::onIdle(void) { // NOTE: called with interrupts disabled
     QF_INT_ENABLE(); // enable interrupts, see NOTE01
 
     while (U2STAbits.UTXBF == 0) { // TX Buffer not full?
-        uint16_t b;
-
         QF_INT_DISABLE();
-        b = QS::getByte();
+        uint16_t b = QS::getByte();
         QF_INT_ENABLE();
 
         if (b == QS_EOD) { // End-Of-Data reached?

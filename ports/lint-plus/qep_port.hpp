@@ -1,7 +1,6 @@
-/// \file
-/// \brief QV/C++ port to Lint, Generic C++ compiler
-/// \note This is just an EXAMPLE of a QV port used for "linting" the QV.
-/// \cond
+/// @file
+/// @brief QEP/C++ port, generic C++ compiler
+/// @cond
 ///***************************************************************************
 /// Last updated for version 6.6.0
 /// Last updated on  2019-07-30
@@ -31,18 +30,17 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
-/// \endcond
+/// @endcond
 
-#ifndef QV_PORT_HPP
-#define QV_PORT_HPP
+#ifndef QEP_PORT_HPPPP
+#define QEP_PORT_HPPPP
 
-//lint -save -e1960    MISRA-C++:2008 Rule 7-3-1, Global declaration
+// Exact-width types. WG14/N843 C99 Standard, Section 7.18.1.1
+#include <stdint.h>
 
-//lint -restore
+#include "qep.hpp" // QEP platform-independent public interface
 
-#include "qv.hpp" // QK platform-independent public interface
-
-#endif // QV_PORT_HPP
+#endif // QEP_PORT_HPPPP

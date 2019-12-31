@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web  : https://state-machine.com
-// Email: info@state-machine.com
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"  // QP/C++ API
 #include "dpp.hpp"    // application events and active objects
@@ -94,7 +94,7 @@ QActive * const AO_Table = (QActive *)&l_table; // "opaque" AO pointer
 //............................................................................
 Table::Table()
    : QActive((QStateHandler)&Table::initial),
-      m_te_DISPLAY_TIMEOUT(DISPLAY_TIMEOUT_SIG)
+      m_te_DISPLAY_TIMEOUT(this, DISPLAY_TIMEOUT_SIG)
 
 {
     uint8_t n;
@@ -142,8 +142,7 @@ QState Table::serving(Table *me, QEvt const *e) {
 
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            me->m_te_DISPLAY_TIMEOUT.postEvery((QActive *)me,
-                                               DISPLAY_TIMEOUT);
+            me->m_te_DISPLAY_TIMEOUT.armX(DISPLAY_TIMEOUT);
             me->displayOn();
             return Q_HANDLED();
         }

@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
 // https://state-machine.com
-// mailto:info@state-machine.com
+// <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
 #include "dpp.hpp"
@@ -82,8 +82,9 @@ static uint32_t l_rnd; // random seed
 
     QP::QSTimeCtr QS_tickTime_;
     QP::QSTimeCtr QS_tickPeriod_;
-    static uint8_t l_SysTick_Handler;
-    static uint8_t l_GPIOPortA_IRQHandler;
+    static uint8_t const l_SysTick_Handler = static_cast<uint8_t>(0);
+    static uint8_t const l_GPIOPortA_IRQHandler = static_cast<uint8_t>(0);
+    static uint8_t const l_dummy_AP_obj = static_cast<uint8_t>(0);
 
     #define UART_BAUD_RATE      115200U
     #define UART_FR_TXFE        (1U << 7)
@@ -460,17 +461,19 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, static_cast<void *>(0))
+    QS_BEGIN(DPP::COMMAND_STAT, &DPP::l_dummy_AP_obj)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
+        QS_U32(8, param2);
+        QS_U32(8, param3);
     QS_END()
 
     switch (cmdId) {
-        case 1: {
-            QS_target_info_(static_cast<uint8_t>(0xFF)); // test a reset
+        case 10: {
+            Q_ERROR(); // for testing assertions
             break;
         }
-        case 10: {
+        case 11: {
             assert_failed("QS_onCommand", 10); // for testing assertions
             break;
         }

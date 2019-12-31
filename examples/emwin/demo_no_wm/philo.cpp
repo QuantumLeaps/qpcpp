@@ -25,11 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
 // https://state-machine.com
-// mailto:info@state-machine.com
+// <info@state-machine.com>
 //////////////////////////////////////////////////////////////////////////////
 #include "qpcpp.hpp"
 #include "dpp.hpp"
@@ -76,7 +76,7 @@ QActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AOs
 //............................................................................
 Philo::Philo()
     : QActive((QStateHandler)&Philo::initial),
-      m_timeEvt(TIMEOUT_SIG)
+      m_timeEvt(this, TIMEOUT_SIG)
 {}
 //............................................................................
 QState Philo::initial(Philo *me, QEvt const *) {
@@ -111,7 +111,7 @@ QState Philo::initial(Philo *me, QEvt const *) {
 QState Philo::thinking(Philo *me, QEvt const *e) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            me->m_timeEvt.postIn(me, THINK_TIME);
+            me->m_timeEvt.armX(THINK_TIME);
             return Q_HANDLED();
         }
         case TIMEOUT_SIG: {
@@ -153,7 +153,7 @@ QState Philo::hungry(Philo *me, QEvt const *e) {
 QState Philo::eating(Philo *me, QEvt const *e) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            me->m_timeEvt.postIn(me, EAT_TIME);
+            me->m_timeEvt.armX(EAT_TIME);
             return Q_HANDLED();
         }
         case Q_EXIT_SIG: {

@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -46,9 +46,6 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qs")
 
 //****************************************************************************
-extern char_t const BUILD_DATE[12];
-extern char_t const BUILD_TIME[9];
-
 QS QS::priv_; // QS private data
 
 //****************************************************************************
@@ -70,7 +67,7 @@ QS QS::priv_; // QS private data
 /// and check sums on each record allow the QSPY host uitiliy to easily detect
 /// any data loss.
 ///
-void QS::initBuf(uint8_t sto[], uint_fast16_t const stoSize) {
+void QS::initBuf(uint8_t * const sto, uint_fast16_t const stoSize) {
     // the provided buffer must be at least 8 bytes long
     Q_REQUIRE_ID(100, stoSize > static_cast<uint_fast16_t>(8));
 
@@ -87,7 +84,7 @@ void QS::initBuf(uint8_t sto[], uint_fast16_t const stoSize) {
     priv_.locFilter[TE_OBJ] = static_cast<void *>(0);
     priv_.locFilter[TE_OBJ] = static_cast<void *>(0);
 
-    priv_.buf      = &sto[0];
+    priv_.buf      = sto;
     priv_.end      = static_cast<QSCtr>(stoSize);
     priv_.head     = static_cast<QSCtr>(0);
     priv_.tail     = static_cast<QSCtr>(0);
@@ -97,8 +94,8 @@ void QS::initBuf(uint8_t sto[], uint_fast16_t const stoSize) {
     priv_.critNest = static_cast<uint_fast8_t>(0);
 
     // produce an empty record to "flush" the QS trace buffer
-    beginRec(QS_REC_NUM_(QS_EMPTY));
-    endRec();
+    beginRec_(QS_REC_NUM_(QS_EMPTY));
+    endRec_();
 
     // produce the Target info QS record
     QS_target_info_(static_cast<uint8_t>(0xFF));
@@ -119,7 +116,7 @@ void QS::initBuf(uint8_t sto[], uint_fast16_t const stoSize) {
 /// @sa QP::QS::filterOff(), QS_FILTER_SM_OBJ, QS_FILTER_AO_OBJ,
 /// QS_FILTER_MP_OBJ, QS_FILTER_EQ_OBJ, and QS_FILTER_TE_OBJ.
 ///
-void QS::filterOn(uint_fast8_t const rec) {
+void QS::filterOn_(uint_fast8_t const rec) {
     if (rec == static_cast<uint_fast8_t>(QS_ALL_RECORDS)) {
         uint_fast8_t i;
         for (i = static_cast<uint_fast8_t>(0);
@@ -202,7 +199,7 @@ void QS::filterOn(uint_fast8_t const rec) {
 /// of filtering. The second layer is based on the object-type. Both filter
 /// layers must be enabled for the QS record to be inserted in the QS buffer.
 ///
-void QS::filterOff(uint_fast8_t const rec) {
+void QS::filterOff_(uint_fast8_t const rec) {
     uint8_t tmp;
 
     if (rec == static_cast<uint_fast8_t>(QS_ALL_RECORDS)) {
@@ -266,8 +263,8 @@ void QS::filterOff(uint_fast8_t const rec) {
     }
     else if (rec == static_cast<uint_fast8_t>(QS_UA_RECORDS)) {
         priv_.glbFilter[12] &= static_cast<uint8_t>(~0xF0U);
-        priv_.glbFilter[13] &= static_cast<uint8_t>(~0xFFU);
-        priv_.glbFilter[14] &= static_cast<uint8_t>(~0xFFU);
+        priv_.glbFilter[13] = static_cast<uint8_t>(0);
+        priv_.glbFilter[14] = static_cast<uint8_t>(0);
         priv_.glbFilter[15] &= static_cast<uint8_t>(~0x1FU);
     }
     else {
@@ -287,20 +284,20 @@ void QS::filterOff(uint_fast8_t const rec) {
 /// or #QS_BEGIN_NOCRIT, depending if it's called in a normal code or from
 /// a critical section.
 ///
-void QS::beginRec(uint_fast8_t const rec) {
-    uint8_t b = static_cast<uint8_t>(priv_.seq + static_cast<uint8_t>(1));
+void QS::beginRec_(uint_fast8_t const rec) {
+    uint8_t const b = static_cast<uint8_t>(priv_.seq + static_cast<uint8_t>(1));
     uint8_t chksum_ = static_cast<uint8_t>(0); // reset the checksum
-    uint8_t *buf_   = priv_.buf;   // put in a temporary (register)
-    QSCtr   head_   = priv_.head;  // put in a temporary (register)
-    QSCtr   end_    = priv_.end;   // put in a temporary (register)
+    uint8_t * const buf_   = priv_.buf; // put in a temporary (register)
+    QSCtr head_      = priv_.head;  // put in a temporary (register)
+    QSCtr const end_ = priv_.end;  // put in a temporary (register)
 
     priv_.seq = b; // store the incremented sequence num
     priv_.used += static_cast<QSCtr>(2); // 2 bytes about to be added
 
-    QS_INSERT_ESC_BYTE(b)
+    QS_INSERT_ESC_BYTE_(b)
 
-    chksum_ = static_cast<uint8_t>(chksum_ + static_cast<uint8_t>(rec));
-    QS_INSERT_BYTE(static_cast<uint8_t>(rec)) // rec does not need escaping
+    chksum_ += static_cast<uint8_t>(rec);
+    QS_INSERT_BYTE_(static_cast<uint8_t>(rec)) // rec does not need escaping
 
     priv_.head   = head_;   // save the head
     priv_.chksum = chksum_; // save the checksum
@@ -313,26 +310,25 @@ void QS::beginRec(uint_fast8_t const rec) {
 /// or #QS_END_NOCRIT, depending if it's called in a normal code or from
 /// a critical section.
 ///
-void QS::endRec(void) {
-    uint8_t *buf_ = priv_.buf;  // put in a temporary (register)
-    QSCtr   head_ = priv_.head;
-    QSCtr   end_  = priv_.end;
-    uint8_t b     = priv_.chksum;
+void QS::endRec_(void) {
+    uint8_t * const buf_ = priv_.buf;  // put in a temporary (register)
+    QSCtr head_ = priv_.head;
+    QSCtr const end_ = priv_.end;
+    uint8_t b = priv_.chksum;
     b ^= static_cast<uint8_t>(0xFF); // invert the bits in the checksum
-
 
     priv_.used += static_cast<QSCtr>(2); // 2 bytes about to be added
 
     if ((b != QS_FRAME) && (b != QS_ESC)) {
-        QS_INSERT_BYTE(b)
+        QS_INSERT_BYTE_(b)
     }
     else {
-        QS_INSERT_BYTE(QS_ESC)
-        QS_INSERT_BYTE(b ^ QS_ESC_XOR)
+        QS_INSERT_BYTE_(QS_ESC)
+        QS_INSERT_BYTE_(b ^ QS_ESC_XOR)
         ++priv_.used; // account for the ESC byte
     }
 
-    QS_INSERT_BYTE(QS_FRAME) // do not escape this QS_FRAME
+    QS_INSERT_BYTE_(QS_FRAME) // do not escape this QS_FRAME
 
     priv_.head = head_; // save the head
     if (priv_.used > end_) { // overrun over the old data?
@@ -344,52 +340,52 @@ void QS::endRec(void) {
 //****************************************************************************
 void QS_target_info_(uint8_t const isReset) {
 
-    QS::beginRec(static_cast<uint_fast8_t>(QS_TARGET_INFO));
-        QS_U8_(isReset);
+    QS::beginRec_(static_cast<uint_fast8_t>(QS_TARGET_INFO));
+        QS_U8_PRE_(isReset);
 
-        QS_U16_(QP_VERSION); // two-byte version number
+        QS_U16_PRE_(QP_VERSION); // two-byte version number
 
         // send the object sizes...
-        QS_U8_(static_cast<uint8_t>(Q_SIGNAL_SIZE)
+        QS_U8_PRE_(static_cast<uint8_t>(Q_SIGNAL_SIZE)
                | static_cast<uint8_t>(
                      static_cast<uint8_t>(QF_EVENT_SIZ_SIZE) << 4));
 
 #ifdef QF_EQUEUE_CTR_SIZE
-        QS_U8_(static_cast<uint8_t>(QF_EQUEUE_CTR_SIZE)
+        QS_U8_PRE_(static_cast<uint8_t>(QF_EQUEUE_CTR_SIZE)
                | static_cast<uint8_t>(
                      static_cast<uint8_t>(QF_TIMEEVT_CTR_SIZE) << 4));
 #else
-        QS_U8_(static_cast<uint8_t>(
+        QS_U8_PRE_(static_cast<uint8_t>(
                    static_cast<uint8_t>(QF_TIMEEVT_CTR_SIZE) << 4));
 #endif // ifdef QF_EQUEUE_CTR_SIZE
 
 #ifdef QF_MPOOL_CTR_SIZE
-        QS_U8_(static_cast<uint8_t>(QF_MPOOL_SIZ_SIZE)
+        QS_U8_PRE_(static_cast<uint8_t>(QF_MPOOL_SIZ_SIZE)
                | static_cast<uint8_t>(
                      static_cast<uint8_t>(QF_MPOOL_CTR_SIZE) << 4));
 #else
-        QS_U8_(static_cast<uint8_t>(0));
+        QS_U8_PRE_(static_cast<uint8_t>(0));
 #endif // ifdef QF_MPOOL_CTR_SIZE
 
-        QS_U8_(static_cast<uint8_t>(QS_OBJ_PTR_SIZE)
+        QS_U8_PRE_(static_cast<uint8_t>(QS_OBJ_PTR_SIZE)
                | static_cast<uint8_t>(
                      static_cast<uint8_t>(QS_FUN_PTR_SIZE) << 4));
-        QS_U8_(static_cast<uint8_t>(QS_TIME_SIZE));
+        QS_U8_PRE_(static_cast<uint8_t>(QS_TIME_SIZE));
 
         // send the limits...
-        QS_U8_(static_cast<uint8_t>(QF_MAX_ACTIVE));
-        QS_U8_(static_cast<uint8_t>(QF_MAX_EPOOL)
+        QS_U8_PRE_(static_cast<uint8_t>(QF_MAX_ACTIVE));
+        QS_U8_PRE_(static_cast<uint8_t>(QF_MAX_EPOOL)
                | static_cast<uint8_t>(
                      static_cast<uint8_t>(QF_MAX_TICK_RATE) << 4));
 
         // send the build time in three bytes (sec, min, hour)...
-        QS_U8_(static_cast<uint8_t>(
+        QS_U8_PRE_(static_cast<uint8_t>(
                    static_cast<uint8_t>(10)
                    *(static_cast<uint8_t>(BUILD_TIME[6])
                          - static_cast<uint8_t>('0')))
                 + (static_cast<uint8_t>(BUILD_TIME[7])
                          - static_cast<uint8_t>('0')));
-        QS_U8_(static_cast<uint8_t>(
+        QS_U8_PRE_(static_cast<uint8_t>(
                    static_cast<uint8_t>(10)
                    *(static_cast<uint8_t>(BUILD_TIME[3])
                          - static_cast<uint8_t>('0')))
@@ -398,11 +394,11 @@ void QS_target_info_(uint8_t const isReset) {
         if (static_cast<uint8_t>(BUILD_TIME[0])
             == static_cast<uint8_t>(' '))
         {
-            QS_U8_(static_cast<uint8_t>(BUILD_TIME[1])
+            QS_U8_PRE_(static_cast<uint8_t>(BUILD_TIME[1])
                    - static_cast<uint8_t>('0'));
         }
         else {
-            QS_U8_(static_cast<uint8_t>(
+            QS_U8_PRE_(static_cast<uint8_t>(
                 static_cast<uint8_t>(10)*(
                     static_cast<uint8_t>(BUILD_TIME[0])
                         - static_cast<uint8_t>('0')))
@@ -414,11 +410,11 @@ void QS_target_info_(uint8_t const isReset) {
         if (static_cast<uint8_t>(BUILD_DATE[4])
             == static_cast<uint8_t>(' '))
         {
-            QS_U8_(static_cast<uint8_t>(BUILD_DATE[5])
+            QS_U8_PRE_(static_cast<uint8_t>(BUILD_DATE[5])
                    - static_cast<uint8_t>('0'));
         }
         else {
-            QS_U8_(static_cast<uint8_t>(
+            QS_U8_PRE_(static_cast<uint8_t>(
                        static_cast<uint8_t>(10)*(
                            static_cast<uint8_t>(BUILD_DATE[4])
                                - static_cast<uint8_t>('0')))
@@ -495,14 +491,14 @@ void QS_target_info_(uint8_t const isReset) {
                 b = static_cast<uint8_t>(0);
                 break;
         }
-        QS_U8_(b); // store the month
-        QS_U8_(static_cast<uint8_t>(
+        QS_U8_PRE_(b); // store the month
+        QS_U8_PRE_(static_cast<uint8_t>(
                    static_cast<uint8_t>(10)*(
                        static_cast<uint8_t>(BUILD_DATE[9])
                            - static_cast<uint8_t>('0')))
                    + (static_cast<uint8_t>(BUILD_DATE[10])
                            - static_cast<uint8_t>('0')));
-    QS::endRec();
+    QS::endRec_();
 }
 
 //****************************************************************************
@@ -510,16 +506,16 @@ void QS_target_info_(uint8_t const isReset) {
 /// @note This function is only to be used through macros, never in the
 /// client code directly.
 ///
-void QS::u8(uint8_t const format, uint8_t const d) {
-    uint8_t chksum_ = priv_.chksum; // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;    // put in a temporary (register)
-    QSCtr   head_   = priv_.head;   // put in a temporary (register)
-    QSCtr   end_    = priv_.end;    // put in a temporary (register)
+void QS::u8_fmt_(uint8_t const format, uint8_t const d) {
+    uint8_t chksum_ = priv_.chksum;  // put in a temporary (register)
+    uint8_t *const buf_ = priv_.buf; // put in a temporary (register)
+    QSCtr   head_   = priv_.head;    // put in a temporary (register)
+    QSCtr const end_= priv_.end;     // put in a temporary (register)
 
     priv_.used += static_cast<QSCtr>(2); // 2 bytes about to be added
 
-    QS_INSERT_ESC_BYTE(format)
-    QS_INSERT_ESC_BYTE(d)
+    QS_INSERT_ESC_BYTE_(format)
+    QS_INSERT_ESC_BYTE_(d)
 
     priv_.head   = head_;   // save the head
     priv_.chksum = chksum_; // save the checksum
@@ -530,22 +526,22 @@ void QS::u8(uint8_t const format, uint8_t const d) {
 /// This function is only to be used through macros, never in the
 /// client code directly.
 ///
-void QS::u16(uint8_t format, uint16_t d) {
+void QS::u16_fmt_(uint8_t format, uint16_t d) {
     uint8_t chksum_ = priv_.chksum; // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;    // put in a temporary (register)
+    uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
     QSCtr   head_   = priv_.head;   // put in a temporary (register)
-    QSCtr   end_    = priv_.end;    // put in a temporary (register)
+    QSCtr const end_= priv_.end;    // put in a temporary (register)
 
     priv_.used += static_cast<QSCtr>(3); // 3 bytes about to be added
 
-    QS_INSERT_ESC_BYTE(format)
+    QS_INSERT_ESC_BYTE_(format)
 
     format = static_cast<uint8_t>(d);
-    QS_INSERT_ESC_BYTE(format)
+    QS_INSERT_ESC_BYTE_(format)
 
     d >>= 8;
     format = static_cast<uint8_t>(d);
-    QS_INSERT_ESC_BYTE(format)
+    QS_INSERT_ESC_BYTE_(format)
 
     priv_.head   = head_;    // save the head
     priv_.chksum = chksum_;  // save the checksum
@@ -555,18 +551,18 @@ void QS::u16(uint8_t format, uint16_t d) {
 /// @note This function is only to be used through macros, never in the
 /// client code directly.
 ///
-void QS::u32(uint8_t format, uint32_t d) {
+void QS::u32_fmt_(uint8_t format, uint32_t d) {
     uint8_t chksum_ = priv_.chksum;  // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;     // put in a temporary (register)
+    uint8_t * const buf_= priv_.buf; // put in a temporary (register)
     QSCtr   head_   = priv_.head;    // put in a temporary (register)
-    QSCtr   end_    = priv_.end;     // put in a temporary (register)
+    QSCtr const end_= priv_.end;     // put in a temporary (register)
 
     priv_.used += static_cast<QSCtr>(5); // 5 bytes about to be added
-    QS_INSERT_ESC_BYTE(format) // insert the format byte
+    QS_INSERT_ESC_BYTE_(format) // insert the format byte
 
     for (int_t i = static_cast<int_t>(4); i != static_cast<int_t>(0); --i) {
         format = static_cast<uint8_t>(d);
-        QS_INSERT_ESC_BYTE(format)
+        QS_INSERT_ESC_BYTE_(format)
         d >>= 8;
     }
 
@@ -575,78 +571,44 @@ void QS::u32(uint8_t format, uint32_t d) {
 }
 
 //****************************************************************************
-/// @note This function is only to be used through macros, never in the
-/// client code directly.
+/// @note This function is only to be used through macro QS_USR_DICTIONARY()
 ///
-void QS::u8_(uint8_t const d) {
-    uint8_t chksum_ = priv_.chksum; // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;    // put in a temporary (register)
-    QSCtr   head_   = priv_.head;   // put in a temporary (register)
-    QSCtr   end_    = priv_.end;    // put in a temporary (register)
-
-    ++priv_.used;  // 1 byte about to be added
-    QS_INSERT_ESC_BYTE(d)
-
-    priv_.head   = head_;   // save the head
-    priv_.chksum = chksum_; // save the checksum
+void QS::usr_dict_pre_(enum_t const rec,
+                       char_t const * const name)
+{
+    QS_CRIT_STAT_
+    QS_CRIT_ENTRY_();
+    beginRec_(static_cast<uint_fast8_t>(QS_USR_DICT));
+    QS_U8_PRE_(static_cast<uint8_t>(rec));
+    QS_STR_PRE_(name);
+    endRec_();
+    QS_CRIT_EXIT_();
+    onFlush();
 }
 
 //****************************************************************************
 /// @note This function is only to be used through macros, never in the
 /// client code directly.
 ///
-void QS::u8u8_(uint8_t const d1, uint8_t const d2) {
-    uint8_t chksum_ = priv_.chksum; // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;    // put in a temporary (register)
-    QSCtr   head_   = priv_.head;   // put in a temporary (register)
-    QSCtr   end_    = priv_.end;    // put in a temporary (register)
+void QS::mem_fmt_(uint8_t const *blk, uint8_t size) {
+    uint8_t b = static_cast<uint8_t>(MEM_T);
+    uint8_t chksum_ = static_cast<uint8_t>(priv_.chksum + b);
+    uint8_t * const buf_= priv_.buf; // put in a temporary (register)
+    QSCtr   head_   = priv_.head;    // put in a temporary (register)
+    QSCtr const end_= priv_.end;     // put in a temporary (register)
 
-    priv_.used += static_cast<QSCtr>(2); // 2 bytes about to be added
-    QS_INSERT_ESC_BYTE(d1)
-    QS_INSERT_ESC_BYTE(d2)
+    priv_.used += (static_cast<QSCtr>(size) // size+2 bytes to be added
+                   + static_cast<QSCtr>(2));
 
-    priv_.head   = head_;    // save the head
-    priv_.chksum = chksum_;  // save the checksum
-}
+    QS_INSERT_BYTE_(b)
+    QS_INSERT_ESC_BYTE_(size)
 
-//****************************************************************************
-/// @note This function is only to be used through macros, never in the
-/// client code directly.
-///
-void QS::u16_(uint16_t d) {
-    uint8_t b = static_cast<uint8_t>(d);
-    uint8_t chksum_ = priv_.chksum; // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;    // put in a temporary (register)
-    QSCtr   head_   = priv_.head;   // put in a temporary (register)
-    QSCtr   end_    = priv_.end;    // put in a temporary (register)
-
-    priv_.used += static_cast<QSCtr>(2); // 2 bytes about to be added
-
-    QS_INSERT_ESC_BYTE(b)
-
-    d >>= 8;
-    b = static_cast<uint8_t>(d);
-    QS_INSERT_ESC_BYTE(b)
-
-    priv_.head   = head_;    // save the head
-    priv_.chksum = chksum_;  // save the checksum
-}
-
-//****************************************************************************
-/// @note This function is only to be used through macros, never in the
-/// client code directly.
-///
-void QS::u32_(uint32_t d) {
-    uint8_t chksum_ = priv_.chksum; // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;    // put in a temporary (register)
-    QSCtr   head_   = priv_.head;   // put in a temporary (register)
-    QSCtr   end_    = priv_.end;    // put in a temporary (register)
-
-    priv_.used += static_cast<QSCtr>(4); // 4 bytes about to be added
-    for (int_t i = static_cast<int_t>(4); i != static_cast<int_t>(0); --i) {
-        uint8_t b = static_cast<uint8_t>(d);
-        QS_INSERT_ESC_BYTE(b)
-        d >>= 8;
+    // output the 'size' number of bytes
+    while (size != static_cast<uint8_t>(0)) {
+        b = *blk;
+        QS_INSERT_ESC_BYTE_(b)
+        QS_PTR_INC_(blk);
+        --size;
     }
 
     priv_.head   = head_;    // save the head
@@ -657,22 +619,132 @@ void QS::u32_(uint32_t d) {
 /// @note This function is only to be used through macros, never in the
 /// client code directly.
 ///
-void QS::str_(char_t const *s) {
-    uint8_t b = static_cast<uint8_t>(*s);
-    uint8_t chksum_ = priv_.chksum; // put in a temporary (register)
-    uint8_t *buf_   = priv_.buf;    // put in a temporary (register)
-    QSCtr   head_   = priv_.head;   // put in a temporary (register)
-    QSCtr   end_    = priv_.end;    // put in a temporary (register)
-    QSCtr   used_   = priv_.used;   // put in a temporary (register)
+void QS::str_fmt_(char_t const *s) {
+    uint8_t b       = static_cast<uint8_t>(*s);
+    uint8_t chksum_ = static_cast<uint8_t>(
+                          priv_.chksum + static_cast<uint8_t>(STR_T));
+    uint8_t * const buf_= priv_.buf; // put in a temporary (register)
+    QSCtr   head_   = priv_.head;    // put in a temporary (register)
+    QSCtr const end_= priv_.end;     // put in a temporary (register)
+    QSCtr   used_   = priv_.used;    // put in a temporary (register)
 
+    used_ += static_cast<QSCtr>(2); // the format byte and the terminating-0
+
+    QS_INSERT_BYTE_(static_cast<uint8_t>(STR_T))
     while (b != static_cast<uint8_t>(0)) {
-        chksum_ += b;      // update checksum
-        QS_INSERT_BYTE(b)  // ASCII characters don't need escaping
+        // ASCII characters don't need escaping
+        chksum_ += b;  // update checksum
+        QS_INSERT_BYTE_(b)
         QS_PTR_INC_(s);
         b = static_cast<uint8_t>(*s);
         ++used_;
     }
-    QS_INSERT_BYTE(static_cast<uint8_t>(0)) // zero-terminate the string
+    QS_INSERT_BYTE_(static_cast<uint8_t>(0)) // zero-terminate the string
+
+    priv_.head   = head_;   // save the head
+    priv_.chksum = chksum_; // save the checksum
+    priv_.used   = used_;   // save # of used buffer space
+}
+
+//****************************************************************************
+/// @note This function is only to be used through macros, never in the
+/// client code directly.
+///
+void QS::u8_raw_(uint8_t const d) {
+    uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
+    uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
+    QSCtr   head_   = priv_.head;     // put in a temporary (register)
+    QSCtr const end_= priv_.end;      // put in a temporary (register)
+
+    ++priv_.used;  // 1 byte about to be added
+    QS_INSERT_ESC_BYTE_(d)
+
+    priv_.head   = head_;   // save the head
+    priv_.chksum = chksum_; // save the checksum
+}
+
+//****************************************************************************
+/// @note This function is only to be used through macros, never in the
+/// client code directly.
+///
+void QS::u8u8_raw_(uint8_t const d1, uint8_t const d2) {
+    uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
+    uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
+    QSCtr   head_   = priv_.head;     // put in a temporary (register)
+    QSCtr const end_= priv_.end;      // put in a temporary (register)
+
+    priv_.used += static_cast<QSCtr>(2); // 2 bytes about to be added
+    QS_INSERT_ESC_BYTE_(d1)
+    QS_INSERT_ESC_BYTE_(d2)
+
+    priv_.head   = head_;    // save the head
+    priv_.chksum = chksum_;  // save the checksum
+}
+
+//****************************************************************************
+/// @note This function is only to be used through macros, never in the
+/// client code directly.
+///
+void QS::u16_raw_(uint16_t d) {
+    uint8_t b = static_cast<uint8_t>(d);
+    uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
+    uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
+    QSCtr   head_   = priv_.head;     // put in a temporary (register)
+    QSCtr const end_= priv_.end;      // put in a temporary (register)
+
+    priv_.used += static_cast<QSCtr>(2); // 2 bytes about to be added
+
+    QS_INSERT_ESC_BYTE_(b)
+
+    d >>= 8;
+    b = static_cast<uint8_t>(d);
+    QS_INSERT_ESC_BYTE_(b)
+
+    priv_.head   = head_;    // save the head
+    priv_.chksum = chksum_;  // save the checksum
+}
+
+//****************************************************************************
+/// @note This function is only to be used through macros, never in the
+/// client code directly.
+///
+void QS::u32_raw_(uint32_t d) {
+    uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
+    uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
+    QSCtr   head_   = priv_.head;     // put in a temporary (register)
+    QSCtr const end_= priv_.end;      // put in a temporary (register)
+
+    priv_.used += static_cast<QSCtr>(4); // 4 bytes about to be added
+    for (int_t i = static_cast<int_t>(4); i != static_cast<int_t>(0); --i) {
+        uint8_t const b = static_cast<uint8_t>(d);
+        QS_INSERT_ESC_BYTE_(b)
+        d >>= 8;
+    }
+
+    priv_.head   = head_;    // save the head
+    priv_.chksum = chksum_;  // save the checksum
+}
+
+//****************************************************************************
+/// @note This function is only to be used through macros, never in the
+/// client code directly.
+///
+void QS::str_raw_(char_t const *s) {
+    uint8_t b = static_cast<uint8_t>(*s);
+    uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
+    uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
+    QSCtr   head_   = priv_.head;     // put in a temporary (register)
+    QSCtr const end_= priv_.end;      // put in a temporary (register)
+    QSCtr   used_   = priv_.used;     // put in a temporary (register)
+
+    while (b != static_cast<uint8_t>(0)) {
+        chksum_ += b;      // update checksum
+        QS_INSERT_BYTE_(b)  // ASCII characters don't need escaping
+        QS_PTR_INC_(s);
+        b = static_cast<uint8_t>(*s);
+        ++used_;
+    }
+    QS_INSERT_BYTE_(static_cast<uint8_t>(0)) // zero-terminate the string
     ++used_;
 
     priv_.head   = head_;    // save the head
@@ -696,8 +768,8 @@ uint16_t QS::getByte(void) {
         ret = QS_EOD; // set End-Of-Data
     }
     else {
-        uint8_t *buf_ = priv_.buf;  // put in a temporary (register)
-        QSCtr tail_   = priv_.tail; // put in a temporary (register)
+        uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
+        QSCtr tail_ = priv_.tail;         // put in a temporary (register)
 
         // the byte to return
         ret = static_cast<uint16_t>(QS_PTR_AT_(buf_, tail_));
@@ -736,7 +808,7 @@ uint16_t QS::getByte(void) {
 /// @note QP::QS::getBlock() is __not__ protected with a critical section.
 ///
 uint8_t const *QS::getBlock(uint16_t * const pNbytes) {
-    QSCtr used_ = priv_.used;  // put in a temporary (register)
+    QSCtr const used_ = priv_.used; // put in a temporary (register)
     uint8_t *buf_;
 
     // any bytes used in the ring buffer?
@@ -745,8 +817,8 @@ uint8_t const *QS::getBlock(uint16_t * const pNbytes) {
         buf_     = static_cast<uint8_t *>(0); // no bytes available right now
     }
     else {
-        QSCtr tail_ = priv_.tail; // put in a temporary (register)
-        QSCtr end_  = priv_.end;  // put in a temporary (register)
+        QSCtr tail_      = priv_.tail; // put in a temporary (register)
+        QSCtr const end_ = priv_.end;  // put in a temporary (register)
         QSCtr n = static_cast<QSCtr>(end_ - tail_);
         if (n > used_) {
             n = used_;
@@ -771,8 +843,8 @@ uint8_t const *QS::getBlock(uint16_t * const pNbytes) {
 //****************************************************************************
 /// @note This function is only to be used through macro QS_SIG_DICTIONARY()
 ///
-void QS::sig_dict(enum_t const sig, void const * const obj,
-                  char_t const *name)
+void QS::sig_dict_pre_(enum_t const sig, void const * const obj,
+                       char_t const *name)
 {
     QS_CRIT_STAT_
 
@@ -780,11 +852,11 @@ void QS::sig_dict(enum_t const sig, void const * const obj,
         QS_PTR_INC_(name);
     }
     QS_CRIT_ENTRY_();
-    beginRec(static_cast<uint_fast8_t>(QS_SIG_DICT));
-    QS_SIG_(static_cast<QSignal>(sig));
-    QS_OBJ_(obj);
-    QS_STR_(name);
-    endRec();
+    beginRec_(static_cast<uint_fast8_t>(QS_SIG_DICT));
+    QS_SIG_PRE_(static_cast<QSignal>(sig));
+    QS_OBJ_PRE_(obj);
+    QS_STR_PRE_(name);
+    endRec_();
     QS_CRIT_EXIT_();
     onFlush();
 }
@@ -792,8 +864,8 @@ void QS::sig_dict(enum_t const sig, void const * const obj,
 //****************************************************************************
 /// @note This function is only to be used through macro QS_OBJ_DICTIONARY()
 ///
-void QS::obj_dict(void const * const obj,
-                  char_t const *name)
+void QS::obj_dict_pre_(void const * const obj,
+                       char_t const *name)
 {
     QS_CRIT_STAT_
 
@@ -801,10 +873,10 @@ void QS::obj_dict(void const * const obj,
         QS_PTR_INC_(name);
     }
     QS_CRIT_ENTRY_();
-    beginRec(static_cast<uint_fast8_t>(QS_OBJ_DICT));
-    QS_OBJ_(obj);
-    QS_STR_(name);
-    endRec();
+    beginRec_(static_cast<uint_fast8_t>(QS_OBJ_DICT));
+    QS_OBJ_PRE_(obj);
+    QS_STR_PRE_(name);
+    endRec_();
     QS_CRIT_EXIT_();
     onFlush();
 }
@@ -812,95 +884,19 @@ void QS::obj_dict(void const * const obj,
 //****************************************************************************
 /// @note This function is only to be used through macro QS_FUN_DICTIONARY()
 ///
-void QS::fun_dict(void (* const fun)(void), char_t const *name) {
+void QS::fun_dict_pre_(void (* const fun)(void), char_t const *name) {
     QS_CRIT_STAT_
 
     if (*name == static_cast<char_t>('&')) {
         QS_PTR_INC_(name);
     }
     QS_CRIT_ENTRY_();
-    beginRec(static_cast<uint_fast8_t>(QS_FUN_DICT));
-    QS_FUN_(fun);
-    QS_STR_(name);
-    endRec();
+    beginRec_(static_cast<uint_fast8_t>(QS_FUN_DICT));
+    QS_FUN_PRE_(fun);
+    QS_STR_PRE_(name);
+    endRec_();
     QS_CRIT_EXIT_();
     onFlush();
-}
-
-//****************************************************************************
-/// @note This function is only to be used through macro QS_USR_DICTIONARY()
-///
-void QS::usr_dict(enum_t const rec,
-                  char_t const * const name)
-{
-    QS_CRIT_STAT_
-    QS_CRIT_ENTRY_();
-    beginRec(static_cast<uint_fast8_t>(QS_USR_DICT));
-    QS_U8_(static_cast<uint8_t>(rec));
-    QS_STR_(name);
-    endRec();
-    QS_CRIT_EXIT_();
-    onFlush();
-}
-
-//****************************************************************************
-/// @note This function is only to be used through macros, never in the
-/// client code directly.
-///
-void QS::mem(uint8_t const *blk, uint8_t size) {
-    uint8_t b = static_cast<uint8_t>(MEM_T);
-    uint8_t chksum_ = static_cast<uint8_t>(priv_.chksum + b);
-    uint8_t *buf_   = priv_.buf;   // put in a temporary (register)
-    QSCtr   head_   = priv_.head;  // put in a temporary (register)
-    QSCtr   end_    = priv_.end;   // put in a temporary (register)
-
-    priv_.used += (static_cast<QSCtr>(size) // size+2 bytes to be added
-                   + static_cast<QSCtr>(2));
-
-    QS_INSERT_BYTE(b)
-    QS_INSERT_ESC_BYTE(size)
-
-    // output the 'size' number of bytes
-    while (size != static_cast<uint8_t>(0)) {
-        b = *blk;
-        QS_INSERT_ESC_BYTE(b)
-        QS_PTR_INC_(blk);
-        --size;
-    }
-
-    priv_.head   = head_;    // save the head
-    priv_.chksum = chksum_;  // save the checksum
-}
-
-//****************************************************************************
-/// @note This function is only to be used through macros, never in the
-/// client code directly.
-///
-void QS::str(char_t const *s) {
-    uint8_t b       = static_cast<uint8_t>(*s);
-    uint8_t chksum_ = static_cast<uint8_t>(
-                          priv_.chksum + static_cast<uint8_t>(STR_T));
-    uint8_t *buf_   = priv_.buf;  // put in a temporary (register)
-    QSCtr   head_   = priv_.head; // put in a temporary (register)
-    QSCtr   end_    = priv_.end;  // put in a temporary (register)
-    QSCtr   used_   = priv_.used; // put in a temporary (register)
-
-    used_ += static_cast<QSCtr>(2); // the format byte and the terminating-0
-
-    QS_INSERT_BYTE(static_cast<uint8_t>(STR_T))
-    while (b != static_cast<uint8_t>(0)) {
-        // ASCII characters don't need escaping
-        chksum_ += b;  // update checksum
-        QS_INSERT_BYTE(b)
-        QS_PTR_INC_(s);
-        b = static_cast<uint8_t>(*s);
-        ++used_;
-    }
-    QS_INSERT_BYTE(static_cast<uint8_t>(0)) // zero-terminate the string
-
-    priv_.head   = head_;   // save the head
-    priv_.chksum = chksum_; // save the checksum
-    priv_.used   = used_;   // save # of used buffer space
 }
 
 } // namespace QP

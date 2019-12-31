@@ -28,7 +28,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://www.state-machine.com
+# https://www.state-machine.com/licensing
 # mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:

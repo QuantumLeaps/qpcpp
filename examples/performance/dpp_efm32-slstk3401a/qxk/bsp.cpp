@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last Updated for Version: 5.9.7
-// Date of the Last Update:  2017-08-20
+// Last updated for version 6.7.0
+// Last updated on  2019-12-26
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,15 +25,15 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// https://state-machine.com
-// mailto:info@state-machine.com
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
 #include "dpp.hpp"
-#include "test.h"
+#include "test.hpp"
 #include "bsp.hpp"
 
 #include "em_device.h"  // the device specific header (SiLabs)
@@ -78,7 +78,6 @@ Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 #define PB1_PIN     7
 
 static uint32_t l_rnd; // random seed
-static QP::QXMutex l_rndMutex; // to protect the random number generator
 
 #ifdef Q_SPY
 
@@ -251,20 +250,21 @@ void BSP::displayPaused(uint8_t paused) {
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
-    l_rndMutex.lock(); // lock the random-seed mutex
+
+    // lock the QXK scheduler up to priority N_PHILO+1
+    QP::QSchedStatus schedStat = QP::QXK::schedLock(N_PHILO + 1U);
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
     uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
     l_rnd = rnd; // set for the next time
-    l_rndMutex.unlock(); // unlock the random-seed mutex
+    QP::QXK::schedUnlock(schedStat); // unlock the QXK scheduler
 
     return (rnd >> 8);
 }
 //............................................................................
 void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
-    l_rndMutex.init(N_PHILO); // ceiling <== maximum Philo priority
 }
 //............................................................................
 void BSP::ledOn(void) {
@@ -315,13 +315,12 @@ void QF::onCleanup(void) {
 }
 //............................................................................
 void QXK::onIdle(void) {
-/*
     // toggle the User LED on and then off, see NOTE01
     QF_INT_DISABLE();
     GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
     GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
     QF_INT_ENABLE();
-*/
+
 #ifdef Q_SPY
     QS::rxParse();  // parse all the received bytes
 
@@ -346,7 +345,7 @@ void QXK::onIdle(void) {
 }
 
 //............................................................................
-extern "C" void Q_onAssert(char const *module, int loc) {
+extern "C" void Q_onAssert(char_t const *module, int_t loc) {
     //
     // NOTE: add here your application-specific error handling
     //
@@ -526,6 +525,6 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 // NOTE01:
 // The User LED is used to visualize the idle loop activity. The brightness
 // of the LED is proportional to the frequency of invcations of the idle loop.
-// Please note that the LED is toggled with interrupts locked, so no interrupt
-// execution time contributes to the brightness of the User LED.
+// Please note that the LED is toggled with interrupts disabled, so no
+// interrupt execution time contributes to the brightness of the User LED.
 //

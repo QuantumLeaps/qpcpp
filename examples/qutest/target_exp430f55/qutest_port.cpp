@@ -25,11 +25,11 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://www.state-machine.com
-* mailto:info@state-machine.com
+* <www.state-machine.com/licensing>
+* <info@state-machine.com>
 *****************************************************************************/
 /// @file
 /// @brief QUTEST port for the MSP-EXP430F5529LP board
@@ -61,11 +61,11 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses/>.
 ///
 /// Contact information:
 /// https://state-machine.com
-/// mailto:info@state-machine.com
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 #include "qpcpp.hpp"

@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0 / Qt 5.x
-/// Last updated on  2019-09-12
+/// Last updated for version 6.7.0 / Qt 5.x
+/// Last updated on  2019-12-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -136,9 +136,9 @@ void QF_setTickRate(unsigned ticksPerSec) {
 }
 //............................................................................
 void QActive::start(uint_fast8_t const prio,
-                     QEvt const **qSto, uint_fast16_t qLen,
-                     void * const stkSto, uint_fast16_t const stkSize,
-                     void const * const par)
+                    QEvt const * * const qSto, uint_fast16_t const qLen,
+                    void * const stkSto, uint_fast16_t const stkSize,
+                    void const * const par)
 {
     Q_REQUIRE(stkSto == static_cast<void *>(0)); // no per-task stack
 

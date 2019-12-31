@@ -1,11 +1,11 @@
 ;-----------------------------------------------------------------------------
 ; Product:  QV port to ARM7-9, IAR-ARM Assembler
-; Last Updated for Version: 5.4.0
-; Date of the Last Update:  2015-04-01
+; Last Updated for Version: 6.7.0
+; Date of the Last Update:  2019-12-14
 ;
-;                    Q u a n t u m     L e a P s
-;                    ---------------------------
-;                    innovating embedded systems
+;                    Q u a n t u m  L e a P s
+;                    ------------------------
+;                    Modern Embedded Software
 ;
 ; Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ;
@@ -25,11 +25,11 @@
 ; GNU General Public License for more details.
 ;
 ; You should have received a copy of the GNU General Public License
-; along with this program. If not, see <http://www.gnu.org/licenses/>.
+; along with this program. If not, see <www.gnu.org/licenses/>.
 ;
 ; Contact information:
-; Web:   https://state-machine.com
-; Email: info@state-machine.com
+; <www.state-machine.com/licensing>
+; <info@state-machine.com>
 ;-----------------------------------------------------------------------------
 
 NO_IRQ      DEFINE     0x80     ; mask to disable interrupts (FIQ and IRQ)

@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -101,7 +101,7 @@ extern pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
 
     // native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt const *>(0)) \
+        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt *>(0)) \
             pthread_cond_wait(&(me_)->m_osObject, &QF_pThreadMutex_)
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \

@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-09-12
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-29
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -192,17 +192,17 @@ public:
     //! Starts execution of an active object and registers the object
     //! with the framework.
     virtual void start(uint_fast8_t const prio,
-                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       QEvt const * * const qSto, uint_fast16_t const qLen,
                        void * const stkSto, uint_fast16_t const stkSize,
                        void const * const par);
 
     //! Overloaded start function (no initialization event)
     virtual void start(uint_fast8_t const prio,
-                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       QEvt const * * const qSto, uint_fast16_t const qLen,
                        void * const stkSto, uint_fast16_t const stkSize)
     {
         this->start(prio, qSto, qLen, stkSto, stkSize,
-                    static_cast<void const *>(0));
+                    static_cast<void *>(0));
     }
 
 #ifdef QF_ACTIVE_STOP
@@ -325,7 +325,7 @@ private:
 class QMActive : public QActive {
 public:
     // all the following operations delegate to the QHsm class...
-    virtual void init(void const * const par);
+    virtual void init(void const * const e);
     virtual void init(void);
     virtual void dispatch(QEvt const * const e);
 
@@ -345,14 +345,14 @@ protected:
     QMActive(QStateHandler const initial);
 
 private:
-    //! operation inherited from QActive/QHsm, but disallowed in QP::QMActive
-    bool isIn(QStateHandler const s);
+    //! operation inherited from QP::QHsm, but disallowed in QP::QMActive
+    virtual bool isIn(QStateHandler const s);
 
-    //! operation inherited from QActive/QHsm, but disallowed in QP::QMActive
-    QStateHandler state(void) const;
+    //! operation inherited from QP::QHsm, but disallowed in QP::QMActive
+    virtual QStateHandler state(void) const;
 
-    //! operation inherited from QActive/QHsm, but disallowed in QP::QMActive
-    QStateHandler childState(QStateHandler const parent);
+    //! operation inherited from QP::QHsm, but disallowed in QP::QMActive
+    virtual QStateHandler childState(QStateHandler const parent);
 };
 
 
@@ -442,40 +442,6 @@ public:
     //! Get the current value of the down-counter of a time event.
     QTimeEvtCtr currCtr(void) const;
 
-#if (!defined QP_IMPL) && (QP_API_VERSION < 500)
-    //! @deprecated TimeEvt ctor provided for backwards compatibility.
-    /// @overload QTimeEvt::QTimeEvt(QActive * const, enum_t const,
-    ///                              uint_fast8_t const)
-    QTimeEvt(enum_t const sgnl) :
-#ifdef Q_EVT_CTOR
-        QEvt(static_cast<QSignal>(sgnl)),
-#endif
-        m_next(static_cast<QTimeEvt *>(0)),
-        m_act(static_cast<void *>(0)),
-        m_ctr(static_cast<QTimeEvtCtr>(0)),
-        m_interval(static_cast<QTimeEvtCtr >(0))
-    {
-#ifndef Q_EVT_CTOR
-        sig = static_cast<QSignal>(sgnl); // set QEvt::sig of this time event
-#endif
-        // time event must be static, see NOTE01
-        poolId_ = static_cast<uint8_t>(0); // not from any event pool
-        refCtr_ = static_cast<uint8_t>(0); // default rate 0, see NOTE02
-    }
-
-    //! @deprecated interface provided for backwards compatibility.
-    void postIn(QActive * const act, QTimeEvtCtr const nTicks) {
-        m_act = act;
-        armX(nTicks, static_cast<QTimeEvtCtr>(0));
-    }
-
-    //! @deprecated interface provided for backwards compatibility.
-    void postEvery(QActive * const act, QTimeEvtCtr const nTicks) {
-        m_act = act;
-        armX(nTicks, nTicks);
-    }
-#endif // (!defined QP_IMPL) && (QP_API_VERSION < 500)
-
 private:
     //! private default constructor only for friends
     QTimeEvt(void);
@@ -552,11 +518,11 @@ public:
     static void stop(void);
 
 #ifndef Q_SPY
-    static void publish_(QEvt const *e);
+    static void publish_(QEvt const * const e);
     static void tickX_(uint_fast8_t const tickRate);
 #else
     //! Publish event to the framework.
-    static void publish_(QEvt const *e, void const *sender);
+    static void publish_(QEvt const * const e, void const * const sender);
 
     //! Processes all armed time events at every clock tick.
     static void tickX_(uint_fast8_t const tickRate,
@@ -580,7 +546,7 @@ public:
                        uint_fast16_t const margin, enum_t const sig);
 
     //! Recycle a dynamic event.
-    static void gc(QEvt const *e);
+    static void gc(QEvt const * const e);
 
     //! Internal QF implementation of creating new event reference.
     static QEvt const *newRef_(QEvt const * const e,
@@ -602,7 +568,7 @@ public:
     static void add_(QActive * const a);
 
     //! Clear a specified region of memory to zero.
-    static void bzero(void * const start, uint_fast16_t len);
+    static void bzero(void * const start, uint_fast16_t const len);
 
 // API to be used exclusively inside ISRs (useful in some QP ports)
 #ifdef QF_ISR_API
@@ -652,10 +618,10 @@ uint_fast16_t const QF_NO_MARGIN = static_cast<uint_fast16_t>(0xFFFF);
 ///
 class QTicker : public QActive {
 public:
-    QTicker(uint_fast8_t const tickRate); // ctor
+    explicit QTicker(uint_fast8_t const tickRate); // explicit ctor
 
-    virtual void init(void const * const par);
-    virtual void init(void) { this->init(static_cast<void const *>(0)); }
+    virtual void init(void const * const e);
+    virtual void init(void) { this->init(static_cast<void *>(0)); }
     virtual void dispatch(QEvt const * const e);
 #ifndef Q_SPY
     virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
@@ -697,7 +663,7 @@ public:
         if ((e_) != static_cast<evtT_ *>(0)) { \
             new((e_)) evtT_((sig_),  ##__VA_ARGS__); \
         } \
-     } while (0)
+     } while (false)
 
 #else // QEvt is a POD (Plain Old Datatype)
 
@@ -858,13 +824,13 @@ public:
     /// @note
     /// The @p sendedr_ parameter is actually only used when QS tracing
     /// is enabled (macro #Q_SPY is defined). When QS software tracing is
-    /// disenabled, the QACTIVE_POST() macro does not pass the @p sender_
+    /// disenabled, the POST() macro does not pass the @p sender_
     /// parameter, so the overhead of passing this extra parameter is entirely
     /// avoided.
     ///
     /// @note the pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, if QP::QActive::post() is called from an
-    /// interrupt or other context, you can create a unique object just to
+    /// to an active object. In fact, if POST() is called from an interrupt
+    /// or other context, you can create a unique object just to
     /// unambiguously identify the sender of the event.
     ///
     /// @sa QP::QActive::post_()
@@ -892,13 +858,12 @@ public:
     /// @note
     /// The @p sender_ parameter is actually only used when QS tracing
     /// is enabled (macro #Q_SPY is defined). When QS software tracing is
-    /// disabled, the QACTIVE_POST() macro does not pass the @p sender_
-    /// parameter, so the overhead of passing this extra parameter is
-    /// entirely avoided.
+    /// disabled, the POST_X() macro does not pass the @p sender_ parameter,
+    /// so the overhead of passing this extra parameter is entirely avoided.
     ///
     /// @note
     /// The pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, if QP::QActive::post() is called from an
+    /// to an active object. In fact, if POST_X() is called from an
     /// interrupt or other context, you can create a unique object just to
     /// unambiguously identify the sender of the event.
     ///

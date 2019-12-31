@@ -3,8 +3,8 @@
 /// @brief Internal (package scope) QS/C++ interface.
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -31,7 +31,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -40,7 +40,7 @@
 #define QS_PKG_HPP
 
 //! Internal QS macro to insert an un-escaped byte into the QS buffer
-#define QS_INSERT_BYTE(b_) \
+#define QS_INSERT_BYTE_(b_) \
     QS_PTR_AT_(buf_, head_) = (b_); \
     ++head_; \
     if (head_ == end_) { \
@@ -48,14 +48,14 @@
     }
 
 //! Internal QS macro to insert an escaped byte into the QS buffer
-#define QS_INSERT_ESC_BYTE(b_) \
+#define QS_INSERT_ESC_BYTE_(b_) \
     chksum_ += (b_); \
     if (((b_) != QS_FRAME) && ((b_) != QS_ESC)) { \
-        QS_INSERT_BYTE(b_) \
+        QS_INSERT_BYTE_(b_) \
     } \
     else { \
-        QS_INSERT_BYTE(QS_ESC) \
-        QS_INSERT_BYTE(static_cast<uint8_t>((b_) ^ QS_ESC_XOR)) \
+        QS_INSERT_BYTE_(QS_ESC) \
+        QS_INSERT_BYTE_(static_cast<uint8_t>((b_) ^ QS_ESC_XOR)) \
         ++priv_.used; \
     }
 
@@ -74,6 +74,9 @@
 #define QS_REC_NUM_(enum_) (static_cast<uint_fast8_t>(enum_))
 
 namespace QP {
+
+extern char_t const BUILD_DATE[12];
+extern char_t const BUILD_TIME[9];
 
 /// @brief Frame character of the QS output protocol
 uint8_t const QS_FRAME = static_cast<uint8_t>(0x7E);

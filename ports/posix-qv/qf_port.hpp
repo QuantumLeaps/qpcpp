@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -101,7 +101,7 @@ int  QF_consoleWaitForKey(void);
 
     // event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
+        Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
         QV_readySet_.insert((me_)->m_prio); \

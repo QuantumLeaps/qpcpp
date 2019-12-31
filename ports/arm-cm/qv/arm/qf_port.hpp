@@ -30,7 +30,7 @@
 /// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// <www.state-machine.com>
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
@@ -76,7 +76,7 @@
         QF_PRIMASK_DISABLE(); \
         QF_set_BASEPRI(QF_BASEPRI); \
         QF_PRIMASK_ENABLE(); \
-    } while (0)
+    } while (false)
     #define QF_INT_ENABLE()      QF_set_BASEPRI(0U)
 
     // QF critical section entry/exit (unconditional interrupt disabling)
