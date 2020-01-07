@@ -44,8 +44,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="game-gui.rc">
-      <Filter>Res</Filter>
-    </ResourceCompile>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
 </Project>

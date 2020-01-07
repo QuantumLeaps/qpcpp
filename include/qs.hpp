@@ -563,13 +563,13 @@ public:
     QActiveDummy(void); // ctor
 
     virtual void start(uint_fast8_t const prio,
-                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       QEvt const * * const qSto, uint_fast16_t const qLen,
                        void * const stkSto, uint_fast16_t const stkSize,
                        void const * const par);
 
     //! Overloaded start function (no initialization event)
     virtual void start(uint_fast8_t const prio,
-                       QEvt const *qSto[], uint_fast16_t const qLen,
+                       QEvt const * * const qSto, uint_fast16_t const qLen,
                        void * const stkSto, uint_fast16_t const stkSize)
     {
         this->start(prio, qSto, qLen, stkSto, stkSize,

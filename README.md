@@ -82,9 +82,11 @@ model of concurrency with hierarchical state machines.
 
 ---------------------------------------------------------------------------
 # Getting Started with QP/C++
-The [QP/C++ Reference Manual](https://www.state-machine.com/qpcpp/) provides instructions on how to download, install, and get started with QP/C++ quickly.
+The [QP/C++ Reference Manual](https://www.state-machine.com/qpcpp/) provides
+instructions on how to download, install, and get started with QP/C++ quickly.
 
-The [AppNote: "Getting Started with QP/C++"](https://www.state-machine.com/doc/AN_Getting_Started_with_QPCpp.pdf) contains also a tutorial, in which you build a simple "Blinky" application.
+The [AppNote: "Getting Started with QP/C++"][AN] contains also a tutorial,
+in which you build a simple "Blinky" application.
 
 
 ---------------------------------------------------------------------------
@@ -93,7 +95,9 @@ QP/C++ is licensed under the increasingly popular [dual licensing model][Lic],
 in which both the open source software distribution mechanism and
 traditional closed source software distribution models are combined.
 
-> **NOTE:** If your company has a policy forbidding open source in your product, all QP frameworks can be [licensed commercially](https://www.state-machine.com/licensing), in which case you don't use any open source license and you do not violate your policy.
+> **NOTE:** If your company has a policy forbidding open source in your product,
+all QP frameworks can be [licensed commercially][Lic], in which case you don't
+use any open source license and you do not violate your policy.
 
 ---------------------------------------------------------------------------
 # QP/C++ Documentation
@@ -117,3 +121,4 @@ The **QP/C++ Manual** is located online at: https://www.state-machine.com/qpcpp
    [Active]: <https://www.state-machine.com/doc/concepts#Active>
    [HSM]: <https://www.state-machine.com/doc/concepts#HSM>
    [Lic]: <https://www.state-machine.com/licensing>
+   [AN]: <https://www.state-machine.com/doc/AN_Getting_Started_with_QPCpp.pdf>

@@ -263,7 +263,7 @@ void QS::onTestLoop() {
         }
         else if (FD_ISSET(l_sock, &readSet)) { // socket ready?
             uint8_t buf[QS_RX_SIZE];
-            int status = recv(l_sock, (char *)buf, (int)sizeof(buf), 0);
+            status = recv(l_sock, (char *)buf, (int)sizeof(buf), 0);
             while (status > 0) { // any data received?
                 uint8_t *pb;
                 int i = (int)rxGetNfree();

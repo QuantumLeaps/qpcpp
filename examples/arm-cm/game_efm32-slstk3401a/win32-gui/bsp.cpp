@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: "Fly 'n' Shoot" game example for Win32-GUI
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-20
+// Last Updated for Version: 6.7.0
+// Date of the Last Update:  2020-01-06
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -623,7 +623,7 @@ extern "C" int WINAPI WinMain(HINSTANCE hInst, HINSTANCE /*hPrevInst*/,
 
     // create the main custom dialog window
     HWND hWnd = CreateCustDialog(hInst, IDD_APPLICATION, NULL,
-                                 &WndProc, "QP_APP");
+                                 &WndProc, "MY_CLASS");
     ShowWindow(hWnd, iCmdShow); // show the main window
 
     // enter the message loop...
