@@ -237,12 +237,10 @@ void QActive::start(uint_fast8_t const prio,
 
     pthread_attr_setschedparam(&attr, &param);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_attr_setstacksize(&attr, (stkSize < PTHREAD_STACK_MIN
+                                      ? PTHREAD_STACK_MIN
+                                      : stkSize));
 
-    // stack size not provided?
-    if (stkSize == 0U) {
-        // set the allowed minimum
-        stkSize = (uint_fast16_t)PTHREAD_STACK_MIN;
-    }
     pthread_t thread;
     if (pthread_create(&thread, &attr, &ao_thread, this) != 0) {
 
