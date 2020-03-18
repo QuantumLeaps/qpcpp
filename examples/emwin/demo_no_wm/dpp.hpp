@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example
-// Last updated for version 5.8.2
-// Last updated on  2017-01-15
+// Last updated for version 6.8.0
+// Last updated on  2020-01-22
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 // along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //////////////////////////////////////////////////////////////////////////////
 #ifndef DPP_HPP
@@ -66,9 +66,10 @@ struct TableEvt : public QEvt {
 };
 
 struct MouseEvt : public QEvt {
-    int xPos;
-    int yPos;
-    uint8_t buttonStates;
+    // payload: GUI_PID_STATE
+    int x, y;
+    uint8_t Pressed;
+    uint8_t Layer;
 };
 
 enum { N_PHILO = 5 };  // number of philosophers

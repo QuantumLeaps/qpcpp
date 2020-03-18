@@ -3,14 +3,14 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -40,10 +40,10 @@
 #define QF_PORT_HPP
 
 // The maximum number of system clock tick rates
-#define QF_MAX_TICK_RATE        2
+#define QF_MAX_TICK_RATE        2U
 
 // The maximum number of active objects in the application, see NOTE1
-#define QF_MAX_ACTIVE           32
+#define QF_MAX_ACTIVE           32U
 
 // QF interrupt disable/enable, see NOTE2
 #define QF_INT_DISABLE()        __asm__ volatile("DI")
@@ -55,7 +55,7 @@
 #define QF_CRIT_EXIT(dummy)     QF_INT_ENABLE()
 
 // fast log-base-2 with CLZ instruction
-#define QF_LOG2(n_) ((uint8_t)(32 - _clz(n_)))
+#define QF_LOG2(n_) (static_cast<std::uint8_t>(32U - _clz(n_)))
 
 #include <xc.h>       // for _clz()
 

@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -45,17 +45,17 @@
 #define QF_THREAD_TYPE       void*
 
 // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE        64
+#define QF_MAX_ACTIVE        64U
 
 // The number of system clock tick rates
-#define QF_MAX_TICK_RATE     2
+#define QF_MAX_TICK_RATE     2U
 
 // various QF object sizes configuration for this port
-#define QF_EVENT_SIZ_SIZE    4
-#define QF_EQUEUE_CTR_SIZE   4
-#define QF_MPOOL_SIZ_SIZE    4
-#define QF_MPOOL_CTR_SIZE    4
-#define QF_TIMEEVT_CTR_SIZE  4
+#define QF_EVENT_SIZ_SIZE    4U
+#define QF_EQUEUE_CTR_SIZE   4U
+#define QF_MPOOL_SIZ_SIZE    4U
+#define QF_MPOOL_CTR_SIZE    4U
+#define QF_TIMEEVT_CTR_SIZE  4U
 
 // Win32 critical section, see NOTE1
 // QF_CRIT_STAT_TYPE not defined
@@ -158,15 +158,14 @@ int QF_consoleWaitForKey(void);
 
     // Win32-specific event queue customization
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt *>(0)) { \
+        while ((me_)->m_eQueue.m_frontEvt == nullptr) { \
             QF_CRIT_EXIT_(); \
             (void)WaitForSingleObject((me_)->m_osObject, (DWORD)INFINITE); \
             QF_CRIT_ENTRY_(); \
         }
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        Q_ASSERT_ID(410, QF::active_[(me_)->m_prio] \
-                         != static_cast<QActive *>(0)); \
+        Q_ASSERT_ID(410, QF::active_[(me_)->m_prio] != nullptr); \
         (void)SetEvent((me_)->m_osObject)
 
     // Win32-specific event pool operations

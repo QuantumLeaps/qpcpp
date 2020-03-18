@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-28
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -41,7 +41,8 @@
 #include "qf_pkg.hpp"       // QF package-scope interface
 #include "qassert.h"        // QP embedded systems-friendly assertions
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS package-scope internal interface
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -72,11 +73,10 @@ void QF::init(void) {
     // clear the internal QF variables, so that the framework can (re)start
     // correctly even if the startup code is not called to clear the
     // uninitialized data (as is required by the C++ Standard).
-    extern uint_fast8_t QF_maxPool_;
-    QF_maxPool_ = static_cast<uint_fast8_t>(0);
-    bzero(&QF::timeEvtHead_[0],
-          static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
-    bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
+    extern std::uint_fast8_t QF_maxPool_;
+    QF_maxPool_ = 0U;
+    bzero(&QF::timeEvtHead_[0], sizeof(QF::timeEvtHead_));
+    bzero(&active_[0],          sizeof(active_));
 }
 //****************************************************************************
 void QF_enterCriticalSection_(void) {
@@ -112,7 +112,8 @@ static DWORD WINAPI ao_thread(LPVOID me) {
 }
 //****************************************************************************
 int_t QF::run(void) {
-    onStartup();  // startup callback
+
+    onStartup(); // application-specific startup callback
 
     // leave the startup critical section to unblock any active objects
     // started before calling QF::run()
@@ -141,11 +142,11 @@ int_t QF::run(void) {
     QS_EXIT();              // cleanup the QSPY connection
     //DeleteCriticalSection(&l_startupCritSect);
     //DeleteCriticalSection(&l_win32CritSect);
-    return static_cast<int_t>(0); // return success
+    return 0; // return success
 }
 //****************************************************************************
-void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
-    Q_REQUIRE_ID(600, ticksPerSec != static_cast<uint32_t>(0));
+void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
+    Q_REQUIRE_ID(600, ticksPerSec != 0U);
     l_tickMsec = 1000UL / ticksPerSec;
     l_tickPrio = tickPrio;
 }
@@ -166,34 +167,34 @@ void QF_consoleCleanup(void) {
 }
 //............................................................................
 int QF_consoleGetKey(void) {
-    if (_kbhit()) { /* any key pressed? */
-        return _getch();
+    if (_kbhit()) { // any key pressed?
+        return static_cast<int>(_getwch());
     }
     return 0;
 }
 //............................................................................
 int QF_consoleWaitForKey(void) {
-    return _getch();
+    return static_cast<int>(_getwch());
 }
 
 //****************************************************************************
-void QActive::start(uint_fast8_t const prio,
-                    QEvt const * * const qSto, uint_fast16_t const qLen,
-                    void * const stkSto, uint_fast16_t const stkSize,
+void QActive::start(std::uint_fast8_t const prio,
+                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
     (void)stkSize; // unused paramteter in the Win32 port
 
-    Q_REQUIRE_ID(800, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
-        && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*...in range */
-        && (stkSto == static_cast<void *>(0))); // statck storage must NOT...
-                                                // ... be provided
+    Q_REQUIRE_ID(800, (0U < prio)  /* priority...*/
+        && (prio <= QF_MAX_ACTIVE) /*...in range */
+        && (stkSto == nullptr));  // statck storage must NOT...
+                                   // ... be provided
     m_eQueue.init(qSto, qLen);
     m_prio = prio;  // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
 
     // save osObject as integer, in case it contains the Win32 priority
-    //int win32Prio = (m_osObject != static_cast<void *>(0))
+    //int win32Prio = (m_osObject != nullptr)
     //    ? reinterpret_cast<intptr_t>(m_osObject)
     //    : THREAD_PRIORITY_NORMAL;
 
@@ -203,16 +204,17 @@ void QActive::start(uint_fast8_t const prio,
     this->init(par); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
 
-    // stack size not provided?
-    SIZE_T thrStackSize = stkSize;
-    if (thrStackSize == 0U) {
-        thrStackSize = 1024U; // NOTE: will be rounded up to the nearest page
-    }
-
     // create a Win32 thread for the AO;
     // The thread is created with THREAD_PRIORITY_NORMAL
-    m_thread = CreateThread(NULL, thrStackSize, &ao_thread, this, 0, NULL);
+    m_thread = CreateThread(
+        NULL,
+        (stkSize < 1024U ? 1024U : stkSize),
+        &ao_thread,
+        this,
+        0,
+        NULL);
     Q_ENSURE_ID(830, m_thread != static_cast<HANDLE>(0)); // must succeed
 }
 
 } // namespace QP
+

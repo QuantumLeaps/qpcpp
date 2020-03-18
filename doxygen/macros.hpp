@@ -68,7 +68,7 @@ namespace QP {
 // need to define the macro appropriately for the underlying kernel/OS you're
 /// using.
 #define QACTIVE_EQUEUE_WAIT_(me_) \
-    Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt const *>(0))
+    Q_ASSERT((me_)->m_eQueue.m_frontEvt != nullptr)
 
 /// Platform-dependent macro defining how QF should signal the
 /// active object task that an event has just arrived.
@@ -84,11 +84,11 @@ namespace QP {
 /// of QF. In other QF ports you need to define the macro appropriately for
 /// the underlying kernel/OS you're using.
 #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
-    QK_readySet_.insert((me_)->m_prio); \
-    if (QK_intNest_ == static_cast<uint8_t>(0)) { \
-        uint8_t p = QK_schedPrio_(); \
-        if (p != static_cast<uint8_t>(0)) { \
-            QK_sched_(p); \
+    QK_readySet_.insert((me_)->m_prio);  \
+    if (QK_intNest_ == 0U) {             \
+        uint8_t p = QK_schedPrio_();     \
+        if (p != 0U) {                   \
+            QK_sched_(p);                \
         } \
     } \
 } while (false)

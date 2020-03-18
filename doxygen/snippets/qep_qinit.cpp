@@ -1,6 +1,6 @@
 // initial pseudostate of the Bomb FSM ......................................
-QState Bomb::initial(Bomb * const me, QEvt const *e) {
-    Q_REQUIRE(e != static_cast<QEvt *>(0)); // initialization event expected
+QState Bomb::initial(Bomb * const me, void const *e) {
+    Q_REQUIRE(e != nullptr); // initialization event expected
     me->updateState("top-INIT");
     me->timeout_ = INIT_TIMEOUT;
     me->defuse_ = Q_EVT_CAST(BombInitEvt)->defuse;

@@ -31,22 +31,22 @@ int main() {
     // start the active objects (basic-threads)...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start(
-            static_cast<uint_fast8_t>(n + 1), // QP priority of the AO
+            static_cast<std::uint_fast8_t>(n + 1U), // QP priority of the AO
             philoQueueSto[n],          // event queue storage
             Q_DIM(philoQueueSto[n]),   // queue length [events]
             philoStackSto[n],          // stack storage
             sizeof(philoStackSto[n]),  // stack size [bytes]
-            static_cast<QP::QEvt *>(0));   // initialization event
+            nullptr);                  // initialization parameter
     }
     . . .
     // start the extended-threads...
     DPP::XT_Test->start(
-            static_cast<uint_fast8_t>(10), // QP priority of the AO
-            testQueueSto,            // event queue storage
-            Q_DIM(testQueueSto),     // queue length [events]
-            testStackSto,            // stack storage
-            sizeof(testStackSto),    // stack size [bytes]
-            static_cast<QP::QEvt *>(0)); // initialization event
+            10U,                       // QP priority of the AO
+            testQueueSto,              // event queue storage
+            Q_DIM(testQueueSto),       // queue length [events]
+            testStackSto,              // stack storage
+            sizeof(testStackSto),      // stack size [bytes]
+            nullptr);                  // initialization parameter
     . . .
     return QP::QF::run(); // run the QF application
 }

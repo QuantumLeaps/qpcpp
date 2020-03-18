@@ -62,23 +62,23 @@ int main(int argc, char *argv[]) {
     QP::QF::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
 
     // send signal dictionaries for globally published events...
-    QS_SIG_DICTIONARY(GAME::TIME_TICK_SIG,      static_cast<void *>(0));
-    QS_SIG_DICTIONARY(GAME::PLAYER_TRIGGER_SIG, static_cast<void *>(0));
-    QS_SIG_DICTIONARY(GAME::PLAYER_QUIT_SIG,    static_cast<void *>(0));
-    QS_SIG_DICTIONARY(GAME::GAME_OVER_SIG,      static_cast<void *>(0));
+    QS_SIG_DICTIONARY(GAME::TIME_TICK_SIG,      nullptr);
+    QS_SIG_DICTIONARY(GAME::PLAYER_TRIGGER_SIG, nullptr);
+    QS_SIG_DICTIONARY(GAME::PLAYER_QUIT_SIG,    nullptr);
+    QS_SIG_DICTIONARY(GAME::GAME_OVER_SIG,      nullptr);
 
     // start the active objects...
     // NOTE: AO_Tunnel is the GUI Active Object
     GAME::AO_Tunnel ->start(1U, // priority
                       (QP::QEvt const **)0, 0U,    // no evt queue
-                      static_cast<void *>(0), 0U); // no stack for GUI thread
+                      nullptr, 0U); // no stack for GUI thread
 
     GAME::AO_Missile->start(2U,                    // priority
                       missileQueueSto, Q_DIM(missileQueueSto), // evt queue
-                      static_cast<void *>(0), 0U); // default stack size
+                      nullptr, 0U); // default stack size
     GAME::AO_Ship   ->start(3U,                    // priority
                       shipQueueSto, Q_DIM(shipQueueSto), // evt queue
-                      static_cast<void *>(0), 0U); // default stack size
+                      nullptr, 0U); // default stack size
 
     return QP::QF::run(); // run the QF application
 }

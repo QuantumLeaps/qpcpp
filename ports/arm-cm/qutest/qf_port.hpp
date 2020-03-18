@@ -45,10 +45,10 @@
 //#define QF_THREAD_TYPE
 
 // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE        64
+#define QF_MAX_ACTIVE        64U
 
 // The number of system clock tick rates
-#define QF_MAX_TICK_RATE     2
+#define QF_MAX_TICK_RATE     2U
 
 // QF interrupt disable/enable
 #define QF_INT_DISABLE()     (++QP::QF_intNest)
@@ -83,9 +83,10 @@ extern uint8_t volatile QF_intNest;
 
     // native event queue operations
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
+        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QS::rxPriv_.readySet.insert(static_cast<uint_fast8_t>((me_)->m_prio)))
+        (QS::rxPriv_.readySet.insert(   \
+            static_cast<std::uint_fast8_t>((me_)->m_prio)))
 
     // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool

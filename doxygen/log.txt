@@ -1,7 +1,7 @@
 C:/qp_lab/qpcpp/source/qxk.cpp:65: warning: Compound QP::QXKIdleThread is not documented.
 C:/qp_lab/qpcpp/include/qs.h:383: warning: Compound QP::QS::QSrxPriv is not documented.
-C:/qp_lab/qpcpp/include/qassert.h:197: warning: argument 'loc' of command @param is not found in the argument list of Q_onAssert(char_t const *const module, int_t location)
-C:/qp_lab/qpcpp/include/qassert.h:223: warning: The following parameters of Q_onAssert(char_t const *const module, int_t location) are not documented:
+C:/qp_lab/qpcpp/include/qassert.h:197: warning: argument 'loc' of command @param is not found in the argument list of Q_onAssert(char const *const module, int_t location)
+C:/qp_lab/qpcpp/include/qassert.h:223: warning: The following parameters of Q_onAssert(char const *const module, int_t location) are not documented:
   parameter 'location'
 C:/qp_lab/qpcpp/include/qep.h:649: warning: Illegal command n as part of a title section
 C:/qp_lab/qpcpp/include/qep.h:638: warning: Illegal command n as part of a title section

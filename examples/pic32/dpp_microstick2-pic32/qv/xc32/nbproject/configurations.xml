@@ -33,13 +33,13 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>../../bsp.h</itemPath>
-      <itemPath>../../dpp.h</itemPath>
       <itemPath>../../main.cpp</itemPath>
       <itemPath>../../philo.cpp</itemPath>
       <itemPath>../../table.cpp</itemPath>
       <itemPath>bsp.cpp</itemPath>
       <itemPath>../../../../../include/qstamp.cpp</itemPath>
+      <itemPath>../../bsp.hpp</itemPath>
+      <itemPath>../../dpp.hpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-28
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -41,7 +41,8 @@
 #include "qf_pkg.hpp"
 #include "qassert.h"
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS package-scope internal interface
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -71,7 +72,7 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qf_port")
 
 #ifdef Q_SPY
-    static uint8_t const l_clock_tick = 0U;
+    static constexpr std::uint8_t l_clock_tick = 0U;
 #endif
 
 //............................................................................
@@ -101,18 +102,18 @@ void QF::thread_(QActive *act) {
     }
 }
 //............................................................................
-void QActive::start(uint_fast8_t const prio,
-                    QEvt const * * const qSto, uint_fast16_t const qLen,
-                    void * const stkSto, uint_fast16_t const stkSize,
-                    void const * const par)
+void QActive::start(std::uint_fast8_t const prio,
+                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    void * const stkSto, std::uint_fast16_t const stkSize,
+                    void const * const par) // see NOTE1
 {
     (void)stkSize; // unused paramteter in the VxWorks port
 
     Q_REQUIRE_ID(200, (prio <= QF_MAX_ACTIVE) /* not exceeding max */
-        && (qSto != static_cast<QEvt const **>(0)) /* queue storage */
-        && (qLen > static_cast<uint_fast16_t>(0))  /* queue size */
-        && (stkSto == static_cast<void *>(0))      /* NO stack storage */
-        && (stkSize > static_cast<uint_fast16_t>(0))); // stack size
+        && (qSto != nullptr) /* queue storage */
+        && (qLen > 0U)  /* queue size */
+        && (stkSto == nullptr) /* NO stack storage */
+        && (stkSize > 0U)); // stack size
 
     // create the event queue for the AO
     m_eQueue.init(qSto, qLen);
@@ -181,9 +182,9 @@ static void usrClockHook(TASK_ID /*tid*/) {
 // to the AO task. Here is an example of usage:
 //
 // AO_Table->start(
-//      static_cast<uint_fast8_t>(N_PHILO + 1),
+//      N_PHILO + 1U,
 //      l_tableQueueSto, Q_DIM(l_tableQueueSto),
-//      (void *)0, sizeof(l_tableStk),
-//      reinterpret_cast<QEvt *>(VX_FP_TASK | VX_NO_STACK_FILL));
+//      nullptr, sizeof(l_tableStk),
+//      reinterpret_cast<void *>(VX_FP_TASK | VX_NO_STACK_FILL));
 //
 

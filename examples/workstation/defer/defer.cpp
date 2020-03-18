@@ -84,7 +84,7 @@ private:
 Q_STATE_DEF(TServer, initial) {
     (void)e; // unused paramteter
     // no active request yet
-    m_activeRequest = static_cast<RequestEvt const *>(0);
+    m_activeRequest = nullptr;
     return tran(&idle);
 }
 //............................................................................

@@ -66,8 +66,7 @@ int main() {
         launcherQueueSto,             // event queue storage
         Q_DIM(launcherQueueSto),      // queue length [events]
         launcherStackSto,             // stack storage
-        sizeof(launcherStackSto),     // stack size [bytes]
-        static_cast<QP::QEvt *>(0)); // initialization event (not used)
+        sizeof(launcherStackSto));    // stack size [bytes]
 
     return QP::QF::run(); // run the QF application
 }

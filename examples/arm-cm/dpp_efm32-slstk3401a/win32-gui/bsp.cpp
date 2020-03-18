@@ -183,13 +183,13 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
                 case IDC_PAUSE: {  // PAUSE owner-drawn button
                     switch (OwnerDrawnButton_draw(&l_pauseBtn,pdis)) {
                         case BTN_DEPRESSED: {
-                            AO_Table->POST(&pe, static_cast<void *>(0));
+                            AO_Table->POST(&pe, nullptr);
                             break;
                         }
                         case BTN_RELEASED: {
                             static QP::QEvt const se =
                                 QEVT_INITIALIZER(SERVE_SIG);
-                            AO_Table->POST(&se, static_cast<void *>(0));
+                            AO_Table->POST(&se, nullptr);
                             break;
                         }
                         default: {
@@ -311,7 +311,7 @@ void QF_onClockTick(void) {
 }
 
 //............................................................................
-extern "C" void Q_onAssert(char const * const module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     QF::stop();  // stop ticking
     QS_ASSERTION(module, loc, 10000U); // report assertion to QS
 
@@ -337,7 +337,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, static_cast<void *>(0))
+    QS_BEGIN(DPP::COMMAND_STAT, nullptr)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()

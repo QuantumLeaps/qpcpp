@@ -149,7 +149,7 @@ void QF_onClockTick(void) {
 
 //............................................................................
 // this function is used by the QP embedded systems-friendly assertions
-extern "C" void Q_onAssert(char const * const module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     cout << "Assertion failed in " << module << ':' << loc
          << flush << endl;
     QF::onCleanup();

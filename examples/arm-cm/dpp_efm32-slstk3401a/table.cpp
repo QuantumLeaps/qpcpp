@@ -57,12 +57,12 @@ inline uint8_t LEFT(uint8_t const n) {
     return static_cast<uint8_t>((n + 1U) % N_PHILO);
 }
 
-static uint8_t const FREE = static_cast<uint8_t>(0);
-static uint8_t const USED = static_cast<uint8_t>(1);
+static uint8_t const FREE = 0U;
+static uint8_t const USED = 1U;
 
-static char_t const * const THINKING = &"thinking"[0];
-static char_t const * const HUNGRY   = &"hungry  "[0];
-static char_t const * const EATING   = &"eating  "[0];
+static char const * const THINKING = &"thinking"[0];
+static char const * const HUNGRY   = &"hungry  "[0];
+static char const * const EATING   = &"eating  "[0];
 
 // Local objects -------------------------------------------------------------
 static Table l_table; // the single instance of the Table active object

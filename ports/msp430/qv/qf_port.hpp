@@ -39,13 +39,13 @@
 #define QF_PORT_HPP
 
 // The maximum number of active objects in the application, see NOTE01
-#define QF_MAX_ACTIVE        8
+#define QF_MAX_ACTIVE        8U
 
-#define QF_EVENT_SIZ_SIZE    1
-#define QF_EQUEUE_CTR_SIZE   1
-#define QF_MPOOL_SIZ_SIZE    1
-#define QF_MPOOL_CTR_SIZE    1
-#define QF_TIMEEVT_CTR_SIZE  2
+#define QF_EVENT_SIZ_SIZE    1U
+#define QF_EQUEUE_CTR_SIZE   1U
+#define QF_MPOOL_SIZ_SIZE    1U
+#define QF_MPOOL_CTR_SIZE    1U
+#define QF_TIMEEVT_CTR_SIZE  2U
 
 // QF interrupt disable/enable...
 #define QF_INT_DISABLE()     __disable_interrupt()

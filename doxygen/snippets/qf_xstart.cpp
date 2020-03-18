@@ -11,11 +11,11 @@ int main() {
     // start the extended Test1 thread
     // start the extended Test1 thread
     DPP::XT_Test1->start(
-            static_cast<uint_fast8_t>(1), // QP prio of the thread
+            1U,                      // QP prio of the thread
             test1QueueSto,           // event queue storage
             Q_DIM(test1QueueSto),    // queue length [events]
             test1StackSto,           // stack storage
             sizeof(test1StackSto),   // stack size [bytes]
-            static_cast<QP::QEvt *>(0)); // initialization event
+            nullptr);                // initialization event
     . . .
 }

@@ -45,6 +45,7 @@ spy/
 settings/
 .settings/
 targetConfigs/
+3rd_party/emWin/
 
 Debug/
 Release/

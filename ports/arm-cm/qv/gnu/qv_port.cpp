@@ -28,11 +28,11 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://www.state-machine.com/licensing
-* mailto:info@state-machine.com
+* <www.state-machine.com/licensing>
+* <info@state-machine.com>
 ******************************************************************************
 * @endcond
 */
@@ -54,14 +54,14 @@ __attribute__ ((naked, optimize("-fno-stack-protector")))
 uint_fast8_t QF_qlog2(uint32_t x) {
 __asm volatile (
     "  MOV     r1,#0            \n"
-#if (QF_MAX_ACTIVE > 16)
+#if (QF_MAX_ACTIVE > 16U)
     "  LSR     r2,r0,#16        \n"
     "  BEQ     QF_qlog2_1       \n"
     "  MOV     r1,#16           \n"
     "  MOV     r0,r2            \n"
     "QF_qlog2_1:                \n"
 #endif
-#if (QF_MAX_ACTIVE > 8)
+#if (QF_MAX_ACTIVE > 8U)
     "  LSR     r2,r0,#8         \n"
     "  BEQ     QF_qlog2_2       \n"
     "  ADD     r1, r1,#8        \n"

@@ -48,7 +48,7 @@ public:
 //.$enddecl${Events::TableEvt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // number of philosophers
-#define N_PHILO (static_cast<uint8_t>(5))
+#define N_PHILO 5U
 
 //.$declare${AOs::AO_Philo[N_PHILO]} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace DPP {

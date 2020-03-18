@@ -54,7 +54,7 @@
 #endif
 
 // The maximum number of active objects in the application, see NOTE1
-#define QF_MAX_ACTIVE         32
+#define QF_MAX_ACTIVE         32U
 
 // QF interrupt disabling/enabling (task level)
 #define QF_INT_DISABLE()      taskDISABLE_INTERRUPTS()
@@ -65,13 +65,13 @@
 #define QF_CRIT_ENTRY(stat_)  taskENTER_CRITICAL()
 #define QF_CRIT_EXIT(stat_)   taskEXIT_CRITICAL()
 
-#include "FreeRTOS.h"  // FreeRTOS master include file, see NOTE4/
-#include "task.h"      // FreeRTOS task  management
+#include "FreeRTOS.h"   // FreeRTOS master include file, see NOTE4/
+#include "task.h"       // FreeRTOS task  management
 
-#include "qep_port.hpp"  // QEP port
-#include "qequeue.hpp"   // this QP port uses the native QF event queue
-#include "qmpool.hpp"    // this QP port uses the native QF memory pool
-#include "qf.hpp"        // QF platform-independent public interface
+#include "qep_port.hpp" // QEP port
+#include "qequeue.hpp"  // this QP port uses the native QF event queue
+#include "qmpool.hpp"   // this QP port uses the native QF memory pool
+#include "qf.hpp"       // QF platform-independent public interface
 
 // the "FromISR" versions of the QF APIs, see NOTE3
 #ifdef Q_SPY
@@ -102,34 +102,31 @@
 #endif
 
 #define TICK_FROM_ISR(pxHigherPrioTaskWoken_, sender_) \
-    TICK_X_FROM_ISR(static_cast<uint_fast8_t>(0), \
-                   (pxHigherPrioTaskWoken_), (sender_))
+    TICK_X_FROM_ISR(0U, (pxHigherPrioTaskWoken_), (sender_))
 
 #ifdef Q_EVT_CTOR
     #define Q_NEW_FROM_ISR(evtT_, sig_, ...) \
-        (new(QP::QF::newXfromISR_(static_cast<uint_fast16_t>(sizeof(evtT_)),\
-                     QP::QF_NO_MARGIN, static_cast<enum_t>(0))) \
+        (new(QP::QF::newXfromISR_(sizeof(evtT_), QP::QF_NO_MARGIN, 0)) \
             evtT_((sig_),  ##__VA_ARGS__))
 
-    #define Q_NEW_X_FROM_ISR(e_, evtT_, margin_, sig_, ...) do { \
-        (e_) = static_cast<evtT_ *>( \
-                  QP::QF::newXfromISR_(static_cast<uint_fast16_t>( \
-                  sizeof(evtT_)), (margin_), static_cast<enum_t>(0))); \
-        if ((e_) != static_cast<evtT_ *>(0)) { \
+    #define Q_NEW_X_FROM_ISR(e_, evtT_, margin_, sig_, ...) do {        \
+        (e_) = static_cast<evtT_ *>(                                    \
+                  QP::QF::newXfromISR_(static_cast<std::uint_fast16_t>( \
+                  sizeof(evtT_)), (margin_), 0));                       \
+        if ((e_) != nullptr) {                                          \
             new((e_)) evtT_((sig_),  ##__VA_ARGS__); \
         } \
      } while (false)
 
 #else // QEvt is a POD (Plain Old Datatype)
-    #define Q_NEW_FROM_ISR(evtT_, sig_) \
-        (static_cast<evtT_ *>(QP::QF::newXfromISR_( \
-                static_cast<uint_fast16_t>(sizeof(evtT_)), \
+    #define Q_NEW_FROM_ISR(evtT_, sig_)                         \
+        (static_cast<evtT_ *>(QP::QF::newXfromISR_(             \
+                static_cast<std::uint_fast16_t>(sizeof(evtT_)), \
                 QP::QF_NO_MARGIN, (sig_))))
 
-    #define Q_NEW_X_FROM_ISR(e_, evtT_, margin_, sig_) \
-        ((e_) = static_cast<evtT_ *>(\
-        QP::QF::newXfromISR_(static_cast<uint_fast16_t>(sizeof(evtT_)),\
-                         (margin_), (sig_))))
+    #define Q_NEW_X_FROM_ISR(e_, evtT_, margin_, sig_)          \
+        ((e_) = static_cast<evtT_ *>(                           \
+        QP::QF::newXfromISR_(sizeof(evtT_), (margin_), (sig_))))
 #endif
 
 namespace QP {
@@ -163,16 +160,16 @@ extern "C" {
 //
 #ifdef QP_IMPL
     // FreeRTOS blocking for event queue implementation (task level)
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt *>(0)) { \
-            QF_CRIT_EXIT_(); \
-            ulTaskNotifyTake(pdTRUE, portMAX_DELAY); \
-            QF_CRIT_ENTRY_(); \
+    #define QACTIVE_EQUEUE_WAIT_(me_)                   \
+        while ((me_)->m_eQueue.m_frontEvt == nullptr) { \
+            QF_CRIT_EXIT_();                            \
+            ulTaskNotifyTake(pdTRUE, portMAX_DELAY);    \
+            QF_CRIT_ENTRY_();                           \
         }
 
     // FreeRTOS signaling (unblocking) for event queue (task level)
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
-        QF_CRIT_EXIT_(); \
+    #define QACTIVE_EQUEUE_SIGNAL_(me_) do {             \
+        QF_CRIT_EXIT_();                                 \
         xTaskNotifyGive((TaskHandle_t)&(me_)->m_thread); \
         QF_CRIT_ENTRY_(); \
     } while (false)
@@ -186,7 +183,7 @@ extern "C" {
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
     #define QF_EPOOL_EVENT_SIZE_(p_) \
-        static_cast<uint_fast16_t>((p_).getBlockSize())
+        static_cast<std::uint_fast16_t>((p_).getBlockSize())
     #define QF_EPOOL_GET_(p_, e_, m_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
     #define QF_EPOOL_PUT_(p_, e_) ((p_).put(e_))

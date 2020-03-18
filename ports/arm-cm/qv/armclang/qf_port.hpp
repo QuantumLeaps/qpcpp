@@ -39,13 +39,13 @@
 #define QF_PORT_HPP
 
 // The maximum number of system clock tick rates
-#define QF_MAX_TICK_RATE        2
+#define QF_MAX_TICK_RATE        2U
 
 // QF interrupt disable/enable and log2()...
 #if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1(v6-M, v6S-M)?
 
     // The maximum number of active objects in the application, see NOTE1
-    #define QF_MAX_ACTIVE       8
+    #define QF_MAX_ACTIVE       8U
 
     // Cortex-M0/M0+/M1(v6-M, v6S-M) interrupt disabling policy, see NOTE2
     #define QF_INT_DISABLE()    __asm volatile ("cpsid i")
@@ -60,12 +60,12 @@
     #define QF_AWARE_ISR_CMSIS_PRI 0
 
     // hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
-    #define QF_LOG2(n_) QF_qlog2(static_cast<uint32_t>(n_))
+    #define QF_LOG2(n_) QF_qlog2(static_cast<std::uint32_t>(n_))
 
 #else // Cortex-M3/M4/M7
 
     // The maximum number of active objects in the application, see NOTE1
-    #define QF_MAX_ACTIVE       16
+    #define QF_MAX_ACTIVE       16U
 
     // Cortex-M3/M4/M7 alternative interrupt disabling with PRIMASK
     #define QF_PRIMASK_DISABLE() __asm volatile ("cpsid i")
@@ -89,7 +89,7 @@
     #define QF_AWARE_ISR_CMSIS_PRI (QF_BASEPRI >> (8 - __NVIC_PRIO_BITS))
 
     // Cortex-M3/M4/M7 provide the CLZ instruction for fast LOG2
-    #define QF_LOG2(n_) (static_cast<uint_fast8_t>( \
+    #define QF_LOG2(n_) (static_cast<std::uint_fast8_t>( \
         32U - __builtin_clz(static_cast<unsigned>(n_))))
 
 #endif

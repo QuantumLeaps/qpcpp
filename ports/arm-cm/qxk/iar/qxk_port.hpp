@@ -39,23 +39,21 @@
 #define QXK_PORT_HPP
 
 // determination if the code executes in the ISR context
-#define QXK_ISR_CONTEXT_() (__get_IPSR() != static_cast<uint32_t>(0))
+#define QXK_ISR_CONTEXT_() (__get_IPSR() != 0U)
 
 // trigger the PendSV exception to pefrom the context switch
 #define QXK_CONTEXT_SWITCH_() \
-    (*Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = \
-        static_cast<uint32_t>(1U << 28))
+    (*Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (1U << 28))
 
 // QXK ISR entry and exit
 #define QXK_ISR_ENTRY() ((void)0)
 
-#define QXK_ISR_EXIT()  do { \
-    QF_INT_DISABLE(); \
-    if (QXK_sched_() != static_cast<uint_fast8_t>(0)) { \
-        *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = \
-            static_cast<uint32_t>(1U << 28); \
-    } \
-    QF_INT_ENABLE(); \
+#define QXK_ISR_EXIT()  do {                                  \
+    QF_INT_DISABLE();                                         \
+    if (QXK_sched_() != 0U) {                                 \
+        *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (1U << 28); \
+    }                                                         \
+    QF_INT_ENABLE();                                          \
 } while (false)
 
 // initialization of the QXK kernel

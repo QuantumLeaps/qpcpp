@@ -76,7 +76,7 @@ void BSP_terminate(int) {
     qApp->quit(); // quit the Qt application *after* the QF_run() has stopped
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char_t const *stat) {
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
 
     static QLabel * const philoLabel[] = {
         Gui::instance()->m_philoLabel_0,
@@ -128,7 +128,7 @@ void BSP_randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 //............................................................................
-void Q_onAssert(char_t const * const module, int_t loc) {
+Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     QMessageBox::critical(0, "PROBLEM",
         QString("<p>Assertion failed in module <b>%1</b>,"
                 "location <b>%2</b></p>")
@@ -198,7 +198,7 @@ void QP::QS::onCleanup(void) {
 void QP::QS::onFlush(void) {
     uint16_t nBytes = 1024U;
     uint8_t const *block;
-    while ((block = getBlock(&nBytes)) != static_cast<uint8_t *>(0)) {
+    while ((block = getBlock(&nBytes)) != nullptr) {
         QSPY_parse(block, nBytes);
         nBytes = 1024U;
     }
@@ -212,7 +212,7 @@ void QP::QS_onEvent(void) {
     uint16_t nBytes = 1024;
     uint8_t const *block;
     QF_CRIT_ENTRY(dummy);
-    if ((block = QS::getBlock(&nBytes)) != static_cast<uint8_t *>(0)) {
+    if ((block = QS::getBlock(&nBytes)) != nullptr) {
         QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
     }

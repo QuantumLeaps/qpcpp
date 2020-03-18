@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: BSP for emWin/uC/GUI, Win32 simulation, NO Window Manager
-// Last updated for version 6.2.0
-// Last updated on  2018-03-16
+// Last updated for version 6.8.0
+// Last updated on  2020-01-22
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -37,8 +37,8 @@
 
 extern "C" {
     #include "GUI.h"
+    #include "GUI_SIM.h"
     #include "DIALOG.h"
-    #include "SIM.h"
 }
 
 #include <windows.h>
@@ -60,19 +60,20 @@ Q_DEFINE_THIS_FILE
 //............................................................................
 static void simHardKey(int keyIndex, int keyState) {
     static const QEvt keyEvt[] = {
-        { KEY_UP_REL_SIG,       0 },  // hardkey UP released
-        { KEY_UP_PRESS_SIG,     0 },  // hardkey UP pressed
-        { KEY_RIGHT_REL_SIG,    0 },  // hardkey RIGHT released
-        { KEY_RIGHT_PRESS_SIG,  0 },  // hardkey RIGHT pressed
-        { KEY_CENTER_REL_SIG,   0 },  // hardkey CENTER released
-        { KEY_CENTER_PRESS_SIG, 0 },  // hardkey CENTER pressed
-        { KEY_LEFT_REL_SIG,     0 },  // hardkey LEFT released
-        { KEY_LEFT_PRESS_SIG,   0 },  // hardkey LEFT pressed
-        { KEY_DOWN_REL_SIG,     0 },  // hardkey DOWN released
-        { KEY_DOWN_PRESS_SIG,   0 },  // hardkey DOWN pressed
-        { KEY_POWER_REL_SIG,    0 },  // hardkey POWER released
-        { KEY_POWER_PRESS_SIG,  0 }   // hardkey POWER pressed
+        { KEY_UP_REL_SIG,       0 }, // hardkey UP released
+        { KEY_UP_PRESS_SIG,     0 }, // hardkey UP pressed
+        { KEY_RIGHT_REL_SIG,    0 }, // hardkey RIGHT released
+        { KEY_RIGHT_PRESS_SIG,  0 }, // hardkey RIGHT pressed
+        { KEY_CENTER_REL_SIG,   0 }, // hardkey CENTER released
+        { KEY_CENTER_PRESS_SIG, 0 }, // hardkey CENTER pressed
+        { KEY_LEFT_REL_SIG,     0 }, // hardkey LEFT released
+        { KEY_LEFT_PRESS_SIG,   0 }, // hardkey LEFT pressed
+        { KEY_DOWN_REL_SIG,     0 }, // hardkey DOWN released
+        { KEY_DOWN_PRESS_SIG,   0 }, // hardkey DOWN pressed
+        { KEY_POWER_REL_SIG,    0 }, // hardkey POWER released
+        { KEY_POWER_PRESS_SIG,  0 }  // hardkey POWER pressed
     };
+
     // do not overrun the array
     Q_REQUIRE((keyIndex * 2) + keyState < Q_DIM(keyEvt));
 
@@ -86,9 +87,10 @@ static void simHardKey(int keyIndex, int keyState) {
 //............................................................................
 extern "C" void GUI_MOUSE_StoreState(const GUI_PID_STATE *pState) {
     MouseEvt *pe = Q_NEW(MouseEvt, MOUSE_CHANGE_SIG);
-    pe->xPos = pState->x;
-    pe->yPos = pState->y;
-    pe->buttonStates = pState->Pressed;
+    pe->x = pState->x;
+    pe->y = pState->y;
+    pe->Pressed = pState->Pressed;
+    pe->Layer = pState->Layer;
     AO_Table->POST(pe, &l_MOUSE_StoreState);
 }
 //............................................................................
@@ -122,24 +124,6 @@ void BSP_init(void) {
     }
 
     QF_setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
-
-#ifdef Q_SPY
-    {
-        HANDLE hIdle;
-        char const *hostAndPort = SIM_GetCmdLine();
-        if (hostAndPort != NULL) { // port specified?
-            hostAndPort = "localhost:6601";
-        }
-        if (!QS_INIT(hostAndPort)) {
-            MessageBox(NULL, "Failed to open the TCP/IP socket for QS output",
-                       "QS Socket Failure", MB_TASKMODAL | MB_OK);
-            return;
-        }
-        hIdle = CreateThread(NULL, 1024, &idleThread, (void *)0, 0, NULL);
-        Q_ASSERT(hIdle != (HANDLE)0); // thread must be created
-        SetThreadPriority(hIdle, THREAD_PRIORITY_IDLE);
-    }
-#endif
 }
 //............................................................................
 void QF::onStartup(void) {
@@ -156,7 +140,7 @@ void QP::QF_onClockTick(void) {
 }
 
 //............................................................................
-void Q_onAssert(char const * const file, int loc) {
+Q_NORETURN Q_onAssert(char const * const file, int_t const loc) {
     char str[256];
 
     QF_CRIT_ENTRY(dummy); // make sure nothing else is running
@@ -165,27 +149,3 @@ void Q_onAssert(char const * const file, int loc) {
     QF::stop(); // terminate the QF, causes termination of the MainTask()
 }
 
-//----------------------------------------------------------------------------
-#ifdef Q_SPY // define QS callbacks
-
-//............................................................................
-//! callback function to execute a user command (to be implemented in BSP)
-void QS::onCommand(uint8_t cmdId,
-    uint32_t param1, uint32_t param2, uint32_t param3)
-{
-    switch (cmdId) {
-    case 0U: {
-        break;
-    }
-    default:
-        break;
-    }
-
-    // unused parameters
-    (void)param1;
-    (void)param2;
-    (void)param3;
-}
-
-#endif // Q_SPY
-//----------------------------------------------------------------------------

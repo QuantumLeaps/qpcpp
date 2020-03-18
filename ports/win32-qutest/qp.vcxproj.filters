@@ -66,10 +66,13 @@
     <ClCompile Include="..\..\src\qf\qf_actq.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="qep_port.h">
+    <ClInclude Include="qf_port.hpp">
       <Filter>QP_port</Filter>
     </ClInclude>
-    <ClInclude Include="qf_port.h">
+    <ClInclude Include="qs_port.hpp">
+      <Filter>QP_port</Filter>
+    </ClInclude>
+    <ClInclude Include="qep_port.hpp">
       <Filter>QP_port</Filter>
     </ClInclude>
   </ItemGroup>

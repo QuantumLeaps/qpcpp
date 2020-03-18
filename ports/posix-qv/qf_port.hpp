@@ -44,17 +44,17 @@
 //#define QF_THREAD_TYPE     // not used
 
 // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE        64
+#define QF_MAX_ACTIVE        64U
 
 // The number of system clock tick rates
-#define QF_MAX_TICK_RATE     2
+#define QF_MAX_TICK_RATE     2U
 
 // various QF object sizes configuration for this port
-#define QF_EVENT_SIZ_SIZE    4
-#define QF_EQUEUE_CTR_SIZE   4
-#define QF_MPOOL_SIZ_SIZE    4
-#define QF_MPOOL_CTR_SIZE    4
-#define QF_TIMEEVT_CTR_SIZE  4
+#define QF_EVENT_SIZ_SIZE    4U
+#define QF_EQUEUE_CTR_SIZE   4U
+#define QF_MPOOL_SIZ_SIZE    4U
+#define QF_MPOOL_CTR_SIZE    4U
+#define QF_TIMEEVT_CTR_SIZE  4U
 
 // QF critical section entry/exit for POSIX, see NOTE1
 // QF_CRIT_STAT_TYPE not defined
@@ -101,7 +101,7 @@ int  QF_consoleWaitForKey(void);
 
     // event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT((me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
+        Q_ASSERT((me_)->m_eQueue.m_frontEvt != nullptr)
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
         QV_readySet_.insert((me_)->m_prio); \

@@ -3,14 +3,14 @@
 /// @ingroup qep qf qv qk qxk qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-21
+/// Last updated for version 6.8.0
+/// Last updated on  2020-03-03
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -43,6 +43,16 @@
 /// This header file must be included directly or indirectly
 /// in all application modules (*.cpp files) that use QP/C++.
 
+//****************************************************************************
+#include "qf_port.hpp"      // QF/C++ port from the port directory
+#include "qassert.h"        // QP assertions
+#ifdef Q_SPY                // software tracing enabled?
+    #include "qs_port.hpp"  // QS/C++ port from the port directory
+#else
+    #include "qs_dummy.hpp" // QS/C++ dummy (inactive) interface
+#endif
+
+//****************************************************************************
 #ifndef QP_API_VERSION
 
 //! Macro that specifies the backwards compatibility with the
@@ -61,13 +71,85 @@
 
 #endif  // QP_API_VERSION
 
-#include "qf_port.hpp"      // QF/C++ port from the port directory
-#include "qassert.h"        // QP assertions
-#ifdef Q_SPY                // software tracing enabled?
-    #include "qs_port.hpp"  // QS/C++ port from the port directory
-#else
-    #include "qs_dummy.hpp" // QS/C++ dummy (inactive) interface
-#endif
+// QP/C++ API compatibility layer...
+
+//****************************************************************************
+#if (QP_API_VERSION < 680)
+
+//! @deprecated
+//! Macro to specify a transition in the "me->" impl-strategy.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// you call tran(Q_STATE_CAST(target_)).
+#define Q_TRAN(target_)       (me->tran(Q_STATE_CAST(target_)))
+
+//! @deprecated
+//! Macro to specify a tran-to-history in the "me->" impl-strategy.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// you call tran_hist(Q_STATE_CAST(hist_)).
+#define Q_TRAN_HIST(hist_)    (me->tran_hist((hist_)))
+
+//! @deprecated
+//! Macro to specify the superstate in the "me->" impl-strategy.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// you call super(state_)).
+#define Q_SUPER(state_)       (me->super((state_)))
+
+//! @deprecated
+//! Macro to call in a QM state entry-handler. Applicable only to QMSMs.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// the QM-generated code calls qm_entry(Q_STATE_CAST(state_)).
+#define QM_ENTRY(state_)      (me->qm_entry((state_)))
+
+//! @deprecated
+//! Macro to call in a QM state exit-handler. Applicable only to QMSMs.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// the QM-generated code calls qm_exit(Q_STATE_CAST(state_)).
+#define QM_EXIT(state_)       (me->qm_exit((state_)))
+
+//! @deprecated
+//! Macro to call in a QM submachine exit-handler. Applicable only to QMSMs.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// the QM-generated code calls qm_sm_exit(Q_STATE_CAST(state_)).
+#define QM_SM_EXIT(state_)    (me->qm_sm_exit((state_)))
+
+//! @deprecated
+//! Macro to call in a QM state-handler when it executes a transition.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// the QM-generated code calls qm_tran((tatbl_)).
+#define QM_TRAN(tatbl_)       (me->qm_tran((tatbl_)))
+
+//! @deprecated
+//! Macro to call in a QM state-handler when it executes an initial tran.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// the QM-generated code calls qm_tran_init((tatbl_)).
+#define QM_TRAN_INIT(tatbl_)  (me->qm_tran_init((tatbl_)))
+
+//! @deprecated
+//! Macro to call in a QM state-handler when it executes a tran-to-history.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// the QM-generated code calls qm_tran_hist((history_), (tatbl_)).
+#define QM_TRAN_HIST(history_, tatbl_) \
+    (me->qm_tran_hist((history_), (tatbl_)))
+
+//! @deprecated
+//! Macro to call in a QM state-handler when it executes an initial tran.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// the QM-generated code calls qm_tran_ep((tatbl_)).
+#define QM_TRAN_EP(tatbl_)    (me->qm_tran_ep((tatbl_)))
+
+//! @deprecated
+//! Macro to call in a QM state-handler when it executes a tran-to-exit-point.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// the QM-generated code calls qm_tran_xp((xp_), (tatbl_)).
+#define QM_TRAN_XP(xp_, tatbl_) (me->qm_tran_xp((xp_), (tatbl_)))
+
+//! @deprecated
+//! Designates the superstate of a given state in a subclass of QP::QMsm.
+/// Instead use the new impl-strategy without the "me->" pointer, where
+/// the QM-generated code calls qm_super_sub((state_)).
+#define QM_SUPER_SUB(state_)  (me->qm_super_sub((state_)))
+
+#endif // QP_API_VERSION < 680
 
 #endif // qpcpp_h
 

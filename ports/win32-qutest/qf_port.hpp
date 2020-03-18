@@ -3,14 +3,14 @@
 /// @ingroup qutest
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -45,10 +45,10 @@
 //#define QF_THREAD_TYPE
 
 // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE        64
+#define QF_MAX_ACTIVE        64U
 
 // The number of system clock tick rates
-#define QF_MAX_TICK_RATE     2
+#define QF_MAX_TICK_RATE     2U
 
 // Activate the QF QActive::stop() API
 #define QF_ACTIVE_STOP       1
@@ -129,9 +129,10 @@ extern uint8_t volatile QF_intNest;
 
     // native event queue operations
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
+        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QS::rxPriv_.readySet.insert(static_cast<uint_fast8_t>((me_)->m_prio)))
+        (QS::rxPriv_.readySet.insert(   \
+            static_cast<std::uint_fast8_t>((me_)->m_prio)))
 
     // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool

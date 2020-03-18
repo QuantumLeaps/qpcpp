@@ -281,7 +281,7 @@ void QF::onCleanup(void) {
 }
 
 //............................................................................
-extern "C" void Q_onAssert(char const *module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     //
     // NOTE: add here your application-specific error handling
     //
@@ -362,7 +362,7 @@ void QS::onFlush(void) {
 #endif
 
     OS_ENTER_CRITICAL();
-    while ((block = getBlock(&fifo)) != static_cast<uint8_t *>(0)) {
+    while ((block = getBlock(&fifo)) != nullptr) {
         OS_EXIT_CRITICAL();
         // busy-wait until TX FIFO empty
         while ((UART0->FR & UART_FR_TXFE) == 0U) {

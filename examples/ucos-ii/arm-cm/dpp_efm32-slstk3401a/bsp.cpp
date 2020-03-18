@@ -333,7 +333,7 @@ void QF::onCleanup(void) {
 }
 
 //............................................................................
-extern "C" void Q_onAssert(char const *module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     //
     // NOTE: add here your application-specific error handling
     //
@@ -480,7 +480,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, static_cast<void *>(0))
+    QS_BEGIN(DPP::COMMAND_STAT, nullptr)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()

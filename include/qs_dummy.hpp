@@ -4,14 +4,14 @@
 /// @ingroup qs qpspy
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-22
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -56,8 +56,8 @@
 #define QS_FILTER_TE_OBJ(obj_)          ((void)0)
 #define QS_FILTER_AP_OBJ(obj_)          ((void)0)
 
-#define QS_GET_BYTE(pByte_)             (static_cast<uint16_t>(0xFFFFU))
-#define QS_GET_BLOCK(pSize_)            (static_cast<uint8_t *>(0))
+#define QS_GET_BYTE(pByte_)             (0xFFFFU)
+#define QS_GET_BLOCK(pSize_)            (nullptr)
 
 #define QS_BEGIN(rec_, obj_)            if (false) {
 #define QS_END()                        }

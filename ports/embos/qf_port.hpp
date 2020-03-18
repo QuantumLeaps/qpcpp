@@ -41,10 +41,10 @@
 // message mailbox and thread types for embOS
 #define QF_EQUEUE_TYPE       OS_MAILBOX
 #define QF_THREAD_TYPE       OS_TASK
-#define QF_OS_OBJECT_TYPE    uint32_t
+#define QF_OS_OBJECT_TYPE    std::uint32_t
 
 // The maximum number of active objects in the application, see NOTE1
-#define QF_MAX_ACTIVE        32
+#define QF_MAX_ACTIVE        32U
 
 // QF interrupt disable/enable
 #define QF_INT_DISABLE()     OS_IncDI()
@@ -56,7 +56,7 @@
 #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
 // thred options...
-#define QF_TASK_USES_FPU     (static_cast<uint32_t>(1))
+#define QF_TASK_USES_FPU     1U
 
 #include "RTOS.h"      // embOS API
 #include "qep_port.hpp"  // QEP port
@@ -89,7 +89,7 @@
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
     #define QF_EPOOL_EVENT_SIZE_(p_) \
-        static_cast<uint_fast16_t>((p_).getBlockSize())
+        static_cast<std::uint_fast16_t>((p_).getBlockSize())
     #define QF_EPOOL_GET_(p_, e_, m_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_))))
     #define QF_EPOOL_PUT_(p_, e_) ((p_).put(e_))

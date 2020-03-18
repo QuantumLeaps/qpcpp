@@ -384,12 +384,12 @@
           <Files>
             <File>
               <FileName>test_blinky.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>.\test_blinky.cpp</FilePath>
             </File>
             <File>
               <FileName>blinky.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\blinky.cpp</FilePath>
             </File>
             <File>
@@ -399,7 +399,7 @@
             </File>
             <File>
               <FileName>bsp.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\bsp.cpp</FilePath>
             </File>
             <File>
@@ -409,7 +409,7 @@
             </File>
             <File>
               <FileName>qstamp.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\include\qstamp.cpp</FilePath>
             </File>
           </Files>
@@ -430,7 +430,7 @@
             <File>
               <FileName>startup_TM4C123GH6PM.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\3rd_party\ek-tm4c123gxl\arm\startup_TM4C123GH6PM.s</FilePath>
+              <FilePath>..\..\..\..\3rd_party\ek-tm4c123gxl\armclang\startup_TM4C123GH6PM.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -439,87 +439,87 @@
           <Files>
             <File>
               <FileName>qep_hsm.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qep_hsm.cpp</FilePath>
             </File>
             <File>
               <FileName>qep_msm.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qep_msm.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_act.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_act.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_actq.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_actq.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_defer.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_defer.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_dyn.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_dyn.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_mem.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_mem.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_ps.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_ps.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_qact.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_qact.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_qeq.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_qeq.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_qmact.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_qmact.cpp</FilePath>
             </File>
             <File>
               <FileName>qf_time.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qf\qf_time.cpp</FilePath>
             </File>
             <File>
               <FileName>qs.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qs\qs.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_64bit.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qs\qs_64bit.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_fp.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qs\qs_fp.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_rx.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qs\qs_rx.cpp</FilePath>
             </File>
             <File>
               <FileName>qutest.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\src\qs\qutest.cpp</FilePath>
             </File>
           </Files>
@@ -529,7 +529,7 @@
           <Files>
             <File>
               <FileName>qutest_port.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\target_tm4c123\qutest_port.cpp</FilePath>
             </File>
           </Files>

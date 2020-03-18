@@ -2,8 +2,8 @@
 /// @brief QEP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0 / Qt 5.x
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.0 / Qt 5.x
+/// Last updated on  2020-01-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -44,7 +44,7 @@
 // provide QEvt virtual destructor
 #define Q_EVT_VIRTUAL 1
 
-#include <stdint.h> // Exact-width types. WG14/N843 C99, Section 7.18.1.1
+#include <cstdint>    // Exact-width types. C++11 dtandard
 #include "qep.hpp"    // QEP platform-independent public interface
 
 #endif // QEP_PORT_HPP

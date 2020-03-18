@@ -31,7 +31,7 @@ void BSP_ledOff(void) {
 void BSP_ledOn(void) {
     cout << "LED ON" << endl;
 }
-extern "C" void Q_onAssert(char const * const module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     cout << "Assertion failed in " << module << ':' << loc << endl;
     exit(-1);
 }

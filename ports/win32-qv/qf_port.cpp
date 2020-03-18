@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-28
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -36,18 +36,19 @@
 ///***************************************************************************
 /// @endcond
 ///
-#define QP_IMPL           // this is QP implementation
+#define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
 #include "qf_pkg.hpp"       // QF package-scope interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS package-scope internal interface
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-#include <limits.h>       // limits of dynamic range for integers
-#include <conio.h>        // console input/output
+#include <limits.h>         // limits of dynamic range for integers
+#include <conio.h>          // console input/output
 
 namespace QP {
 
@@ -73,11 +74,10 @@ void QF::init(void) {
     // clear the internal QF variables, so that the framework can (re)start
     // correctly even if the startup code is not called to clear the
     // uninitialized data (as is required by the C++ Standard).
-    extern uint_fast8_t QF_maxPool_;
-    QF_maxPool_ = static_cast<uint_fast8_t>(0);
-    bzero(&QF::timeEvtHead_[0],
-          static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
-    bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
+    extern std::uint_fast8_t QF_maxPool_;
+    QF_maxPool_ = 0U;
+    bzero(&QF::timeEvtHead_[0], sizeof(QF::timeEvtHead_));
+    bzero(&active_[0],          sizeof(active_));
 }
 //****************************************************************************
 void QF_enterCriticalSection_(void) {
@@ -100,27 +100,27 @@ int_t QF::run(void) {
     l_isRunning = true; // QF is running
 
     // system clock tick configured?
-    if (l_tickMsec != static_cast<uint32_t>(0)) {
+    if (l_tickMsec != 0U) {
         // create the ticker thread...
         HANDLE ticker = CreateThread(NULL, 1024, &ticker_thread,
-                                     static_cast<void *>(0), 0U, NULL);
+                                     nullptr, 0U, NULL);
         // thread must be created
         Q_ASSERT_ID(310, ticker != static_cast<HANDLE>(0));
     }
 
-    // the combined event-loop and background-loop of the QV kernel */
+    // the combined event-loop and background-loop of the QV kernel
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
     while (l_isRunning) {
         // find the maximum priority AO ready to run
         if (QV_readySet_.notEmpty()) {
-            uint_fast8_t p = QV_readySet_.findMax();
+            std::uint_fast8_t p = QV_readySet_.findMax();
             QActive *a = active_[p];
             QF_CRIT_EXIT_();
 
             // the active object 'a' must still be registered in QF
             // (e.g., it must not be stopped)
-            Q_ASSERT_ID(320, a != static_cast<QActive *>(0));
+            Q_ASSERT_ID(320, a != nullptr);
 
             // perform the run-to-completion (RTS) step...
             // 1. retrieve the event from the AO's event queue, which by this
@@ -134,7 +134,7 @@ int_t QF::run(void) {
 
             QF_CRIT_ENTRY_();
 
-            if (a->m_eQueue.isEmpty()) { /* empty queue? */
+            if (a->m_eQueue.isEmpty()) { // empty queue? */
                 QV_readySet_.rmove(p);
             }
         }
@@ -145,8 +145,7 @@ int_t QF::run(void) {
             // QP events become available.
             QF_CRIT_EXIT_();
 
-            (void)WaitForSingleObject(QV_win32Event_,
-                                      static_cast<DWORD>(INFINITE));
+            (void)WaitForSingleObject(QV_win32Event_, INFINITE);
 
             QF_CRIT_ENTRY_();
         }
@@ -158,15 +157,15 @@ int_t QF::run(void) {
     //CloseHandle(QV_win32Event_);
     //DeleteCriticalSection(&l_win32CritSect);
     //free all "fudged" event pools...
-    return static_cast<int_t>(0); // return success
+    return 0; // return success
 }
 //****************************************************************************
-void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
-    if (ticksPerSec != static_cast<uint32_t>(0)) {
+void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
+    if (ticksPerSec != 0U) {
         l_tickMsec = 1000UL / ticksPerSec;
     }
     else {
-        l_tickMsec = static_cast<uint32_t>(0); // means NO system clock tick
+        l_tickMsec = 0U; // means NO system clock tick
     }
     l_tickPrio = tickPrio;
 }
@@ -179,28 +178,28 @@ void QF_consoleCleanup(void) {
 }
 //............................................................................
 int QF_consoleGetKey(void) {
-    if (_kbhit()) { /* any key pressed? */
-        return _getch();
+    if (_kbhit()) { // any key pressed?
+        return static_cast<int>(_getwch());
     }
     return 0;
 }
 //............................................................................
 int QF_consoleWaitForKey(void) {
-    return _getch();
+    return static_cast<int>(_getwch());
 }
 
 //****************************************************************************
-void QActive::start(uint_fast8_t const prio,
-                    QEvt const * * const qSto, uint_fast16_t const qLen,
-                    void * const stkSto, uint_fast16_t const stkSize,
+void QActive::start(std::uint_fast8_t const prio,
+                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
     (void)stkSize; // unused paramteter in the Win32-QV port
 
-    Q_REQUIRE_ID(600, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
-        && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*... in range */
-        && (stkSto == static_cast<void *>(0)));    /* statck storage must NOT...
-                                                    * ... be provided */
+    Q_REQUIRE_ID(600, (0U < prio)  /* priority...*/
+        && (prio <= QF_MAX_ACTIVE) /*... in range */
+        && (stkSto == nullptr));  // statck storage must NOT...
+                                   // ... be provided
 
     m_eQueue.init(qSto, qLen);
     m_prio = prio;  // set the QF priority of this AO before adding it to QF
@@ -230,7 +229,7 @@ static DWORD WINAPI ticker_thread(LPVOID /*arg*/) { // for CreateThread()
         Sleep(l_tickMsec); // wait for the tick interval
         QF_onClockTick();  // clock tick callback (must call QF_TICK_X())
     }
-    return static_cast<DWORD>(0); // return success
+    return 0; // return success
 }
 
 } // namespace QP

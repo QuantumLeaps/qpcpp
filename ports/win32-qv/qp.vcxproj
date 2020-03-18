@@ -185,8 +185,9 @@
     <ClCompile Include="qwin_gui.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="qep_port.h" />
-    <ClInclude Include="qf_port.h" />
+    <ClInclude Include="qep_port.hpp" />
+    <ClInclude Include="qf_port.hpp" />
+    <ClInclude Include="qs_port.hpp" />
     <ClInclude Include="qwin_gui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

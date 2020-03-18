@@ -53,7 +53,7 @@ void QP::QF::onStartup(void) {
     QS_OBJ_DICTIONARY(&l_time_tick);
 }
 //............................................................................
-void Q_onAssert(char_t const * const module, int_t loc) {
+Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     QMessageBox::critical(0, "PROBLEM",
         QString("<p>Assertion failed in module <b>%1</b>,"
                 "location <b>%2</b></p>")
@@ -75,7 +75,7 @@ void BSP_terminate(int16_t /*result*/) {
     qApp->quit(); // quit the Qt application *after* the QF_run() has stopped
 }
 //............................................................................
-void BSP_showState(char_t const *state) {
+void BSP_showState(char const *state) {
     qDebug("state:%s", state);
     Gui::instance()->m_stateLabel->setText(state);
 }

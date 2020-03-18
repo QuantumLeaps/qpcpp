@@ -96,7 +96,7 @@ bool QS::onStartup(void const *arg) {
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     // extract hostName from 'arg' (hostName:port_remote)...
-    src = (arg != static_cast<void *>(0))
+    src = (arg != nullptr)
           ? static_cast<char const *>(arg)
           : "localhost"; // default QSPY host
     dst = hostName;

@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ///**************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-26
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -39,7 +39,8 @@
 #include "qf_port.hpp"      // QF port
 #include "qf_pkg.hpp"
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS package-scope internal interface
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -59,7 +60,7 @@ void QF::init(void) {
 //............................................................................
 int_t QF::run(void) {
     onStartup();  // the startup callback
-    return static_cast<int_t>(0); // return success
+    return 0; // return success
 }
 //............................................................................
 void QF::stop(void) {
@@ -80,9 +81,9 @@ static void thread_function(ULONG thread_input) { // ThreadX signature
     QF::thread_(reinterpret_cast<QActive *>(thread_input));
 }
 //............................................................................
-void QActive::start(uint_fast8_t const prio,
-                    QEvt const * * const qSto, uint_fast16_t const qLen,
-                    void * const stkSto, uint_fast16_t const stkSize,
+void QActive::start(std::uint_fast8_t const prio,
+                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
     // allege that the ThreadX queue is created successfully
@@ -119,9 +120,9 @@ void QActive::start(uint_fast8_t const prio,
 }
 //............................................................................
 #ifndef Q_SPY
-bool QActive::post_(QEvt const * const e, uint_fast16_t const margin)
+bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin)
 #else
-bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
+bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender)
 #endif
 {
@@ -129,11 +130,11 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    uint_fast16_t nFree =
-        static_cast<uint_fast16_t>(m_eQueue.tx_queue_available_storage);
+    std::uint_fast16_t nFree =
+        static_cast<std::uint_fast16_t>(m_eQueue.tx_queue_available_storage);
 
     if (margin == QF_NO_MARGIN) {
-        if (nFree > static_cast<QEQueueCtr>(0)) {
+        if (nFree > 0U) {
             status = true; // can post
         }
         else {
@@ -157,13 +158,13 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
             QS_SIG_PRE_(e->sig);  // the signal of the event
             QS_OBJ_PRE_(this);    // this active object (recipient)
             QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-            QS_EQC_PRE_(static_cast<QEQueueCtr>(nFree)); // # free entries
-            QS_EQC_PRE_(static_cast<QEQueueCtr>(0)); // min # free (unknown)
+            QS_EQC_PRE_(nFree);   // # free entries
+            QS_EQC_PRE_(0U);      // min # free (unknown)
         QS_END_NOCRIT_PRE_()
 
         // is it a pool event?
-        if (e->poolId_ != static_cast<uint8_t>(0)) {
-            QF_EVT_REF_CTR_INC_(e);  // increment the reference counter
+        if (e->poolId_ != 0U) {
+            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
         }
 
         QF_CRIT_EXIT_();
@@ -182,8 +183,8 @@ bool QActive::post_(QEvt const * const e, uint_fast16_t const margin,
             QS_SIG_PRE_(e->sig);  // the signal of the event
             QS_OBJ_PRE_(this);    // this active object (recipient)
             QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-            QS_EQC_PRE_(static_cast<QEQueueCtr>(nFree)); // # free entries
-            QS_EQC_PRE_(static_cast<QEQueueCtr>(0)); // min # free (unknown)
+            QS_EQC_PRE_(nFree);   // # free entries
+            QS_EQC_PRE_(0U);      // min # free (unknown)
         QS_END_NOCRIT_PRE_()
 
         QF_CRIT_EXIT_();
@@ -203,12 +204,12 @@ void QActive::postLIFO(QEvt const * const e) {
         QS_OBJ_PRE_(this);    // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
         // # free entries available
-        QS_EQC_PRE_(static_cast<QEQueueCtr>(m_eQueue.tx_queue_available_storage));
-        QS_EQC_PRE_(static_cast<QEQueueCtr>(0)); // min # free entries (unknown)
+        QS_EQC_PRE_(m_eQueue.tx_queue_available_storage);
+        QS_EQC_PRE_(0U); // min # free entries (unknown)
     QS_END_NOCRIT_PRE_()
 
     // is it a pool event?
-    if (e->poolId_ != static_cast<uint8_t>(0)) {
+    if (e->poolId_ != 0U) {
         QF_EVT_REF_CTR_INC_(e);  // increment the reference counter
     }
 
@@ -235,18 +236,18 @@ QEvt const *QActive::get_(void) {
         QS_OBJ_PRE_(this);    // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
         // min # free entries
-        QS_EQC_PRE_(static_cast<QEQueueCtr>(m_eQueue.tx_queue_available_storage));
+        QS_EQC_PRE_(m_eQueue.tx_queue_available_storage);
     QS_END_PRE_()
 
     return e;
 }
 
 //............................................................................
-void QFSchedLock::lock(uint_fast8_t prio) {
+void QFSchedLock::lock(std::uint_fast8_t prio) {
     m_lockHolder = tx_thread_identify();
 
     /// @pre must be thread level, so current TX thread must be available
-    Q_REQUIRE_ID(800, m_lockHolder != static_cast<TX_THREAD *>(0));
+    Q_REQUIRE_ID(800, m_lockHolder != nullptr);
 
     UINT tx_err = tx_thread_preemption_change(m_lockHolder,
                      (QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - prio),
@@ -256,16 +257,15 @@ void QFSchedLock::lock(uint_fast8_t prio) {
         QS_CRIT_STAT_
         m_lockPrio = prio;
 
-        QS_BEGIN_PRE_(QS_SCHED_LOCK, static_cast<void *>(0), static_cast<void *>(0))
+        QS_BEGIN_PRE_(QS_SCHED_LOCK, nullptr, nullptr)
             QS_TIME_PRE_(); // timestamp
-            QS_2U8_PRE_(static_cast<uint8_t>(QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE
-                                         - m_prevThre),
-                    static_cast<uint8_t>(prio)); // new lock prio
+            QS_2U8_PRE_(QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - m_prevThre,
+                        prio); // new lock prio
         QS_END_PRE_()
     }
     else if (tx_err == TX_THRESH_ERROR) {
         // threshold was greater than (lower prio) than the current prio
-        m_lockPrio = static_cast<uint_fast8_t>(0); // threshold not changed
+        m_lockPrio = 0U; // threshold not changed
     }
     else {
         /* no other errors are tolerated */
@@ -278,15 +278,13 @@ void QFSchedLock::unlock(void) const {
     QS_CRIT_STAT_
 
     /// @pre the lock holder TX thread must be available
-    Q_REQUIRE_ID(900, (m_lockHolder != static_cast<TX_THREAD *>(0))
-                      && (m_lockPrio != static_cast<uint_fast8_t>(0)));
+    Q_REQUIRE_ID(900, (m_lockHolder != nullptr)
+                      && (m_lockPrio != 0U));
 
-    QS_BEGIN_PRE_(QS_SCHED_UNLOCK,
-              static_cast<void *>(0), static_cast<void *>(0))
+    QS_BEGIN_PRE_(QS_SCHED_UNLOCK, nullptr, nullptr)
         QS_TIME_PRE_(); // timestamp
-        QS_2U8_PRE_(static_cast<uint8_t>(m_lockPrio), /* prev lock prio */
-                static_cast<uint8_t>(QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE
-                                     - m_prevThre)); // new lock prio
+        QS_2U8_PRE_(m_lockPrio,/* prev lock prio */
+                    QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - m_prevThre);
     QS_END_PRE_()
 
     // restore the preemption threshold of the lock holder

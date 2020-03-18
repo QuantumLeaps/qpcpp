@@ -47,7 +47,7 @@ enum BSP_PedsSignal {
 #define BSP_TICKS_PER_SEC   100U
 
 void BSP_init(void);
-void BSP_showState(char_t const *state);
+void BSP_showState(char const *state);
 void BSP_signalCars(enum BSP_CarsSignal sig);
 void BSP_signalPeds(enum BSP_PedsSignal sig);
 void BSP_terminate(int16_t result);

@@ -66,22 +66,20 @@ int main() {
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->setAttr(QP::TASK_NAME_ATTR, "Philo");
         DPP::AO_Philo[n]->start(
-            static_cast<uint_fast8_t>(n + 1), // QP priority of the AO
+            n + 1U,                  // QP priority of the AO
             philoQueueSto[n],        // event queue storage
             Q_DIM(philoQueueSto[n]), // queue length [events]
             philoStack[n],           // stack storage
-            sizeof(philoStack[n]),   // stack size [bytes]
-            static_cast<QP::QEvt *>(0)); // initialization event
+            sizeof(philoStack[n]));  // stack size [bytes]
     }
 
     DPP::AO_Table->setAttr(QP::TASK_NAME_ATTR, "Table");
     DPP::AO_Table->start(
-        static_cast<uint_fast8_t>(N_PHILO + 1), // QP priority of the AO
+        N_PHILO + 1U,            // QP priority of the AO
         tableQueueSto,           // event queue storage
         Q_DIM(tableQueueSto),    // queue length [events]
         tableStack,              // stack storage
-        sizeof(tableStack),      // stack size [bytes]
-        static_cast<QP::QEvt *>(0)); // initialization event
+        sizeof(tableStack));     // stack size [bytes]
 
     return QP::QF::run(); // run the QF application
 }

@@ -264,7 +264,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pa050</state>
+                    <state>Pe540</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -350,6 +350,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..</state>
+                    <state>$PROJ_DIR$\SEGGER</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\embos</state>
@@ -1326,7 +1327,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pa050</state>
+                    <state>Pe540</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -1412,6 +1413,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..</state>
+                    <state>$PROJ_DIR$\SEGGER</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\embos</state>
@@ -2069,7 +2071,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>###Unitialized###</state>
+                    <state>dpp_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>
@@ -2388,7 +2390,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pa050</state>
+                    <state>Pe540</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -2474,6 +2476,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..</state>
+                    <state>$PROJ_DIR$\SEGGER</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\embos</state>
@@ -3189,6 +3192,8 @@
     </configuration>
     <mfc>
         <configuration>Debug</configuration>
+        <configuration>Release</configuration>
+        <configuration>Spy</configuration>
     </mfc>
     <group>
         <name>Application</name>
@@ -3302,7 +3307,7 @@
             <name>$PROJ_DIR$\Setup\OS_Error.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\Setup\RTOSInit_STM32F4x_CMSIS.c</name>
+            <name>$PROJ_DIR$\Setup\RTOSInit_STM32F4xx.c</name>
         </file>
     </group>
     <group>

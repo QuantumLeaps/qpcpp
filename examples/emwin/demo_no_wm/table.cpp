@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example with emWin/uC/GUI, NO Window Manager
-// Last updated for version 6.2.0
-// Last updated on  2018-03-16
+// Last updated for version 6.8.0
+// Last updated on  2020-01-22
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -37,8 +37,8 @@
 
 extern "C" {
     #include "GUI.h"
+    #include "GUI_SIM.h"
     #include "DIALOG.h"
-    #include "SIM.h"
 }
 
 Q_DEFINE_THIS_FILE
@@ -53,10 +53,10 @@ public:
     Table();
 
 private:
-    static QState initial(Table *me, QEvt const *e);
-    static QState ready  (Table *me, QEvt const *e);
-    static QState serving(Table *me, QEvt const *e);
-    static QState paused (Table *me, QEvt const *e);
+    Q_STATE_DECL(initial);
+    Q_STATE_DECL(ready);
+    Q_STATE_DECL(serving);
+    Q_STATE_DECL(paused);
 };
 
 #define RIGHT(n_) ((uint8_t)(((n_) + (N_PHILO - 1)) % N_PHILO))
@@ -167,59 +167,48 @@ Table::Table() : QActive((QStateHandler)&Table::initial) {
     }
 }
 //............................................................................
-QState Table::initial(Table *me, QEvt const *) {
-
-    QS_OBJ_DICTIONARY(&l_table);
-    QS_FUN_DICTIONARY(&QHsm::top);
-    QS_FUN_DICTIONARY(&Table::initial);
-    QS_FUN_DICTIONARY(&Table::serving);
-
-    QS_SIG_DICTIONARY(DONE_SIG,  0); // global signals
-    QS_SIG_DICTIONARY(EAT_SIG,   0);
-    QS_SIG_DICTIONARY(PAUSE_SIG, 0);
-
-    QS_SIG_DICTIONARY(HUNGRY_SIG, me); // signal just for Table
+Q_STATE_DEF(Table, initial) {
 
     GUI_Init(); // initialize the embedded GUI
 
-    me->subscribe(DONE_SIG);
-    me->subscribe(PAUSE_SIG);
+    subscribe(DONE_SIG);
+    subscribe(PAUSE_SIG);
 
-    return Q_TRAN(&Table::ready);
+    return tran(&ready);
 }
 //............................................................................
-QState Table::ready(Table *me, QEvt const *e) {
+Q_STATE_DEF(Table, ready) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             renderDppScreen();
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case Q_INIT_SIG: {
-            return Q_TRAN(&Table::serving);
+            return tran(&serving);
         }
 
         // ... hardkey events ...
         case KEY_LEFT_REL_SIG: { // hardkey LEFT released
             moveDppScreen(-5, 0);
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case KEY_RIGHT_REL_SIG: { // hardkey RIGHT released
             moveDppScreen(5, 0);
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case KEY_DOWN_REL_SIG: { // hardkey DOWN released
             moveDppScreen(0, 5);
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case KEY_UP_REL_SIG: {   // hardkey UP released
             moveDppScreen(0, -5);
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return super(&top);
 }
 //............................................................................
-QState Table::serving(Table *me, QEvt const *e) {
+Q_STATE_DEF(Table, serving) {
     uint8_t n, m;
     TableEvt *pe;
 
@@ -227,46 +216,46 @@ QState Table::serving(Table *me, QEvt const *e) {
         case Q_ENTRY_SIG: {
             displyTableStat("serving");
             for (n = 0; n < N_PHILO; ++n) { // give permissions to eat...
-                if (me->m_isHungry[n]
-                    && (me->m_fork[LEFT(n)] == FREE)
-                        && (me->m_fork[n] == FREE))
+                if (m_isHungry[n]
+                    && (m_fork[LEFT(n)] == FREE)
+                        && (m_fork[n] == FREE))
                 {
-                    me->m_fork[LEFT(n)] = me->m_fork[n] = USED;
+                    m_fork[LEFT(n)] = m_fork[n] = USED;
                     pe = Q_NEW(TableEvt, EAT_SIG);
                     pe->philoNum = n;
                     QF::PUBLISH(pe, me);
-                    me->m_isHungry[n] = 0;
+                    m_isHungry[n] = 0;
                     displyPhilStat(n, "eating  ");
                 }
             }
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case HUNGRY_SIG: {
             n = ((TableEvt *)e)->philoNum;
-            Q_ASSERT(n < N_PHILO && !me->m_isHungry[n]);
+            Q_ASSERT(n < N_PHILO && !m_isHungry[n]);
             displyPhilStat(n, "hungry  ");
             m = LEFT(n);
-            if (me->m_fork[m] == FREE && me->m_fork[n] == FREE) {
-                me->m_fork[m] = me->m_fork[n] = USED;
+            if (m_fork[m] == FREE && m_fork[n] == FREE) {
+                m_fork[m] = m_fork[n] = USED;
                 pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = n;
                 QF::PUBLISH(pe, me);
                 displyPhilStat(n, "eating  ");
             }
             else {
-                me->m_isHungry[n] = 1;
+                m_isHungry[n] = 1;
             }
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case DONE_SIG: {
             n = ((TableEvt *)e)->philoNum;
             Q_ASSERT(n < N_PHILO);
             displyPhilStat(n, "thinking");
-            me->m_fork[LEFT(n)] = me->m_fork[n] = FREE;
+            m_fork[LEFT(n)] = m_fork[n] = FREE;
             m = RIGHT(n); // check the right neighbor
-            if (me->m_isHungry[m] && me->m_fork[m] == FREE) {
-                me->m_fork[n] = me->m_fork[m] = USED;
-                me->m_isHungry[m] = 0;
+            if (m_isHungry[m] && m_fork[m] == FREE) {
+                m_fork[n] = m_fork[m] = USED;
+                m_isHungry[m] = 0;
                 pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
                 QF::PUBLISH(pe, me);
@@ -274,50 +263,50 @@ QState Table::serving(Table *me, QEvt const *e) {
             }
             m = LEFT(n); // check the left neighbor
             n = LEFT(m);
-            if (me->m_isHungry[m] && me->m_fork[n] == FREE) {
-                me->m_fork[m] = me->m_fork[n] = USED;
-                me->m_isHungry[m] = 0;
+            if (m_isHungry[m] && m_fork[n] == FREE) {
+                m_fork[m] = m_fork[n] = USED;
+                m_isHungry[m] = 0;
                 pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
                 QF::PUBLISH(pe, me);
                 displyPhilStat(m, "eating  ");
             }
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case PAUSE_SIG: // "Toggle" button pressed
         case KEY_CENTER_PRESS_SIG: { // hardkey CENTER pressed
-            return Q_TRAN(&Table::paused);
+            return tran(&paused);
         }
     }
-    return Q_SUPER(&Table::ready);
+    return super(&ready);
 }
 //............................................................................
-QState Table::paused(Table *me, QEvt const *e) {
+Q_STATE_DEF(Table, paused) {
     uint8_t n;
 
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             displyTableStat("paused");
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case HUNGRY_SIG: {
             n = ((TableEvt *)e)->philoNum;
-            Q_ASSERT(n < N_PHILO && !me->m_isHungry[n]);
+            Q_ASSERT(n < N_PHILO && !m_isHungry[n]);
             displyPhilStat(n, "hungry  ");
-            me->m_isHungry[n] = 1;
-            return Q_HANDLED();
+            m_isHungry[n] = 1;
+            return Q_RET_HANDLED;
         }
         case DONE_SIG: {
             n = ((TableEvt *)e)->philoNum;
             Q_ASSERT(n < N_PHILO);
             displyPhilStat(n, "thinking");
-            me->m_fork[LEFT(n)] = me->m_fork[n] = FREE;
-            return Q_HANDLED();
+            m_fork[LEFT(n)] = m_fork[n] = FREE;
+            return Q_RET_HANDLED;
         }
         case PAUSE_SIG: // "Toggle" button pressed
         case KEY_CENTER_REL_SIG: { // hardkey CENTER released
-            return Q_TRAN(&Table::serving);
+            return tran(&serving);
         }
     }
-    return Q_SUPER(&Table::ready);
+    return super(&ready);
 }

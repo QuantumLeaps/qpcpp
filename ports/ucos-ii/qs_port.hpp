@@ -38,9 +38,9 @@
 #ifndef QS_PORT_HPP
 #define QS_PORT_HPP
 
-#define QS_TIME_SIZE        4
-#define QS_OBJ_PTR_SIZE     4
-#define QS_FUN_PTR_SIZE     4
+#define QS_TIME_SIZE        4U
+#define QS_OBJ_PTR_SIZE     4U
+#define QS_FUN_PTR_SIZE     4U
 
 //****************************************************************************
 // NOTE: QS might be used with or without other QP components, in which case

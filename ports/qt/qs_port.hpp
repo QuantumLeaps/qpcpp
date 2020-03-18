@@ -37,14 +37,14 @@
 #ifndef QS_PORT_HPP
 #define QS_PORT_HPP
 
-#define QS_TIME_SIZE            4
+#define QS_TIME_SIZE            4U
 
 #if defined(__LP64__) || defined(_LP64) // 64-bit architecture?
-    #define QS_OBJ_PTR_SIZE     8
-    #define QS_FUN_PTR_SIZE     8
+    #define QS_OBJ_PTR_SIZE     8U
+    #define QS_FUN_PTR_SIZE     8U
 #else  // 32-bit architecture
-    #define QS_OBJ_PTR_SIZE     4
-    #define QS_FUN_PTR_SIZE     4
+    #define QS_OBJ_PTR_SIZE     4U
+    #define QS_FUN_PTR_SIZE     4U
 #endif
 
 //****************************************************************************

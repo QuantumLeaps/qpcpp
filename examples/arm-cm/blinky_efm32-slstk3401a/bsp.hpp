@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: Simple Blinky example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Last updated for version 6.8.0
+// Last updated on  2020-01-20
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -34,7 +34,7 @@
 #ifndef BSP_HPP
 #define BSP_HPP
 
-uint32_t const BSP_TICKS_PER_SEC = static_cast<uint32_t>(100);
+constexpr std::uint32_t BSP_TICKS_PER_SEC = 100U;
 
 void BSP_init(void);
 void BSP_ledOff(void);

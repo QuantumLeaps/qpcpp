@@ -1,16 +1,15 @@
 /// @file
-/// @brief QEP/C++ port to 32-bit CPU, generic C++ compiler
-/// @ingroup qep
+/// @brief QEP/C++ port, GCC-ARM compiler
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -39,8 +38,11 @@
 #ifndef QEP_PORT_HPP
 #define QEP_PORT_HPP
 
-#include <stdint.h> // exact-width integers, WG14/N843 C99 Standard, 7.18.1.1
-#include "qep.hpp"    // QEP platform-independent public interface
+//! no-return function specifier (GCC-ARM compiler)
+#define Q_NORETURN   __attribute__ ((noreturn)) void
+
+#include <cstdint>  // Exact-width types. C++11 Standard
+
+#include "qep.hpp"  // QEP platform-independent public interface
 
 #endif // QEP_PORT_HPP
-

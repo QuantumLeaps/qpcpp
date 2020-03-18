@@ -184,6 +184,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -324,6 +325,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
@@ -386,16 +388,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -443,7 +435,7 @@
             <File>
               <FileName>startup_stm32l053xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\arm\startup_stm32l053xx.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\armclang\startup_stm32l053xx.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -521,29 +513,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qs_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qv_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qv_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -582,6 +554,7 @@
                 <uThumb>2</uThumb>
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
+                <uGnu>2</uGnu>
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>
@@ -815,6 +788,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -955,6 +929,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
@@ -1017,16 +992,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1074,7 +1039,7 @@
             <File>
               <FileName>startup_stm32l053xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\arm\startup_stm32l053xx.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\armclang\startup_stm32l053xx.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1152,29 +1117,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qs_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qv_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qv_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1213,6 +1158,7 @@
                 <uThumb>2</uThumb>
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
+                <uGnu>2</uGnu>
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>
@@ -1446,6 +1392,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1586,6 +1533,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
@@ -1648,16 +1596,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1705,7 +1643,7 @@
             <File>
               <FileName>startup_stm32l053xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\arm\startup_stm32l053xx.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\armclang\startup_stm32l053xx.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1783,29 +1721,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qs_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qv_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qv_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.h</FilePath>
             </File>
           </Files>
         </Group>

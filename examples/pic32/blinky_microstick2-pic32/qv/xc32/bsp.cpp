@@ -112,7 +112,7 @@ void BSP_ledOn(void) {
 // that you ship your production code with assertions enabled).
 //
 extern "C"
-void Q_onAssert(char const * const file, int loc) {
+Q_NORETURN Q_onAssert(char const * const file, int_t const loc) {
     (void)file;       // unused parameter
     (void)loc;        // unused parameter
     QF_INT_DISABLE(); // make sure that interrupts are disabled

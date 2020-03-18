@@ -228,7 +228,7 @@ void QF::onCleanup(void) {
 }
 
 //............................................................................
-extern "C" void Q_onAssert(char const *module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     //
     // NOTE: add here your application-specific error handling
     //
@@ -340,7 +340,7 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
 void QS::onFlush(void) {
     uint16_t fifo = UART_TXFIFO_DEPTH; // Tx FIFO depth
     uint8_t const *block;
-    while ((block = getBlock(&fifo)) != static_cast<uint8_t *>(0)) {
+    while ((block = getBlock(&fifo)) != nullptr) {
         // busy-wait until TX FIFO empty
         while ((UART0->FR & UART_FR_TXFE) == 0U) {
         }
@@ -370,7 +370,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, static_cast<void *>(0))
+    QS_BEGIN(DPP::COMMAND_STAT, nullptr)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
         QS_U32(8, param2);

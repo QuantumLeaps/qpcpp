@@ -106,7 +106,7 @@ Tunnel::Tunnel()
     for (uint8_t n = 0U; n < GAME_MINES_MAX; ++n) {
         m_mine1_pool[n] = Mine1_getInst(n);  // initialize mine1-type pool
         m_mine2_pool[n] = Mine2_getInst(n);  // initialize mine2-type pool
-        m_mines[n] = static_cast<QHsm *>(0); // mine 'n' is unused
+        m_mines[n] = nullptr;                // mine 'n' is unused
     }
 }
 
@@ -198,7 +198,7 @@ void Tunnel::plantMine() {
 //.${AOs::Tunnel::dispatchToAllMines} ........................................
 void Tunnel::dispatchToAllMines(QP::QEvt const * e) {
     for (uint8_t n = 0U; n < GAME_MINES_MAX; ++n) {
-        if (m_mines[n] != static_cast<QHsm *>(0)) { // is the mine used?
+        if (m_mines[n] != nullptr) { // is the mine used?
             m_mines[n]->dispatch(e);
         }
     }
@@ -253,8 +253,8 @@ Q_STATE_DEF(Tunnel, active) {
         //.${AOs::Tunnel::SM::active::MINE_DISABLED}
         case MINE_DISABLED_SIG: {
             Q_ASSERT((Q_EVT_CAST(MineEvt)->id < GAME_MINES_MAX)
-                && (m_mines[Q_EVT_CAST(MineEvt)->id] != static_cast<QHsm *>(0)));
-            m_mines[Q_EVT_CAST(MineEvt)->id] = static_cast<QHsm *>(0);
+                && (m_mines[Q_EVT_CAST(MineEvt)->id] != nullptr));
+            m_mines[Q_EVT_CAST(MineEvt)->id] = nullptr;
             status_ = Q_RET_HANDLED;
             break;
         }

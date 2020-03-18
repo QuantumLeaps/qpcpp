@@ -10,7 +10,7 @@
       <TargetName>dpp-dbg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6070000::V6.7::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -184,6 +184,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>3</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -324,6 +325,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
@@ -381,19 +383,9 @@
           <GroupName>Applicatioin</GroupName>
           <Files>
             <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\bsp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
             </File>
             <File>
               <FileName>main.cpp</FileName>
@@ -423,7 +415,7 @@
             <File>
               <FileName>startup_stm32h743xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\nucleo-h743zi\arm\startup_stm32h743xx.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\nucleo-h743zi\armclang\startup_stm32h743xx.s</FilePath>
             </File>
             <File>
               <FileName>system_stm32h7xx.c</FileName>
@@ -622,6 +614,7 @@
                 <uThumb>2</uThumb>
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
+                <uGnu>2</uGnu>
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>
@@ -860,6 +853,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>3</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1000,6 +994,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
@@ -1057,19 +1052,9 @@
           <GroupName>Applicatioin</GroupName>
           <Files>
             <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\bsp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
             </File>
             <File>
               <FileName>main.cpp</FileName>
@@ -1099,7 +1084,7 @@
             <File>
               <FileName>startup_stm32h743xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\nucleo-h743zi\arm\startup_stm32h743xx.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\nucleo-h743zi\armclang\startup_stm32h743xx.s</FilePath>
             </File>
             <File>
               <FileName>system_stm32h7xx.c</FileName>
@@ -1298,6 +1283,7 @@
                 <uThumb>2</uThumb>
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
+                <uGnu>2</uGnu>
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>
@@ -1536,6 +1522,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>3</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1676,6 +1663,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
@@ -1733,19 +1721,9 @@
           <GroupName>Applicatioin</GroupName>
           <Files>
             <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\bsp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
             </File>
             <File>
               <FileName>main.cpp</FileName>
@@ -1775,7 +1753,7 @@
             <File>
               <FileName>startup_stm32h743xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\nucleo-h743zi\arm\startup_stm32h743xx.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\nucleo-h743zi\armclang\startup_stm32h743xx.s</FilePath>
             </File>
             <File>
               <FileName>system_stm32h7xx.c</FileName>
@@ -1974,6 +1952,7 @@
                 <uThumb>2</uThumb>
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
+                <uGnu>2</uGnu>
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>

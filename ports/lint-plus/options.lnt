@@ -2,15 +2,14 @@
 /// @brief PC-Lint-Plus option file for linting QP/C++ source code
 /// @cond
 ///===========================================================================
-/// Product: QP/C++
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-26
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-27
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -47,20 +46,39 @@
 -i%QPCPP%/include  // QP/C++ public includes
 -i%QPCPP%/src      // QP/C++ package-scope includes
 
-// size options corresponding to GNU-ARM
--si4 -sl4 -sll8 -ss2 -sw4 -sp4 -sf4 -sd8 -sld8 +fzl
-
 // standards
-au-misra-cpp.lnt    // MISRA-C++:2008
+-std=c++11         // C++ language standard
+au-autosar.lnt     // AUTOSAR:C++14
 au-ds.lnt           // Dan Saks recommendations
 //-strong(AXJ)        // Strong type checking
 
+// size/alignment options
+cpu.lnt             // for the chosen CPU
+
 /////////////////////////////////////////////////////////////////////////////
 // QP/C++ options for clients
-qpcpp.lnt           // QP/C options
+qpcpp.lnt           // QP/C++ options
 
 /////////////////////////////////////////////////////////////////////////////
 // additional suppression rules for building QP/C source code...
+
+// general suppression for now...
+
+// preprocessor directive ... is deprecated. [AUTOSAR Rule A16-0-1]
+-e586
+
+// preprocessor directive encountered in conditionally excluded region
+// [AUTOSAR Rule A16-0-1], [AUTOSAR Rule A16-6-1]
+-e886
+
+// friend ... in class
+-e9435
+
+// symbol ... has array type
+-e9436
+
+// enum ... is not a scoped enumeration [AUTOSAR Rule A7-2-3]
+-e9419
 
 // QEP -----------------------------------------------------------------------
 
@@ -344,4 +362,19 @@ qpcpp.lnt           // QP/C options
  QS_TEST_PROBE,
  QS_TEST_PROBE_ID)
 
+// don't report problems within QS_target_info_() function
+-efunc(9130,
+ QP::QS_target_info_)
+-efunc(9114,
+ QP::QS_target_info_)
+-efunc(9117,
+ QP::QS_target_info_)
+-efunc(9125,
+ QP::QS_target_info_)
+-efunc(9112,
+ QP::QS_target_info_)
+-efunc(9128,
+ QP::QS_target_info_)
+-efunc(737,
+ QP::QS_target_info_)
 

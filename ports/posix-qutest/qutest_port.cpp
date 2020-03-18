@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -47,7 +47,8 @@
 #define QP_IMPL         // this is QP implementation
 #include "qf_port.hpp"  // QF port
 #include "qassert.h"    // QP embedded systems-friendly assertions
-#include "qs_port.hpp"  // include QS port
+#include "qs_port.hpp"  // QS port
+#include "qs_pkg.hpp"   // QS package-scope internal interface
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -101,7 +102,7 @@ bool QS::onStartup(void const *arg) {
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     // extract hostName from 'arg' (hostName:port_remote)...
-    src = (arg != static_cast<void *>(0))
+    src = (arg != nullptr)
           ? static_cast<char const *>(arg)
           : "localhost"; // default QSPY host
     dst = hostName;

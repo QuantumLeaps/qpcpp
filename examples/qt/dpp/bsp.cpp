@@ -72,7 +72,7 @@ void BSP_terminate(int) {
     qApp->quit(); // quit the Qt application *after* the QF::run() has stopped
 }
 //............................................................................
-void BSP_displayPhilStat(uint8_t n, char_t const *stat) {
+void BSP_displayPhilStat(uint8_t n, char const *stat) {
     //qDebug("philo[%d] is %s", n, stat);
     l_stdOutStream << "philo[" << n << "] is " << stat << endl;
 }
@@ -101,7 +101,7 @@ void BSP_randomSeed(uint32_t seed) {
 }
 
 //****************************************************************************
-void Q_onAssert(char_t const * const module, int loc) {
+Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     QS_ASSERTION(module, loc, 10000U); // send assertion info to the QS trace
     qFatal("Assertion failed in module %s, location %d", module, loc);
 }

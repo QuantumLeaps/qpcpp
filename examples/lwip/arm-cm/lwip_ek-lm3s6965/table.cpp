@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example with lwIP and direct screen output
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-12
+// Last Updated for Version: 6.8.0
+// Date of the Last Update:  2020-01-24
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -54,8 +54,8 @@ public:
     Table(); // ctor
 
 private:
-    static QState initial(Table *me, QEvt const *e);
-    static QState serving(Table *me, QEvt const *e);
+    Q_STATE_DECL(initial);
+    Q_STATE_DECL(serving);
 
 private:
     void displayInit(void);
@@ -105,134 +105,134 @@ Table::Table()
     m_udpCtr = 0;
 }
 //............................................................................
-QState Table::initial(Table *me, QEvt const *e) {
+Q_STATE_DEF(Table, initial) {
     (void)e; // unused parameter
 
-    me->displayInit(); // Initialize the OLED display
+    displayInit(); // Initialize the OLED display
 
     // subscribe to published events...
-    me->subscribe(DONE_SIG);
-    me->subscribe(BTN_DOWN_SIG);
-    me->subscribe(DISPLAY_IPADDR_SIG);
-    me->subscribe(DISPLAY_CGI_SIG);
-    me->subscribe(DISPLAY_UDP_SIG);
+    subscribe(DONE_SIG);
+    subscribe(BTN_DOWN_SIG);
+    subscribe(DISPLAY_IPADDR_SIG);
+    subscribe(DISPLAY_CGI_SIG);
+    subscribe(DISPLAY_UDP_SIG);
 
     QS_OBJ_DICTIONARY(&l_table);
-    QS_FUN_DICTIONARY(&QHsm::top);
-    QS_FUN_DICTIONARY(&Table::initial);
-    QS_FUN_DICTIONARY(&Table::serving);
+    QS_FUN_DICTIONARY(&top);
+    QS_FUN_DICTIONARY(&initial);
+    QS_FUN_DICTIONARY(&serving);
 
     // global signals...
-    QS_SIG_DICTIONARY(DONE_SIG,           static_cast<void *>(0));
-    QS_SIG_DICTIONARY(EAT_SIG,            static_cast<void *>(0));
-    QS_SIG_DICTIONARY(DISPLAY_IPADDR_SIG, static_cast<void *>(0));
-    QS_SIG_DICTIONARY(DISPLAY_CGI_SIG,    static_cast<void *>(0));
-    QS_SIG_DICTIONARY(DISPLAY_UDP_SIG,    static_cast<void *>(0));
+    QS_SIG_DICTIONARY(DONE_SIG,           nullptr);
+    QS_SIG_DICTIONARY(EAT_SIG,            nullptr);
+    QS_SIG_DICTIONARY(DISPLAY_IPADDR_SIG, nullptr);
+    QS_SIG_DICTIONARY(DISPLAY_CGI_SIG,    nullptr);
+    QS_SIG_DICTIONARY(DISPLAY_UDP_SIG,    nullptr);
 
     // signals just for Table...
-    QS_SIG_DICTIONARY(HUNGRY_SIG,          me);
-    QS_SIG_DICTIONARY(DISPLAY_TIMEOUT_SIG, me);
+    QS_SIG_DICTIONARY(HUNGRY_SIG,          this);
+    QS_SIG_DICTIONARY(DISPLAY_TIMEOUT_SIG, this);
 
-    return Q_TRAN(&Table::serving);
+    return tran(&serving);
 }
 //............................................................................
-QState Table::serving(Table *me, QEvt const *e) {
+Q_STATE_DEF(Table, serving) {
     uint8_t n, m;
     TableEvt *pe;
 
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            me->m_te_DISPLAY_TIMEOUT.armX(DISPLAY_TIMEOUT);
-            me->displayOn();
-            return Q_HANDLED();
+            m_te_DISPLAY_TIMEOUT.armX(DISPLAY_TIMEOUT);
+            displayOn();
+            return Q_RET_HANDLED;
         }
         case Q_EXIT_SIG: {
-            me->m_te_DISPLAY_TIMEOUT.disarm();
-            me->displayOff();
-            return Q_HANDLED();
+            m_te_DISPLAY_TIMEOUT.disarm();
+            displayOff();
+            return Q_RET_HANDLED;
         }
         case HUNGRY_SIG: {
             n = ((TableEvt const *)e)->philoNum;
             // philo ID must be in range and he must be not hungry
-            Q_ASSERT((n < N_PHILO) && (!me->m_isHungry[n]));
+            Q_ASSERT((n < N_PHILO) && (!m_isHungry[n]));
 
-            me->displayPhilStat(n, "hungry  ");
+            displayPhilStat(n, "hungry  ");
             m = LEFT(n);
-            if ((me->m_fork[m] == FREE) && (me->m_fork[n] == FREE)) {
-                me->m_fork[m] = me->m_fork[n] = USED;
+            if ((m_fork[m] == FREE) && (m_fork[n] == FREE)) {
+                m_fork[m] = m_fork[n] = USED;
                 pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = n;
-                QF::PUBLISH(pe, me);
-                me->displayPhilStat(n, "eating  ");
+                QF::PUBLISH(pe, this);
+                displayPhilStat(n, "eating  ");
             }
             else {
-                me->m_isHungry[n] = 1;
+                m_isHungry[n] = 1;
             }
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case DONE_SIG: {
             n = ((TableEvt const *)e)->philoNum;
             // philo ID must be in range and he must be not hungry
-            Q_ASSERT((n < N_PHILO) && (!me->m_isHungry[n]));
+            Q_ASSERT((n < N_PHILO) && (!m_isHungry[n]));
 
-            me->displayPhilStat(n, "thinking");
+            displayPhilStat(n, "thinking");
             m = LEFT(n);
             // both forks of Phil[n] must be used
-            Q_ASSERT((me->m_fork[n] == USED) && (me->m_fork[m] == USED));
+            Q_ASSERT((m_fork[n] == USED) && (m_fork[m] == USED));
 
-            me->m_fork[m] = me->m_fork[n] = FREE;
+            m_fork[m] = m_fork[n] = FREE;
             m = RIGHT(n); // check the right neighbor
-            if (me->m_isHungry[m] && (me->m_fork[m] == FREE)) {
-                me->m_fork[n] = me->m_fork[m] = USED;
-                me->m_isHungry[m] = 0;
+            if (m_isHungry[m] && (m_fork[m] == FREE)) {
+                m_fork[n] = m_fork[m] = USED;
+                m_isHungry[m] = 0;
                 pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
-                QF::PUBLISH(pe, me);
-                me->displayPhilStat(m, "eating  ");
+                QF::PUBLISH(pe, this);
+                displayPhilStat(m, "eating  ");
             }
             m = LEFT(n);  // check the left neighbor
             n = LEFT(m);  // left fork of the left neighbor
-            if (me->m_isHungry[m] && (me->m_fork[n] == FREE)) {
-                me->m_fork[m] = me->m_fork[n] = USED;
-                me->m_isHungry[m] = 0;
+            if (m_isHungry[m] && (m_fork[n] == FREE)) {
+                m_fork[m] = m_fork[n] = USED;
+                m_isHungry[m] = 0;
                 pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
-                QF::PUBLISH(pe, me);
-                me->displayPhilStat(m, "eating  ");
+                QF::PUBLISH(pe, this);
+                displayPhilStat(m, "eating  ");
             }
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
         case BTN_DOWN_SIG: {
-            me->displayOn();
-            return Q_HANDLED();
+            displayOn();
+            return Q_RET_HANDLED;
         }
         case DISPLAY_TIMEOUT_SIG: {
-            me->displayOff();
-            return Q_HANDLED();
+            displayOff();
+            return Q_RET_HANDLED;
         }
         case DISPLAY_IPADDR_SIG: {
-            me->displyIPAddr(((TextEvt *)e)->text);
-            return Q_HANDLED();
+            displyIPAddr(((TextEvt *)e)->text);
+            return Q_RET_HANDLED;
         }
         case DISPLAY_CGI_SIG: {
-            me->displyCgiText(((TextEvt *)e)->text);
-            return Q_HANDLED();
+            displyCgiText(((TextEvt *)e)->text);
+            return Q_RET_HANDLED;
         }
         case DISPLAY_UDP_SIG: {
             TextEvt *te;
 
-            me->displyUdpText(((TextEvt *)e)->text);
-            ++me->m_udpCtr;
+            displyUdpText(((TextEvt *)e)->text);
+            ++m_udpCtr;
 
             te = Q_NEW(TextEvt, SEND_UDP_SIG);
             snprintf(te->text, Q_DIM(te->text), "%s-%d",
-                     ((TextEvt const *)e)->text, (int)me->m_udpCtr);
-            AO_LwIPMgr->POST(te, me); // post directly
+                     ((TextEvt const *)e)->text, (int)m_udpCtr);
+            AO_LwIPMgr->POST(te, this); // post directly
 
-            return Q_HANDLED();
+            return Q_RET_HANDLED;
         }
     }
-    return Q_SUPER(&QHsm::top);
+    return super(&top);
 }
 
 // helper functions for the display ..........................................

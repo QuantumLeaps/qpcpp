@@ -2,14 +2,14 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0 / Qt 5.x
-/// Last updated on  2019-09-12
+/// Last updated for version 6.8.0 / Qt 5.x
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -44,34 +44,34 @@ namespace QP {
 class GuiQActive : public QActive {
 public:
     GuiQActive(QStateHandler const initial) : QActive(initial) {}
-    virtual void start(uint_fast8_t const prio,
-        QEvt const *qSto[], uint_fast16_t const qLen,
-        void * const stkSto, uint_fast16_t const stkSize,
-        void const * const par);
+    void start(std::uint_fast8_t const prio,
+               QEvt const * * const qSto, std::uint_fast16_t const qLen,
+               void * const stkSto, std::uint_fast16_t const stkSize,
+               void const * const par) override;
 #ifndef Q_SPY
-    virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
+    bool post_(QEvt const * const e, std::uint_fast16_t const margin) override;
 #else
-    virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
-        void const * const sender);
+    bool post_(QEvt const * const e, std::uint_fast16_t const margin,
+        void const * const sender) override;
 #endif // Q_SPY
-    virtual void postLIFO(QEvt const * const e);
+    void postLIFO(QEvt const * const e) override;
 };
 
 //............................................................................
 class GuiQMActive : public QMActive {
 public:
     GuiQMActive(QStateHandler const initial) : QMActive(initial) {}
-    virtual void start(uint_fast8_t const prio,
-                       QEvt const *qSto[], uint_fast16_t const qLen,
-                       void * const stkSto, uint_fast16_t const stkSize,
-                       void const * const par);
+    void start(std::uint_fast8_t const prio,
+               QEvt const * * const qSto, std::uint_fast16_t const qLen,
+               void * const stkSto, std::uint_fast16_t const stkSize,
+               void const * const par) override;
 #ifndef Q_SPY
-    virtual bool post_(QEvt const * const e, uint_fast16_t const margin);
+    bool post_(QEvt const * const e, std::uint_fast16_t const margin) override;
 #else
-    virtual bool post_(QEvt const * const e, uint_fast16_t const margin,
-                       void const * const sender);
+    bool post_(QEvt const * const e, std::uint_fast16_t const margin,
+                       void const * const sender) override;
 #endif // Q_SPY
-    virtual void postLIFO(QEvt const * const e);
+    void postLIFO(QEvt const * const e) override;
 };
 
 } // namespace QP

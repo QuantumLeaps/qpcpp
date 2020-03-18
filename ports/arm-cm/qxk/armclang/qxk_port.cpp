@@ -3,14 +3,14 @@
 * @brief QXK/C++ port to ARM Cortex-M, ARM-CLANG toolset
 * @cond
 ******************************************************************************
-* Last updated for version 6.6.1
-* Last updated on  2019-12-10
+* Last updated for version 6.8.0
+* Last updated on  2020-01-25
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -31,18 +31,19 @@
 * along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* <www.state-machine.com/licensing/>
-* <info@state-machine.com/>
+* <www.state-machine.com/licensing>
+* <info@state-machine.com>
 ******************************************************************************
 * @endcond
 */
+/* This QXK port is part of the interanl QP implementation */
+#define QP_IMPL 1U
 #include "qf_port.hpp"
+#include "qxk_pkg.hpp"
 
 extern "C" {
 
 /* prototypes --------------------------------------------------------------*/
-void QXK_stackInit_(void *act, QP::QXThreadHandler thread,
-                    void *stkSto, uint_fast16_t stkSize);
 void PendSV_Handler(void);
 void NMI_Handler(void);
 void Thread_ret(void);
@@ -110,27 +111,27 @@ void QXK_init(void) {
 * of this thread. In that case the kernel cannot use the thread yet, so no
 * critical section is needed.
 *****************************************************************************/
-void QXK_stackInit_(void *act, QP::QXThreadHandler thread,
-                    void *stkSto, uint_fast16_t stkSize)
+void QXK_stackInit_(void *thr, QP::QXThreadHandler const handler,
+             void * const stkSto, std::uint_fast16_t const stkSize) noexcept
 {
     extern void QXK_threadRet_(void); /* extended thread return */
 
     /* round down the stack top to the 8-byte boundary
     * NOTE: ARM Cortex-M stack grows down from hi -> low memory
     */
-    uint32_t *sp =
-        (uint32_t *)((((uint32_t)stkSto + stkSize) >> 3) << 3);
-    uint32_t *sp_limit;
+    std::uint32_t *sp = (std::uint32_t *)(
+        (((std::uint32_t)stkSto + stkSize) >> 3) << 3);
+    std::uint32_t *sp_limit;
 
     /* synthesize the ARM Cortex-M exception stack frame...*/
     *(--sp) = (1U << 24);    /* xPSR  (just the THUMB bit) */
-    *(--sp) = (uint32_t)thread;          /* PC (the thread routine) */
-    *(--sp) = (uint32_t)&QXK_threadRet_; /* LR (return from thread) */
+    *(--sp) = (std::uint32_t)handler;         /* PC (the thread routine) */
+    *(--sp) = (std::uint32_t)&QXK_threadRet_; /* LR (return from thread) */
     *(--sp) = 0x0000000CU;   /* R12 */
     *(--sp) = 0x00000003U;   /* R3  */
     *(--sp) = 0x00000002U;   /* R2  */
     *(--sp) = 0x00000001U;   /* R1  */
-    *(--sp) = (uint32_t)act; /* R0 (argument to the thread routine */
+    *(--sp) = (std::uint32_t)thr; /* R0 (argument to the thread routine */
     *(--sp) = 0x0000000BU;   /* R11 */
     *(--sp) = 0x0000000AU;   /* R10 */
     *(--sp) = 0x00000009U;   /* R9  */
@@ -146,10 +147,11 @@ void QXK_stackInit_(void *act, QP::QXThreadHandler thread,
 #endif                       /* VFP available */
 
     /* save the top of the stack in the thread's attibute */
-    ((QP::QActive *)act)->m_osObject = sp;
+    static_cast<QP::QActive *>(thr)->m_osObject = sp;
 
     /* pre-fill the unused part of the stack with 0xDEADBEEF */
-    sp_limit = (uint32_t *)(((((uint32_t)stkSto - 1U) >> 3) + 1U) << 3);
+    sp_limit = (std::uint32_t *)(
+        ((((std::uint32_t)stkSto - 1U) >> 3) + 1U) << 3);
     for (; sp >= sp_limit; --sp) {
         *sp = 0xDEADBEEFU;
     }
@@ -572,14 +574,14 @@ __attribute__ ((naked))
 uint_fast8_t QF_qlog2(uint32_t x) {
 __asm volatile (
     "  MOVS    r1,#0            \n"
-#if (QF_MAX_ACTIVE > 16)
+#if (QF_MAX_ACTIVE > 16U)
     "  LSRS    r2,r0,#16        \n"
     "  BEQ     QF_qlog2_1       \n"
     "  MOVS    r1,#16           \n"
     "  MOVS    r0,r2            \n"
     "QF_qlog2_1:                \n"
 #endif
-#if (QF_MAX_ACTIVE > 8)
+#if (QF_MAX_ACTIVE > 8U)
     "  LSRS    r2,r0,#8         \n"
     "  BEQ     QF_qlog2_2       \n"
     "  ADDS    r1, r1,#8        \n"

@@ -221,6 +221,8 @@ void BSP::init(void) {
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
+    (void)n; // unused parameter (in Debug/Release configurations)
+
     GPIOF->DATA_Bits[LED_RED]   = ((stat[0] == 'h') ? 0xFFU : 0U);
     GPIOF->DATA_Bits[LED_GREEN] = ((stat[0] == 'e') ? 0xFFU : 0U);
 
@@ -341,7 +343,7 @@ void QXK::onIdle(void) {
 }
 
 //............................................................................
-extern "C" void Q_onAssert(char const *module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const *module, int_t const loc) {
     //
     // NOTE: add here your application-specific error handling
     //
@@ -431,7 +433,7 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
 void QS::onFlush(void) {
     uint16_t fifo = UART_TXFIFO_DEPTH; // Tx FIFO depth
     uint8_t const *block;
-    while ((block = getBlock(&fifo)) != static_cast<uint8_t *>(0)) {
+    while ((block = getBlock(&fifo)) != nullptr) {
         // busy-wait until TX FIFO empty
         while ((UART0->FR & UART_FR_TXFE) == 0U) {
         }

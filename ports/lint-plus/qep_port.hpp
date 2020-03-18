@@ -1,15 +1,15 @@
 /// @file
-/// @brief QEP/C++ port, generic C++ compiler
+/// @brief QEP/C++ port, generic C++11 compiler
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -35,12 +35,14 @@
 ///***************************************************************************
 /// @endcond
 
-#ifndef QEP_PORT_HPPPP
-#define QEP_PORT_HPPPP
+#ifndef QEP_PORT_HPP
+#define QEP_PORT_HPP
 
-// Exact-width types. WG14/N843 C99 Standard, Section 7.18.1.1
-#include <stdint.h>
+//! no-return function specifier (C11/C++11 Standard)
+#define Q_NORETURN  _Noreturn void
 
-#include "qep.hpp" // QEP platform-independent public interface
+#include <cstdint>  // Exact-width types. C++11 Standard
 
-#endif // QEP_PORT_HPPPP
+#include "qep.hpp"  // QEP platform-independent public interface
+
+#endif // QEP_PORT_HPP

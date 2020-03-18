@@ -3,14 +3,14 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-27
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -41,7 +41,8 @@
 #include "qxk_pkg.hpp"      // QXK package-scope internal interface
 #include "qassert.h"        // QP embedded systems-friendly assertions
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS facilities for pre-defined trace records
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -73,14 +74,14 @@ Q_DEFINE_THIS_MODULE("qxk_sema")
 /// QXSemaphore::init() must be called **before** the semaphore can be used
 /// (signaled or waited on).
 ///
-void QXSemaphore::init(uint_fast16_t const count,
-                       uint_fast16_t const max_count)
+void QXSemaphore::init(std::uint_fast16_t const count,
+                       std::uint_fast16_t const max_count) noexcept
 {
     /// @pre max_count must be greater than zero
-    Q_REQUIRE_ID(100, max_count > static_cast<uint_fast16_t>(0));
+    Q_REQUIRE_ID(100, max_count > 0U);
 
-    m_count     = static_cast<uint16_t>(count);
-    m_max_count = static_cast<uint16_t>(max_count);
+    m_count     = static_cast<std::uint16_t>(count);
+    m_max_count = static_cast<std::uint16_t>(max_count);
     m_waitSet.setEmpty();
 }
 
@@ -105,7 +106,7 @@ void QXSemaphore::init(uint_fast16_t const count,
 /// @note
 /// Multiple extended threads can wait for a given semahpre.
 ///
-bool QXSemaphore::wait(uint_fast16_t const nTicks) {
+bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
     bool signaled = true; // assume that the semaphore will be signaled
     QF_CRIT_STAT_
 
@@ -118,18 +119,19 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
     /// - be called from an extended thread;
     /// - the thread must NOT be already blocked on any object.
     ///
-    Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) /* can't wait inside an ISR */
-        && (m_max_count > static_cast<uint16_t>(0)) /* initialized */
-        && (curr != static_cast<QXThread *>(0)) /* curr must be extended */
-        && (curr->m_temp.obj == static_cast<QMState *>(0))); // NOT blocked
+    Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
+        && (m_max_count > 0U)
+        && (curr != nullptr)
+        && (curr->m_temp.obj == nullptr)); // NOT blocked
     /// @pre also: the thread must NOT be holding a scheduler lock.
     Q_REQUIRE_ID(201, QXK_attr_.lockHolder != curr->m_prio);
 
-    if (m_count > static_cast<uint16_t>(0)) {
+    if (m_count > 0U) {
         --m_count;
     }
     else {
-        uint_fast8_t const p = static_cast<uint_fast8_t>(curr->m_prio);
+        std::uint_fast8_t const p =
+            static_cast<std::uint_fast8_t>(curr->m_prio);
 
         // remember the blocking object (this semaphore)
         curr->m_temp.obj = QXK_PTR_CAST_(QMState*, this);
@@ -150,7 +152,7 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
         Q_ASSERT_ID(240, curr->m_temp.obj == QXK_PTR_CAST_(QMState*, this));
 
         // did the blocking time-out? (signal of zero means that it did)
-        if (curr->m_timeEvt.sig != static_cast<QSignal>(0)) {
+        if (curr->m_timeEvt.sig != 0U) {
             if (m_waitSet.hasElement(p)) { // still waiting?
                 m_waitSet.rmove(p); // remove the unblocked thread
                 signaled = false; // the semaphore was NOT signaled
@@ -166,7 +168,7 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
 
             --m_count; // semaphore signaled: decrement the count
         }
-        curr->m_temp.obj = static_cast<QMState *>(0); // clear blocked obj.
+        curr->m_temp.obj = nullptr; // clear blocked obj.
     }
     QF_CRIT_EXIT_();
 
@@ -186,16 +188,16 @@ bool QXSemaphore::wait(uint_fast16_t const nTicks) {
 /// This function can be called from any context, including ISRs and basic
 /// threds (active objects).
 ///
-bool QXSemaphore::tryWait(void) {
+bool QXSemaphore::tryWait(void) noexcept {
     bool isAvailable;
     QF_CRIT_STAT_
 
     /// @pre the semaphore must be initialized
-    Q_REQUIRE_ID(300, m_max_count > static_cast<uint16_t>(0));
+    Q_REQUIRE_ID(300, m_max_count > 0U);
 
     QF_CRIT_ENTRY_();
     // is the semaphore available?
-    if (m_count > static_cast<uint16_t>(0)) {
+    if (m_count > 0U) {
         --m_count;
         isAvailable = true;
     }
@@ -225,12 +227,12 @@ bool QXSemaphore::tryWait(void) {
 /// A semaphore can be signaled from many places, including from ISRs, basic
 /// threads (AOs), and extended threads.
 ///
-bool QXSemaphore::signal(void) {
+bool QXSemaphore::signal(void) noexcept {
     bool signaled = true; // assume that the semaphore will be signaled
     QF_CRIT_STAT_
 
     /// @pre the semaphore must be initialized
-    Q_REQUIRE_ID(400, m_max_count > static_cast<uint16_t>(0));
+    Q_REQUIRE_ID(400, m_max_count > 0U);
 
     QF_CRIT_ENTRY_();
     if (m_count < m_max_count) {
@@ -240,7 +242,7 @@ bool QXSemaphore::signal(void) {
         if (m_waitSet.notEmpty()) {
 
             // find the highest-priority thread waiting on this semaphore
-            uint_fast8_t const p = m_waitSet.findMax();
+            std::uint_fast8_t const p = m_waitSet.findMax();
             QXThread * const thr = QXK_PTR_CAST_(QXThread*, QF::active_[p]);
 
             // assert that:
@@ -248,8 +250,8 @@ bool QXSemaphore::signal(void) {
             // - the thread must be extended; and
             // - must be blocked on this semaphore;
             //
-            Q_ASSERT_ID(410, (thr != static_cast<QXThread *>(0))
-                && (thr->m_osObject != static_cast<void *>(0))
+            Q_ASSERT_ID(410, (thr != nullptr)
+                && (thr->m_osObject != nullptr)
                 && (thr->m_temp.obj == QXK_PTR_CAST_(QMState*, this)));
 
             // disarm the internal time event

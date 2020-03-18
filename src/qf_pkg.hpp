@@ -3,14 +3,14 @@
 /// @brief Internal (package scope) QF/C++ interface.
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-23
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -112,9 +112,9 @@ namespace QP {
 
 // package-scope objects -----------------------------------------------------
 extern QF_EPOOL_TYPE_ QF_pool_[QF_MAX_EPOOL]; //!< allocate event pools
-extern uint_fast8_t QF_maxPool_;     //!< # of initialized event pools
-extern QSubscrList *QF_subscrList_;  //!< the subscriber list array
-extern enum_t QF_maxPubSignal_;      //!< the maximum published signal
+extern std::uint_fast8_t QF_maxPool_; //!< # of initialized event pools
+extern QSubscrList *QF_subscrList_;   //!< the subscriber list array
+extern enum_t QF_maxPubSignal_;       //!< the maximum published signal
 
 //............................................................................
 //! Structure representing a free block in the Native QF Memory Pool
@@ -129,32 +129,30 @@ struct QFreeBlock {
 // is NOT used for reference counting in time events, because the @c poolId_
 // attribute is zero ("static events").
 //
-enum {
-    TE_IS_LINKED    = static_cast<uint8_t>(1U << 7), // flag
-    TE_WAS_DISARMED = static_cast<uint8_t>(1U << 6), // flag
-    TE_TICK_RATE    = static_cast<uint8_t>(0x0F)     // bitmask
-};
+constexpr std::uint8_t TE_IS_LINKED    = 1U << 7;  // flag
+constexpr std::uint8_t TE_WAS_DISARMED = 1U << 6;  // flag
+constexpr std::uint8_t TE_TICK_RATE    = 0x0FU;     // bitmask
 
 //****************************************************************************
 // internal helper inline functions
 
 //! return the Pool-ID of an event @p e
-inline uint8_t QF_EVT_POOL_ID_ (QEvt const * const e) {
+inline std::uint8_t QF_EVT_POOL_ID_ (QEvt const * const e) noexcept {
     return e->poolId_;
 }
 
 //! return the Reference Conter of an event @p e
-inline uint8_t QF_EVT_REF_CTR_ (QEvt const * const e) {
+inline std::uint8_t QF_EVT_REF_CTR_ (QEvt const * const e) noexcept {
     return e->refCtr_;
 }
 
 //! increment the refCtr_ of an event @p e
-inline void QF_EVT_REF_CTR_INC_(QEvt const * const e) {
+inline void QF_EVT_REF_CTR_INC_(QEvt const * const e) noexcept {
     ++(QF_EVT_CONST_CAST_(e))->refCtr_;
 }
 
 //! decrement the refCtr_ of an event @p e
-inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
+inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) noexcept {
     --(QF_EVT_CONST_CAST_(e))->refCtr_;
 }
 
@@ -171,75 +169,5 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
 
 //! access element at index @p i_ from the base pointer @p base_
 #define QF_PTR_AT_(base_, i_) (base_[i_])
-
-//****************************************************************************
-#ifdef Q_SPY  // QS software tracing enabled?
-
-    #if (QF_EQUEUE_CTR_SIZE == 1)
-
-        //! Internal QS macro to output an unformatted event queue
-        //! counter data element
-        /// @note the counter size depends on the macro #QF_EQUEUE_CTR_SIZE.
-        #define QS_EQC_PRE_(ctr_)       QS::u8_raw_(static_cast<uint8_t>(ctr_))
-    #elif (QF_EQUEUE_CTR_SIZE == 2)
-        #define QS_EQC_PRE_(ctr_)       QS::u16_raw_(static_cast<uint16_t>(ctr_))
-    #elif (QF_EQUEUE_CTR_SIZE == 4)
-        #define QS_EQC_PRE_(ctr_)       QS::u32_raw_(static_cast<uint32_t>(ctr_))
-    #else
-        #error "QF_EQUEUE_CTR_SIZE not defined"
-    #endif
-
-
-    #if (QF_EVENT_SIZ_SIZE == 1)
-
-        //! Internal QS macro to output an unformatted event size
-        //! data element
-        /// @note the event size depends on the macro #QF_EVENT_SIZ_SIZE.
-        #define QS_EVS_PRE_(size_)      QS::u8_raw_(static_cast<uint8_t>(size_))
-    #elif (QF_EVENT_SIZ_SIZE == 2)
-        #define QS_EVS_PRE_(size_)      QS::u16_raw_(static_cast<uint16_t>(size_))
-    #elif (QF_EVENT_SIZ_SIZE == 4)
-        #define QS_EVS_PRE_(size_)      QS::u32_raw_(static_cast<uint32_t>(size_))
-    #endif
-
-
-    #if (QF_MPOOL_SIZ_SIZE == 1)
-
-        //! Internal QS macro to output an unformatted memory pool
-        /// block-size data element
-        /// @note the block-size depends on the macro #QF_MPOOL_SIZ_SIZE.
-        #define QS_MPS_PRE_(size_)  QS::u8_raw_(static_cast<uint8_t>(size_))
-    #elif (QF_MPOOL_SIZ_SIZE == 2)
-        #define QS_MPS_PRE_(size_)  QS::u16_raw_(static_cast<uint16_t>(size_))
-    #elif (QF_MPOOL_SIZ_SIZE == 4)
-        #define QS_MPS_PRE_(size_)  QS::u32_raw_(static_cast<uint32_t>(size_))
-    #endif
-
-    #if (QF_MPOOL_CTR_SIZE == 1)
-
-        //! Internal QS macro to output an unformatted memory pool
-        //! block-counter data element
-        /// @note the counter size depends on the macro #QF_MPOOL_CTR_SIZE.
-        #define QS_MPC_PRE_(ctr_)       QS::u8_raw_(static_cast<uint8_t>(ctr_))
-    #elif (QF_MPOOL_CTR_SIZE == 2)
-        #define QS_MPC_PRE_(ctr_)       QS::u16_raw_(static_cast<uint16_t>(ctr_))
-    #elif (QF_MPOOL_CTR_SIZE == 4)
-        #define QS_MPC_PRE_(ctr_)       QS::u32_raw_(static_cast<uint32_t>(ctr_))
-    #endif
-
-
-    #if (QF_TIMEEVT_CTR_SIZE == 1)
-
-        //! Internal QS macro to output an unformatted time event
-        //! tick-counter data element
-        /// @note the counter size depends on the macro #QF_TIMEEVT_CTR_SIZE.
-        #define QS_TEC_PRE_(ctr_)       QS::u8_raw_(static_cast<uint8_t>(ctr_))
-    #elif (QF_TIMEEVT_CTR_SIZE == 2)
-        #define QS_TEC_PRE_(ctr_)       QS::u16_raw_(static_cast<uint16_t>(ctr_))
-    #elif (QF_TIMEEVT_CTR_SIZE == 4)
-        #define QS_TEC_PRE_(ctr_)       QS::u32_raw_(static_cast<uint32_t>(ctr_))
-    #endif
-
-#endif  // Q_SPY
 
 #endif  // QF_PKG_HPP

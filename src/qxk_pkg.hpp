@@ -3,14 +3,14 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-26
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-16
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -42,7 +42,7 @@
 namespace QP {
 
 //! timeout signals
-enum QXK_Timeouts {
+enum QXK_Timeouts : std::uint8_t {
     QXK_DELAY_SIG = Q_USER_SIG,
     QXK_QUEUE_SIG,
     QXK_SEMA_SIG
@@ -54,11 +54,11 @@ enum QXK_Timeouts {
 extern "C" {
 
 //! initialize the private stack of a given AO
-void QXK_stackInit_(void *thr, QP::QXThreadHandler handler,
-                    void *stkSto, uint_fast16_t stkSize);
+void QXK_stackInit_(void *thr, QP::QXThreadHandler const handler,
+             void * const stkSto, std::uint_fast16_t const stkSize) noexcept;
 
 //! called when a thread function returns
-void QXK_threadRet_(void);
+void QXK_threadRet_(void) noexcept;
 
 } // extern "C"
 

@@ -403,16 +403,6 @@
               <FilePath>..\test.cpp</FilePath>
             </File>
             <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -455,7 +445,7 @@
             <File>
               <FileName>startup_stm32l053xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\arm\startup_stm32l053xx.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\armclang\startup_stm32l053xx.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -548,29 +538,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qs_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qxk_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qxk_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1062,16 +1032,6 @@
               <FilePath>..\test.cpp</FilePath>
             </File>
             <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1114,7 +1074,7 @@
             <File>
               <FileName>startup_stm32l053xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\arm\startup_stm32l053xx.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\armclang\startup_stm32l053xx.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1207,29 +1167,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qs_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qxk_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qxk_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1721,16 +1661,6 @@
               <FilePath>..\test.cpp</FilePath>
             </File>
             <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1773,7 +1703,7 @@
             <File>
               <FileName>startup_stm32l053xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\arm\startup_stm32l053xx.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\nucleo-l053r8\armclang\startup_stm32l053xx.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1866,29 +1796,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qs_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qxk_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qxk_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.h</FilePath>
             </File>
           </Files>
         </Group>

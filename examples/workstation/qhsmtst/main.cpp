@@ -141,7 +141,7 @@ void BSP_terminate(int16_t const result) {
     exit(result);
 }
 //............................................................................
-extern "C" void Q_onAssert(char const * const file, int line) {
+extern "C" Q_NORETURN Q_onAssert(char const * const file, int_t const  line) {
     fprintf(stderr, "Assertion failed in %s, line %d", file, line);
     QF::onCleanup();
     exit(-1);

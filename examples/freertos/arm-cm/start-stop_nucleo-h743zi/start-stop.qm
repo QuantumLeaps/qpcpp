@@ -58,14 +58,13 @@ QS_SIG_DICTIONARY(TIMEOUT_SIG, (void *)0);</action>
      <entry>// placement new to execute the Worker ctor
 m_worker = new (&amp;Worker::inst) Worker;
 m_worker-&gt;start(
-    1U,                          // QP priority of the AO
+    1U,                         // QP priority of the AO
     l_workerQueueSto,           // event queue storage
     Q_DIM(l_workerQueueSto),    // queue length [events]
     l_workerStackSto,           // stack storage
-    sizeof(l_workerStackSto),   // stack size [bytes]
-    static_cast&lt;QP::QEvt *&gt;(0)); // initialization event (not used)</entry>
+    sizeof(l_workerStackSto));   // stack size [bytes]</entry>
      <exit>m_worker-&gt;~Worker(); // explicit destructor call
-m_worker = 0;</exit>
+m_worker = nullptr;</exit>
      <!--${AOs::Launcher::SM::active::DONE}-->
      <tran trig="DONE">
       <action brief="wait for Worker to stop">// arm a timer for at least one tick

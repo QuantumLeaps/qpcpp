@@ -36,8 +36,7 @@
 
 //............................................................................
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                     LPSTR lpCmdLine, int nCmdShow)
+    LPSTR lpCmdLine, int nCmdShow)
 {
-    SIM_GUI_App(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-    return 0;
+    return SIM_GUI_App(hInstance, lpCmdLine);
 }

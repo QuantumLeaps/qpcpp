@@ -95,7 +95,7 @@ score   = score_p;</code>
 for (uint8_t n = 0U; n &lt; GAME_MINES_MAX; ++n) {
     m_mine1_pool[n] = Mine1_getInst(n);  // initialize mine1-type pool
     m_mine2_pool[n] = Mine2_getInst(n);  // initialize mine2-type pool
-    m_mines[n] = static_cast&lt;QHsm *&gt;(0); // mine 'n' is unused
+    m_mines[n] = nullptr;                // mine 'n' is unused
 }</code>
    </operation>
    <!--${AOs::Tunnel::advance}-->
@@ -186,7 +186,7 @@ if ((m_last_mine_x + GAME_MINES_DIST_MIN &lt; GAME_TUNNEL_WIDTH)
     <!--${AOs::Tunnel::dispatchToAllMin~::e}-->
     <parameter name="e" type="QP::QEvt const *"/>
     <code>for (uint8_t n = 0U; n &lt; GAME_MINES_MAX; ++n) {
-    if (m_mines[n] != static_cast&lt;QHsm *&gt;(0)) { // is the mine used?
+    if (m_mines[n] != nullptr) { // is the mine used?
         m_mines[n]-&gt;dispatch(e);
     }
 }</code>
@@ -230,8 +230,8 @@ QS_SIG_DICTIONARY(SCORE_SIG,          this);
      <!--${AOs::Tunnel::SM::active::MINE_DISABLED}-->
      <tran trig="MINE_DISABLED">
       <action>Q_ASSERT((Q_EVT_CAST(MineEvt)-&gt;id &lt; GAME_MINES_MAX)
-    &amp;&amp; (m_mines[Q_EVT_CAST(MineEvt)-&gt;id] != static_cast&lt;QHsm *&gt;(0)));
-m_mines[Q_EVT_CAST(MineEvt)-&gt;id] = static_cast&lt;QHsm *&gt;(0);</action>
+    &amp;&amp; (m_mines[Q_EVT_CAST(MineEvt)-&gt;id] != nullptr));
+m_mines[Q_EVT_CAST(MineEvt)-&gt;id] = nullptr;</action>
       <tran_glyph conn="2,9,3,-1,14">
        <action box="0,-2,14,2"/>
       </tran_glyph>

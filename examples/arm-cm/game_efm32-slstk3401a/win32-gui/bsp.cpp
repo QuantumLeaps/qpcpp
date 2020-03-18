@@ -811,7 +811,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
 //..........................................................................*/
 static void playerTrigger(void) {
     static QP::QEvt const fireEvt = { PLAYER_TRIGGER_SIG, 0U, 0U };
-    QP::QF::PUBLISH(&fireEvt, static_cast<void *>(0));
+    QP::QF::PUBLISH(&fireEvt, nullptr);
 }
 
 
@@ -837,7 +837,7 @@ void QF_onClockTick(void) {
     QS_OUTPUT();   // handle the QS output
 }
 //............................................................................
-extern "C" void Q_onAssert(char const * const module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     QF::stop();  // stop ticking
     QS_ASSERTION(module, loc, 10000U); // report assertion to QS
 
@@ -863,7 +863,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN(GAME::COMMAND_STAT, static_cast<void *>(0))
+    QS_BEGIN(GAME::COMMAND_STAT, nullptr)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()

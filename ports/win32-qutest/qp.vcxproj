@@ -91,8 +91,9 @@
     <ClCompile Include="qutest_port.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="qep_port.h" />
-    <ClInclude Include="qf_port.h" />
+    <ClInclude Include="qep_port.hpp" />
+    <ClInclude Include="qf_port.hpp" />
+    <ClInclude Include="qs_port.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

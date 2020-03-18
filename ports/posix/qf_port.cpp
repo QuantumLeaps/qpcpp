@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-28
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -44,7 +44,8 @@
 #include "qf_pkg.hpp"       // QF package-scope interface
 #include "qassert.h"        // QP embedded systems-friendly assertions
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS package-scope internal interface
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -96,11 +97,10 @@ void QF::init(void) {
     // clear the internal QF variables, so that the framework can (re)start
     // correctly even if the startup code is not called to clear the
     // uninitialized data (as is required by the C++ Standard).
-    extern uint_fast8_t QF_maxPool_;
-    QF_maxPool_ = static_cast<uint_fast8_t>(0);
-    bzero(&QF::timeEvtHead_[0],
-          static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
-    bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
+    extern std::uint_fast8_t QF_maxPool_;
+    QF_maxPool_ = 0U;
+    bzero(&QF::timeEvtHead_[0], sizeof(QF::timeEvtHead_));
+    bzero(&active_[0],          sizeof(active_));
 
     l_tick.tv_sec = 0;
     l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC/100L; // default clock tick
@@ -149,11 +149,11 @@ int_t QF::run(void) {
     pthread_mutex_destroy(&l_startupMutex);
     pthread_mutex_destroy(&QF_pThreadMutex_);
 
-    return static_cast<int_t>(0); // return success
+    return 0; // return success
 }
 //****************************************************************************
-void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
-    Q_REQUIRE_ID(300, ticksPerSec != static_cast<uint32_t>(0));
+void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
+    Q_REQUIRE_ID(300, ticksPerSec != 0U);
     l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
     l_tickPrio = tickPrio;
 }
@@ -205,18 +205,18 @@ int QF_consoleWaitForKey(void) {
 }
 
 //****************************************************************************
-void QActive::start(uint_fast8_t const prio,
-                    QEvt const * * const qSto, uint_fast16_t const qLen,
-                    void * const stkSto, uint_fast16_t const stkSize,
+void QActive::start(std::uint_fast8_t const prio,
+                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
     // p-threads allocate stack internally
-    Q_REQUIRE_ID(600, stkSto == static_cast<void *>(0));
+    Q_REQUIRE_ID(600, stkSto == nullptr);
 
     pthread_cond_init(&m_osObject, 0);
 
     m_eQueue.init(qSto, qLen);
-    m_prio = static_cast<uint8_t>(prio); // set the QF priority of this AO
+    m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
     QF::add_(this); // make QF aware of this AO
 
     this->init(par); // execute initial transition (virtual call)
@@ -231,9 +231,8 @@ void QActive::start(uint_fast8_t const prio,
 
     // see NOTE04
     struct sched_param param;
-    param.sched_priority = prio
-                           + (sched_get_priority_max(SCHED_FIFO)
-                              - QF_MAX_ACTIVE - 3);
+    param.sched_priority = prio + (sched_get_priority_max(SCHED_FIFO)
+                                - QF_MAX_ACTIVE - 3U);
 
     pthread_attr_setschedparam(&attr, &param);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
@@ -256,13 +255,13 @@ void QActive::start(uint_fast8_t const prio,
             pthread_create(&thread, &attr, &ao_thread, this) == 0);
     }
     pthread_attr_destroy(&attr);
-    m_thread = static_cast<uint8_t>(1);
+    m_thread = 1U;
 }
 
 //............................................................................
 static void *ao_thread(void *arg) { // the expected POSIX signature
     QF::thread_(static_cast<QActive *>(arg));
-    return static_cast<void *>(0); // return success
+    return nullptr; // return success
 }
 
 //****************************************************************************

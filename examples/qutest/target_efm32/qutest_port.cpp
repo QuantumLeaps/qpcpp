@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 5.9.0
-/// Last updated on  2017-05-17
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-13
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -28,15 +28,23 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#include "qpcpp.hpp"
+#ifndef Q_SPY
+    #error "Q_SPY must be defined to compile qutest_port.cpp"
+#endif // Q_SPY
+
+#define QP_IMPL        // this is QP implementation
+#include "qf_port.hpp" // QF port
+#include "qs_port.hpp" // QS port
+#include "qs_pkg.hpp"  // QS package-scope interface
+#include "qassert.h"   // QP embedded systems-friendly assertions
 
 #include "em_device.h"  // the device specific header (SiLabs)
 #include "em_cmu.h"     // Clock Management Unit (SiLabs)

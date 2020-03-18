@@ -118,7 +118,7 @@ void BSP::terminate(int16_t result) {
     (void)result;
 }
 //............................................................................
-void BSP::displayPhilStat(uint8_t const n, char_t const *stat) {
+void BSP::displayPhilStat(uint8_t const n, char const *stat) {
     (void)n;
     (void)stat;
     LED_TOGGLE();
@@ -153,7 +153,7 @@ void BSP::randomSeed(uint32_t seed) {
 // that you ship your production code with assertions enabled).
 //
 extern "C"
-void Q_onAssert(char const * const file, int loc) {
+Q_NORETURN Q_onAssert(char const * const file, int_t const loc) {
     (void)file;       // unused parameter
     (void)loc;        // unused parameter
     QF_INT_DISABLE(); // make sure that interrupts are disabled

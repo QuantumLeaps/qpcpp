@@ -2,14 +2,14 @@
 /// @brief QF/C++ memory management services
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-22
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -40,7 +40,8 @@
 #include "qf_pkg.hpp"       // QF package-scope interface
 #include "qassert.h"        // QP embedded systems-friendly assertions
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS facilities for pre-defined trace records
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -60,13 +61,13 @@ Q_DEFINE_THIS_MODULE("qf_mem")
 /// memory, size of this memory, and the block size to manage.
 ///
 QMPool::QMPool(void)
-  : m_start(static_cast<void *>(0)),
-    m_end(static_cast<void *>(0)),
-    m_free_head(static_cast<void *>(0)),
-    m_blockSize(static_cast<QMPoolSize>(0)),
-    m_nTot(static_cast<QMPoolCtr>(0)),
-    m_nFree(static_cast<QMPoolCtr>(0)),
-    m_nMin(static_cast<QMPoolCtr>(0))
+  : m_start(nullptr),
+    m_end(nullptr),
+    m_free_head(nullptr),
+    m_blockSize(0U),
+    m_nTot(0U),
+    m_nFree(0U),
+    m_nMin(0U)
 {}
 
 //****************************************************************************
@@ -99,16 +100,15 @@ QMPool::QMPool(void)
 /// @note
 /// Many QF ports use memory pools to implement the event pools.
 ///
-void QMPool::init(void * const poolSto, uint_fast32_t poolSize,
-                  uint_fast16_t blockSize)
+void QMPool::init(void * const poolSto, std::uint_fast32_t poolSize,
+                  std::uint_fast16_t blockSize) noexcept
 {
     /// @pre The memory block must be valid and
     /// the poolSize must fit at least one free block and
     /// the blockSize must not be too close to the top of the dynamic range
-    Q_REQUIRE_ID(100, (poolSto != static_cast<void *>(0))
-        && (poolSize >= static_cast<uint_fast32_t>(sizeof(QFreeBlock)))
-        && (static_cast<uint_fast16_t>(
-               blockSize + static_cast<uint_fast16_t>(sizeof(QFreeBlock)))
+    Q_REQUIRE_ID(100, (poolSto != nullptr)
+        && (poolSize >= sizeof(QFreeBlock))
+        && (static_cast<std::uint_fast16_t>(blockSize + sizeof(QFreeBlock))
             > blockSize));
 
     m_free_head = poolSto;
@@ -118,36 +118,36 @@ void QMPool::init(void * const poolSto, uint_fast32_t poolSize,
     m_blockSize = static_cast<QMPoolSize>(sizeof(QFreeBlock));
 
     //# free blocks in a memory block
-    uint_fast16_t nblocks = static_cast<uint_fast16_t>(1);
+    std::uint_fast16_t nblocks = 1U;
     while (m_blockSize < static_cast<QMPoolSize>(blockSize)) {
         m_blockSize += static_cast<QMPoolSize>(sizeof(QFreeBlock));
         ++nblocks;
     }
     // use rounded-up value
-    blockSize = static_cast<uint_fast16_t>(m_blockSize);
+    blockSize = static_cast<std::uint_fast16_t>(m_blockSize);
 
     // the whole pool buffer must fit at least one rounded-up block
-    Q_ASSERT_ID(110, poolSize >= static_cast<uint_fast32_t>(blockSize));
+    Q_ASSERT_ID(110, poolSize >= blockSize);
 
     // chain all blocks together in a free-list...
 
     // don't count the last block
-    poolSize -= static_cast<uint_fast32_t>(blockSize);
-    m_nTot = static_cast<QMPoolCtr>(1); // one (the last) block in the pool
+    poolSize -= static_cast<std::uint_fast32_t>(blockSize);
+    m_nTot = 1U; // one (the last) block in the pool
 
     // start at the head of the free list
     QFreeBlock *fb = static_cast<QFreeBlock *>(m_free_head);
 
     // chain all blocks together in a free-list...
-    while (poolSize >= static_cast<uint_fast32_t>(blockSize)) {
+    while (poolSize >= blockSize) {
         fb->m_next = &QF_PTR_AT_(fb, nblocks); // setup the next link
         fb = fb->m_next;  // advance to next block
         // reduce the available pool size
-        poolSize -= static_cast<uint_fast32_t>(blockSize);
+        poolSize -= static_cast<std::uint_fast32_t>(blockSize);
         ++m_nTot;         // increment the number of blocks so far
     }
 
-    fb->m_next = static_cast<QFreeBlock *>(0); // the last link points to NULL
+    fb->m_next = nullptr; // the last link points to NULL
     m_nFree    = m_nTot;  // all blocks are free
     m_nMin     = m_nTot;  // the minimum number of free blocks
     m_start    = poolSto; // the original start this pool buffer
@@ -170,7 +170,7 @@ void QMPool::init(void * const poolSto, uint_fast32_t poolSize,
 /// @sa
 /// QP::QMPool::get()
 ///
-void QMPool::put(void * const b) {
+void QMPool::put(void * const b) noexcept {
 
     /// @pre # free blocks cannot exceed the total # blocks and
     /// the block pointer must be in range to come from this pool.
@@ -219,7 +219,7 @@ void QMPool::put(void * const b) {
 /// @sa
 /// QP::QMPool::put()
 ///
-void *QMPool::get(uint_fast16_t const margin) {
+void *QMPool::get(std::uint_fast16_t const margin) noexcept {
     QFreeBlock *fb;
     QF_CRIT_STAT_
 
@@ -229,18 +229,18 @@ void *QMPool::get(uint_fast16_t const margin) {
         fb = static_cast<QFreeBlock *>(m_free_head);  // get a free block
 
         // the pool has some free blocks, so a free block must be available
-        Q_ASSERT_CRIT_(310, fb != static_cast<QFreeBlock *>(0));
+        Q_ASSERT_CRIT_(310, fb != nullptr);
 
         // put volatile to a temporary to avoid UB
         void * const fb_next = fb->m_next;
 
         // is the pool becoming empty?
         --m_nFree;  // one free block less
-        if (m_nFree == static_cast<QMPoolCtr>(0)) {
+        if (m_nFree == 0U) {
             // pool is becoming empty, so the next free block must be NULL
-            Q_ASSERT_CRIT_(320, fb_next == static_cast<QFreeBlock *>(0));
+            Q_ASSERT_CRIT_(320, fb_next == nullptr);
 
-            m_nMin = static_cast<QMPoolCtr>(0);// remember that pool got empty
+            m_nMin = 0U;// remember that pool got empty
         }
         else {
             // pool is not empty, so the next free block must be in range
@@ -268,7 +268,7 @@ void *QMPool::get(uint_fast16_t const margin) {
     }
     // don't have enough free blocks at this point
     else {
-        fb = static_cast<QFreeBlock *>(0);
+        fb = nullptr;
 
         QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET_ATTEMPT,
                          QS::priv_.locFilter[QS::MP_OBJ], m_start)
@@ -296,16 +296,16 @@ void *QMPool::get(uint_fast16_t const margin) {
 /// @returns
 /// the minimum number of unused blocks in the given event pool.
 ///
-uint_fast16_t QF::getPoolMin(uint_fast8_t const poolId) {
+std::uint_fast16_t QF::getPoolMin(std::uint_fast8_t const poolId) noexcept {
 
     /// @pre the poolId must be in range
     Q_REQUIRE_ID(400, (QF_maxPool_ <= Q_DIM(QF_pool_))
-                       && (static_cast<uint_fast8_t>(1) <= poolId)
+                       && (1U <= poolId)
                        && (poolId <= QF_maxPool_));
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-    uint_fast16_t const min = static_cast<uint_fast16_t>(
-        QF_pool_[poolId - static_cast<uint_fast8_t>(1)].m_nMin);
+    std::uint_fast16_t const min = static_cast<std::uint_fast16_t>(
+        QF_pool_[poolId - 1U].m_nMin);
     QF_CRIT_EXIT_();
 
     return min;

@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-26
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -43,24 +43,24 @@ namespace QP {
 
 #ifndef QF_MAX_ACTIVE
     // default value when NOT defined
-    #define QF_MAX_ACTIVE 32
+    #define QF_MAX_ACTIVE 32U
 #endif
 
-#if (QF_MAX_ACTIVE < 1) || (64 < QF_MAX_ACTIVE)
-    #error "QF_MAX_ACTIVE out of range. Valid range is 1..64"
-#elif (QF_MAX_ACTIVE <= 8)
-    typedef uint8_t QPSetBits;
-#elif (QF_MAX_ACTIVE <= 16)
-    typedef uint16_t QPSetBits;
+#if (QF_MAX_ACTIVE < 1U) || (64U < QF_MAX_ACTIVE)
+    #error "QF_MAX_ACTIVE out of range. Valid range is 1U..64U"
+#elif (QF_MAX_ACTIVE <= 8U)
+    using QPSetBits = std::uint8_t;
+#elif (QF_MAX_ACTIVE <= 16U)
+    using QPSetBits = std::uint16_t;
 #else
     //! bitmask for the internal representation of QPSet elements
-    typedef uint32_t QPSetBits;
+    using QPSetBits = std::uint32_t;
 #endif
 
 //****************************************************************************
 // Log-base-2 calculations ...
 #ifndef QF_LOG2
-    extern "C" uint_fast8_t QF_LOG2(QPSetBits x);
+    extern "C" std::uint_fast8_t QF_LOG2(QPSetBits x) noexcept;
 #endif // QF_LOG2
 
 //****************************************************************************
@@ -78,48 +78,45 @@ struct QPSet {
     QPSetBits volatile m_bits;  //!< bitmask with a bit for each element
 
     //! Makes the priority set @p me_ empty.
-    void setEmpty(void) {
-        m_bits = static_cast<QPSetBits>(0);
+    void setEmpty(void) noexcept {
+        m_bits = 0U;
     }
 
     //! Evaluates to true if the priority set is empty
-    bool isEmpty(void) const {
-        return (m_bits == static_cast<QPSetBits>(0));
+    bool isEmpty(void) const noexcept {
+        return (m_bits == 0U);
     }
 
     //! Evaluates to true if the priority set is not empty
-    bool notEmpty(void) const {
-        return (m_bits != static_cast<QPSetBits>(0));
+    bool notEmpty(void) const noexcept {
+        return (m_bits != 0U);
     }
 
     //! the function evaluates to TRUE if the priority set has the element n.
-    bool hasElement(uint_fast8_t const n) const {
-        return (m_bits & (static_cast<QPSetBits>(1)
-                          << (n - static_cast<uint_fast8_t>(1))))
-               != static_cast<QPSetBits>(0);
+    bool hasElement(std::uint_fast8_t const n) const noexcept {
+        return (m_bits & (1U << (n - 1U))) != 0U;
     }
 
     //! insert element @p n into the set, n = 1..QF_MAX_ACTIVE
-    void insert(uint_fast8_t const n) {
-        m_bits |= static_cast<QPSetBits>(
-            static_cast<QPSetBits>(1) << (n - static_cast<uint_fast8_t>(1)));
+    void insert(std::uint_fast8_t const n) noexcept {
+        m_bits |= (1U << (n - 1U));
     }
 
     //! remove element @p n from the set, n = 1..QF_MAX_ACTIVE
     /// @note
     /// intentionally misspelled ("rmove") to avoid collision with
     /// the C++ standard library facility "remove"
-    void rmove(uint_fast8_t const n) {
-        m_bits &= static_cast<QPSetBits>(
-           ~(static_cast<QPSetBits>(1) << (n - static_cast<uint_fast8_t>(1))));
+    void rmove(std::uint_fast8_t const n) noexcept {
+        m_bits &=
+           static_cast<QPSetBits>(~(static_cast<QPSetBits>(1) << (n - 1U)));
     }
 
-    uint_fast8_t findMax(void) const {
+    std::uint_fast8_t findMax(void) const noexcept {
         return QF_LOG2(m_bits);
     }
 };
 
-#else // QF_MAX_ACTIVE > 32
+#else // QF_MAX_ACTIVE > 32U
 
 //! Priority Set of up to 64 elements
 ///
@@ -131,50 +128,43 @@ struct QPSet {
 ///
 struct QPSet {
 
-    uint32_t volatile m_bits[2]; //!< 2 bitmasks with a bit for each element
+    //! Two 32-bit bitmasks with a bit for each element
+    std::uint32_t volatile m_bits[2];
 
     //! Makes the priority set @p me_ empty.
-    void setEmpty(void) {
-        m_bits[0] = static_cast<uint32_t>(0);
-        m_bits[1] = static_cast<uint32_t>(0);
+    void setEmpty(void) noexcept {
+        m_bits[0] = 0U;
+        m_bits[1] = 0U;
     }
 
     //! Evaluates to true if the priority set is empty
     // the following logic avoids UB in volatile access for MISRA compliantce
-    bool isEmpty(void) const {
-        return (m_bits[0] == static_cast<uint32_t>(0))
-               ? (m_bits[1] == static_cast<uint32_t>(0))
-               : false;
+    bool isEmpty(void) const noexcept {
+        return (m_bits[0] == 0U) ? (m_bits[1] == 0U) : false;
     }
 
     //! Evaluates to true if the priority set is not empty
     // the following logic avoids UB in volatile access for MISRA compliantce
-    bool notEmpty(void) const {
-        return (m_bits[0] != static_cast<uint32_t>(0))
-               ? true
-               : (m_bits[1] != static_cast<uint32_t>(0));
+    bool notEmpty(void) const noexcept {
+        return (m_bits[0] != 0U) ? true : (m_bits[1] != 0U);
     }
 
     //! the function evaluates to TRUE if the priority set has the element n.
-    bool hasElement(uint_fast8_t const n) const {
-        return (n <= static_cast<uint_fast8_t>(32))
-            ? ((m_bits[0] & (static_cast<uint32_t>(1)
-                             << (n - static_cast<uint_fast8_t>(1))))
-               != static_cast<uint32_t>(0))
-            : ((m_bits[1] & (static_cast<uint32_t>(1)
-                             << (n - static_cast<uint_fast8_t>(33))))
-               != static_cast<uint32_t>(0));
+    bool hasElement(std::uint_fast8_t const n) const noexcept {
+        return (n <= 32U)
+            ? ((m_bits[0] & (static_cast<std::uint32_t>(1) << (n - 1U)))
+                  != 0U)
+            : ((m_bits[1] & (static_cast<std::uint32_t>(1) << (n - 33U)))
+                  != 0U);
     }
 
     //! insert element @p n into the set, n = 1..64
-    void insert(uint_fast8_t const n) {
-        if (n <= static_cast<uint_fast8_t>(32)) {
-            m_bits[0] |= (static_cast<uint32_t>(1)
-                          << (n - static_cast<uint_fast8_t>(1)));
+    void insert(std::uint_fast8_t const n) noexcept {
+        if (n <= 32U) {
+            m_bits[0] |= (static_cast<std::uint32_t>(1) << (n - 1U));
         }
         else {
-            m_bits[1] |= (static_cast<uint32_t>(1)
-                          << (n - static_cast<uint_fast8_t>(33)));
+            m_bits[1] |= (static_cast<std::uint32_t>(1) << (n - 33U));
         }
     }
 
@@ -182,22 +172,19 @@ struct QPSet {
     /// @note
     /// intentionally misspelled ("rmove") to avoid collision with
     /// the C++ standard library facility "remove"
-    void rmove(uint_fast8_t const n) {
-        if (n <= static_cast<uint_fast8_t>(32)) {
-            (m_bits[0] &= ~(static_cast<uint32_t>(1)
-                            << (n - static_cast<uint_fast8_t>(1))));
+    void rmove(std::uint_fast8_t const n) noexcept {
+        if (n <= 32U) {
+            (m_bits[0] &= ~(static_cast<std::uint32_t>(1) << (n - 1U)));
         }
         else {
-            (m_bits[1] &= ~(static_cast<uint32_t>(1)
-                            << (n - static_cast<uint_fast8_t>(33))));
+            (m_bits[1] &= ~(static_cast<std::uint32_t>(1) << (n - 33U)));
         }
     }
 
     //! find the maximum element in the set, returns zero if the set is empty
-    uint_fast8_t findMax(void) const {
-        return (m_bits[1] != static_cast<uint32_t>(0))
-            ? (QF_LOG2(m_bits[1])
-              + static_cast<uint_fast8_t>(32)) \
+    std::uint_fast8_t findMax(void) const noexcept {
+        return (m_bits[1] != 0U)
+            ? (QF_LOG2(m_bits[1]) + 32U)
             : (QF_LOG2(m_bits[0]));
     }
 };

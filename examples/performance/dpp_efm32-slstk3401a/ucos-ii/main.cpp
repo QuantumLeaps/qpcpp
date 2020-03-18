@@ -95,7 +95,7 @@ int main() {
         static_cast<INT16U>(N_PHILO + 2U),       // the unique task id
         static_cast<OS_STK *>(&testStackSto[0]), // pbos
         static_cast<INT32U>(sizeof(testStackSto)/sizeof(OS_STK)),
-        static_cast<void *>(0),                  // pext
+        nullptr,                  // pext
         static_cast<INT16U>(OS_TASK_OPT_STK_CLR))); // task attributes
 
     return QP::QF::run(); // run the QF application

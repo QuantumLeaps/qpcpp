@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: BSP for emWin/uC/GUI, Win32 simulation, NO Window Manager
-// Last updated for version 6.2.0
-// Last updated on  2018-03-16
+// Last updated for version 6.8.0
+// Last updated on  2020-01-22
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -37,8 +37,8 @@
 
 extern "C" {
     #include "GUI.h"
+    #include "GUI_SIM.h"
     #include "DIALOG.h"
-    #include "SIM.h"
 }
 
 #include <windows.h>
@@ -87,9 +87,10 @@ static void simHardKey(int keyIndex, int keyState) {
 //............................................................................
 extern "C" void GUI_MOUSE_StoreState(const GUI_PID_STATE *pState) {
     MouseEvt *pe = Q_NEW(MouseEvt, MOUSE_CHANGE_SIG);
-    pe->xPos = pState->x;
-    pe->yPos = pState->y;
-    pe->buttonStates = pState->Pressed;
+    pe->x = pState->x;
+    pe->y = pState->y;
+    pe->Pressed = pState->Pressed;
+    pe->Layer = pState->Layer;
     AO_Table->POST(pe, &l_MOUSE_StoreState);
 }
 //............................................................................
@@ -123,24 +124,6 @@ void BSP_init(void) {
     }
 
     QF_setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
-
-#ifdef Q_SPY
-    {
-        HANDLE hIdle;
-        char const *hostAndPort = SIM_GetCmdLine();
-        if (hostAndPort != NULL) { // port specified?
-            hostAndPort = "localhost:6601";
-        }
-        if (!QS_INIT(hostAndPort)) {
-            MessageBox(NULL, "Failed to open the TCP/IP socket for QS output",
-                       "QS Socket Failure", MB_TASKMODAL | MB_OK);
-            return;
-        }
-        hIdle = CreateThread(NULL, 1024, &idleThread, (void *)0, 0, NULL);
-        Q_ASSERT(hIdle != (HANDLE)0); // thread must be created
-        SetThreadPriority(hIdle, THREAD_PRIORITY_IDLE);
-    }
-#endif
 }
 //............................................................................
 void QF::onStartup(void) {
@@ -157,103 +140,12 @@ void QP::QF_onClockTick(void) {
 }
 
 //............................................................................
-void Q_onAssert(char const * const file, int loc) {
+Q_NORETURN Q_onAssert(char const * const file, int_t const loc) {
     char str[256];
 
     QF_CRIT_ENTRY(dummy); // make sure nothing else is running
     sprintf(str, "%s:%d", file, loc);
     MessageBox(NULL, str, "Assertion Failure", MB_TASKMODAL | MB_OK);
-    QF::stop();      // terminate the QF, causes termination of the MainTask()
+    QF::stop(); // terminate the QF, causes termination of the MainTask()
 }
 
-//----------------------------------------------------------------------------
-#ifdef Q_SPY // define QS callbacks
-
-bool QS::onStartup(void const *arg) {
-    static uint8_t qsBuf[1024]; // 1K buffer for Quantum Spy
-    static WSADATA wsaData;
-    char host[64];
-    char const *src;
-    char *dst;
-    USHORT port = 6601; // default port
-    ULONG ioctl_opt = 1;
-    struct sockaddr_in servAddr;
-    struct hostent *server;
-
-    initBuf(qsBuf, sizeof(qsBuf));
-
-       // initialize Windows sockets */
-    if (WSAStartup(MAKEWORD(2,0), &wsaData) == SOCKET_ERROR) {
-        return (uint8_t)0;
-    }
-
-    src = (char const *)arg;
-    dst = host;
-    while ((*src != '\0') && (*src != ':') && (dst < &host[sizeof(host)])) {
-        *dst++ = *src++;
-    }
-    *dst = '\0';
-    if (*src == ':') {
-        port = (USHORT)strtoul(src + 1, NULL, 10);
-    }
-
-
-    l_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); // TCP socket
-    if (l_sock == INVALID_SOCKET){
-        return (uint8_t)0;
-    }
-
-    server = gethostbyname(host);
-    if (server == NULL) {
-        return (uint8_t)0;
-    }
-    memset(&servAddr, 0, sizeof(servAddr));
-    servAddr.sin_family = AF_INET;
-    memcpy(&servAddr.sin_addr, server->h_addr, server->h_length);
-    servAddr.sin_port = htons(port);
-    if (connect(l_sock, (struct sockaddr *)&servAddr, sizeof(servAddr))
-        == SOCKET_ERROR)
-    {
-        QS_EXIT();
-        return (uint8_t)0;
-    }
-
-       // Set the socket to non-blocking mode. */
-    if (ioctlsocket(l_sock, FIONBIO, &ioctl_opt) == SOCKET_ERROR) {
-        QS_EXIT();
-        return (uint8_t)0;
-    }
-
-    // only after successful opeing of the socket turn on QS global filters
-    QS_FILTER_ON(QS_SM_RECORDS);
-    QS_FILTER_ON(QS_AO_RECORDS);
-    QS_FILTER_ON(QS_UA_RECORDS);
-
-    return true; // success
-}
-//............................................................................
-void QS::onCleanup(void) {
-    if (l_sock != INVALID_SOCKET) {
-        closesocket(l_sock);
-    }
-    WSACleanup();
-}
-//............................................................................
-void QS::onFlush(void) {
-    uint16_t nBytes = 1000;
-    uint8_t const *block;
-    QF_CRIT_ENTRY(dummy);
-    while ((block = getBlock(&nBytes)) != (uint8_t *)0) {
-        QF_CRIT_EXIT(dummy);
-        send(l_sock, (char const *)block, nBytes, 0);
-        nBytes = 1000;
-        QF_CRIT_ENTRY(dummy);
-    }
-    QF_CRIT_EXIT(dummy);
-}
-//............................................................................
-QSTimeCtr QS::onGetTime(void) {
-    return (QSTimeCtr)clock();
-}
-#endif // Q_SPY
-//----------------------------------------------------------------------------

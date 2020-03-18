@@ -3,14 +3,14 @@
 * @brief QK/C++ port to ARM Cortex-M, IAR-ARM toolset
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.8
-* Last updated on  2019-01-10
+* Last updated for version 6.8.0
+* Last updated on  2020-01-25
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -31,11 +31,13 @@
 * along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* <www.state-machine.com/licensing/>
-* <info@state-machine.com/>
+* <www.state-machine.com/licensing>
+* <info@state-machine.com>
 ******************************************************************************
 * @endcond
 */
+/* This QK port is part of the interanl QP implementation */
+#define QP_IMPL 1U
 #include "qf_port.hpp"
 
 extern "C" {
@@ -248,22 +250,20 @@ __asm volatile (
 /* hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction) */
 uint_fast8_t QF_qlog2(uint32_t x) {
     static uint8_t const log2LUT[16] = {
-        (uint8_t)0, (uint8_t)1, (uint8_t)2, (uint8_t)2,
-        (uint8_t)3, (uint8_t)3, (uint8_t)3, (uint8_t)3,
-        (uint8_t)4, (uint8_t)4, (uint8_t)4, (uint8_t)4,
-        (uint8_t)4, (uint8_t)4, (uint8_t)4, (uint8_t)4
+        0U, 1U, 2U, 2U, 3U, 3U, 3U, 3U,
+        4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U
     };
     uint_fast8_t n;
     __asm (
         "MOVS    %[n],#0\n"
-#if (QF_MAX_ACTIVE > 16)
+#if (QF_MAX_ACTIVE > 16U)
         "LSRS    r2,r0,#16\n"
         "BEQ.N   QF_qlog2_1\n"
         "MOVS    %[n],#16\n"
         "MOVS    r0,r2\n"
     "QF_qlog2_1:\n"
 #endif
-#if (QF_MAX_ACTIVE > 8)
+#if (QF_MAX_ACTIVE > 8U)
         "LSRS    r2,r0,#8\n"
         "BEQ.N   QF_qlog2_2\n"
         "ADDS    %[n],%[n],#8\n"

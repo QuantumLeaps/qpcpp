@@ -42,7 +42,7 @@ public:
 
     static void init(int argc, char **argv);
     static void displayPaused(uint8_t const paused);
-    static void displayPhilStat(uint8_t const n, char_t const *stat);
+    static void displayPhilStat(uint8_t const n, char const *stat);
     static void terminate(int16_t const result);
 
     static void randomSeed(uint32_t const seed); // random seed

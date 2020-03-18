@@ -64,7 +64,7 @@ int main() {
             static_cast<uint_fast8_t>(n + 1), // QP priority
             philoQueueSto[n],          // event queue storage
             Q_DIM(philoQueueSto[n]),   // queue length [events]
-            static_cast<void *>(0),    // no stack storage
+            nullptr,    // no stack storage
             static_cast<uint_fast16_t>(0)); // stack size [bytes]
     }
 
@@ -72,7 +72,7 @@ int main() {
             static_cast<uint_fast8_t>(N_PHILO + 2U), // QP priority
             tableQueueSto,           // event queue storage
             Q_DIM(tableQueueSto),    // queue length [events]
-            static_cast<void *>(0),    // no stack storage
+            nullptr,    // no stack storage
             static_cast<uint_fast16_t>(0)); // stack size [bytes]
 
     // start the extended thread for testing

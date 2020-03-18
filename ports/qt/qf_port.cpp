@@ -2,14 +2,14 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0 / Qt 5.x
-/// Last updated on  2019-12-26
+/// Last updated for version 6.8.0 / Qt 5.x
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -44,7 +44,8 @@
 #include "qf_pkg.hpp"       // QF package-scope interface
 #include "qassert.h"        // QP embedded systems-friendly assertions
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS package-scope internal interface
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -70,7 +71,7 @@ AOThread::~AOThread() {
 }
 //............................................................................
 void AOThread::run() {
-    Q_REQUIRE(m_act != static_cast<void *>(0));
+    Q_REQUIRE(m_act != nullptr);
     QP::QF::thread_(static_cast<QP::QActive *>(m_act));
 }
 
@@ -122,7 +123,7 @@ void QF::stop(void) {
 //............................................................................
 void QF_setQtPrio(QActive *act, int_t qtPrio) {
     // thread not created yet?
-    if (act->getThread() == static_cast<QThread *>(0)) {
+    if (act->getThread() == nullptr) {
         // store the priority for later
         act->getOsObject() = reinterpret_cast<QWaitCondition *>(qtPrio);
     }
@@ -135,12 +136,12 @@ void QF_setTickRate(unsigned ticksPerSec) {
     l_tickerThread.m_tickInterval = 1000U/ticksPerSec;
 }
 //............................................................................
-void QActive::start(uint_fast8_t const prio,
-                    QEvt const * * const qSto, uint_fast16_t const qLen,
-                    void * const stkSto, uint_fast16_t const stkSize,
+void QActive::start(std::uint_fast8_t const prio,
+                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    Q_REQUIRE(stkSto == static_cast<void *>(0)); // no per-task stack
+    Q_REQUIRE(stkSto == nullptr); // no per-task stack
 
     m_thread   = new AOThread(this);
     m_osObject = new QWaitCondition;

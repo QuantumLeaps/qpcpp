@@ -2,14 +2,14 @@
 /// @brief PC-Lint-Plus option file for linting QP/C++ applications
 /// @cond
 ///===========================================================================
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-31
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -37,9 +37,18 @@
 
 // Assertions ----------------------------------------------------------------
 
+// old-style c comment [AUTOSAR Rule A2-8-4]
+-efile(1904,
+ -qassert.h)
+
 // give Q_onAssert() the semantics of "exit"
 -function(exit,
  Q_onAssert)
+
+// C-style array type [AUTOSAR Rule A18-1-1]
+-esym(9436,
+ QP::versionStr)
+
 
 // MC++R16-0-4 function-like macro
 -esym(9026,

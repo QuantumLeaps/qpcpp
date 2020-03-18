@@ -72,51 +72,44 @@ int main() {
 
     // start the extended Test1 thread
     DPP::XT_Test1->start(
-            static_cast<uint_fast8_t>(1), // QP prio of the thread
+            1U,                      // QP prio of the thread
             test1QueueSto,           // event queue storage
             Q_DIM(test1QueueSto),    // queue length [events]
             test1StackSto,           // stack storage
-            sizeof(test1StackSto),   // stack size [bytes]
-            static_cast<QP::QEvt *>(0)); // initialization event
+            sizeof(test1StackSto));  // stack size
 
     // NOTE: leave priority 2 free for a mutex
 
     // start the Philo active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start(
-            static_cast<uint_fast8_t>(n + 3), // QP priority of the AO
-            philoQueueSto[n],          // event queue storage
-            Q_DIM(philoQueueSto[n]),   // queue length [events]
-            static_cast<void *>(0),    // no stack storage
-            static_cast<uint_fast16_t>(0), // stack size [bytes]
-            static_cast<QP::QEvt *>(0));   // initialization event
+            (n + 3U),                // QP priority of the AO
+            philoQueueSto[n],        // event queue storage
+            Q_DIM(philoQueueSto[n]), // queue length [events]
+            nullptr, 0U);            // no stack storage
     }
 
     // example of prioritizing the Ticker0 active object
-    DPP::the_Ticker0->start((uint_fast8_t)(N_PHILO + 3), // priority
-                            0, 0,
-                            0, 0);
+    DPP::the_Ticker0->start(N_PHILO + 3U, // priority
+                            0, 0, 0, 0);
 
     // NOTE: leave priority (N_PHILO + 4) free for mutex
 
     // start the extended Test2 thread
     DPP::XT_Test2->start(
-            static_cast<uint_fast8_t>(N_PHILO + 5), // QP prio of the thread
+            N_PHILO + 5U,            // QP prio of the thread
             test2QueueSto,           // event queue storage
             Q_DIM(test2QueueSto),    // queue length [events]
             test2StackSto,           // stack storage
-            sizeof(test2StackSto),   // stack size [bytes]
-            static_cast<QP::QEvt *>(0)); // initialization event
+            sizeof(test2StackSto));  // stack size [bytes]
 
     // NOTE: leave priority (N_PHILO + 6) free for mutex
 
     DPP::AO_Table->start(
-            static_cast<uint_fast8_t>(N_PHILO + 7), // QP priority of the AO
+            N_PHILO + 7U,            // QP priority of the AO
             tableQueueSto,           // event queue storage
             Q_DIM(tableQueueSto),    // queue length [events]
-            static_cast<void *>(0),  // no stack storage
-            static_cast<uint_fast16_t>(0), // stack size [bytes]
-            static_cast<QP::QEvt *>(0));   // initialization event
+            nullptr, 0U);            // no stack storage
 
     return QP::QF::run(); // run the QF application
 }

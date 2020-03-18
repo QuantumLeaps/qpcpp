@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -43,7 +43,7 @@
 #define QF_THREAD_TYPE       uint32_t
 
 // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE ((OS_LOWEST_PRIO - 1 < 64) ? (OS_LOWEST_PRIO - 1) : 64)
+#define QF_MAX_ACTIVE ((OS_LOWEST_PRIO - 1 < 64) ? (OS_LOWEST_PRIO - 1) : 64U)
 
 // uC/OS-II critical section operations (critical section type 3), NOTE1
 #define QF_CRIT_STAT_TYPE    OS_CPU_SR
@@ -66,39 +66,39 @@
     // uC/OS-II-specific scheduler locking, see NOTE2
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) do { \
-        if (OSIntNesting == static_cast<INT8U>(0)) { \
-            OSSchedLock(); \
+        if (OSIntNesting == 0U) {      \
+            OSSchedLock();             \
         } \
     } while (false)
     #define QF_SCHED_UNLOCK_() do { \
-        if (OSIntNesting == static_cast<INT8U>(0)) { \
-            OSSchedUnlock(); \
+        if (OSIntNesting == 0U) {   \
+            OSSchedUnlock();        \
         } \
     } while (false)
 
 
     // uC/OS-II event pool operations...
     #define QF_EPOOL_TYPE_ OS_MEM*
-    #define QF_EPOOL_INIT_(pool_, poolSto_, poolSize_, evtSize_) do { \
-        INT8U err; \
+    #define QF_EPOOL_INIT_(pool_, poolSto_, poolSize_, evtSize_) do {       \
+        INT8U err;                                                          \
         (pool_) = OSMemCreate((poolSto_), (INT32U)((poolSize_)/(evtSize_)), \
-                              (INT32U)(evtSize_), &err); \
-        Q_ASSERT_ID(105, err == OS_ERR_NONE); \
+                              (INT32U)(evtSize_), &err);                    \
+        Q_ASSERT_ID(105, err == OS_ERR_NONE);                               \
     } while (false)
 
     #define QF_EPOOL_EVENT_SIZE_(pool_) ((pool_)->OSMemBlkSize)
-    #define QF_EPOOL_GET_(pool_, e_, m_) do { \
-        QF_CRIT_STAT_ \
-        QF_CRIT_ENTRY_(); \
-        if ((pool_)->OSMemNFree > (m_)) { \
-            INT8U err; \
+    #define QF_EPOOL_GET_(pool_, e_, m_) do {       \
+        QF_CRIT_STAT_                               \
+        QF_CRIT_ENTRY_();                           \
+        if ((pool_)->OSMemNFree > (m_)) {           \
+            INT8U err;                              \
             (e_) = (QEvt *)OSMemGet((pool_), &err); \
-            Q_ASSERT_ID(205, err == OS_ERR_NONE); \
-        } \
-        else { \
-            (e_) = static_cast<QEvt *>(0); \
-        } \
-        QF_CRIT_EXIT_(); \
+            Q_ASSERT_ID(205, err == OS_ERR_NONE);   \
+        }                                           \
+        else {                                      \
+            (e_) = nullptr;          \
+        }                                           \
+        QF_CRIT_EXIT_();                            \
     } while (false)
 
     #define QF_EPOOL_PUT_(pool_, e_) \

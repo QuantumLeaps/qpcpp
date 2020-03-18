@@ -69,23 +69,23 @@ int main() {
     QS_OBJ_DICTIONARY(GAME::AO_Tunnel);
 
     // signal dictionaries for globally published events...
-    QS_SIG_DICTIONARY(GAME::TIME_TICK_SIG,      static_cast<void *>(0));
-    QS_SIG_DICTIONARY(GAME::PLAYER_TRIGGER_SIG, static_cast<void *>(0));
-    QS_SIG_DICTIONARY(GAME::PLAYER_QUIT_SIG,    static_cast<void *>(0));
-    QS_SIG_DICTIONARY(GAME::GAME_OVER_SIG,      static_cast<void *>(0));
+    QS_SIG_DICTIONARY(GAME::TIME_TICK_SIG,      nullptr);
+    QS_SIG_DICTIONARY(GAME::PLAYER_TRIGGER_SIG, nullptr);
+    QS_SIG_DICTIONARY(GAME::PLAYER_QUIT_SIG,    nullptr);
+    QS_SIG_DICTIONARY(GAME::GAME_OVER_SIG,      nullptr);
 
     // start the active objects...
     GAME::the_Ticker0->start(1U, // priority
                              0, 0, 0, 0);
     GAME::AO_Tunnel ->start(2U,                     // priority
                       tunnelQueueSto, Q_DIM(tunnelQueueSto), // evt queue
-                      static_cast<void *>(0), 0U);  // no per-thread stack
+                      nullptr, 0U);  // no per-thread stack
     GAME::AO_Ship   ->start(3U,                     // priority
                       shipQueueSto, Q_DIM(shipQueueSto), // evt queue
-                      static_cast<void *>(0), 0U);  // no per-thread stack
+                      nullptr, 0U);  // no per-thread stack
     GAME::AO_Missile->start(4U,                     // priority
                       missileQueueSto, Q_DIM(missileQueueSto), // evt queue
-                      static_cast<void *>(0), 0U);  // no per-thread stack
+                      nullptr, 0U);  // no per-thread stack
 
     return QP::QF::run(); // run the QF application
 }

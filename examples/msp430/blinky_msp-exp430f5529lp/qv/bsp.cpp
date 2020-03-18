@@ -124,7 +124,7 @@ void QV::onIdle(void) { // NOTE: called with interrutps DISABLED, see NOTE1
 }
 
 //............................................................................
-extern "C" void Q_onAssert(char const *module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     // implement the error-handling policy for your application!!!
     QF_INT_DISABLE(); // disable all interrupts
     QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));

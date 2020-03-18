@@ -1,49 +1,16 @@
-/*****************************************************************************
-* Product: QUTEST port for the MSP-EXP430F5529LP board
-* Last updated for version 6.3.8
-* Last updated on  2019-01-24
-*
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
-*
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
-*
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses/>.
-*
-* Contact information:
-* <www.state-machine.com/licensing>
-* <info@state-machine.com>
-*****************************************************************************/
 /// @file
 /// @brief QUTEST port for the MSP-EXP430F5529LP board
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.8
-/// Last updated on  2019-01-24
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -61,14 +28,23 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://state-machine.com
+/// <www.state-machine.com/licensing>
 /// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
-#include "qpcpp.hpp"
+
+#ifndef Q_SPY
+    #error "Q_SPY must be defined to compile qutest_port.cpp"
+#endif // Q_SPY
+
+#define QP_IMPL        // this is QP implementation
+#include "qf_port.hpp" // QF port
+#include "qs_port.hpp" // QS port
+#include "qs_pkg.hpp"  // QS package-scope interface
+#include "qassert.h"   // QP embedded systems-friendly assertions
 
 #include <msp430f5529.h>  // MSP430 variant used
 // add other drivers if necessary...

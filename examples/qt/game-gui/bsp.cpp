@@ -251,7 +251,7 @@ void BSP_moveShipDown(void) {
                  &l_bsp);
 }
 //............................................................................
-void Q_onAssert(char_t const * const module, int_t loc) {
+Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     QMessageBox::critical(0, "PROBLEM",
         QString("<p>Assertion failed in module <b>%1</b>,"
                 "location <b>%2</b></p>")
@@ -321,7 +321,7 @@ void QP::QS::onCleanup(void) {
 void QP::QS::onFlush(void) {
     uint16_t nBytes = 1024U;
     uint8_t const *block;
-    while ((block = getBlock(&nBytes)) != static_cast<uint8_t *>(0)) {
+    while ((block = getBlock(&nBytes)) != nullptr) {
         QSPY_parse(block, nBytes);
         nBytes = 1024U;
     }
@@ -336,7 +336,7 @@ void QP::QS_onEvent(void) {
     uint16_t nBytes = 1024;
     uint8_t const *block;
     QF_CRIT_ENTRY(dummy);
-    if ((block = QS::getBlock(&nBytes)) != static_cast<uint8_t *>(0)) {
+    if ((block = QS::getBlock(&nBytes)) != nullptr) {
         QF_CRIT_EXIT(dummy);
         QSPY_parse(block, nBytes);
     }

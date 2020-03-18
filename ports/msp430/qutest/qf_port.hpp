@@ -44,13 +44,13 @@
 /*#define QF_THREAD_TYPE */
 
 // The maximum number of active objects in the application, see NOTE01
-#define QF_MAX_ACTIVE        8
+#define QF_MAX_ACTIVE        8U
 
-#define QF_EVENT_SIZ_SIZE    1
-#define QF_EQUEUE_CTR_SIZE   1
-#define QF_MPOOL_SIZ_SIZE    1
-#define QF_MPOOL_CTR_SIZE    1
-#define QF_TIMEEVT_CTR_SIZE  2
+#define QF_EVENT_SIZ_SIZE    1U
+#define QF_EQUEUE_CTR_SIZE   1U
+#define QF_MPOOL_SIZ_SIZE    1U
+#define QF_MPOOL_CTR_SIZE    1U
+#define QF_TIMEEVT_CTR_SIZE  2U
 
 // QF interrupt disable/enable
 #define QF_INT_DISABLE()     (++QP::QF_intNest)
@@ -85,9 +85,10 @@ extern uint8_t volatile QF_intNest;
 
     // native event queue operations
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != static_cast<QEvt *>(0))
+        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QS::rxPriv_.readySet.insert(static_cast<uint_fast8_t>((me_)->m_prio)))
+        (QS::rxPriv_.readySet.insert(   \
+            static_cast<std::uint_fast8_t>((me_)->m_prio)))
 
     // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool

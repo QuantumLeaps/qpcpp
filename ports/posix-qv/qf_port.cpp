@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-26
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -44,7 +44,8 @@
 #include "qf_pkg.hpp"       // QF package-scope interface
 #include "qassert.h"        // QP embedded systems-friendly assertions
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS package-scope internal interface
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -93,11 +94,10 @@ void QF::init(void) {
     // clear the internal QF variables, so that the framework can (re)start
     // correctly even if the startup code is not called to clear the
     // uninitialized data (as is required by the C++ Standard).
-    extern uint_fast8_t QF_maxPool_;
-    QF_maxPool_ = static_cast<uint_fast8_t>(0);
-    bzero(&QF::timeEvtHead_[0],
-          static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
-    bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
+    extern std::uint_fast8_t QF_maxPool_;
+    QF_maxPool_ = 0U;
+    bzero(&QF::timeEvtHead_[0], sizeof(QF::timeEvtHead_));
+    bzero(&active_[0],          sizeof(active_));
 
     l_tick.tv_sec = 0;
     l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC/100L; // default clock tick
@@ -172,13 +172,13 @@ int_t QF::run(void) {
     while (l_isRunning) {
 
         if (QV_readySet_.notEmpty()) {
-            uint_fast8_t p = QV_readySet_.findMax();
+            std::uint_fast8_t p = QV_readySet_.findMax();
             QActive *a = active_[p];
             QF_CRIT_EXIT_();
 
             // the active object 'a' must still be registered in QF
             // (e.g., it must not be stopped)
-            Q_ASSERT_ID(320, a != static_cast<QActive *>(0));
+            Q_ASSERT_ID(320, a != nullptr);
 
             // perform the run-to-completion (RTS) step...
             // 1. retrieve the event from the AO's event queue, which by this
@@ -214,11 +214,11 @@ int_t QF::run(void) {
     pthread_cond_destroy(&QV_condVar_); // cleanup the condition variable
     pthread_mutex_destroy(&l_pThreadMutex); // cleanup the global mutex
 
-    return static_cast<int_t>(0); // return success
+    return 0; // return success
 }
 //****************************************************************************
-void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio) {
-    if (ticksPerSec != static_cast<uint32_t>(0)) {
+void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
+    if (ticksPerSec != 0U) {
         l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
     }
     else {
@@ -264,20 +264,20 @@ int QF_consoleWaitForKey(void) {
 }
 
 //****************************************************************************
-void QActive::start(uint_fast8_t const prio,
-                    QEvt const * * const qSto, uint_fast16_t const qLen,
-                    void * const stkSto, uint_fast16_t const stkSize,
+void QActive::start(std::uint_fast8_t const prio,
+                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
     (void)stkSize; // unused paramteter in the POSIX port
 
-    Q_REQUIRE_ID(600, (static_cast<uint_fast8_t>(0) < prio) /* priority...*/
-        && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE)) /*.. in range */
-        && (stkSto == static_cast<void *>(0))); // statck storage must NOT...
-                                                  // ... be provided
+    Q_REQUIRE_ID(600, (0U < prio)  /* priority...*/
+        && (prio <= QF_MAX_ACTIVE) /*.. in range */
+        && (stkSto == nullptr));   // statck storage must NOT...
+                                    // ... be provided
 
     m_eQueue.init(qSto, qLen);
-    m_prio = static_cast<uint8_t>(prio); // set the QF priority of this AO
+    m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
     QF::add_(this); // make QF aware of this AO
 
     this->init(par); // execute initial transition (virtual call)
@@ -290,7 +290,7 @@ static void *ticker_thread(void * /*arg*/) { // for pthread_create()
         nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
         QF_onClockTick(); // clock tick callback (must call QF_TICK_X())
     }
-    return static_cast<void *>(0); // return success
+    return nullptr; // return success
 }
 
 //****************************************************************************

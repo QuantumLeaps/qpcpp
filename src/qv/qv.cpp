@@ -4,14 +4,14 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-28
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -42,7 +42,8 @@
 #include "qf_pkg.hpp"       // QF package-scope internal interface
 #include "qassert.h"        // QP embedded systems-friendly assertions
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS facilities for pre-defined trace records
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -76,14 +77,13 @@ extern "C" {
 /// the uninitialized data (as is required by the C Standard).
 ///
 void QF::init(void) {
-    QF_maxPool_      = static_cast<uint_fast8_t>(0);
-    QF_subscrList_   = static_cast<QSubscrList *>(0);
-    QF_maxPubSignal_ = static_cast<enum_t>(0);
+    QF_maxPool_      = 0U;
+    QF_subscrList_   = nullptr;
+    QF_maxPubSignal_ = 0;
 
-    bzero(&QF::timeEvtHead_[0],
-          static_cast<uint_fast16_t>(sizeof(QF::timeEvtHead_)));
-    bzero(&active_[0], static_cast<uint_fast16_t>(sizeof(active_)));
-    bzero(&QV_readySet_, static_cast<uint_fast16_t>(sizeof(QV_readySet_)));
+    bzero(&QF::timeEvtHead_[0], sizeof(QF::timeEvtHead_));
+    bzero(&active_[0], sizeof(active_));
+    bzero(&QV_readySet_, sizeof(QV_readySet_));
 
 #ifdef QV_INIT
     QV_INIT(); // port-specific initialization of the QV kernel
@@ -124,7 +124,7 @@ void QF::stop(void) {
 ///
 int_t QF::run(void) {
 #ifdef Q_SPY
-    uint_fast8_t pprev = static_cast<uint_fast8_t>(0); // previous priority
+    std::uint_fast8_t pprev = 0U; // previous priority
 #endif
 
     onStartup(); // startup callback
@@ -135,15 +135,14 @@ int_t QF::run(void) {
 
         // find the maximum priority AO ready to run
         if (QV_readySet_.notEmpty()) {
-            uint_fast8_t const p = QV_readySet_.findMax();
+            std::uint_fast8_t const p = QV_readySet_.findMax();
             QActive * const a = active_[p];
 
 #ifdef Q_SPY
             QS_BEGIN_NOCRIT_PRE_(QS_SCHED_NEXT,
                              QS::priv_.locFilter[QS::AO_OBJ], a)
                 QS_TIME_PRE_(); // timestamp
-                QS_2U8_PRE_(static_cast<uint8_t>(p), // prio of the scheduled AO
-                        static_cast<uint8_t>(pprev)); // previous priority
+                QS_2U8_PRE_(p, pprev);// scheduled prio & previous prio
             QS_END_NOCRIT_PRE_()
 
             pprev = p; // update previous priority
@@ -169,14 +168,13 @@ int_t QF::run(void) {
         }
         else { // no AO ready to run --> idle
 #ifdef Q_SPY
-            if (pprev != static_cast<uint_fast8_t>(0)) {
-                QS_BEGIN_NOCRIT_PRE_(QS_SCHED_IDLE,
-                    static_cast<void *>(0), static_cast<void *>(0))
-                    QS_TIME_PRE_();                          // timestamp
-                    QS_U8_PRE_(static_cast<uint8_t>(pprev)); // previous prio
+            if (pprev != 0U) {
+                QS_BEGIN_NOCRIT_PRE_(QS_SCHED_IDLE, nullptr, nullptr)
+                    QS_TIME_PRE_();    // timestamp
+                    QS_U8_PRE_(pprev); // previous prio
                 QS_END_NOCRIT_PRE_()
 
-                pprev = static_cast<uint_fast8_t>(0); // update previous prio
+                pprev = 0U; // update previous prio
             }
 #endif // Q_SPY
 
@@ -192,7 +190,7 @@ int_t QF::run(void) {
         }
     }
 #ifdef __GNUC__ // GNU compiler?
-    return static_cast<int_t>(0);
+    return 0;
 #endif
 }
 
@@ -214,9 +212,9 @@ int_t QF::run(void) {
 /// The following example shows starting an AO when a per-task stack is needed
 /// @include qf_start.cpp
 ///
-void QActive::start(uint_fast8_t const prio,
-                    QEvt const * * const qSto, uint_fast16_t const qLen,
-                    void * const stkSto, uint_fast16_t const stkSize,
+void QActive::start(std::uint_fast8_t const prio,
+                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
     (void)stkSize; // unused paramteter in the QV port
@@ -224,12 +222,12 @@ void QActive::start(uint_fast8_t const prio,
     /// @pre the priority must be in range and the stack storage must not
     /// be provided, because the QV kernel does not need per-AO stacks.
     ///
-    Q_REQUIRE_ID(500, (static_cast<uint_fast8_t>(0) < prio)
-                      && (prio <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
-                      && (stkSto == static_cast<void *>(0)));
+    Q_REQUIRE_ID(500,
+        (0U < prio) && (prio <= QF_MAX_ACTIVE)
+        && (stkSto == nullptr));
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
-    m_prio = static_cast<uint8_t>(prio);  // set the QF prio of this AO
+    m_prio = static_cast<std::uint8_t>(prio);  // set the QF prio of this AO
 
     QF::add_(this); // make QF aware of this AO
 

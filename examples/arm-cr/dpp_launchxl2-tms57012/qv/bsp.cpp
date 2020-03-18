@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, LAUCHXL2-TMS570LS12 board, cooperative QV kernel
-// Last Updated for Version: 5.9.5
-// Date of the Last Update:  2017-07-20
+// Last updated for version 6.8.0
+// Last updated on  2020-01-23
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,10 +25,10 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
@@ -290,7 +290,7 @@ void QV::onIdle(void) { // CATION: called with interrupts DISABLED, NOTE01
 }
 
 //............................................................................
-extern "C" void Q_onAssert(char const *module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     //
     // NOTE: add here your application-specific error handling
     //
@@ -382,15 +382,15 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, static_cast<void *>(0))
+    QS_BEGIN(DPP::COMMAND_STAT, nullptr)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()
 
     if ((cmdId == 10U) || (cmdId == 11U)) {
         // report error
-        QS_BEGIN(QS_RX_STATUS, static_cast<void *>(0))
-            QS_U8_(static_cast<uint8_t>(0x80) | cmdId); // error
+        QS_BEGIN(QS_RX_STATUS, nullptr)
+             QP::QS::u8_raw_(0x80U | cmdId); // error
         QS_END()
     }
 }

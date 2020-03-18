@@ -1,15 +1,15 @@
-/// \file
-/// \brief QEP/C++ port to Win32 API
-/// \cond
+/// @file
+/// @brief port to Win32 with GNU or Visual Studio C/C++ compilers
+/// @cond
 ///***************************************************************************
-/// Last updated for version 5.4.0
-/// Last updated on  2015-03-14
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-22
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps, www.state-machine.com/licensing.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -27,27 +27,31 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// Web:   www.state-machine.com/licensing
-/// Email: info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
-/// \endcond
+/// @endcond
 
 #ifndef QEP_PORT_HPP
 #define QEP_PORT_HPP
 
-#include <stdint.h> // Exact-width types. WG14/N843 C99, Section 7.18.1.1
+#ifdef __GNUC__
 
-#ifdef _MSC_VER
-#pragma warning (disable: 4510 4512 4610)
+    /*! no-return function specifier (GCC-ARM compiler) */
+    #define Q_NORETURN   __attribute__ ((noreturn)) void
+
+#elif (defined _MSC_VER) && (defined __cplusplus)
+
+    /* no-return function specifier (Microsoft Visual Studio compiler) */
+    #define Q_NORETURN   [[ noreturn ]] void
+
 #endif
 
-#include "qep.hpp"    // QEP platform-independent public interface
+#include <cstdint>  // Exact-width types. C++11 Standard
 
-#ifdef _MSC_VER
-#pragma warning (default: 4510 4512 4610)
-#endif
+#include "qep.hpp"  // QEP platform-independent public interface
 
 #endif // QEP_PORT_HPP

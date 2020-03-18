@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-22
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -41,45 +41,45 @@
 
 #ifndef QF_MPOOL_SIZ_SIZE
     //! macro to override the default QP::QMPoolSize size.
-    /// Valid values 1, 2, or 4; default 2
-    #define QF_MPOOL_SIZ_SIZE 2
+    /// Valid values 1U, 2U, or 4U; default 2U
+    #define QF_MPOOL_SIZ_SIZE 2U
 #endif
 
 #ifndef QF_MPOOL_CTR_SIZE
     //! macro to override the default QMPoolCtr size.
-    //! Valid values 1, 2, or 4; default 2
+    //! Valid values 1U, 2U, or 4U; default 2U
     #define QF_MPOOL_CTR_SIZE 2
 #endif
 
 namespace QP {
-#if (QF_MPOOL_SIZ_SIZE == 1)
-    typedef uint8_t QMPoolSize;
-#elif (QF_MPOOL_SIZ_SIZE == 2)
+#if (QF_MPOOL_SIZ_SIZE == 1U)
+    using QMPoolSize = std::uint8_t;
+#elif (QF_MPOOL_SIZ_SIZE == 2U)
     //! The data type to store the block-size based on the macro
     //! #QF_MPOOL_SIZ_SIZE.
     /// @description
     /// The dynamic range of this data type determines the maximum size
     /// of blocks that can be managed by the native QF event pool.
-    typedef uint16_t QMPoolSize;
-#elif (QF_MPOOL_SIZ_SIZE == 4)
-    typedef uint32_t QMPoolSize;
+    using QMPoolSize = std::uint16_t;
+#elif (QF_MPOOL_SIZ_SIZE == 4U)
+    using QMPoolSize = std::uint32_t;
 #else
-    #error "QF_MPOOL_SIZ_SIZE defined incorrectly, expected 1, 2, or 4"
+    #error "QF_MPOOL_SIZ_SIZE defined incorrectly, expected 1U, 2U, or 4U"
 #endif
 
-#if (QF_MPOOL_CTR_SIZE == 1)
-    typedef uint8_t QMPoolCtr;
-#elif (QF_MPOOL_CTR_SIZE == 2)
+#if (QF_MPOOL_CTR_SIZE == 1U)
+    using QMPoolCtr = std::uint8_t;
+#elif (QF_MPOOL_CTR_SIZE == 2U)
     //! The data type to store the block-counter based on the macro
     //! #QF_MPOOL_CTR_SIZE.
     /// @description
     /// The dynamic range of this data type determines the maximum number
     /// of blocks that can be stored in the pool.
-    typedef uint16_t QMPoolCtr;
-#elif (QF_MPOOL_CTR_SIZE == 4)
-    typedef uint32_t QMPoolCtr;
+    using QMPoolCtr = std::uint16_t;
+#elif (QF_MPOOL_CTR_SIZE == 4U)
+    using QMPoolCtr = std::uint32_t;
 #else
-    #error "QF_MPOOL_CTR_SIZE defined incorrectly, expected 1, 2, or 4"
+    #error "QF_MPOOL_CTR_SIZE defined incorrectly, expected 1U, 2U, or 4U"
 #endif
 
 //****************************************************************************
@@ -136,29 +136,32 @@ public:
     QMPool(void); //!< public default constructor
 
     //! Initializes the native QF event pool
-    void init(void * const poolSto, uint_fast32_t poolSize,
-              uint_fast16_t blockSize);
+    void init(void * const poolSto, std::uint_fast32_t poolSize,
+              std::uint_fast16_t blockSize) noexcept;
 
     //! Obtains a memory block from a memory pool.
-    void *get(uint_fast16_t const margin);
+    void *get(std::uint_fast16_t const margin) noexcept;
 
     //! Returns a memory block back to a memory pool.
-    void put(void * const b);
+    void put(void * const b) noexcept;
 
     //! return the fixed block-size of the blocks managed by this pool
-    QMPoolSize getBlockSize(void) const {
+    QMPoolSize getBlockSize(void) const noexcept {
         return m_blockSize;
     }
 
 // duplicated API to be used exclusively inside ISRs (useful in some QP ports)
 #ifdef QF_ISR_API
-    void *getFromISR(uint_fast16_t const margin);
-    void putFromISR(void * const b);
+    void *getFromISR(std::uint_fast16_t const margin) noexcept;
+    void putFromISR(void * const b) noexcept;
 #endif // QF_ISR_API
 
 private:
-    QMPool(QMPool const &); //!< disallow copying of QMPools
-    QMPool &operator=(QMPool const &); //!< disallow assigning of QMPools
+    //! disallow copying of QMPools
+    QMPool(QMPool const &) = delete;
+
+    //!< disallow assigning of QMPools
+    QMPool &operator=(QMPool const &) = delete;
 
     friend class QF;
 #ifdef Q_UTEST

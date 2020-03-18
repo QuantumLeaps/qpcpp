@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-22
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -41,7 +41,8 @@
 #include "qf_pkg.hpp"       // QF package-scope interface
 #include "qassert.h"        // QP embedded systems-friendly assertions
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS facilities for pre-defined trace records
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -73,8 +74,8 @@ Q_DEFINE_THIS_MODULE("qf_defer")
 /// @sa
 /// QP::QActive::recall(), QP::QEQueue, QP::QActive::flushDeferred()
 ///
-bool QActive::defer(QEQueue * const eq, QEvt const * const e) const {
-    bool const status = eq->post(e, static_cast<uint_fast16_t>(0));
+bool QActive::defer(QEQueue * const eq, QEvt const * const e) const noexcept {
+    bool const status = eq->post(e, 0U);
     QS_CRIT_STAT_
 
     QS_BEGIN_PRE_(QS_QF_ACTIVE_DEFER, QS::priv_.locFilter[QS::AO_OBJ], this)
@@ -109,25 +110,25 @@ bool QActive::defer(QEQueue * const eq, QEvt const * const e) const {
 /// @sa
 /// QP::QActive::recall(), QP::QEQueue, QP::QActive::postLIFO_()
 ///
-bool QActive::recall(QEQueue * const eq) {
+bool QActive::recall(QEQueue * const eq) noexcept {
     QEvt const * const e = eq->get(); // try to get evt from deferred queue
     bool recalled;
 
     // event available?
-    if (e != static_cast<QEvt *>(0)) {
+    if (e != nullptr) {
         QActive::postLIFO(e); // post it to the _front_ of the AO's queue
 
         QF_CRIT_STAT_
         QF_CRIT_ENTRY_();
 
         // is it a dynamic event?
-        if (e->poolId_ != static_cast<uint8_t>(0)) {
+        if (e->poolId_ != 0U) {
 
             // after posting to the AO's queue the event must be referenced
             // at least twice: once in the deferred event queue (eq->get()
             // did NOT decrement the reference counter) and once in the
             // AO's event queue.
-            Q_ASSERT_CRIT_(210, e->refCtr_ >= static_cast<uint8_t>(2));
+            Q_ASSERT_CRIT_(210, e->refCtr_ >= 2U);
 
             // we need to decrement the reference counter once, to account
             // for removing the event from the deferred event queue.
@@ -176,12 +177,9 @@ bool QActive::recall(QEQueue * const eq) {
 /// @sa
 /// QP::QActive::defer(), QP::QActive::recall(), QP::QEQueue
 ///
-uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const {
-    uint_fast16_t n = static_cast<uint_fast16_t>(0);
-    for (QEvt const *e = eq->get();
-         e != static_cast<QEvt *>(0);
-         e = eq->get())
-    {
+std::uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const noexcept {
+    std::uint_fast16_t n = 0U;
+    for (QEvt const *e = eq->get(); e != nullptr; e = eq->get()) {
         QF::gc(e); // garbage collect
         ++n; // count the flushed event
     }

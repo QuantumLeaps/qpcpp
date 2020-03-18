@@ -18,7 +18,7 @@ int main() {
     blinky.start(5U, // priority
                  (void *)0, 0, // message queue (not used)
                  stack_blinky, sizeof(stack_blinky), // stack
-                 static_cast<QP::QEvt *>(0));   // initialization event
+                 nullptr);     // initialization event
     . . .
     return QP::QF::run(); // run the application
 }

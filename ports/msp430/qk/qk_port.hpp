@@ -41,16 +41,16 @@
 // QK interrupt entry and exit...
 #define QK_ISR_ENTRY()    (++QK_attr_.intNest)
 
-#define QK_ISR_EXIT()     do { \
-    --QK_attr_.intNest; \
-    if (QK_attr_.intNest == static_cast<uint_fast8_t>(0)) { \
-        if (QK_sched_() != static_cast<uint_fast8_t>(0)) { \
-            QK_activate_(); \
-        } \
-    } \
-    else { \
-        Q_ERROR(); \
-    } \
+#define QK_ISR_EXIT()     do {    \
+    --QK_attr_.intNest;           \
+    if (QK_attr_.intNest == 0U) { \
+        if (QK_sched_() != 0U) {  \
+            QK_activate_();       \
+        }                         \
+    }                             \
+    else {                        \
+        Q_ERROR();                \
+    }                             \
 } while (false)
 
 #include "qk.hpp"  // QK platform-independent public interface

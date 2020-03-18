@@ -44,10 +44,10 @@
 #define QF_OS_OBJECT_TYPE    bool
 
 // QF priority offset within ThreadX priority numbering scheme, see NOTE1
-#define QF_TX_PRIO_OFFSET    8
+#define QF_TX_PRIO_OFFSET    8U
 
 // The maximum number of active objects in the application, see NOTE2
-#define QF_MAX_ACTIVE        (31 - QF_TX_PRIO_OFFSET)
+#define QF_MAX_ACTIVE        (31U - QF_TX_PRIO_OFFSET)
 
 // QF critical section for ThreadX, see NOTE3
 #define QF_CRIT_STAT_TYPE    UINT
@@ -69,17 +69,17 @@
 
     // ThreadX-specific scheduler locking (implemented in qf_port.cpp)
     #define QF_SCHED_STAT_ QFSchedLock lockStat_;
-    #define QF_SCHED_LOCK_(prio_) do { \
-        if (_tx_thread_system_state != (UINT)0) { \
-            lockStat_.m_lockPrio = static_cast<uint_fast8_t>(0); \
-        } else { \
-            lockStat_.lock((prio_)); \
+    #define QF_SCHED_LOCK_(prio_) do {       \
+        if (_tx_thread_system_state != 0U) { \
+            lockStat_.m_lockPrio = 0U;       \
+        } else {                             \
+            lockStat_.lock((prio_));         \
         } \
     } while (false)
-    #define QF_SCHED_UNLOCK_() do { \
-        if (lockStat_.m_lockPrio != static_cast<uint_fast8_t>(0)) { \
-            lockStat_.unlock(); \
-        } \
+    #define QF_SCHED_UNLOCK_() do {       \
+        if (lockStat_.m_lockPrio != 0U) { \
+            lockStat_.unlock();           \
+        }                                 \
     } while (false)
 
     namespace QP {
@@ -104,7 +104,7 @@
                  (poolSto_), (poolSize_)) == TX_SUCCESS)
 
     #define QF_EPOOL_EVENT_SIZE_(pool_) \
-        (static_cast<uint_fast16_t>((pool_).tx_block_pool_block_size))
+        (static_cast<std::uint_fast16_t>((pool_).tx_block_pool_block_size))
 
     #define QF_EPOOL_GET_(pool_, e_, margin_) do { \
         QF_CRIT_STAT_ \
@@ -115,7 +115,7 @@
                      == TX_SUCCESS); \
         } \
         else { \
-            (e_) = static_cast<QEvt *>(0); \
+            (e_) = nullptr; \
         } \
         QF_CRIT_EXIT_(); \
     } while (false)

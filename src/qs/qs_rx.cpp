@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-23
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -47,89 +47,89 @@ namespace QP {
 Q_DEFINE_THIS_MODULE("qs_rx")
 
 //****************************************************************************
-QS::QSrxPriv QS::rxPriv_; // QS-RX private data
+struct QS::QSrxPriv QS::rxPriv_; // QS-RX private data
 
 //****************************************************************************
-#if (QS_OBJ_PTR_SIZE == 1)
-    typedef uint8_t QSObj;
-#elif (QS_OBJ_PTR_SIZE == 2)
-    typedef uint16_t QSObj;
-#elif (QS_OBJ_PTR_SIZE == 4)
-    typedef uint32_t QSObj;
-#elif (QS_OBJ_PTR_SIZE == 8)
-    typedef uint64_t QSObj;
+#if (QS_OBJ_PTR_SIZE == 1U)
+    using QSObj = std::uint8_t;
+#elif (QS_OBJ_PTR_SIZE == 2U)
+    using QSObj = std::uint16_t;
+#elif (QS_OBJ_PTR_SIZE == 4U)
+    using QSObj = std::uint32_t;
+#elif (QS_OBJ_PTR_SIZE == 8U)
+    using QSObj = std::uint64_t;
 #endif
 
-#if (QS_FUN_PTR_SIZE == 1)
-    typedef uint8_t QSFun;
-#elif (QS_FUN_PTR_SIZE == 2)
-    typedef uint16_t QSFun;
-#elif (QS_FUN_PTR_SIZE == 4)
-    typedef uint32_t QSFun;
-#elif (QS_FUN_PTR_SIZE == 8)
-    typedef uint64_t QSFun;
+#if (QS_FUN_PTR_SIZE == 1U)
+    using QSFun = std::uint8_t;
+#elif (QS_FUN_PTR_SIZE == 2U)
+    using QSFun = std::uint16_t;
+#elif (QS_FUN_PTR_SIZE == 4U)
+    using QSFun = std::uint32_t;
+#elif (QS_FUN_PTR_SIZE == 8U)
+    using QSFun = std::uint64_t;
 #endif
 
 /// @cond
 /// Exlcude the following internals from the Doxygen documentation
 /// Extended-state variables used for parsing various QS-RX Records
 struct CmdVar {
-    uint32_t param1;
-    uint32_t param2;
-    uint32_t param3;
-    uint8_t  idx;
-    uint8_t  cmdId;
+    std::uint32_t param1;
+    std::uint32_t param2;
+    std::uint32_t param3;
+    std::uint8_t  idx;
+    std::uint8_t  cmdId;
 };
 
 struct TickVar {
-    uint_fast8_t rate;
+    std::uint_fast8_t rate;
 };
 
 struct PeekVar {
-    uint16_t offs;
-    uint8_t  size;
-    uint8_t  num;
-    uint8_t  idx;
+    std::uint16_t offs;
+    std::uint8_t  size;
+    std::uint8_t  num;
+    std::uint8_t  idx;
 };
 
 struct PokeVar {
-    uint32_t data;
-    uint16_t offs;
-    uint8_t  size;
-    uint8_t  num;
-    uint8_t  idx;
-    uint8_t  fill;
+    std::uint32_t data;
+    std::uint16_t offs;
+    std::uint8_t  size;
+    std::uint8_t  num;
+    std::uint8_t  idx;
+    std::uint8_t  fill;
 };
 
 struct GFltVar {
-    uint8_t data[16];
-    uint8_t idx;
+    std::uint8_t data[16];
+    std::uint8_t idx;
 };
 
 struct ObjVar {
     QSObj   addr;
-    uint8_t idx;
-    uint8_t kind; // see qs.hpp, enum QSpyObjKind
-    uint8_t recId;
+    std::uint8_t idx;
+    std::uint8_t kind; // see qs.hpp, enum QSpyObjKind
+    std::uint8_t recId;
 };
 
 struct TPVar {  // Test-Probe
     QSFun    addr;
-    uint32_t data;
-    uint8_t  idx;
+    std::uint32_t data;
+    std::uint8_t  idx;
 };
 
 struct AFltVar {
-    uint8_t prio;
+    std::uint8_t prio;
 };
 
 struct EvtVar {
     QEvt    *e;
-    uint8_t *p;
+    std::uint8_t *p;
     QSignal  sig;
-    uint16_t len;
-    uint8_t  prio;
-    uint8_t  idx;
+    std::uint16_t len;
+    std::uint8_t  prio;
+    std::uint8_t  idx;
 };
 
 // extended-state variables for the current QS-RX state
@@ -145,13 +145,13 @@ static struct ExtState {
         EvtVar   evt;
         TPVar    tp;
     } var;
-    uint8_t state;
-    uint8_t esc;
-    uint8_t seq;
-    uint8_t chksum;
+    std::uint8_t state;
+    std::uint8_t esc;
+    std::uint8_t seq;
+    std::uint8_t chksum;
 } l_rx;
 
-enum RxStateEnum {
+enum RxStateEnum : std::uint8_t {
     WAIT4_SEQ,
     WAIT4_REC,
     WAIT4_INFO_FRAME,
@@ -201,22 +201,22 @@ enum RxStateEnum {
 #ifdef Q_UTEST
     static struct TestData {
         TPVar     tpBuf[16]; // buffer of Test-Probes received so far
-        uint8_t   tpNum;     // current number of Test-Probes
+        std::uint8_t tpNum;  // current number of Test-Probes
         QSTimeCtr testTime;  // test time (tick counter)
     } l_testData;
 #endif // Q_UTEST
 
 // internal helper functions...
-static void rxParseData_(uint8_t b);
-static void rxHandleBadFrame_(uint8_t state);
-static void rxReportAck_(enum QSpyRxRecords recId);
-static void rxReportError_(uint8_t code);
-static void rxReportDone_(enum QSpyRxRecords recId);
-static void rxPoke_(void);
+static void rxParseData_(std::uint8_t const b) noexcept;
+static void rxHandleBadFrame_(std::uint8_t const state) noexcept;
+static void rxReportAck_(enum QSpyRxRecords const recId) noexcept;
+static void rxReportError_(std::uint8_t const code) noexcept;
+static void rxReportDone_(enum QSpyRxRecords const recId) noexcept;
+static void rxPoke_(void) noexcept;
 
 //! Internal QS-RX function to take a transition in the QS-RX FSM
-static inline void tran_(RxStateEnum const target) {
-    l_rx.state = static_cast<uint8_t>(target);
+static inline void tran_(RxStateEnum const target) noexcept {
+    l_rx.state = static_cast<std::uint8_t>(target);
 }
 /// @endcond
 
@@ -241,33 +241,35 @@ static inline void tran_(RxStateEnum const target) {
 /// The QS-RX channel will report any data errors by sending the
 /// QS_RX_DATA_ERROR trace record.
 ///
-void QS::rxInitBuf(uint8_t sto[], uint16_t const stoSize) {
+void QS::rxInitBuf(std::uint8_t * const sto,
+                   std::uint16_t const stoSize) noexcept
+{
     rxPriv_.buf  = &sto[0];
-    rxPriv_.end  = static_cast<QSCtr>(stoSize) - static_cast<QSCtr>(1);
-    rxPriv_.head = static_cast<QSCtr>(0);
-    rxPriv_.tail = static_cast<QSCtr>(0);
+    rxPriv_.end  = static_cast<QSCtr>(static_cast<QSCtr>(stoSize) - 1U);
+    rxPriv_.head = 0U;
+    rxPriv_.tail = 0U;
 
-    rxPriv_.currObj[QS::SM_OBJ] = static_cast<void *>(0);
-    rxPriv_.currObj[QS::AO_OBJ] = static_cast<void *>(0);
-    rxPriv_.currObj[QS::MP_OBJ] = static_cast<void *>(0);
-    rxPriv_.currObj[QS::EQ_OBJ] = static_cast<void *>(0);
-    rxPriv_.currObj[QS::TE_OBJ] = static_cast<void *>(0);
-    rxPriv_.currObj[QS::AP_OBJ] = static_cast<void *>(0);
+    rxPriv_.currObj[QS::SM_OBJ] = nullptr;
+    rxPriv_.currObj[QS::AO_OBJ] = nullptr;
+    rxPriv_.currObj[QS::MP_OBJ] = nullptr;
+    rxPriv_.currObj[QS::EQ_OBJ] = nullptr;
+    rxPriv_.currObj[QS::TE_OBJ] = nullptr;
+    rxPriv_.currObj[QS::AP_OBJ] = nullptr;
 
     tran_(WAIT4_SEQ);
-    l_rx.esc    = static_cast<uint8_t>(0);
-    l_rx.seq    = static_cast<uint8_t>(0);
-    l_rx.chksum = static_cast<uint8_t>(0);
+    l_rx.esc    = 0U;
+    l_rx.seq    = 0U;
+    l_rx.chksum = 0U;
 
-    beginRec_(static_cast<uint_fast8_t>(QS_OBJ_DICT));
+    beginRec_(static_cast<std::uint_fast8_t>(QS_OBJ_DICT));
         QS_OBJ_PRE_(&rxPriv_);
         QS_STR_PRE_("QS_RX");
     endRec_();
     // no QS_REC_DONE(), because QS is not running yet
 
 #ifdef Q_UTEST
-    l_testData.tpNum    = static_cast<uint8_t>(0);
-    l_testData.testTime = static_cast<QSTimeCtr>(0);
+    l_testData.tpNum    = 0U;
+    l_testData.testTime = 0U;
 #endif // Q_UTEST
 }
 
@@ -279,16 +281,16 @@ void QS::rxInitBuf(uint8_t sto[], uint16_t const stoSize) {
 /// the head pointer is not being moved concurrently. The tail pointer might
 /// be moving, meaning that bytes can be concurrently removed from the buffer.
 ///
-uint16_t QS::rxGetNfree(void) {
-    uint16_t nFree;
+std::uint16_t QS::rxGetNfree(void) noexcept {
+    std::uint16_t nFree;
     if (rxPriv_.head == rxPriv_.tail) {
-        nFree = static_cast<uint16_t>(rxPriv_.end);
+        nFree = static_cast<std::uint16_t>(rxPriv_.end);
     }
     else if (rxPriv_.head < rxPriv_.tail) {
-        nFree = static_cast<uint16_t>(rxPriv_.tail - rxPriv_.head);
+        nFree = static_cast<std::uint16_t>(rxPriv_.tail - rxPriv_.head);
     }
     else {
-        nFree = static_cast<uint16_t>((rxPriv_.tail + rxPriv_.end)
+        nFree = static_cast<std::uint16_t>((rxPriv_.tail + rxPriv_.end)
                                       - rxPriv_.head);
     }
     return nFree;
@@ -297,38 +299,38 @@ uint16_t QS::rxGetNfree(void) {
 //****************************************************************************
 void QS::rxParse(void) {
     while (rxPriv_.head != rxPriv_.tail) { // QS-RX buffer not empty?
-        uint8_t b = QS_PTR_AT_(rxPriv_.buf, rxPriv_.tail);
+        std::uint8_t b = rxPriv_.buf[rxPriv_.tail];
 
-        if (rxPriv_.tail != static_cast<QSCtr>(0)) {
+        if (rxPriv_.tail != 0U) {
             --rxPriv_.tail;
         }
         else {
              rxPriv_.tail = rxPriv_.end;
         }
 
-        if (l_rx.esc != static_cast<uint8_t>(0)) {  // escaped byte arrived?
-            l_rx.esc = static_cast<uint8_t>(0);
+        if (l_rx.esc != 0U) {  // escaped byte arrived?
+            l_rx.esc = 0U;
             b ^= QS_ESC_XOR;
 
             l_rx.chksum += b;
             rxParseData_(b);
         }
         else if (b == QS_ESC) {
-            l_rx.esc = static_cast<uint8_t>(1);
+            l_rx.esc = 1U;
         }
         else if (b == QS_FRAME) {
             // get ready for the next frame
             b = l_rx.state; // save the current state in b
-            l_rx.esc = static_cast<uint8_t>(0);
+            l_rx.esc = 0U;
             tran_(WAIT4_SEQ);
 
             if (l_rx.chksum == QS_GOOD_CHKSUM) {
-                l_rx.chksum = static_cast<uint8_t>(0);
+                l_rx.chksum = 0U;
                 rxHandleGoodFrame_(b);
             }
             else { // bad checksum
-                l_rx.chksum = static_cast<uint8_t>(0);
-                rxReportError_(static_cast<uint8_t>(0x00));
+                l_rx.chksum = 0U;
+                rxReportError_(0x00U);
                 rxHandleBadFrame_(b);
             }
         }
@@ -340,12 +342,12 @@ void QS::rxParse(void) {
 }
 
 //****************************************************************************
-static void rxParseData_(uint8_t const b) {
+static void rxParseData_(std::uint8_t const b) noexcept {
     switch (l_rx.state) {
         case WAIT4_SEQ: {
             ++l_rx.seq;
             if (l_rx.seq != b) { // not the expected sequence?
-                rxReportError_(static_cast<uint8_t>(0x42));
+                rxReportError_(0x42U);
                 l_rx.seq = b; // update the sequence
             }
             tran_(WAIT4_REC);
@@ -366,36 +368,32 @@ static void rxParseData_(uint8_t const b) {
                     tran_(WAIT4_TICK_RATE);
                     break;
                 case QS_RX_PEEK:
-                    if (QS::rxPriv_.currObj[QS::AP_OBJ]
-                        != static_cast<void *>(0))
-                    {
-                        l_rx.var.peek.offs = static_cast<uint16_t>(0);
-                        l_rx.var.peek.idx  = static_cast<uint8_t>(0);
+                    if (QS::rxPriv_.currObj[QS::AP_OBJ] != nullptr) {
+                        l_rx.var.peek.offs = 0U;
+                        l_rx.var.peek.idx  = 0U;
                         tran_(WAIT4_PEEK_OFFS);
                     }
                     else {
-                        rxReportError_(static_cast<uint8_t>(QS_RX_PEEK));
+                        rxReportError_(static_cast<std::uint8_t>(QS_RX_PEEK));
                         tran_(ERROR_STATE);
                     }
                     break;
                 case QS_RX_POKE:
                 case QS_RX_FILL:
                     l_rx.var.poke.fill =
-                        (b == static_cast<uint8_t>(QS_RX_FILL))
-                            ? static_cast<uint8_t>(1)
-                            : static_cast<uint8_t>(0);
-                    if (QS::rxPriv_.currObj[QS::AP_OBJ]
-                        != static_cast<void *>(0))
-                    {
-                        l_rx.var.poke.offs = static_cast<uint16_t>(0);
-                        l_rx.var.poke.idx  = static_cast<uint8_t>(0);
+                        (b == static_cast<std::uint8_t>(QS_RX_FILL))
+                            ? 1U
+                            : 0U;
+                    if (QS::rxPriv_.currObj[QS::AP_OBJ] != nullptr) {
+                        l_rx.var.poke.offs = 0U;
+                        l_rx.var.poke.idx  = 0U;
                         tran_(WAIT4_POKE_OFFS);
                     }
                     else {
                         rxReportError_(
-                            (l_rx.var.poke.fill != static_cast<uint8_t>(0))
-                                ? static_cast<uint8_t>(QS_RX_FILL)
-                                : static_cast<uint8_t>(QS_RX_POKE));
+                            (l_rx.var.poke.fill != 0U)
+                                ? static_cast<std::uint8_t>(QS_RX_FILL)
+                                : static_cast<std::uint8_t>(QS_RX_POKE));
                         tran_(ERROR_STATE);
                     }
                     break;
@@ -404,18 +402,20 @@ static void rxParseData_(uint8_t const b) {
                     break;
                 case QS_RX_LOC_FILTER:
                     l_rx.var.obj.recId =
-                        static_cast<uint8_t>(QS_RX_LOC_FILTER);
+                        static_cast<std::uint8_t>(QS_RX_LOC_FILTER);
                     tran_(WAIT4_OBJ_KIND);
                     break;
                 case QS_RX_AO_FILTER:
                     tran_(WAIT4_AO_FILTER_PRIO);
                     break;
                 case QS_RX_CURR_OBJ:
-                    l_rx.var.obj.recId = static_cast<uint8_t>(QS_RX_CURR_OBJ);
+                    l_rx.var.obj.recId =
+                        static_cast<std::uint8_t>(QS_RX_CURR_OBJ);
                     tran_(WAIT4_OBJ_KIND);
                     break;
                 case QS_RX_QUERY_CURR:
-                    l_rx.var.obj.recId = static_cast<uint8_t>(QS_RX_QUERY_CURR);
+                    l_rx.var.obj.recId =
+                        static_cast<std::uint8_t>(QS_RX_QUERY_CURR);
                     tran_(WAIT4_QUERY_KIND);
                     break;
                 case QS_RX_EVENT:
@@ -434,24 +434,24 @@ static void rxParseData_(uint8_t const b) {
                     break;
                 case QS_RX_TEST_PROBE:
                     if (l_testData.tpNum
-                        < static_cast<uint8_t>(
+                        < static_cast<std::uint8_t>(
                               (sizeof(l_testData.tpBuf)
                                / sizeof(l_testData.tpBuf[0]))))
                     {
-                        l_rx.var.tp.data = static_cast<uint32_t>(0);
-                        l_rx.var.tp.idx  = static_cast<uint8_t>(0);
+                        l_rx.var.tp.data = 0U;
+                        l_rx.var.tp.idx  = 0U;
                         tran_(WAIT4_TEST_PROBE_DATA);
                     }
                     else { // the number of Test-Probes exceeded
                         rxReportError_(
-                            static_cast<uint8_t>(QS_RX_TEST_PROBE));
+                            static_cast<std::uint8_t>(QS_RX_TEST_PROBE));
                         tran_(ERROR_STATE);
                     }
                     break;
 #endif // Q_UTEST
 
                 default:
-                    rxReportError_(static_cast<uint8_t>(0x43U));
+                    rxReportError_(0x43U);
                     tran_(ERROR_STATE);
                     break;
             }
@@ -463,39 +463,39 @@ static void rxParseData_(uint8_t const b) {
         }
         case WAIT4_CMD_ID: {
             l_rx.var.cmd.cmdId  = b;
-            l_rx.var.cmd.idx    = static_cast<uint8_t>(0);
-            l_rx.var.cmd.param1 = static_cast<uint32_t>(0);
-            l_rx.var.cmd.param2 = static_cast<uint32_t>(0);
-            l_rx.var.cmd.param3 = static_cast<uint32_t>(0);
+            l_rx.var.cmd.idx    = 0U;
+            l_rx.var.cmd.param1 = 0U;
+            l_rx.var.cmd.param2 = 0U;
+            l_rx.var.cmd.param3 = 0U;
             tran_(WAIT4_CMD_PARAM1);
             break;
         }
         case WAIT4_CMD_PARAM1: {
             l_rx.var.cmd.param1 |=
-                (static_cast<uint32_t>(b) << l_rx.var.cmd.idx);
-            l_rx.var.cmd.idx    += static_cast<uint8_t>(8);
-            if (l_rx.var.cmd.idx == static_cast<uint8_t>((8*4))) {
-                l_rx.var.cmd.idx = static_cast<uint8_t>(0);
+                (static_cast<std::uint32_t>(b) << l_rx.var.cmd.idx);
+            l_rx.var.cmd.idx    += 8U;
+            if (l_rx.var.cmd.idx == (8U*4U)) {
+                l_rx.var.cmd.idx = 0U;
                 tran_(WAIT4_CMD_PARAM2);
             }
             break;
         }
         case WAIT4_CMD_PARAM2: {
             l_rx.var.cmd.param2 |=
-                static_cast<uint32_t>(b) << l_rx.var.cmd.idx;
-            l_rx.var.cmd.idx    += static_cast<uint8_t>(8);
-            if (l_rx.var.cmd.idx == static_cast<uint8_t>((8*4))) {
-                l_rx.var.cmd.idx = static_cast<uint8_t>(0);
+                static_cast<std::uint32_t>(b) << l_rx.var.cmd.idx;
+            l_rx.var.cmd.idx    += 8U;
+            if (l_rx.var.cmd.idx == (8U*4U)) {
+                l_rx.var.cmd.idx = 0U;
                 tran_(WAIT4_CMD_PARAM3);
             }
             break;
         }
         case WAIT4_CMD_PARAM3: {
             l_rx.var.cmd.param3 |=
-                static_cast<uint32_t>(b) << l_rx.var.cmd.idx;
-            l_rx.var.cmd.idx    += static_cast<uint8_t>(8);
-            if (l_rx.var.cmd.idx == static_cast<uint8_t>((8*4))) {
-                l_rx.var.cmd.idx = static_cast<uint8_t>(0);
+                static_cast<std::uint32_t>(b) << l_rx.var.cmd.idx;
+            l_rx.var.cmd.idx    += 8U;
+            if (l_rx.var.cmd.idx == (8U*4U)) {
+                l_rx.var.cmd.idx = 0U;
                 tran_(WAIT4_CMD_FRAME);
             }
             break;
@@ -509,7 +509,7 @@ static void rxParseData_(uint8_t const b) {
             break;
         }
         case WAIT4_TICK_RATE: {
-            l_rx.var.tick.rate = static_cast<uint_fast8_t>(b);
+            l_rx.var.tick.rate = static_cast<std::uint_fast8_t>(b);
             tran_(WAIT4_TICK_FRAME);
             break;
         }
@@ -518,27 +518,27 @@ static void rxParseData_(uint8_t const b) {
             break;
         }
         case WAIT4_PEEK_OFFS: {
-            if (l_rx.var.peek.idx == static_cast<uint8_t>(0)) {
-                l_rx.var.peek.offs = static_cast<uint16_t>(b);
-                l_rx.var.peek.idx += static_cast<uint8_t>(8);
+            if (l_rx.var.peek.idx == 0U) {
+                l_rx.var.peek.offs = static_cast<std::uint16_t>(b);
+                l_rx.var.peek.idx += 8U;
             }
             else {
-                l_rx.var.peek.offs |= static_cast<uint16_t>(
-                                          static_cast<uint16_t>(b) << 8);
+                l_rx.var.peek.offs |= static_cast<std::uint16_t>(
+                                          static_cast<std::uint16_t>(b) << 8);
                 tran_(WAIT4_PEEK_SIZE);
             }
             break;
         }
         case WAIT4_PEEK_SIZE: {
-            if ((b == static_cast<uint8_t>(1))
-                || (b == static_cast<uint8_t>(2))
-                || (b == static_cast<uint8_t>(4)))
+            if ((b == 1U)
+                || (b == 2U)
+                || (b == 4U))
             {
                 l_rx.var.peek.size = b;
                 tran_(WAIT4_PEEK_NUM);
             }
             else {
-                rxReportError_(static_cast<uint8_t>(QS_RX_PEEK));
+                rxReportError_(static_cast<std::uint8_t>(QS_RX_PEEK));
                 tran_(ERROR_STATE);
             }
             break;
@@ -553,54 +553,54 @@ static void rxParseData_(uint8_t const b) {
             break;
         }
         case WAIT4_POKE_OFFS: {
-            if (l_rx.var.poke.idx == static_cast<uint8_t>(0)) {
-                l_rx.var.poke.offs = static_cast<uint16_t>(b);
-                l_rx.var.poke.idx  = static_cast<uint8_t>(1);
+            if (l_rx.var.poke.idx == 0U) {
+                l_rx.var.poke.offs = static_cast<std::uint16_t>(b);
+                l_rx.var.poke.idx  = 1U;
             }
             else {
-                l_rx.var.poke.offs |= static_cast<uint16_t>(
-                                          static_cast<uint16_t>(b) << 8);
+                l_rx.var.poke.offs |= static_cast<std::uint16_t>(
+                                          static_cast<std::uint16_t>(b) << 8);
                 tran_(WAIT4_POKE_SIZE);
             }
             break;
         }
         case WAIT4_POKE_SIZE: {
-            if ((b == static_cast<uint8_t>(1))
-                || (b == static_cast<uint8_t>(2))
-                || (b == static_cast<uint8_t>(4)))
+            if ((b == 1U)
+                || (b == 2U)
+                || (b == 4U))
             {
                 l_rx.var.poke.size = b;
                 tran_(WAIT4_POKE_NUM);
             }
             else {
-                rxReportError_((l_rx.var.poke.fill != static_cast<uint8_t>(0))
-                                  ? static_cast<uint8_t>(QS_RX_FILL)
-                                  : static_cast<uint8_t>(QS_RX_POKE));
+                rxReportError_((l_rx.var.poke.fill != 0U)
+                                  ? static_cast<std::uint8_t>(QS_RX_FILL)
+                                  : static_cast<std::uint8_t>(QS_RX_POKE));
                 tran_(ERROR_STATE);
             }
             break;
         }
         case WAIT4_POKE_NUM: {
-            if (b > static_cast<uint8_t>(0)) {
+            if (b > 0U) {
                 l_rx.var.poke.num  = b;
-                l_rx.var.poke.data = static_cast<uint32_t>(0);
-                l_rx.var.poke.idx  = static_cast<uint8_t>(0);
-                tran_((l_rx.var.poke.fill != static_cast<uint8_t>(0))
+                l_rx.var.poke.data = 0U;
+                l_rx.var.poke.idx  = 0U;
+                tran_((l_rx.var.poke.fill != 0U)
                             ? WAIT4_FILL_DATA
                             : WAIT4_POKE_DATA);
             }
             else {
-                rxReportError_((l_rx.var.poke.fill != static_cast<uint8_t>(0))
-                                  ? static_cast<uint8_t>(QS_RX_FILL)
-                                  : static_cast<uint8_t>(QS_RX_POKE));
+                rxReportError_((l_rx.var.poke.fill != 0U)
+                                  ? static_cast<std::uint8_t>(QS_RX_FILL)
+                                  : static_cast<std::uint8_t>(QS_RX_POKE));
                 tran_(ERROR_STATE);
             }
             break;
         }
         case WAIT4_FILL_DATA: {
             l_rx.var.poke.data |=
-                static_cast<uint32_t>(b) << l_rx.var.poke.idx;
-            l_rx.var.poke.idx += static_cast<uint8_t>(8);
+                static_cast<std::uint32_t>(b) << l_rx.var.poke.idx;
+            l_rx.var.poke.idx += 8U;
             if ((l_rx.var.poke.idx >> 3) == l_rx.var.poke.size) {
                 tran_(WAIT4_FILL_FRAME);
             }
@@ -608,12 +608,12 @@ static void rxParseData_(uint8_t const b) {
         }
         case WAIT4_POKE_DATA: {
             l_rx.var.poke.data |=
-                static_cast<uint32_t>(b) << l_rx.var.poke.idx;
-            l_rx.var.poke.idx += static_cast<uint8_t>(8);
+                static_cast<std::uint32_t>(b) << l_rx.var.poke.idx;
+            l_rx.var.poke.idx += 8U;
             if ((l_rx.var.poke.idx >> 3) == l_rx.var.poke.size) {
                 rxPoke_();
                 --l_rx.var.poke.num;
-                if (l_rx.var.poke.num == static_cast<uint8_t>(0)) {
+                if (l_rx.var.poke.num == 0U) {
                     tran_(WAIT4_POKE_FRAME);
                 }
             }
@@ -628,12 +628,12 @@ static void rxParseData_(uint8_t const b) {
             break;
         }
         case WAIT4_GLB_FILTER_LEN: {
-            if (b == static_cast<uint8_t>(sizeof(l_rx.var.gFlt.data))) {
-                l_rx.var.gFlt.idx = static_cast<uint8_t>(0);
+            if (b == static_cast<std::uint8_t>(sizeof(l_rx.var.gFlt.data))) {
+                l_rx.var.gFlt.idx = 0U;
                 tran_(WAIT4_GLB_FILTER_DATA);
             }
             else {
-                rxReportError_(static_cast<uint8_t>(QS_RX_GLB_FILTER));
+                rxReportError_(static_cast<std::uint8_t>(QS_RX_GLB_FILTER));
                 tran_(ERROR_STATE);
             }
             break;
@@ -641,9 +641,7 @@ static void rxParseData_(uint8_t const b) {
         case WAIT4_GLB_FILTER_DATA: {
             l_rx.var.gFlt.data[l_rx.var.gFlt.idx] = b;
             ++l_rx.var.gFlt.idx;
-            if (l_rx.var.gFlt.idx
-                == static_cast<uint8_t>(sizeof(l_rx.var.gFlt.data)))
-            {
+            if (l_rx.var.gFlt.idx == sizeof(l_rx.var.gFlt.data)) {
                 tran_(WAIT4_GLB_FILTER_FRAME);
             }
             break;
@@ -653,10 +651,10 @@ static void rxParseData_(uint8_t const b) {
             break;
         }
         case WAIT4_OBJ_KIND: {
-            if (b <= static_cast<uint8_t>(QS::SM_AO_OBJ)) {
+            if (b <= static_cast<std::uint8_t>(QS::SM_AO_OBJ)) {
                 l_rx.var.obj.kind = b;
-                l_rx.var.obj.addr = static_cast<QSObj>(0);
-                l_rx.var.obj.idx  = static_cast<uint8_t>(0);
+                l_rx.var.obj.addr = 0U;
+                l_rx.var.obj.idx  = 0U;
                 tran_(WAIT4_OBJ_ADDR);
             }
             else {
@@ -667,10 +665,10 @@ static void rxParseData_(uint8_t const b) {
         }
         case WAIT4_OBJ_ADDR: {
             l_rx.var.obj.addr |=
-                static_cast<uint32_t>(b) << l_rx.var.obj.idx;
-            l_rx.var.obj.idx += static_cast<uint8_t>(8);
+                static_cast<std::uint32_t>(b) << l_rx.var.obj.idx;
+            l_rx.var.obj.idx += 8U;
             if (l_rx.var.obj.idx
-                == static_cast<uint8_t>((8*QS_OBJ_PTR_SIZE)))
+                == (8U * static_cast<unsigned>(QS_OBJ_PTR_SIZE)))
             {
                 tran_(WAIT4_OBJ_FRAME);
             }
@@ -681,7 +679,7 @@ static void rxParseData_(uint8_t const b) {
             break;
         }
         case WAIT4_QUERY_KIND: {
-            if (b < static_cast<uint8_t>(QS::MAX_OBJ)) {
+            if (b < static_cast<std::uint8_t>(QS::MAX_OBJ)) {
                 l_rx.var.obj.kind = b;
                 tran_(WAIT4_QUERY_FRAME);
             }
@@ -706,44 +704,46 @@ static void rxParseData_(uint8_t const b) {
         }
         case WAIT4_EVT_PRIO: {
             l_rx.var.evt.prio = b;
-            l_rx.var.evt.sig  = static_cast<QSignal>(0);
-            l_rx.var.evt.idx  = static_cast<uint8_t>(0);
+            l_rx.var.evt.sig  = 0U;
+            l_rx.var.evt.idx  = 0U;
             tran_(WAIT4_EVT_SIG);
             break;
         }
         case WAIT4_EVT_SIG: {
             l_rx.var.evt.sig |= static_cast<QSignal>(
-                                static_cast<uint32_t>(b) << l_rx.var.evt.idx);
-            l_rx.var.evt.idx += static_cast<uint8_t>(8);
-            if (l_rx.var.evt.idx == static_cast<uint8_t>((8*Q_SIGNAL_SIZE))) {
-                l_rx.var.evt.len = static_cast<uint16_t>(0);
-                l_rx.var.evt.idx = static_cast<uint8_t>(0);
+                          static_cast<std::uint32_t>(b) << l_rx.var.evt.idx);
+            l_rx.var.evt.idx += 8U;
+            if (l_rx.var.evt.idx
+                == (8U *static_cast<unsigned>(Q_SIGNAL_SIZE)))
+            {
+                l_rx.var.evt.len = 0U;
+                l_rx.var.evt.idx = 0U;
                 tran_(WAIT4_EVT_LEN);
             }
             break;
         }
         case WAIT4_EVT_LEN: {
-            l_rx.var.evt.len |= static_cast<uint16_t>(
-                                static_cast<uint32_t>(b) << l_rx.var.evt.idx);
-            l_rx.var.evt.idx += static_cast<uint8_t>(8);
-            if (l_rx.var.evt.idx == static_cast<uint8_t>((8*2))) {
-                if ((l_rx.var.evt.len + static_cast<uint16_t>(sizeof(QEvt)))
-                    <= static_cast<uint16_t>(QF::poolGetMaxBlockSize()))
+            l_rx.var.evt.len |= static_cast<std::uint16_t>(
+                                static_cast<unsigned>(b) << l_rx.var.evt.idx);
+            l_rx.var.evt.idx += 8U;
+            if (l_rx.var.evt.idx == (8U * 2U)) {
+                if ((l_rx.var.evt.len + sizeof(QEvt))
+                    <= static_cast<std::uint16_t>(QF::poolGetMaxBlockSize()))
                 {
                     // report Ack before generating any other QS records
                     rxReportAck_(QS_RX_EVENT);
 
                     l_rx.var.evt.e = QF::newX_(
-                        (static_cast<uint_fast16_t>(l_rx.var.evt.len)
-                         + static_cast<uint_fast16_t>(sizeof(QEvt))),
-                        static_cast<uint_fast16_t>(0), // margin
+                        (static_cast<std::uint_fast16_t>(l_rx.var.evt.len)
+                         + sizeof(QEvt)),
+                        0U, // margin
                         static_cast<enum_t>(l_rx.var.evt.sig));
                     // event allocated?
-                    if (l_rx.var.evt.e != static_cast<QEvt *>(0)) {
+                    if (l_rx.var.evt.e != nullptr) {
                         l_rx.var.evt.p =
-                            reinterpret_cast<uint8_t *>(l_rx.var.evt.e);
+                            reinterpret_cast<std::uint8_t *>(l_rx.var.evt.e);
                         l_rx.var.evt.p += sizeof(QEvt);
-                        if (l_rx.var.evt.len > static_cast<uint16_t>(0)) {
+                        if (l_rx.var.evt.len > 0U) {
                             tran_(WAIT4_EVT_PAR);
                         }
                         else {
@@ -751,12 +751,12 @@ static void rxParseData_(uint8_t const b) {
                         }
                     }
                     else {
-                        rxReportError_(static_cast<uint8_t>(QS_RX_EVENT));
+                        rxReportError_(static_cast<std::uint8_t>(QS_RX_EVENT));
                         tran_(ERROR_STATE);
                     }
                 }
                 else {
-                    rxReportError_(static_cast<uint8_t>(QS_RX_EVENT));
+                    rxReportError_(static_cast<std::uint8_t>(QS_RX_EVENT));
                     tran_(ERROR_STATE);
                 }
             }
@@ -766,7 +766,7 @@ static void rxParseData_(uint8_t const b) {
             *l_rx.var.evt.p = b;
             ++l_rx.var.evt.p;
             --l_rx.var.evt.len;
-            if (l_rx.var.evt.len == static_cast<uint16_t>(0)) {
+            if (l_rx.var.evt.len == 0U) {
                 tran_(WAIT4_EVT_FRAME);
             }
             break;
@@ -790,21 +790,23 @@ static void rxParseData_(uint8_t const b) {
             break;
         }
         case WAIT4_TEST_PROBE_DATA: {
-            l_rx.var.tp.data |= static_cast<uint32_t>(b) << l_rx.var.tp.idx;
-            l_rx.var.tp.idx += static_cast<uint8_t>(8);
-            if (l_rx.var.tp.idx
-                == static_cast<uint8_t>(8U*sizeof(uint32_t)))
-            {
-                l_rx.var.tp.addr = static_cast<uint32_t>(0);
-                l_rx.var.tp.idx  = static_cast<uint8_t>(0);
+            l_rx.var.tp.data |=
+                (static_cast<std::uint32_t>(b) << l_rx.var.tp.idx);
+            l_rx.var.tp.idx += 8U;
+            if (l_rx.var.tp.idx == (8U * sizeof(std::uint32_t))) {
+                l_rx.var.tp.addr = 0U;
+                l_rx.var.tp.idx  = 0U;
                 tran_(WAIT4_TEST_PROBE_ADDR);
             }
             break;
         }
         case WAIT4_TEST_PROBE_ADDR: {
-            l_rx.var.tp.addr |= static_cast<uint32_t>(b) << l_rx.var.tp.idx;
-            l_rx.var.tp.idx += static_cast<uint8_t>(8);
-            if (l_rx.var.tp.idx == static_cast<uint8_t>(8*QS_FUN_PTR_SIZE)) {
+            l_rx.var.tp.addr |=
+                (static_cast<std::uint32_t>(b) << l_rx.var.tp.idx);
+            l_rx.var.tp.idx += 8U;
+            if (l_rx.var.tp.idx
+                == (8U * static_cast<unsigned>(QS_FUN_PTR_SIZE)))
+            {
                 tran_(WAIT4_TEST_PROBE_FRAME);
             }
             break;
@@ -820,7 +822,7 @@ static void rxParseData_(uint8_t const b) {
             break;
         }
         default: { // unexpected or unimplemented state
-            rxReportError_(static_cast<uint8_t>(0x45));
+            rxReportError_(0x45U);
             tran_(ERROR_STATE);
             break;
         }
@@ -828,14 +830,14 @@ static void rxParseData_(uint8_t const b) {
 }
 
 //****************************************************************************
-void QS::rxHandleGoodFrame_(uint8_t state) {
-    uint8_t i;
-    uint8_t *ptr;
+void QS::rxHandleGoodFrame_(std::uint8_t const state) {
+    std::uint8_t i;
+    std::uint8_t *ptr;
 
     switch (state) {
         case WAIT4_INFO_FRAME: {
             // no need to report Ack or Done
-            QS_target_info_(static_cast<uint8_t>(0)); // send only Target info
+            QS_target_info_(0U); // send only Target info
             break;
         }
         case WAIT4_RESET_FRAME: {
@@ -849,7 +851,7 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
         case WAIT4_CMD_FRAME: {
             rxReportAck_(QS_RX_COMMAND);
             QS::onCommand(l_rx.var.cmd.cmdId, l_rx.var.cmd.param1,
-                         l_rx.var.cmd.param2, l_rx.var.cmd.param3);
+                          l_rx.var.cmd.param2, l_rx.var.cmd.param3);
 #ifdef Q_UTEST
             QS::processTestEvts_(); // process all events produced
 #endif
@@ -859,11 +861,10 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
         case WAIT4_TICK_FRAME: {
             rxReportAck_(QS_RX_TICK);
 #ifdef Q_UTEST
-            QS::tickX_(static_cast<uint_fast8_t>(l_rx.var.tick.rate),
-                       &QS::rxPriv_); // process tick
+            QS::tickX_(l_rx.var.tick.rate, &QS::rxPriv_); // process tick
             QS::processTestEvts_(); // process all events produced
 #else
-            QF::tickX_(static_cast<uint_fast8_t>(l_rx.var.tick.rate),
+            QF::tickX_(static_cast<std::uint_fast8_t>(l_rx.var.tick.rate),
                        &QS::rxPriv_);
 #endif
             rxReportDone_(QS_RX_TICK);
@@ -871,23 +872,26 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
         }
         case WAIT4_PEEK_FRAME: {
             // no need to report Ack or Done
-            QS::beginRec_(static_cast<uint_fast8_t>(QS_PEEK_DATA));
-                ptr = (static_cast<uint8_t *>(QS::rxPriv_.currObj[QS::AP_OBJ])
+            QS::beginRec_(static_cast<std::uint_fast8_t>(QS_PEEK_DATA));
+                ptr = (static_cast<std::uint8_t*>(
+                           QS::rxPriv_.currObj[QS::AP_OBJ])
                        + l_rx.var.peek.offs);
                 QS_TIME_PRE_();                  // timestamp
                 QS_U16_PRE_(l_rx.var.peek.offs); // data offset
                 QS_U8_PRE_(l_rx.var.peek.size);  // data size
                 QS_U8_PRE_(l_rx.var.peek.num);   // number of data items
-                for (i =static_cast<uint8_t>(0); i < l_rx.var.peek.num; ++i) {
+                for (i = 0U; i < l_rx.var.peek.num; ++i) {
                     switch (l_rx.var.peek.size) {
                         case 1:
                             QS_U8_PRE_(*(ptr + i));
                             break;
                         case 2:
-                            QS_U16_PRE_(*(reinterpret_cast<uint16_t *>(ptr) + i));
+                            QS_U16_PRE_(
+                                *(reinterpret_cast<std::uint16_t*>(ptr) + i));
                             break;
                         case 4:
-                            QS_U32_PRE_(*(reinterpret_cast<uint32_t *>(ptr) + i));
+                            QS_U32_PRE_(
+                                *(reinterpret_cast<std::uint32_t*>(ptr) + i));
                             break;
                         default:
                             break;
@@ -899,7 +903,7 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
         }
         case WAIT4_POKE_DATA: {
             // received less than expected poke data items
-            rxReportError_(static_cast<uint8_t>(QS_RX_POKE));
+            rxReportError_(static_cast<std::uint8_t>(QS_RX_POKE));
             break;
         }
         case WAIT4_POKE_FRAME: {
@@ -909,19 +913,21 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
         }
         case WAIT4_FILL_FRAME: {
             rxReportAck_(QS_RX_FILL);
-            ptr = (static_cast<uint8_t *>(QS::rxPriv_.currObj[QS::AP_OBJ])
+            ptr = (static_cast<std::uint8_t *>(
+                       QS::rxPriv_.currObj[QS::AP_OBJ])
                    + l_rx.var.poke.offs);
-            for (i = static_cast<uint8_t>(0); i < l_rx.var.poke.num; ++i) {
+            for (i = 0U; i < l_rx.var.poke.num; ++i) {
                 switch (l_rx.var.poke.size) {
                     case 1:
-                        *(ptr + i) = static_cast<uint8_t>(l_rx.var.poke.data);
+                        *(ptr + i) =
+                            static_cast<std::uint8_t>(l_rx.var.poke.data);
                         break;
                     case 2:
-                        *(reinterpret_cast<uint16_t *>(ptr) + i) =
-                            static_cast<uint16_t>(l_rx.var.poke.data);
+                        *(reinterpret_cast<std::uint16_t *>(ptr) + i) =
+                            static_cast<std::uint16_t>(l_rx.var.poke.data);
                         break;
                     case 4:
-                        *(reinterpret_cast<uint32_t *>(ptr) + i) =
+                        *(reinterpret_cast<std::uint32_t *>(ptr) + i) =
                             l_rx.var.poke.data;
                         break;
                     default:
@@ -934,15 +940,16 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
             rxReportAck_(QS_RX_GLB_FILTER);
 
             // never disable the non-maskable records
-            l_rx.var.gFlt.data[0] |= static_cast<uint8_t>(0x01);
-            l_rx.var.gFlt.data[7] |= static_cast<uint8_t>(0xFC);
-            l_rx.var.gFlt.data[8] |= static_cast<uint8_t>(0x3F);
+            l_rx.var.gFlt.data[0] |= 0x01U;
+            l_rx.var.gFlt.data[7] |= 0xFCU;
+            l_rx.var.gFlt.data[8] |= 0x3FU;
 
             // never enable the last 3 records (0x7D, 0x7E, 0x7F)
-            l_rx.var.gFlt.data[15] &= static_cast<uint8_t>(0x1F);
+            l_rx.var.gFlt.data[15] &= 0x1FU;
 
-            for (i = static_cast<uint8_t>(0);
-                 i < static_cast<uint8_t>(sizeof(QS::priv_.glbFilter)); ++i)
+            for (i = 0U;
+                 i < static_cast<std::uint8_t>(sizeof(QS::priv_.glbFilter));
+                 ++i)
             {
                 QS::priv_.glbFilter[i] = l_rx.var.gFlt.data[i];
             }
@@ -951,9 +958,9 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
         }
         case WAIT4_OBJ_FRAME: {
             i = l_rx.var.obj.kind;
-            if (i < static_cast<uint8_t>(QS::MAX_OBJ)) {
+            if (i < static_cast<std::uint8_t>(QS::MAX_OBJ)) {
                 if (l_rx.var.obj.recId
-                    == static_cast<uint8_t>(QS_RX_LOC_FILTER))
+                    == static_cast<std::uint8_t>(QS_RX_LOC_FILTER))
                 {
                     QS::priv_.locFilter[i] =
                          reinterpret_cast<void *>(l_rx.var.obj.addr);
@@ -966,9 +973,9 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
                     static_cast<enum QSpyRxRecords>(l_rx.var.obj.recId));
             }
             // both SM and AO
-            else if (i == static_cast<uint8_t>(QS::SM_AO_OBJ)) {
+            else if (i == static_cast<std::uint8_t>(QS::SM_AO_OBJ)) {
                 if (l_rx.var.obj.recId
-                    == static_cast<uint8_t>(QS_RX_LOC_FILTER))
+                    == static_cast<std::uint8_t>(QS_RX_LOC_FILTER))
                 {
                     QS::priv_.locFilter[QS::SM_OBJ] =
                         reinterpret_cast<void *>(l_rx.var.obj.addr);
@@ -991,36 +998,48 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
         }
         case WAIT4_QUERY_FRAME: {
             i = l_rx.var.obj.kind;
-            ptr = reinterpret_cast<uint8_t *>(QS::rxPriv_.currObj[i]);
-            if (ptr != static_cast<void *>(0)) {
-                QS::beginRec_(static_cast<uint_fast8_t>(QS_QUERY_DATA));
+            ptr = reinterpret_cast<std::uint8_t *>(QS::rxPriv_.currObj[i]);
+            if (ptr != nullptr) {
+                QS::beginRec_(static_cast<std::uint_fast8_t>(QS_QUERY_DATA));
                     QS_TIME_PRE_(); // timestamp
                     QS_U8_PRE_(i);  // object kind
                     QS_OBJ_PRE_(ptr);
                     switch (i) {
                         case QS::SM_OBJ:
-                            QS_FUN_PRE_(reinterpret_cast<QHsm *>(ptr)->m_state.fun);
+                            QS_FUN_PRE_(
+                                reinterpret_cast<QHsm *>(ptr)->m_state.fun);
                             break;
 
 #ifdef Q_UTEST
                         case QS::AO_OBJ:
-                            QS_EQC_PRE_(reinterpret_cast<QActive *>(ptr)->m_eQueue.m_nFree);
-                            QS_EQC_PRE_(reinterpret_cast<QActive *>(ptr)->m_eQueue.m_nMin);
+                            QS_EQC_PRE_(reinterpret_cast<QActive *>(ptr)
+                                        ->m_eQueue.m_nFree);
+                            QS_EQC_PRE_(reinterpret_cast<QActive *>(ptr)
+                                        ->m_eQueue.m_nMin);
                             break;
                         case QS::MP_OBJ:
-                            QS_MPC_PRE_(reinterpret_cast<QMPool *>(ptr)->m_nFree);
-                            QS_MPC_PRE_(reinterpret_cast<QMPool *>(ptr)->m_nMin);
+                            QS_MPC_PRE_(reinterpret_cast<QMPool *>(ptr)
+                                        ->m_nFree);
+                            QS_MPC_PRE_(reinterpret_cast<QMPool *>(ptr)
+                                        ->m_nMin);
                             break;
                         case QS::EQ_OBJ:
-                            QS_EQC_PRE_(reinterpret_cast<QEQueue *>(ptr)->m_nFree);
-                            QS_EQC_PRE_(reinterpret_cast<QEQueue *>(ptr)->m_nMin);
+                            QS_EQC_PRE_(reinterpret_cast<QEQueue *>(ptr)
+                                        ->m_nFree);
+                            QS_EQC_PRE_(reinterpret_cast<QEQueue *>(ptr)
+                                        ->m_nMin);
                             break;
                         case QS::TE_OBJ:
-                            QS_OBJ_PRE_(reinterpret_cast<QTimeEvt *>(ptr)->m_act);
-                            QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(ptr)->m_ctr);
-                            QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(ptr)->m_interval);
-                            QS_SIG_PRE_(reinterpret_cast<QTimeEvt *>(ptr)->sig);
-                            QS_U8_PRE_ (reinterpret_cast<QTimeEvt *>(ptr)->refCtr_);
+                            QS_OBJ_PRE_(reinterpret_cast<QTimeEvt *>(ptr)
+                                        ->m_act);
+                            QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(ptr)
+                                        ->m_ctr);
+                            QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(ptr)
+                                        ->m_interval);
+                            QS_SIG_PRE_(reinterpret_cast<QTimeEvt *>(ptr)
+                                        ->sig);
+                            QS_U8_PRE_ (reinterpret_cast<QTimeEvt *>(ptr)
+                                        ->refCtr_);
                             break;
 #endif // Q_UTEST
 
@@ -1031,13 +1050,13 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
                 QS_REC_DONE();
             }
             else {
-                rxReportError_(static_cast<uint8_t>(QS_RX_QUERY_CURR));
+                rxReportError_(static_cast<std::uint8_t>(QS_RX_QUERY_CURR));
             }
             break;
         }
         case WAIT4_AO_FILTER_FRAME: {
             rxReportAck_(QS_RX_AO_FILTER);
-            if (l_rx.var.aFlt.prio <= static_cast<uint8_t>(QF_MAX_ACTIVE)) {
+            if (l_rx.var.aFlt.prio <= QF_MAX_ACTIVE) {
                 rxReportAck_(QS_RX_AO_FILTER);
                 QS::priv_.locFilter[QS::AO_OBJ] =
                     QF::active_[l_rx.var.aFlt.prio];
@@ -1045,7 +1064,7 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
                     QF::active_[l_rx.var.aFlt.prio];
             }
             else {
-                rxReportError_(static_cast<uint8_t>(QS_RX_AO_FILTER));
+                rxReportError_(static_cast<std::uint8_t>(QS_RX_AO_FILTER));
             }
             // no need to report Done
             break;
@@ -1056,27 +1075,24 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
             QS::onTestEvt(l_rx.var.evt.e); // "massage" the event, if needed
 #endif // Q_UTEST
             // use 'i' as status, 0 == success,no-recycle
-            i = static_cast<uint8_t>(0);
+            i = 0U;
 
-            if (l_rx.var.evt.prio == static_cast<uint8_t>(0)) { // publish
+            if (l_rx.var.evt.prio == 0U) { // publish
                 QF::PUBLISH(l_rx.var.evt.e, &QS::rxPriv_);
             }
-            else if (l_rx.var.evt.prio < static_cast<uint8_t>(QF_MAX_ACTIVE))
-            {
+            else if (l_rx.var.evt.prio < QF_MAX_ACTIVE) {
                 if (!QF::active_[l_rx.var.evt.prio]->POST_X(
                                 l_rx.var.evt.e,
-                                static_cast<uint_fast16_t>(0), // margin
+                                0U, // margin
                                 &QS::rxPriv_))
                 {
                     // failed QACTIVE_POST() recycles the event
-                    i = static_cast<uint8_t>(0x80); // failure, no recycle
+                    i = 0x80U; // failure, no recycle
                 }
             }
-            else if (l_rx.var.evt.prio == static_cast<uint8_t>(255)) {
+            else if (l_rx.var.evt.prio == 255U) {
                 // dispatch to the current SM object
-                if (QS::rxPriv_.currObj[QS::SM_OBJ]
-                    != static_cast<void *>(0))
-                {
+                if (QS::rxPriv_.currObj[QS::SM_OBJ] != nullptr) {
                     // increment the ref-ctr to simulate the situation
                     // when the event is just retreived from a queue.
                     // This is expected for the following QF::gc() call.
@@ -1085,16 +1101,15 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
 
                     static_cast<QHsm *>(QS::rxPriv_.currObj[QS::SM_OBJ])
                             ->dispatch(l_rx.var.evt.e);
-                    i = static_cast<uint8_t>(0x01);  // success, recycle
+                    i = 0x01U;  // success, recycle
                 }
                 else {
-                    i = static_cast<uint8_t>(0x81);  // failure, recycle
+                    i = 0x81U;  // failure, recycle
                 }
             }
-            else if (l_rx.var.evt.prio == static_cast<uint8_t>(254)) {
+            else if (l_rx.var.evt.prio == 254U) {
                 // init the current SM object"
-                if (QS::rxPriv_.currObj[QS::SM_OBJ] != static_cast<void *>(0))
-                {
+                if (QS::rxPriv_.currObj[QS::SM_OBJ] != nullptr) {
                     // increment the ref-ctr to simulate the situation
                     // when the event is just retreived from a queue.
                     // This is expected for the following QF::gc() call.
@@ -1103,41 +1118,40 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
 
                     static_cast<QHsm *>(QS::rxPriv_.currObj[QS::SM_OBJ])
                             ->init(l_rx.var.evt.e);
-                    i = static_cast<uint8_t>(0x01);  // success, recycle
+                    i = 0x01U;  // success, recycle
                 }
                 else {
-                    i = static_cast<uint8_t>(0x81);  // failure, recycle
+                    i = 0x81U;  // failure, recycle
                 }
             }
-            else if (l_rx.var.evt.prio == static_cast<uint8_t>(253)) {
+            else if (l_rx.var.evt.prio == 253U) {
                 // post to the current AO
-                if (QS::rxPriv_.currObj[QS::AO_OBJ] != static_cast<void *>(0))
-                {
+                if (QS::rxPriv_.currObj[QS::AO_OBJ] != nullptr) {
                     if (!static_cast<QActive *>(
                             QS::rxPriv_.currObj[QS::AO_OBJ])->POST_X(
                                 l_rx.var.evt.e,
-                                static_cast<uint_fast16_t>(0), // margin
+                                0U, // margin
                                 &QS::rxPriv_))
                     {
                         // failed QACTIVE_POST() recycles the event
-                        i = static_cast<uint8_t>(0x80); // failure, no recycle
+                        i = 0x80U; // failure, no recycle
                     }
                 }
                 else {
-                    i = static_cast<uint8_t>(0x81);  // failure, recycle
+                    i = 0x81U;  // failure, recycle
                 }
             }
             else {
-                i = static_cast<uint8_t>(0x81);  // failure, recycle
+                i = 0x81U;  // failure, recycle
             }
 
             // recycle needed?
-            if ((i & static_cast<uint8_t>(0x01)) != static_cast<uint8_t>(0)) {
+            if ((i & 1U) != 0U) {
                 QF::gc(l_rx.var.evt.e);
             }
             // failure?
-            if ((i & static_cast<uint8_t>(0x80)) != static_cast<uint8_t>(0)) {
-                rxReportError_(static_cast<uint8_t>(QS_RX_EVENT));
+            if ((i & 0x80U) != 0U) {
+                rxReportError_(static_cast<std::uint8_t>(QS_RX_EVENT));
             }
             else {
 #ifdef Q_UTEST
@@ -1151,8 +1165,8 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
 #ifdef Q_UTEST
         case WAIT4_TEST_SETUP_FRAME: {
             rxReportAck_(QS_RX_TEST_SETUP);
-            l_testData.tpNum = static_cast<uint8_t>(0); // clear Test-Probes
-            l_testData.testTime = static_cast<QSTimeCtr>(0); //clear time tick
+            l_testData.tpNum = 0U; // clear Test-Probes
+            l_testData.testTime = 0U; //clear time tick
             // don't clear current objects
             QS::onTestSetup(); // application-specific test setup
             // no need to report Done
@@ -1172,9 +1186,9 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
         }
         case WAIT4_TEST_PROBE_FRAME: {
             rxReportAck_(QS_RX_TEST_PROBE);
-            Q_ASSERT_ID(815, l_testData.tpNum
-                             < static_cast<uint8_t>(sizeof(l_testData.tpBuf)
-                                               /sizeof(l_testData.tpBuf[0])));
+            Q_ASSERT_ID(815,
+                l_testData.tpNum
+                   < (sizeof(l_testData.tpBuf) / sizeof(l_testData.tpBuf[0])));
             l_testData.tpBuf[l_testData.tpNum] = l_rx.var.tp;
             ++l_testData.tpNum;
             // no need to report Done
@@ -1187,74 +1201,70 @@ void QS::rxHandleGoodFrame_(uint8_t state) {
             break;
         }
         default: {
-            rxReportError_(static_cast<uint8_t>(0x47));
+            rxReportError_(0x47U);
             break;
         }
     }
 }
 
 //****************************************************************************
-static void rxHandleBadFrame_(uint8_t state) {
-    rxReportError_(static_cast<uint8_t>(0x50)); // error for all bad frames
-    switch (state) {
-        case WAIT4_EVT_FRAME: {
-            Q_ASSERT_ID(910, l_rx.var.evt.e != (QEvt *)0);
-            QF::gc(l_rx.var.evt.e); // don't leak an allocated event
-            break;
-        }
-        default: {
-            break;
-        }
+static void rxHandleBadFrame_(std::uint8_t const state) noexcept {
+    rxReportError_(0x50U); // error for all bad frames
+    if (state == static_cast<std::uint8_t>(WAIT4_EVT_FRAME)) {
+        Q_ASSERT_ID(910, l_rx.var.evt.e != nullptr);
+        QF::gc(l_rx.var.evt.e); // don't leak an allocated event
     }
 }
 
-/****************************************************************************/
-static void rxReportAck_(enum QSpyRxRecords recId) {
-    QS::beginRec_(static_cast<uint_fast8_t>(QS_RX_STATUS));
+//****************************************************************************
+static void rxReportAck_(enum QSpyRxRecords const recId) noexcept {
+    QS::beginRec_(static_cast<std::uint_fast8_t>(QS_RX_STATUS));
         QS_U8_PRE_(recId); // record ID
     QS::endRec_();
     QS_REC_DONE();
 }
 
 //****************************************************************************
-static void rxReportError_(uint8_t const code) {
-    QS::beginRec_(static_cast<uint_fast8_t>(QS_RX_STATUS));
-        QS_U8_PRE_(static_cast<uint8_t>(static_cast<uint8_t>(0x80) | code));
+static void rxReportError_(std::uint8_t const code) noexcept {
+    QS::beginRec_(static_cast<std::uint_fast8_t>(QS_RX_STATUS));
+        QS_U8_PRE_(0x80U | code);
     QS::endRec_();
     QS_REC_DONE();
 }
 
-/****************************************************************************/
-static void rxReportDone_(enum QSpyRxRecords recId) {
-    QS::beginRec_(static_cast<uint_fast8_t>(QS_TARGET_DONE));
+//****************************************************************************
+static void rxReportDone_(enum QSpyRxRecords const recId) noexcept {
+    QS::beginRec_(static_cast<std::uint_fast8_t>(QS_TARGET_DONE));
         QS_TIME_PRE_();    // timestamp
         QS_U8_PRE_(recId); // record ID
     QS::endRec_();
     QS_REC_DONE();
 }
 
-/****************************************************************************/
-static void rxPoke_(void) {
-    uint8_t *ptr = ((uint8_t *)QS::rxPriv_.currObj[QS::AP_OBJ]
-                    + l_rx.var.poke.offs);
+//****************************************************************************
+static void rxPoke_(void) noexcept {
+    std::uint8_t * const ptr =
+        (static_cast<std::uint8_t *>(QS::rxPriv_.currObj[QS::AP_OBJ])
+         + l_rx.var.poke.offs);
     switch (l_rx.var.poke.size) {
         case 1:
-            *ptr = static_cast<uint8_t>(l_rx.var.poke.data);
+            *ptr = static_cast<std::uint8_t>(l_rx.var.poke.data);
             break;
         case 2:
-            *(uint16_t *)ptr = static_cast<uint16_t>(l_rx.var.poke.data);
+            *reinterpret_cast<std::uint16_t *>(ptr)
+                = static_cast<std::uint16_t>(l_rx.var.poke.data);
             break;
         case 4:
-            *(uint32_t *)ptr = l_rx.var.poke.data;
+            *reinterpret_cast<std::uint32_t *>(ptr) = l_rx.var.poke.data;
             break;
         default:
             Q_ERROR_ID(900);
             break;
     }
 
-    l_rx.var.poke.data = static_cast<uint32_t>(0);
-    l_rx.var.poke.idx  = static_cast<uint8_t>(0);
-    l_rx.var.poke.offs += static_cast<uint16_t>(l_rx.var.poke.size);
+    l_rx.var.poke.data = 0U;
+    l_rx.var.poke.idx  = 0U;
+    l_rx.var.poke.offs += static_cast<std::uint16_t>(l_rx.var.poke.size);
 }
 
 //============================================================================
@@ -1272,36 +1282,30 @@ static void rxPoke_(void) {
 /// If there is no Test-Probe for a ginve API, or no more Test-Probes for
 /// a given API, the function returns zero.
 ///
-uint32_t QS::getTestProbe_(void (* const api)(void)) {
-    uint32_t data = static_cast<uint32_t>(0);
-    uint_fast8_t i;
-    for (i = static_cast<uint_fast8_t>(0);
-         i < static_cast<uint_fast8_t>(l_testData.tpNum);
-         ++i)
-    {
-        if (l_testData.tpBuf[i].addr == (QSFun)api) {
-            QS_CRIT_STAT_
-
+std::uint32_t QS::getTestProbe_(void (* const api)(void)) noexcept {
+    std::uint32_t data = 0U;
+    for (std::uint8_t i = 0U; i < l_testData.tpNum; ++i) {
+        if (l_testData.tpBuf[i].addr == reinterpret_cast<QSFun>(api)) {
             data = l_testData.tpBuf[i].data;
-            --l_testData.tpNum;
-            // move all remaining entries in the buffer up by one
-            for (; i < static_cast<uint_fast8_t>(l_testData.tpNum); ++i) {
-                l_testData.tpBuf[i] =
-                    l_testData.tpBuf[i + static_cast<uint_fast8_t>(1)];
-            }
-            // i == l_testData.tpNum, which terminates the top loop
-            QS::beginRec_(static_cast<uint_fast8_t>(QS_TEST_PROBE_GET));
+            QS::beginRec_(static_cast<std::uint_fast8_t>(QS_TEST_PROBE_GET));
                 QS_TIME_PRE_();    // timestamp
                 QS_FUN_PRE_(api);  // the calling API
                 QS_U32_PRE_(data); // the Test-Probe data
             QS::endRec_();
             QS_REC_DONE();
+
+            --l_testData.tpNum; // one less Test-Probe
+            // move all remaining entries in the buffer up by one
+            for (std::uint8_t j = i; j < l_testData.tpNum; ++j) {
+                l_testData.tpBuf[j] = l_testData.tpBuf[j + 1U];
+            }
+            break; // we are done (Test-Probe retreived)
         }
     }
     return data;
 }
 
-/****************************************************************************/
+//****************************************************************************
 QSTimeCtr QS::onGetTime(void) {
     return (++l_testData.testTime);
 }

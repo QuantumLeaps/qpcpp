@@ -2,14 +2,14 @@
 /// @brief QMActive::QMActive() and virtual functions
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-29
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -37,7 +37,7 @@
 
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.hpp"    // QF port
-#include "qassert.h"        // QP embedded systems-friendly assertions
+#include "qassert.h"      // QP embedded systems-friendly assertions
 
 //! Internal macro to cast a QP::QMActive pointer @p qact_ to QP::QMsm*
 /// @note
@@ -55,10 +55,10 @@
 
 namespace QP {
 
-Q_DEFINE_THIS_MODULE("qf_qmact")
+//Q_DEFINE_THIS_MODULE("qf_qmact")
 
 //............................................................................
-QMActive::QMActive(QStateHandler const initial)
+QMActive::QMActive(QStateHandler const initial) noexcept
   : QActive(initial)
 {
     m_temp.fun  = initial;
@@ -78,43 +78,14 @@ void QMActive::dispatch(QEvt const * const e) {
     QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::dispatch(e);
 }
 //............................................................................
-bool QMActive::isInState(QMState const * const st) const {
+bool QMActive::isInState(QMState const * const st) const noexcept {
     return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)->QMsm::isInState(st);
 }
 //............................................................................
-QMState const *QMActive::childStateObj(QMState const * const parent) const {
+QMState const *QMActive::childStateObj(QMState const * const parent)
+    const noexcept
+{
     return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)->QMsm::childStateObj(parent);
-}
-
-
-//****************************************************************************
-// operations inherited from QP::QHsm, but disallowed in subclasses
-// of QP::QMActive...
-
-//............................................................................
-bool QMActive::isIn(QStateHandler const s) {
-    (void)s; // unused parameter
-
-    /// @pre isIn() is disallowed in subclasses of QMActive.
-    /// Use QP::QMActive::isInState() instead.
-    Q_ERROR_ID(700);
-    return false;
-}
-//............................................................................
-QStateHandler QMActive::state(void) const {
-    /// @pre state() is disallowed in subclasses of QMActive.
-    /// Use QP::QMActive::stateObj() instead.
-    Q_ERROR_ID(800);
-    return static_cast<QStateHandler>(0);
-}
-//............................................................................
-QStateHandler QMActive::childState(QStateHandler const parent) {
-    (void)parent; // unused parameter
-
-    /// @pre childState() is disallowed in subclasses of QMActive.
-    /// Use QP::QMActive::childStateObj() instead.
-    Q_ERROR_ID(900);
-    return static_cast<QStateHandler>(0);
 }
 
 } // namespace QP

@@ -61,7 +61,7 @@ void QP::QF_onClockTick(void) {
     }
 }
 //............................................................................
-extern "C" void Q_onAssert(char_t const * const file, int_t line) {
+extern "C" Q_NORETURN Q_onAssert(char const * const file, int_t const line) {
     cerr << "Assertion failed in " << file << " line " << line << endl;
     QP::QF::onCleanup();
     exit(-1);

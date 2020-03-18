@@ -3,14 +3,14 @@
 * @brief QK/C++ port to ARM Cortex-M, ARM-CLANG toolset
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.8
-* Last updated on  2019-01-10
+* Last updated for version 6.8.0
+* Last updated on  2020-01-25
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -28,14 +28,16 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://www.state-machine.com/licensing
-* mailto:info@state-machine.com
+* <www.state-machine.com/licensing>
+* <info@state-machine.com>
 ******************************************************************************
 * @endcond
 */
+/* This QK port is part of the interanl QP implementation */
+#define QP_IMPL 1U
 #include "qf_port.hpp"
 
 extern "C" {
@@ -252,14 +254,14 @@ __attribute__ ((naked))
 uint_fast8_t QF_qlog2(uint32_t x) {
 __asm volatile (
     "  MOVS    r1,#0            \n"
-#if (QF_MAX_ACTIVE > 16)
+#if (QF_MAX_ACTIVE > 16U)
     "  LSRS    r2,r0,#16        \n"
     "  BEQ     QF_qlog2_1       \n"
     "  MOVS    r1,#16           \n"
     "  MOVS    r0,r2            \n"
     "QF_qlog2_1:                \n"
 #endif
-#if (QF_MAX_ACTIVE > 8)
+#if (QF_MAX_ACTIVE > 8U)
     "  LSRS    r2,r0,#8         \n"
     "  BEQ     QF_qlog2_2       \n"
     "  ADDS    r1, r1,#8        \n"

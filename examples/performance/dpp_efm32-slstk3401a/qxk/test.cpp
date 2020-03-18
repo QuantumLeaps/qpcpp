@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 6.7.0
-// Last updated on  2019-12-26
+// Last updated for version 6.8.0
+// Last updated on  2020-01-15
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -43,7 +43,7 @@ static void thread_function(QP::QXThread * const me) {
     (void)me; // unused parameter
     XT_Sema.init(1U); // 1 count
     for (;;) {
-        (void)XT_Sema.wait(QXTHREAD_NO_TIMEOUT); // wait forever
+        (void)XT_Sema.wait(QP::QXTHREAD_NO_TIMEOUT); // wait forever
         BSP::ledOn();
         QP::QXThread::delay(1U);  // block for 1 clock tick
         BSP::ledOff();

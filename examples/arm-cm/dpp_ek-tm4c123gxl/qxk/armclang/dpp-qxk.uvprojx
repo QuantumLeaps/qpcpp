@@ -10,7 +10,7 @@
       <TargetName>dpp-dbg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6070000::V6.7::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -72,7 +72,7 @@
           <BeforeMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd /c "if exist .\dbg\qstamp.o del .\dbg\qstamp.o"</UserProg1Name>
+            <UserProg1Name>cmd /c "del .\dbg\qstamp.o"</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -134,11 +134,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4096</DriverSelection>
+            <DriverSelection>4097</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -184,6 +184,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -324,6 +325,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
@@ -333,7 +335,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-fno-exceptions</MiscControls>
+              <MiscControls></MiscControls>
               <Define>TARGET_IS_TM4C123_RB1</Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\src;..\..\..\..\..\ports\arm-cm\qxk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\ek-tm4c123gxl</IncludePath>
@@ -386,34 +388,9 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>test.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\test.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>README.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\README.txt</FilePath>
             </File>
             <File>
               <FileName>table.cpp</FileName>
@@ -424,6 +401,16 @@
               <FileName>qstamp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\main.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>test.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\test.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -443,7 +430,7 @@
             <File>
               <FileName>startup_TM4C123GH6PM.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\ek-tm4c123gxl\arm\startup_TM4C123GH6PM.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\ek-tm4c123gxl\armclang\startup_TM4C123GH6PM.s</FilePath>
             </File>
             <File>
               <FileName>gpio.h</FileName>
@@ -556,29 +543,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qs_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qxk_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qxk_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -617,6 +584,7 @@
                 <uThumb>2</uThumb>
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
+                <uGnu>2</uGnu>
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>
@@ -657,6 +625,11 @@
               <FileName>qs.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qs_64bit.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qs_64bit.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_fp.cpp</FileName>
@@ -738,7 +711,7 @@
           <BeforeMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd /c "if exist .\rel\qstamp.o del .\rel\qstamp.o"</UserProg1Name>
+            <UserProg1Name>cmd /c "del .\rel\qstamp.o"</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -850,6 +823,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -990,6 +964,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
@@ -999,7 +974,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-fno-exceptions</MiscControls>
+              <MiscControls></MiscControls>
               <Define>NDEBUG TARGET_IS_TM4C123_RB1</Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\src;..\..\..\..\..\ports\arm-cm\qxk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\ek-tm4c123gxl</IncludePath>
@@ -1052,34 +1027,9 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>test.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\test.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>README.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\README.txt</FilePath>
             </File>
             <File>
               <FileName>table.cpp</FileName>
@@ -1090,6 +1040,16 @@
               <FileName>qstamp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\main.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>test.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\test.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1109,7 +1069,7 @@
             <File>
               <FileName>startup_TM4C123GH6PM.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\ek-tm4c123gxl\arm\startup_TM4C123GH6PM.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\ek-tm4c123gxl\armclang\startup_TM4C123GH6PM.s</FilePath>
             </File>
             <File>
               <FileName>gpio.h</FileName>
@@ -1222,29 +1182,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qs_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qxk_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qxk_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1283,6 +1223,7 @@
                 <uThumb>2</uThumb>
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
+                <uGnu>2</uGnu>
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>
@@ -1325,6 +1266,11 @@
               <FilePath>..\..\..\..\..\src\qs\qs.cpp</FilePath>
             </File>
             <File>
+              <FileName>qs_64bit.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qs_64bit.cpp</FilePath>
+            </File>
+            <File>
               <FileName>qs_fp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_fp.cpp</FilePath>
@@ -1342,7 +1288,7 @@
       <TargetName>dpp-spy</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6070000::V6.7::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -1404,7 +1350,7 @@
           <BeforeMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd /c "if exist .\spy\qstamp.o del .\spy\qstamp.o"</UserProg1Name>
+            <UserProg1Name>cmd /c "del .\spy\qstamp.o"</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1516,6 +1462,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1656,6 +1603,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
@@ -1665,7 +1613,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-fno-exceptions</MiscControls>
+              <MiscControls></MiscControls>
               <Define>Q_SPY TARGET_IS_TM4C123_RB1</Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\src;..\..\..\..\..\ports\arm-cm\qxk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\ek-tm4c123gxl</IncludePath>
@@ -1718,34 +1666,9 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>test.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\test.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>bsp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\bsp.h</FilePath>
-            </File>
-            <File>
-              <FileName>dpp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\dpp.h</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>README.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\README.txt</FilePath>
             </File>
             <File>
               <FileName>table.cpp</FileName>
@@ -1756,6 +1679,16 @@
               <FileName>qstamp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\main.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>test.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\test.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1775,7 +1708,7 @@
             <File>
               <FileName>startup_TM4C123GH6PM.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\ek-tm4c123gxl\arm\startup_TM4C123GH6PM.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\ek-tm4c123gxl\armclang\startup_TM4C123GH6PM.s</FilePath>
             </File>
             <File>
               <FileName>gpio.h</FileName>
@@ -1888,29 +1821,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qs_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qxk_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qxk_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qxk\armclang\qxk_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1921,6 +1834,11 @@
               <FileName>qs.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qs_64bit.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qs_64bit.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_fp.cpp</FileName>

@@ -58,8 +58,6 @@ All ports are located in sub-directories of the <span class="img folder">ports</
         </li>
         <li><span class="img folder">iar</span> &mdash; Port to IAR toolset
         </li>
-        <li><span class="img folder">ti</span> &mdash; Port to TI/CCS toolset
-        </li>
       </ul>
     </ul>
 

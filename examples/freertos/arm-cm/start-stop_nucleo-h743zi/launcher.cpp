@@ -121,19 +121,18 @@ Q_STATE_DEF(Launcher, active) {
             // placement new to execute the Worker ctor
             m_worker = new (&Worker::inst) Worker;
             m_worker->start(
-                1U,                          // QP priority of the AO
+                1U,                         // QP priority of the AO
                 l_workerQueueSto,           // event queue storage
                 Q_DIM(l_workerQueueSto),    // queue length [events]
                 l_workerStackSto,           // stack storage
-                sizeof(l_workerStackSto),   // stack size [bytes]
-                static_cast<QP::QEvt *>(0)); // initialization event (not used)
+                sizeof(l_workerStackSto));   // stack size [bytes]
             status_ = Q_RET_HANDLED;
             break;
         }
         //.${AOs::Launcher::SM::active}
         case Q_EXIT_SIG: {
             m_worker->~Worker(); // explicit destructor call
-            m_worker = 0;
+            m_worker = nullptr;
             status_ = Q_RET_HANDLED;
             break;
         }

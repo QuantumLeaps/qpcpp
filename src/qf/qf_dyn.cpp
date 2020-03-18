@@ -2,14 +2,14 @@
 /// @brief QF/C++ dynamic event management
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2019-12-27
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -40,7 +40,8 @@
 #include "qf_pkg.hpp"       // QF package-scope interface
 #include "qassert.h"        // QP embedded systems-friendly assertions
 #ifdef Q_SPY                // QS software tracing enabled?
-    #include "qs_port.hpp"  // include QS port
+    #include "qs_port.hpp"  // QS port
+    #include "qs_pkg.hpp"   // QS facilities for pre-defined trace records
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -51,7 +52,7 @@ Q_DEFINE_THIS_MODULE("qf_dyn")
 
 // Package-scope objects *****************************************************
 QF_EPOOL_TYPE_ QF_pool_[QF_MAX_EPOOL]; // allocate the event pools
-uint_fast8_t QF_maxPool_; // number of initialized event pools
+std::uint_fast8_t QF_maxPool_; // number of initialized event pools
 
 //****************************************************************************
 /// @description
@@ -81,19 +82,20 @@ uint_fast8_t QF_maxPool_; // number of initialized event pools
 /// @sa QF initialization example for QP::QF::init()
 ///
 void QF::poolInit(void * const poolSto,
-                  uint_fast32_t const poolSize, uint_fast16_t const evtSize)
+                  std::uint_fast32_t const poolSize,
+                  std::uint_fast16_t const evtSize) noexcept
 {
     /// @pre cannot exceed the number of available memory pools
     Q_REQUIRE_ID(200, QF_maxPool_
-                      < static_cast<uint_fast8_t>(Q_DIM(QF_pool_)));
+                      < static_cast<std::uint_fast8_t>(Q_DIM(QF_pool_)));
 
-    uint_fast16_t const lastEvtSize = /* last initialized event size */
-        ((QF_maxPool_ == static_cast<uint_fast8_t>(0))
-         ? static_cast<uint_fast16_t>(0)
+    std::uint_fast16_t const lastEvtSize = // last initialized event size
+        ((QF_maxPool_ ==0U)
+         ? 0U
          : QF_EPOOL_EVENT_SIZE_(
-            QF_pool_[QF_maxPool_ - static_cast<uint_fast8_t>(1)]));
+            QF_pool_[QF_maxPool_ - 1U]));
     /// @pre please initialize event pools in ascending order of evtSize
-    Q_REQUIRE_ID(201, (QF_maxPool_ == static_cast<uint_fast8_t>(0))
+    Q_REQUIRE_ID(201, (QF_maxPool_ == 0U)
         || (lastEvtSize < evtSize));
 
     QF_EPOOL_INIT_(QF_pool_[QF_maxPool_], poolSto, poolSize, evtSize);
@@ -103,9 +105,9 @@ void QF::poolInit(void * const poolSto,
     // generate the object-dictionary entry for the initialized pool
     char_t obj_name[9] = "EvtPool?";
     obj_name[7] = static_cast<char_t>(
-        static_cast<int8_t>('0') + static_cast<int8_t>(QF_maxPool_));
-    QS::obj_dict_pre_(&QF_pool_[QF_maxPool_ - static_cast<uint_fast8_t>(1)],
-                      &obj_name[0]);
+        static_cast<std::int8_t>('0')
+        + static_cast<std::int8_t>(QF_maxPool_));
+    QS::obj_dict_pre_(&QF_pool_[QF_maxPool_ - 1U], &obj_name[0]);
 #endif // Q_SPY
 }
 
@@ -135,13 +137,13 @@ void QF::poolInit(void * const poolSto,
 /// The application code should not call this function directly.
 /// The only allowed use is thorough the macros Q_NEW() or Q_NEW_X().
 ///
-QEvt *QF::newX_(uint_fast16_t const evtSize,
-                uint_fast16_t const margin, enum_t const sig)
+QEvt *QF::newX_(std::uint_fast16_t const evtSize,
+                std::uint_fast16_t const margin, enum_t const sig) noexcept
 {
-    uint_fast8_t idx;
+    std::uint_fast8_t idx;
 
     // find the pool id that fits the requested event size ...
-    for (idx = static_cast<uint_fast8_t>(0); idx < QF_maxPool_; ++idx) {
+    for (idx = 0U; idx < QF_maxPool_; ++idx) {
         if (evtSize <= QF_EPOOL_EVENT_SIZE_(QF_pool_[idx])) {
             break;
         }
@@ -150,31 +152,25 @@ QEvt *QF::newX_(uint_fast16_t const evtSize,
     Q_ASSERT_ID(310, idx < QF_maxPool_);
 
     QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QF_NEW, static_cast<void *>(0), static_cast<void *>(0))
-        QS_TIME_PRE_();                              // timestamp
-        QS_EVS_PRE_(static_cast<QEvtSize>(evtSize)); // the size of the event
-        QS_SIG_PRE_(static_cast<QSignal>(sig));      // the signal of the event
+    QS_BEGIN_PRE_(QS_QF_NEW, nullptr, nullptr)
+        QS_TIME_PRE_();       // timestamp
+        QS_EVS_PRE_(evtSize); // the size of the evt
+        QS_SIG_PRE_(sig);     // the signal of the evt
     QS_END_PRE_()
 
     // get e -- platform-dependent
     QEvt *e;
-    QF_EPOOL_GET_(QF_pool_[idx], e,
-                  ((margin != QF_NO_MARGIN)
-                      ? margin
-                      : static_cast<uint_fast16_t>(0)));
+    QF_EPOOL_GET_(QF_pool_[idx], e, ((margin != QF_NO_MARGIN) ? margin : 0U));
 
     // was e allocated correctly?
-    if (e != static_cast<QEvt *>(0)) {
+    if (e != nullptr) {
         e->sig     = static_cast<QSignal>(sig); // set the signal
-        // store pool ID
-        e->poolId_ = static_cast<uint8_t>(
-                       idx + static_cast<uint_fast8_t>(1));
-        // initialize the reference counter to 0
-        e->refCtr_ = static_cast<uint8_t>(0);
+        e->poolId_ = static_cast<std::uint8_t>(idx + 1U); // store pool ID
+        e->refCtr_ = 0U; // initialize the reference counter to 0
     }
     else {
         // must tolerate bad alloc.
-        Q_ASSERT_ID(320, margin != static_cast<uint_fast16_t>(QF_NO_MARGIN));
+        Q_ASSERT_ID(320, margin != QF_NO_MARGIN);
     }
     return e; // can't be NULL if we can't tolerate bad allocation
 }
@@ -202,20 +198,19 @@ QEvt *QF::newX_(uint_fast16_t const evtSize,
 /// automatic garbage collection is **NOT** performed for these events.
 /// In this case you need to call QP::QF::gc() explicitly.
 ///
-void QF::gc(QEvt const * const e) {
+void QF::gc(QEvt const * const e) noexcept {
     // is it a dynamic event?
-    if (e->poolId_ != static_cast<uint8_t>(0)) {
+    if (e->poolId_ != 0U) {
         QF_CRIT_STAT_
         QF_CRIT_ENTRY_();
 
         // isn't this the last reference?
-        if (e->refCtr_ > static_cast<uint8_t>(1)) {
+        if (e->refCtr_ > 1U) {
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC_ATTEMPT,
-                             static_cast<void *>(0), static_cast<void *>(0))
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC_ATTEMPT, nullptr, nullptr)
                 QS_TIME_PRE_();        // timestamp
                 QS_SIG_PRE_(e->sig);   // the signal of the event
-                QS_2U8_PRE_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
+                QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr
             QS_END_NOCRIT_PRE_()
 
             QF_EVT_REF_CTR_DEC_(e); // decrement the ref counter
@@ -224,14 +219,13 @@ void QF::gc(QEvt const * const e) {
         }
         // this is the last reference to this event, recycle it
         else {
-            uint_fast8_t const idx = static_cast<uint_fast8_t>(e->poolId_)
-                               - static_cast<uint_fast8_t>(1);
+            std::uint_fast8_t const idx =
+                static_cast<std::uint_fast8_t>(e->poolId_) - 1U;
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC,
-                             static_cast<void *>(0), static_cast<void *>(0))
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC, nullptr, nullptr)
                 QS_TIME_PRE_();        // timestamp
                 QS_SIG_PRE_(e->sig);   // the signal of the event
-                QS_2U8_PRE_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
+                QS_2U8_PRE_(e->poolId_, e->refCtr_);
             QS_END_NOCRIT_PRE_()
 
             QF_CRIT_EXIT_();
@@ -265,20 +259,20 @@ void QF::gc(QEvt const * const e) {
 /// The application code should not call this function directly.
 /// The only allowed use is thorough the macro Q_NEW_REF().
 ///
-QEvt const *QF::newRef_(QEvt const * const e, QEvt const * const evtRef) {
+QEvt const *QF::newRef_(QEvt const * const e,
+                        QEvt const * const evtRef) noexcept
+{
     //! @pre the event must be dynamic and the provided event reference
     //! must not be already in use
-    Q_REQUIRE_ID(500,
-        (e->poolId_ != static_cast<uint8_t>(0))
-        && (evtRef == static_cast<QEvt *>(0)));
+    Q_REQUIRE_ID(500, (e->poolId_ != 0U)
+                      && (evtRef == nullptr));
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
     QF_EVT_REF_CTR_INC_(e); // increments the ref counter
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_NEW_REF,
-                     static_cast<void *>(0), static_cast<void *>(0))
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_NEW_REF, nullptr, nullptr)
         QS_TIME_PRE_();      // timestamp
         QS_SIG_PRE_(e->sig); // the signal of the event
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
@@ -299,11 +293,10 @@ QEvt const *QF::newRef_(QEvt const * const e, QEvt const * const evtRef) {
 /// The application code should not call this function directly.
 /// The only allowed use is thorough the macro Q_DELETE_REF().
 ///
-void QF::deleteRef_(QEvt const * const evtRef) {
+void QF::deleteRef_(QEvt const * const evtRef) noexcept {
     QS_CRIT_STAT_
 
-    QS_BEGIN_PRE_(QS_QF_DELETE_REF,
-              static_cast<void *>(0), static_cast<void *>(0))
+    QS_BEGIN_PRE_(QS_QF_DELETE_REF, nullptr, nullptr)
         QS_TIME_PRE_();           // timestamp
         QS_SIG_PRE_(evtRef->sig); // the signal of the event
         QS_2U8_PRE_(evtRef->poolId_, evtRef->refCtr_); // pool Id & ref Count
@@ -316,9 +309,8 @@ void QF::deleteRef_(QEvt const * const evtRef) {
 /// @description
 /// Obtain the block size of any registered event pools
 ///
-uint_fast16_t QF::poolGetMaxBlockSize(void) {
-    return QF_EPOOL_EVENT_SIZE_(
-               QF_pool_[QF_maxPool_ - static_cast<uint_fast8_t>(1)]);
+std::uint_fast16_t QF::poolGetMaxBlockSize(void) noexcept {
+    return QF_EPOOL_EVENT_SIZE_(QF_pool_[QF_maxPool_ - 1U]);
 }
 
 } // namespace QP

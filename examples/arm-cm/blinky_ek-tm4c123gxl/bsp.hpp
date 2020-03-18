@@ -34,7 +34,7 @@
 #ifndef BSP_HPP
 #define BSP_HPP
 
-uint32_t const BSP_TICKS_PER_SEC = static_cast<uint32_t>(100);
+constexpr uint32_t BSP_TICKS_PER_SEC = 100U;
 
 void BSP_init(void);
 void BSP_ledOff(void);

@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example for QXK
-// Last updated for version 6.7.0
-// Last updated on  2019-12-26
+// Last updated for version 6.8.0
+// Last updated on  2020-01-15
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -71,7 +71,7 @@ static void Thread1_run(QP::QXThread * const me) {
     me->m_thread = &l_tls1;
 
     for (;;) {
-        l_mutex.lock(QXTHREAD_NO_TIMEOUT); // lock the mutex
+        l_mutex.lock(QP::QXTHREAD_NO_TIMEOUT); // lock the mutex
         BSP::ledOn();
 
         if (l_mutex.tryLock()) { // exercise the mutex
@@ -129,7 +129,7 @@ static void Thread2_run(QP::QXThread * const me) {
         // wait on a semaphore (BLOCK indefinitely)
         l_sema.wait();
 
-        l_mutex.lock(QXTHREAD_NO_TIMEOUT); // lock the mutex
+        l_mutex.lock(QP::QXTHREAD_NO_TIMEOUT); // lock the mutex
         QP::QXThread::delay(1U);  // wait more (BLOCK)
         l_mutex.unlock();
 

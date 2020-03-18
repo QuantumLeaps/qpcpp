@@ -49,17 +49,17 @@
 #define QF_THREAD_TYPE       int
 
 // The maximum number of active objects in the application
-#define QF_MAX_ACTIVE        64
+#define QF_MAX_ACTIVE        64U
 
 // The number of system clock tick rates
-#define QF_MAX_TICK_RATE     2
+#define QF_MAX_TICK_RATE     2U
 
 // various QF object sizes configuration for this port
-#define QF_EVENT_SIZ_SIZE    4
-#define QF_EQUEUE_CTR_SIZE   4
-#define QF_MPOOL_SIZ_SIZE    4
-#define QF_MPOOL_CTR_SIZE    4
-#define QF_TIMEEVT_CTR_SIZE  4
+#define QF_EVENT_SIZ_SIZE    4U
+#define QF_EQUEUE_CTR_SIZE   4U
+#define QF_MPOOL_SIZ_SIZE    4U
+#define QF_MPOOL_CTR_SIZE    4U
+#define QF_TIMEEVT_CTR_SIZE  4U
 
 // QF priority offset within VxWorks priority numbering scheme, see NOTE1
 #define QF_VX_PRIO_OFFSET    108
@@ -97,18 +97,17 @@
     } else ((void)0)
 
     // event queue customization
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == static_cast<QEvt *>(0)) { \
-            UINT32 eventsReceived; \
-            QF_CRIT_EXIT_(); \
+    #define QACTIVE_EQUEUE_WAIT_(me_)                                     \
+        while ((me_)->m_eQueue.m_frontEvt == nullptr) {                   \
+            UINT32 eventsReceived;                                        \
+            QF_CRIT_EXIT_();                                              \
             Q_ALLEGE_ID(405, eventReceive(QF_EQUEUE_EVT, EVENTS_WAIT_ANY, \
-                        WAIT_FOREVER, &eventsReceived) == OK); \
-            QF_CRIT_ENTRY_(); \
+                        WAIT_FOREVER, &eventsReceived) == OK);            \
+            QF_CRIT_ENTRY_();                                             \
         }
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        Q_ASSERT_ID(410, QF::active_[(me_)->m_prio] \
-                         != static_cast<QActive *>(0)); \
+        Q_ASSERT_ID(410, QF::active_[(me_)->m_prio] != nullptr); \
         Q_ALLEGE_ID(415, eventSend((me_)->m_thread, QF_EQUEUE_EVT) == OK)
 
     // event pool operations

@@ -288,7 +288,7 @@ void QK::onIdle(void) {
 #endif
 }
 //............................................................................
-extern "C" void Q_onAssert(char const * const module, int loc) {
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     QF_INT_DISABLE(); // disable all interrupts
     //
     // NOTE: add here your application-specific error handling

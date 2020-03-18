@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: main task for emWin/uC/GUI, Win32 simulation
-// Last updated for version 6.2.0
-// Last updated on  2018-03-16
+// Last updated for version 6.8.0
+// Last updated on  2020-01-22
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -34,7 +34,8 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "dpp.hpp"
-                                                               // GUI includes
+
+// GUI includes
 Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
@@ -47,39 +48,30 @@ static union SmallEvents {
     TableEvt te;
     MouseEvt me;
     // other event types to go into this pool
-} l_smlPoolSto[2*N_PHILO];                 // storage for the small event pool
+} l_smlPoolSto[2*N_PHILO]; // storage for the small event pool
 
 //............................................................................
 extern "C" void MainTask(void) {
-    BSP_init();                                          // initialize the BSP
+    BSP_init(); // initialize the BSP
 
-    QF::init();       // initialize the framework and the underlying RT kernel
+    QF::init(); // initialize the framework and the underlying RT kernel
 
-                                                     // object dictionaries...
-    QS_OBJ_DICTIONARY(l_smlPoolSto);
-    QS_OBJ_DICTIONARY(l_tableQueueSto);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[0]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[1]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[2]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[3]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[4]);
+    QF::psInit(l_subscrSto, Q_DIM(l_subscrSto)); // init publish-subscribe
 
-    QF::psInit(l_subscrSto, Q_DIM(l_subscrSto));     // init publish-subscribe
-
-                                                  // initialize event pools...
+    // initialize event pools...
     QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
 
-                                                // start the active objects...
+    // start the active objects...
     uint8_t n;
     for (n = 0; n < N_PHILO; ++n) {
         AO_Philo[n]->start((uint8_t)(n + 1),
                            l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
-                           (void *)0, 1024, (QEvt *)0);
+                           (void *)0, 1024, (void *)0);
     }
     AO_Table->start((uint8_t)(N_PHILO + 1),
                     l_tableQueueSto, Q_DIM(l_tableQueueSto),
-                    (void *)0, 1024, (QEvt *)0);
+                    (void *)0, 1024, (void *)0);
 
-    QF::run();                                       // run the QF application
+    QF::run(); // run the QF application
 }
 
