@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.8.0
-/// Last updated on  2020-01-23
+/// Last updated on  2020-03-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -69,14 +69,6 @@ void QF::init(void) {
     // any active objects started before calling QF::run()
     InitializeCriticalSection(&l_startupCritSect);
     EnterCriticalSection(&l_startupCritSect);
-
-    // clear the internal QF variables, so that the framework can (re)start
-    // correctly even if the startup code is not called to clear the
-    // uninitialized data (as is required by the C++ Standard).
-    extern std::uint_fast8_t QF_maxPool_;
-    QF_maxPool_ = 0U;
-    bzero(&QF::timeEvtHead_[0], sizeof(QF::timeEvtHead_));
-    bzero(&active_[0],          sizeof(active_));
 }
 //****************************************************************************
 void QF_enterCriticalSection_(void) {

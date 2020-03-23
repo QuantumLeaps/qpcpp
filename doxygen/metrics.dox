@@ -1,9 +1,9 @@
-/** @page metrics Code Metrics
+/** @page metrics Code Metrics 
 
-@code{cpp}
-                   Code Metrics for QP/C++
+@code{cpp} 
+                   Code Metrics for QP/C++ 
 ================================================
-  NLOC    CCN   token  PARAM  length  location
+  NLOC    CCN   token  PARAM  length  location  
 ------------------------------------------------
        3      1     14      1       4 QP::QEvt::QEvt@159-162@..\include\qep.hpp
        3      1     11      1       3 QP::QEQueue::getNFree@223-225@..\include\qequeue.hpp
@@ -108,29 +108,29 @@
        5      1     28      1       5 QP::QTimeEvt::wasDisarmed@532-536@..\src\qf\qf_time.cpp
        7      1     28      1       9 QP::QTimeEvt::currCtr@551-559@..\src\qf\qf_time.cpp
       11      2     79      1      16 QP::QF::init@78-93@..\src\qk\qk.cpp
-       3      1     14      1       4 QP::QF::stop@106-109@..\src\qk\qk.cpp
-       6      2     26      1       8 QP::initial_events@114-121@..\src\qk\qk.cpp
-      10      3     40      1      14 QP::QF::run@132-145@..\src\qk\qk.cpp
-      21      5    139      6      30 QP::QActive::start@164-193@..\src\qk\qk.cpp
-      21      2    138      1      32 QP::QK::schedLock@218-249@..\src\qk\qk.cpp
-      22      4    149      1      33 QP::QK::schedUnlock@268-300@..\src\qk\qk.cpp
-      14      3     94      1      17 QK_sched_@320-336@..\src\qk\qk.cpp
-      61     15    421      1     105 QK_activate_@347-451@..\src\qk\qk.cpp
+       3      1     14      1       4 QP::QF::stop@111-114@..\src\qk\qk.cpp
+       6      2     26      1       8 QP::initial_events@119-126@..\src\qk\qk.cpp
+      10      3     40      1      14 QP::QF::run@137-150@..\src\qk\qk.cpp
+      21      5    139      6      30 QP::QActive::start@169-198@..\src\qk\qk.cpp
+      21      2    138      1      32 QP::QK::schedLock@223-254@..\src\qk\qk.cpp
+      22      4    149      1      33 QP::QK::schedUnlock@273-305@..\src\qk\qk.cpp
+      14      3     94      1      17 QK_sched_@325-341@..\src\qk\qk.cpp
+      61     15    421      1     105 QK_activate_@352-456@..\src\qk\qk.cpp
        9      2     67      1      13 QP::QF::init@79-91@..\src\qv\qv.cpp
-       3      1     12      1       4 QP::QF::stop@104-107@..\src\qv\qv.cpp
-      37      9    198      1      71 QP::QF::run@125-195@..\src\qv\qv.cpp
-      15      3    109      6      22 QP::QActive::start@215-236@..\src\qv\qv.cpp
+       3      1     12      1       4 QP::QF::stop@109-112@..\src\qv\qv.cpp
+      37      9    198      1      71 QP::QF::run@130-200@..\src\qv\qv.cpp
+      15      3    109      6      22 QP::QActive::start@220-241@..\src\qv\qv.cpp
        2      1     10      0       2 QP::QXKIdleThread::QXKIdleThread@68-69@..\src\qxk\qxk.cpp
       14      2    103      1      22 QP::QF::init@85-106@..\src\qxk\qxk.cpp
-       3      1     12      1       4 QP::QF::stop@119-122@..\src\qxk\qxk.cpp
-       6      2     26      1       8 QP::initial_events@127-134@..\src\qxk\qxk.cpp
-      10      3     40      1      15 QP::QF::run@143-157@..\src\qxk\qxk.cpp
-      24      6    161      6      34 QP::QActive::start@174-207@..\src\qxk\qxk.cpp
-      24      3    150      1      34 QP::QXK::schedLock@230-263@..\src\qxk\qxk.cpp
-      22      4    149      1      34 QP::QXK::schedUnlock@282-315@..\src\qxk\qxk.cpp
-      51      7    296      1      70 QXK_sched_@335-404@..\src\qxk\qxk.cpp
-      79     16    547      1     135 QXK_activate_@415-549@..\src\qxk\qxk.cpp
-      13      2     72      1      20 QXK_current@552-571@..\src\qxk\qxk.cpp
+       3      1     12      1       4 QP::QF::stop@124-127@..\src\qxk\qxk.cpp
+       6      2     26      1       8 QP::initial_events@132-139@..\src\qxk\qxk.cpp
+      10      3     40      1      15 QP::QF::run@148-162@..\src\qxk\qxk.cpp
+      24      6    161      6      34 QP::QActive::start@179-212@..\src\qxk\qxk.cpp
+      24      3    150      1      34 QP::QXK::schedLock@235-268@..\src\qxk\qxk.cpp
+      22      4    149      1      34 QP::QXK::schedUnlock@287-320@..\src\qxk\qxk.cpp
+      51      7    296      1      70 QXK_sched_@340-409@..\src\qxk\qxk.cpp
+      79     16    547      1     135 QXK_activate_@420-554@..\src\qxk\qxk.cpp
+      13      2     72      1      20 QXK_current@557-576@..\src\qxk\qxk.cpp
       16      4    105      1      24 QP::QXMutex::init@84-107@..\src\qxk\qxk_mutex.cpp
       66     12    456      1     108 QP::QXMutex::lock@129-236@..\src\qxk\qxk_mutex.cpp
       47     10    301      1      71 QP::QXMutex::tryLock@256-326@..\src\qxk\qxk_mutex.cpp
@@ -201,12 +201,12 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 =========================================================================================================
 !!!! Warnings (cyclomatic_complexity > 20 or nloc > 1000000 or length > 500 or parameter_count > 10) !!!!
 ================================================
-  NLOC    CCN   token  PARAM  length  location
+  NLOC    CCN   token  PARAM  length  location  
 ------------------------------------------------
      117     21    675      1     169 QP::QMsm::dispatch@147-315@..\src\qf\qep_msm.cpp
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
       3971      18.8     3.4      114.9      152            1      0.01    0.04
-@endcode
-*/
+@endcode 
+*/ 
