@@ -9,7 +9,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated on  2020-03-25
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -414,11 +414,11 @@ void QTicker::dispatch(QEvt const * const e) noexcept {
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-    QEQueueCtr n = m_eQueue.m_tail; // # ticks since the last call
+    QEQueueCtr nTicks = m_eQueue.m_tail; // # ticks since the last call
     m_eQueue.m_tail = 0U; // clear the # ticks
     QF_CRIT_EXIT_();
 
-    for (; n > 0U; --n) {
+    for (; nTicks > 0U; --nTicks) {
         QF::TICK_X(static_cast<std::uint_fast8_t>(m_eQueue.m_head), this);
     }
 }
