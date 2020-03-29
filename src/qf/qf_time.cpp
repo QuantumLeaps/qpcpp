@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated on  2020-03-29
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -416,6 +416,7 @@ bool QTimeEvt::disarm(void) noexcept {
     }
     else { // the time event was already disarmed automatically
         wasArmed = false;
+        refCtr_ &= static_cast<std::uint8_t>(~TE_WAS_DISARMED);
 
         QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_DISARM_ATTEMPT,
                          QS::priv_.locFilter[QS::TE_OBJ], this)

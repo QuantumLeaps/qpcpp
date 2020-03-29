@@ -103,10 +103,10 @@
       16      2    100      3      32 QP::QTimeEvt::QTimeEvt@230-261@..\src\qf\qf_time.cpp
       13      1     49      0      27 QP::QTimeEvt::QTimeEvt@267-293@..\src\qf\qf_time.cpp
       33      7    205      2      57 QP::QTimeEvt::armX@321-377@..\src\qf\qf_time.cpp
-      31      2    143      1      37 QP::QTimeEvt::disarm@395-431@..\src\qf\qf_time.cpp
-      33      7    199      1      58 QP::QTimeEvt::rearm@453-510@..\src\qf\qf_time.cpp
-       5      1     28      1       5 QP::QTimeEvt::wasDisarmed@532-536@..\src\qf\qf_time.cpp
-       7      1     28      1       9 QP::QTimeEvt::currCtr@551-559@..\src\qf\qf_time.cpp
+      32      2    155      1      38 QP::QTimeEvt::disarm@395-432@..\src\qf\qf_time.cpp
+      33      7    199      1      58 QP::QTimeEvt::rearm@454-511@..\src\qf\qf_time.cpp
+       5      1     28      1       5 QP::QTimeEvt::wasDisarmed@533-537@..\src\qf\qf_time.cpp
+       7      1     28      1       9 QP::QTimeEvt::currCtr@552-560@..\src\qf\qf_time.cpp
       11      2     79      1      16 QP::QF::init@78-93@..\src\qk\qk.cpp
        3      1     14      1       4 QP::QF::stop@111-114@..\src\qk\qk.cpp
        6      2     26      1       8 QP::initial_events@119-126@..\src\qk\qk.cpp
@@ -187,7 +187,7 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
      11       8.0     3.0       59.0         1     ..\src\qf\qf_qact.cpp
     159      30.0     4.0      154.4         5     ..\src\qf\qf_qeq.cpp
      27       3.8     1.0       25.3         6     ..\src\qf\qf_qmact.cpp
-    231      24.4     3.4      132.0         9     ..\src\qf\qf_time.cpp
+    232      24.6     3.4      133.3         9     ..\src\qf\qf_time.cpp
     184      18.8     4.1      122.2         9     ..\src\qk\qk.cpp
      76      16.0     3.8       96.5         4     ..\src\qv\qv.cpp
     267      22.5     4.3      142.4        11     ..\src\qxk\qxk.cpp
@@ -207,6 +207,6 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
-      3971      18.8     3.4      114.9      152            1      0.01    0.04
+      3972      18.8     3.4      114.9      152            1      0.01    0.04
 @endcode 
 */ 
