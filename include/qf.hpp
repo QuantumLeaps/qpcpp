@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated on  2020-04-03
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -724,7 +724,7 @@ public:
     /// @include qf_postx.cpp
     #define Q_NEW_X(e_, evtT_, margin_, sig_)        \
         ((e_) = static_cast<evtT_ *>(QP::QF::newX_(  \
-                    sizeof(evtT_) (margin_), (sig_))))
+                    sizeof(evtT_), (margin_), (sig_))))
 #endif
 
 //! Create a new reference of the current event `e` */
