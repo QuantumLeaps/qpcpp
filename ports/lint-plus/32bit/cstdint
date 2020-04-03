@@ -3,7 +3,7 @@
 /// like ARM Cortex-M.
 
 #ifndef _GLIBCXX_CSTDINT
-#define _GLIBCXX_CSTDINT 1
+#define _GLIBCXX_CSTDINT
 
 //lint -save
 //lint -e9093 AUTOSAR:M17-0-2 the name ... is reserved to the compiler

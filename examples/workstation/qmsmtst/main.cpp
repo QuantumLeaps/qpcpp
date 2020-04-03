@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QHsmTst Example
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-14
+// Last Updated for Version: 6.8.0
+// Date of the Last Update:  2020-04-01
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -34,8 +34,8 @@
 #include "qpcpp.hpp"
 #include "qmsmtst.hpp"
 
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
-#include <stdio.h>
 
 using namespace QP;
 
@@ -63,18 +63,18 @@ int main(int argc, char *argv[ ]) {
     if (l_outFile == (FILE *)0) { // interactive version?
         l_outFile = stdout;
 
-        printf("QMsmTst example, built on %s at %s\n"
+        PRINTF_S("QMsmTst example, built on %s at %s\n"
                "QEP: %s.\nPress ESC to quit...\n",
-               __DATE__, __TIME__, QP::QEP::getVersion());
+               __DATE__, __TIME__, QP_VERSION_STR);
 
         the_msm->init(); // trigger the initial tran. in the test HSM
 
         for (;;) { // event loop
-            printf("\n>");
+            PRINTF_S("\n>", "");
 
             int c;
             c = (uint8_t)QP::QF_consoleWaitForKey();
-            printf("%c: ", (c >= ' ') ? c : 'X');
+            PRINTF_S("%c: ", (c >= ' ') ? c : 'X');
 
             QP::QEvt e = QEVT_INITIALIZER(0);
             if ('a' <= c && c <= 'i') { // in range?
@@ -94,8 +94,8 @@ int main(int argc, char *argv[ ]) {
         }
     }
     else { // batch version
-        printf("QMsmTst, output saved to %s\n", argv[1]);
-        fprintf(l_outFile,
+        PRINTF_S("QMsmTst, output saved to %s\n", argv[1]);
+        FPRINTF_S(l_outFile,
                 "QMsmTst example, QEP %s\n", QP::QEP::getVersion());
 
         the_msm->init(); // trigger the initial tran. in the test HSM
@@ -132,24 +132,24 @@ int main(int argc, char *argv[ ]) {
 
 //............................................................................
 void BSP_display(char const *msg) {
-    fprintf(l_outFile, msg);
+    FPRINTF_S(l_outFile, "%s",  msg);
 }
 //............................................................................
 void BSP_terminate(int16_t const result) {
-    printf("Bye, Bye!");
+    PRINTF_S("%s", "Bye, Bye!");
     QF::onCleanup();
     exit(result);
 }
 //............................................................................
 extern "C" Q_NORETURN Q_onAssert(char const * const file, int_t const  line) {
-    fprintf(stderr, "Assertion failed in %s, line %d", file, line);
+    FPRINTF_S(stderr, "Assertion failed in %s, line %d", file, line);
     QF::onCleanup();
     exit(-1);
 }
 //............................................................................
 static void dispatch(QP::QSignal sig) {
     Q_REQUIRE((A_SIG <= sig) && (sig <= I_SIG));
-    fprintf(l_outFile, "\n%c:", 'A' + sig - A_SIG);
+    FPRINTF_S(l_outFile, "\n%c:", 'A' + sig - A_SIG);
     QP::QEvt e = QEVT_INITIALIZER(sig);
     the_msm->dispatch(&e); // dispatch the event
 }

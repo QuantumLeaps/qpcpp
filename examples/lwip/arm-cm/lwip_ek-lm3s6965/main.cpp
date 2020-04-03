@@ -58,16 +58,16 @@ int main(void) {
     // start the active objects...
     AO_LwIPMgr->start(1U,
                     lwIPMgrQueueSto, Q_DIM(lwIPMgrQueueSto),
-                    (void *)0, 0U);
+                    nullptr, 0U);
 
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         AO_Philo[n]->start(n + 2U,
                            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-                           (void *)0, 0U);
+                           nullptr, 0U);
     }
     AO_Table->start(N_PHILO + 2U,
                     tableQueueSto, Q_DIM(tableQueueSto),
-                    (void *)0, 0U);
+                    nullptr, 0U);
 
     return QF::run(); // run the application
 }

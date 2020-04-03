@@ -34,7 +34,7 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-#include <stdio.h> // this example uses printf() to report status
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 
 Q_DEFINE_THIS_FILE
 
@@ -91,7 +91,7 @@ Q_STATE_DEF(TServer, initial) {
 Q_STATE_DEF(TServer, final) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            printf("final-ENTRY;\nBye!Bye!\n");
+            PRINTF_S("%s\n", "final-ENTRY;\nBye!Bye!");
             QF::stop(); // terminate the application
             return Q_RET_HANDLED;
         }
@@ -102,13 +102,13 @@ Q_STATE_DEF(TServer, final) {
 Q_STATE_DEF(TServer, idle) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            printf("idle-ENTRY;\n");
+            PRINTF_S("%s\n", "idle-ENTRY;");
             // recall the request from the requestQueue
             if (recall(&m_requestQueue)) {
-                printf("Request recalled\n");
+                PRINTF_S("%s\n", "Request recalled");
             }
             else {
-                printf("No deferred requests\n");
+                PRINTF_S("%s\n", "No deferred requests");
             }
             return Q_RET_HANDLED;
         }
@@ -118,8 +118,8 @@ Q_STATE_DEF(TServer, idle) {
             // recycled.
             Q_NEW_REF(m_activeRequest, RequestEvt);
 
-            printf("Processing request #%d\n",
-                   (int)m_activeRequest->ref_num);
+            PRINTF_S("Processing request #%d\n",
+                     (int)m_activeRequest->ref_num);
             return tran(&receiving);
         }
         case TERMINATE_SIG: {
@@ -133,8 +133,8 @@ Q_STATE_DEF(TServer, busy) {
     QState status;
     switch (e->sig) {
         case Q_EXIT_SIG: {
-            printf("busy-EXIT; done processing request #%d\n",
-                   (int)m_activeRequest->ref_num);
+            PRINTF_S("busy-EXIT; done processing request #%d\n",
+                     (int)m_activeRequest->ref_num);
 
             // delete the reference to the active request, because
             // it is now processed.
@@ -145,12 +145,12 @@ Q_STATE_DEF(TServer, busy) {
         }
         case NEW_REQUEST_SIG: {
             if (defer(&m_requestQueue, e)) { // could defer?
-                printf("Request #%d deferred;\n",
-                       (int)((RequestEvt const *)e)->ref_num);
+                PRINTF_S("Request #%d deferred;\n",
+                         (int)((RequestEvt const *)e)->ref_num);
             }
             else {
-                printf("Request #%d IGNORED;\n",
-                       (int)((RequestEvt const *)e)->ref_num);
+                PRINTF_S("Request #%d IGNORED;\n",
+                         (int)((RequestEvt const *)e)->ref_num);
                 // notify the request sender that his request was denied...
             }
             status = Q_RET_HANDLED;
@@ -173,8 +173,8 @@ Q_STATE_DEF(TServer, receiving) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             // inform about the first stage of processing of the request...
-            printf("receiving-ENTRY; active request: #%d\n",
-                   (int)m_activeRequest->ref_num);
+            PRINTF_S("receiving-ENTRY; active request: #%d\n",
+                     (int)m_activeRequest->ref_num);
 
             // one-shot timeout in 1 second
             m_receivedEvt.armX(BSP_TICKS_PER_SEC, 0U);
@@ -202,8 +202,8 @@ Q_STATE_DEF(TServer, authorizing) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             // inform about the second stage of processing of the request..
-            printf("authorizing-ENTRY; active request: #%d\n",
-                   (int)m_activeRequest->ref_num);
+            PRINTF_S("authorizing-ENTRY; active request: #%d\n",
+                     (int)m_activeRequest->ref_num);
 
             // one-shot timeout in 2 seconds
             m_authorizedEvt.armX(2*BSP_TICKS_PER_SEC, 0U);
@@ -229,7 +229,7 @@ static RequestEvt    l_smlPoolSto[10]; // small event pool
 
 //............................................................................
 int main(int argc, char *argv[]) {
-    printf("Reminder state pattern\nQP version: %s\n"
+    PRINTF_S("Reminder state pattern\nQP version: %s\n"
            "Press n to generate a new request\n"
            "Press ESC to quit...\n",
            QP::versionStr);
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
 
     // start the active objects...
     l_tserver.start(1, l_tserverQSto, Q_DIM(l_tserverQSto),
-                   (void *)0, 0, (QEvt *)0);
+                   nullptr, 0, (QEvt *)0);
 
     return QF::run(); // run the QF application
 }
@@ -258,12 +258,12 @@ void BSP_onKeyboardInput(uint8_t key) {
             RequestEvt *e = Q_NEW(RequestEvt, NEW_REQUEST_SIG);
             e->ref_num = (++reqCtr); // set the reference number
             // post directly to TServer active object
-            l_tserver.POST(e, (void *)0); // post directly to TServer AO
+            l_tserver.POST(e, nullptr); // post directly to TServer AO
             break;
         }
         case '\33': { // ESC pressed?
             static QEvt const terminateEvt = { TERMINATE_SIG, 0U, 0U };
-            l_tserver.POST(&terminateEvt, (void *)0);
+            l_tserver.POST(&terminateEvt, nullptr);
             break;
         }
     }

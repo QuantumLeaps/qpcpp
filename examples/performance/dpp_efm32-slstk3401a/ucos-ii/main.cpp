@@ -89,7 +89,7 @@ int main() {
     // start a "naked" uC/OS-II task for testing...
     Q_ALLEGE(OS_ERR_NONE == OSTaskCreateExt(
         &test_thread, // the test thread function
-        (void *)0,    // the 'pdata' parameter
+        nullptr,    // the 'pdata' parameter
         &testStackSto[(sizeof(testStackSto)/sizeof(OS_STK)) - 1],
         static_cast<INT8U>(QF_MAX_ACTIVE - (N_PHILO + 3U)), // uC/OS-II prio
         static_cast<INT16U>(N_PHILO + 2U),       // the unique task id

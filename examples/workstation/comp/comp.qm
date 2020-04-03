@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.6.0" links="1">
+<model version="5.0.0" links="1">
  <documentation>Dining Philosopher Problem example
 
 NOTE: Requries QP5</documentation>
@@ -325,7 +325,7 @@ $declare(Components::APP_alarmClock)
 #include &quot;alarm.hpp&quot;
 #include &quot;clock.hpp&quot;
 
-#include &lt;stdio.h&gt;
+#include &quot;safe_std.h&quot;   // portable &quot;safe&quot; &lt;stdio.h&gt;/&lt;string.h&gt; facilities
 
 Q_DEFINE_THIS_FILE
 

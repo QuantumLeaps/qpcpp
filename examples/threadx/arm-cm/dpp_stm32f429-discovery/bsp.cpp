@@ -129,7 +129,7 @@ void BSP::init(void) {
     // seed the random number generator
     BSP::randomSeed(1234U);
 
-    if (!QS_INIT((void *)0)) { // initialize the QS software tracing
+    if (!QS_INIT(nullptr)) { // initialize the QS software tracing
         Q_ERROR();
     }
     QS_USR_DICTIONARY(PHILO_STAT);

@@ -171,7 +171,7 @@ void BSP::init(void) {
     // initialize the random seed
     BSP::randomSeed(1234U);
 
-    if (QS_INIT((void *)0) == 0) { // initialize the QS software tracing
+    if (QS_INIT(nullptr) == 0) { // initialize the QS software tracing
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_rtiCompare0);

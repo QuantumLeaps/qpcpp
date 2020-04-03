@@ -110,11 +110,11 @@ Q_STATE_DEF(Table, initial) {
     }
 
     // global signals...
-    QS_SIG_DICTIONARY(DONE_SIG,      (void *)0);
-    QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
-    QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(SERVE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(TEST_SIG,      (void *)0);
+    QS_SIG_DICTIONARY(DONE_SIG,      nullptr);
+    QS_SIG_DICTIONARY(EAT_SIG,       nullptr);
+    QS_SIG_DICTIONARY(PAUSE_SIG,     nullptr);
+    QS_SIG_DICTIONARY(SERVE_SIG,     nullptr);
+    QS_SIG_DICTIONARY(TEST_SIG,      nullptr);
 
     // signals just for this AO...
     QS_SIG_DICTIONARY(HUNGRY_SIG, this);

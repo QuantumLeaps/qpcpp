@@ -168,7 +168,7 @@ void BSP_init(void) {
     // transition of the Table AO (see Table_displayInit()).
     //
 
-    if (!QS_INIT((void *)0)) { // initialize the QS software tracing
+    if (!QS_INIT(nullptr)) { // initialize the QS software tracing
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);

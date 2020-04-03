@@ -73,12 +73,12 @@ enum {
 
 // ISRs used in this project =================================================
 void SysTick_Handler(void) {
-    QP::QF::TICK_X(0U, (void *)0); // process time events for rate 0
+    QP::QF::TICK_X(0U, nullptr); // process time events for rate 0
 }
 //............................................................................
 void Timer0A_IRQHandler(void) {
     TIMER0->ICR |= (1U << 0); // clear the Timer0 interrupt source
-    QP::QF::TICK_X(1U, (void *)0); // process time events for rate 1
+    QP::QF::TICK_X(1U, nullptr); // process time events for rate 1
 }
 //............................................................................
 void GPIOPortF_IRQHandler(void) {

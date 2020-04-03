@@ -520,6 +520,11 @@
     +elib(9108)
     -append(9108,[AUTOSAR Rule M3-1-2])
 
+    /* 1798 - block scope declaration of function is taken to mean a member of an enclosing namespace but does not introduce a name */
+    +e1798
+    +elib(1798)
+    -append(1798,[AUTOSAR Rule M3-1-2])
+
 /* Rule A3-1-4 (required, implementation, automated) */
 
     /* 9067 - extern array declared without size or initializer */
@@ -821,11 +826,17 @@
 
 /* Rule A5-0-2 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 9177 - condition of if/for/while/do statement has non-Boolean type */
+    +e9177
+    +elib(9177)
+    -append(9177,[AUTOSAR Rule A5-0-2])
 
 /* Rule M5-0-14 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 9178 - predicate of conditional operator has non-Boolean type */
+    +e9178
+    +elib(9178)
+    -append(9178,[AUTOSAR Rule M5-0-14])
 
 /* Rule M5-0-15 (required, implementation, automated) */
 
@@ -966,10 +977,15 @@
 
 /* Rule A5-2-2 (required, implementation, automated) */
 
-    /* 1924 - use of c-style cast */
+    /* 1924 - use of c-style cast (except to void) */
     +e1924
     +elib(1924)
     -append(1924,[AUTOSAR Rule A5-2-2])
+
+    /* 1954 - use of c-style cast (to void) */
+    +e1954
+    +elib(1954)
+    -append(1954,[AUTOSAR Rule A5-2-2])
 
 /* Rule A5-2-3 (required, implementation, automated) */
 
@@ -1094,7 +1110,10 @@
 
 /* Rule A5-5-1 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 414 - possible division by zero */
+    +e414
+    +elib(414)
+    -append(414,[AUTOSAR Rule A5-5-1])
 
 /* Rule M5-8-1 (required, implementation, partially automated) */
 
@@ -1338,7 +1357,10 @@
 
 /* Rule A7-1-3 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 9183 - qualifier precedes typedef type */
+    +e9183
+    +elib(9183)
+    -append(9183,[AUTOSAR Rule A7-1-3])
 
 /* Rule A7-1-4 (required, implementation, automated) */
 
@@ -1805,7 +1827,10 @@
 
 /* Rule A12-8-7 (advisory, implementation, automated) */
 
-    /* not currently supported */
+    /* 9185 - assignment operator declared without lvalue ref-qualifier */
+    +e9185
+    +elib(9185)
+    -append(9185,[AUTOSAR Rule A12-8-7])
 
 /* Rule A13-1-1 (required, implementation, automated) */
 
@@ -1837,7 +1862,10 @@
 
 /* Rule A13-2-3 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 9186 - non-Boolean return type for comparison function */
+    +e9186
+    +elib(9186)
+    -append(9186,[AUTOSAR Rule A13-2-3])
 
 /* Rule A13-3-1 (required, implementation, automated) */
 
@@ -1845,7 +1873,10 @@
 
 /* Rule A13-5-1 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 9187 - non-const overloaded subscript operator declared without a corresponding const version */
+    +e9187
+    +elib(9187)
+    -append(9187,[AUTOSAR Rule A13-5-1])
 
 /* Rule A13-6-1 (required, implementation, automated) */
 

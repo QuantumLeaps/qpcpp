@@ -210,7 +210,7 @@ void BSP::init(void) {
 
     BSP::randomSeed(1234U);
 
-    if (!QS_INIT((void *)0)) { // initialize the QS software tracing
+    if (!QS_INIT(nullptr)) { // initialize the QS software tracing
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
@@ -236,7 +236,7 @@ void BSP::displayPaused(uint8_t const paused) {
     //GPIOF->DATA_Bits[LED_RED] = ((paused != 0U) ? 0xFFU : 0U);
 
     static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
-    XT_Test2->POST_X(&pauseEvt, 1U, (void *)0);
+    XT_Test2->POST_X(&pauseEvt, 1U, nullptr);
 
     // application-specific trace record
     QS_BEGIN(PAUSED_STAT, AO_Table)

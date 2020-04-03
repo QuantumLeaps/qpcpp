@@ -34,7 +34,7 @@
 #include "alarm.hpp"
 #include "clock.hpp"
 
-#include <stdio.h>
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 
 //............................................................................
 int main(int argc, char *argv[]) {
@@ -42,14 +42,14 @@ int main(int argc, char *argv[]) {
     static QF_MPOOL_EL(TimeEvt) smlPoolSto[10]; // storage for small pool
 
 
-    printf("Orthogonal Component pattern\nQEP version: %s\nQF  version: %s\n"
+    PRINTF_S("Orthogonal Component pattern\nQP version: %s\n"
            "Press 'o' to turn the Alarm ON\n"
            "Press 'f' to turn the Alarm OFF\n"
            "Press '0'..'9' to set the Alarm time\n"
            "Press 'a' to set the Clock in 12-hour mode\n"
            "Press 'b' to set the Clock in 24-hour mode\n"
            "Press ESC to quit...\n",
-           QEP::getVersion(), QF::getVersion());
+           QP_VERSION_STR);
 
     BSP_init(argc, argv); // initialize the BSP
     QF::init(); // initialize the framework and the underlying RT kernel
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     // start the active objects...
     APP_alarmClock->start(1U,
                   alarmClockQSto, Q_DIM(alarmClockQSto),
-                  (void *)0, 0);
+                  nullptr, 0);
 
     return QF::run(); // run the QF application
 }

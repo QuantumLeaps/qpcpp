@@ -47,7 +47,7 @@ int main() {
     // instantiate and start the active objects...
     AO_Blinky->start(1U,                            // priority
                      blinkyQSto, Q_DIM(blinkyQSto), // event queue
-                     (void *)0, 0U);                // stack (unused)
+                     nullptr, 0U);                // stack (unused)
 
     return QF::run(); // run the QF application
 }

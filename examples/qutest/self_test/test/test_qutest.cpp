@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-14
+/// Last updated for version 6.8.0
+/// Last updated on  2020-03-30
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -28,7 +28,7 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
 /// <www.state-machine.com/licensing>
@@ -50,6 +50,7 @@ enum {
     FIXTURE_SETUP = QS_USER,
     FIXTURE_TEARDOWN,
     COMMAND_X,
+    COMMAND_Y,
     MY_RECORD,
 };
 
@@ -58,10 +59,10 @@ int main(int argc, char *argv[]) {
     QF::init();  // initialize the framework
 
     // initialize the QS software tracing
-    Q_ALLEGE(QS_INIT(argc <= 1 ? (void *)0 : argv[1]));
+    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
 
     // global filter
-    QS_FILTER_ON(QS_ALL_RECORDS); // enable all maskable filters
+    QS_FILTER_ON(QS_ALL_RECORDS); // enable all QS records
 
     // dictionaries...
     QS_OBJ_DICTIONARY(buffer);
@@ -70,6 +71,7 @@ int main(int argc, char *argv[]) {
     QS_USR_DICTIONARY(FIXTURE_SETUP);
     QS_USR_DICTIONARY(FIXTURE_TEARDOWN);
     QS_USR_DICTIONARY(COMMAND_X);
+    QS_USR_DICTIONARY(COMMAND_Y);
     QS_USR_DICTIONARY(MY_RECORD);
 
     return QF::run(); // run the tests
@@ -77,19 +79,19 @@ int main(int argc, char *argv[]) {
 
 //............................................................................
 void QS::onTestSetup(void) {
-    QS_BEGIN(FIXTURE_SETUP, (void *)0)
+    QS_BEGIN(FIXTURE_SETUP, nullptr)
     QS_END()
 }
 //............................................................................
 void QS::onTestTeardown(void) {
-    QS_BEGIN(FIXTURE_TEARDOWN, (void *)0)
+    QS_BEGIN(FIXTURE_TEARDOWN, nullptr)
     QS_END()
 }
 
 //............................................................................
 //! callback function to execute user commands
-void QS::onCommand(uint8_t cmdId,   uint32_t param1,
-                   uint32_t param2, uint32_t param3)
+void QS::onCommand(uint8_t cmdId,
+                   uint32_t param1, uint32_t param2, uint32_t param3)
 {
     (void)param1;
     (void)param2;
@@ -98,9 +100,17 @@ void QS::onCommand(uint8_t cmdId,   uint32_t param1,
     switch (cmdId) {
         case COMMAND_X: {
             uint32_t x = myFun();
-            QS_BEGIN(COMMAND_X, (void *)0) // application-specific record
+            QS_BEGIN(COMMAND_X, nullptr) // application-specific record
                 QS_U32(0, x);
                 // ...
+            QS_END()
+            break;
+        }
+        case COMMAND_Y: {
+            QS_BEGIN(COMMAND_Y, nullptr) // application-specific record
+                QS_FUN(&myFun);
+                QS_MEM(buffer, param1);
+                QS_STR((char const *)&buffer[33]);
             QS_END()
             break;
         }

@@ -76,8 +76,8 @@ Q_STATE_DEF(Launcher, initial) {
     QS_OBJ_DICTIONARY(&Launcher::inst);
     QS_OBJ_DICTIONARY(&Launcher::inst.m_te);
 
-    QS_SIG_DICTIONARY(DONE_SIG,    (void *)0);
-    QS_SIG_DICTIONARY(TIMEOUT_SIG, (void *)0);
+    QS_SIG_DICTIONARY(DONE_SIG,    nullptr);
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr);
 
     QS_FUN_DICTIONARY(&inactive);
     QS_FUN_DICTIONARY(&active);

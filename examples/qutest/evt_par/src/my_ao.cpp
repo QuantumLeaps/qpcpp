@@ -26,10 +26,10 @@ QState MyAO::initial(MyAO * const me, QEvt const * const e) {
     QS_FUN_DICTIONARY(&MyAO::initial);
     QS_FUN_DICTIONARY(&MyAO::active);
 
-    QS_SIG_DICTIONARY(MY_EVT0_SIG,   (void *)0);
-    QS_SIG_DICTIONARY(MY_EVT1_SIG,   (void *)0);
-    QS_SIG_DICTIONARY(MY_EVT2_SIG,   (void *)0);
-    QS_SIG_DICTIONARY(MY_EVT3_SIG,   (void *)0);
+    QS_SIG_DICTIONARY(MY_EVT0_SIG,   nullptr);
+    QS_SIG_DICTIONARY(MY_EVT1_SIG,   nullptr);
+    QS_SIG_DICTIONARY(MY_EVT2_SIG,   nullptr);
+    QS_SIG_DICTIONARY(MY_EVT3_SIG,   nullptr);
 
     return Q_TRAN(&MyAO::active);
 }

@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product:  Board Support Package (BSP) for the Calculator example
-// Last Updated for Version: 6.5.0
-// Date of the Last Update:  2019-03-21
+// Last Updated for Version: 6.8.0
+// Date of the Last Update:  2020-03-31
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -34,10 +34,9 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-#include <iostream>
-#include <stdio.h>
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
-#include <string.h>
+#include <iostream>
 
 using namespace QP;
 using namespace std;
@@ -61,18 +60,18 @@ void BSP_insert(int keyId) {
         ++l_len;
     }
     else if (l_len < (DISP_WIDTH - 1)) {
-        memmove(&l_display[0], &l_display[1], DISP_WIDTH - 1);
+        MEMMOVE_S(&l_display[0], DISP_WIDTH, &l_display[1], DISP_WIDTH - 1);
         l_display[DISP_WIDTH - 1] = (char)keyId;
         ++l_len;
     }
 }
 //............................................................................
 void BSP_display(double value) {
-    sprintf(l_display, "%9.6g", value);
+    SNPRINTF_S(l_display, DISP_WIDTH, "%9.6g", value);
 }
 //............................................................................
 void BSP_display_error(char const *err) {
-    strcpy(l_display, err);
+    STRCPY_S(l_display, DISP_WIDTH, err);
 }
 //............................................................................
 void BSP_negate(void) {

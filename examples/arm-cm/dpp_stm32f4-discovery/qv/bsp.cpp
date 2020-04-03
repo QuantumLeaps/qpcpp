@@ -215,7 +215,7 @@ void BSP::init(void) {
     // seed the random number generator
     randomSeed(1234U);
 
-    if (QS_INIT((void *)0) == 0U) { // initialize the QS software tracing
+    if (QS_INIT(nullptr) == 0U) { // initialize the QS software tracing
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_SysTick);

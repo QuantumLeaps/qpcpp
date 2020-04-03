@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.0
+/// Last updated on  2020-03-31
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -41,12 +41,12 @@
     #error "Q_SPY must be defined to compile qs_port.cpp"
 #endif // Q_SPY
 
-#define QP_IMPL       // this is QP implementation
+#define QP_IMPL         // this is QP implementation
 #include "qf_port.hpp"  // QF port
-#include "qassert.h"  // QP embedded systems-friendly assertions
+#include "qassert.h"    // QP embedded systems-friendly assertions
 #include "qs_port.hpp"  // include QS port
 
-#include <stdio.h>
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 #include <time.h>
 #include <conio.h>
@@ -99,8 +99,8 @@ bool QS::onStartup(void const *arg) {
 
     // initialize Windows sockets version 2.2
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR) {
-        fprintf(stderr,
-            "<TARGET> ERROR Windows Sockets cannot be initialized\n");
+        FPRINTF_S(stderr, "%s\n",
+            "<TARGET> ERROR Windows Sockets cannot be initialized");
         goto error;
     }
 
@@ -121,8 +121,8 @@ bool QS::onStartup(void const *arg) {
     if (*src == ':') {
         serviceName = src + 1;
     }
-    //printf("<TARGET> Connecting to QSPY on Host=%s:%s...\n",
-    //       hostName, serviceName);
+    //PRINTF_S("<TARGET> Connecting to QSPY on Host=%s:%s...\n",
+    //         hostName, serviceName);
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -130,9 +130,9 @@ bool QS::onStartup(void const *arg) {
     hints.ai_protocol = IPPROTO_TCP;
     status = getaddrinfo(hostName, serviceName, &hints, &result);
     if (status != 0) {
-        fprintf(stderr,
+        FPRINTF_S(stderr,
             "<TARGET> ERROR   cannot resolve host Name=%s:%s,Err=%d\n",
-                    hostName, serviceName, status);
+            hostName, serviceName, status);
         goto error;
     }
 
@@ -153,8 +153,8 @@ bool QS::onStartup(void const *arg) {
 
     // socket could not be opened & connected?
     if (l_sock == INVALID_SOCKET) {
-        fprintf(stderr, "<TARGET> ERROR   cannot connect to QSPY at "
-            "host=%s:%s\n",
+        FPRINTF_S(stderr,
+            "<TARGET> ERROR   cannot connect to QSPY at host=%s:%s\n",
             hostName, serviceName);
         goto error;
     }
@@ -162,8 +162,9 @@ bool QS::onStartup(void const *arg) {
     // set the socket to non-blocking mode
     ioctl_opt = 1;
     if (ioctlsocket(l_sock, FIONBIO, &ioctl_opt) != NO_ERROR) {
-        fprintf(stderr, "<TARGET> ERROR   Failed to set non-blocking socket "
-            "WASErr=%d\n", WSAGetLastError());
+        FPRINTF_S(stderr,
+            "<TARGET> ERROR   Failed to set non-blocking socket WASErr=%d\n",
+            WSAGetLastError());
         goto error;
     }
 
@@ -175,8 +176,8 @@ bool QS::onStartup(void const *arg) {
     setsockopt(l_sock, SOL_SOCKET, SO_DONTLINGER,
                (const char *)&sockopt_bool, sizeof(sockopt_bool));
 
-    //printf("<TARGET> Connected to QSPY at Host=%s:%d\n",
-    //       hostName, port_remote);
+    //PRINTF_S("<TARGET> Connected to QSPY at Host=%s:%d\n",
+    //         hostName, port_remote);
     onFlush();
 
     return true;  // success
@@ -191,7 +192,7 @@ void QS::onCleanup(void) {
         l_sock = INVALID_SOCKET;
     }
     WSACleanup();
-    //printf("<TARGET> Disconnected from QSPY\n");
+    //PRINTF_S("%s\n", "<TARGET> Disconnected from QSPY");
 }
 //............................................................................
 void QS::onReset(void) {
@@ -205,7 +206,7 @@ void QS::onFlush(void) {
     QS_CRIT_STAT_
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
-        fprintf(stderr, "<TARGET> ERROR   invalid TCP socket\n");
+        FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
         return;
     }
 
@@ -224,8 +225,9 @@ void QS::onFlush(void) {
                     Sleep(QS_TIMEOUT_MS);
                 }
                 else { // some other socket error...
-                    fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
-                           "WASErr=%d\n", err);
+                    FPRINTF_S(stderr,
+                        "<TARGET> ERROR   sending data over TCP,WASErr=%d\n",
+                        err);
                     return;
                 }
             }
@@ -259,7 +261,7 @@ void QS_output(void) {
     QS_CRIT_STAT_
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
-        fprintf(stderr, "<TARGET> ERROR   invalid TCP socket\n");
+        FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
         return;
     }
 
@@ -278,8 +280,9 @@ void QS_output(void) {
                     Sleep(QS_TIMEOUT_MS);
                 }
                 else { // some other socket error...
-                    fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
-                           "WASErr=%d\n", err);
+                    FPRINTF_S(stderr,
+                        "<TARGET> ERROR   sending data over TCP,WASErr=%d\n",
+                        err);
                     return;
                 }
             }

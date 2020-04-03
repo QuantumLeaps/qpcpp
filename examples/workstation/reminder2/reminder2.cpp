@@ -34,7 +34,7 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-#include <stdio.h>
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 
 Q_DEFINE_THIS_FILE
 
@@ -104,13 +104,13 @@ Q_STATE_DEF(Cruncher, processing) {
                 status = Q_RET_HANDLED;
             }
             else {
-                printf("pi=%16.14f\n", 4.0*m_sum);
+                PRINTF_S("pi=%16.14f\n", 4.0*m_sum);
                 status = tran(&processing);
             }
             break;
         }
         case ECHO_SIG: {
-            printf("Echo! pi=%16.14f\n", 4.0*m_sum);
+            PRINTF_S("Echo! pi=%16.14f\n", 4.0*m_sum);
             status = Q_RET_HANDLED;
             break;
         }
@@ -151,7 +151,7 @@ static QF_MPOOL_EL(ReminderEvt) l_smlPoolSto[20]; // storage for small pool
 
 //............................................................................
 int main(int argc, char *argv[]) {
-    printf("Reminder state pattern\nQP version: %s\n"
+    PRINTF_S("Reminder state pattern\nQP version: %s\n"
            "Press 'e' to echo the current value...\n"
            "Press ESC to quit...\n",
            QP::versionStr);
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
     // instantiate and start the active objects...
     l_cruncher.start(1U,
                      l_cruncherQSto, Q_DIM(l_cruncherQSto),
-                     (void *)0, 0U, (QEvt *)0);
+                     nullptr, 0U, (QEvt *)0);
 
     return QF::run(); // run the QF application
 }
@@ -175,7 +175,7 @@ void BSP_onKeyboardInput(uint8_t key) {
     switch (key) {
         case 'e': {
             static QEvt const echoEvt = { ECHO_SIG, 0U, 0U };
-            l_cruncher.POST(&echoEvt, (void *)0);
+            l_cruncher.POST(&echoEvt, nullptr);
             break;
         }
         case '\033': { // ESC pressed?
@@ -183,7 +183,7 @@ void BSP_onKeyboardInput(uint8_t key) {
             // It can be posted/published as any other event.
             //
             static QEvt const terminateEvt = { TERMINATE_SIG, 0U, 0U };
-            l_cruncher.POST(&terminateEvt, (void *)0);
+            l_cruncher.POST(&terminateEvt, nullptr);
             break;
         }
     }

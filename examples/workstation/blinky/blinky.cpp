@@ -38,7 +38,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 void QF::onStartup(void) {}
 void QF::onCleanup(void) {}
 void QP::QF_onClockTick(void) {
-    QF::TICK_X(0U, (void *)0);  // perform the QF clock tick processing
+    QF::TICK_X(0U, nullptr);  // perform the QF clock tick processing
 }
 
 enum BlinkySignals {
@@ -73,7 +73,7 @@ int main() {
     QF::init(); // initialize the framework
     AO_Blinky->start(1U, // priority
                      blinky_queueSto, Q_DIM(blinky_queueSto),
-                     (void *)0, 0U); // no stack
+                     nullptr, 0U); // no stack
     return QF::run(); // run the QF application
 }
 

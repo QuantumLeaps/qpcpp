@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     // start the active objects...
     PELICAN::AO_Pelican->start(1U,
                  (QP::QEvt const **)0, 0U, // no queue
-                 (void *)0, 0U); // default stack size
+                 nullptr, 0U); // default stack size
 
     return QP::QF::run(); // calls qApp->exec()
 }

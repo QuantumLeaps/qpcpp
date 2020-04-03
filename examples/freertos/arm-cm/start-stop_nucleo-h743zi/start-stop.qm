@@ -32,8 +32,8 @@ subscribe(DONE_SIG);
 QS_OBJ_DICTIONARY(&amp;Launcher::inst);
 QS_OBJ_DICTIONARY(&amp;Launcher::inst.m_te);
 
-QS_SIG_DICTIONARY(DONE_SIG,    (void *)0);
-QS_SIG_DICTIONARY(TIMEOUT_SIG, (void *)0);</action>
+QS_SIG_DICTIONARY(DONE_SIG,    nullptr);
+QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr);</action>
      <initial_glyph conn="2,2,5,1,38,6,0">
       <action box="0,0,4,2"/>
      </initial_glyph>

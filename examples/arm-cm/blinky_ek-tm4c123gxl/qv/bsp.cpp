@@ -80,7 +80,7 @@ extern "C" {
 //............................................................................
 void SysTick_Handler(void); // prototype
 void SysTick_Handler(void) {
-    QF::TICK_X(0U, (void *)0); // process time events for rate 0
+    QF::TICK_X(0U, nullptr); // process time events for rate 0
 }
 
 } // extern "C"

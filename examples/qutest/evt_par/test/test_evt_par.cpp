@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     QF::init();   // initialize the framework and the underlying RT kernel
 
     // initialize the QS software tracing
-    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : (void *)0));
+    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(AO_MyAO);
@@ -62,9 +62,7 @@ int main(int argc, char *argv[]) {
     AO_MyAO->start(1U,                  // QP priority of the AO
                   myAoQueueSto,         // event queue storage
                   Q_DIM(myAoQueueSto),  // queue length [events]
-                  (void *)0,            // stack storage (not used)
-                  0U,                   // size of the stack [bytes]
-                  (QEvt *)0);           // initialization event/
+                  nullptr, 0U);         // stack storage and size (not used)
 
     return QF::run(); // run the QF application
 }
@@ -96,7 +94,6 @@ void QS::onCommand(uint8_t cmdId,
     (void)param2; // unused parameter
     (void)param3; // unused parameter
 
-    //printf("<TARGET> Command id=%d param=%d\n", (int)cmdId, (int)param);
     switch (cmdId) {
         case 0: {
             break;
@@ -111,22 +108,22 @@ void QS::onTestEvt(QEvt *e) {
 
     switch (e->sig) {
         case MY_EVT0_SIG:
-            QS_BEGIN(MY_EVT0, (void *)0) // user-specific record
+            QS_BEGIN(MY_EVT0, nullptr) // user-specific record
             QS_END()
             break;
         case MY_EVT1_SIG:
-            QS_BEGIN(MY_EVT1, (void *)0) // user-specific record
+            QS_BEGIN(MY_EVT1, nullptr) // user-specific record
                 QS_U32(0, Q_EVT_CAST(MyEvt1)->u32);
             QS_END()
             break;
         case MY_EVT2_SIG:
-            QS_BEGIN(MY_EVT2, (void *)0) // user-specific record
+            QS_BEGIN(MY_EVT2, nullptr) // user-specific record
                 QS_U32(0, Q_EVT_CAST(MyEvt2)->u32);
                 QS_U32(0, Q_EVT_CAST(MyEvt2)->u16);
             QS_END()
             break;
         case MY_EVT3_SIG:
-            QS_BEGIN(MY_EVT3, (void *)0) // user-specific record
+            QS_BEGIN(MY_EVT3, nullptr) // user-specific record
                 QS_U32(0, Q_EVT_CAST(MyEvt3)->u32);
                 QS_U32(0, Q_EVT_CAST(MyEvt3)->u16);
                 QS_U32(0, Q_EVT_CAST(MyEvt3)->u8);

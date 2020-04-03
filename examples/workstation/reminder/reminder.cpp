@@ -34,7 +34,7 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-#include <stdio.h>
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 
 Q_DEFINE_THIS_FILE
 
@@ -87,7 +87,7 @@ Q_STATE_DEF(Sensor, initial) {
 Q_STATE_DEF(Sensor, final) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            printf("-> final\n");
+            PRINTF_S("%s\n", "-> final");
             QF::stop(); // stop QF and cleanup
             return Q_RET_HANDLED;
         }
@@ -115,7 +115,7 @@ Q_STATE_DEF(Sensor, polling) {
             static const QEvt dataReadyEvt = { DATA_READY_SIG, 0U, 0U };
 
             ++m_pollCtr;
-            printf("poll %3d\n", m_pollCtr);
+            PRINTF_S("poll %3d\n", m_pollCtr);
             if ((m_pollCtr & 0x3U) == 0U) { // modulo 4
                 POST(&dataReadyEvt, me);
             }
@@ -140,7 +140,7 @@ Q_STATE_DEF(Sensor, processing) {
 Q_STATE_DEF(Sensor, idle) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            printf("-> idle\n");
+            PRINTF_S("%s\n", "-> idle");
             return Q_RET_HANDLED;
         }
         case DATA_READY_SIG: {
@@ -153,12 +153,12 @@ Q_STATE_DEF(Sensor, idle) {
 Q_STATE_DEF(Sensor, busy) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            printf("-> busy\n");
+            PRINTF_S("%s\n", "-> busy");
             return Q_RET_HANDLED;
         }
         case TIMEOUT_SIG: {
             ++m_procCtr;
-            printf("process %3d\n", m_procCtr);
+            PRINTF_S("process %3d\n", m_procCtr);
             if ((m_procCtr & 0x1U) == 0U) { // modulo 2
                 return tran(&idle);
             }
@@ -177,7 +177,7 @@ static void *l_regPoolSto[100/sizeof(void *)]; // storage for the event pool
 
 //............................................................................
 int main(int argc, char *argv[]) {
-    printf("Reminder state pattern\nQP version: %s\n"
+    PRINTF_S("Reminder state pattern\nQP version: %s\n"
            "Press ESC to quit...\n",
            QP::versionStr);
 
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
 
     // start the active objects...
     l_sensor.start(1U, l_sensorQSto, Q_DIM(l_sensorQSto),
-                   (void *)0, 0, (QEvt *)0);
+                   nullptr, 0, (QEvt *)0);
 
     return QF::run();  // run the QF application
 }
@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
 void BSP_onKeyboardInput(uint8_t key) {
     switch (key) {
         case '\33': { // ESC pressed?
-            l_sensor.POST(Q_NEW(QEvt, TERMINATE_SIG), (void *)0);
+            l_sensor.POST(Q_NEW(QEvt, TERMINATE_SIG), nullptr);
             break;
         }
     }

@@ -67,12 +67,12 @@ int main(int argc, char *argv[]) {
     for (uint_fast8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1),
                                 l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
-                                (void *)0, 0U); // default stack size
+                                nullptr, 0U); // default stack size
     }
     // NOTE: Table is the GUI Thread in this app
     DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 1),
                          (QP::QEvt const **)0, 0U,// no evt queue for GUI thread
-                         (void *)0, 0U);          // no stack for GUI thread
+                         nullptr, 0U);          // no stack for GUI thread
 
     return QP::QF::run(); // calls qApp->exec()
 }

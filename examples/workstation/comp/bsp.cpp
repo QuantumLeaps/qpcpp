@@ -35,7 +35,7 @@
 #include "clock.hpp"
 #include "bsp.hpp"
 
-#include <stdio.h>
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 
 using namespace std;
@@ -48,11 +48,11 @@ void BSP_init(int /*argc*/, char * /*argv*/[]) {
 void BSP_onKeyboardInput(uint8_t key) {
     switch (key) {
         case 'o': { // 'o': Alarm on event?
-            APP_alarmClock->POST(Q_NEW(QEvt, ALARM_ON_SIG), (void *)0);
+            APP_alarmClock->POST(Q_NEW(QEvt, ALARM_ON_SIG), nullptr);
             break;
         }
         case 'f': { // 'f': Alarm off event?
-            APP_alarmClock->POST(Q_NEW(QEvt, ALARM_OFF_SIG), (void *)0);
+            APP_alarmClock->POST(Q_NEW(QEvt, ALARM_OFF_SIG), nullptr);
             break;
         }
         case '1':
@@ -66,47 +66,44 @@ void BSP_onKeyboardInput(uint8_t key) {
         case '9': {
             SetEvt *e = Q_NEW(SetEvt, ALARM_SET_SIG);
             e->digit = (uint8_t)(key - '0');
-            APP_alarmClock->POST(e, (void *)0);
+            APP_alarmClock->POST(e, nullptr);
             break;
         }
         case '0': {
             SetEvt *e = Q_NEW(SetEvt, ALARM_SET_SIG);
             e->digit = 0;
-            APP_alarmClock->POST(e, (void *)0);
+            APP_alarmClock->POST(e, nullptr);
             break;
         }
         case 'a': { // 'a': Clock 12H event?
-            APP_alarmClock->POST(Q_NEW(QEvt, CLOCK_12H_SIG), (void *)0);
+            APP_alarmClock->POST(Q_NEW(QEvt, CLOCK_12H_SIG), nullptr);
             break;
         }
         case 'b': { // 'b': Clock 24H event?
-            APP_alarmClock->POST(Q_NEW(QEvt, CLOCK_24H_SIG), (void *)0);
+            APP_alarmClock->POST(Q_NEW(QEvt, CLOCK_24H_SIG), nullptr);
             break;
         }
         case '\33': { // ESC pressed?
-            APP_alarmClock->POST(Q_NEW(QEvt, TERMINATE_SIG), (void *)0);
+            APP_alarmClock->POST(Q_NEW(QEvt, TERMINATE_SIG), nullptr);
             break;
         }
     }
 }
 //............................................................................
 void BSP_showMsg(char const *str) {
-    printf(str);
-    printf("\n");
+    PRINTF_S("%s\n", str);
     fflush(stdout);
 }
 //............................................................................
 void BSP_showTime24H(char const *str, uint32_t time, uint32_t base) {
-    printf(str);
-    printf("%02d:%02d\n", (int)(time / base), (int)(time % base));
+    PRINTF_S("%s %02d:%02d\n", str, (int)(time / base), (int)(time % base));
     fflush(stdout);
 }
 //............................................................................
 void BSP_showTime12H(char const *str, uint32_t time, uint32_t base) {
     uint32_t h = time / base;
 
-    printf(str);
-    printf("%02d:%02d %s\n", (h % 12) ? (h % 12) : 12,
+    PRINTF_S("%s %02d:%02d %s\n", str, (h % 12) ? (h % 12) : 12,
            time % base, (h / 12) ? "PM" : "AM");
     fflush(stdout);
 }
@@ -129,7 +126,7 @@ void QP::QF_onClockTick(void) {
 }
 //............................................................................
 extern "C" Q_NORETURN Q_onAssert(char const * const file, int_t const line) {
-    fprintf(stderr, "Assertion failed in %s at %d\n", file, line);
+    FPRINTF_S(stderr, "Assertion failed in %s at %d\n", file, line);
     exit(-1);
 
 }

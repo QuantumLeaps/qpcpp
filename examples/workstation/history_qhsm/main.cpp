@@ -34,7 +34,7 @@
 #include "qpcpp.hpp"   // QP API
 #include "history.hpp"
 
-#include <stdio.h>
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 
 using namespace QP;
@@ -46,7 +46,7 @@ int main() {
     QF::init();
     QF::onStartup();
 
-    printf("History state pattern\nQEP version: %s\n"
+    PRINTF_S("History state pattern\nQEP version: %s\n"
            "Press 'o' to OPEN  the door\n"
            "Press 'c' to CLOSE the door\n"
            "Press 't' to start TOASTING\n"
@@ -60,10 +60,10 @@ int main() {
 
     for (;;) {
 
-        printf("\n");
+        PRINTF_S("\n", "");
 
         uint8_t c = (uint8_t)QF_consoleWaitForKey();
-        printf("%c: ", c);
+        PRINTF_S("%c: ", c);
 
         QP::QEvt e;
         switch (c) {
@@ -100,7 +100,7 @@ void QF_onClockTick(void) {
 
 //............................................................................
 extern "C" Q_NORETURN Q_onAssert(char const * const file, int_t const  line) {
-    fprintf(stderr, "Assertion failed in %s, line %d", file, line);
+    FPRINTF_S(stderr, "Assertion failed in %s, line %d", file, line);
     QF::onCleanup();
     exit(-1);
 }

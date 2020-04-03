@@ -48,7 +48,7 @@ enum {
 
 // BSP functions =============================================================
 void BSP::init(int argc, char **argv) {
-    Q_ALLEGE(QS_INIT(argc <= 1 ? (void *)0 : argv[1]));
+    Q_ALLEGE(QS_INIT(argc <= 1 ? nullptr : argv[1]));
 
     QS_FUN_DICTIONARY(&BSP::displayPaused);
     QS_FUN_DICTIONARY(&BSP::displayPhilStat);

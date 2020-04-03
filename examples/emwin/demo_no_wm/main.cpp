@@ -66,11 +66,11 @@ extern "C" void MainTask(void) {
     for (n = 0; n < N_PHILO; ++n) {
         AO_Philo[n]->start((uint8_t)(n + 1),
                            l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
-                           (void *)0, 1024, (void *)0);
+                           nullptr, 1024, nullptr);
     }
     AO_Table->start((uint8_t)(N_PHILO + 1),
                     l_tableQueueSto, Q_DIM(l_tableQueueSto),
-                    (void *)0, 1024, (void *)0);
+                    nullptr, 1024, nullptr);
 
     QF::run(); // run the QF application
 }

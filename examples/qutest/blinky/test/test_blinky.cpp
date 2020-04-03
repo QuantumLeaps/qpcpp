@@ -47,12 +47,12 @@ int main(int argc, char *argv[]) {
     QF::init();  // initialize the framework
 
     // initialize the QS software tracing
-    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : (void *)0));
+    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
 
     BSP::init(); // initialize the BSP
 
     // dictionaries...
-    QS_SIG_DICTIONARY(TIMEOUT_SIG, (void *)0);
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr);
 
     // pause execution of the test and wait for the test script to continue
     QS_TEST_PAUSE();
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     // start the active objects...
     AO_Blinky->start(1U,
                      blinkyQSto, Q_DIM(blinkyQSto),
-                     (void *)0, 0U, (QEvt *)0);
+                     nullptr, 0U, (QEvt *)0);
 
     return QF::run();
 }

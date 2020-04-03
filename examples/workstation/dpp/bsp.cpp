@@ -35,7 +35,7 @@
 #include "dpp.hpp"
 #include "bsp.hpp"
 
-#include <stdio.h>
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 
 Q_DEFINE_THIS_FILE
@@ -55,7 +55,7 @@ static uint32_t l_rnd; // random seed
 
 //............................................................................
 void BSP::init(int argc, char **argv) {
-    printf("Dining Philosopher Problem example"
+    PRINTF_S("Dining Philosopher Problem example"
            "\nQP %s\n"
            "Press p to pause the forks\n"
            "Press s to serve the forks\n"
@@ -66,7 +66,7 @@ void BSP::init(int argc, char **argv) {
 
     (void)argc;
     (void)argv;
-    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : (void *)0));
+    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
     QS_OBJ_DICTIONARY(&l_clock_tick); // must be called *after* QF::init()
     QS_USR_DICTIONARY(PHILO_STAT);
 
@@ -81,16 +81,16 @@ void BSP::terminate(int16_t result) {
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
-    printf("Philosopher %2d is %s\n", (int)n, stat);
+    PRINTF_S("Philosopher %2d is %s\n", (int)n, stat);
 
-    QS_BEGIN(PHILO_STAT, (void *)0) // application-specific record begin
+    QS_BEGIN(PHILO_STAT, nullptr) // application-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()
 }
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
-    printf("Paused is %s\n", paused ? "ON" : "OFF");
+    PRINTF_S("Paused is %s\n", paused ? "ON" : "OFF");
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
@@ -118,7 +118,7 @@ void QF::onStartup(void) { // QS startup callback
 }
 //............................................................................
 void QF::onCleanup(void) {  // cleanup callback
-    printf("\nBye! Bye!\n");
+    PRINTF_S("\n%s\n", "Bye! Bye!");
     QF_consoleCleanup();
 }
 //............................................................................
@@ -177,7 +177,7 @@ void QS::onCommand(uint8_t cmdId,
 //............................................................................
 extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     QS_ASSERTION(module, loc, (uint32_t)10000U); // report assertion to QS
-    fprintf(stderr, "Assertion failed in %s:%d", module, loc);
+    FPRINTF_S(stderr, "Assertion failed in %s:%d", module, loc);
     QP::QF::onCleanup();
     exit(-1);
 }

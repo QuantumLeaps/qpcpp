@@ -164,8 +164,8 @@ bool QP::QS::onStartup(void const *) {
                 QF_MPOOL_CTR_SIZE,  // poolCtrSize
                 QF_MPOOL_SIZ_SIZE,  // poolBlkSize
                 QF_TIMEEVT_CTR_SIZE,// tevtCtrSize
-                (void *)0,          // matFile,
-                (void *)0,
+                nullptr,          // matFile,
+                nullptr,
                 &custParserFun);    // customized parser function
 
     l_time.start();                 // start the time stamp

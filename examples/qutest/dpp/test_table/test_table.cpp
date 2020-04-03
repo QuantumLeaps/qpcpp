@@ -66,13 +66,13 @@ int main(int argc, char *argv[]) {
     QS_OBJ_DICTIONARY(AO_Philo[4]);
 
     // signal dictionaries
-    QS_SIG_DICTIONARY(DONE_SIG,      (void *)0);
-    QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
-    QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(SERVE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(TEST_SIG,      (void *)0);
-    QS_SIG_DICTIONARY(HUNGRY_SIG,    (void *)0);
-    QS_SIG_DICTIONARY(TIMEOUT_SIG,   (void *)0);
+    QS_SIG_DICTIONARY(DONE_SIG,      nullptr);
+    QS_SIG_DICTIONARY(EAT_SIG,       nullptr);
+    QS_SIG_DICTIONARY(PAUSE_SIG,     nullptr);
+    QS_SIG_DICTIONARY(SERVE_SIG,     nullptr);
+    QS_SIG_DICTIONARY(TEST_SIG,      nullptr);
+    QS_SIG_DICTIONARY(HUNGRY_SIG,    nullptr);
+    QS_SIG_DICTIONARY(TIMEOUT_SIG,   nullptr);
 
     // pause execution of the test and wait for the test script to continue
     QS_TEST_PAUSE();
@@ -89,14 +89,14 @@ int main(int argc, char *argv[]) {
     //       them to events.
     for (int_t n = 0; n < N_PHILO; ++n) {
         AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
-                    (QP::QEvt const **)0, 0U, (void *)0, 0U);
+                    (QP::QEvt const **)0, 0U, nullptr, 0U);
         AO_Philo[n]->subscribe(EAT_SIG);
     }
 
     // start the active object under test (AOUT)...
     AO_Table->start((uint_fast8_t)(N_PHILO + 1U), // priority
                     tableQueueSto, Q_DIM(tableQueueSto),
-                    (void *)0, 0U);
+                    nullptr, 0U);
 
     return QP::QF::run(); // run the QF application
 }
@@ -157,7 +157,7 @@ void QS::onTestPost(void const *sender, QActive *recipient,
         case EAT_SIG:
         case DONE_SIG:
         case HUNGRY_SIG:
-            QS_BEGIN(QUTEST_ON_POST, (void *)0) // application-specific record
+            QS_BEGIN(QUTEST_ON_POST, nullptr) // application-specific record
                 QS_SIG(e->sig, recipient);
                 QS_U8(0, Q_EVT_CAST(TableEvt)->philoNum);
             QS_END()

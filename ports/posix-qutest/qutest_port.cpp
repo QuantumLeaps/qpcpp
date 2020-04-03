@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.8.0
-/// Last updated on  2020-01-23
+/// Last updated on  2020-03-31
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -50,9 +50,8 @@
 #include "qs_port.hpp"  // QS port
 #include "qs_pkg.hpp"   // QS package-scope internal interface
 
-#include <stdio.h>
+#include "safe_std.h" // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
-#include <string.h>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -114,12 +113,12 @@ bool QS::onStartup(void const *arg) {
     }
     *dst = '\0'; // zero-terminate hostName
 
-    // extract port_remote from 'arg' (hostName:port_remote)...
+    // extract serviceName from 'arg' (hostName:serviceName)...
     if (*src == ':') {
         serviceName = src + 1;
     }
-    //printf("<TARGET> Connecting to QSPY on Host=%s:%s...\n",
-    //       hostName, serviceName);
+    //PRINTF_S("<TARGET> Connecting to QSPY on Host=%s:%s...\n",
+    //         hostName, serviceName);
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -127,9 +126,9 @@ bool QS::onStartup(void const *arg) {
     hints.ai_protocol = IPPROTO_TCP;
     status = getaddrinfo(hostName, serviceName, &hints, &result);
     if (status != 0) {
-        fprintf(stderr,
+        FPRINTF_S(stderr,
             "<TARGET> ERROR   cannot resolve host Name=%s:%s,Err=%d\n",
-                    hostName, serviceName, status);
+            hostName, serviceName, status);
         goto error;
     }
 
@@ -150,7 +149,7 @@ bool QS::onStartup(void const *arg) {
 
     // socket could not be opened & connected?
     if (l_sock == INVALID_SOCKET) {
-        fprintf(stderr, "<TARGET> ERROR   cannot connect to QSPY at "
+        FPRINTF_S(stderr, "<TARGET> ERROR   cannot connect to QSPY at "
             "host=%s:%s\n",
             hostName, serviceName);
         goto error;
@@ -159,14 +158,14 @@ bool QS::onStartup(void const *arg) {
     // set the socket to non-blocking mode
     status = fcntl(l_sock, F_GETFL, 0);
     if (status == -1) {
-        fprintf(stderr,
+        FPRINTF_S(stderr,
             "<TARGET> ERROR   Socket configuration failed errno=%d\n",
             errno);
         QS_EXIT();
         goto error;
     }
     if (fcntl(l_sock, F_SETFL, status | O_NONBLOCK) != 0) {
-        fprintf(stderr, "<TARGET> ERROR   Failed to set non-blocking socket "
+        FPRINTF_S(stderr, "<TARGET> ERROR   Failed to set non-blocking socket "
             "errno=%d\n", errno);
         QS_EXIT();
         goto error;
@@ -180,8 +179,8 @@ bool QS::onStartup(void const *arg) {
     setsockopt(l_sock, SOL_SOCKET, SO_LINGER,
                &sockopt_bool, sizeof(sockopt_bool));
 
-    //printf("<TARGET> Connected to QSPY at Host=%s:%d\n",
-    //       hostName, port_remote);
+    //PRINTF_S("<TARGET> Connected to QSPY at Host=%s:%d\n",
+    //         hostName, port_remote);
     onFlush();
 
     // install the SIGINT (Ctrl-C) signal handler
@@ -199,7 +198,7 @@ void QS::onCleanup(void) {
         close(l_sock);
         l_sock = INVALID_SOCKET;
     }
-    //printf("<TARGET> Disconnected from QSPY\n");
+    //PRINTF_S("%s\n", "<TARGET> Disconnected from QSPY");
 }
 //............................................................................
 void QS::onReset(void) {
@@ -213,7 +212,7 @@ void QS::onFlush(void) {
     static struct timespec const c_timeout = { 0, QS_TIMEOUT_MS * 1000000L };
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
-        fprintf(stderr, "<TARGET> ERROR   invalid TCP socket\n");
+        FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
         return;
     }
 
@@ -221,7 +220,7 @@ void QS::onFlush(void) {
     while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
-            if (nSent == SOCKET_ERROR) { /* sending failed? */
+            if (nSent == SOCKET_ERROR) { // sending failed?
                 if ((errno == EWOULDBLOCK) || (errno == EAGAIN)) {
                     // sleep for the timeout and then loop back
                     // to send() the SAME data again
@@ -229,13 +228,14 @@ void QS::onFlush(void) {
                     nanosleep(&c_timeout, NULL);
                 }
                 else { // some other socket error...
-                    fprintf(stderr, "<TARGET> ERROR   sending data over TCP,"
-                           "errno=%d\n", errno);
+                    FPRINTF_S(stderr,
+                        "<TARGET> ERROR   sending data over TCP,errno=%d\n",
+                        errno);
                     return;
                 }
             }
             else if (nSent < (int)nBytes) { // sent fewer than requested?
-                nanosleep(&c_timeout, NULL); // sleep for the timeout */
+                nanosleep(&c_timeout, NULL); // sleep for the timeout
                 // adjust the data and loop back to send() the rest
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
@@ -264,8 +264,7 @@ void QS::onTestLoop() {
         int nrec = select(l_sock + 1, &readSet,
                           (fd_set *)0, (fd_set *)0, &timeout);
         if (nrec < 0) {
-            fprintf(stderr,
-                "<TARGET> ERROR socket select,errno=%d\n",
+            FPRINTF_S(stderr, "<TARGET> ERROR socket select,errno=%d\n",
                 errno);
             onCleanup();
             exit(-2);
@@ -298,7 +297,7 @@ void QS::onTestLoop() {
 //............................................................................
 static void sigIntHandler(int /*dummy*/) {
     QS::onCleanup();
-    //printf("\n<TARGET> disconnecting from QSPY\n");
+    //PRINTF_S("\n%s\n","<TARGET> disconnecting from QSPY");
     exit(-1);
 }
 

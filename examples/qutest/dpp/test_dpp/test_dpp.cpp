@@ -90,7 +90,7 @@ void QS::onTestPost(void const *sender, QActive *recipient,
         case DPP::EAT_SIG:
         case DPP::DONE_SIG:
         case DPP::HUNGRY_SIG:
-            QS_BEGIN(QUTEST_ON_POST, (void *)0) // application-specific record
+            QS_BEGIN(QUTEST_ON_POST, nullptr) // application-specific record
                 QS_SIG(e->sig, recipient);
                 QS_U8(0, Q_EVT_CAST(DPP::TableEvt)->philoNum);
             QS_END()

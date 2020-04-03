@@ -60,18 +60,18 @@ Gui *Gui::instance() {
 //............................................................................
 void Gui::onPausePressed() { // slot
     static QP::QEvt const e(DPP::PAUSE_SIG);
-    QP::QF::PUBLISH(&e, (void *)0);
+    QP::QF::PUBLISH(&e, nullptr);
     qDebug("onPausePressed");
 }
 //............................................................................
 void Gui::onPauseReleased() { // slot
     static QP::QEvt const e(DPP::SERVE_SIG);
-    QP::QF::PUBLISH(&e, (void *)0);
+    QP::QF::PUBLISH(&e, nullptr);
     qDebug("onPauseReleased");
 }
 //............................................................................
 void Gui::onQuit() { // slot
     static QP::QEvt const e(DPP::TERMINATE_SIG);
-    QP::QF::PUBLISH(&e, (void *)0);
+    QP::QF::PUBLISH(&e, nullptr);
     qDebug("onQuit");
 }

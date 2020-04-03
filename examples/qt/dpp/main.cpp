@@ -65,11 +65,11 @@ int main(int argc, char *argv[]) {
     for (uint_fast8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1),
                                 l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
-                                (void *)0, 0U); // default stack size
+                                nullptr, 0U); // default stack size
     }
     DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 1),
                          l_tableQueueSto, Q_DIM(l_tableQueueSto),
-                         (void *)0, 0U); // default stack size
+                         nullptr, 0U); // default stack size
 
     return QP::QF::run(); // calls qApp->exec()
 }

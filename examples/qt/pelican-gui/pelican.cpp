@@ -109,9 +109,9 @@ Q_STATE_DEF(Pelican, initial) {
     QS_FUN_DICTIONARY(&Pelican::pedsWalk);
     QS_FUN_DICTIONARY(&Pelican::pedsFlash);
 
-    QS_SIG_DICTIONARY(PEDS_WAITING_SIG, (void *)0);  // global signals
-    QS_SIG_DICTIONARY(ON_SIG,           (void *)0);
-    QS_SIG_DICTIONARY(OFF_SIG,          (void *)0);
+    QS_SIG_DICTIONARY(PEDS_WAITING_SIG, nullptr);  // global signals
+    QS_SIG_DICTIONARY(ON_SIG,           nullptr);
+    QS_SIG_DICTIONARY(OFF_SIG,          nullptr);
 
     QS_SIG_DICTIONARY(TIMEOUT_SIG,      &l_Pelican); // just for Pelican
 
@@ -216,7 +216,7 @@ Q_STATE_DEF(Pelican, carsGreen) {
     }
     return status_;
 }
-//.${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenNoPed} 
+//.${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenNoPed}
 Q_STATE_DEF(Pelican, carsGreenNoPed) {
     QP::QState status_;
     switch (e->sig) {
@@ -243,7 +243,7 @@ Q_STATE_DEF(Pelican, carsGreenNoPed) {
     }
     return status_;
 }
-//.${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenInt} 
+//.${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenInt}
 Q_STATE_DEF(Pelican, carsGreenInt) {
     QP::QState status_;
     switch (e->sig) {
@@ -265,7 +265,7 @@ Q_STATE_DEF(Pelican, carsGreenInt) {
     }
     return status_;
 }
-//.${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenPedWait} 
+//.${components::Pelican::SM::operational::carsEnabled::carsGreen::carsGreenPedWait}
 Q_STATE_DEF(Pelican, carsGreenPedWait) {
     QP::QState status_;
     switch (e->sig) {

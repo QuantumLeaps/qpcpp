@@ -284,7 +284,7 @@ void BSP::init(void) {
     BSP::randomSeed(1234U);
 
     // initialize the QS software tracing...
-    if (!QS_INIT((void *)0)) {
+    if (!QS_INIT(nullptr)) {
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_TickHook);

@@ -113,7 +113,7 @@ void BSP::init(void) {
     P1DIR |= LED1;  // set LED1 pin to output
     P4DIR |= LED2;  // set LED2 pin to output
 
-    if (QS_INIT((void *)0) == 0) { // initialize the QS software tracing
+    if (QS_INIT(nullptr) == 0) { // initialize the QS software tracing
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_timer0_ISR);

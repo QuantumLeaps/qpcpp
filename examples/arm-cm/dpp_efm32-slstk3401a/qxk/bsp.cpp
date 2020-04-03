@@ -212,7 +212,7 @@ void BSP::init(void) {
     //...
     BSP::randomSeed(1234U);
 
-    if (!QS_INIT((void *)0)) { // initialize the QS software tracing
+    if (!QS_INIT(nullptr)) { // initialize the QS software tracing
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
@@ -243,13 +243,13 @@ void BSP::displayPaused(uint8_t paused) {
         // for testing the extended threads...
         static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
         XT_Test2->delayCancel(); // make sure Test2 is not delayed
-        XT_Test2->POST_X(&pauseEvt, 1U, (void *)0); // post to Test2's queue
+        XT_Test2->POST_X(&pauseEvt, 1U, nullptr); // post to Test2's queue
     }
     else {
         GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
     }
 
-    QS_BEGIN(PAUSED_STAT, (void *)0) // application-specific record begin
+    QS_BEGIN(PAUSED_STAT, nullptr) // application-specific record begin
         QS_U8(1, paused);  // Paused status
     QS_END()
 }

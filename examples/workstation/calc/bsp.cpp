@@ -34,10 +34,9 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-#include <iostream>
-#include <stdio.h>
+#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
-#include <string.h>
+#include <iostream>
 
 using namespace QP;
 using namespace std;

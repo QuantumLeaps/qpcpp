@@ -58,7 +58,7 @@ Gui *Gui::instance() { // static
 //............................................................................
 void Gui::onPedsPressed() { // slot
     static QP::QEvt const e(PELICAN::PEDS_WAITING_SIG);
-    PELICAN::AO_Pelican->POST(&e, (void *)0);
+    PELICAN::AO_Pelican->POST(&e, nullptr);
     m_pedsButton1->setIcon(QPixmap(":/res/BTN_DWN.png"));
     m_pedsButton2->setIcon(QPixmap(":/res/BTN_DWN.png"));
 }
@@ -71,20 +71,20 @@ void Gui::onPedsReleased() { // slot
 void Gui::onOnPressed() { // slot
     static QP::QEvt const e(PELICAN::OFF_SIG);
     m_onOffButton->setText("OFF");
-    PELICAN::AO_Pelican->POST(&e, (void *)0);
+    PELICAN::AO_Pelican->POST(&e, nullptr);
     qDebug("onOnPressed");
 }
 //............................................................................
 void Gui::onOnReleased() { // slot
     static QP::QEvt const e(PELICAN::ON_SIG);
     m_onOffButton->setText("ON");
-    PELICAN::AO_Pelican->POST(&e, (void *)0);
+    PELICAN::AO_Pelican->POST(&e, nullptr);
     qDebug("onOnReleased");
 }
 //............................................................................
 void Gui::onQuit() { // slot
     static QP::QEvt const e(PELICAN::TERMINATE_SIG);
-    QP::QF::PUBLISH(&e, (void *)0);
+    QP::QF::PUBLISH(&e, nullptr);
     qDebug("onQuit");
 }
 

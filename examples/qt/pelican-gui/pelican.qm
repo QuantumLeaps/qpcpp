@@ -227,9 +227,9 @@ QS_FUN_DICTIONARY(&amp;Pelican::pedsEnabled);
 QS_FUN_DICTIONARY(&amp;Pelican::pedsWalk);
 QS_FUN_DICTIONARY(&amp;Pelican::pedsFlash);
 
-QS_SIG_DICTIONARY(PEDS_WAITING_SIG, (void *)0);  // global signals
-QS_SIG_DICTIONARY(ON_SIG,           (void *)0);
-QS_SIG_DICTIONARY(OFF_SIG,          (void *)0);
+QS_SIG_DICTIONARY(PEDS_WAITING_SIG, nullptr);  // global signals
+QS_SIG_DICTIONARY(ON_SIG,           nullptr);
+QS_SIG_DICTIONARY(OFF_SIG,          nullptr);
 
 QS_SIG_DICTIONARY(TIMEOUT_SIG,      &amp;l_Pelican); // just for Pelican
 

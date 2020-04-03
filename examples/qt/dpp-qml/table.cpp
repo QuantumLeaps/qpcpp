@@ -105,10 +105,10 @@ Q_STATE_DEF(Table, initial) {
     QS_FUN_DICTIONARY(&Table::serving);
     QS_FUN_DICTIONARY(&Table::paused);
 
-    QS_SIG_DICTIONARY(DONE_SIG,      (void *)0); // global signals
-    QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
-    QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(TERMINATE_SIG, (void *)0);
+    QS_SIG_DICTIONARY(DONE_SIG,      nullptr); // global signals
+    QS_SIG_DICTIONARY(EAT_SIG,       nullptr);
+    QS_SIG_DICTIONARY(PAUSE_SIG,     nullptr);
+    QS_SIG_DICTIONARY(TERMINATE_SIG, nullptr);
 
     QS_SIG_DICTIONARY(HUNGRY_SIG,    this); // signal just for Table
 

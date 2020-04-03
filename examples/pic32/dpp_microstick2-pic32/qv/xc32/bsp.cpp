@@ -101,7 +101,7 @@ void BSP::init(void) {
 
     randomSeed(1234U);
 
-    Q_ALLEGE(QS_INIT((void *)0)); // initialize the QS software tracing
+    Q_ALLEGE(QS_INIT(nullptr)); // initialize the QS software tracing
     QS_OBJ_DICTIONARY(&l_tickISR);
     QS_OBJ_DICTIONARY(&l_testISR);
 }

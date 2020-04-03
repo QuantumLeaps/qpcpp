@@ -135,14 +135,14 @@ Q_STATE_DEF(Table, initial) {
     QS_OBJ_DICTIONARY(&m_philo[4]);
     QS_OBJ_DICTIONARY(&m_philo[4].m_timeEvt);
 
-    QS_SIG_DICTIONARY(DONE_SIG,      (void *)0); /* global signals */
-    QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
-    QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(SERVE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(TEST_SIG,      (void *)0);
-    QS_SIG_DICTIONARY(HUNGRY_SIG,    (void *)0);
-    QS_SIG_DICTIONARY(HUNGRY_SIG,    (void *)0);
-    QS_SIG_DICTIONARY(TIMEOUT_SIG,   (void *)0);
+    QS_SIG_DICTIONARY(DONE_SIG,      nullptr); /* global signals */
+    QS_SIG_DICTIONARY(EAT_SIG,       nullptr);
+    QS_SIG_DICTIONARY(PAUSE_SIG,     nullptr);
+    QS_SIG_DICTIONARY(SERVE_SIG,     nullptr);
+    QS_SIG_DICTIONARY(TEST_SIG,      nullptr);
+    QS_SIG_DICTIONARY(HUNGRY_SIG,    nullptr);
+    QS_SIG_DICTIONARY(HUNGRY_SIG,    nullptr);
+    QS_SIG_DICTIONARY(TIMEOUT_SIG,   nullptr);
 
 
     subscribe(PAUSE_SIG);

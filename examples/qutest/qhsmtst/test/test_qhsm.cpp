@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     QF::init(); // initialize the framework and the underlying RT kernel
 
     // initialize the QS software tracing
-    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : (void *)0));
+    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
 
     // initialize event pools...
     QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
@@ -80,7 +80,6 @@ void QS::onCommand(uint8_t cmdId,
     (void)param2;
     (void)param3;
 
-    //printf("<TARGET> Command id=%d param=%d\n", (int)cmdId, (int)param);
     switch (cmdId) {
        case 0U: {
            break;
@@ -113,7 +112,7 @@ void QS::onTestPost(void const *sender, QActive *recipient,
 namespace QHSMTST {
 
 void BSP_display(char const *msg) {
-    QS_BEGIN(BSP_DISPLAY, (void *)0) // application-specific record
+    QS_BEGIN(BSP_DISPLAY, nullptr) // application-specific record
         QS_STR(msg);
     QS_END()
 }
