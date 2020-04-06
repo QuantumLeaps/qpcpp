@@ -95,10 +95,10 @@ enum : QSignal {
 ///
 static QEvt const QEP_reservedEvt_[4] = {
 #ifdef Q_EVT_CTOR // Is the QEvt constructor provided?
-    0U,
-    1U,
-    2U,
-    3U
+    QEvt(0U),
+    QEvt(1U),
+    QEvt(2U),
+    QEvt(3U)
 #else // QEvt is a POD (Plain Old Datatype)
     { 0U, 0U, 0U },
     { 1U, 0U, 0U },

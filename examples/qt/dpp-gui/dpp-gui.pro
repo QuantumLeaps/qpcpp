@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------------
 # Product: DPP-GUI exampe for Qt5
-# Last updated for version 6.6.0
-# Last updated on  2019-07-30
+# Last updated for version 6.8.1
+# Last updated on  2020-04-04
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+# Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 # along with this program. If not, see <www.gnu.org/licenses>.
 #
 # Contact information:
-# <www.state-machine.com>
+# <www.state-machine.com/licensing>
 # <info@state-machine.com>
 #-----------------------------------------------------------------------------
 
@@ -37,12 +37,13 @@ TEMPLATE = app
 QT      += core gui widgets
 TARGET   = dpp-gui
 DEFINES += QT_NO_STATEMACHINE
+CONFIG  += c++11
 
 QPCPP = ../../..
 
 INCLUDEPATH = . \
     $$QPCPP/include \
-    $$QPCPP/ports/qt \
+    $$QPCPP/ports/qt
 
 SOURCES += \
     main.cpp \

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.6.0" links="1">
+<model version="5.0.0" links="1">
  <documentation>Dining Philosopher Problem example for Qt with GUI</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -195,11 +195,13 @@ postLIFO(pe); // &lt;==</code>
    <!--${Events::TableEvt::philoNum}-->
    <attribute name="philoNum" type="uint8_t" visibility="0x00" properties="0x00"/>
    <!--${Events::TableEvt::TableEvt}-->
-   <operation name="TableEvt" type="QEvt(sig), philoNum(n)" visibility="0x00" properties="0x02">
+   <operation name="TableEvt" type="" visibility="0x00" properties="0x02">
     <!--${Events::TableEvt::TableEvt::sig}-->
     <parameter name="sig" type="QP::QSignal"/>
     <!--${Events::TableEvt::TableEvt::n}-->
     <parameter name="n" type="uint8_t"/>
+    <code>: QEvt(sig),
+  philoNum(n)</code>
    </operation>
   </class>
  </package>

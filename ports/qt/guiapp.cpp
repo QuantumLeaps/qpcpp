@@ -99,6 +99,9 @@ void GuiQActive::start(std::uint_fast8_t const prio,
               && (qSto == nullptr) /* does not need per-actor queue */
               && (stkSto == nullptr)); // AOs don't need stack
 
+    (void)stkSize;
+    (void)qLen;
+
     setPrio(prio);  // set the QF priority of this AO
     QF::add_(this); // make QF aware of this AO
     static_cast<GuiApp *>(QApplication::instance())->registerAct(this);
@@ -109,7 +112,7 @@ void GuiQActive::start(std::uint_fast8_t const prio,
 //............................................................................
 #ifndef Q_SPY
 bool GuiQActive::post_(QEvt const * const e,
-                       std::uint_fast16_t const /*margin*/)
+                       std::uint_fast16_t const /*margin*/) noexcept
 #else
 bool GuiQActive::post_(QEvt const * const e,
                        std::uint_fast16_t const /*margin*/,
@@ -143,7 +146,7 @@ bool GuiQActive::post_(QEvt const * const e,
     return true;
 }
 //............................................................................
-void GuiQActive::postLIFO(QEvt const * const e) {
+void GuiQActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
@@ -180,6 +183,9 @@ void GuiQMActive::start(std::uint_fast8_t const prio,
               && (qSto == nullptr) /* does not need per-actor queue */
               && (stkSto == nullptr)); // AOs don't need stack
 
+    (void)stkSize;
+    (void)qLen;
+
     setPrio(prio);  // set the QF priority of this active object
     QF::add_(this); // make QF aware of this active object
     static_cast<GuiApp *>(QApplication::instance())->registerAct(this);
@@ -190,7 +196,7 @@ void GuiQMActive::start(std::uint_fast8_t const prio,
 //............................................................................
 #ifndef Q_SPY
 bool GuiQMActive::post_(QEvt const * const e,
-                        std::uint_fast16_t const /*margin*/)
+                        std::uint_fast16_t const /*margin*/) noexcept
 #else
 bool GuiQMActive::post_(QEvt const * const e,
                         std::uint_fast16_t const /*margin*/,
@@ -224,7 +230,7 @@ bool GuiQMActive::post_(QEvt const * const e,
     return true;
 }
 //............................................................................
-void GuiQMActive::postLIFO(QEvt const * const e) {
+void GuiQMActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 

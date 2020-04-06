@@ -6,6 +6,27 @@
   NLOC    CCN   token  PARAM  length  location  
 ------------------------------------------------
        3      1     14      1       4 QP::QEvt::QEvt@159-162@..\include\qep.hpp
+       5      1     26      2       5 QP::QEvt::QEvt@166-170@..\include\qep.hpp
+       1      1      6      0       1 QP::QEvt::~QEvt@174-174@..\include\qep.hpp
+       1      1     13      1       1 QP::QHsm::init@281-281@..\include\qep.hpp
+       3      1     13      1       3 QP::QHsm::state@292-294@..\include\qep.hpp
+       4      1     18      1       4 QP::QHsm::tran@350-353@..\include\qep.hpp
+       4      1     18      1       4 QP::QHsm::tran_hist@356-359@..\include\qep.hpp
+       4      1     18      1       4 QP::QHsm::super@362-365@..\include\qep.hpp
+       4      1     30      1       4 QP::QHsm::qm_tran@376-379@..\include\qep.hpp
+       7      1     42      2       7 QP::QHsm::qm_tran_hist@383-389@..\include\qep.hpp
+       4      1     30      1       4 QP::QHsm::qm_tran_init@393-396@..\include\qep.hpp
+       4      1     30      1       4 QP::QHsm::qm_tran_ep@400-403@..\include\qep.hpp
+       7      1     40      2       7 QP::QHsm::qm_tran_xp@407-413@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_entry@417-420@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_exit@423-426@..\include\qep.hpp
+       4      1     19      1       4 QP::QHsm::qm_entry@429-432@..\include\qep.hpp
+       4      1     19      1       4 QP::QHsm::qm_exit@435-438@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_sm_exit@442-445@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_super_sub@449-452@..\include\qep.hpp
+       1      1     13      1       1 QP::QMsm::init@498-498@..\include\qep.hpp
+       3      1     13      1       3 QP::QMsm::stateObj@507-509@..\include\qep.hpp
+       3      1     10      1       3 QP::QEP::getVersion@584-586@..\include\qep.hpp
        3      1     11      1       3 QP::QEQueue::getNFree@223-225@..\include\qequeue.hpp
        3      1     11      1       3 QP::QEQueue::getNMin@238-240@..\include\qequeue.hpp
        3      1     13      1       3 QP::QEQueue::isEmpty@252-254@..\include\qequeue.hpp
@@ -41,6 +62,7 @@
        1      1     14      1       1 QP::QActiveDummy::init@605-605@..\include\qs.hpp
        1      1     14      1       1 QP::QXThread::init@86-86@..\include\qxthread.hpp
        6      1     51      5       6 QP::QXThread::start@99-104@..\include\qxthread.hpp
+       2      1     11      1       3 QP::QEvt@101-103@..\src\qf\qep_hsm.cpp
        4      1     27      1       4 QP::QHsm::QHsm@119-122@..\src\qf\qep_hsm.cpp
        2      1      8      0       2 QP::QHsm::~QHsm@128-129@..\src\qf\qep_hsm.cpp
       48      7    342      1      68 QP::QHsm::init@140-207@..\src\qf\qep_hsm.cpp
@@ -162,7 +184,7 @@
 NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 --------------------------------------------------------------
       5       0.0     0.0        0.0         0     ..\include\qassert.h
-    214       3.0     1.0       14.0         1     ..\include\qep.hpp
+    214       3.7     1.0       20.5        22     ..\include\qep.hpp
      38       3.0     1.0       11.7         3     ..\include\qequeue.hpp
     188       2.7     1.0       18.3        10     ..\include\qf.hpp
      32       3.0     1.0       10.0         1     ..\include\qk.hpp
@@ -176,7 +198,7 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
      12       0.0     0.0        0.0         0     ..\include\qv.hpp
      32       0.0     0.0        0.0         0     ..\include\qxk.hpp
      62       3.5     1.0       32.5         2     ..\include\qxthread.hpp
-    320      37.4     5.9      215.1         8     ..\src\qf\qep_hsm.cpp
+    320      33.4     5.3      192.4         9     ..\src\qf\qep_hsm.cpp
     310      36.9     6.4      216.0         8     ..\src\qf\qep_msm.cpp
      62      12.5     3.5       91.8         4     ..\src\qf\qf_act.cpp
     242      25.4     4.0      147.9         9     ..\src\qf\qf_actq.cpp
@@ -207,6 +229,6 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
-      3972      18.8     3.4      114.9      152            1      0.01    0.04
+      3972      16.9     3.1      103.0      174            1      0.01    0.04
 @endcode 
 */ 

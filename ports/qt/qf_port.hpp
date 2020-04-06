@@ -2,14 +2,14 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0 / Qt 5.x
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.1 / Qt 5.x
+/// Last updated on  2020-04-04
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -65,9 +65,9 @@
 #define QF_CRIT_ENTRY(dummy)   QF_INT_DISABLE()
 #define QF_CRIT_EXIT(dummy)    QF_INT_ENABLE()
 
-class QWaitCondition; // forward declaration
-class QThread;        // forward declaration
-class QMutex;         // forward declaration
+class QWaitCondition;   // forward declaration
+class QThread;          // forward declaration
+class QMutex;           // forward declaration
 
 #include "qep_port.hpp" // QEP port
 #include "qequeue.hpp"  // Qt port uses event-queue
@@ -78,6 +78,14 @@ class QMutex;         // forward declaration
 #ifdef QT_GUI_LIB
     #include "guiapp.hpp"    // GUI QF application interface (only when needed)
     #include "guiactive.hpp" // GUI active objects interface (only when needed)
+#else
+    #include <QCoreApplication>
+#endif
+
+// fix the conflict between the Qt's Q_NORETURN and QP's Q_NORETURN...
+#ifdef Q_NORETURN
+#undef Q_NORETURN
+#define Q_NORETURN void
 #endif
 
 namespace QP {

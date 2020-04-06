@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.6.0" links="1">
+<model version="5.0.0" links="1">
  <documentation>&quot;Fly 'n' Shoot&quot; game model from Chapters 1 &amp; 9 of PSiCC2 for Qt with GUI
 NOTE: Adapted for QP-Qt integartion</documentation>
  <!--${qpcpp}-->
@@ -198,13 +198,16 @@ postLIFO(pe); // &lt;==</code>
    <!--${Events::ObjectPosEvt::y}-->
    <attribute name="y" type="uint8_t" visibility="0x00" properties="0x00"/>
    <!--${Events::ObjectPosEvt::ObjectPosEvt}-->
-   <operation name="ObjectPosEvt" type="QEvt(sig), x(x_p), y(y_p)" visibility="0x00" properties="0x02">
+   <operation name="ObjectPosEvt" type="" visibility="0x00" properties="0x02">
     <!--${Events::ObjectPosEvt::ObjectPosEvt::sig}-->
     <parameter name="sig" type="QP::QSignal"/>
     <!--${Events::ObjectPosEvt::ObjectPosEvt::x_p}-->
     <parameter name="x_p" type="uint8_t"/>
     <!--${Events::ObjectPosEvt::ObjectPosEvt::y_p}-->
     <parameter name="y_p" type="uint8_t"/>
+    <code>: QEvt(sig),
+  x(x_p),
+  y(y_p)</code>
    </operation>
   </class>
   <!--${Events::ObjectImageEvt}-->
@@ -218,7 +221,7 @@ postLIFO(pe); // &lt;==</code>
    <!--${Events::ObjectImageEvt::pad}-->
    <attribute name="pad? defined __LP64__" type="uint32_t" visibility="0x00" properties="0x00"/>
    <!--${Events::ObjectImageEvt::ObjectImageEvt}-->
-   <operation name="ObjectImageEvt" type="QEvt(sig), x(x_p), y(y_p), bmp(bmp_p)" visibility="0x00" properties="0x02">
+   <operation name="ObjectImageEvt" type="" visibility="0x00" properties="0x02">
     <!--${Events::ObjectImageEvt::ObjectImageEvt::sig}-->
     <parameter name="sig" type="QP::QSignal"/>
     <!--${Events::ObjectImageEvt::ObjectImageEvt::x_p}-->
@@ -227,6 +230,10 @@ postLIFO(pe); // &lt;==</code>
     <parameter name="y_p" type="uint8_t"/>
     <!--${Events::ObjectImageEvt::ObjectImageEvt::bmp_p}-->
     <parameter name="bmp_p" type="uint8_t"/>
+    <code>: QEvt(sig),
+  x(x_p),
+  y(y_p),
+  bmp(bmp_p)</code>
    </operation>
   </class>
   <!--${Events::MineEvt}-->
@@ -234,11 +241,13 @@ postLIFO(pe); // &lt;==</code>
    <!--${Events::MineEvt::id}-->
    <attribute name="id" type="uint8_t" visibility="0x00" properties="0x00"/>
    <!--${Events::MineEvt::MineEvt}-->
-   <operation name="MineEvt" type="QEvt(sig), id(id_p)" visibility="0x00" properties="0x02">
+   <operation name="MineEvt" type="" visibility="0x00" properties="0x02">
     <!--${Events::MineEvt::MineEvt::sig}-->
     <parameter name="sig" type="QP::QSignal"/>
     <!--${Events::MineEvt::MineEvt::id_p}-->
     <parameter name="id_p" type="uint8_t"/>
+    <code>: QEvt(sig),
+  id(id_p)</code>
    </operation>
   </class>
   <!--${Events::ScoreEvt}-->
@@ -246,11 +255,13 @@ postLIFO(pe); // &lt;==</code>
    <!--${Events::ScoreEvt::score}-->
    <attribute name="score" type="uint16_t" visibility="0x00" properties="0x00"/>
    <!--${Events::ScoreEvt::ScoreEvt}-->
-   <operation name="ScoreEvt" type="QEvt(sig), score(score_p)" visibility="0x00" properties="0x02">
+   <operation name="ScoreEvt" type="" visibility="0x00" properties="0x02">
     <!--${Events::ScoreEvt::ScoreEvt::sig}-->
     <parameter name="sig" type="QP::QSignal"/>
     <!--${Events::ScoreEvt::ScoreEvt::score_p}-->
     <parameter name="score_p" type="uint16_t"/>
+    <code>: QEvt(sig),
+  score(score_p)</code>
    </operation>
   </class>
  </package>

@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0 / Qt 5.x
-/// Last updated on  2020-01-23
+/// Last updated for version 6.8.1 / Qt 5.x
+/// Last updated on  2020-04-04
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -49,12 +49,13 @@ public:
                void * const stkSto, std::uint_fast16_t const stkSize,
                void const * const par) override;
 #ifndef Q_SPY
-    bool post_(QEvt const * const e, std::uint_fast16_t const margin) override;
+    bool post_(QEvt const * const e,
+               std::uint_fast16_t const margin) noexcept override;
 #else
     bool post_(QEvt const * const e, std::uint_fast16_t const margin,
         void const * const sender) override;
 #endif // Q_SPY
-    void postLIFO(QEvt const * const e) override;
+    void postLIFO(QEvt const * const e) noexcept override;
 };
 
 //............................................................................
@@ -66,12 +67,13 @@ public:
                void * const stkSto, std::uint_fast16_t const stkSize,
                void const * const par) override;
 #ifndef Q_SPY
-    bool post_(QEvt const * const e, std::uint_fast16_t const margin) override;
+    bool post_(QEvt const * const e,
+               std::uint_fast16_t const margin) noexcept override;
 #else
     bool post_(QEvt const * const e, std::uint_fast16_t const margin,
                        void const * const sender) override;
 #endif // Q_SPY
-    void postLIFO(QEvt const * const e) override;
+    void postLIFO(QEvt const * const e) noexcept override;
 };
 
 } // namespace QP

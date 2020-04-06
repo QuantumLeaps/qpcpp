@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.8.1
-/// Last updated on  2020-04-02
+/// Last updated on  2020-04-05
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -156,17 +156,17 @@ namespace QP {
     class QEvt {
     public:
         //! public constructor (dynamic event)
-        QEvt(QSignal const s) noexcept
+        explicit QEvt(QSignal const s) noexcept
           : sig(s)
           // poolId_/refCtr_ intentionally uninitialized
         {}
         enum StaticEvt : std::uint8_t { STATIC_EVT };
 
         //! public constructor (static event)
-        QEvt(QSignal const s, StaticEvt /*dummy*/) noexcept
+        explicit QEvt(QSignal const s, StaticEvt /*dummy*/) noexcept
           : sig(s),
             poolId_(0U),
-            refCtr_(0U))
+            refCtr_(0U)
         {}
 
 #ifdef Q_EVT_VIRTUAL
@@ -188,10 +188,10 @@ namespace QP {
         friend class QEQueue;
         friend class QTicker;
         friend class QXThread;
-        friend std::uint8_t QF_EVT_POOL_ID_ (QEvt const * const e);
-        friend std::uint8_t QF_EVT_REF_CTR_ (QEvt const * const e);
-        friend void QF_EVT_REF_CTR_INC_(QEvt const * const e);
-        friend void QF_EVT_REF_CTR_DEC_(QEvt const * const e);
+        friend std::uint8_t QF_EVT_POOL_ID_ (QEvt const * const e) noexcept;
+        friend std::uint8_t QF_EVT_REF_CTR_ (QEvt const * const e) noexcept;
+        friend void QF_EVT_REF_CTR_INC_(QEvt const * const e) noexcept;
+        friend void QF_EVT_REF_CTR_DEC_(QEvt const * const e) noexcept;
     };
 
 #else // QEvt is a POD (Plain Old Datatype)
@@ -302,7 +302,7 @@ public:
 
 protected:
     //! Protected constructor of QHsm.
-    QHsm(QStateHandler const initial) noexcept;
+    explicit QHsm(QStateHandler const initial) noexcept;
 
 public:
 // facilities for the QHsm implementation strategy...
@@ -513,7 +513,7 @@ public:
 
 protected:
     //! Protected constructor
-    QMsm(QStateHandler const initial) noexcept;
+    explicit QMsm(QStateHandler const initial) noexcept;
 
 private:
     //! disallow the inhertited isIn() function in QP::QMsm and subclasses

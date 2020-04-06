@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------------
 # Product: DPP console exampe for Qt (console)
-# Last updated for version 6.6.0
-# Last updated on  2019-07-30
+# Last updated for version 6.8.1
+# Last updated on  2020-04-04
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+# Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 # along with this program. If not, see <www.gnu.org/licenses>.
 #
 # Contact information:
-# <www.state-machine.com>
+# <www.state-machine.com/licensing>
 # <info@state-machine.com>
 #-----------------------------------------------------------------------------
 
@@ -38,6 +38,7 @@ QT      += core
 QT      -= gui
 CONFIG  += console
 CONFIG  -= app_bundle
+CONFIG  += c++11
 TARGET   = dpp
 DEFINES += QT_NO_STATEMACHINE
 
