@@ -62,7 +62,7 @@
        1      1     14      1       1 QP::QActiveDummy::init@605-605@..\include\qs.hpp
        1      1     14      1       1 QP::QXThread::init@86-86@..\include\qxthread.hpp
        6      1     51      5       6 QP::QXThread::start@99-104@..\include\qxthread.hpp
-       2      1     11      1       3 QP::QEvt@101-103@..\src\qf\qep_hsm.cpp
+       2      1     15      2       3 QP::QEvt@101-103@..\src\qf\qep_hsm.cpp
        4      1     27      1       4 QP::QHsm::QHsm@119-122@..\src\qf\qep_hsm.cpp
        2      1      8      0       2 QP::QHsm::~QHsm@128-129@..\src\qf\qep_hsm.cpp
       48      7    342      1      68 QP::QHsm::init@140-207@..\src\qf\qep_hsm.cpp
@@ -122,13 +122,13 @@
        5      1     27      1       5 QP::QMActive::childStateObj@85-89@..\src\qf\qf_qmact.cpp
       69      7    375      2     100 QP::QF::tickX_@79-178@..\src\qf\qf_time.cpp
       13      3     61      1      13 QP::QF::noTimeEvtsActiveX@205-217@..\src\qf\qf_time.cpp
-      16      2    100      3      32 QP::QTimeEvt::QTimeEvt@230-261@..\src\qf\qf_time.cpp
-      13      1     49      0      27 QP::QTimeEvt::QTimeEvt@267-293@..\src\qf\qf_time.cpp
-      33      7    205      2      57 QP::QTimeEvt::armX@321-377@..\src\qf\qf_time.cpp
-      32      2    155      1      38 QP::QTimeEvt::disarm@395-432@..\src\qf\qf_time.cpp
-      33      7    199      1      58 QP::QTimeEvt::rearm@454-511@..\src\qf\qf_time.cpp
-       5      1     28      1       5 QP::QTimeEvt::wasDisarmed@533-537@..\src\qf\qf_time.cpp
-       7      1     28      1       9 QP::QTimeEvt::currCtr@552-560@..\src\qf\qf_time.cpp
+      16      2    104      3      32 QP::QTimeEvt::QTimeEvt@230-261@..\src\qf\qf_time.cpp
+      13      1     53      0      29 QP::QTimeEvt::QTimeEvt@267-295@..\src\qf\qf_time.cpp
+      33      7    205      2      57 QP::QTimeEvt::armX@323-379@..\src\qf\qf_time.cpp
+      32      2    155      1      38 QP::QTimeEvt::disarm@397-434@..\src\qf\qf_time.cpp
+      33      7    199      1      58 QP::QTimeEvt::rearm@456-513@..\src\qf\qf_time.cpp
+       5      1     28      1       5 QP::QTimeEvt::wasDisarmed@535-539@..\src\qf\qf_time.cpp
+       7      1     28      1       9 QP::QTimeEvt::currCtr@554-562@..\src\qf\qf_time.cpp
       11      2     79      1      16 QP::QF::init@78-93@..\src\qk\qk.cpp
        3      1     14      1       4 QP::QF::stop@111-114@..\src\qk\qk.cpp
        6      2     26      1       8 QP::initial_events@119-126@..\src\qk\qk.cpp
@@ -198,7 +198,7 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
      12       0.0     0.0        0.0         0     ..\include\qv.hpp
      32       0.0     0.0        0.0         0     ..\include\qxk.hpp
      62       3.5     1.0       32.5         2     ..\include\qxthread.hpp
-    320      33.4     5.3      192.4         9     ..\src\qf\qep_hsm.cpp
+    320      33.4     5.3      192.9         9     ..\src\qf\qep_hsm.cpp
     310      36.9     6.4      216.0         8     ..\src\qf\qep_msm.cpp
      62      12.5     3.5       91.8         4     ..\src\qf\qf_act.cpp
     242      25.4     4.0      147.9         9     ..\src\qf\qf_actq.cpp
@@ -209,7 +209,7 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
      11       8.0     3.0       59.0         1     ..\src\qf\qf_qact.cpp
     159      30.0     4.0      154.4         5     ..\src\qf\qf_qeq.cpp
      27       3.8     1.0       25.3         6     ..\src\qf\qf_qmact.cpp
-    232      24.6     3.4      133.3         9     ..\src\qf\qf_time.cpp
+    232      24.6     3.4      134.2         9     ..\src\qf\qf_time.cpp
     184      18.8     4.1      122.2         9     ..\src\qk\qk.cpp
      76      16.0     3.8       96.5         4     ..\src\qv\qv.cpp
     267      22.5     4.3      142.4        11     ..\src\qxk\qxk.cpp
@@ -229,6 +229,6 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
-      3972      16.9     3.1      103.0      174            1      0.01    0.04
+      3972      16.9     3.1      103.1      174            1      0.01    0.04
 @endcode 
 */ 

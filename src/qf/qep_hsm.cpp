@@ -93,12 +93,12 @@ enum : QSignal {
 /// to state handler functions of QP::QHsm and QP::QFsm subclasses to execute
 /// entry actions, exit actions, and initial transitions.
 ///
-static QEvt const QEP_reservedEvt_[4] = {
+static QEvt const QEP_reservedEvt_[4] {
 #ifdef Q_EVT_CTOR // Is the QEvt constructor provided?
-    QEvt(0U),
-    QEvt(1U),
-    QEvt(2U),
-    QEvt(3U)
+    QEvt(0U, QEvt::STATIC_EVT),
+    QEvt(1U, QEvt::STATIC_EVT),
+    QEvt(2U, QEvt::STATIC_EVT),
+    QEvt(3U, QEvt::STATIC_EVT)
 #else // QEvt is a POD (Plain Old Datatype)
     { 0U, 0U, 0U },
     { 1U, 0U, 0U },

@@ -155,15 +155,15 @@ namespace QP {
     //************************************************************************
     class QEvt {
     public:
-        //! public constructor (dynamic event)
-        explicit QEvt(QSignal const s) noexcept
+        //! public constructor (overload for dynamic events)
+        QEvt(QSignal const s) noexcept
           : sig(s)
           // poolId_/refCtr_ intentionally uninitialized
         {}
-        enum StaticEvt : std::uint8_t { STATIC_EVT };
 
-        //! public constructor (static event)
-        explicit QEvt(QSignal const s, StaticEvt /*dummy*/) noexcept
+        //! public constructor (overload for static events)
+        enum StaticEvt : std::uint8_t { STATIC_EVT };
+        constexpr QEvt(QSignal const s, StaticEvt /*dummy*/) noexcept
           : sig(s),
             poolId_(0U),
             refCtr_(0U)

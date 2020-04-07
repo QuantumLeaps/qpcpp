@@ -2,8 +2,8 @@
 /// @brief port to Win32 with GNU or Visual Studio C/C++ compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-22
+/// Last updated for version 6.8.1
+/// Last updated on  2020-04-07
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -49,6 +49,10 @@
     #define Q_NORETURN   [[ noreturn ]] void
 
 #endif
+
+// uncomment to provide QEvt constructors
+//#define Q_EVT_CTOR    1
+//#define Q_EVT_VIRTUAL 1
 
 #include <cstdint>  // Exact-width types. C++11 Standard
 

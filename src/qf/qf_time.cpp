@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-29
+/// Last updated for version 6.8.1
+/// Last updated on  2020-04-05
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -231,7 +231,7 @@ QTimeEvt::QTimeEvt(QActive * const act,
     enum_t const sgnl, std::uint_fast8_t const tickRate) noexcept
     :
 #ifdef Q_EVT_CTOR
-    QEvt(static_cast<QSignal>(sgnl)),
+    QEvt(static_cast<QSignal>(sgnl), QEvt::STATIC_EVT),
 #else
     QEvt(),
 #endif
@@ -267,7 +267,7 @@ QTimeEvt::QTimeEvt(QActive * const act,
 QTimeEvt::QTimeEvt() noexcept
     :
 #ifdef Q_EVT_CTOR
-    QEvt(0U),
+    QEvt(0U, QEvt::STATIC_EVT),
 #else
     QEvt(),
 #endif // Q_EVT_CTOR
@@ -278,7 +278,6 @@ QTimeEvt::QTimeEvt() noexcept
 {
 #ifndef Q_EVT_CTOR
     sig = 0U;
-#endif  // Q_EVT_CTOR
 
     // Setting the POOL_ID event attribute to zero is correct only for
     // events not allocated from event pools, which must be the case
@@ -290,6 +289,9 @@ QTimeEvt::QTimeEvt() noexcept
     // reused to hold the tickRate as well as other information
     //
     refCtr_ = 0U; // default rate 0
+
+#endif  // Q_EVT_CTOR
+
 }
 
 //****************************************************************************
