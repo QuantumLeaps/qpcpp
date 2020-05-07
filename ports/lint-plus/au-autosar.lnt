@@ -484,7 +484,7 @@
 
 /* Rule A2-14-2 (required, implementation, automated) */
 
-    /* 1107 - lower case literal suffix */
+    /* 1107 - invalid concatenation of wide string literals of different kinds */
     +e1107
     +elib(1107)
     -append(1107,[AUTOSAR Rule A2-14-2])
@@ -530,7 +530,7 @@
     /* 9067 - extern array declared without size or initializer */
     +e9067
     +elib(9067)
-    -append(9067,[AUTOSAR Rule A3-1-3])
+    -append(9067,[AUTOSAR Rule A3-1-4])
 
 /* Rule M3-2-1 (required, implementation, automated) */
 
@@ -1330,12 +1330,12 @@
     /* 952 - parameter of function could be const */
     +e952
     +elib(952)
-    -append(952,[AUTOSAR Rule M7-1-1])
+    -append(952,[AUTOSAR Rule A7-1-1])
 
     /* 953 - local variable could be const */
     +e953
     +elib(953)
-    -append(953,[AUTOSAR Rule M7-1-1])
+    -append(953,[AUTOSAR Rule A7-1-1])
 
 /* Rule A7-1-2 (required, implementation, automated) */
 
@@ -2070,7 +2070,7 @@
     /* 1906 - exception specification for function */
     +e1906
     +elib(1906)
-    -append(1906,[AUTOSAR Rule M15-4-1])
+    -append(1906,[AUTOSAR Rule A15-4-1])
 
 /* Rule A15-4-2 (required, implementation, automated) */
 

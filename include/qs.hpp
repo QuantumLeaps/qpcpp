@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-23
+/// Last updated for version 6.8.1
+/// Last updated on  2020-05-07
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -339,7 +339,7 @@ public:
 
 #if (QS_OBJ_PTR_SIZE == 8U) || (QS_FUN_PTR_SIZE == 8U)
     //! Output uint64_t data element without format information
-    static void u64_raw_(std::uint64_t d);
+    static void u64_raw_(std::uint64_t d) noexcept;
 
     //! Output uint64_t data element with format information
     static void u64_fmt_(std::uint8_t format, std::uint64_t d) noexcept;
