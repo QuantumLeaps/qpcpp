@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.1
+/// Last updated on  2020-05-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -833,11 +833,14 @@ static void rxParseData_(std::uint8_t const b) noexcept {
 void QS::rxHandleGoodFrame_(std::uint8_t const state) {
     std::uint8_t i;
     std::uint8_t *ptr;
+    QS_CRIT_STAT_
 
     switch (state) {
         case WAIT4_INFO_FRAME: {
             // no need to report Ack or Done
+            QS_CRIT_ENTRY_();
             QS_target_info_(0U); // send only Target info
+            QS_CRIT_EXIT_();
             break;
         }
         case WAIT4_RESET_FRAME: {
@@ -872,6 +875,7 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
         }
         case WAIT4_PEEK_FRAME: {
             // no need to report Ack or Done
+            QS_CRIT_ENTRY_();
             QS::beginRec_(static_cast<std::uint_fast8_t>(QS_PEEK_DATA));
                 ptr = (static_cast<std::uint8_t*>(
                            QS::rxPriv_.currObj[QS::AP_OBJ])
@@ -898,7 +902,9 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
                     }
                 }
             QS::endRec_();
-            QS_REC_DONE();
+            QS_CRIT_EXIT_();
+
+            QS_REC_DONE(); // user callback (if defined)
             break;
         }
         case WAIT4_POKE_DATA: {
@@ -1000,6 +1006,7 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
             i = l_rx.var.obj.kind;
             ptr = reinterpret_cast<std::uint8_t *>(QS::rxPriv_.currObj[i]);
             if (ptr != nullptr) {
+                QS_CRIT_ENTRY_();
                 QS::beginRec_(static_cast<std::uint_fast8_t>(QS_QUERY_DATA));
                     QS_TIME_PRE_(); // timestamp
                     QS_U8_PRE_(i);  // object kind
@@ -1047,7 +1054,9 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
                             break;
                     }
                 QS::endRec_();
-                QS_REC_DONE();
+                QS_CRIT_EXIT_();
+
+                QS_REC_DONE(); // user callback (if defined)
             }
             else {
                 rxReportError_(static_cast<std::uint8_t>(QS_RX_QUERY_CURR));
@@ -1218,27 +1227,39 @@ static void rxHandleBadFrame_(std::uint8_t const state) noexcept {
 
 //****************************************************************************
 static void rxReportAck_(enum QSpyRxRecords const recId) noexcept {
+    QS_CRIT_STAT_
+    QS_CRIT_ENTRY_();
     QS::beginRec_(static_cast<std::uint_fast8_t>(QS_RX_STATUS));
         QS_U8_PRE_(recId); // record ID
     QS::endRec_();
-    QS_REC_DONE();
+    QS_CRIT_EXIT_();
+
+    QS_REC_DONE(); // user callback (if defined)
 }
 
 //****************************************************************************
 static void rxReportError_(std::uint8_t const code) noexcept {
+    QS_CRIT_STAT_
+    QS_CRIT_ENTRY_();
     QS::beginRec_(static_cast<std::uint_fast8_t>(QS_RX_STATUS));
-        QS_U8_PRE_(0x80U | code);
+        QS_U8_PRE_(0x80U | code); // error code
     QS::endRec_();
-    QS_REC_DONE();
+    QS_CRIT_EXIT_();
+
+    QS_REC_DONE(); // user callback (if defined)
 }
 
 //****************************************************************************
 static void rxReportDone_(enum QSpyRxRecords const recId) noexcept {
+    QS_CRIT_STAT_
+    QS_CRIT_ENTRY_();
     QS::beginRec_(static_cast<std::uint_fast8_t>(QS_TARGET_DONE));
         QS_TIME_PRE_();    // timestamp
         QS_U8_PRE_(recId); // record ID
     QS::endRec_();
-    QS_REC_DONE();
+    QS_CRIT_EXIT_();
+
+    QS_REC_DONE(); // user callback (if defined)
 }
 
 //****************************************************************************
@@ -1287,12 +1308,17 @@ std::uint32_t QS::getTestProbe_(void (* const api)(void)) noexcept {
     for (std::uint8_t i = 0U; i < l_testData.tpNum; ++i) {
         if (l_testData.tpBuf[i].addr == reinterpret_cast<QSFun>(api)) {
             data = l_testData.tpBuf[i].data;
+
+            QS_CRIT_STAT_
+            QS_CRIT_ENTRY_();
             QS::beginRec_(static_cast<std::uint_fast8_t>(QS_TEST_PROBE_GET));
                 QS_TIME_PRE_();    // timestamp
                 QS_FUN_PRE_(api);  // the calling API
                 QS_U32_PRE_(data); // the Test-Probe data
             QS::endRec_();
-            QS_REC_DONE();
+            QS_CRIT_EXIT_();
+
+            QS_REC_DONE(); // user callback (if defined)
 
             --l_testData.tpNum; // one less Test-Probe
             // move all remaining entries in the buffer up by one
