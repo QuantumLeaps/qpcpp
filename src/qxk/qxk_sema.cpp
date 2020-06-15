@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-06-15
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -152,7 +152,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
         Q_ASSERT_ID(240, curr->m_temp.obj == QXK_PTR_CAST_(QMState*, this));
 
         // did the blocking time-out? (signal of zero means that it did)
-        if (curr->m_timeEvt.sig != 0U) {
+        if (curr->m_timeEvt.sig == 0U) {
             if (m_waitSet.hasElement(p)) { // still waiting?
                 m_waitSet.rmove(p); // remove the unblocked thread
                 signaled = false; // the semaphore was NOT signaled
