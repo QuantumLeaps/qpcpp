@@ -3,8 +3,8 @@
 /// @brief Internal (package scope) QF/C++ interface.
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -76,7 +76,7 @@
     ///
     #define QF_CRIT_EXIT_()     QF_CRIT_EXIT(dummy)
 
-#else
+#elif (!defined QF_CRIT_STAT_)
     #define QF_CRIT_STAT_       QF_CRIT_STAT_TYPE critStat_;
     #define QF_CRIT_ENTRY_()    QF_CRIT_ENTRY(critStat_)
     #define QF_CRIT_EXIT_()     QF_CRIT_EXIT(critStat_)
@@ -129,8 +129,8 @@ struct QFreeBlock {
 // is NOT used for reference counting in time events, because the @c poolId_
 // attribute is zero ("static events").
 //
-constexpr std::uint8_t TE_IS_LINKED    = 1U << 7;  // flag
-constexpr std::uint8_t TE_WAS_DISARMED = 1U << 6;  // flag
+constexpr std::uint8_t TE_IS_LINKED    = 1U << 7U;  // flag
+constexpr std::uint8_t TE_WAS_DISARMED = 1U << 6U;  // flag
 constexpr std::uint8_t TE_TICK_RATE    = 0x0FU;     // bitmask
 
 //****************************************************************************

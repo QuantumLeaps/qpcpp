@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ///**************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -151,7 +151,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
     if (status) { // can post the event?
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_PRE_();       // timestamp
             QS_OBJ_PRE_(sender);  // the sender object

@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.8.1
-/// Last updated on  2020-05-07
+/// Last updated on  2020-06-04
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -77,16 +77,16 @@ enum QSpyRecords : std::uint8_t {
     // [10] Active Object (AO) records
     QS_QF_ACTIVE_DEFER,   //!< AO deferred an event
     QS_QF_ACTIVE_RECALL,  //!< AO recalled an event
-    QS_QF_ACTIVE_SUBSCRIBE, //!< an AO subscribed to an event
+    QS_QF_ACTIVE_SUBSCRIBE,  //!< an AO subscribed to an event
     QS_QF_ACTIVE_UNSUBSCRIBE,//!< an AO unsubscribed to an event
-    QS_QF_ACTIVE_POST_FIFO, //!< an event was posted (FIFO) directly to AO
+    QS_QF_ACTIVE_POST,      //!< an event was posted (FIFO) directly to AO
     QS_QF_ACTIVE_POST_LIFO, //!< an event was posted (LIFO) directly to AO
     QS_QF_ACTIVE_GET,     //!< AO got an event and its queue is not empty
     QS_QF_ACTIVE_GET_LAST,//!< AO got an event and its queue is empty
     QS_QF_ACTIVE_RECALL_ATTEMPT, //!< AO attempted to recall an event
 
     // [19] Event Queue (EQ) records
-    QS_QF_EQUEUE_POST_FIFO, //!< an event was posted (FIFO) to a raw queue
+    QS_QF_EQUEUE_POST,      //!< an event was posted (FIFO) to a raw queue
     QS_QF_EQUEUE_POST_LIFO, //!< an event was posted (LIFO) to a raw queue
     QS_QF_EQUEUE_GET,     //!< get an event and queue still not empty
     QS_QF_EQUEUE_GET_LAST,//!< get the last event from the queue
@@ -692,10 +692,11 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
 /// filter is disabled by setting the active object pointer @p obj_ to NULL.@n
 /// @n
 /// The active object filter affects the following QS records:
-/// ::QS_QF_ACTIVE_DEFER, ::QS_QF_ACTIVE_RECALL, ::QS_QF_ACTIVE_SUBSCRIBE,
-/// ::QS_QF_ACTIVE_UNSUBSCRIBE, ::QS_QF_ACTIVE_POST, ::QS_QF_ACTIVE_POST_LIFO,
-/// ::QS_QF_ACTIVE_GET, ::QS_QF_ACTIVE_GET_LAST, and
-/// ::QS_QF_ACTIVE_RECALL_ATTEMPT.
+/// QP::QS_QF_ACTIVE_DEFER, QP::QS_QF_ACTIVE_RECALL,
+/// QP::QS_QF_ACTIVE_SUBSCRIBE, QP::QS_QF_ACTIVE_UNSUBSCRIBE,
+/// QP::QS_QF_ACTIVE_POST, QP::QS_QF_ACTIVE_POST_LIFO,
+/// QP::QS_QF_ACTIVE_GET, QP::QS_QF_ACTIVE_GET_LAST, and
+/// QP::QS_QF_ACTIVE_RECALL_ATTEMPT.
 ///
 /// @sa Example of using QS filters in #QS_FILTER_ON documentation
 #define QS_FILTER_AO_OBJ(obj_) \
@@ -732,7 +733,7 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
 /// filter is disabled by setting the event queue pointer @p obj_ to NULL.@n
 /// @n
 /// The event queue filter affects the following QS records:
-/// QP::QS_QF_EQUEUE_POST_FIFO, QP::QS_QF_EQUEUE_POST_LIFO,
+/// QP::QS_QF_EQUEUE_POST, QP::QS_QF_EQUEUE_POST_LIFO,
 /// QP::QS_QF_EQUEUE_GET, and QP::QS_QF_EQUEUE_GET_LAST.
 ///
 /// @sa Example of using QS filters in #QS_FILTER_ON documentation
@@ -823,7 +824,7 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
 
 #ifndef QS_REC_DONE
     //! macro to hook up user code when a QS record is produced
-    #define QS_REC_DONE() ((void)0)
+    #define QS_REC_DONE() (static_cast<void>(0))
 #endif // QS_REC_DONE
 
 //! helper macro for checking the global QS filter
@@ -832,7 +833,10 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
       & static_cast<std::uint8_t>(                              \
             1U << (static_cast<unsigned>(rec_) & 7U))) != 0U)
 
-// QS-specific critical section ..............................................
+//****************************************************************************
+// Facilities for QS ciritical section
+
+// QS-specific critical section
 #ifdef QS_CRIT_ENTRY // separate QS critical section defined?
 
 #ifndef QS_CRIT_STAT_TYPE
@@ -878,7 +882,7 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
     /// @sa #QF_CRIT_EXIT
     #define QS_CRIT_EXIT_()     QF_CRIT_EXIT(dummy); QS_REC_DONE()
 
-#else  // simple unconditional interrupt disabling used
+#elif (!defined QS_CRIT_STAT_)
     #define QS_CRIT_STAT_       QF_CRIT_STAT_TYPE critStat_;
     #define QS_CRIT_ENTRY_()    QF_CRIT_ENTRY(critStat_)
     #define QS_CRIT_EXIT_()     QF_CRIT_EXIT(critStat_); QS_REC_DONE()
@@ -1013,7 +1017,7 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
         QP::QS::u32_fmt_(QP::QS::SIG_T, static_cast<std::uint32_t>(sig_)); \
         QP::QS::obj_raw_(obj_)
 #else
-    //! Output formatted event signal (of type ::QSignal) and
+    //! Output formatted event signal (of type QP::QSignal) and
     //! the state machine object to the user QS record
     #define QS_SIG(sig_, obj_) \
         QP::QS::u16_fmt_(QP::QS::SIG_T, static_cast<std::uint16_t>(sig_)); \

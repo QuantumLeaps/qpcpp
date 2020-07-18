@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-06-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -89,12 +89,19 @@ void QF::thread_(QActive *act) {
     EnterCriticalSection(&l_startupCritSect);
     LeaveCriticalSection(&l_startupCritSect);
 
-    // event-loop
-    for (;;) { // for-ever
+#ifdef QF_ACTIVE_STOP
+    while (act->m_thread)
+#else
+    for (;;) // for-ever
+#endif
+    {
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
+#ifdef QF_ACTIVE_STOP
+    remove_(act); // remove this object from QF
+#endif
 }
 //****************************************************************************
 // helper function to match the signature expeced by CreateThread() Win32 API
@@ -125,10 +132,10 @@ int_t QF::run(void) {
     }
     SetThreadPriority(GetCurrentThread(), threadPrio);
 
-    do {
+    while (l_isRunning) {
         Sleep(l_tickMsec);  // wait for the tick interval
         QF_onClockTick();   // clock tick callback (must call QF_TICK_X())
-    } while (l_isRunning);
+    }
 
     onCleanup();            // cleanup callback
     QS_EXIT();              // cleanup the QSPY connection
@@ -205,8 +212,15 @@ void QActive::start(std::uint_fast8_t const prio,
         this,
         0,
         NULL);
-    Q_ENSURE_ID(830, m_thread != static_cast<HANDLE>(0)); // must succeed
+    Q_ENSURE_ID(830, m_thread != nullptr); // must succeed
 }
+//............................................................................
+#ifdef QF_ACTIVE_STOP
+void QActive::stop(void) {
+    unsubscribeAll(); // unsubscribe this AO from all events
+    m_thread = nullptr; // stop the thread loop (see QF::thread_)
+}
+#endif
 
 } // namespace QP
 

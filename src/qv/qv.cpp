@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -207,11 +207,9 @@ int_t QF::run(void) {
 /// @param[in] qSto    pointer to the storage for the ring buffer of the
 ///                    event queue (used only with the built-in QP::QEQueue)
 /// @param[in] qLen    length of the event queue (in events)
-/// @param[in] stkSto  pointer to the stack storage (must be NULL in QV)
+/// @param[in] stkSto  pointer to the stack storage (must be nullptr in QV)
 /// @param[in] stkSize stack size [bytes]
-// @param[in] par     pointer to an extra parameter (might be NULL)
-///
-/// @note This function should be called via the macro START().
+/// @param[in] par     pointer to an extra parameter (might be nullptr)
 ///
 /// @usage
 /// The following example shows starting an AO when a per-task stack is needed
@@ -222,7 +220,7 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    (void)stkSize; // unused paramteter in the QV port
+    static_cast<void>(stkSize); // unused paramteter in the QV port
 
     /// @pre the priority must be in range and the stack storage must not
     /// be provided, because the QV kernel does not need per-AO stacks.

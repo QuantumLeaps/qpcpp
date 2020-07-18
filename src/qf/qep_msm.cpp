@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -220,7 +220,7 @@ void QMsm::dispatch(QEvt const * const e) {
                 tmp.obj = m_state.obj; // save history
                 m_state.obj = s; // restore the original state
                 exitToTranSource_(s, t);
-                (void)execTatbl_(tatbl);
+                static_cast<void>(execTatbl_(tatbl));
                 r = enterHistory_(tmp.obj);
                 s = m_state.obj;
             }
@@ -235,7 +235,7 @@ void QMsm::dispatch(QEvt const * const e) {
 #endif // Q_SPY
                     exitToTranSource_(s, t);
                     // take the tran-to-XP segment inside submachine
-                    (void)execTatbl_(tatbl);
+                    static_cast<void>(execTatbl_(tatbl));
                     s = m_state.obj;
 #ifdef Q_SPY
                     m_temp.tatbl = tmp.tatbl; // restore m_temp
@@ -249,7 +249,7 @@ void QMsm::dispatch(QEvt const * const e) {
 #endif // Q_SPY
                     exitToTranSource_(m_state.obj, t);
                     // take the tran-to-XP segment inside submachine
-                    (void)execTatbl_(tatbl);
+                    static_cast<void>(execTatbl_(tatbl));
 #ifdef Q_SPY
                     m_temp.obj = s; // restore me->temp
 #endif // Q_SPY
@@ -409,7 +409,8 @@ void QMsm::exitToTranSource_(QMState const *s,
     while (s != ts) {
         // exit action provided in state 's'?
         if (s->exitAction != nullptr) {
-            (void)(*s->exitAction)(this); // execute the exit action
+            // execute the exit action
+            static_cast<void>((*s->exitAction)(this));
 
             QS_CRIT_STAT_
             QS_BEGIN_PRE_(QS_QEP_STATE_EXIT,
@@ -470,7 +471,8 @@ QState QMsm::enterHistory_(QMState const * const hist) {
     // retrace the entry path in reverse (desired) order...
     while (i > 0U) {
         --i;
-        (void)(*epath[i]->entryAction)(this); // run entry action in epath[i]
+        // run entry action in epath[i]
+        static_cast<void>((*epath[i]->entryAction)(this));
 
         QS_BEGIN_PRE_(QS_QEP_STATE_ENTRY,
                       QS::priv_.locFilter[QS::SM_OBJ], this)
@@ -556,7 +558,8 @@ QMState const *QMsm::childStateObj(QMState const * const parent)
     /// @post the child must be found
     Q_ENSURE_ID(810, isFound);
 #ifdef Q_NASSERT
-    (void)isFound; // avoid compiler warning about unused variable
+    // avoid compiler warning about unused variable
+    static_cast<void>(isFound);
 #endif
 
     return child; // return the child

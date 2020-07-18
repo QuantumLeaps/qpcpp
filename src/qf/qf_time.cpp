@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.1
-/// Last updated on  2020-04-05
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -54,6 +54,7 @@ Q_DEFINE_THIS_MODULE("qf_time")
 // Package-scope objects *****************************************************
 QTimeEvt QF::timeEvtHead_[QF_MAX_TICK_RATE]; // heads of time event lists
 
+#ifdef Q_SPY
 //****************************************************************************
 /// @description
 /// This function must be called periodically from a time-tick ISR or from
@@ -61,6 +62,7 @@ QTimeEvt QF::timeEvtHead_[QF_MAX_TICK_RATE]; // heads of time event lists
 /// system clock tick rate.
 ///
 /// @param[in] tickRate  system clock tick rate serviced in this call [1..15].
+/// @param[in] sender    pointer to a sender object (used in QS only).
 ///
 /// @note
 /// this function should be called only via the macro TICK_X()
@@ -73,11 +75,10 @@ QTimeEvt QF::timeEvtHead_[QF_MAX_TICK_RATE]; // heads of time event lists
 /// @sa
 /// QP::QTimeEvt.
 ///
-#ifndef Q_SPY
-void QF::tickX_(std::uint_fast8_t const tickRate) noexcept
-#else
 void QF::tickX_(std::uint_fast8_t const tickRate,
                 void const * const sender) noexcept
+#else
+void QF::tickX_(std::uint_fast8_t const tickRate) noexcept
 #endif
 {
     QTimeEvt *prev = &timeEvtHead_[tickRate];
@@ -162,7 +163,8 @@ void QF::tickX_(std::uint_fast8_t const tickRate,
 
                 QF_CRIT_EXIT_(); // exit crit. section before posting
 
-                (void)act->POST(t, sender); // asserts if queue overflows
+                // asserts if queue overflows
+                static_cast<void>(act->POST(t, sender));
             }
             else {
                 prev = t; // advance to this time event

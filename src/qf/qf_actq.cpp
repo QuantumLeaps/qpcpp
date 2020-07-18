@@ -8,8 +8,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-25
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -56,6 +56,7 @@ namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_actq")
 
+#ifdef Q_SPY
 //****************************************************************************
 /// @description
 /// Direct event posting is the simplest asynchronous communication method
@@ -65,6 +66,7 @@ Q_DEFINE_THIS_MODULE("qf_actq")
 /// @param[in]     margin number of required free slots in the queue
 ///                after posting the event. The special value QP::QF_NO_MARGIN
 ///                means that this function will assert if posting fails.
+/// @param[in]     sender pointer to a sender object (used in QS only)
 ///
 /// @returns
 /// 'true' (success) if the posting succeeded (with the provided margin) and
@@ -85,13 +87,12 @@ Q_DEFINE_THIS_MODULE("qf_actq")
 /// @sa
 /// QActive::postLIFO()
 ///
-#ifndef Q_SPY
-bool QActive::post_(QEvt const * const e,
-                    std::uint_fast16_t const margin) noexcept
-#else
 bool QActive::post_(QEvt const * const e,
                     std::uint_fast16_t const margin,
                     void const * const sender) noexcept
+#else
+bool QActive::post_(QEvt const * const e,
+                    std::uint_fast16_t const margin) noexcept
 #endif
 {
     bool status;
@@ -138,7 +139,7 @@ bool QActive::post_(QEvt const * const e,
             m_eQueue.m_nMin = nFree; // update minimum so far
         }
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_PRE_();               // timestamp
             QS_OBJ_PRE_(sender);          // the sender object
@@ -151,7 +152,7 @@ bool QActive::post_(QEvt const * const e,
 
 #ifdef Q_UTEST
         // callback to examine the posted event under the the same conditions
-        // as producing the QS_QF_ACTIVE_POST_FIFO trace record, which are:
+        // as producing the QS_QF_ACTIVE_POST trace record, which are:
         // 1. the local AO-filter is not set (zero) OR
         // 2. the local AO-filter is set to this AO ('me')
         //
@@ -405,12 +406,12 @@ QTicker::QTicker(std::uint_fast8_t const tickRate) noexcept
 }
 //............................................................................
 void QTicker::init(void const * const e) noexcept {
-    (void)e;
+    static_cast<void>(e); // unused parameter
     m_eQueue.m_tail = 0U;
 }
 //............................................................................
 void QTicker::dispatch(QEvt const * const e) noexcept {
-    (void)e;
+    static_cast<void>(e); // unused parameter
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
@@ -423,16 +424,20 @@ void QTicker::dispatch(QEvt const * const e) noexcept {
     }
 }
 //............................................................................
-#ifndef Q_SPY
-bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin)
-    noexcept
-#else
+#ifdef Q_SPY
+//****************************************************************************
+/// @sa
+/// QActive::post_()
+///
 bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
+#else
+bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin)
+    noexcept
 #endif
 {
-    (void)e; // unused parameter
-    (void)margin; // unused parameter
+    static_cast<void>(e);      // unused parameter
+    static_cast<void>(margin); // unused parameter
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
@@ -452,7 +457,7 @@ bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
     ++m_eQueue.m_tail; // account for one more tick event
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_PRE_();      // timestamp
         QS_OBJ_PRE_(sender); // the sender object
@@ -470,7 +475,7 @@ bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
 //****************************************************************************
 void QTicker::postLIFO(QEvt const * const e) noexcept {
-    (void)e; // unused parameter
+    static_cast<void>(e); // unused parameter
     Q_ERROR_ID(900); // operation not allowed
 }
 

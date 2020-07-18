@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-06-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -159,12 +159,20 @@ void QF::thread_(QActive *act) {
     pthread_mutex_lock(&l_startupMutex);
     pthread_mutex_unlock(&l_startupMutex);
 
-    // event-loop
-    for (;;) { // for-ever
+#ifdef QF_ACTIVE_STOP
+    act->m_thread = true;
+    while (act->m_thread)
+#else
+    for (;;) // for-ever
+#endif
+    {
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
+#ifdef QF_ACTIVE_STOP
+    remove_(act); // remove this object from QF
+#endif
 }
 
 //............................................................................
@@ -247,8 +255,14 @@ void QActive::start(std::uint_fast8_t const prio,
             pthread_create(&thread, &attr, &ao_thread, this) == 0);
     }
     pthread_attr_destroy(&attr);
-    m_thread = 1U;
 }
+//............................................................................
+#ifdef QF_ACTIVE_STOP
+void QActive::stop(void) {
+    unsubscribeAll(); // unsubscribe this AO from all events
+    m_thread = false; // stop the thread loop (see QF::thread_)
+}
+#endif
 
 //............................................................................
 static void *ao_thread(void *arg) { // the expected POSIX signature

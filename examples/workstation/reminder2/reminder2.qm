@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="5.0.2" links="1">
+ <documentation>Dining Philosopher Problem example
+
+NOTE: Requries QP6.</documentation>
+ <!--${qpcpp}-->
+ <framework name="qpcpp"/>
+ <!--${Events}-->
+ <package name="Events" stereotype="0x01">
+  <!--${Events::ReminderEvt}-->
+  <class name="ReminderEvt" superclass="qpcpp::QEvt">
+   <!--${Events::ReminderEvt::iter}-->
+   <attribute name="iter" type="std::uint32_t" visibility="0x00" properties="0x00">
+    <documentation>the next iteration to perform</documentation>
+   </attribute>
+  </class>
+ </package>
+ <!--${Components}-->
+ <package name="Components" stereotype="0x02">
+  <!--${Components::Cruncher}-->
+  <class name="Cruncher" superclass="qpcpp::QActive">
+   <documentation>&quot;Nmber Cruncher&quot; AO</documentation>
+   <!--${Components::Cruncher::m_sum}-->
+   <attribute name="m_sum" type="double" visibility="0x02" properties="0x00">
+    <documentation>// internal variable</documentation>
+   </attribute>
+   <!--${Components::Cruncher::Cruncher}-->
+   <operation name="Cruncher" type="explicit" visibility="0x00" properties="0x02">
+    <specifiers>noexcept</specifiers>
+    <documentation>ctor</documentation>
+    <code>  : QActive(Q_STATE_CAST(&amp;initial))</code>
+   </operation>
+   <!--${Components::Cruncher::SM}-->
+   <statechart properties="0x02">
+    <!--${Components::Cruncher::SM::initial}-->
+    <initial target="../1">
+     <action>(void)e; // unused parameter</action>
+     <initial_glyph conn="2,2,5,1,44,6,-2">
+      <action box="0,-2,6,2"/>
+     </initial_glyph>
+    </initial>
+    <!--${Components::Cruncher::SM::processing}-->
+    <state name="processing">
+     <entry>ReminderEvt *reminder = Q_NEW(ReminderEvt, CRUNCH_SIG);
+reminder-&gt;iter = 0;
+POST(reminder, this);
+m_sum = 0.0;</entry>
+     <!--${Components::Cruncher::SM::processing::CRUNCH}-->
+     <tran trig="CRUNCH">
+      <action>uint32_t i = Q_EVT_CAST(ReminderEvt)-&gt;iter;
+uint32_t n = i;
+i += 100U;
+for (; n &lt; i; ++n) {
+    if ((n &amp; 1) == 0) {
+        m_sum += 1.0/(2*n + 1);
+    }
+    else {
+        m_sum -= 1.0/(2*n + 1);
+    }
+}</action>
+      <!--${Components::Cruncher::SM::processing::CRUNCH::[else]}-->
+      <choice target="../..">
+       <guard brief="else"/>
+       <action>PRINTF_S(&quot;pi=%16.14f\n&quot;, 4.0*m_sum);</action>
+       <choice_glyph conn="24,18,5,1,22,-4,-2">
+        <action box="1,0,15,2"/>
+       </choice_glyph>
+      </choice>
+      <!--${Components::Cruncher::SM::processing::CRUNCH::[i<0x07000000U]}-->
+      <choice>
+       <guard>i &lt; 0x07000000U</guard>
+       <action>ReminderEvt *reminder = Q_NEW(ReminderEvt, CRUNCH_SIG);
+reminder-&gt;iter = i;
+POST(reminder, me);</action>
+       <choice_glyph conn="24,18,4,-1,-4,14">
+        <action box="0,-6,17,2"/>
+       </choice_glyph>
+      </choice>
+      <tran_glyph conn="2,18,3,-1,22">
+       <action box="0,-2,24,2"/>
+      </tran_glyph>
+     </tran>
+     <!--${Components::Cruncher::SM::processing::ECHO}-->
+     <tran trig="ECHO">
+      <action>PRINTF_S(&quot;Echo! pi=%16.14f\n&quot;, 4.0*m_sum);</action>
+      <tran_glyph conn="2,22,3,-1,22">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <!--${Components::Cruncher::SM::processing::TERMINATE}-->
+     <tran trig="TERMINATE" target="../../2">
+      <tran_glyph conn="2,26,3,1,44,12,-14">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,6,42,26">
+      <entry box="1,2,6,2"/>
+     </state_glyph>
+    </state>
+    <!--${Components::Cruncher::SM::final}-->
+    <state name="final">
+     <entry brief="stop">PRINTF_S(&quot;%s\n&quot;, &quot;final-ENTRY;&quot;);
+         QP::QF::stop(); // terminate the application</entry>
+     <state_glyph node="2,36,30,10">
+      <entry box="1,2,6,2"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="50,48"/>
+   </statechart>
+  </class>
+ </package>
+ <!--${.}-->
+ <directory name=".">
+  <!--${.::reminder2.cpp}-->
+  <file name="reminder2.cpp">
+   <text>#include &quot;qpcpp.hpp&quot;
+#include &quot;bsp.hpp&quot;
+
+#include &quot;safe_std.h&quot;   // portable &quot;safe&quot; &lt;stdio.h&gt;/&lt;string.h&gt; facilities
+
+Q_DEFINE_THIS_FILE
+
+using namespace QP;
+
+//............................................................................
+enum ReminderSignals {
+    CRUNCH_SIG = Q_USER_SIG, // the invented reminder signal
+    ECHO_SIG,     // check the responsiveness of the system
+    TERMINATE_SIG // terminate the application
+};
+
+//............................................................................
+$declare${Events::ReminderEvt}
+
+// Active object class -----------------------------------------------------..
+$declare${Components::Cruncher}
+
+$define${Components::Cruncher}
+
+// test harness ==============================================================
+
+// Local-scope objects -------------------------------------------------------
+static Cruncher l_cruncher;     // the Cruncher active object
+QEvt const *l_cruncherQSto[10]; // Event queue storage for Cruncher AO
+static QF_MPOOL_EL(ReminderEvt) l_smlPoolSto[20]; // storage for small pool
+
+//............................................................................
+int main(int argc, char *argv[]) {
+    PRINTF_S(&quot;Reminder state pattern\nQP version: %s\n&quot;
+           &quot;Press 'e' to echo the current value...\n&quot;
+           &quot;Press ESC to quit...\n&quot;,
+           QP::versionStr);
+
+    BSP_init(argc, argv); // initialize the BSP
+    QF::init(); // initialize the framework and the underlying RT kernel
+
+    // publish-subscribe not used, no call to QF_psInit()
+
+    QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
+
+    // instantiate and start the active objects...
+    l_cruncher.start(1U,
+                     l_cruncherQSto, Q_DIM(l_cruncherQSto),
+                     nullptr, 0U, (QEvt *)0);
+
+    return QF::run(); // run the QF application
+}
+//............................................................................
+void BSP_onKeyboardInput(uint8_t key) {
+    switch (key) {
+        case 'e': {
+            static QEvt const echoEvt = { ECHO_SIG, 0U, 0U };
+            l_cruncher.POST(&amp;echoEvt, nullptr);
+            break;
+        }
+        case '\033': { // ESC pressed?
+            // NOTE: this constant event is statically pre-allocated.
+            // It can be posted/published as any other event.
+            //
+            static QEvt const terminateEvt = { TERMINATE_SIG, 0U, 0U };
+            l_cruncher.POST(&amp;terminateEvt, nullptr);
+            break;
+        }
+    }
+}
+</text>
+  </file>
+ </directory>
+</model>

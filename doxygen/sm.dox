@@ -50,7 +50,7 @@ An even earlier QP/C++ state machine implementation strategy, used in QP/C++ ver
 This latest "no me-> pointer" state machine implementation style in QP/C++ applies a hybrid approach. Internally, it represents states as simple and efficient pointers to "state-caller" functions. But these "state-caller" functions call "state-handlers" as regular members of the state machine class, which have the `this` pointer and therefore can access all members of the state machine class naturally (without the need for the "me-> pointer").
 
 
-------------------------------------------------------------------------------
+
 @section sm_decl State Machine Declaration
 Hierarchical state machines are represented in QP/C++ as subclasses of the @ref classes "QHsm abstract base class", which is defined in the header file <span class="img folder">qpcpp\include\qep.h</span>. Please note that abstract classes like QP::QMsm, QP::QActive and QP::QMActive are also subclasses of QP::QHsm, so their subclasses also can have state machines.
 
@@ -91,7 +91,7 @@ Hierarchical state machines are represented in QP/C++ as subclasses of the @ref 
 </ul>
 
 
-<div class="separate"></div>
+
 @subsection sm_state_decl The Q_STATE_DECL() Macro
 The Q_STATE_DECL() macro declares **two** functions for every state: the "state-handler" **regular member**  function and the "state-caller" **static member** function. So, for example, the declaration of the "on" state Q_STATE_DECL(on) expands to the following two declarations within the `Calc` class:
 
@@ -121,14 +121,14 @@ virtual Q_STATE_DECL(ready);
 @endcode
 
 
------------------------------------------------------------------------------
+
 @section sm_def State Machine Definition
 The definition of the state machine class is the actual code for your state machine. You need to define (i.e., write the code for) all "state-handler" member functions you declared in the @ref sm_decl "state machine class declaration". You don't need to explicitly define the "state-caller" static functions, because they are synthesized implicitly in the macro Q_STATE_DEF()).
 
 One important aspect to realize about coding "state-handler" functions is that they are always called from the @ref comp_qep "QEP event processor". The purpose of the "state-handlers" is to perform *your* specific actions and then to *tell* the event processor what needs to be done with the state machine. For example, if your "state-handler" performs a state transition, it executes some actions and then it calls the special @ref QP::QHsm::tran() "tran(<target>)" function, where it specifies the `<target>` state of this state transition. The state-handler then **returns** the status from the `tran()` function, and through this return value it informs the @ref comp_qep "QEP event processor" what needs to be done with the state machine. Based on this information, the event-processor might decide to call this or other state-handler functions to process the same current event. The following code examples should make all this clearer.
 
 
-<div class="separate"></div>
+
 @subsection sm_state_def The Q_STATE_DEF() Macro
 Every state that has been declared with the @ref sm_decl "Q_STATE_DECL()" macro in the state machine class needs to be defined with the Q_STATE_DEF() macro. For example, the state "ready" in the Calculator state machines, the Q_STATE_DEF(Calc, ready) macro expands into the following code:
 
@@ -147,7 +147,7 @@ Every state that has been declared with the @ref sm_decl "Q_STATE_DECL()" macro 
 </ul>
 
 
-<div class="separate"></div>
+
 @subsection sm_def_init Top-Most Initial Pseudostate
 Every state machine must have exactly one top-most initial pseudo-state, which is assumed when the state machine is instantiated in the @ref sm_ctor "constructor" of the state machine class. By convention, the initial pseudo-state should be always called **initial**.
 
@@ -173,7 +173,7 @@ This top-most initial pseudo-state has one transition, which points to the state
 </ul>
 
 
-<div class="separate"></div>
+
 @subsection sm_def_state State-Handler Member Functions
 Every regular state (including states nested in other states) is also coded with the Q_STATE_DEF() macro. The function body, following the macro, consists of the `switch` statement that discriminates based on the event signal (`e->sig`). The following code shows the complete definition of the Calculator "on" state. The explanation section below the code clarifies the main points.
 
@@ -283,7 +283,7 @@ Every regular state (including states nested in other states) is also coded with
 The `switch` statement code and the single `return` from the state-handler function is compliant with the MISRA standards.
 
 
-------------------------------------------------------------------------------
+
 @section sm_call State-Handler Call Overhead
 For embedded system applications, it is always interesting to know the overhead of the implementation used. It turns out that the chosen "state-caller"/"state-handler" implementation is very efficient. The following dis-assembly listing shows the code generated for invocation of a state-handler from the QEP code. The compiler used is IAR C/C++ EWARM 8.32 with Cortex-M target CPU and Medium level of optimization.
 

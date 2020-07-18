@@ -3,8 +3,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -97,8 +97,8 @@ extern "C" {
 
     // QV-specific scheduler locking (not needed in QV)
     #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) ((void)0)
-    #define QF_SCHED_UNLOCK_()    ((void)0)
+    #define QF_SCHED_LOCK_(dummy) (static_cast<void>(0))
+    #define QF_SCHED_UNLOCK_()    (static_cast<void>(0))
 
     // QV-specific native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \

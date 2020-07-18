@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -157,20 +157,20 @@ extern "C" {
         QP::QPSetBits t;
 
 #if (QF_MAX_ACTIVE > 16U)
-        t = static_cast<QP::QPSetBits>(x >> 16);
+        t = static_cast<QP::QPSetBits>(x >> 16U);
         if (t != 0U) {
             n += 16U;
             x = t;
         }
 #endif
 #if (QF_MAX_ACTIVE > 8U)
-        t = (x >> 8);
+        t = (x >> 8U);
         if (t != 0U) {
             n += 8U;
             x = t;
         }
 #endif
-        t = (x >> 4);
+        t = (x >> 4U);
         if (t != 0U) {
             n += 4U;
             x = t;

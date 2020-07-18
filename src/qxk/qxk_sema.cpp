@@ -137,8 +137,8 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
         curr->m_temp.obj = QXK_PTR_CAST_(QMState*, this);
         curr->teArm_(static_cast<enum_t>(QXK_SEMA_SIG), nTicks);
 
-        // remove this curr prio from the ready set (block)
-        // and insert to the waiting set on this mutex
+        // remove this curr prio from the ready set (will block)
+        // and insert to the waiting set on this semaphore
         m_waitSet.insert(p);         // add to waiting-set
         QXK_attr_.readySet.rmove(p); // remove from ready-set
 

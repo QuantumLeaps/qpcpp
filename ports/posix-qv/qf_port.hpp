@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to POSIX API with cooperative QV scheduler (posix-qv)
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.2
+/// Last updated on  2020-06-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -40,14 +40,17 @@
 
 // event queue and thread types
 #define QF_EQUEUE_TYPE       QEQueue
-//#define QF_OS_OBJECT_TYPE  // not used
-//#define QF_THREAD_TYPE     // not used
+// QF_OS_OBJECT_TYPE  not used
+// QF_THREAD_TYPE     not used
 
 // The maximum number of active objects in the application
 #define QF_MAX_ACTIVE        64U
 
 // The number of system clock tick rates
 #define QF_MAX_TICK_RATE     2U
+
+// Activate the QF QActive::stop() API
+#define QF_ACTIVE_STOP       1
 
 // various QF object sizes configuration for this port
 #define QF_EVENT_SIZ_SIZE    4U

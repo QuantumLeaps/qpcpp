@@ -410,7 +410,7 @@
             <File>
               <FileName>startup_efm32pg1b.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\armclang\startup_efm32pg1b.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\arm\startup_efm32pg1b.s</FilePath>
             </File>
             <File>
               <FileName>efm32pg1b200f256gm48.h</FileName>
@@ -1024,7 +1024,7 @@
             <File>
               <FileName>startup_efm32pg1b.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\armclang\startup_efm32pg1b.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\arm\startup_efm32pg1b.s</FilePath>
             </File>
             <File>
               <FileName>efm32pg1b200f256gm48.h</FileName>
@@ -1638,7 +1638,7 @@
             <File>
               <FileName>startup_efm32pg1b.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\armclang\startup_efm32pg1b.s</FilePath>
+              <FilePath>..\..\..\..\..\3rd_party\efm32pg1b\arm\startup_efm32pg1b.s</FilePath>
             </File>
             <File>
               <FileName>efm32pg1b200f256gm48.h</FileName>

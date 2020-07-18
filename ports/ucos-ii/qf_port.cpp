@@ -1,9 +1,9 @@
 /// @file
-/// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
+/// @brief QF/C++ port to uC/OS-II RTOS, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -99,8 +99,12 @@ void QActive::start(std::uint_fast8_t const prio,
     INT8U err = OSTaskCreateExt(
         &task_function, // the task function
         this,     // the 'pdata' parameter
-        &(((OS_STK *)stkSto)[(stkSize / sizeof(OS_STK)) - 1]), // ptos
-        p_ucos,                 // uC/OS-II task priority
+#if OS_STK_GROWTH
+        &static_cast<OS_STK *>(stkSto)[(stkSize/sizeof(OS_STK)) - 1], // ptos
+#else
+        static_cast<OS_STK *>(stkSto), // ptos
+#endif
+        p_ucos,                    // uC/OS-II task priority
         static_cast<INT16U>(prio), // the unique QP priority is the task id
         static_cast<OS_STK *>(stkSto),  // pbos
         static_cast<INT32U>(stkSize/sizeof(OS_STK)),// size in OS_STK units
@@ -168,7 +172,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
     if (status) { // can post the event?
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
                          QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_PRE_();      // timestamp
             QS_OBJ_PRE_(sender); // the sender object

@@ -4,8 +4,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -160,7 +160,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) noexcept {
             Q_ASSERT_ID(210, active_[p] != nullptr);
 
             // POST() asserts internally if the queue overflows
-            (void)active_[p]->POST(e, sender);
+            static_cast<void>(active_[p]->POST(e, sender));
 
             subscrList.rmove(p); // remove the handled subscriber
             if (subscrList.notEmpty()) {  // still more subscribers?
@@ -192,7 +192,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) noexcept {
 ///
 /// The following example shows how the Table active object subscribes
 /// to three signals in the initial transition:
-/// @include qf_subscribe.c
+/// @include qf_subscribe.cpp
 ///
 /// @sa
 /// QP::QF::publish_(), QP::QActive::unsubscribe(), and

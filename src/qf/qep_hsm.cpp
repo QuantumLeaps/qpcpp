@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -163,12 +163,12 @@ void QHsm::init(void const * const e) {
         std::int_fast8_t ip = 0; // entry path index
 
         path[0] = m_temp.fun;
-        (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+        static_cast<void>(QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_));
         while (m_temp.fun != t) {
             ++ip;
             Q_ASSERT_ID(220, ip < static_cast<std::int_fast8_t>(Q_DIM(path)));
             path[ip] = m_temp.fun;
-            (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+            static_cast<void>(QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_));
         }
         m_temp.fun = path[0];
 
@@ -211,6 +211,7 @@ void QHsm::init(void const * const e) {
 /// The QP::QHsm::top() state handler is the ultimate root of state hierarchy
 /// in all HSMs derived from QP::QHsm.
 ///
+/// @param[in] me pointer to the HSM instance
 /// @param[in] e  pointer to the event to be dispatched to the HSM
 ///
 /// @returns
@@ -222,8 +223,8 @@ void QHsm::init(void const * const e) {
 /// conformance with the state-handler function signature QP::QStateHandler.
 ///
 QState QHsm::top(void * const me, QEvt const * const e) noexcept {
-    (void)me;
-    (void)e;
+    static_cast<void>(me); // unused parameter
+    static_cast<void>(e);  // unused parameter
     return Q_RET_IGNORED; // the top state ignores all events
 }
 
@@ -293,7 +294,8 @@ void QHsm::dispatch(QEvt const * const e) {
                     QS_FUN_PRE_(t);    // the exited state
                 QS_END_PRE_()
 
-                (void)QEP_TRIG_(t, QEP_EMPTY_SIG_); // find superstate of t
+                // find superstate of t
+                static_cast<void>(QEP_TRIG_(t, QEP_EMPTY_SIG_));
             }
         }
 
@@ -332,12 +334,14 @@ void QHsm::dispatch(QEvt const * const e) {
             ip = 0;
             path[0] = m_temp.fun;
 
-            (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_); // find superstate
+            // find superstate
+            static_cast<void>(QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_));
 
             while (m_temp.fun != t) {
                 ++ip;
                 path[ip] = m_temp.fun;
-                (void)QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);// find superstate
+                // find superstate
+                static_cast<void>(QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_));
             }
             m_temp.fun = path[0];
 
@@ -417,7 +421,8 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]) {
         ip = 0; // enter the target
     }
     else {
-        (void)QEP_TRIG_(t, QEP_EMPTY_SIG_); // superstate of target
+        // superstate of target
+        static_cast<void>(QEP_TRIG_(t, QEP_EMPTY_SIG_));
         t = m_temp.fun;
 
         // (b) check source==target->super
@@ -425,7 +430,8 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]) {
             ip = 0; // enter the target
         }
         else {
-            (void)QEP_TRIG_(s, QEP_EMPTY_SIG_); // superstate of src
+            // superstate of src
+            static_cast<void>(QEP_TRIG_(s, QEP_EMPTY_SIG_));
 
             // (c) check source->super==target->super
             if (m_temp.fun == t) {
@@ -507,7 +513,8 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]) {
                                         QS_FUN_PRE_(t);
                                     QS_END_PRE_()
 
-                                    (void)QEP_TRIG_(t, QEP_EMPTY_SIG_);
+                                    static_cast<void>(
+                                        QEP_TRIG_(t, QEP_EMPTY_SIG_));
                                 }
                                 t = m_temp.fun; //  set to super of t
                                 iq = ip;
@@ -516,7 +523,7 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]) {
                                     if (t == path[iq]) {
                                         ip = iq - 1; // do not enter LCA
                                         iq = -1; // break out of inner loop
-                                        r = Q_RET_HANDLED; // break from outer loop
+                                        r = Q_RET_HANDLED; // break outer loop
                                     }
                                     else {
                                         --iq;
@@ -540,7 +547,7 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]) {
 /// For a HSM, to "be in a state" means also to be in a superstate of
 /// of the state.
 ///
-/// @param[in] state pointer to the state-handler function to be tested
+/// @param[in] s pointer to the state-handler function to be tested
 ///
 /// @returns
 /// 'true' if the HSM is in the @p state and 'false' otherwise
@@ -611,7 +618,8 @@ QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
     /// @post the child must be confirmed
     Q_ENSURE_ID(810, isFound);
 #ifdef Q_NASSERT
-    (void)isFound; // avoid compiler warning about unused variable
+    // avoid compiler warning about unused variable
+    static_cast<void>(isFound);
 #endif
 
     return child; // return the child

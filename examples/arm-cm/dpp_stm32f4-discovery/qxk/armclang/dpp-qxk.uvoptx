@@ -161,7 +161,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\3rd_party\stm32f4-discovery\armclang\startup_stm32f4xx.s</Filename>
+          <Filename>..\..\..\..\..\3rd_party\stm32f4-discovery\arm\startup_stm32f4xx.s</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\dpp_qxk\../../../../../3rd_party/stm32f4-discovery/arm/startup_stm32f4xx.s\231</Expression>
         </Bp>
@@ -438,7 +438,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\..\3rd_party\stm32f4-discovery\armclang\startup_stm32f4xx.s</Filename>
+          <Filename>..\..\..\..\..\3rd_party\stm32f4-discovery\arm\startup_stm32f4xx.s</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -667,7 +667,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\3rd_party\stm32f4-discovery\armclang\startup_stm32f4xx.s</Filename>
+          <Filename>..\..\..\..\..\3rd_party\stm32f4-discovery\arm\startup_stm32f4xx.s</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\dpp_qxk\../../../../../3rd_party/stm32f4-discovery/arm/startup_stm32f4xx.s\259</Expression>
         </Bp>
@@ -731,7 +731,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\..\3rd_party\stm32f4-discovery\armclang\startup_stm32f4xx.s</Filename>
+          <Filename>..\..\..\..\..\3rd_party\stm32f4-discovery\arm\startup_stm32f4xx.s</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -897,7 +897,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\3rd_party\stm32f4-discovery\armclang\startup_stm32f4xx.s</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\3rd_party\stm32f4-discovery\arm\startup_stm32f4xx.s</PathWithFileName>
       <FilenameWithoutPath>startup_stm32f4xx.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

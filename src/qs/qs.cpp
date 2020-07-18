@@ -183,7 +183,7 @@ void QS::filterOn_(std::uint_fast8_t const rec) noexcept {
         // record numbers can't exceed QS_ESC, so they don't need escaping
         Q_ASSERT_ID(210, rec < static_cast<std::uint_fast8_t>(QS_ESC));
 
-        priv_.glbFilter[rec >> 3] |=
+        priv_.glbFilter[rec >> 3U] |=
             static_cast<std::uint8_t>(1U << (rec & 7U));
     }
 }
@@ -268,7 +268,7 @@ void QS::filterOff_(std::uint_fast8_t const rec) noexcept {
         // record IDs can't exceed QS_ESC, so they don't need escaping
         Q_ASSERT_ID(310, rec < static_cast<std::uint_fast8_t>(QS_ESC));
 
-        priv_.glbFilter[rec >> 3] &= static_cast<std::uint8_t>(
+        priv_.glbFilter[rec >> 3U] &= static_cast<std::uint8_t>(
                     ~static_cast<std::uint8_t>(1U << (rec & 7U)));
     }
 }
@@ -347,28 +347,28 @@ void QS_target_info_(std::uint8_t const isReset) noexcept {
 
         // send the object sizes...
         QS::u8_raw_(Q_SIGNAL_SIZE
-                    | static_cast<std::uint8_t>(QF_EVENT_SIZ_SIZE << 4));
+                    | static_cast<std::uint8_t>(QF_EVENT_SIZ_SIZE << 4U));
 
 #ifdef QF_EQUEUE_CTR_SIZE
         QS::u8_raw_(QF_EQUEUE_CTR_SIZE
-                    | static_cast<std::uint8_t>(QF_TIMEEVT_CTR_SIZE << 4));
+                    | static_cast<std::uint8_t>(QF_TIMEEVT_CTR_SIZE << 4U));
 #else
-        QS::u8_raw_(static_cast<std::uint8_t>(QF_TIMEEVT_CTR_SIZE << 4));
+        QS::u8_raw_(static_cast<std::uint8_t>(QF_TIMEEVT_CTR_SIZE << 4U));
 #endif // ifdef QF_EQUEUE_CTR_SIZE
 
 #ifdef QF_MPOOL_CTR_SIZE
         QS::u8_raw_(QF_MPOOL_SIZ_SIZE
-                    | static_cast<std::uint8_t>(QF_MPOOL_CTR_SIZE << 4));
+                    | static_cast<std::uint8_t>(QF_MPOOL_CTR_SIZE << 4U));
 #else
         QS::u8_raw_(0U);
 #endif // ifdef QF_MPOOL_CTR_SIZE
 
-        QS::u8_raw_(QS_OBJ_PTR_SIZE | (QS_FUN_PTR_SIZE << 4));
+        QS::u8_raw_(QS_OBJ_PTR_SIZE | (QS_FUN_PTR_SIZE << 4U));
         QS::u8_raw_(QS_TIME_SIZE);
 
         // send the limits...
         QS::u8_raw_(QF_MAX_ACTIVE);
-        QS::u8_raw_(QF_MAX_EPOOL | (QF_MAX_TICK_RATE << 4));
+        QS::u8_raw_(QF_MAX_EPOOL | (QF_MAX_TICK_RATE << 4U));
 
         // send the build time in three bytes (sec, min, hour)...
         QS::u8_raw_((10U * (TIME[6] - ZERO)) + (TIME[7] - ZERO));
@@ -473,7 +473,7 @@ void QS::u16_fmt_(std::uint8_t format, std::uint16_t d) noexcept {
     format = static_cast<std::uint8_t>(d);
     QS_INSERT_ESC_BYTE_(format)
 
-    d >>= 8;
+    d >>= 8U;
     format = static_cast<std::uint8_t>(d);
     QS_INSERT_ESC_BYTE_(format)
 
@@ -497,7 +497,7 @@ void QS::u32_fmt_(std::uint8_t format, std::uint32_t d) noexcept {
     for (std::uint_fast8_t i = 4U; i != 0U; --i) {
         format = static_cast<std::uint8_t>(d);
         QS_INSERT_ESC_BYTE_(format)
-        d >>= 8;
+        d >>= 8U;
     }
 
     priv_.head   = head_;   // save the head
@@ -629,7 +629,7 @@ void QS::u16_raw_(std::uint16_t d) noexcept {
 
     QS_INSERT_ESC_BYTE_(b)
 
-    d >>= 8;
+    d >>= 8U;
     b = static_cast<std::uint8_t>(d);
     QS_INSERT_ESC_BYTE_(b)
 
@@ -651,7 +651,7 @@ void QS::u32_raw_(std::uint32_t d) noexcept {
     for (std::uint_fast8_t i = 4U; i != 0U; --i) {
         std::uint8_t const b = static_cast<std::uint8_t>(d);
         QS_INSERT_ESC_BYTE_(b)
-        d >>= 8;
+        d >>= 8U;
     }
 
     priv_.head   = head_;    // save the head

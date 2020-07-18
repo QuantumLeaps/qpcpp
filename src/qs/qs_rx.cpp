@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.1
-/// Last updated on  2020-05-13
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -524,7 +524,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             }
             else {
                 l_rx.var.peek.offs |= static_cast<std::uint16_t>(
-                                          static_cast<std::uint16_t>(b) << 8);
+                                         static_cast<std::uint16_t>(b) << 8U);
                 tran_(WAIT4_PEEK_SIZE);
             }
             break;
@@ -559,7 +559,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             }
             else {
                 l_rx.var.poke.offs |= static_cast<std::uint16_t>(
-                                          static_cast<std::uint16_t>(b) << 8);
+                                         static_cast<std::uint16_t>(b) << 8U);
                 tran_(WAIT4_POKE_SIZE);
             }
             break;
@@ -601,7 +601,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             l_rx.var.poke.data |=
                 static_cast<std::uint32_t>(b) << l_rx.var.poke.idx;
             l_rx.var.poke.idx += 8U;
-            if ((l_rx.var.poke.idx >> 3) == l_rx.var.poke.size) {
+            if ((l_rx.var.poke.idx >> 3U) == l_rx.var.poke.size) {
                 tran_(WAIT4_FILL_FRAME);
             }
             break;
@@ -610,7 +610,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             l_rx.var.poke.data |=
                 static_cast<std::uint32_t>(b) << l_rx.var.poke.idx;
             l_rx.var.poke.idx += 8U;
-            if ((l_rx.var.poke.idx >> 3) == l_rx.var.poke.size) {
+            if ((l_rx.var.poke.idx >> 3U) == l_rx.var.poke.size) {
                 rxPoke_();
                 --l_rx.var.poke.num;
                 if (l_rx.var.poke.num == 0U) {
@@ -1295,7 +1295,7 @@ static void rxPoke_(void) noexcept {
 /// @description
 /// This function obtains the Test-Probe for a given API.
 ///
-/// @param[in]  api_id  the API-ID that requests its Test-Probe
+/// @param[in]  api  pointer to the API function that requests its Test-Probe
 ///
 /// @returns Test-Probe data that has been received for the given API
 /// from the Host (running qutest). For any ginve API, the function returns

@@ -549,7 +549,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\qp\qpcpp\3rd_party\ek-tm4c123gxl\armclang\startup_TM4C123GH6PM.s</Filename>
+          <Filename>C:\qp\qpcpp\3rd_party\ek-tm4c123gxl\arm\startup_TM4C123GH6PM.s</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -684,7 +684,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\3rd_party\efm32pg1b\armclang\startup_efm32pg1b.s</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\3rd_party\efm32pg1b\arm\startup_efm32pg1b.s</PathWithFileName>
       <FilenameWithoutPath>startup_efm32pg1b.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

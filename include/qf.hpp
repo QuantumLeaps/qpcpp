@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-04-03
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -207,6 +207,11 @@ public:
 #ifdef QF_ACTIVE_STOP
     //! Stops execution of an active object and removes it from the
     //! framework's supervision.
+    /// @attention
+    /// QActive::stop() must be called only from the AO that is about
+    /// to stop its execution. By that time, any pointers or references
+    /// to the AO are considered invalid (dangling) and it becomes
+    /// illegal for the rest of the application to post events to the AO.
     void stop(void);
 #endif
 
@@ -654,7 +659,7 @@ public:
     /// The #QF_CRIT_EXIT_NOP() macro contains minimal code required to
     /// prevent such merging of critical sections in such merging of
     /// critical sections in QF ports, in which it can occur.
-    #define QF_CRIT_EXIT_NOP()   ((void)0)
+    #define QF_CRIT_EXIT_NOP()   (static_cast<void>(0))
 #endif
 
 //****************************************************************************
@@ -703,6 +708,7 @@ public:
     /// This macro allocates a new event and sets the pointer @p e_, while
     /// leaving at least @p margin_ of events still available in the pool
     ///
+    /// @param[out] e_     pointer to the newly allocated event
     /// @param[in] evtT_   event type (class name) of the event to allocate
     /// @param[in] margin_ number of events that must remain available
     ///                    in the given pool after this allocation. The
@@ -779,8 +785,8 @@ public:
     /// because it provides the vital information for software tracing and
     /// avoids any overhead when the tracing is disabled.
     ///
-    /// @param[in] tickRate clock tick rate to be serviced through this call
-    /// @param[in] sender   pointer to the sender object. This parameter
+    /// @param[in] tickRate_ clock tick rate to be serviced through this call
+    /// @param[in] sender_   pointer to the sender object. This parameter
     ///            is actually only used when QS software tracing is enabled
     ///            (macro #Q_SPY is defined)
     /// @note
@@ -790,7 +796,7 @@ public:
     ///
     /// @note
     /// The pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, when #QF_TICK_X() is called from
+    /// to an active object. In fact, when TICK_X() is called from
     /// an interrupt, you would create a unique object just to unambiguously
     /// identify the ISR as the sender of the time events.
     ///
@@ -840,8 +846,7 @@ public:
     /// unambiguously identify the sender of the event.
     ///
     /// @sa QP::QActive::post_()
-    #define POST(e_, sender_) \
-        post_((e_), QP::QF_NO_MARGIN, (sender_))
+    #define POST(e_, sender_) post_((e_), QP::QF_NO_MARGIN, (sender_))
 
     //! Invoke the direct event posting facility QP::QActive::post_()
     //! without delivery guarantee.

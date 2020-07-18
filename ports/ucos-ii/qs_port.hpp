@@ -1,9 +1,9 @@
 /// @file
-/// @brief QS/C++ port to a 32-bit CPU, generic compiler
+/// @brief QS/C++ port to uC/OS-II and 32-bit CPUs
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated on  2020-06-04
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -49,6 +49,13 @@
 // the QF framework, by simply including "qf_port.hpp" *before* "qs.hpp".
 //
 #include "qf_port.hpp" // use QS with QF
+
+#if (OS_CRITICAL_METHOD == 3u)
+    #define QS_CRIT_STAT_       OS_CPU_SR cpu_sr;
+    #define QS_CRIT_ENTRY_()    OS_ENTER_CRITICAL()
+    #define QS_CRIT_EXIT_()     OS_EXIT_CRITICAL(); QS_REC_DONE()
+#endif // OS_CRITICAL_METHOD
+
 #include "qs.hpp"      // QS platform-independent public interface
 
 #endif // QS_PORT_HPP

@@ -1,7 +1,7 @@
 //****************************************************************************
-// Product:  Board Support Package (BSP) for the Calculator example
-// Last Updated for Version: 6.8.0
-// Date of the Last Update:  2020-03-31
+// Product: Board Support Package (BSP) for the Calculator example
+// Last Updated for Version: 6.8.2
+// Date of the Last Update:  2020-06-22
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -36,12 +36,15 @@
 
 #include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
-#include <iostream>
 
 using namespace QP;
 using namespace std;
 
-#define DISP_WIDTH  9
+#define DISP_WIDTH      15
+
+/* helper macros to "stringify" values */
+#define VAL(x) #x
+#define STRINGIFY(x) VAL(x)
 
 static char l_display[DISP_WIDTH + 1]; // the calculator display
 static int  l_len; // number of displayed characters
@@ -67,7 +70,7 @@ void BSP_insert(int keyId) {
 }
 //............................................................................
 void BSP_display(double value) {
-    SNPRINTF_S(l_display, DISP_WIDTH, "%9.6g", value);
+    SNPRINTF_S(l_display, DISP_WIDTH, "%10.7g", value);
 }
 //............................................................................
 void BSP_display_error(char const *err) {
@@ -80,11 +83,12 @@ void BSP_negate(void) {
 }
 //............................................................................
 void BSP_show_display(void) {
-    cout << endl << '[' << l_display << "] ";
+    PRINTF_S("\n[%" STRINGIFY(DISP_WIDTH) "s] ", l_display);
 }
 //............................................................................
 void BSP_exit(void) {
-    cout << endl << "Bye! Bye" << endl;
+    PRINTF_S("\n%s\n", "Bye! Bye!");
+    fflush(stdout);
     QF::onCleanup();
     exit(0);
 }
@@ -94,7 +98,7 @@ double BSP_get_value(void) {
 }
 //............................................................................
 void BSP_message(char const *msg) {
-    cout << msg;
+    PRINTF_S("%s", msg);
 }
 
 namespace QP {
@@ -115,8 +119,7 @@ void QF_onClockTick(void) {
 //............................................................................
 // this function is used by the QP embedded systems-friendly assertions
 extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
-    cout << "Assertion failed in " << module << ':' << loc
-         << flush << endl;
+    FPRINTF_S(stderr, "Assertion failed in %s:%d", module, loc);
     QF::onCleanup();
     exit(-1);
 }

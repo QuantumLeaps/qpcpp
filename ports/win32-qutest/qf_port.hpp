@@ -3,8 +3,8 @@
 /// @ingroup qutest
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-31
+/// Last updated for version 6.8.2
+/// Last updated on  2020-06-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -41,8 +41,8 @@
 
 // QUTEST event queue and thread types
 #define QF_EQUEUE_TYPE QEQueue
-//#define QF_OS_OBJECT_TYPE
-//#define QF_THREAD_TYPE
+// QF_OS_OBJECT_TYPE  not used
+// QF_THREAD_TYPE     not used
 
 // The maximum number of active objects in the application
 #define QF_MAX_ACTIVE        64U

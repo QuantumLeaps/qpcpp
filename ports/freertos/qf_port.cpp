@@ -194,7 +194,7 @@ bool QActive::postFromISR_(QEvt const * const e,
 
     if (status) { // can post the event?
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
                              QS::priv_.locFilter[QS::AO_OBJ], this)
             QS_TIME_PRE_();       // timestamp
             QS_OBJ_PRE_(sender);  // the sender object

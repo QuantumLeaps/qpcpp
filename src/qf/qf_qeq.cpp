@@ -2,8 +2,8 @@
 /// @brief QP::QEQueue implementation
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -144,7 +144,7 @@ bool QEQueue::post(QEvt const * const e,
             m_nMin = nFree; // update minimum so far
         }
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_POST_FIFO,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_POST,
                          QS::priv_.locFilter[QS::EQ_OBJ], this)
             QS_TIME_PRE_();                     // timestamp
             QS_SIG_PRE_(e->sig);                // the signal of this event

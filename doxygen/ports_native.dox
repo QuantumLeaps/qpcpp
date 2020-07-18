@@ -31,6 +31,12 @@ The QP/C++ "port" to PC-Lint-Plus is located in the directory <span class="img f
   |
   | +-ports/           - QP/C++ ports directory
   | | +-lint-plus/     - QP/C++ "port" to PC-Lint-Plus
+  | | |  +-16bit/      - QP/C++ "port" to 16-bit CPUs
+  | | | |  +-cpu.lnt   - Lint options for a 16-bit CPU
+  | | | |  +-cstdint   - Standard exact-width integers for a 16-bit CPU
+  | | |  +-32bit/      - QP/C++ "port" to 32-bit CPUs
+  | | | |  +-cpu.lnt   - Lint options for a 32-bit CPU
+  | | | |  +-cstdint   - Standard exact-width integers for a 32-bit CPU
   | | | +-qk/          - QP/C++ port with the QK kernel
   | | | +-qv/          - QP/C++ port with the QV kernel
   | | | +-qxk/         - QP/C++ port with the QXK kernel
@@ -46,10 +52,6 @@ The QP/C++ "port" to PC-Lint-Plus is located in the directory <span class="img f
   | | | +-lint_qk.log  - PC/Lint-Plus output for the QK  component of QP/C++
   | | | +-lint_qxk.log - PC/Lint-Plus output for the QXK component of QP/C++
   | | | +-qep_port.hpp - QEP component "port" to a "generic C++ compiler"
-  | | | +-qf_port.h    - QF  component "port" to a "generic C++ compiler"
-  | | | +-qs_port.h    - QS  component "port" to a "generic C++ compiler"
-  | | | +-stdbool.h    - Standard Boolean type and constants for a "generic C++ compiler"
-  | | | +-stdint.h     - Standard exact-width integers for a "generic C++ compiler"
   | |
   | +-examples\        - QP/C++ examples directory (application)
   | | +-arm-cm\        - QP/C++ examples for ARM Cortex-M
@@ -60,7 +62,7 @@ The QP/C++ "port" to PC-Lint-Plus is located in the directory <span class="img f
 @endcode
 
 
-------------------------------------------------------------------------------
+
 @section lint_qpcpp Linting the QP/C++ Source Code
 The directory <span class="img folder">qpcpp/ports/lint-plus</span> (see listing above) contains also the **lin.bat** batch file for "linting" the QP/C++ source code. The `lin.bat` batch file invokes PC-Lint-Plus and generates the lint output files. As shown in the listing above, the lint output is collected into four text files `lint_qf.log`, `lint_qs.log`, `lint_qk.log`, `lint_qv.log`, and `lint_qs.log`, for QEP/QF, QK, QV, QXK and QS components of the QP/C++ framework, respectively.
 
@@ -74,7 +76,7 @@ The `lin.bat` batch file invoked without any command-line options checks the QP/
 According to the PC-Lint-Plus guidelines, the `lin.bat` uses two option files: the `qpcpp.lnt` configuration file discussed before and the `options.lnt` configuration file that covers all deviations from the MISRA-C++ rules **within the QP/C++ source code**. These deviations are intentionally localized to QP/C++ code and are independent from your **application-level** code. In other words, a MISRA-C++ deviation present in the QP/C++ code does **not** mean that such deviation is somehow allowed or its detection is somehow suppressed in the **application-level** code. This is because the the `options.lnt` configuration file for internals of QP/C++ is **not** used to "lint" the application-level code.
 
 
-------------------------------------------------------------------------------
+
 @section lint_app Linting QP/C++ Application Code
 The QP/C++ baseline code contains an example of MISRA-C++ compliance checking with PC-Lint-Plus: the DPP example for the EK-TM4C123GLX Cortex-M4F board, located in the directory <span class="img folder">qpcpp/examples/arm-cm/dpp_ek-tm4c123gxl/lint-plus</span>. The PC-Lint-Plus analysis is very simple and requires invoking the **lin.bat** file.
 
@@ -85,7 +87,7 @@ In order to execute the **lin.bat** file on your system, you might need to adjus
 The `lint-plus` subdirectory contains also the `options.lnt` with the PC-Lint-Plus options specific to linting the application. Here, you might include linting options for your specific compiler, as described in the "PC-Lint-Plus Manual", Chapter 2 "Installation and Configuration".
 
 
-------------------------------------------------------------------------------
+
 @section lint_options Structure of PC-Lint-Plus Options for QP/C++
 PC-Lint-Plus has several places where it reads its currently valid options:
 - From special PC-Lint-Plus option files (usually called `*.lnt`)
@@ -103,7 +105,7 @@ As shown in the PC-Lint-Plus "port" files description, the directory <span class
 Note that the `qpc/include` directory contains all PC-Lint-Plus option files used in "linting" the code, including the standard MISRA-C++:2008 `au-misra-cpp.lnt` option file as well as Dan Saks' recommendations `au-ds.lnt`, which are copied from the PC-Lint-Plus distribution. This design freezes the lint options for which the compliance has been checked.
 
 
-<div class="separate"></div>
+
 @subsection lint_std_lnt The std.lnt option file
 According to the Gimpel Software *PC-Lint-Plus Configuration Guidelines*, the file `qpcpp/include/std.lnt` file, contains the top-level options, which Quantum Leaps recommends for all projects. These options include the formatting of the PC-Lint-Plus messages and making two passes to perform better cross-module analysis. However, the most important option is `-restore_at_end`, which has the effect of surrounding each source file with options `-save` and `-restore`. This precaution prevents options from "bleeding" from one file to another.
 
@@ -111,7 +113,7 @@ According to the Gimpel Software *PC-Lint-Plus Configuration Guidelines*, the fi
 @include std.lnt
 
 
-<div class="separate"></div>
+
 @subsection lint_qpcpp_lnt  The qpcpp.lnt option file
 The most important file for "linting" QP/C++ applications is the **qpcpp.lnt** option file. This file handles all deviations from the MISRA-C++:2008 rules, which might arise at the application-level code from the use of the QP/C++ framework. In other words, the **qpcpp.lnt** option file allows completely clean "linting" of the application-level code, as long as the application code does not violate any of the MISRA-C++:2008 rules.
 
@@ -130,10 +132,11 @@ For example, for reasons explained in Section 5.10 of the <a href="https://www.s
 
 @section arm-cr_qk Preemptive QK Kernel
 
-\includelineno ports/arm-cr/qk/iar/qk_port.s
+@includelineno ports/arm-cr/qk/gnu/qk_port.hpp
 
 @section arm-cr_qv Cooperative QV Kernel
 
+@next{arm7-9}
 */
 /*##########################################################################*/
 /*! @page arm7-9 ARM7/ARM9
@@ -142,10 +145,11 @@ For example, for reasons explained in Section 5.10 of the <a href="https://www.s
 
 @section arm7-9_qk Preemptive QK Kernel
 
-@includelineno ports/arm7-9/qk/iar/qk_port.s
+@includelineno ports/arm7-9/qk/gnu/qk_port.s
 
 @section arm7-9_qv Cooperative QV Kernel
 
+@next{msp430}
 */
 /*##########################################################################*/
 /*! @page msp430 MSP430

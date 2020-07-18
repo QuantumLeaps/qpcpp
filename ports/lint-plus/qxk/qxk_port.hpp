@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-16
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------

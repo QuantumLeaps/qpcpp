@@ -45,7 +45,7 @@ The sub-directory <span class="img folder">iar</span> contains the workspace and
 After you load the DPP example into the STM32F4-Discovery board, the application should start blinking the 4 on-board LEDs. You can press the User button (blue) to PAUSE the philosophers for as long as the button is depressed. The philosophers resume dining when you release the User button. (In the PAUSED state the Table active object stops granting permissions to eat, so eventually all philosophers end in the "hungry" state.)
 
 
-------------------------------------------------------------------------------
+
 @section embos_dpp_stm32f429-discovery_qs QS Software Tracing
 
 The DPP example for embOS on STM32F4-Discovery board provides the "Spy" build configuration, which outputs the QS (Quantum Spy) software tracing data through USART2. To get the data out of the board, you need to connect the TTL/RS232 converter as follows:
@@ -80,7 +80,7 @@ The actual COM port number might be different on your Windows machine. Please ch
 <script src="preview.js" type="text/javascript"></script>
 @endhtmlonly
 
-The QP/C examples for FreeRTOS are as follows:
+The QP/C++ examples for FreeRTOS are as follows:
 
 - ARM Cortex-M
     - @subpage freertos_dpp_ek-tm4c123gxl (Cortex-M4F) <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a><br>(ARM-KEIL, GNU-ARM and IAR EWARM toolchains)
@@ -275,7 +275,7 @@ The sub-directory <span class="img folder">iar</span> contains the workspace and
 After you load the DPP example into the STM32F4-Discovery board, the application should start blinking the 4 on-board LEDs. You can press the User button (blue) to PAUSE the philosophers for as long as the button is depressed. The philosophers resume dining when you release the User button. (In the PAUSED state the Table active object stops granting permissions to eat, so eventually all philosophers end in the "hungry" state.)
 
 
-------------------------------------------------------------------------------
+
 @section threadx_dpp_stm32f429-discovery_qs QS Software Tracing
 
 The DPP example for ThreadX on STM32F4-Discovery board provides the "Spy" build configuration, which outputs the QS (Quantum Spy) software tracing data through USART2. To get the data out of the board, you need to connect the TTL/RS232 converter as follows:
@@ -313,8 +313,8 @@ The actual COM port number might be different on your Windows machine. Please ch
 The QP/C++ examples for uC/OS-II are as follows:
 
 - ARM Cortex-M
-    - @subpage ucos-ii_dpp_ek-tm4c123gxl (Cortex-M4F) <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a><br>(ARM-KEIL and IAR EWARM toolsets)
-    - @subpage ucos-ii_dpp_nucleo-l152re (Cortex-M3) <a class="preview board" href="bd_nucleo-l152re.jpg" title="NUCLEO-L152RE"></a><br>(ARM-KEIL and IAR EWARM toolsets)
+    - @subpage ucos-ii_dpp_ek-tm4c123gxl (Cortex-M4F) <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a><br>(ARM-CLANG, GNU-ARM and IAR EWARM toolsets)
+    - @subpage ucos-ii_dpp_nucleo-l053r8 (Cortex-M0+) <a class="preview board" href="bd_NUCLEO-L053R8.jpg" title="NUCLEO-L053R8"></a><br>(ARM-CLANG, GNU-ARM, and IAR EWARM toolsets)
 
 @note
 You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; icon in the list below to see the picture of the board.
@@ -324,20 +324,20 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 /*##########################################################################*/
 /*! @page ucos-ii_dpp_ek-tm4c123gxl DPP on EK-TM4C123GXL
 
-@image html bd_EK-TM4C123GXL.jpg EK-TM4C123GXL board
+@image html bd_EK-TM4C123GXL.jpg "EK-TM4C123GXL board"
 
-DPP example for Texas Instruments TivaC123GXL MCU (Cortex-M4F) and IAR EWARM toolsets.
+DPP example for Texas Instruments TivaC123GXL MCU (Cortex-M4F) and ARM-CLANG, GNU-ARM and IAR EWARM toolsets.
 
 @image html under_construction.jpg
 
-@next{ucos-ii_dpp_nucleo-l152re examples}
+@next{ucos-ii_dpp_nucleo-l053r8 examples}
 */
 /*##########################################################################*/
-/*! @page ucos-ii_dpp_nucleo-l152re DPP on NUCLEO-L152RE
+/*! @page ucos-ii_dpp_nucleo-l053r8 DPP on STM32-NUCLEO-L053R8
 
-@image html bd_nucleo-l152re.jpg NUCLEO-L152RE board
+@image html bd_NUCLEO-L053R8.jpg "STM32-NUCLEO-L053R8 board"
 
-DPP example for Texas Instruments STM32 L152RET6 MCU (Cortex-M3) and IAR EWARM toolsets.
+DPP example for STM32 L053R8 MCU (Cortex-M0+) and ARM-CLANG, GNU-ARM and IAR EWARM toolsets.
 
 @image html under_construction.jpg
 

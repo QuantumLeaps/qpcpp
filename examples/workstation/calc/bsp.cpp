@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Board Support Package (BSP) for the Calculator example
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-14
+// Last Updated for Version: 6.8.2
+// Date of the Last Update:  2020-06-22
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -36,12 +36,15 @@
 
 #include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
-#include <iostream>
 
 using namespace QP;
 using namespace std;
 
-#define DISP_WIDTH  9
+#define DISP_WIDTH      15
+
+/* helper macros to "stringify" values */
+#define VAL(x) #x
+#define STRINGIFY(x) VAL(x)
 
 static char l_display[DISP_WIDTH + 1]; // the calculator display
 static int  l_len; // number of displayed characters
@@ -60,7 +63,7 @@ void BSP_insert(int keyId) {
         ++l_len;
     }
     else if (l_len < (DISP_WIDTH - 1)) {
-        memmove(&l_display[0], &l_display[1], DISP_WIDTH - 1);
+        MEMMOVE_S(&l_display[0], DISP_WIDTH, &l_display[1], DISP_WIDTH - 1);
         l_display[DISP_WIDTH - 1] = (char)keyId;
         ++l_len;
     }
@@ -72,11 +75,12 @@ void BSP_negate(void) {
 }
 //............................................................................
 void BSP_display(void) {
-    cout << endl << '[' << l_display << "] ";
+    PRINTF_S("\n[%" STRINGIFY(DISP_WIDTH) "s] ", l_display);
 }
 //............................................................................
 void BSP_exit(void) {
-    cout << endl << "Bye! Bye" << endl;
+    PRINTF_S("\n%s\n", "Bye! Bye!");
+    fflush(stdout);
     QF::onCleanup();
     exit(0);
 }
@@ -106,7 +110,8 @@ int BSP_eval(double operand1, int oper, double operand2) {
                 result = operand1 / operand2;
             }
             else {
-            strcpy(l_display, " Error 0 "); // error: divide by zero
+                // error: divide by zero
+                STRCPY_S(l_display, DISP_WIDTH, " Error 0 ");
                 ok = 0;
             }
             break;
@@ -117,10 +122,11 @@ int BSP_eval(double operand1, int oper, double operand2) {
             result = 0.0;
         }
         if ((-99999999.0 < result) && (result < 99999999.0)) {
-            sprintf(l_display, "%9.6g", result);
+            SNPRINTF_S(l_display, DISP_WIDTH, "%10.7g", result);
         }
         else {
-            strcpy(l_display, " Error 1 "); // error: out of range
+            // error: out of range
+            STRCPY_S(l_display, DISP_WIDTH, " Error 1 ");
             ok = 0;
         }
     }
@@ -128,7 +134,7 @@ int BSP_eval(double operand1, int oper, double operand2) {
 }
 //............................................................................
 void BSP_message(char const *msg) {
-    cout << msg;
+    PRINTF_S("%s", msg);
 }
 
 namespace QP {
@@ -149,8 +155,7 @@ void QF_onClockTick(void) {
 //............................................................................
 // this function is used by the QP embedded systems-friendly assertions
 extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
-    cout << "Assertion failed in " << module << ':' << loc
-         << flush << endl;
+    FPRINTF_S(stderr, "Assertion failed in %s:%d", module, loc);
     QF::onCleanup();
     exit(-1);
 }

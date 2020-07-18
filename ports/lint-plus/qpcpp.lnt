@@ -2,8 +2,8 @@
 /// @brief PC-Lint-Plus option file for linting QP/C++ applications
 /// @cond
 ///===========================================================================
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -49,7 +49,6 @@
 -esym(9436,
  QP::versionStr)
 
-
 // MC++R16-0-4 function-like macro
 -esym(9026,
  Q_ASSERT,
@@ -67,6 +66,21 @@
  Q_ASSERT_STATIC,
  Q_ASSERT_COMPILE,
  Q_DEFINE_THIS_MODULE)
+
+// use of c-style cast to void [AS-A5-2-2]
+-emacro(1954,
+ Q_ASSERT,
+ Q_ASSERT_ID,
+ Q_ALLEGE,
+ Q_ALLEGE_ID,
+ Q_ERROR,
+ Q_ERROR_ID,
+ Q_REQUIRE,
+ Q_REQUIRE_ID,
+ Q_ENSURE,
+ Q_ENSURE_ID,
+ Q_INVARIANT,
+ Q_INVARIANT_ID)
 
 // MC++R10-0-6 unparenthesized macro parameter 'class_' in definition of macro
 -esym(9022,

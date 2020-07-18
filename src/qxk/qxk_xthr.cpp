@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -77,16 +77,7 @@ namespace QP {
 ///
 /// @param[in]     handler  the thread-handler function
 /// @param[in]     tickRate the system clock tick rate to use for timeouts
-///
-/// @note
-/// Must be called only ONCE before QXThread::start().
-///
-/// @usage
-/// The following example illustrates how to invoke the QXThread ctor in the
-/// main() function:
-/// @include
-/// qxk_xctor.cpp
-///
+///                in this thread
 QXThread::QXThread(QXThreadHandler const handler,
                    std::uint_fast8_t const tickRate) noexcept
   : QActive(Q_STATE_CAST(handler)),
@@ -124,11 +115,11 @@ void QXThread::dispatch(QEvt const * const e) noexcept {
 ///                        or zero if queue not used
 /// @param[in]     stkSto  pointer to the stack storage (must be provided)
 /// @param[in]     stkSize stack size [in bytes] (must not be zero)
-// @param[in] par     pointer to an extra parameter (might be NULL)
+/// @param[in]     par     pointer to an extra parameter (might be NULL)
 ///
 /// @usage
 /// The following example shows starting an extended thread:
-/// @include qxk_xstart.cpp
+/// @include qxk_start.cpp
 ///
 void QXThread::start(std::uint_fast8_t const prio,
                      QEvt const * * const qSto, std::uint_fast16_t const qLen,
@@ -175,6 +166,7 @@ void QXThread::start(std::uint_fast8_t const prio,
     QF_CRIT_EXIT_();
 }
 
+#ifdef Q_SPY
 //****************************************************************************
 /// @description
 /// Direct event posting is the simplest asynchronous communication method
@@ -186,10 +178,12 @@ void QXThread::start(std::uint_fast8_t const prio,
 /// returns 1 (success) if the posting succeeded (with the provided margin)
 /// and 0 (failure) when the posting fails.
 ///
-/// @param[in]     e      pointer to the event to be posted
-/// @param[in]     margin number of required free slots in the queue
-///                after posting the event. The special value QP::QF_NO_MARGIN
-///                means that this function will assert if posting fails.
+/// @param[in] e      pointer to the event to be posted
+/// @param[in] margin number of required free slots in the queue
+///                   after posting the event. The special value
+///                   QP::QF_NO_MARGIN means that this function will assert
+///                   if posting fails.
+/// @param[in] sender  pointer to a sender object (used in QS only)
 ///
 /// @returns
 /// 'true' (success) if the posting succeeded (with the provided margin) and
@@ -205,13 +199,12 @@ void QXThread::start(std::uint_fast8_t const prio,
 /// be delivered in this case.
 /// delivered in this case.
 ///
-#ifndef Q_SPY
-bool QXThread::post_(QEvt const * const e,
-                     std::uint_fast16_t const margin) noexcept
-#else
 bool QXThread::post_(QEvt const * const e,
                      std::uint_fast16_t const margin,
                      void const * const sender) noexcept
+#else
+bool QXThread::post_(QEvt const * const e,
+                     std::uint_fast16_t const margin) noexcept
 #endif
 {
     bool status;
@@ -274,7 +267,7 @@ bool QXThread::post_(QEvt const * const e,
                 m_eQueue.m_nMin = nFree; // update minimum so far
             }
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
                                  QS::priv_.locFilter[QS::AO_OBJ], this)
                 QS_TIME_PRE_();        // timestamp
                 QS_OBJ_PRE_(sender);   // the sender object
@@ -334,7 +327,7 @@ bool QXThread::post_(QEvt const * const e,
     else { // the queue is not available
          QF::gc(e); // make sure the event is not leaked
          status = false;
-         Q_ERROR_ID(320);
+         Q_ERROR_ID(320); // this extended thread cannot accept events
     }
 
     return status;
@@ -344,7 +337,7 @@ bool QXThread::post_(QEvt const * const e,
 /// @description
 /// Last-In-First-Out (LIFO) policy is not supported for extened threads.
 ///
-/// @param[in  e  pointer to the event to post to the queue
+/// @param[in]  e  pointer to the event to post to the queue
 ///
 /// @sa
 /// QActive::postLIFO_()
@@ -439,8 +432,7 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
             QS_END_NOCRIT_PRE_()
         }
         else {
-            // the queue becomes empty
-            thr->m_eQueue.m_frontEvt = nullptr;
+            thr->m_eQueue.m_frontEvt = nullptr; // the queue becomes empty
 
             // all entries in the queue must be free (+1 for fronEvt)
             Q_ASSERT_ID(520, nFree == (thr->m_eQueue.m_end + 1U));
@@ -517,10 +509,10 @@ void QXThread::teArm_(enum_t const sig,
         // NOTE: For the duration of a single clock tick of the specified tick
         // rate a time event can be disarmed and yet still linked in the list,
         // because un-linking is performed exclusively in QF::tickX().
-        if ((m_timeEvt.refCtr_ & 0x80U) == 0U) {
+        if ((m_timeEvt.refCtr_ & TE_IS_LINKED) == 0U) {
             std::uint_fast8_t const tickRate =
                 static_cast<std::uint_fast8_t>(m_timeEvt.refCtr_);
-            m_timeEvt.refCtr_ |= 0x80U; // mark as linked
+            m_timeEvt.refCtr_ |= TE_IS_LINKED; // mark as linked
 
             // The time event is initially inserted into the separate
             // "freshly armed" list based on QF::timeEvtHead_[tickRate].act.
@@ -643,7 +635,7 @@ void QXK_threadRet_(void) noexcept {
     Q_REQUIRE_ID(901, QXK_attr_.lockHolder != thr->m_prio);
 
     std::uint_fast8_t const p =
-        static_cast<std::uint_fast8_t>(QXK_attr_.curr->m_startPrio);
+        static_cast<std::uint_fast8_t>(thr->m_startPrio);
 
     // remove this thread from the QF
     QP::QF::active_[p] = nullptr;

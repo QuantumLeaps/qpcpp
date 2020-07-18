@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, uC/OS-II kernel
-// Last updated for version 5.9.5
-// Last updated on  2017-07-20
+// Last updated for version 6.8.1
+// Last updated on  2020-06-04
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,10 +25,10 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
@@ -157,7 +157,7 @@ void App_TimeTickHook(void) {
     static struct ButtonsDebouncing {
         uint32_t depressed;
         uint32_t previous;
-    } buttons = { ~0U, ~0U }; // state of the button debouncing
+    } buttons = { 0U, 0U }; // state of the button debouncing
 
     uint32_t current = ~GPIOF->DATA_Bits[BTN_SW1 | BTN_SW2]; // read SW1 & SW2
     tmp = buttons.depressed;     // save the debounced depressed buttons
@@ -185,6 +185,16 @@ void BSP::init(void) {
     //  but SystemCoreClock needs to be updated
     //
     SystemCoreClockUpdate();
+
+    // configure the FPU usage by choosing one of the options...
+    // Do NOT to use the automatic FPU state preservation and
+    // do NOT to use the FPU lazy stacking.
+    //
+    // NOTE:
+    // Use the following setting when FPU is used in ONE task only and not
+    // in any ISR. This option should be used with CAUTION.
+    //
+    FPU->FPCCR &= ~((1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos));
 
     // enable clock for to the peripherals used by this application...
     SYSCTL->RCGCGPIO |= (1U << 5); // enable Run mode for GPIOF
@@ -266,11 +276,14 @@ namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    // initialize the system clock tick...
-    OS_CPU_SysTickInit(SystemCoreClock / OS_TICKS_PER_SEC);
+    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
+    // NOTE: do NOT call OS_CPU_SysTickInit() from uC/OS-II
+    //
+    SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
 
-    // set priorities of the ISRs used in the system
-    NVIC_SetPriority(GPIOA_IRQn,   0xFFU);
+    // set priorities of ALL ISRs used in the system, see NOTE1
+    NVIC_SetPriority(SysTick_IRQn,  CPU_CFG_KA_IPL_BOUNDARY + 1U);
+    NVIC_SetPriority(GPIOA_IRQn,    CPU_CFG_KA_IPL_BOUNDARY);
     // ...
 
     // enable IRQs in the NVIC...
@@ -287,7 +300,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     //
     (void)module;
     (void)loc;
-    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
+    QS_ASSERTION(module, loc, 10000U); // report assertion to QS
 
 #ifndef NDEBUG
     // light all both LEDs
@@ -379,7 +392,7 @@ void QS::onFlush(void) {
 //............................................................................
 //! callback function to reset the target (to be implemented in the BSP)
 void QS::onReset(void) {
-    //TBD
+    NVIC_SystemReset();
 }
 //............................................................................
 //! callback function to execute a user command (to be implemented in BSP)
@@ -398,9 +411,8 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 } // namespace QP
 
 //****************************************************************************
-// NOTE01:
-// The User LED is used to visualize the idle loop activity. The brightness
-// of the LED is proportional to the frequency of invcations of the idle loop.
-// Please note that the LED is toggled with interrupts locked, so no interrupt
-// execution time contributes to the brightness of the User LED.
+// NOTE1:
+// All ISRs that make system calls MUST be prioritized as "kernel-aware".
+// On Cortex-M3/4/7 this means ISR priorities with numerical valuses higher
+// or equal CPU_CFG_KA_IPL_BOUNDARY.
 //

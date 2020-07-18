@@ -1,6 +1,9 @@
-:: Generate Metrics for QP/C++ ..............................................
-@set LIZARD=C:\tools\Python27\python.exe C:\tools\lizard\lizard.py 
+@setlocal
 
+:: Simple complexity metrics tool  (adjust to your system) ...................
+@set LIZARD=lizard
+
+:: Generate metrics.dox file...
 @set METRICS_INP=..\include ..\src -x ..\src\qs\*
 @set METRICS_OUT=metrics.dox
 
@@ -11,5 +14,4 @@
 
 %LIZARD% -m -L500 -a10 -C20 -V %METRICS_INP% >> %METRICS_OUT%
 
-@echo @endcode >> %METRICS_OUT%
-@echo */ >> %METRICS_OUT%
+@endlocal

@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-06-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -54,7 +54,7 @@ namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
-/* Global objects ==========================================================*/
+// Global objects ============================================================
 QPSet  QV_readySet_;   // QV-ready set of active objects
 HANDLE QV_win32Event_; // Win32 event to signal events
 
@@ -223,6 +223,20 @@ static DWORD WINAPI ticker_thread(LPVOID /*arg*/) { // for CreateThread()
     }
     return 0; // return success
 }
+//............................................................................
+#ifdef QF_ACTIVE_STOP
+void QActive::stop(void) {
+    unsubscribeAll(); // unsubscribe from all events
+
+    // make sure the AO is no longer in "ready set"
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
+    QV_readySet_.rmove(m_prio);
+    QF_CRIT_EXIT_();
+
+    QF::remove_(this); // remove this AO from QF
+}
+#endif
 
 } // namespace QP
 

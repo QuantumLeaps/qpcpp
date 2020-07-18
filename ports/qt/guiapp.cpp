@@ -2,14 +2,14 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0 / Qt 5.x
-/// Last updated on  2019-09-12
+/// Last updated for version 6.8.2 / Qt 5.x
+/// Last updated on  2020-07-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -127,7 +127,7 @@ bool GuiQActive::post_(QEvt const * const e,
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_PRE_();              // timestamp
         QS_OBJ_PRE_(sender);         // the sender object
@@ -211,7 +211,7 @@ bool GuiQMActive::post_(QEvt const * const e,
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_FIFO,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_PRE_();              // timestamp
         QS_OBJ_PRE_(sender);         // the sender object

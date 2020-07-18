@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -191,16 +191,13 @@
 ///
 #define QF_INT_ENABLE()             intEnable()
 
-extern "C" void intDisable(void);
-extern "C" void intEnable(void);
-
 //! Define the type of the critical section status.
 /// @description
 /// Defining this macro configures the "saving and restoring critical section
 /// status" policy. Conversely, if this macro is not defined, the simple
 /// "unconditional critical section exit" is used.
 ///
-#define QF_CRIT_STAT_TYPE           int_t
+#define QF_CRIT_STAT_TYPE           unsigned
 
 //! Define the critical section entry policy.
 ///
@@ -231,6 +228,15 @@ extern "C" void intEnable(void);
 ///
 #define QF_CRIT_EXIT(stat_)         critExit(stat_)
 
+//! Enable the QActive::stop() API in the QF port.
+///
+/// @description
+/// Defining this macro enables the QActive::stop() API in a given port.
+/// This feature should be used with caution, as stopping and re-starting
+/// active objects **cleanly** can be tricky.
+///
+#define QF_ACTIVE_STOP
+
 //lint -restore
 
 #include "qep_port.hpp"   // QEP port
@@ -239,6 +245,9 @@ extern "C" void intEnable(void);
 #include "qxthread.hpp"   // QXK naked thread
 
 extern "C" {
+
+void intDisable(void);
+void intEnable(void);
 
 QF_CRIT_STAT_TYPE critEntry(void);
 void critExit(QF_CRIT_STAT_TYPE stat);

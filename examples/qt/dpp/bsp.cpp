@@ -149,22 +149,10 @@ bool QS::onStartup(void const *) {
 
     l_time.start();                 // start the time stamp
 
-    // set up the QS filters...
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_ON(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_ON(QS_QEP_UNHANDLED);
-
-    QS_FILTER_ON(QS_QF_ACTIVE_POST_FIFO);
-    QS_FILTER_ON(QS_QF_ACTIVE_POST_LIFO);
-    QS_FILTER_ON(QS_QF_PUBLISH);
-
-    QS_FILTER_ON(PHILO_STAT);
+    // setup the QS filters...
+    QS_FILTER_ON(QS_SM_RECORDS); // state machine records */
+    QS_FILTER_ON(QS_AO_RECORDS); // active object records */
+    QS_FILTER_ON(QS_UA_RECORDS); // all usedr records */
 
     return true; // success
 }

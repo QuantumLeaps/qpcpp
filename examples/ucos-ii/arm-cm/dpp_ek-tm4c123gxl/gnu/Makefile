@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on EK-TM4C123GXL, uC/OS-II kernel, GNU-ARM
-# Last Updated for Version: 6.5.0
-# Date of the Last Update:  2019-04-15
+# Last Updated for Version: 6.8.1
+# Date of the Last Update:  2020-06-04
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -25,11 +25,11 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://www.state-machine.com
-# mailto:info@state-machine.com
+# <www.state-machine.com/licensing>
+# <info@state-machine.com>
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
@@ -68,24 +68,23 @@ QP_PORT_DIR := $(QPCPP)/ports/ucos-ii
 # list of all source directories used by this project
 VPATH = \
 	.. \
-	../.. \
 	$(QPCPP)/src/qf \
 	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
-	$(QPCPP)/3rd_party/uCOS-II/Source \
-	$(QPCPP)/3rd_party/uCOS-II/Ports/ARM-Cortex-M4/Generic/GNU \
+	$(QPCPP)/3rd_party/ucos-ii/Source \
+	$(QPCPP)/3rd_party/ucos-ii/Ports/ARM-Cortex-M/ARMv7-M \
+	$(QPCPP)/3rd_party/ucos-ii/Ports/ARM-Cortex-M/ARMv7-M/GNU \
 	$(QPCPP)/3rd_party/ek-tm4c123gxl \
 	$(QPCPP)/3rd_party/ek-tm4c123gxl/gnu
 
 # list of all include directories needed by this project
 INCLUDES  = \
 	-I.. \
-	-I../.. \
 	-I$(QPCPP)/include \
 	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
-	-I$(QPCPP)/3rd_party/uCOS-II/Source \
-	-I$(QPCPP)/3rd_party/uCOS-II/Ports/ARM-Cortex-M4/Generic/GNU \
+	-I$(QPCPP)/3rd_party/ucos-ii/Source \
+	-I$(QPCPP)/3rd_party/ucos-ii/Ports/ARM-Cortex-M/ARMv7-M/GNU \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
 	-I$(QPCPP)/3rd_party/ek-tm4c123gxl
 
@@ -136,6 +135,7 @@ RTOS_SRCS := \
 	os_task.c \
 	os_time.c \
 	os_tmr.c \
+	os_dbg.c \
 	os_cpu_c.c
 
 QS_SRCS := \
@@ -191,7 +191,7 @@ MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build options for various configurations for ARM Cortex-M4F
+# build options for various configurations for ARM Cortex-M
 #
 
 # combine all the soruces...

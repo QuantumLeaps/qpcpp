@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -39,12 +39,12 @@
 #ifndef QPSET_HPP
 #define QPSET_HPP
 
-namespace QP {
-
 #ifndef QF_MAX_ACTIVE
     // default value when NOT defined
     #define QF_MAX_ACTIVE 32U
 #endif
+
+namespace QP {
 
 #if (QF_MAX_ACTIVE < 1U) || (64U < QF_MAX_ACTIVE)
     #error "QF_MAX_ACTIVE out of range. Valid range is 1U..64U"

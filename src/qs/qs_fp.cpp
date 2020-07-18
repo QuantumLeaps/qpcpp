@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -64,7 +64,7 @@ void QS::f32_fmt_(std::uint8_t format, float32_t const d) noexcept {
     for (std::uint_fast8_t i = 4U; i != 0U; --i) {
         format = static_cast<std::uint8_t>(fu32.u);
         QS_INSERT_ESC_BYTE_(format)
-        fu32.u >>= 8;
+        fu32.u >>= 8U;
     }
 
     priv_.head   = head_;    // save the head
@@ -111,14 +111,14 @@ void QS::f64_fmt_(std::uint8_t format, float64_t const d) noexcept {
     for (i = 4U; i != 0U; --i) {
         format = static_cast<std::uint8_t>(fu64.i.u1);
         QS_INSERT_ESC_BYTE_(format)
-        fu64.i.u1 >>= 8;
+        fu64.i.u1 >>= 8U;
     }
 
     // output 4 bytes from fu64.i.u2 ...
     for (i = 4U; i != 0U; --i) {
         format = static_cast<std::uint8_t>(fu64.i.u2);
         QS_INSERT_ESC_BYTE_(format)
-        fu64.i.u2 >>= 8;
+        fu64.i.u2 >>= 8U;
     }
 
     priv_.head   = head_;   // update the head

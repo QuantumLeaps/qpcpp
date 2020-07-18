@@ -3,14 +3,14 @@
 /// \note This is just an EXAMPLE of a QV port used for "linting" the QV.
 /// \cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -39,10 +39,24 @@
 #ifndef QV_PORT_HPP
 #define QV_PORT_HPP
 
-//lint -save -e1960    MISRA-C++:2008 Rule 7-3-1, Global declaration
-
-//lint -restore
+//! Macro to put the CPU to sleep safely in the cooperative
+// QV kernel (inside QV::onIdle()).
+//
+///
+/// @description
+/// This macro is provided in some QP ports for the QV kernel and
+/// in general it depends on the interrupt disabling policy.
+///
+/// @note The provided code is just an example (for ARM Cortex-M).
+///
+#define QV_CPU_SLEEP() do { \
+    __disable_interrupt(); \
+    QF_INT_ENABLE(); \
+    __WFI(); \
+    __enable_interrupt(); \
+} while (false)
 
 #include "qv.hpp" // QK platform-independent public interface
 
 #endif // QV_PORT_HPP
+

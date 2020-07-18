@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -156,22 +156,21 @@ int_t QF::run(void) {
 // @param[in] prio    priority at which to start the active object
 // @param[in] qSto    pointer to the storage for the ring buffer of the
 //                    event queue (used only with the built-in QP::QEQueue)
-// @param[in] qLen    length of the event queue [events]
-// @param[in] stkSto  pointer to the stack storage (must be NULL in QK)
+// @param[in] qLen    length of the event queue [number of QP::QEvt* pointers]
+// @param[in] stkSto  pointer to the stack storage (must be nullptr in QK)
 // @param[in] stkSize stack size [bytes]
-// @param[in] par     pointer to an extra parameter (might be NULL)
+// @param[in] par     pointer to an extra parameter (might be nullptr)
 //
 // @usage
 // The following example shows starting an AO when a per-task stack is needed:
-// @include
-// qf_start.cpp
+// @include qf_start.cpp
 //
 void QActive::start(std::uint_fast8_t const prio,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    (void)stkSize; // unused paramteter in the QK port
+    static_cast<void>(stkSize); // unused paramteter in the QK port
 
     /// @pre AO cannot be started from an ISR, the priority must be in range
     /// and the stack storage must not be provided, because the QK kernel does
@@ -231,7 +230,7 @@ QSchedStatus QK::schedLock(std::uint_fast8_t const ceiling) noexcept {
 
     // first store the previous lock prio if it is below the ceiling
     if (static_cast<std::uint_fast8_t>(QK_attr_.lockPrio) < ceiling) {
-        stat = (static_cast<QSchedStatus>(QK_attr_.lockPrio) << 8);
+        stat = (static_cast<QSchedStatus>(QK_attr_.lockPrio) << 8U);
         QK_attr_.lockPrio = static_cast<std::uint8_t>(ceiling);
 
         QS_BEGIN_NOCRIT_PRE_(QS_SCHED_LOCK, nullptr, nullptr)
@@ -276,7 +275,7 @@ void QK::schedUnlock(QSchedStatus const stat) noexcept {
         std::uint_fast8_t const lockPrio =
             static_cast<std::uint_fast8_t>(QK_attr_.lockPrio);
         std::uint_fast8_t const prevPrio =
-            static_cast<std::uint_fast8_t>(stat >> 8);
+            static_cast<std::uint_fast8_t>(stat >> 8U);
         QF_CRIT_STAT_
         QF_CRIT_ENTRY_();
 

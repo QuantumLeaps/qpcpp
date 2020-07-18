@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-06-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -275,6 +275,20 @@ void QActive::start(std::uint_fast8_t const prio,
     this->init(par); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
 }
+//............................................................................
+#ifdef QF_ACTIVE_STOP
+void QActive::stop(void) {
+    unsubscribeAll(); // unsubscribe from all events
+
+    // make sure the AO is no longer in "ready set"
+    QF_CRIT_STAT_
+    QF_CRIT_ENTRY_();
+    QV_readySet_.rmove(m_prio);
+    QF_CRIT_EXIT_();
+
+    QF::remove_(this); // remove this AO from QF
+}
+#endif
 
 //****************************************************************************
 static void *ticker_thread(void * /*arg*/) { // for pthread_create()

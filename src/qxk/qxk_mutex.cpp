@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -79,7 +79,7 @@ Q_DEFINE_THIS_MODULE("qxk_mutex")
 /// that uses this mutex.
 ///
 /// @usage
-/// @include qxk_mux.cpp
+/// @include qxk_mutex.cpp
 ///
 void QXMutex::init(std::uint_fast8_t const ceiling) noexcept {
     QF_CRIT_STAT_
@@ -124,7 +124,7 @@ void QXMutex::init(std::uint_fast8_t const ceiling) noexcept {
 /// QXMutex::unlock().
 ///
 /// @usage
-/// @include qxk_mux.cpp
+/// @include qxk_mutex.cpp
 ///
 bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
     bool locked = true; // assume that the mutex will be locked
@@ -139,7 +139,7 @@ bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
     /// - be called from an extended thread;
     /// - the ceiling priority must not be used; or if used
     ///   - the thread priority must be below the ceiling of the mutex;
-    ///   the ceiling must be in range
+    /// - the ceiling must be in range
     /// - the thread must NOT be already blocked on any object.
     ///
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
@@ -182,7 +182,7 @@ bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
     // is the mutex locked by this thread already (nested locking)?
     else if (m_holderPrio == curr->m_startPrio) {
 
-        // the nesting level must not exceed 0xFF
+        // the nesting level must not exceed the dynamic range of uint8_t
         Q_ASSERT_ID(220, m_lockNest < 0xFFU);
 
         ++m_lockNest;
@@ -283,8 +283,8 @@ bool QXMutex::tryLock(void) noexcept {
 
         if (m_ceiling != 0U) {
             // the priority slot must be set to this mutex
-            Q_ASSERT_ID(310,
-                QF::active_[m_ceiling] == QXK_PTR_CAST_(QActive *, this));
+            Q_ASSERT_ID(310, QF::active_[m_ceiling]
+                             == QXK_PTR_CAST_(QActive *, this));
 
             // boost the priority of this thread to the mutex ceiling
             curr->m_prio = m_ceiling;
@@ -307,7 +307,7 @@ bool QXMutex::tryLock(void) noexcept {
     }
     // is the mutex held by this thread already (nested locking)?
     else if (m_holderPrio == curr->m_startPrio) {
-        // the nesting level must not exceed 0xFF
+        // the nesting level must not exceed  the dynamic range of uint8_t
         Q_ASSERT_ID(320, m_lockNest < 0xFFU);
 
         ++m_lockNest;
@@ -340,7 +340,7 @@ bool QXMutex::tryLock(void) noexcept {
 /// ballanced by the matching call to QXMutex::unlock().
 ///
 /// @usage
-/// @include qxk_mux.cpp
+/// @include qxk_mutex.cpp
 ///
 void QXMutex::unlock(void) noexcept {
     QActive *curr;

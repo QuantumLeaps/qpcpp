@@ -2,8 +2,8 @@
 /// @brief PC-Lint-Plus option file for linting QP/C++ source code
 /// @cond
 ///===========================================================================
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-27
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -312,10 +312,24 @@ qpcpp.lnt           // QP/C++ options
  QS_BEGIN_PRE_,
  QS_BEGIN_NOCRIT_PRE_)
 
-// Constant expression evaluates to 0 in 'binary' operation '>>'
+// constant expression evaluates to 0 in 'binary' operation '>>'
 -emacro(778,
  QS_BEGIN_PRE_,
  QS_BEGIN_NOCRIT_PRE_)
+
+// constant value used in Boolean context
+-emacro(506,
+ QS_BEGIN_PRE_,
+ QS_BEGIN_NOCRIT_PRE_)
+
+// bitwise operator '>>' applied to signed underlying type [AS-M5-0-21]
+-emacro(9130,
+ QS_BEGIN_PRE_,
+ QS_BEGIN_NOCRIT_PRE_)
+
+// use of c-style cast to void [AS-A5-2-2]
+-emacro(1954,
+ QS_END_PRE_)
 
 // MC++R0-1-9 operator == always evaluates to true
 -emacro(948,

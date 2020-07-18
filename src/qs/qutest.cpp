@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-23
+/// Last updated for version 6.8.2
+/// Last updated on  2020-07-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -88,8 +88,8 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    (void)stkSto;  // unused parameter
-    (void)stkSize; // unused parameter
+    static_cast<void>(stkSto);  // unused parameter
+    static_cast<void>(stkSize); // unused parameter
 
     // priority must be in range
     Q_REQUIRE_ID(200, (0U < prio) && (prio <= QF_MAX_ACTIVE));
@@ -122,10 +122,10 @@ void QActiveDummy::start(std::uint_fast8_t const prio,
 {
     // No special preconditions for checking parameters to allow starting
     // dummy AOs the exact same way as the real counterparts.
-    (void)qSto;    // unusuded parameter
-    (void)qLen;    // unusuded parameter
-    (void)stkSto;  // unusuded parameter
-    (void)stkSize; // unusuded parameter
+    static_cast<void>(qSto);    // unusuded parameter
+    static_cast<void>(qLen);    // unusuded parameter
+    static_cast<void>(stkSto);  // unusuded parameter
+    static_cast<void>(stkSize); // unusuded parameter
 
     m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
 
@@ -136,7 +136,7 @@ void QActiveDummy::start(std::uint_fast8_t const prio,
 }
 //............................................................................
 void QActiveDummy::init(void const * const e) noexcept {
-    (void)e; // unused paramter
+    static_cast<void>(e); // unused paramter
 
     QS_CRIT_STAT_
     QS_BEGIN_PRE_(QS_QEP_STATE_INIT, QS::priv_.locFilter[QS::SM_OBJ], this)
@@ -181,7 +181,7 @@ bool QActiveDummy::post_(QEvt const * const e,
     }
 
     std::uint_fast8_t rec =
-        (status ? static_cast<std::uint8_t>(QS_QF_ACTIVE_POST_FIFO)
+        (status ? static_cast<std::uint8_t>(QS_QF_ACTIVE_POST)
                 : static_cast<std::uint8_t>(QS_QF_ACTIVE_POST_ATTEMPT));
     QS_BEGIN_NOCRIT_PRE_(rec, QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_PRE_();      // timestamp
@@ -194,7 +194,7 @@ bool QActiveDummy::post_(QEvt const * const e,
     QS_END_NOCRIT_PRE_()
 
     // callback to examine the posted event under the the same conditions
-    // as producing the QS_QF_ACTIVE_POST_FIFO trace record, which are:
+    // as producing the QS_QF_ACTIVE_POST trace record, which are:
     // 1. the local AO-filter is not set (zero) OR
     // 2. the local AO-filter is set to this AO ('me')
     //
@@ -345,7 +345,8 @@ void QS::tickX_(std::uint_fast8_t const tickRate,
 
         QF_CRIT_EXIT_(); // exit crit. section before posting
 
-        (void)act->POST(t, sender); // asserts if queue overflows
+        // asserts if queue overflows
+        static_cast<void>(act->POST(t, sender));
 
         QF_CRIT_ENTRY_();
     }
