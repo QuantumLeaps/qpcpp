@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: Console-based BSP
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-14
+// Last Updated for Version: 6.9.0
+// Date of the Last Update:  2020-08-20
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -34,14 +34,29 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-#include <iostream>
+#include "safe_std.h" // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 
 using namespace std;
 using namespace QP;
 
+Q_DEFINE_THIS_FILE
+
+#ifdef Q_SPY
+static uint8_t const l_QF_onClockTick = 0;
+#endif
+
 //............................................................................
-void BSP_init(int /*argc*/, char * /*argv*/[]) {
+void BSP_init(int argc, char * argv[]) {
+    (void)argc;
+    (void)argv;
+    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
+
+    QS_OBJ_DICTIONARY(&l_QF_onClockTick);
+
+    // setup the QS filters...
+    QS_FILTER_ON(QP::QS_ALL_RECORDS);
+    QS_FILTER_OFF(QP::QS_QF_TICK);
 }
 //............................................................................
 void QF::onStartup(void) {
@@ -54,15 +69,46 @@ void QF::onCleanup(void) {
 }
 //............................................................................
 void QP::QF_onClockTick(void) {
-    QF::TICK_X(0U, &l_clock_tick); // perform the QF clock tick processing
+    QF::TICK_X(0U, &l_QF_onClockTick); // perform the QF clock tick processing
+
+    QS_RX_INPUT(); // handle the QS-RX input
+    QS_OUTPUT();   // handle the QS output
+
     int key = QF_consoleGetKey();
     if (key != 0) { /* any key pressed? */
         BSP_onKeyboardInput((uint8_t)key);
     }
 }
+
+//----------------------------------------------------------------------------
+#ifdef Q_SPY
+
 //............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const file, int_t const line) {
-    cerr << "Assertion failed in " << file << " line " << line << endl;
+//! callback function to execute a user command (to be implemented in BSP)
+void QS::onCommand(uint8_t cmdId,
+                   uint32_t param1, uint32_t param2, uint32_t param3)
+{
+    switch (cmdId) {
+       case 0U: {
+           break;
+       }
+       default:
+           break;
+    }
+
+    // unused parameters
+    (void)param1;
+    (void)param2;
+    (void)param3;
+}
+
+#endif // Q_SPY
+//----------------------------------------------------------------------------
+
+//............................................................................
+extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
+    printf("Assertion failed in %s:%d\n", module, loc);
+    FPRINTF_S(stderr, "Assertion failed in %s:%d", module, loc);
     QP::QF::onCleanup();
     exit(-1);
 }

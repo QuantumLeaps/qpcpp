@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0 / Qt 5.x
-/// Last updated on  2020-01-23
+/// Last updated for version 6.9.0 / Qt 5.x
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -100,6 +100,11 @@ int_t QF::run(void) {
 
     //l_tickerThread.setStackSize(1024U*4U); // 4KB of stack
     l_tickerThread.start();
+
+    // produce the QS_QF_RUN trace record
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_END_PRE_()
 
     // run the Qt event loop (console or GUI)
     return static_cast<int_t>(QCoreApplication::instance()->exec());

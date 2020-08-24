@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-06-23
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -103,6 +103,11 @@ int_t QF::run(void) {
     // the combined event-loop and background-loop of the QV kernel
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
+
+    // produce the QS_QF_RUN trace record
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_END_NOCRIT_PRE_()
+
     while (l_isRunning) {
         // find the maximum priority AO ready to run
         if (QV_readySet_.notEmpty()) {

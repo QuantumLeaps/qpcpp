@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX/P-threads
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.4
-/// Last updated on  2020-08-05
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -116,6 +116,10 @@ void QF_leaveCriticalSection_(void) {
 //****************************************************************************
 int_t QF::run(void) {
     onStartup(); // application-specific startup callback
+
+    // produce the QS_QF_RUN trace record
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_END_NOCRIT_PRE_()
 
     // try to set the priority of the ticker thread, see NOTE01
     struct sched_param sparam;

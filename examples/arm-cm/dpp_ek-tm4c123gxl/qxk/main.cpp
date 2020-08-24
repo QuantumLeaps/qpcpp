@@ -55,14 +55,6 @@ int main() {
     QP::QF::init();  // initialize the framework and the underlying RT kernel
     DPP::BSP::init(); // initialize the BSP
 
-    // object dictionaries...
-    QS_OBJ_DICTIONARY(DPP::AO_Table);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[0]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[1]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[2]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
-
     // init publish-subscribe
     QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
 

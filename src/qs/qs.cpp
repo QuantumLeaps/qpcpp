@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -120,11 +120,15 @@ void QS::initBuf(std::uint8_t * const sto,
 ///
 void QS::filterOn_(std::uint_fast8_t const rec) noexcept {
     if (rec == static_cast<std::uint_fast8_t>(QS_ALL_RECORDS)) {
-        for (std::uint_fast8_t i = 0U; i < 15U; ++i) {
-            priv_.glbFilter[i] = 0xFFU; // set all bits
+        // set all global filters (partially unrolled loop)
+        for (std::uint_fast8_t i = 0U; i < Q_DIM(priv_.glbFilter); i += 4U) {
+            priv_.glbFilter[i     ] = 0xFFU;
+            priv_.glbFilter[i + 1U] = 0xFFU;
+            priv_.glbFilter[i + 2U] = 0xFFU;
+            priv_.glbFilter[i + 3U] = 0xFFU;
         }
         // never turn the last 3 records on (0x7D, 0x7E, 0x7F)
-        priv_.glbFilter[sizeof(priv_.glbFilter) - 1U] = 0x1FU;
+        priv_.glbFilter[15] = 0x1FU;
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_SM_RECORDS)) {
         priv_.glbFilter[0] |= 0xFEU;
@@ -151,7 +155,7 @@ void QS::filterOn_(std::uint_fast8_t const rec) noexcept {
         priv_.glbFilter[5] |= 0x1FU;
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_TE_RECORDS)) {
-        priv_.glbFilter[4] |= 0x7FU;
+        priv_.glbFilter[4] |= 0x3FU;
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_SC_RECORDS)) {
         priv_.glbFilter[6] |= 0x7FU;
@@ -161,11 +165,11 @@ void QS::filterOn_(std::uint_fast8_t const rec) noexcept {
         priv_.glbFilter[13] |= 0x01U;
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_U1_RECORDS)) {
-        priv_.glbFilter[13] |= 0x1EU;
+        priv_.glbFilter[13] |= 0x3EU;
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_U2_RECORDS)) {
-        priv_.glbFilter[13] |= 0xE0U;
-        priv_.glbFilter[14] |= 0x03U;
+        priv_.glbFilter[13] |= 0xC0U;
+        priv_.glbFilter[14] |= 0x07U;
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_U3_RECORDS)) {
         priv_.glbFilter[14] |= 0xF8U;
@@ -185,6 +189,9 @@ void QS::filterOn_(std::uint_fast8_t const rec) noexcept {
 
         priv_.glbFilter[rec >> 3U] |=
             static_cast<std::uint8_t>(1U << (rec & 7U));
+
+        // never turn the last 3 records on (0x7D, 0x7E, 0x7F)
+        priv_.glbFilter[15] &= 0x1FU;
     }
 }
 
@@ -199,17 +206,22 @@ void QS::filterOn_(std::uint_fast8_t const rec) noexcept {
 /// layers must be enabled for the QS record to be inserted in the QS buffer.
 ///
 void QS::filterOff_(std::uint_fast8_t const rec) noexcept {
-    std::uint8_t tmp;
+    std::uint_fast8_t tmp;
 
     if (rec == static_cast<std::uint_fast8_t>(QS_ALL_RECORDS)) {
-        // first clear all global filters
-        for (tmp = 15U; tmp > 0U; --tmp) {
-            priv_.glbFilter[tmp] = 0U;
+        // clear all global filters (partially unrolled loop)
+        for (tmp = 0U; tmp < Q_DIM(priv_.glbFilter); tmp += 4U) {
+            priv_.glbFilter[tmp     ] = 0x00U;
+            priv_.glbFilter[tmp + 1U] = 0x00U;
+            priv_.glbFilter[tmp + 2U] = 0x00U;
+            priv_.glbFilter[tmp + 3U] = 0x00U;
         }
-        // next leave the specific filters enabled
+        // leave the "not maskable" filters enabled,
+        // see qs.h, Miscellaneous QS records (not maskable)
+        //
         priv_.glbFilter[0] = 0x01U;
         priv_.glbFilter[7] = 0xFCU;
-        priv_.glbFilter[8] = 0x3FU;
+        priv_.glbFilter[8] = 0x7FU;
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_SM_RECORDS)) {
         priv_.glbFilter[0] &= static_cast<std::uint8_t>(~0xFEU);
@@ -236,7 +248,7 @@ void QS::filterOff_(std::uint_fast8_t const rec) noexcept {
         priv_.glbFilter[5] &= static_cast<std::uint8_t>(~0x1FU);
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_TE_RECORDS)) {
-        priv_.glbFilter[4] &= static_cast<std::uint8_t>(~0x7FU);
+        priv_.glbFilter[4] &= static_cast<std::uint8_t>(~0x3FU);
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_SC_RECORDS)) {
         priv_.glbFilter[6] &= static_cast<std::uint8_t>(~0x7FU);
@@ -246,11 +258,11 @@ void QS::filterOff_(std::uint_fast8_t const rec) noexcept {
         priv_.glbFilter[13] &= static_cast<std::uint8_t>(~0x01U);
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_U1_RECORDS)) {
-        priv_.glbFilter[13] &= static_cast<std::uint8_t>(~0x1EU);
+        priv_.glbFilter[13] &= static_cast<std::uint8_t>(~0x3EU);
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_U2_RECORDS)) {
-        priv_.glbFilter[13] &= static_cast<std::uint8_t>(~0xE0U);
-        priv_.glbFilter[14] &= static_cast<std::uint8_t>(~0x03U);
+        priv_.glbFilter[13] &= static_cast<std::uint8_t>(~0xC0U);
+        priv_.glbFilter[14] &= static_cast<std::uint8_t>(~0x07U);
     }
     else if (rec == static_cast<std::uint_fast8_t>(QS_U3_RECORDS)) {
         priv_.glbFilter[14] &= static_cast<std::uint8_t>(~0xF8U);
@@ -270,6 +282,13 @@ void QS::filterOff_(std::uint_fast8_t const rec) noexcept {
 
         priv_.glbFilter[rec >> 3U] &= static_cast<std::uint8_t>(
                     ~static_cast<std::uint8_t>(1U << (rec & 7U)));
+
+        // leave the "not maskable" filters enabled,
+        // see qs.h, Miscellaneous QS records (not maskable)
+        //
+        priv_.glbFilter[0] |= 0x01U;
+        priv_.glbFilter[7] |= 0xFCU;
+        priv_.glbFilter[8] |= 0x7FU;
     }
 }
 
@@ -343,7 +362,16 @@ void QS_target_info_(std::uint8_t const isReset) noexcept {
 
     QS::beginRec_(static_cast<std::uint_fast8_t>(QS_TARGET_INFO));
         QS::u8_raw_(isReset);
-        QS::u16_raw_(QP_VERSION); // two-byte version number
+
+        static union {
+            std::uint16_t u16;
+            std::uint8_t  u8[2];
+        } endian_test;
+        endian_test.u16 = 0x0102U;
+        // big endian ? add the 0x8000U flag
+        QS_U16_PRE_(((endian_test.u8[0] == 0x01U)
+                    ? (0x8000U | QP_VERSION)
+                    : QP_VERSION)); // target endianness + version number
 
         // send the object sizes...
         QS::u8_raw_(Q_SIGNAL_SIZE

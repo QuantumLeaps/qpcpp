@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L152RE board, cooperative QV kernel
-// Last updated for version 5.9.5
-// Last updated on  2017-07-20
+// Last Updated for Version: 6.9.0
+// Date of the Last Update:  2020-08-14
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
@@ -42,26 +42,6 @@ Q_DEFINE_THIS_FILE
 
 // namespace DPP *************************************************************
 namespace DPP {
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-// DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-//
-enum KernelUnawareISRs { // see NOTE00
-    // ...
-    MAX_KERNEL_UNAWARE_CMSIS_PRI  // keep always last
-};
-// "kernel-unaware" interrupts can't overlap "kernel-aware" interrupts
-Q_ASSERT_COMPILE(MAX_KERNEL_UNAWARE_CMSIS_PRI <= QF_AWARE_ISR_CMSIS_PRI);
-
-enum KernelAwareISRs {
-    EXTI0_PRIO = QF_AWARE_ISR_CMSIS_PRI, // see NOTE00
-    SYSTICK_PRIO,
-    // ...
-    MAX_KERNEL_AWARE_CMSIS_PRI // keep always last
-};
-// "kernel-aware" interrupts should not overlap the PendSV priority
-Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 
 // Local-scope objects -------------------------------------------------------
 // LED pins available on the board (just one user LED LD2--Green on PA.5)
@@ -138,6 +118,16 @@ void EXTI0_IRQHandler(void) {
     DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),
                         &l_EXTI0_IRQHandler);
 }
+//............................................................................
+#if Q_SPY
+void USART2_IRQHandler(void) { // kernel UNAWARE interrupt
+    // is RX register NOT empty?
+    if ((USART2->SR & (1U << 5)) != 0) {
+        uint32_t b = USART2->DR;
+        QP::QS::rxPut(b);
+    }
+}
+#endif
 
 } // extern "C"
 
@@ -176,6 +166,10 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_EXTI0_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
+
+    // setup the QS filters...
+    QS_FILTER_ON(QS_ALL_RECORDS);
+    QS_FILTER_OFF(QS_QF_TICK);
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -236,12 +230,16 @@ void QF::onStartup(void) {
     // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     //
-    NVIC_SetPriority(SysTick_IRQn, DPP::SYSTICK_PRIO);
-    NVIC_SetPriority(EXTI0_IRQn,   DPP::EXTI0_PRIO);
+    NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 1);
+    NVIC_SetPriority(EXTI0_IRQn,     QF_AWARE_ISR_CMSIS_PRI + 2);
+    NVIC_SetPriority(USART2_IRQn,    0); // kernel UNAWARE interrupt
     // ...
 
     // enable IRQs...
     NVIC_EnableIRQ(EXTI0_IRQn);
+#ifdef Q_SPY
+    NVIC_EnableIRQ(USART2_IRQn); // UART2 interrupt used for QS-RX
+#endif
 }
 //............................................................................
 void QF::onCleanup(void) {
@@ -254,6 +252,8 @@ void QV::onIdle(void) { // called with interrupts disabled, see NOTE01
 
 #ifdef Q_SPY
     QF_INT_ENABLE();
+    QS::rxParse();  // parse all the received bytes
+
     if ((USART2->SR & 0x0080U) != 0) {  // is TXE empty?
         QF_INT_DISABLE();
         uint16_t b = QS::getByte();
@@ -311,7 +311,10 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 //............................................................................
 bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[2*1024]; // buffer for Quantum Spy
+    static uint8_t qsRxBuf[128];  /* buffer for QS-RX channel */
+
     initBuf(qsBuf, sizeof(qsBuf));
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     // enable peripheral clock for USART2
     RCC->AHBENR   |=  (1U <<  0);   // Enable GPIOA clock
@@ -323,29 +326,17 @@ bool QS::onStartup(void const *arg) {
     GPIOA->MODER  &= ~(( 3U << 2*3) | ( 3U << 2*2));
     GPIOA->MODER  |=  (( 2U << 2*3) | ( 2U << 2*2));
 
-    USART2->BRR  = __USART_BRR(SystemCoreClock, 115200U); // baud rate
+    USART2->BRR  = __USART_BRR(SystemCoreClock, 115200U);  // baud rate
     USART2->CR3  = 0x0000U;        // no flow control
     USART2->CR2  = 0x0000U;        // 1 stop bit
     USART2->CR1  = ((1U <<  2) |   // enable RX
                     (1U <<  3) |   // enable TX
+                    (1U <<  5) |   // enable RX interrupt
                     (0U << 12) |   // 1 start bit, 8 data bits
                     (1U << 13));   // enable USART
 
     DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
-
-    // setup the QS filters...
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_ON(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_ON(QS_QEP_UNHANDLED);
-
-    QS_FILTER_ON(DPP::PHILO_STAT);
 
     return true; // return success
 }
@@ -369,7 +360,7 @@ void QS::onFlush(void) {
     QF_INT_DISABLE();
     while ((b = getByte()) != QS_EOD) { // while not End-Of-Data...
         QF_INT_ENABLE();
-        while ((USART2->SR & 0x0080U) == 0U) { // while TXE not empty
+        while ((USART2->SR & (1U << 7)) == 0U) { // while TXE not empty
         }
         USART2->DR  = (b & 0xFFU);  // put into the DR register
         QF_INT_DISABLE();
@@ -379,7 +370,7 @@ void QS::onFlush(void) {
 //............................................................................
 //! callback function to reset the target (to be implemented in the BSP)
 void QS::onReset(void) {
-    //TBD
+    NVIC_SystemReset();
 }
 //............................................................................
 //! callback function to execute a uesr command (to be implemented in BSP)

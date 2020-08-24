@@ -68,14 +68,6 @@ int main() {
     //
     DPP::BSP::init();
 
-    // object dictionaries...
-    QS_OBJ_DICTIONARY(DPP::AO_Table);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[0]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[1]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[2]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
-
     // start the extended Test1 thread
     DPP::XT_Test1->start(
             1U,                      // QP prio of the thread

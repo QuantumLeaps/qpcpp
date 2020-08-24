@@ -40,7 +40,7 @@
        3      1     17      1       3 QP::QTimeEvt::toTimeEvt@462-464@..\include\qf.hpp
        3      1     10      1       3 QP::QF::getVersion@493-495@..\include\qf.hpp
        1      1     14      1       1 QP::QTicker::init@637-637@..\include\qf.hpp
-       3      1     10      1       3 QP::QK::getVersion@160-162@..\include\qk.hpp
+       3      1     10      1       3 QP::QK::getVersion@155-157@..\include\qk.hpp
        3      1     11      1       3 QP::QMPool::getBlockSize@149-151@..\include\qmpool.hpp
        3      1     11      1       3 QP::QPSet::setEmpty@81-83@..\include\qpset.hpp
        3      1     15      1       3 QP::QPSet::isEmpty@86-88@..\include\qpset.hpp
@@ -56,10 +56,10 @@
        8      2     70      1       8 QP::QPSet::insert@162-169@..\include\qpset.hpp
        8      2     74      1       8 QP::QPSet::rmove@175-182@..\include\qpset.hpp
        5      2     40      1       5 QP::QPSet::findMax@185-189@..\include\qpset.hpp
-       7      1     28      1       7 QP::QS::force_cast@499-505@..\include\qs.hpp
-      14      4     87      1      14 QP::QS::rxPut@563-576@..\include\qs.hpp
-       6      1     51      5       6 QP::QActiveDummy::start@597-602@..\include\qs.hpp
-       1      1     14      1       1 QP::QActiveDummy::init@605-605@..\include\qs.hpp
+       7      1     28      1       7 QP::QS::force_cast@500-506@..\include\qs.hpp
+      14      4     87      1      14 QP::QS::rxPut@564-577@..\include\qs.hpp
+       6      1     51      5       6 QP::QActiveDummy::start@598-603@..\include\qs.hpp
+       1      1     14      1       1 QP::QActiveDummy::init@606-606@..\include\qs.hpp
        1      1     14      1       1 QP::QXThread::init@86-86@..\include\qxthread.hpp
        6      1     51      5       6 QP::QXThread::start@99-104@..\include\qxthread.hpp
        2      1     15      2       3 QP::QEvt@101-103@..\src\qf\qep_hsm.cpp
@@ -132,49 +132,49 @@
       11      2     79      1      16 QP::QF::init@78-93@..\src\qk\qk.cpp
        3      1     14      1       4 QP::QF::stop@111-114@..\src\qk\qk.cpp
        6      2     26      1       8 QP::initial_events@119-126@..\src\qk\qk.cpp
-      10      3     40      1      14 QP::QF::run@137-150@..\src\qk\qk.cpp
-      21      5    142      6      30 QP::QActive::start@168-197@..\src\qk\qk.cpp
-      21      2    138      1      32 QP::QK::schedLock@222-253@..\src\qk\qk.cpp
-      22      4    149      1      33 QP::QK::schedUnlock@272-304@..\src\qk\qk.cpp
-      14      3     94      1      17 QK_sched_@324-340@..\src\qk\qk.cpp
-      61     15    421      1     105 QK_activate_@351-455@..\src\qk\qk.cpp
+      12      3     51      1      19 QP::QF::run@137-155@..\src\qk\qk.cpp
+      21      5    142      6      30 QP::QActive::start@173-202@..\src\qk\qk.cpp
+      21      2    138      1      32 QP::QK::schedLock@227-258@..\src\qk\qk.cpp
+      22      4    149      1      33 QP::QK::schedUnlock@277-309@..\src\qk\qk.cpp
+      14      3     94      1      17 QK_sched_@329-345@..\src\qk\qk.cpp
+      61     15    421      1     105 QK_activate_@356-460@..\src\qk\qk.cpp
        9      2     67      1      13 QP::QF::init@79-91@..\src\qv\qv.cpp
        3      1     12      1       4 QP::QF::stop@109-112@..\src\qv\qv.cpp
-      37      9    198      1      71 QP::QF::run@130-200@..\src\qv\qv.cpp
-      15      3    112      6      22 QP::QActive::start@218-239@..\src\qv\qv.cpp
+      39      9    209      1      76 QP::QF::run@130-205@..\src\qv\qv.cpp
+      15      3    112      6      22 QP::QActive::start@223-244@..\src\qv\qv.cpp
        2      1     10      0       2 QP::QXKIdleThread::QXKIdleThread@68-69@..\src\qxk\qxk.cpp
       14      2    105      1      22 QP::QF::init@85-106@..\src\qxk\qxk.cpp
        3      1     12      1       4 QP::QF::stop@124-127@..\src\qxk\qxk.cpp
        6      2     26      1       8 QP::initial_events@132-139@..\src\qxk\qxk.cpp
-      10      3     40      1      15 QP::QF::run@148-162@..\src\qxk\qxk.cpp
-      23      6    156      6      32 QP::QActive::start@179-210@..\src\qxk\qxk.cpp
-      23      3    150      1      33 QP::QXK::schedLock@233-265@..\src\qxk\qxk.cpp
-      22      4    149      1      34 QP::QXK::schedUnlock@288-321@..\src\qxk\qxk.cpp
-      51      7    296      1      69 QXK_sched_@341-409@..\src\qxk\qxk.cpp
-      77     16    547      1     133 QXK_activate_@420-552@..\src\qxk\qxk.cpp
-      13      2     72      1      20 QXK_current@555-574@..\src\qxk\qxk.cpp
+      12      3     51      1      20 QP::QF::run@148-167@..\src\qxk\qxk.cpp
+      23      6    156      6      32 QP::QActive::start@184-215@..\src\qxk\qxk.cpp
+      23      3    150      1      33 QP::QXK::schedLock@238-270@..\src\qxk\qxk.cpp
+      22      4    149      1      34 QP::QXK::schedUnlock@293-326@..\src\qxk\qxk.cpp
+      51      7    296      1      69 QXK_sched_@346-414@..\src\qxk\qxk.cpp
+      77     16    547      1     133 QXK_activate_@425-557@..\src\qxk\qxk.cpp
+      13      2     72      1      20 QXK_current@560-579@..\src\qxk\qxk.cpp
       16      4    105      1      24 QP::QXMutex::init@84-107@..\src\qxk\qxk_mutex.cpp
-      66     12    456      1     108 QP::QXMutex::lock@129-236@..\src\qxk\qxk_mutex.cpp
+      66     12    459      1     108 QP::QXMutex::lock@129-236@..\src\qxk\qxk_mutex.cpp
       47     10    301      1      71 QP::QXMutex::tryLock@256-326@..\src\qxk\qxk_mutex.cpp
-      68     16    460      1     115 QP::QXMutex::unlock@345-459@..\src\qxk\qxk_mutex.cpp
+      68     16    463      1     115 QP::QXMutex::unlock@345-459@..\src\qxk\qxk_mutex.cpp
        8      1     55      2      10 QP::QXSemaphore::init@77-86@..\src\qxk\qxk_sema.cpp
-      43      7    274      1      68 QP::QXSemaphore::wait@109-176@..\src\qxk\qxk_sema.cpp
+      43      7    277      1      68 QP::QXSemaphore::wait@109-176@..\src\qxk\qxk_sema.cpp
       15      2     55      1      20 QP::QXSemaphore::tryWait@191-210@..\src\qxk\qxk_sema.cpp
-      27      6    169      1      46 QP::QXSemaphore::signal@230-275@..\src\qxk\qxk_sema.cpp
+      27      6    175      1      46 QP::QXSemaphore::signal@230-275@..\src\qxk\qxk_sema.cpp
        8      1     54      2       8 QP::QXThread::QXThread@81-88@..\src\qxk\qxk_xthr.cpp
-       4      1     23      1       4 QP::QXThread::init@92-95@..\src\qxk\qxk_xthr.cpp
-       4      1     23      1       4 QP::QXThread::dispatch@98-101@..\src\qxk\qxk_xthr.cpp
-      25      6    185      6      44 QP::QXThread::start@124-167@..\src\qxk\qxk_xthr.cpp
-      96     13    480      2     129 QP::QXThread::post_@206-334@..\src\qxk\qxk_xthr.cpp
-       4      1     23      1       4 QP::QXThread::postLIFO@345-348@..\src\qxk\qxk_xthr.cpp
-      60      7    436      1      86 QP::QXThread::queueGet@370-455@..\src\qxk\qxk_xthr.cpp
-       5      1     47      1       6 QP::QXThread::block_@464-469@..\src\qxk\qxk_xthr.cpp
-       8      3     56      1       9 QP::QXThread::unblock_@478-486@..\src\qxk\qxk_xthr.cpp
+       4      1     26      1       4 QP::QXThread::init@92-95@..\src\qxk\qxk_xthr.cpp
+       4      1     26      1       4 QP::QXThread::dispatch@98-101@..\src\qxk\qxk_xthr.cpp
+      25      6    191      6      44 QP::QXThread::start@124-167@..\src\qxk\qxk_xthr.cpp
+      96     13    486      2     129 QP::QXThread::post_@206-334@..\src\qxk\qxk_xthr.cpp
+       4      1     26      1       4 QP::QXThread::postLIFO@345-348@..\src\qxk\qxk_xthr.cpp
+      60      7    439      1      86 QP::QXThread::queueGet@370-455@..\src\qxk\qxk_xthr.cpp
+       5      1     50      1       6 QP::QXThread::block_@464-469@..\src\qxk\qxk_xthr.cpp
+       8      3     59      1       9 QP::QXThread::unblock_@478-486@..\src\qxk\qxk_xthr.cpp
       18      3    135      2      33 QP::QXThread::teArm_@496-528@..\src\qxk\qxk_xthr.cpp
       11      2     42      1      14 QP::QXThread::teDisarm_@537-550@..\src\qxk\qxk_xthr.cpp
       20      3    169      1      34 QP::QXThread::delay@554-587@..\src\qxk\qxk_xthr.cpp
       14      2     58      1      16 QP::QXThread::delayCancel@591-606@..\src\qxk\qxk_xthr.cpp
-      14      2    106      1      23 QXK_threadRet_@623-645@..\src\qxk\qxk_xthr.cpp
+      14      2    109      1      23 QXK_threadRet_@623-645@..\src\qxk\qxk_xthr.cpp
        3      1     16      1       3 QP::QF_EVT_POOL_ID_@140-142@..\src\qf_pkg.hpp
        3      1     16      1       3 QP::QF_EVT_REF_CTR_@145-147@..\src\qf_pkg.hpp
        3      1     21      1       3 QP::QF_EVT_REF_CTR_INC_@150-152@..\src\qf_pkg.hpp
@@ -210,12 +210,12 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
     159      30.0     4.0      154.4         5     ..\src\qf\qf_qeq.cpp
      27       3.8     1.0       25.3         6     ..\src\qf\qf_qmact.cpp
     232      24.4     3.4      133.9         9     ..\src\qf\qf_time.cpp
-    184      18.8     4.1      122.6         9     ..\src\qk\qk.cpp
-     76      16.0     3.8       97.2         4     ..\src\qv\qv.cpp
-    263      22.2     4.3      142.1        11     ..\src\qxk\qxk.cpp
-    206      49.2    10.5      330.5         4     ..\src\qxk\qxk_mutex.cpp
-    102      23.2     4.0      138.2         4     ..\src\qxk\qxk_sema.cpp
-    305      20.8     3.3      131.2        14     ..\src\qxk\qxk_xthr.cpp
+    186      19.0     4.1      123.8         9     ..\src\qk\qk.cpp
+     78      16.5     3.8      100.0         4     ..\src\qv\qv.cpp
+    265      22.4     4.3      143.1        11     ..\src\qxk\qxk.cpp
+    206      49.2    10.5      332.0         4     ..\src\qxk\qxk_mutex.cpp
+    102      23.2     4.0      140.5         4     ..\src\qxk\qxk_sema.cpp
+    305      20.8     3.3      133.6        14     ..\src\qxk\qxk_xthr.cpp
      24       3.0     1.0       18.5         4     ..\src\qf_pkg.hpp
       9       0.0     0.0        0.0         0     ..\src\qs_pkg.hpp
      13       0.0     0.0        0.0         0     ..\src\qxk_pkg.hpp
@@ -229,6 +229,6 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
-      3969      16.8     3.1      103.3      174            1      0.01    0.04
+      3975      16.9     3.1      103.8      174            1      0.01    0.04
 @endcode
 */

@@ -380,19 +380,6 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param1;
     (void)param2;
     (void)param3;
-
-    // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, nullptr)
-        QS_U8(2, cmdId);
-        QS_U32(8, param1);
-    QS_END()
-
-    if ((cmdId == 10U) || (cmdId == 11U)) {
-        // report error
-        QS_BEGIN(QS_RX_STATUS, nullptr)
-            QP::QS::u8_raw_(0x80U | cmdId); // error
-        QS_END()
-    }
 }
 
 #endif // Q_SPY

@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-17
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -76,6 +76,11 @@ int_t QF::run(void) {
     QS_FUN_DICTIONARY(&QActive::post_);
     QS_FUN_DICTIONARY(&QActive::postLIFO);
     QS_FUN_DICTIONARY(&QS::processTestEvts_);
+
+    // produce the QS_QF_RUN trace record
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_END_PRE_()
 
     QS::onTestLoop(); // run the unit test
     QS::onCleanup();  // application cleanup
@@ -230,7 +235,7 @@ void QActiveDummy::postLIFO(QEvt const * const e) noexcept {
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO,
-                     QS::priv_.locFilter[QS::AO_OBJ], this)
+                         QS::priv_.locFilter[QS::AO_OBJ], this)
         QS_TIME_PRE_();      // timestamp
         QS_SIG_PRE_(e->sig); // the signal of this event
         QS_OBJ_PRE_(this);   // this active object
@@ -327,7 +332,7 @@ void QS::tickX_(std::uint_fast8_t const tickRate,
             t->refCtr_ &= static_cast<std::uint8_t>(~TE_IS_LINKED);
 
             QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_AUTO_DISARM,
-                             QS::priv_.locFilter[QS::TE_OBJ], t)
+                                 QS::priv_.locFilter[QS::TE_OBJ], t)
                 QS_OBJ_PRE_(t);       // this time event object
                 QS_OBJ_PRE_(act);     // the target AO
                 QS_U8_PRE_(tickRate); // tick rate

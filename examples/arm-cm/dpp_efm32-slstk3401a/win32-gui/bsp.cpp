@@ -1,6 +1,6 @@
 //****************************************************************************
 // Product: DPP example, Win32-GUI
-// Last Updated for Version: 6.8.4
+// Last Updated for Version: 6.9.0
 // Date of the Last Update:  2020-08-06
 //
 //                    Q u a n t u m  L e a P s

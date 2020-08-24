@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -47,26 +47,15 @@
 //****************************************************************************
 // QF configuration for QXK -- data members of the QActive class...
 
-//! Kernel-dependent type of the event queue used for QXK threads
-//
-/// @description
-/// QXK uses the native QF event queue QEQueue.
-///
+// QXK event-queue used for AOs
 #define QF_EQUEUE_TYPE      QEQueue
 
-//! Kernel-dependent OS-attribute of threads in QXK
+// QXK OS-object used to store the private stack poiner for extended threads.
+// (The private stack pointer is NULL for basic-threads).
 //
-/// @description
-/// QXK uses this member to store the private stack poiner for extended
-/// threads. (The private stack pointer is NULL for basic-threads).
-///
 #define QF_OS_OBJECT_TYPE   void*
 
-//! Kernel-dependent type of the thread attribute in QXK
-//
-/// @description
-/// QXK uses this member to store the private Thread-Local Storage pointer.
-///
+// QXK thread type used to store the private Thread-Local Storage pointer.
 #define QF_THREAD_TYPE      void*
 
 //! Access Thread-Local Storage (TLS) and cast it on the given @p type_
@@ -83,14 +72,14 @@ extern "C" {
 
 //! attributes of the QXK kernel
 struct QXK_Attr {
-    QP::QActive * volatile curr; //!< currently executing thread
-    QP::QActive * volatile next; //!< next thread to execute
+    QP::QActive * volatile curr;      //!< currently executing thread
+    QP::QActive * volatile next;      //!< next thread to execute
     std::uint8_t volatile actPrio;    //!< prio of the active basic thread
     std::uint8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
     std::uint8_t volatile lockHolder; //!< prio of the lock holder
     std::uint8_t volatile intNest;    //!< ISR nesting level
-    QP::QActive * idleThread;    //!< pointer to the idle thread
-    QP::QPSet readySet; //!< ready-set of basic- and extended-threads
+    QP::QActive * idleThread;         //!< pointer to the idle thread
+    QP::QPSet readySet;               //!< ready-set of all threads
 };
 
 //! global attributes of the QXK kernel

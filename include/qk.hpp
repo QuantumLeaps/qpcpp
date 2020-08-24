@@ -3,8 +3,8 @@
 /// @ingroup qk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -47,17 +47,12 @@
 //****************************************************************************
 // QF configuration for QK -- data members of the QActive class...
 
-//! Kernel-dependent type of the event queue used for QK threads
-//
-/// @description
-/// QK uses the native QF event queue QEQueue.
+// QK event-queue used for AOs
 #define QF_EQUEUE_TYPE      QEQueue
 
-//! Kernel-dependent type of the thread attribute
+// QK thread type used for AOs
+// QK uses this member to store the private Thread-Local Storage pointer.
 //
-/// @description
-/// QK uses this member to store the private Thread-Local Storage pointer.
-///
 #define QF_THREAD_TYPE      void*
 
 

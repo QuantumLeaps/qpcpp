@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-17
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -90,13 +90,13 @@ QXThread::QXThread(QXThreadHandler const handler,
 //****************************************************************************
 // QXThread virtual function implementations...
 void QXThread::init(void const * const e) noexcept {
-    (void)e; // unused parameter
+    static_cast<void>(e); // unused parameter
     Q_ERROR_ID(110);
 }
 
 //****************************************************************************
 void QXThread::dispatch(QEvt const * const e) noexcept {
-    (void)e; // unused parameter
+    static_cast<void>(e); // unused parameter
     Q_ERROR_ID(120);
 }
 
@@ -126,7 +126,7 @@ void QXThread::start(std::uint_fast8_t const prio,
                      void * const stkSto, std::uint_fast16_t const stkSize,
                      void const * const par)
 {
-    (void)par; // unused parameter
+    static_cast<void>(par); // unused parameter
 
     /// @pre this function must:
     /// - NOT be called from an ISR;
@@ -162,7 +162,7 @@ void QXThread::start(std::uint_fast8_t const prio,
     QXK_attr_.readySet.insert(static_cast<std::uint_fast8_t>(m_prio));
 
     // see if this thread needs to be scheduled in case QXK is running
-    (void)QXK_sched_();
+    static_cast<void>(QXK_sched_());
     QF_CRIT_EXIT_();
 }
 
@@ -284,11 +284,11 @@ bool QXThread::post_(QEvt const * const e,
 
                 // is this thread blocked on the queue?
                 if (m_temp.obj == QXK_PTR_CAST_(QMState*, &m_eQueue)) {
-                    (void)teDisarm_();
+                    static_cast<void>(teDisarm_());
                     QXK_attr_.readySet.insert(
                         static_cast<std::uint_fast8_t>(m_prio));
                     if (!QXK_ISR_CONTEXT_()) {
-                        (void)QXK_sched_();
+                        static_cast<void>(QXK_sched_());
                     }
                 }
             }
@@ -343,7 +343,7 @@ bool QXThread::post_(QEvt const * const e,
 /// QActive::postLIFO_()
 ///
 void QXThread::postLIFO(QEvt const * const e) noexcept {
-    (void)e; // unused parameter
+    static_cast<void>(e); // unused parameter
     Q_ERROR_ID(410);
 }
 
@@ -393,7 +393,7 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
 
         thr->teArm_(static_cast<enum_t>(QXK_QUEUE_SIG), nTicks);
         QXK_attr_.readySet.rmove(static_cast<std::uint_fast8_t>(thr->m_prio));
-        (void)QXK_sched_();
+        static_cast<void>(QXK_sched_());
         QF_CRIT_EXIT_();
         QF_CRIT_EXIT_NOP(); // BLOCK here
 
@@ -465,7 +465,7 @@ void QXThread::block_(void) const noexcept {
     /// @pre the thread holding the lock cannot block!
     Q_REQUIRE_ID(600, (QXK_attr_.lockHolder != m_prio));
     QXK_attr_.readySet.rmove(static_cast<std::uint_fast8_t>(m_prio));
-    (void)QXK_sched_();
+    static_cast<void>(QXK_sched_());
 }
 
 //****************************************************************************
@@ -481,7 +481,7 @@ void QXThread::unblock_(void) const noexcept {
     if ((!QXK_ISR_CONTEXT_()) // not inside ISR?
         && (QF::active_[0] != nullptr)) // kernel started?
     {
-        (void)QXK_sched_();
+        static_cast<void>(QXK_sched_());
     }
 }
 
@@ -640,7 +640,7 @@ void QXK_threadRet_(void) noexcept {
     // remove this thread from the QF
     QP::QF::active_[p] = nullptr;
     QXK_attr_.readySet.rmove(p);
-    (void)QXK_sched_();
+    static_cast<void>(QXK_sched_());
     QF_CRIT_EXIT_();
 }
 

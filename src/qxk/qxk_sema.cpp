@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-06-15
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -143,7 +143,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
         QXK_attr_.readySet.rmove(p); // remove from ready-set
 
         // schedule the next thread if multitasking started
-        (void)QXK_sched_();
+        static_cast<void>(QXK_sched_());
         QF_CRIT_EXIT_();
         QF_CRIT_EXIT_NOP(); // BLOCK here !!!
 
@@ -255,14 +255,14 @@ bool QXSemaphore::signal(void) noexcept {
                 && (thr->m_temp.obj == QXK_PTR_CAST_(QMState*, this)));
 
             // disarm the internal time event
-            (void)thr->teDisarm_();
+            static_cast<void>(thr->teDisarm_());
 
             // make the thread ready to run and remove from the wait-list
             QXK_attr_.readySet.insert(p);
             m_waitSet.rmove(p);
 
             if (!QXK_ISR_CONTEXT_()) { // not inside ISR?
-                (void)QXK_sched_(); // schedule the next thread
+                static_cast<void>(QXK_sched_()); // schedule the next thread
             }
         }
     }

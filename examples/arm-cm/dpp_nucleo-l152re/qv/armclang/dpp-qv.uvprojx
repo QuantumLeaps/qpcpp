@@ -10,7 +10,7 @@
       <TargetName>dpp-dbg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060183::V5.06 update 2 (build 183)::ARMCC</pCCUsed>
+      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -383,11 +383,6 @@
           <GroupName>Application</GroupName>
           <Files>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -411,6 +406,21 @@
               <FileName>qstamp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\main.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\bsp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>dpp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\dpp.hpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -600,11 +610,6 @@
               <FileName>qs.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_64bit.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\src\qs\qs_64bit.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_fp.cpp</FileName>
@@ -997,11 +1002,6 @@
           <GroupName>Application</GroupName>
           <Files>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1025,6 +1025,21 @@
               <FileName>qstamp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\main.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\bsp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>dpp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\dpp.hpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1214,11 +1229,6 @@
               <FileName>qs.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_64bit.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\src\qs\qs_64bit.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_fp.cpp</FileName>
@@ -1611,11 +1621,6 @@
           <GroupName>Application</GroupName>
           <Files>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1639,6 +1644,21 @@
               <FileName>qstamp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\main.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\bsp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>dpp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\dpp.hpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1759,11 +1779,6 @@
               <FileName>qs.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_64bit.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\src\qs\qs_64bit.cpp</FilePath>
             </File>
             <File>
               <FileName>qs_fp.cpp</FileName>

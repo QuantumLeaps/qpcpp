@@ -2188,7 +2188,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.20.2.14834</state>
+                    <state>8.40.2.22864</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -3309,13 +3309,7 @@
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_64bit.cpp</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_fp.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qs_pkg.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_rx.cpp</name>

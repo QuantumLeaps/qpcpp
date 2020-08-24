@@ -2,14 +2,14 @@
 /// @brief QF/C++ port for QUTEST Unit Test, POSIX
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -39,7 +39,7 @@
 #define QF_PORT_HPP
 
 // QUTEST event queue and thread types
-#define QF_EQUEUE_TYPE QEQueue
+#define QF_EQUEUE_TYPE       QEQueue
 //#define QF_OS_OBJECT_TYPE
 //#define QF_THREAD_TYPE
 

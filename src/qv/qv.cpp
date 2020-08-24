@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-18
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -136,6 +136,11 @@ int_t QF::run(void) {
 
     // the combined event-loop and background-loop of the QV kernel...
     QF_INT_DISABLE();
+
+    // produce the QS_QF_RUN trace record
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_END_NOCRIT_PRE_()
+
     for (;;) {
 
         // find the maximum priority AO ready to run

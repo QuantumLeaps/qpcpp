@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-18
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -209,7 +209,7 @@ bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
         curr->teArm_(static_cast<enum_t>(QXK_SEMA_SIG), nTicks);
 
         // schedule the next thread if multitasking started
-        (void)QXK_sched_();
+        static_cast<void>(QXK_sched_());
         QF_CRIT_EXIT_();
         QF_CRIT_EXIT_NOP(); // BLOCK here !!!
 
@@ -415,7 +415,7 @@ void QXMutex::unlock(void) noexcept {
                 && (thr->m_temp.obj == QXK_PTR_CAST_(QMState*, this)));
 
             // disarm the internal time event
-            (void)thr->teDisarm_();
+            static_cast<void>(thr->teDisarm_());
 
             if (m_ceiling != 0U) {
                 // boost the priority of this thread to the mutex ceiling

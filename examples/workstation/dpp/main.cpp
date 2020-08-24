@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-20
+// Last updated for version 6.9.0
+// Last updated on  2020-08-15
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -53,23 +53,6 @@ int main(int argc, char *argv[]) {
     // initialize event pools...
     QP::QF::poolInit(smlPoolSto,
                      sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
-
-    // object dictionaries...
-    QS_OBJ_DICTIONARY(AO_Table);
-    QS_OBJ_DICTIONARY(AO_Philo[0]);
-    QS_OBJ_DICTIONARY(AO_Philo[1]);
-    QS_OBJ_DICTIONARY(AO_Philo[2]);
-    QS_OBJ_DICTIONARY(AO_Philo[3]);
-    QS_OBJ_DICTIONARY(AO_Philo[4]);
-
-    // signal dictionaries...
-    QS_SIG_DICTIONARY(DONE_SIG,    nullptr);
-    QS_SIG_DICTIONARY(EAT_SIG,     nullptr);
-    QS_SIG_DICTIONARY(PAUSE_SIG,   nullptr);
-    QS_SIG_DICTIONARY(SERVE_SIG,   nullptr);
-    QS_SIG_DICTIONARY(TEST_SIG,    nullptr);
-    QS_SIG_DICTIONARY(HUNGRY_SIG,  nullptr);
-    QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr);
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {

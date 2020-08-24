@@ -4,8 +4,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-06-15
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -149,6 +149,11 @@ int_t QF::run(void) {
     QF_INT_DISABLE();
     initial_events(); // process all events posted during initialization
     onStartup(); // application-specific startup callback
+
+    // produce the QS_QF_RUN trace record
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_END_NOCRIT_PRE_()
+
     QF_INT_ENABLE();
 
     // the QXK idle loop...
@@ -241,7 +246,7 @@ QSchedStatus QXK::schedLock(std::uint_fast8_t const ceiling) noexcept {
 
     // first store the previous lock prio if below the ceiling
     if (static_cast<std::uint_fast8_t>(QXK_attr_.lockPrio) < ceiling) {
-        stat = (static_cast<QSchedStatus>(QXK_attr_.lockPrio) << 8);
+        stat = (static_cast<QSchedStatus>(QXK_attr_.lockPrio) << 8U);
         QXK_attr_.lockPrio = static_cast<std::uint8_t>(ceiling);
 
         QS_BEGIN_NOCRIT_PRE_(QS_SCHED_LOCK, nullptr, nullptr)
@@ -291,7 +296,7 @@ void QXK::schedUnlock(QSchedStatus const stat) noexcept {
         std::uint_fast8_t const lockPrio
             = static_cast<std::uint_fast8_t>(QXK_attr_.lockPrio);
         std::uint_fast8_t const prevPrio
-            = static_cast<std::uint_fast8_t>(stat >> 8);
+            = static_cast<std::uint_fast8_t>(stat >> 8U);
         QF_CRIT_STAT_
         QF_CRIT_ENTRY_();
 

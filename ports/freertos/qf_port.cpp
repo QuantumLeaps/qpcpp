@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-23
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -69,6 +69,12 @@ void QF::init(void) {
 //............................................................................
 int_t QF::run(void) {
     onStartup();  // the startup callback (configure/enable interrupts)
+
+    // produce the QS_QF_RUN trace record
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_END_PRE_()
+
     vTaskStartScheduler(); // start the FreeRTOS scheduler
     Q_ERROR_ID(110);       // the FreeRTOS scheduler should never return
     return 0; // dummy return to make the compiler happy

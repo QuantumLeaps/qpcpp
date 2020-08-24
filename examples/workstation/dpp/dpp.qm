@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.6.0" links="1">
+<model version="5.0.3" links="1">
  <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -27,7 +27,7 @@
     m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
    </operation>
    <!--${AOs::Philo::SM}-->
-   <statechart properties="0x02">
+   <statechart properties="0x00">
     <!--${AOs::Philo::SM::initial}-->
     <initial target="../1">
      <action>static bool registered = false; // starts off with 0, per C-standard
@@ -35,11 +35,16 @@
 if (!registered) {
     registered = true;
 
-    QS_OBJ_DICTIONARY(&amp;l_philo[0].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[1].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[2].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[3].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[4].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[0]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[0].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[1]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[1].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[2]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[2].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[3]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[3].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[4]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[4].m_timeEvt);
 
     QS_FUN_DICTIONARY(&amp;Philo::initial);
     QS_FUN_DICTIONARY(&amp;Philo::thinking);
@@ -165,6 +170,16 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     <!--${AOs::Table::SM::initial}-->
     <initial target="../1/2">
      <action>(void)e; // suppress the compiler warning about unused parameter
+
+QS_OBJ_DICTIONARY(&amp;Table::inst);
+
+QS_SIG_DICTIONARY(DONE_SIG,      nullptr); // global signals
+QS_SIG_DICTIONARY(EAT_SIG,       nullptr);
+QS_SIG_DICTIONARY(PAUSE_SIG,     nullptr);
+QS_SIG_DICTIONARY(SERVE_SIG,     nullptr);
+QS_SIG_DICTIONARY(TEST_SIG,      nullptr);
+
+QS_SIG_DICTIONARY(HUNGRY_SIG,    this); // signal just for Table
 
 subscribe(DONE_SIG);
 subscribe(PAUSE_SIG);
@@ -420,8 +435,6 @@ $declare${AOs::Philo}
 namespace DPP {
 
 // Local objects -------------------------------------------------------------
-static Philo l_philo[N_PHILO];   // storage for all Philos
-
 // helper function to provide a randomized think time for Philos
 inline QP::QTimeEvtCtr think_time() {
     return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP::random() % BSP::TICKS_PER_SEC)
@@ -467,12 +480,12 @@ inline uint8_t LEFT(uint8_t const n) {
     return static_cast&lt;uint8_t&gt;((n + 1U) % N_PHILO);
 }
 
-static uint8_t const FREE = static_cast&lt;uint8_t&gt;(0);
-static uint8_t const USED = static_cast&lt;uint8_t&gt;(1);
+constexpr uint8_t FREE = static_cast&lt;uint8_t&gt;(0);
+constexpr uint8_t USED = static_cast&lt;uint8_t&gt;(1);
 
-static char_t const * const THINKING = &amp;&quot;thinking&quot;[0];
-static char_t const * const HUNGRY   = &amp;&quot;hungry  &quot;[0];
-static char_t const * const EATING   = &amp;&quot;eating  &quot;[0];
+constexpr char_t const * const THINKING = &amp;&quot;thinking&quot;[0];
+constexpr char_t const * const HUNGRY   = &amp;&quot;hungry  &quot;[0];
+constexpr char_t const * const EATING   = &amp;&quot;eating  &quot;[0];
 
 } // namespace DPP
 

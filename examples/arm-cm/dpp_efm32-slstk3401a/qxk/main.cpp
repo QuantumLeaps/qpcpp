@@ -56,12 +56,7 @@ int main() {
     DPP::BSP::init(); // initialize the BSP
 
     // object dictionaries...
-    QS_OBJ_DICTIONARY(DPP::AO_Table);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[0]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[1]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[2]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
+    QS_OBJ_DICTIONARY(&l_ticker0);
 
     // init publish-subscribe
     QP::QF::psInit(subscrSto, Q_DIM(subscrSto));

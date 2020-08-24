@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ///**************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-17
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -60,6 +60,12 @@ void QF::init(void) {
 //............................................................................
 int_t QF::run(void) {
     onStartup();  // the startup callback
+
+    // produce the QS_QF_RUN trace record
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_END_PRE_()
+
     return 0; // return success
 }
 //............................................................................

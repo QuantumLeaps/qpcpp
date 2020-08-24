@@ -3,8 +3,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-14
+/// Last updated for version 6.9.0
+/// Last updated on  2020-08-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -46,13 +46,8 @@
 //****************************************************************************
 // QF configuration for QK
 
-//! This macro defines the type of the event queue used for active objects.
-/// @note
-/// This is just an example of the macro definition. Typically, you need
-/// to define it in the specific QF port file (qf_port.hpp). In case of QK,
-/// which always depends on the native QF queue, this macro is defined at the
-/// level of the platform-independent interface qv.hpp.
-#define QF_EQUEUE_TYPE             QEQueue
+// QV event-queue used for AOs
+#define QF_EQUEUE_TYPE       QEQueue
 
 
 //****************************************************************************
