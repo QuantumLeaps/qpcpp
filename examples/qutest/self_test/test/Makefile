@@ -145,7 +145,7 @@ LINK  := g++   # for C++ programs
 # QUTest test script utilities (requires QTOOLS):
 #
 ifeq ("$(wildcard $(QUTEST))","")
-QUTEST := python $(QTOOLS)/qutest/qutest.py
+QUTEST := python3 $(QTOOLS)/qutest/qutest.py
 endif
 
 TESTS  := *.py

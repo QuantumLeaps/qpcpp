@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Board Support Package (BSP) for the Calculator example
-// Last Updated for Version: 6.8.2
-// Date of the Last Update:  2020-06-22
+// Last Updated for Version: 6.9.0
+// Date of the Last Update:  2020-08-25
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -74,7 +74,7 @@ void BSP_display(double value) {
 }
 //............................................................................
 void BSP_display_error(char const *err) {
-    STRCPY_S(l_display, DISP_WIDTH, err);
+    STRNCPY_S(l_display, DISP_WIDTH, err);
 }
 //............................................................................
 void BSP_negate(void) {

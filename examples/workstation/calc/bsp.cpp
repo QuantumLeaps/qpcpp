@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: Board Support Package (BSP) for the Calculator example
-// Last Updated for Version: 6.8.2
-// Date of the Last Update:  2020-06-22
+// Last Updated for Version: 6.9.0
+// Date of the Last Update:  2020-08-25
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -111,7 +111,7 @@ int BSP_eval(double operand1, int oper, double operand2) {
             }
             else {
                 // error: divide by zero
-                STRCPY_S(l_display, DISP_WIDTH, " Error 0 ");
+                STRNCPY_S(l_display, DISP_WIDTH, " Error 0 ");
                 ok = 0;
             }
             break;
@@ -126,7 +126,7 @@ int BSP_eval(double operand1, int oper, double operand2) {
         }
         else {
             // error: out of range
-            STRCPY_S(l_display, DISP_WIDTH, " Error 1 ");
+            STRNCPY_S(l_display, DISP_WIDTH, " Error 1 ");
             ok = 0;
         }
     }
