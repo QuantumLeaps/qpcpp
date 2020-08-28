@@ -1,15 +1,15 @@
 /// @file
-/// @brief QS/C++ port to MSP340 and MSP430X CPUs and IAR-430 compiler
+/// @brief QS/C++ port to MSP340 and MSP430X CPUs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.9.0
+/// Last updated on  2019-08-27
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -42,7 +42,7 @@
 #define QS_TIME_SIZE     4U
 
 // object pointer size in bytes
-#define QS_OBJ_PTR_SIZE  2U
+#define QS_OBJ_PTR_SIZE  4U
 
 // function pointer size in bytes
 #define QS_FUN_PTR_SIZE  4U

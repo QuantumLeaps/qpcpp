@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to MSP430, cooperative QV kernel
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.9.0
+/// Last updated on  2019-08-27
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -60,7 +60,12 @@
 #define QF_CRIT_EXIT(stat_)  __set_interrupt_state(stat_)
 
 
-#include <intrinsics.h> // intrinsic functions
+#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+    #include <intrinsics.h> // intrinsic functions
+#elif defined(__GNUC__)
+    #include <msp430.h>
+    #include "in430.h"
+#endif
 
 #include "qep_port.hpp"   // QEP port
 #include "qv_port.hpp"    // QV cooperative kernel port

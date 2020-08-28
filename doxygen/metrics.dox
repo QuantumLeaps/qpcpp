@@ -1,9 +1,9 @@
-/** @page metrics Code Metrics
+/** @page metrics Code Metrics 
 
-@code{cpp}
-                   Code Metrics for QP/C++
+@code{cpp} 
+                   Code Metrics for QP/C++ 
 ================================================
-  NLOC    CCN   token  PARAM  length  location
+  NLOC    CCN   token  PARAM  length  location  
 ------------------------------------------------
        3      1     14      1       4 QP::QEvt::QEvt@159-162@..\include\qep.hpp
        5      1     26      2       5 QP::QEvt::QEvt@166-170@..\include\qep.hpp
@@ -223,12 +223,12 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 =========================================================================================================
 !!!! Warnings (cyclomatic_complexity > 20 or length > 500 or nloc > 1000000 or parameter_count > 10) !!!!
 ================================================
-  NLOC    CCN   token  PARAM  length  location
+  NLOC    CCN   token  PARAM  length  location  
 ------------------------------------------------
      117     21    684      1     169 QP::QMsm::dispatch@147-315@..\src\qf\qep_msm.cpp
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
       3975      16.9     3.1      103.8      174            1      0.01    0.04
-@endcode
-*/
+@endcode 
+*/ 
