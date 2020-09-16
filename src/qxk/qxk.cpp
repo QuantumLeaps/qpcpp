@@ -5,7 +5,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.0
-/// Last updated on  2020-08-11
+/// Last updated on  2020-09-16
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -529,7 +529,7 @@ void QXK_activate_(void) {
 
     QXK_attr_.actPrio = static_cast<std::uint8_t>(pin); // restore base prio
 
-#if (defined QK_ON_CONTEXT_SW) || (defined Q_SPY)
+#if (defined QXK_ON_CONTEXT_SW) || (defined Q_SPY)
     if (pin != 0U) { // resuming an active object?
         a = QP::QF::active_[pin]; // the pointer to the preempted AO
 
@@ -553,7 +553,7 @@ void QXK_activate_(void) {
     QXK_onContextSw(QP::QF::active_[pprev], a);
 #endif // QXK_ON_CONTEXT_SW
 
-#endif // QK_ON_CONTEXT_SW || Q_SPY
+#endif // QXK_ON_CONTEXT_SW || Q_SPY
 }
 
 //****************************************************************************
