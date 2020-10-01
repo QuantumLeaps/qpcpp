@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ////**************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-11
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-19
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -110,7 +110,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
     bool signaled = true; // assume that the semaphore will be signaled
     QF_CRIT_STAT_
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     QXThread * const curr = QXK_PTR_CAST_(QXThread*, QXK_attr_.curr);
 
     /// @pre this function must:
@@ -131,7 +131,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
     }
     else {
         std::uint_fast8_t const p =
-            static_cast<std::uint_fast8_t>(curr->m_prio);
+            static_cast<std::uint_fast8_t>(curr->m_dynPrio);
 
         // remember the blocking object (this semaphore)
         curr->m_temp.obj = QXK_PTR_CAST_(QMState*, this);
@@ -144,10 +144,10 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
 
         // schedule the next thread if multitasking started
         static_cast<void>(QXK_sched_());
-        QF_CRIT_EXIT_();
+        QF_CRIT_X_();
         QF_CRIT_EXIT_NOP(); // BLOCK here !!!
 
-        QF_CRIT_ENTRY_();   // AFTER unblocking...
+        QF_CRIT_E_();   // AFTER unblocking...
         // the blocking object must be this semaphore
         Q_ASSERT_ID(240, curr->m_temp.obj == QXK_PTR_CAST_(QMState*, this));
 
@@ -170,7 +170,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
         }
         curr->m_temp.obj = nullptr; // clear blocked obj.
     }
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     return signaled;
 }
@@ -195,7 +195,7 @@ bool QXSemaphore::tryWait(void) noexcept {
     /// @pre the semaphore must be initialized
     Q_REQUIRE_ID(300, m_max_count > 0U);
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     // is the semaphore available?
     if (m_count > 0U) {
         --m_count;
@@ -204,7 +204,7 @@ bool QXSemaphore::tryWait(void) noexcept {
     else { // the semaphore is NOT available (would block)
         isAvailable = false;
     }
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     return isAvailable;
 }
@@ -234,7 +234,7 @@ bool QXSemaphore::signal(void) noexcept {
     /// @pre the semaphore must be initialized
     Q_REQUIRE_ID(400, m_max_count > 0U);
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     if (m_count < m_max_count) {
 
         ++m_count; // increment the semaphore count
@@ -269,7 +269,7 @@ bool QXSemaphore::signal(void) noexcept {
     else {
         signaled = false; // semaphore NOT signaled
     }
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     return signaled;
 }

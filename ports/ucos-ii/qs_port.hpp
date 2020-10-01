@@ -2,36 +2,36 @@
 /// @brief QS/C++ port to uC/OS-II and 32-bit CPUs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2020-06-04
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
+// Last updated for version 6.6.0
+// Last updated on  2019-10-14
+//
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
+//
+// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+//
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Alternatively, this program may be distributed and modified under the
+// terms of Quantum Leaps commercial licenses, which expressly supersede
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <www.gnu.org/licenses>.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
@@ -51,9 +51,9 @@
 #include "qf_port.hpp" // use QS with QF
 
 #if (OS_CRITICAL_METHOD == 3u)
-    #define QS_CRIT_STAT_       OS_CPU_SR cpu_sr;
-    #define QS_CRIT_ENTRY_()    OS_ENTER_CRITICAL()
-    #define QS_CRIT_EXIT_()     OS_EXIT_CRITICAL(); QS_REC_DONE()
+    #define QS_CRIT_STAT_    OS_CPU_SR cpu_sr;
+    #define QS_CRIT_E_()     OS_ENTER_CRITICAL()
+    #define QS_CRIT_X_()     OS_EXIT_CRITICAL(); QS_REC_DONE()
 #endif // OS_CRITICAL_METHOD
 
 #include "qs.hpp"      // QS platform-independent public interface

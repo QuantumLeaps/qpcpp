@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example, Win32-GUI
-// Last Updated for Version: 6.9.0
-// Date of the Last Update:  2020-08-06
+// Last Updated for Version: 6.9.1
+// Date of the Last Update:  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -228,8 +228,9 @@ void BSP::init(void) {
     QS_USR_DICTIONARY(COMMAND_STAT);
 
     // setup the QS filters...
-    QS_FILTER_ON(QP::QS_ALL_RECORDS);
-    QS_FILTER_OFF(QP::QS_QF_TICK);
+    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
+    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
+    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
 }
 //............................................................................
 void BSP::terminate(int16_t result) {
@@ -263,7 +264,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
     // set the "segment" # n to the bitmap # 'bitmapNum'
     SegmentDisplay_setSegment(&l_philos, (UINT)n, bitmapNum);
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);   // Philosopher number
         QS_STR(stat);  // Philosopher status
     QS_END()
@@ -336,7 +337,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, nullptr)
+    QS_BEGIN_ID(DPP::COMMAND_STAT, 0U)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()

@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: "Fly 'n' Shoot" game example for Win32-GUI
-// Last Updated for Version: 6.9.0
-// Date of the Last Update:  2020-08-06
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,12 +25,12 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-///***************************************************************************
+//****************************************************************************
 #include "qpcpp.hpp"
 #include "game.hpp"
 #include "bsp.hpp"
@@ -116,8 +116,8 @@ void BSP_init(void) {
     QS_USR_DICTIONARY(COMMAND_STAT);
 
     // setup the QS filters...
-    QS_FILTER_ON(QP::QS_ALL_RECORDS);
-    QS_FILTER_OFF(QP::QS_QF_TICK);
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS);
+    QS_GLB_FILTER(-QP::QS_QF_TICK);
 }
 //..........................................................................*/
 void BSP_terminate(int16_t result) {
@@ -860,13 +860,6 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param1;
     (void)param2;
     (void)param3;
-
-    // application-specific record
-    QS_BEGIN(GAME::COMMAND_STAT, nullptr)
-        QS_U8(2, cmdId);
-        QS_U32(8, param1);
-    QS_END()
-
     if (cmdId == 10U) {
         Q_onAssert("QS::onCommand", 10);
     }

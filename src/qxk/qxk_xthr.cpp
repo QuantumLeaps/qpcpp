@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-11
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-19
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -70,14 +70,6 @@ Q_DEFINE_THIS_MODULE("qxk_xthr")
 namespace QP {
 
 //****************************************************************************
-/// @description
-/// Performs the first step of QXThread initialization by assigning the
-/// thread-handler function and the tick rate at which it will handle
-/// the timeouts.
-///
-/// @param[in]     handler  the thread-handler function
-/// @param[in]     tickRate the system clock tick rate to use for timeouts
-///                in this thread
 QXThread::QXThread(QXThreadHandler const handler,
                    std::uint_fast8_t const tickRate) noexcept
   : QActive(Q_STATE_CAST(handler)),
@@ -89,14 +81,20 @@ QXThread::QXThread(QXThreadHandler const handler,
 
 //****************************************************************************
 // QXThread virtual function implementations...
-void QXThread::init(void const * const e) noexcept {
+void QXThread::init(void const * const e,
+                    std::uint_fast8_t const qs_id) noexcept
+{
     static_cast<void>(e); // unused parameter
+    static_cast<void>(qs_id); // unused parameter
     Q_ERROR_ID(110);
 }
 
 //****************************************************************************
-void QXThread::dispatch(QEvt const * const e) noexcept {
+void QXThread::dispatch(QEvt const * const e,
+                        std::uint_fast8_t const qs_id) noexcept
+{
     static_cast<void>(e); // unused parameter
+    static_cast<void>(qs_id); // unused parameter
     Q_ERROR_ID(120);
 }
 
@@ -148,8 +146,8 @@ void QXThread::start(std::uint_fast8_t const prio,
     // the top-most initial transition 'm_temp.act'
     QXK_stackInit_(this, m_temp.thr, stkSto, stkSize);
 
-    m_prio      = static_cast<std::uint8_t>(prio);
-    m_startPrio = static_cast<std::uint8_t>(prio);
+    m_prio    = static_cast<std::uint8_t>(prio);
+    m_dynPrio = static_cast<std::uint8_t>(prio);
 
     // the new thread is not blocked on any object
     m_temp.obj = nullptr;
@@ -157,13 +155,13 @@ void QXThread::start(std::uint_fast8_t const prio,
     QF::add_(this); // make QF aware of this extended thread
 
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     // extended-thread becomes ready immediately
-    QXK_attr_.readySet.insert(static_cast<std::uint_fast8_t>(m_prio));
+    QXK_attr_.readySet.insert(static_cast<std::uint_fast8_t>(m_dynPrio));
 
     // see if this thread needs to be scheduled in case QXK is running
     static_cast<void>(QXK_sched_());
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 }
 
 #ifdef Q_SPY
@@ -213,14 +211,14 @@ bool QXThread::post_(QEvt const * const e,
 
     // is it the private time event?
     if (e == &m_timeEvt) {
-        QF_CRIT_ENTRY_();
+        QF_CRIT_E_();
         // the private time event is disarmed and not in any queue,
         // so it is safe to change its signal. The signal of 0 means
         // that the time event has expired.
         m_timeEvt.sig = 0U;
 
         unblock_();
-        QF_CRIT_EXIT_();
+        QF_CRIT_X_();
 
         status = true;
     }
@@ -230,7 +228,7 @@ bool QXThread::post_(QEvt const * const e,
         /// @pre event pointer must be valid
         Q_REQUIRE_ID(300, e != nullptr);
 
-        QF_CRIT_ENTRY_();
+        QF_CRIT_E_();
         QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into temporary
 
         // test-probe#1 for faking queue overflow
@@ -267,8 +265,7 @@ bool QXThread::post_(QEvt const * const e,
                 m_eQueue.m_nMin = nFree; // update minimum so far
             }
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
-                                 QS::priv_.locFilter[QS::AO_OBJ], this)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
                 QS_TIME_PRE_();        // timestamp
                 QS_OBJ_PRE_(sender);   // the sender object
                 QS_SIG_PRE_(e->sig);   // the signal of the event
@@ -286,7 +283,7 @@ bool QXThread::post_(QEvt const * const e,
                 if (m_temp.obj == QXK_PTR_CAST_(QMState*, &m_eQueue)) {
                     static_cast<void>(teDisarm_());
                     QXK_attr_.readySet.insert(
-                        static_cast<std::uint_fast8_t>(m_prio));
+                        static_cast<std::uint_fast8_t>(m_dynPrio));
                     if (!QXK_ISR_CONTEXT_()) {
                         static_cast<void>(QXK_sched_());
                     }
@@ -304,12 +301,11 @@ bool QXThread::post_(QEvt const * const e,
                 --m_eQueue.m_head; // advance the head (counter clockwise)
             }
 
-            QF_CRIT_EXIT_();
+            QF_CRIT_X_();
         }
         else { // cannot post the event
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_ATTEMPT,
-                                 QS::priv_.locFilter[QS::AO_OBJ], this)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
                 QS_TIME_PRE_();        // timestamp
                 QS_OBJ_PRE_(sender);   // the sender object
                 QS_SIG_PRE_(e->sig);   // the signal of the event
@@ -319,7 +315,7 @@ bool QXThread::post_(QEvt const * const e,
                 QS_EQC_PRE_(margin);   // margin
             QS_END_NOCRIT_PRE_()
 
-            QF_CRIT_EXIT_();
+            QF_CRIT_X_();
 
             QF::gc(e); // recycle the event to avoid a leak
         }
@@ -372,7 +368,7 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
     QEvt const *e;
     QF_CRIT_STAT_
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     QXThread * const thr = QXTHREAD_CAST_(QXK_attr_.curr);
 
     /// @pre this function must:
@@ -392,12 +388,13 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
         thr->m_temp.obj = QXK_PTR_CAST_(QMState*, &thr->m_eQueue);
 
         thr->teArm_(static_cast<enum_t>(QXK_QUEUE_SIG), nTicks);
-        QXK_attr_.readySet.rmove(static_cast<std::uint_fast8_t>(thr->m_prio));
+        QXK_attr_.readySet.rmove(
+                           static_cast<std::uint_fast8_t>(thr->m_dynPrio));
         static_cast<void>(QXK_sched_());
-        QF_CRIT_EXIT_();
+        QF_CRIT_X_();
         QF_CRIT_EXIT_NOP(); // BLOCK here
 
-        QF_CRIT_ENTRY_();
+        QF_CRIT_E_();
         // the blocking object must be this queue
         Q_ASSERT_ID(510, thr->m_temp.obj ==
                          QXK_PTR_CAST_(QMState *, &thr->m_eQueue));
@@ -418,12 +415,11 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
             thr->m_eQueue.m_frontEvt =
                 QF_PTR_AT_(thr->m_eQueue.m_ring, thr->m_eQueue.m_tail);
             if (thr->m_eQueue.m_tail == 0U) {
-                thr->m_eQueue.m_tail = thr->m_eQueue.m_end;  // wrap
+                thr->m_eQueue.m_tail = thr->m_eQueue.m_end; // wrap
             }
             --thr->m_eQueue.m_tail;
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_GET,
-                                 QS::priv_.locFilter[QS::AO_OBJ], thr)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_GET, thr->m_prio)
                 QS_TIME_PRE_();      // timestamp
                 QS_SIG_PRE_(e->sig); // the signal of this event
                 QS_OBJ_PRE_(&thr);   // this active object
@@ -437,8 +433,7 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
             // all entries in the queue must be free (+1 for fronEvt)
             Q_ASSERT_ID(520, nFree == (thr->m_eQueue.m_end + 1U));
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_GET_LAST,
-                                 QS::priv_.locFilter[QS::AO_OBJ], thr)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_GET_LAST, thr->m_prio)
                 QS_TIME_PRE_();      // timestamp
                 QS_SIG_PRE_(e->sig); // the signal of this event
                 QS_OBJ_PRE_(&thr);   // this active object
@@ -449,7 +444,7 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
     else { // the queue is still empty -- the timeout must have fired
          e = nullptr;
     }
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     return e;
 }
@@ -464,7 +459,7 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
 void QXThread::block_(void) const noexcept {
     /// @pre the thread holding the lock cannot block!
     Q_REQUIRE_ID(600, (QXK_attr_.lockHolder != m_prio));
-    QXK_attr_.readySet.rmove(static_cast<std::uint_fast8_t>(m_prio));
+    QXK_attr_.readySet.rmove(static_cast<std::uint_fast8_t>(m_dynPrio));
     static_cast<void>(QXK_sched_());
 }
 
@@ -476,7 +471,7 @@ void QXThread::block_(void) const noexcept {
 /// must be called from within a critical section
 ///
 void QXThread::unblock_(void) const noexcept {
-    QXK_attr_.readySet.insert(static_cast<std::uint_fast8_t>(m_prio));
+    QXK_attr_.readySet.insert(static_cast<std::uint_fast8_t>(m_dynPrio));
 
     if ((!QXK_ISR_CONTEXT_()) // not inside ISR?
         && (QF::active_[0] != nullptr)) // kernel started?
@@ -554,7 +549,7 @@ bool QXThread::teDisarm_(void) noexcept {
 bool QXThread::delay(std::uint_fast16_t const nTicks) noexcept {
     QF_CRIT_STAT_
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     QXThread * const thr = QXK_PTR_CAST_(QXThread*, QXK_attr_.curr);
 
     /// @pre this function must:
@@ -571,15 +566,15 @@ bool QXThread::delay(std::uint_fast16_t const nTicks) noexcept {
     thr->m_temp.obj = QXK_PTR_CAST_(QMState*, &thr->m_timeEvt);
     thr->teArm_(static_cast<enum_t>(QXK_DELAY_SIG), nTicks);
     thr->block_();
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
     QF_CRIT_EXIT_NOP(); // BLOCK here
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     // the blocking object must be the time event
     Q_ENSURE_ID(890, thr->m_temp.obj
                      == QXK_PTR_CAST_(QMState*, &thr->m_timeEvt));
     thr->m_temp.obj = nullptr; // clear
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     // signal of zero means that the time event was posted without
     // being canceled.
@@ -592,7 +587,7 @@ bool QXThread::delayCancel(void) noexcept {
     bool wasArmed;
     QF_CRIT_STAT_
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     if (m_temp.obj == QXK_PTR_CAST_(QMState*, &m_timeEvt)) {
         wasArmed = teDisarm_();
         unblock_();
@@ -600,7 +595,7 @@ bool QXThread::delayCancel(void) noexcept {
     else {
         wasArmed = false;
     }
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     return wasArmed;
 }
@@ -623,7 +618,7 @@ extern "C" {
 void QXK_threadRet_(void) noexcept {
     QF_CRIT_STAT_
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     QP::QXThread * const thr = QXTHREAD_CAST_(QXK_attr_.curr);
 
     /// @pre this function must:
@@ -635,13 +630,13 @@ void QXK_threadRet_(void) noexcept {
     Q_REQUIRE_ID(901, QXK_attr_.lockHolder != thr->m_prio);
 
     std::uint_fast8_t const p =
-        static_cast<std::uint_fast8_t>(thr->m_startPrio);
+        static_cast<std::uint_fast8_t>(thr->m_prio);
 
     // remove this thread from the QF
     QP::QF::active_[p] = nullptr;
     QXK_attr_.readySet.rmove(p);
     static_cast<void>(QXK_sched_());
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 }
 
 } // extern "C"

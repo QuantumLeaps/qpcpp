@@ -100,10 +100,10 @@
     #define QACTIVE_EQUEUE_WAIT_(me_)                                     \
         while ((me_)->m_eQueue.m_frontEvt == nullptr) {                   \
             UINT32 eventsReceived;                                        \
-            QF_CRIT_EXIT_();                                              \
+            QF_CRIT_X_();                                              \
             Q_ALLEGE_ID(405, eventReceive(QF_EQUEUE_EVT, EVENTS_WAIT_ANY, \
                         WAIT_FOREVER, &eventsReceived) == OK);            \
-            QF_CRIT_ENTRY_();                                             \
+            QF_CRIT_E_();                                             \
         }
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
@@ -112,14 +112,12 @@
 
     // event pool operations
     #define QF_EPOOL_TYPE_  QMPool
-
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
-
     #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_))))
-    #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
+    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+    #define QF_EPOOL_PUT_(p_, e_, qs_id_)  ((p_).put((e_), (qs_id_)))
 
     #include "taskLib.h"      // for taskXXX() functions
     #include "eventLib.h"     // for eventXXX() functions

@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example, QUTEST
-// Last Updated for Version: 6.3.2
-// Date of the Last Update:  2018-06-16
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -65,16 +65,16 @@ void BSP::displayPaused(uint8_t paused) {
     QS_TEST_PROBE_DEF(&BSP::displayPaused)
 
     QS_TEST_PROBE(
-        Q_ASSERT_ID(100, 0);
+        Q_ERROR_ID(100);
     )
-    QS_BEGIN(BSP_CALL, 0) // application-specific record
+    QS_BEGIN_ID(BSP_CALL, 0U) // application-specific record
         QS_FUN(&BSP::displayPaused);
         QS_U8(0, paused);
     QS_END()
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
-    QS_BEGIN(BSP_CALL, 0) // application-specific record
+    QS_BEGIN_ID(BSP_CALL, 0U) // application-specific record
         QS_FUN(&BSP::displayPhilStat);
         QS_U8(0, n);
         QS_STR(stat);
@@ -94,7 +94,7 @@ uint32_t BSP::random(void) {
         rnd = qs_tp_;
     )
 
-    QS_BEGIN(BSP_CALL, 0) // application-specific record
+    QS_BEGIN_ID(BSP_CALL, 0U) // application-specific record
         QS_FUN(&BSP::random);
         QS_U32(0, rnd);
     QS_END()
@@ -108,7 +108,7 @@ void BSP::randomSeed(uint32_t seed) {
         seed = qs_tp_;
     )
     l_rnd = seed;
-    QS_BEGIN(BSP_CALL, 0) // application-specific record
+    QS_BEGIN_ID(BSP_CALL, 0U) // application-specific record
         QS_FUN(&BSP::randomSeed);
         QS_U32(0, seed);
     QS_END()

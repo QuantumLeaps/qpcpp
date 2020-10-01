@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-11
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -158,10 +158,10 @@ int_t QF::run(void) {
 
     // the combined event-loop and background-loop of the QV kernel */
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
     // produce the QS_QF_RUN trace record
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, 0U)
     QS_END_NOCRIT_PRE_()
 
     while (l_isRunning) {
@@ -169,7 +169,7 @@ int_t QF::run(void) {
         if (QV_readySet_.notEmpty()) {
             std::uint_fast8_t p = QV_readySet_.findMax();
             QActive *a = active_[p];
-            QF_CRIT_EXIT_();
+            QF_CRIT_X_();
 
             // the active object 'a' must still be registered in QF
             // (e.g., it must not be stopped)
@@ -182,10 +182,10 @@ int_t QF::run(void) {
             // 3. determine if event is garbage and collect it if so
             //
             QEvt const *e = a->get_();
-            a->dispatch(e);
+            a->dispatch(e, a->m_prio);
             gc(e);
 
-            QF_CRIT_ENTRY_();
+            QF_CRIT_E_();
 
             if (a->m_eQueue.isEmpty()) { /* empty queue? */
                 QV_readySet_.rmove(p);
@@ -202,7 +202,7 @@ int_t QF::run(void) {
             }
         }
     }
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
     onCleanup();  // cleanup callback
     QS_EXIT();    // cleanup the QSPY connection
 
@@ -275,7 +275,7 @@ void QActive::start(std::uint_fast8_t const prio,
     m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
     QF::add_(this); // make QF aware of this AO
 
-    this->init(par); // execute initial transition (virtual call)
+    this->init(par, m_prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
 }
 //............................................................................
@@ -285,9 +285,9 @@ void QActive::stop(void) {
 
     // make sure the AO is no longer in "ready set"
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     QV_readySet_.rmove(m_prio);
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     QF::remove_(this); // remove this AO from QF
 }

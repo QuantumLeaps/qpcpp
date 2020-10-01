@@ -2,8 +2,8 @@
 /// @brief PC-Lint-Plus option file for linting QP/C++ applications
 /// @cond
 ///===========================================================================
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-14
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -244,7 +244,6 @@
  QF_INT_ENABLE,
  QF_CRIT_ENTRY,
  QF_CRIT_EXIT,
- QF_QS_CRIT_EXIT,
  QF_QS_CRIT_ENTRY,
  QF_QS_CRIT_EXIT,
  QF_QS_ISR_ENTRY,
@@ -359,17 +358,12 @@
  QS_EXIT,
  QS_DUMP,
  QS_RESET,
- QS_FILTER_ON,
- QS_FILTER_OFF,
- QS_FILTER_SM_OBJ,
- QS_FILTER_AO_OBJ,
- QS_FILTER_MP_OBJ,
- QS_FILTER_EQ_OBJ,
- QS_FILTER_TE_OBJ,
+ QS_GLB_FILTER,
+ QS_LOC_FILTER,
  QS_FILTER_AP_OBJ,
  QS_GET_BYTE,
  QS_GET_BLOCK,
- QS_BEGIN,
+ QS_BEGIN_ID,
  QS_END,
  QS_BEGIN_NOCRIT,
  QS_END_NOCRIT,
@@ -406,6 +400,8 @@
 
 // MC++R16-0-4 function-like macro
 -esym(9026,
+ QS_GLB_CHECK_,
+ QS_LOC_CHECK_,
  QS_BEGIN_PRE_,
  QS_END_PRE_,
  QS_BEGIN_NOCRIT_PRE_,
@@ -427,8 +423,6 @@
 
 // MC++R16-0-4 function-like macro
 -esym(9026,
- QS_CRIT_ENTRY_,
- QS_CRIT_EXIT_,
  QS_REC_DONE)
 
 // definition of macro ends in semi-colon

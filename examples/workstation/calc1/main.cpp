@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product:  Calculator Example
-// Last Updated for Version: 6.5.0
-// Date of the Last Update:  2019-03-21
+// Last Updated for Version: 6.9.1
+// Date of the Last Update:  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -59,7 +59,7 @@ int main() {
             "Press 'e' or 'E'     to Cancel Entry\n"
             "Press <Esc>          to quit.\n\n";
 
-    the_calc->init(); // trigger initial transition
+    the_calc->init(0U); // trigger initial transition
 
     for (;;) { // event loop
         CalcEvt e; // Calculator event
@@ -130,7 +130,7 @@ int main() {
         }
 
         if (static_cast<QP::QEvt *>(&e)->sig != 0) { // valid event generated?
-            the_calc->dispatch(&e); // dispatch event
+            the_calc->dispatch(&e, 0U); // dispatch event
         }
     }
 

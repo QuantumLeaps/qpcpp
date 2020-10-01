@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-30
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -38,9 +38,6 @@
 
 #define QP_IMPL           // this is QF/QK implementation
 #include "qs_port.hpp"    // QS port
-
-#if (QS_OBJ_PTR_SIZE == 8U) || (QS_FUN_PTR_SIZE == 8U)
-
 #include "qs_pkg.hpp"     // QS package-scope internal interface
 
 namespace QP {
@@ -90,6 +87,4 @@ void QS::u64_fmt_(std::uint8_t format, std::uint64_t d) noexcept {
 }
 
 } // namespace QP
-
-#endif // (QS_OBJ_PTR_SIZE == 8U) || (QS_FUN_PTR_SIZE == 8U)
 

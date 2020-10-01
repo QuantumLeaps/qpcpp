@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example with emWin/uC/GUI, NO Window Manager
-// Last updated for version 6.8.0
-// Last updated on  2020-01-22
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -108,7 +108,7 @@ static const GUI_WIDGET_CREATE_INFO l_dialog[] = {
         GUI_ID_BUTTON0,    160, 130, 80, 30 }
 };
 
-   //..........................................................................*/
+//............................................................................
 static void onMainWndGUI(WM_MESSAGE* pMsg) {
     switch (pMsg->MsgId) {
         case WM_PAINT: {
@@ -125,7 +125,7 @@ static void onMainWndGUI(WM_MESSAGE* pMsg) {
         }
     }
 }
-   //..........................................................................*/
+//............................................................................
 static void onDialogGUI(WM_MESSAGE * pMsg) {
     switch (pMsg->MsgId) {
         case WM_INIT_DIALOG: {
@@ -133,10 +133,10 @@ static void onDialogGUI(WM_MESSAGE * pMsg) {
         }
         case WM_NOTIFY_PARENT: {
             switch (pMsg->Data.v) {
-                case WM_NOTIFICATION_RELEASED: {     // react only if released */
+                case WM_NOTIFICATION_RELEASED: { // react only if released
                     switch (WM_GetId(pMsg->hWinSrc)) {
                         case GUI_ID_BUTTON0: {
-                                        // static PAUSE event for the Table AO */
+                            // static PAUSE event for the Table AO
                             static QEvt const pauseEvt = { PAUSE_SIG, 0 };
                             AO_Table->POST(&pauseEvt, &l_onDialogGUI);
                             break;
@@ -153,23 +153,23 @@ static void onDialogGUI(WM_MESSAGE * pMsg) {
         }
     }
 }
-   //..........................................................................*/
+//............................................................................
 static void displyPhilStat(uint8_t n, char const *stat) {
     TEXT_SetText(WM_GetDialogItem(l_hDlg, GUI_ID_TEXT0 + n), stat);
-    WM_Exec();                    // update the screen and invoke WM callbacks */
+    WM_Exec(); // update the screen and invoke WM callbacks
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n])     // application-specific record begin */
-        QS_U8(1, n);                                     // Philosopher number */
-        QS_STR(stat);                                    // Philosopher status */
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
+        QS_U8(1, n);  // Philosopher number
+        QS_STR(stat); // Philosopher status
     QS_END()
 }
-   //..........................................................................*/
+//............................................................................
 static void displyTableStat(char const *stat) {
     TEXT_SetText(WM_GetDialogItem(l_hDlg, GUI_ID_TEXT5), stat);
-    WM_Exec();                    // update the screen and invoke WM callbacks */
+    WM_Exec();                    // update the screen and invoke WM callbacks
 
-    QS_BEGIN(TABLE_STAT, AO_Table)        // application-specific record begin */
-        QS_STR(stat);                                    // Philosopher status */
+    QS_BEGIN_ID(TABLE_STAT, AO_Table->m_prio) // app-specific record begin
+        QS_STR(stat); // Philosopher status
     QS_END()
 }
 
@@ -218,7 +218,7 @@ Q_STATE_DEF(Table, ready) {
             mouse.Layer   = Q_EVT_CAST(MouseEvt)->Layer;
             GUI_PID_StoreState(&mouse); // update the state of the Mouse PID
 
-            WM_Exec();            // update the screen and invoke WM callbacks
+            WM_Exec(); // update the screen and invoke WM callbacks
             return Q_RET_HANDLED;
         }
 

@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-11
+/// Last updated for version 6.9.1
+/// Last updated on  2020-08-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -96,7 +96,7 @@ void QF::thread_(QActive *act) {
 #endif
     {
         QEvt const *e = act->get_(); // wait for event
-        act->dispatch(e); // dispatch to the active object's state machine
+        act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
 #ifdef QF_ACTIVE_STOP
@@ -115,7 +115,7 @@ int_t QF::run(void) {
     onStartup(); // application-specific startup callback
 
     // produce the QS_QF_RUN trace record
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, 0U)
     QS_END_NOCRIT_PRE_()
 
     // leave the startup critical section to unblock any active objects
@@ -204,7 +204,7 @@ void QActive::start(std::uint_fast8_t const prio,
     // create the Win32 "event" to throttle the AO's event queue
     m_osObject = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-    this->init(par); // execute initial transition (virtual call)
+    this->init(par, m_prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
 
     // create a Win32 thread for the AO;

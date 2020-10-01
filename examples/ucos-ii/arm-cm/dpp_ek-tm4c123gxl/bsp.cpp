@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, uC/OS-II kernel
-// Last updated for version 6.8.1
-// Last updated on  2020-06-04
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -217,6 +217,10 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_tickHook);
     QS_OBJ_DICTIONARY(&l_GPIOPortA_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
+
+    // setup the QS filters...
+    QS_GLB_FILTER(QP::QS_SM_RECORDS);
+    QS_GLB_FILTER(QP::QS_UA_RECORDS);
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -233,7 +237,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
          ? 0xFFU             // turn the LED1 on
          : 0U);              // turn the LED1 off
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()
@@ -346,10 +350,6 @@ bool QS::onStartup(void const *arg) {
 
     DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
-
-    // setup the QS filters...
-    QS_FILTER_ON(QS_SM_RECORDS);
-    QS_FILTER_ON(QS_UA_RECORDS);
 
     return true; // return success
 }

@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-11
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-30
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -54,12 +54,12 @@ namespace QP {
 ///
 /// @note
 /// The QS records labeled as "not maskable" are always enabled and cannot
-/// be turend off with the QS_FILTER_OFF() macro. Other QS trace records
+/// be turend off with the QS_GLB_FILTER() macro. Other QS trace records
 /// can be disabled by means of the "global filters"
 ///
-/// @sa QS_FILTER_ON() and QS_FILTER_OFF() macros
+/// @sa QS_GLB_FILTER() macro
 
-enum QSpyRecords : std::uint8_t {
+enum QSpyRecords : std::int8_t {
     // [0] QS session (not maskable)
     QS_EMPTY,             //!< QS record for cleanly starting a session
 
@@ -91,14 +91,14 @@ enum QSpyRecords : std::uint8_t {
     QS_QF_EQUEUE_GET,     //!< get an event and queue still not empty
     QS_QF_EQUEUE_GET_LAST,//!< get the last event from the queue
 
-    // [23] Reserved QS records
-    QS_RESERVED_23,
+    // [23] Framework (QF) records */
+    QS_QF_NEW_ATTEMPT,    //!< an attempt to allocate an event failed
 
     // [24] Memory Pool (MP) records
     QS_QF_MPOOL_GET,      //!< a memory block was removed from memory pool
     QS_QF_MPOOL_PUT,      //!< a memory block was returned to memory pool
 
-    // [26] Framework (QF) records
+    // [26] Additional Framework (QF) records
     QS_QF_PUBLISH,        //!< an event was published
     QS_QF_NEW_REF,        //!< new event reference was created
     QS_QF_NEW,            //!< new event was created
@@ -196,32 +196,50 @@ enum QSpyRecords : std::uint8_t {
     QS_USER               //!< the first record available to QS users
 };
 
-//! QS record groups for QS_FILTER_ON() and QS_FILTER_OFF()
-enum QSpyRecordGroups : std::uint8_t {
-    QS_ALL_RECORDS = static_cast<std::uint8_t>(0xF0U),//!< all maskable records
-    QS_SM_RECORDS,        //!< State Machine QS records
-    QS_AO_RECORDS,        //!< Active Object QS records
-    QS_EQ_RECORDS,        //!< Event Queues QS records
-    QS_MP_RECORDS,        //!< Memory Pools QS records
-    QS_TE_RECORDS,        //!< Time Events QS records
-    QS_QF_RECORDS,        //!< QF QS records
-    QS_SC_RECORDS,        //!< Scheduler QS records
-    QS_U0_RECORDS,        //!< User Group 100-104 records
-    QS_U1_RECORDS,        //!< User Group 105-109 records
-    QS_U2_RECORDS,        //!< User Group 110-114 records
-    QS_U3_RECORDS,        //!< User Group 115-119 records
-    QS_U4_RECORDS,        //!< User Group 120-124 records
-    QS_UA_RECORDS         //!< All User records
+//! QS record groups for QS_GLB_FILTER()
+enum QSpyRecordGroups : std::int16_t {
+    QS_ALL_RECORDS = static_cast<std::uint8_t>(0xF0U), //!< all QS records
+    QS_SM_RECORDS,  //!< State Machine QS records
+    QS_AO_RECORDS,  //!< Active Object QS records
+    QS_EQ_RECORDS,  //!< Event Queues QS records
+    QS_MP_RECORDS,  //!< Memory Pools QS records
+    QS_TE_RECORDS,  //!< Time Events QS records
+    QS_QF_RECORDS,  //!< QF QS records
+    QS_SC_RECORDS,  //!< Scheduler QS records
+    QS_U0_RECORDS,  //!< User Group 100-104 records
+    QS_U1_RECORDS,  //!< User Group 105-109 records
+    QS_U2_RECORDS,  //!< User Group 110-114 records
+    QS_U3_RECORDS,  //!< User Group 115-119 records
+    QS_U4_RECORDS,  //!< User Group 120-124 records
+    QS_UA_RECORDS   //!< All User records
 };
 
-//! QS user record group offsets
-enum QSpyUserRecords : std::uint8_t {
-    QS_USER0 = QS_USER,   //!< offset for User Group 0
-    QS_USER1 = static_cast<std::uint8_t>(QS_USER0 + 5U),//!< offset of Group 1
-    QS_USER2 = static_cast<std::uint8_t>(QS_USER1 + 5U),//!< offset of Group 2
-    QS_USER3 = static_cast<std::uint8_t>(QS_USER2 + 5U),//!< offset of Group 3
-    QS_USER4 = static_cast<std::uint8_t>(QS_USER3 + 5U) //!< offset of Group 4
+//! QS user record group offsets for QS_GLB_FILTER()
+enum QSpyUserOffsets : std::int16_t {
+    QS_USER0 = QS_USER,      //!< offset for User Group 0
+    QS_USER1 = QS_USER0 + 5, //!< offset of Group 1
+    QS_USER2 = QS_USER1 + 5, //!< offset of Group 2
+    QS_USER3 = QS_USER2 + 5, //!< offset of Group 3
+    QS_USER4 = QS_USER3 + 5, //!< offset of Group 4
 };
+
+//! QS ID offsets for QS_LOC_FILTER()
+enum QSpyIdOffsets : std::int16_t {
+    QS_AO_ID = 0,  //!< offset for AO priorities
+    QS_EP_ID = 64, //!< offset for event-pool IDs
+    QS_EQ_ID = 80, //!< offset for event-queue IDs
+    QS_AP_ID = 96, //!< offset for Appl-spec IDs
+};
+
+//! QS ID groups for QS_LOC_FILTER()
+enum QSpyIdGroups : std::int16_t {
+    QS_ALL_IDS = 0xF0,            //!< all QS IDs
+    QS_AO_IDS  = 0x80 + QS_AO_ID, //!< AO IDs (priorities)
+    QS_EP_IDS  = 0x80 + QS_EP_ID, //!< event-pool IDs
+    QS_EQ_IDS  = 0x80 + QS_EQ_ID, //!< event-queue IDs
+    QS_AP_IDS  = 0x80 + QS_AP_ID, //!< Application-specific IDs
+};
+
 
 } // namespace QP ************************************************************
 
@@ -280,11 +298,13 @@ public:
     static void initBuf(std::uint8_t * const sto,
                         std::uint_fast16_t const stoSize) noexcept;
 
-    //! Turn the global Filter on for a given record type @p rec.
-    static void filterOn_(std::uint_fast8_t const rec) noexcept;
+    //! Set/clear the global Filter for a given QS record
+    //  or a group of records.
+    static void glbFilter_(std::int_fast16_t const filter) noexcept;
 
-    //! Turn the global Filter off for a given record type @p rec.
-    static void filterOff_(std::uint_fast8_t const rec) noexcept;
+    //! Set/clear the local Filter for a given object-id
+    //  or a group of object-ids.
+    static void locFilter_(std::int_fast16_t const filter) noexcept;
 
     //! Mark the begin of a QS record @p rec
     static void beginRec_(std::uint_fast8_t const rec) noexcept;
@@ -338,13 +358,11 @@ public:
     //! Output memory block of up to 255-bytes with format information
     static void mem_fmt_(std::uint8_t const *blk, std::uint8_t size) noexcept;
 
-#if (QS_OBJ_PTR_SIZE == 8U) || (QS_FUN_PTR_SIZE == 8U)
     //! Output uint64_t data element without format information
     static void u64_raw_(std::uint64_t d) noexcept;
 
     //! Output uint64_t data element with format information
     static void u64_fmt_(std::uint8_t format, std::uint64_t d) noexcept;
-#endif  // (QS_OBJ_PTR_SIZE == 8U) || (QS_FUN_PTR_SIZE == 8U)
 
     //! Output signal dictionary record
     static void sig_dict_pre_(enum_t const sig, void const * const obj,
@@ -476,7 +494,7 @@ public:
         FUN_T,        //!< function pointer format
         I64_T,        //!< signed 64-bit integer format
         U64_T,        //!< unsigned 64-bit integer format
-        U32_HEX_T     //!< unsigned 32-bit integer in hex format
+        HEX_FMT       //!< HEX format for the "width" filed
     };
 
     //! Kinds of objects used in QS
@@ -506,8 +524,9 @@ public:
     }
 
     // private QS attributes .................................................
-    std::uint8_t glbFilter[16];     //!< global on/off QS filter
-    void const *locFilter[MAX_OBJ]; //!< local QS filters
+    std::uint8_t glbFilter[16];  //!< global on/off QS filter
+    std::uint8_t locFilter[16];  //!< lobal  on/off QS filter
+    void const *locFilter_AP; //!< deprecated local QS filter
     std::uint8_t *buf;    //!< pointer to the start of the ring buffer
     QSCtr    end;         //!< offset of the end of the ring buffer
     QSCtr    head;        //!< offset to where next byte will be inserted
@@ -602,9 +621,13 @@ public:
         this->start(prio, qSto, qLen, stkSto, stkSize, nullptr);
     }
 
-    void init(void const * const e) noexcept override;
-    void init(void) noexcept override { this->init(nullptr); }
-    void dispatch(QEvt const * const e) noexcept override;
+    void init(void const * const e,
+              std::uint_fast8_t const qs_id) noexcept override;
+    void init(std::uint_fast8_t const qs_id) noexcept override {
+        this->init(qs_id);
+    }
+    void dispatch(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) noexcept override;
     bool post_(QEvt const * const e,
                std::uint_fast16_t const margin,
                void const * const sender) noexcept override;
@@ -612,6 +635,9 @@ public:
 };
 
 constexpr std::uint8_t QUTEST_ON_POST {124U};
+
+// interrupt nesting up-down counter
+extern std::uint8_t volatile QF_intNest;
 
 #endif // Q_UTEST
 
@@ -625,7 +651,7 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
 /// This macro provides an indirection layer to invoke the QS initialization
 /// routine if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
 /// @sa QP::QS::onStartup(), example of setting up a QS filter in
-/// QS_FILTER_ON()
+/// QS_GLB_FILTER()
 #define QS_INIT(arg_)           (QP::QS::onStartup(arg_))
 
 //! Cleanup the QS facility.
@@ -643,139 +669,18 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
 /// @usage
 /// The following example shows how to use QS filters:
 /// @include qs_filter.cpp
-#define QS_FILTER_ON(rec_) \
-    (QP::QS::filterOn_(static_cast<std::uint_fast8_t>(rec_)))
+#define QS_GLB_FILTER(rec_) \
+    (QP::QS::glbFilter_(static_cast<std::int_fast16_t>(rec_)))
 
-//! Global filter OFF for a given record type @p rec.
+//! Local Filter for a given state machine object @p qs_id.
 /// @description
-/// This macro provides an indirection layer to call QP::QS::filterOff()
+/// This macro provides an indirection layer to call QS_locFilter_()
 /// if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
 ///
-/// @sa Example of using QS filters in #QS_FILTER_ON documentation
-#define QS_FILTER_OFF(rec_) \
-    (QP::QS::filterOff_(static_cast<std::uint_fast8_t>(rec_)))
-
-//! Local Filter for a given state machine object @p obj_.
-/// @description
-/// This macro sets up the state machine object local filter if #Q_SPY is
-/// defined, or does nothing if #Q_SPY is not defined. The argument @p obj_
-/// is the pointer to the state machine object that you want to monitor.@n
-/// @n
-/// The state machine object filter allows you to filter QS records pertaining
-/// only to a given state machine object. With this filter disabled, QS will
-/// output records from all state machines in your application. The object
-/// filter is disabled by setting the state machine pointer to NULL.@n
-/// @n
-/// The state machine filter affects the following QS records:
-/// QP::QS_QEP_STATE_ENTRY, QP::QS_QEP_STATE_EXIT, QP::QS_QEP_STATE_INIT,
-/// QP::QS_QEP_INTERN_TRAN, QP::QS_QEP_TRAN, and QP::QS_QEP_IGNORED.
-///
-/// @note
-/// Because active objects are state machines at the same time, the state
-/// machine filter (QS_FILTER_SM_OBJ) pertains to active objects as well.
-/// However, the state machine filter is more general, because it can be
-/// used only for state machines that are not active objects, such as
-/// "Orthogonal Components".
-///
-/// @sa Example of using QS filters in #QS_FILTER_ON documentation
-#define QS_FILTER_SM_OBJ(obj_) \
-    (QP::QS::priv_.locFilter[QP::QS::SM_OBJ] = (obj_))
-
-//! Local Filter for a given active object @p obj_.
-/// @description
-/// This macro sets up the active object local filter if #Q_SPY is defined,
-/// or does nothing if #Q_SPY is not defined. The argument @p obj_ is the
-/// pointer to the active object that you want to monitor.@n
-/// @n
-/// The active object filter allows you to filter QS records pertaining
-/// only to a given active object. With this filter disabled, QS will
-/// output records from all active objects in your application. The object
-/// filter is disabled by setting the active object pointer @p obj_ to NULL.@n
-/// @n
-/// The active object filter affects the following QS records:
-/// QP::QS_QF_ACTIVE_DEFER, QP::QS_QF_ACTIVE_RECALL,
-/// QP::QS_QF_ACTIVE_SUBSCRIBE, QP::QS_QF_ACTIVE_UNSUBSCRIBE,
-/// QP::QS_QF_ACTIVE_POST, QP::QS_QF_ACTIVE_POST_LIFO,
-/// QP::QS_QF_ACTIVE_GET, QP::QS_QF_ACTIVE_GET_LAST, and
-/// QP::QS_QF_ACTIVE_RECALL_ATTEMPT.
-///
-/// @sa Example of using QS filters in #QS_FILTER_ON documentation
-#define QS_FILTER_AO_OBJ(obj_) \
-    (QP::QS::priv_.locFilter[QP::QS::AO_OBJ] = (obj_))
-
-//! Local Filter for a given memory pool object @p obj_.
-/// @description
-/// This macro sets up the memory pool object local filter if #Q_SPY is
-/// defined, or does nothing if #Q_SPY is not defined. The argument @p obj_
-/// is the pointer to the memory buffer used during the initialization of the
-/// event pool with QP::QF::poolInit().@n
-/// @n
-/// The memory pool filter allows you to filter QS records pertaining
-/// only to a given memory pool. With this filter disabled, QS will
-/// output records from all memory pools in your application. The object
-/// filter is disabled by setting the memory pool pointer @p obj_ to NULL.@n
-/// @n
-/// The memory pool filter affects the following QS records:
-/// QP::QS_QF_MPOOL_GET, and QP::QS_QF_MPOOL_PUT.
-///
-/// @sa Example of using QS filters in QS_FILTER_ON() documentation
-#define QS_FILTER_MP_OBJ(obj_) \
-    (QP::QS::priv_.locFilter[QP::QS::MP_OBJ] = (obj_))
-
-//! Filter for a given event queue object @p obj_.
-/// @description
-/// This macro sets up the event queue object filter if #Q_SPY is defined,
-/// or does nothing if #Q_SPY is not defined. The argument @p obj_ is the
-/// pointer to the "raw" thread-safe queue object you want to monitor.@n
-/// @n
-/// The event queue filter allows you to filter QS records pertaining
-/// only to a given event queue. With this filter disabled, QS will
-/// output records from all event queues in your application. The object
-/// filter is disabled by setting the event queue pointer @p obj_ to NULL.@n
-/// @n
-/// The event queue filter affects the following QS records:
-/// QP::QS_QF_EQUEUE_POST, QP::QS_QF_EQUEUE_POST_LIFO,
-/// QP::QS_QF_EQUEUE_GET, and QP::QS_QF_EQUEUE_GET_LAST.
-///
-/// @sa Example of using QS filters in #QS_FILTER_ON documentation
-#define QS_FILTER_EQ_OBJ(obj_) \
-    (QP::QS::priv_.locFilter[QP::QS::EQ_OBJ] = (obj_))
-
-//! Local Filter for a given time event object @p obj_.
-/// @description
-/// This macro sets up the time event object local filter if #Q_SPY is
-/// defined, or does nothing if #Q_SPY is not defined. The argument @p obj_
-/// is the pointer to the time event object you want to monitor.@n
-/// @n
-/// The time event filter allows you to filter QS records pertaining
-/// only to a given time event. With this filter disabled, QS will
-/// output records from all time events in your application. The object
-/// filter is disabled by setting the time event pointer @p obj_ to NULL.@n
-/// @n
-/// The time event filter affects the following QS records:
-/// QP::QS_QF_TIMEEVT_ARM, QP::QS_QF_TIMEEVT_AUTO_DISARM,
-/// QP::QS_QF_TIMEEVT_DISARM_ATTEMPT, QP::QS_QF_TIMEEVT_DISARM,
-/// QP::QS_QF_TIMEEVT_REARM, and QP::QS_QF_TIMEEVT_POST.
-///
-/// @sa Example of using QS filters in #QS_FILTER_ON documentation
-#define QS_FILTER_TE_OBJ(obj_) \
-    (QP::QS::priv_.locFilter[QP::QS::TE_OBJ] = (obj_))
-
-//! Local Filter for a generic application object @p obj_.
-/// @description
-/// This macro sets up the local application object filter if #Q_SPY is
-/// defined, or does nothing if #Q_SPY is not defined. The argument @p obj_
-/// is the pointer to the application object you want to monitor.@n
-/// @n
-/// The application object filter allows you to filter QS records pertaining
-/// only to a given application object. With this filter disabled, QS will
-/// output records from all application-records enabled by the global filter.
-/// The local filter is disabled by setting the time event pointer @p obj_
-/// to NULL.
-///
-/// @sa Example of using QS filters in #QS_FILTER_ON documentation
-#define QS_FILTER_AP_OBJ(obj_) \
-    (QP::QS::priv_.locFilter[QP::QS::AP_OBJ] = (obj_))
+/// The following example shows how to use QS filters:
+/// @include qs_filter.cpp
+#define QS_LOC_FILTER(qs_id_)  \
+    (QP::QS::locFilter_(static_cast<std::int_fast16_t>(qs_id_)))
 
 
 //****************************************************************************
@@ -784,38 +689,32 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
 //! Begin a user QS record with entering critical section.
 /// @description
 /// The following example shows how to build a user QS record using the
-/// macros #QS_BEGIN, #QS_END, and the formatted output macros: #QS_U8 and
-/// #QS_STR.
+/// macros QS_BEGIN_ID(), QS_END(), and the formatted output macros:
+/// QS_U8(), QS_STR(), etc.
 ///
 /// @note
-/// Must always be used in pair with #QS_END
+/// Must always be used in pair with QS_END()
 ///
 /// @include qs_user.cpp
-#define QS_BEGIN(rec_, obj_)                                         \
-    if (QS_GLB_FILTER_(rec_) &&                                      \
-        ((QP::QS::priv_.locFilter[QP::QS::AP_OBJ] == nullptr)        \
-            || (QP::QS::priv_.locFilter[QP::QS::AP_OBJ] == (obj_)))) \
-    {                                                                \
-        QS_CRIT_STAT_                                                \
-        QS_CRIT_ENTRY_();                                            \
-        QP::QS::beginRec_(static_cast<std::uint_fast8_t>(rec_));     \
+#define QS_BEGIN_ID(rec_, qs_id_)                                \
+    if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) {          \
+        QS_CRIT_STAT_                                            \
+        QS_CRIT_E_();                                            \
+        QP::QS::beginRec_(static_cast<std::uint_fast8_t>(rec_)); \
         QS_TIME_PRE_();
 
 //! End a QS record with exiting critical section.
-/// @sa example for #QS_BEGIN
-/// @note Must always be used in pair with #QS_BEGIN
+/// @sa example for QS_BEGIN_ID()
+/// @note Must always be used in pair with QS_BEGIN_ID()
 #define QS_END()           \
         QP::QS::endRec_(); \
-        QS_CRIT_EXIT_();   \
+        QS_CRIT_X_();      \
     }
 
 //! Begin a QS user record without entering critical section.
-#define QS_BEGIN_NOCRIT(rec_, obj_)                                  \
-    if (QS_GLB_FILTER_(rec_) &&                                      \
-        ((QP::QS::priv_.locFilter[QP::QS::AP_OBJ] == nullptr)        \
-            || (QP::QS::priv_.locFilter[QP::QS::AP_OBJ] == (obj_)))) \
-    {                                                                \
-        QP::QS::beginRec_(rec_);                                     \
+#define QS_BEGIN_NOCRIT(rec_, qs_id_)                            \
+    if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) {          \
+        QP::QS::beginRec_(rec_);                                 \
         QS_TIME_PRE_();
 
 //! End a QS user record without exiting critical section.
@@ -829,10 +728,17 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
 #endif // QS_REC_DONE
 
 //! helper macro for checking the global QS filter
-#define QS_GLB_FILTER_(rec_)                                    \
-    ((QP::QS::priv_.glbFilter[static_cast<unsigned>(rec_) >> 3] \
-      & static_cast<std::uint8_t>(                              \
-            1U << (static_cast<unsigned>(rec_) & 7U))) != 0U)
+#define QS_GLB_CHECK_(rec_)                                              \
+    ((QP::QS::priv_.glbFilter[static_cast<std::uint_fast8_t>(rec_) >> 3] \
+      & static_cast<std::uint8_t>(1U                                     \
+             << (static_cast<std::uint_fast8_t>(rec_) & 7U))) != 0U)
+
+//! helper macro for checking the local QS filter
+#define QS_LOC_CHECK_(qs_id_)                                              \
+    ((QP::QS::priv_.locFilter[static_cast<std::uint_fast8_t>(qs_id_) >> 3] \
+      & static_cast<std::uint8_t>(1U                                       \
+             << (static_cast<std::uint_fast8_t>(qs_id_) & 7U))) != 0U)
+
 
 //****************************************************************************
 // Facilities for QS ciritical section
@@ -842,12 +748,12 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
 
 #ifndef QS_CRIT_STAT_TYPE
     #define QS_CRIT_STAT_
-    #define QS_CRIT_ENTRY_()    QS_CRIT_ENTRY(dummy)
-    #define QS_CRIT_EXIT_()     QS_CRIT_EXIT(dummy); QS_REC_DONE()
+    #define QS_CRIT_E_()    QS_CRIT_ENTRY(dummy)
+    #define QS_CRIT_X_()     QS_CRIT_EXIT(dummy); QS_REC_DONE()
 #else
     #define QS_CRIT_STAT_       QS_CRIT_STAT_TYPE critStat_;
-    #define QS_CRIT_ENTRY_()    QS_CRIT_ENTRY(critStat_)
-    #define QS_CRIT_EXIT_()     QS_CRIT_EXIT(critStat_); QS_REC_DONE()
+    #define QS_CRIT_E_()    QS_CRIT_ENTRY(critStat_)
+    #define QS_CRIT_X_()     QS_CRIT_EXIT(critStat_); QS_REC_DONE()
 #endif // QS_CRIT_STAT_TYPE
 
 #else // separate QS critical section not defined--use the QF definition
@@ -871,7 +777,7 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
     /// invokes #QF_CRIT_ENTRY passing the key variable as the parameter.
     /// Otherwise #QF_CRIT_ENTRY is invoked with a dummy parameter.
     /// @sa #QF_CRIT_ENTRY
-    #define QS_CRIT_ENTRY_()    QF_CRIT_ENTRY(dummy)
+    #define QS_CRIT_E_()    QF_CRIT_ENTRY(dummy)
 
     //! This is an internal macro for exiting a critical section.
     /// @description
@@ -881,12 +787,12 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
     /// invokes #QF_CRIT_EXIT passing the key variable as the parameter.
     /// Otherwise #QF_CRIT_EXIT is invoked with a dummy parameter.
     /// @sa #QF_CRIT_EXIT
-    #define QS_CRIT_EXIT_()     QF_CRIT_EXIT(dummy); QS_REC_DONE()
+    #define QS_CRIT_X_()     QF_CRIT_EXIT(dummy); QS_REC_DONE()
 
 #elif (!defined QS_CRIT_STAT_)
     #define QS_CRIT_STAT_       QF_CRIT_STAT_TYPE critStat_;
-    #define QS_CRIT_ENTRY_()    QF_CRIT_ENTRY(critStat_)
-    #define QS_CRIT_EXIT_()     QF_CRIT_EXIT(critStat_); QS_REC_DONE()
+    #define QS_CRIT_E_()    QF_CRIT_ENTRY(critStat_)
+    #define QS_CRIT_X_()     QF_CRIT_EXIT(critStat_); QS_REC_DONE()
 #endif // simple unconditional interrupt disabling used
 
 #endif // separate QS critical section not defined
@@ -941,12 +847,6 @@ constexpr std::uint8_t QUTEST_ON_POST {124U};
     (QP::QS::u64_fmt_(static_cast<std::uint8_t>(             \
         (static_cast<std::uint8_t>((width_) << 4))           \
             | static_cast<std::uint8_t>(QP::QS::U64_T)), (data_)))
-
-//! Output formatted std::uint32_t to the QS record
-#define QS_U32_HEX(width_, data_)                            \
-    (QP::QS::u32_fmt_(static_cast<std::uint8_t>(             \
-        (static_cast<std::uint8_t>((width_) << 4))           \
-            | static_cast<std::uint8_t>(QP::QS::U32_HEX_T)), (data_)))
 
 //! Output formatted 32-bit floating point number to the QS record
 #define QS_F32(width_, data_)                                \

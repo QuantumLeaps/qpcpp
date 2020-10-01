@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-09
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-15
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -184,7 +184,8 @@ public:
     /// queue becomes full and cannot accept the event.
     ///
     /// @sa QP::QEQueue::postLIFO(), QP::QEQueue::get()
-    bool post(QEvt const * const e, std::uint_fast16_t const margin) noexcept;
+    bool post(QEvt const * const e, std::uint_fast16_t const margin,
+              std::uint_fast8_t const qs_id) noexcept;
 
     //! "raw" thread-safe QF event queue implementation for the
     //! First-In-First-Out (FIFO) event posting. You can call this function
@@ -194,7 +195,8 @@ public:
     /// full and cannot accept the event.
     ///
     /// @sa QP::QEQueue::postLIFO(), QP::QEQueue::get()
-    void postLIFO(QEvt const * const e) noexcept;
+    void postLIFO(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) noexcept;
 
     //! "raw" thread-safe QF event queue implementation for the
     //! Last-In-First-Out (LIFO) event posting.
@@ -208,7 +210,7 @@ public:
     /// internally a critical section.
     ///
     /// @sa QP::QEQueue::post(), QP::QEQueue::postLIFO(), QP::QEQueue::get()
-    QEvt const *get(void) noexcept;
+    QEvt const *get(std::uint_fast8_t const qs_id) noexcept;
 
     //! "raw" thread-safe QF event queue operation for obtaining the number
     //! of free entries still available in the queue.

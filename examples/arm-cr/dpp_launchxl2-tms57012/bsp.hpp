@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example
-// Last Updated for Version: 5.6.0
-// Date of the Last Update:  2015-12-28
+// Last updated for version 6.9.1
+// Last updated on  2020-09-22
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,10 +25,10 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com>
 // <info@state-machine.com>
 //****************************************************************************
 #ifndef BSP_HPP

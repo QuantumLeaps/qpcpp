@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ///**************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-11
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -63,7 +63,7 @@ int_t QF::run(void) {
 
     // produce the QS_QF_RUN trace record
     QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_BEGIN_PRE_(QS_QF_RUN, 0U)
     QS_END_PRE_()
 
     return 0; // return success
@@ -77,7 +77,7 @@ void QF::thread_(QActive *act) {
     // event loop of the active object thread
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
-        act->dispatch(e); // dispatch to the active object's state machine
+        act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
 }
@@ -104,7 +104,7 @@ void QActive::start(std::uint_fast8_t const prio,
     m_prio = prio;  // save the QF priority
     QF::add_(this); // make QF aware of this active object
 
-    init(par);      // execute initial transition
+    init(par, m_prio); // execute initial transition
     QS_FLUSH();     // flush the trace buffer to the host
 
     // convert QF priority to the ThreadX priority
@@ -134,7 +134,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 {
     bool status;
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
     std::uint_fast16_t nFree =
         static_cast<std::uint_fast16_t>(m_eQueue.tx_queue_available_storage);
@@ -157,8 +157,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
     if (status) { // can post the event?
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
-                         QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
             QS_TIME_PRE_();       // timestamp
             QS_OBJ_PRE_(sender);  // the sender object
             QS_SIG_PRE_(e->sig);  // the signal of the event
@@ -173,7 +172,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
             QF_EVT_REF_CTR_INC_(e); // increment the reference counter
         }
 
-        QF_CRIT_EXIT_();
+        QF_CRIT_X_();
 
         QEvt const *ep = const_cast<QEvt const *>(e);
         Q_ALLEGE_ID(520,
@@ -182,8 +181,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     }
     else {
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_ATTEMPT,
-            QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
             QS_TIME_PRE_();       // timestamp
             QS_OBJ_PRE_(sender);  // the sender object
             QS_SIG_PRE_(e->sig);  // the signal of the event
@@ -193,7 +191,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
             QS_EQC_PRE_(0U);      // min # free (unknown)
         QS_END_NOCRIT_PRE_()
 
-        QF_CRIT_EXIT_();
+        QF_CRIT_X_();
     }
 
     return status;
@@ -201,10 +199,9 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 //............................................................................
 void QActive::postLIFO(QEvt const * const e) {
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO,
-                     QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
         QS_TIME_PRE_();       // timestamp
         QS_SIG_PRE_(e->sig);  // the signal of this event
         QS_OBJ_PRE_(this);    // this active object
@@ -219,7 +216,7 @@ void QActive::postLIFO(QEvt const * const e) {
         QF_EVT_REF_CTR_INC_(e);  // increment the reference counter
     }
 
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     // LIFO posting must succeed, see NOTE1
     QEvt const *ep = const_cast<QEvt const *>(e);
@@ -236,7 +233,7 @@ QEvt const *QActive::get_(void) {
         tx_queue_receive(&m_eQueue, (VOID *)&e, TX_WAIT_FOREVER)
         == TX_SUCCESS);
 
-    QS_BEGIN_PRE_(QS_QF_ACTIVE_GET, QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_PRE_(QS_QF_ACTIVE_GET, m_prio)
         QS_TIME_PRE_();       // timestamp
         QS_SIG_PRE_(e->sig);  // the signal of this event
         QS_OBJ_PRE_(this);    // this active object
@@ -263,7 +260,7 @@ void QFSchedLock::lock(std::uint_fast8_t prio) {
         QS_CRIT_STAT_
         m_lockPrio = prio;
 
-        QS_BEGIN_PRE_(QS_SCHED_LOCK, nullptr, nullptr)
+        QS_BEGIN_PRE_(QS_SCHED_LOCK, 0U)
             QS_TIME_PRE_(); // timestamp
             QS_2U8_PRE_(QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - m_prevThre,
                         prio); // new lock prio
@@ -287,7 +284,7 @@ void QFSchedLock::unlock(void) const {
     Q_REQUIRE_ID(900, (m_lockHolder != nullptr)
                       && (m_lockPrio != 0U));
 
-    QS_BEGIN_PRE_(QS_SCHED_UNLOCK, nullptr, nullptr)
+    QS_BEGIN_PRE_(QS_SCHED_UNLOCK, 0U)
         QS_TIME_PRE_(); // timestamp
         QS_2U8_PRE_(m_lockPrio,/* prev lock prio */
                     QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - m_prevThre);

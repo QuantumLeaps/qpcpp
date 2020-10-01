@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to POSIX API with cooperative QV scheduler (posix-qv)
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-06-23
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -113,14 +113,12 @@ int  QF_consoleWaitForKey(void);
 
     // event pool operations...
     #define QF_EPOOL_TYPE_  QMPool
-
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
-
     #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_))))
-    #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
+    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
 
     #include <pthread.h>   // POSIX-thread API
 

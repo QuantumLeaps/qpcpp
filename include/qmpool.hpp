@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-09
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -140,10 +140,11 @@ public:
               std::uint_fast16_t blockSize) noexcept;
 
     //! Obtains a memory block from a memory pool.
-    void *get(std::uint_fast16_t const margin) noexcept;
+    void *get(std::uint_fast16_t const margin,
+              std::uint_fast8_t const qs_id) noexcept;
 
     //! Returns a memory block back to a memory pool.
-    void put(void * const b) noexcept;
+    void put(void * const b, std::uint_fast8_t const qs_id) noexcept;
 
     //! return the fixed block-size of the blocks managed by this pool
     QMPoolSize getBlockSize(void) const noexcept {
@@ -152,8 +153,10 @@ public:
 
 // duplicated API to be used exclusively inside ISRs (useful in some QP ports)
 #ifdef QF_ISR_API
-    void *getFromISR(std::uint_fast16_t const margin) noexcept;
-    void putFromISR(void * const b) noexcept;
+    void *getFromISR(std::uint_fast16_t const margin,
+                     std::uint_fast8_t const qs_id) noexcept;
+    void putFromISR(void * const b,
+                    std::uint_fast8_t const qs_id) noexcept;
 #endif // QF_ISR_API
 
 private:

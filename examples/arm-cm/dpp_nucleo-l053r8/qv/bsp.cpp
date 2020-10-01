@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L053R8 board, cooperative QV kernel
-// Last Updated for Version: 6.9.0
-// Date of the Last Update:  2020-08-14
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,10 +25,10 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
@@ -168,6 +168,11 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_EXTI0_1_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
+
+    // setup the QS filters...
+    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
+    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
+    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -178,7 +183,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
         GPIOA->BSRR |= (LED_LD2 << 16);  // turn LED off
     }
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()
@@ -338,19 +343,6 @@ bool QS::onStartup(void const *arg) {
 
     DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
-
-    // setup the QS filters...
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_ON(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_ON(QS_QEP_UNHANDLED);
-
-    QS_FILTER_ON(DPP::PHILO_STAT);
 
     return true; // return success
 }

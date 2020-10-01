@@ -119,9 +119,9 @@ int QF_consoleWaitForKey(void);
     // Win32-specific event queue customization
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         while ((me_)->m_eQueue.m_frontEvt == nullptr) { \
-            QF_CRIT_EXIT_(); \
+            QF_CRIT_X_(); \
             (void)WaitForSingleObject((me_)->m_osObject, (DWORD)INFINITE); \
-            QF_CRIT_ENTRY_(); \
+            QF_CRIT_E_(); \
         }
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
@@ -130,14 +130,12 @@ int QF_consoleWaitForKey(void);
 
     // Win32-specific event pool operations
     #define QF_EPOOL_TYPE_  QMPool
-
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
-
     #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_))))
-    #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
+    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+    #define QF_EPOOL_PUT_(p_, e_, qs_id_)  ((p_).put((e_), (qs_id_)))
 
     // Minimum required Windows version is Windows-XP or newer (0x0501)
     #ifdef WINVER

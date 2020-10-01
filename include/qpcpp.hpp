@@ -3,8 +3,8 @@
 /// @ingroup qep qf qv qk qxk qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-03
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-30
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -72,6 +72,63 @@
 #endif  // QP_API_VERSION
 
 // QP/C++ API compatibility layer...
+
+//****************************************************************************
+#if (QP_API_VERSION < 691)
+
+//! @deprecated enable the QS global filter
+#define QS_FILTER_ON(rec_)        QS_GLB_FILTER((rec_))
+
+//! @deprecated disable the QS global filter
+#define QS_FILTER_OFF(rec_)       QS_GLB_FILTER(-(rec_))
+
+//! @deprecated enable the QS local filter for SM (state machine) object
+#define QS_FILTER_SM_OBJ(obj_)    (static_cast<void>(0))
+
+//! @deprecated enable the QS local filter for AO (active objects)
+#define QS_FILTER_AO_OBJ(obj_)    (static_cast<void>(0))
+
+//! @deprecated enable the QS local filter for MP (memory pool) object
+#define QS_FILTER_MP_OBJ(obj_)    (static_cast<void>(0))
+
+//! @deprecated enable the QS local filter for EQ (event queue) object
+#define QS_FILTER_EQ_OBJ(obj_)    (static_cast<void>(0))
+
+//! @deprecated enable the QS local filter for TE (time event) object
+#define QS_FILTER_TE_OBJ(obj_)    (static_cast<void>(0))
+
+#ifdef Q_SPY
+
+//! @deprecated local Filter for a generic application object @p obj_.
+#define QS_FILTER_AP_OBJ(obj_) \
+    (QP::QS::priv_.locFilter_AP = (obj_))
+
+//! @deprecated begin of a user QS record, instead use QS_BEGIN_ID()
+#define QS_BEGIN(rec_, obj_)                                     \
+    if (QS_GLB_FILTER_(rec_) &&                                  \
+        ((QP::QS::priv_.locFilter[QP::QS::AP_OBJ] == nullptr)    \
+            || (QP::QS::priv_.locFilter_AP == (obj_))))          \
+    {                                                            \
+        QS_CRIT_STAT_                                            \
+        QS_CRIT_E_();                                            \
+        QP::QS::beginRec_(static_cast<std::uint_fast8_t>(rec_)); \
+        QS_TIME_PRE_();
+
+//! @deprecated output hex-formatted std::uint32_t to the QS record
+#define QS_U32_HEX(width_, data_)                            \
+    (QP::QS::u32_fmt_(static_cast<std::uint8_t>(             \
+        (static_cast<std::uint8_t>((width_) << 4))           \
+            | static_cast<std::uint8_t>(0xFU)), (data_)))
+
+
+
+#else
+
+#define QS_FILTER_AP_OBJ(obj_)    (static_cast<void>(0))
+#define QS_BEGIN(rec_, obj_)      if (false) {
+#define QS_U32_HEX(width_, data_) (static_cast<void>(0))
+
+#endif
 
 //****************************************************************************
 #if (QP_API_VERSION < 680)
@@ -150,6 +207,7 @@
 #define QM_SUPER_SUB(state_)  (me->qm_super_sub((state_)))
 
 #endif // QP_API_VERSION < 680
+#endif // QP_API_VERSION < 691
 
 #endif // qpcpp_h
 

@@ -3,8 +3,8 @@
 /// @brief Internal (package scope) QS/C++ interface.
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -65,33 +65,32 @@
 //! Internal QS macro to begin a predefined QS record with critical section.
 /// @note
 /// This macro is intended to use only inside QP components and NOT
-/// at the application level. @sa #QS_BEGIN
-#define QS_BEGIN_PRE_(rec_, objFilter_, obj_) \
-    if (QS_GLB_FILTER_(rec_)                  \
-        && (((objFilter_) == nullptr)         \
-            || ((objFilter_) == (obj_))))     \
-    {                                         \
-        QS_CRIT_ENTRY_();                     \
+/// at the application level.
+/// @sa QS_BEGIN_ID()
+///
+#define QS_BEGIN_PRE_(rec_, qs_id_)                           \
+    if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) {       \
+        QS_CRIT_E_();                                         \
         QP::QS::beginRec_(static_cast<std::uint_fast8_t>(rec_));
 
 //! Internal QS macro to end a predefined QS record with critical section.
 /// @note
 /// This macro is intended to use only inside QP components and NOT
-/// at the application level. @sa #QS_END
+/// at the application level.
+/// @sa QS_END()
+///
 #define QS_END_PRE_()      \
         QP::QS::endRec_(); \
-        QS_CRIT_EXIT_();   \
+        QS_CRIT_X_();      \
     }
 
 //! Internal QS macro to begin a predefined QS record without critical section.
 /// @note
 /// This macro is intended to use only inside QP components and NOT
-/// at the application level. @sa #QS_BEGIN_NOCRIT_PRE_
-#define QS_BEGIN_NOCRIT_PRE_(rec_, objFilter_, obj_) \
-    if (QS_GLB_FILTER_(rec_)                         \
-        && (((objFilter_) == nullptr)                \
-            || ((objFilter_) == (obj_))))            \
-    {                                                \
+/// at the application level.
+/// @sa QS_BEGIN_NOCRIT_PRE_()
+#define QS_BEGIN_NOCRIT_PRE_(rec_, qs_id_)                    \
+    if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) {       \
         QP::QS::beginRec_(static_cast<std::uint_fast8_t>(rec_));
 
 //! Internal QS macro to end a predefiend QS record without critical section.
@@ -251,9 +250,6 @@
 #define QS_REC_NUM_(enum_) (static_cast<std::uint_fast8_t>(enum_))
 
 namespace QP {
-
-extern char const BUILD_DATE[12];
-extern char const BUILD_TIME[9];
 
 /// @brief Frame character of the QS output protocol
 constexpr std::uint8_t QS_FRAME = 0x7EU;

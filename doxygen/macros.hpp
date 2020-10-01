@@ -131,8 +131,8 @@ namespace QP {
 /// @note This is a specific implementation for the QK-port of QF.
 /// In other QF ports you need to define the macro appropriately for
 /// the underlying kernel/OS you're using.
-#define QF_EPOOL_GET_(p_, e_, m_) \
-    ((e_) = static_cast<QEvt *>((p_).get((m_))))
+#define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+    ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
 
 /// Platform-dependent macro defining how QF should return an event
 /// @a e_ to the event pool @a p_
@@ -140,7 +140,7 @@ namespace QP {
 /// @note This is a specific implementation for the QK-port of QF.
 /// In other QF ports you need to define the macro appropriately for
 /// the underlying kernel/OS you're using.
-#define QF_EPOOL_PUT_(p_, e_)   ((p_).put(e_))
+#define QF_EPOOL_PUT_(p_, e_, qs_id_)   ((p_).put((e_), (qs_id_)))
 
 /// Macro that should be defined (typically on the compiler's command line)
 /// in the Win32-GUI applications that use the @ref win32 or @ref win32-qv

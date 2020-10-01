@@ -2,8 +2,8 @@
 /// @brief QMActive::QMActive() and virtual functions
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -65,17 +65,17 @@ QMActive::QMActive(QStateHandler const initial) noexcept
 }
 
 //............................................................................
-void QMActive::init(void const * const e) {
+void QMActive::init(void const * const e, std::uint_fast8_t const qs_id) {
     m_state.obj = &QMsm::msm_top_s;
-    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(e);
+    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(e, qs_id);
 }
 //............................................................................
-void QMActive::init(void) {
-    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init();
+void QMActive::init(std::uint_fast8_t const qs_id) {
+    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(qs_id);
 }
 //............................................................................
-void QMActive::dispatch(QEvt const * const e) {
-    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::dispatch(e);
+void QMActive::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
+    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::dispatch(e, qs_id);
 }
 //............................................................................
 bool QMActive::isInState(QMState const * const st) const noexcept {

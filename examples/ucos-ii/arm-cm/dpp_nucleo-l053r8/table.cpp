@@ -95,7 +95,7 @@ Table::Table()
 
 //.${AOs::Table::SM} .........................................................
 Q_STATE_DEF(Table, initial) {
-    //.${AOs::Table::SM::initial} 
+    //.${AOs::Table::SM::initial}
     (void)e; // suppress the compiler warning about unused parameter
 
     subscribe(DONE_SIG);
@@ -129,12 +129,12 @@ Q_STATE_DEF(Table, initial) {
 Q_STATE_DEF(Table, active) {
     QP::QState status_;
     switch (e->sig) {
-        //.${AOs::Table::SM::active::TEST} 
+        //.${AOs::Table::SM::active::TEST}
         case TEST_SIG: {
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Table::SM::active::EAT} 
+        //.${AOs::Table::SM::active::EAT}
         case EAT_SIG: {
             Q_ERROR();
             status_ = Q_RET_HANDLED;
@@ -151,7 +151,7 @@ Q_STATE_DEF(Table, active) {
 Q_STATE_DEF(Table, serving) {
     QP::QState status_;
     switch (e->sig) {
-        //.${AOs::Table::SM::active::serving} 
+        //.${AOs::Table::SM::active::serving}
         case Q_ENTRY_SIG: {
             for (uint8_t n = 0U; n < N_PHILO; ++n) { // give permissions to eat...
                 if (m_isHungry[n]
@@ -170,7 +170,7 @@ Q_STATE_DEF(Table, serving) {
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Table::SM::active::serving::HUNGRY} 
+        //.${AOs::Table::SM::active::serving::HUNGRY}
         case HUNGRY_SIG: {
             uint8_t n = Q_EVT_CAST(TableEvt)->philoNum;
             // phil ID must be in range and he must be not hungry
@@ -178,7 +178,7 @@ Q_STATE_DEF(Table, serving) {
 
             BSP::displayPhilStat(n, HUNGRY);
             uint8_t m = LEFT(n);
-            //.${AOs::Table::SM::active::serving::HUNGRY::[bothfree]} 
+            //.${AOs::Table::SM::active::serving::HUNGRY::[bothfree]}
             if ((m_fork[m] == FREE) && (m_fork[n] == FREE)) {
                 m_fork[m] = USED;
                 m_fork[n] = USED;
@@ -188,14 +188,14 @@ Q_STATE_DEF(Table, serving) {
                 BSP::displayPhilStat(n, EATING);
                 status_ = Q_RET_HANDLED;
             }
-            //.${AOs::Table::SM::active::serving::HUNGRY::[else]} 
+            //.${AOs::Table::SM::active::serving::HUNGRY::[else]}
             else {
                 m_isHungry[n] = true;
                 status_ = Q_RET_HANDLED;
             }
             break;
         }
-        //.${AOs::Table::SM::active::serving::DONE} 
+        //.${AOs::Table::SM::active::serving::DONE}
         case DONE_SIG: {
             uint8_t n = Q_EVT_CAST(TableEvt)->philoNum;
             // phil ID must be in range and he must be not hungry
@@ -233,13 +233,13 @@ Q_STATE_DEF(Table, serving) {
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Table::SM::active::serving::EAT} 
+        //.${AOs::Table::SM::active::serving::EAT}
         case EAT_SIG: {
             Q_ERROR();
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Table::SM::active::serving::PAUSE} 
+        //.${AOs::Table::SM::active::serving::PAUSE}
         case PAUSE_SIG: {
             status_ = tran(&paused);
             break;
@@ -255,24 +255,24 @@ Q_STATE_DEF(Table, serving) {
 Q_STATE_DEF(Table, paused) {
     QP::QState status_;
     switch (e->sig) {
-        //.${AOs::Table::SM::active::paused} 
+        //.${AOs::Table::SM::active::paused}
         case Q_ENTRY_SIG: {
             BSP::displayPaused(1U);
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Table::SM::active::paused} 
+        //.${AOs::Table::SM::active::paused}
         case Q_EXIT_SIG: {
             BSP::displayPaused(0U);
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Table::SM::active::paused::SERVE} 
+        //.${AOs::Table::SM::active::paused::SERVE}
         case SERVE_SIG: {
             status_ = tran(&serving);
             break;
         }
-        //.${AOs::Table::SM::active::paused::HUNGRY} 
+        //.${AOs::Table::SM::active::paused::HUNGRY}
         case HUNGRY_SIG: {
             uint8_t n = Q_EVT_CAST(TableEvt)->philoNum;
             // philo ID must be in range and he must be not hungry
@@ -282,7 +282,7 @@ Q_STATE_DEF(Table, paused) {
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Table::SM::active::paused::DONE} 
+        //.${AOs::Table::SM::active::paused::DONE}
         case DONE_SIG: {
             uint8_t n = Q_EVT_CAST(TableEvt)->philoNum;
             // phil ID must be in range and he must be not hungry

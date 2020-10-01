@@ -4,8 +4,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-14
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -124,9 +124,9 @@ void QF::publish_(QEvt const * const e, void const * const sender) noexcept {
     Q_REQUIRE_ID(100, static_cast<enum_t>(e->sig) < QF_maxPubSignal_);
 
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_PUBLISH, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_PUBLISH, 0U)
         QS_TIME_PRE_();                      // the timestamp
         QS_OBJ_PRE_(sender);                 // the sender object
         QS_SIG_PRE_(e->sig);                 // the signal of the event
@@ -147,7 +147,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) noexcept {
 
     // make a local, modifiable copy of the subscriber list
     QPSet subscrList = QF_PTR_AT_(QF_subscrList_, e->sig);
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     if (subscrList.notEmpty()) { // any subscribers?
         // the highest-prio subscriber
@@ -206,17 +206,16 @@ void QActive::subscribe(enum_t const sig) const noexcept {
               && (QF::active_[p] == this));
 
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_SUBSCRIBE,
-                     QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_SUBSCRIBE, m_prio)
         QS_TIME_PRE_();    // timestamp
         QS_SIG_PRE_(sig);  // the signal of this event
         QS_OBJ_PRE_(this); // this active object
     QS_END_NOCRIT_PRE_()
 
     QF_PTR_AT_(QF_subscrList_, sig).insert(p); // insert into subscriber-list
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 }
 
 //****************************************************************************
@@ -254,10 +253,9 @@ void QActive::unsubscribe(enum_t const sig) const noexcept {
                       && (QF::active_[p] == this));
 
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_UNSUBSCRIBE,
-                     QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_UNSUBSCRIBE, m_prio)
         QS_TIME_PRE_();         // timestamp
         QS_SIG_PRE_(sig);       // the signal of this event
         QS_OBJ_PRE_(this);      // this active object
@@ -265,7 +263,7 @@ void QActive::unsubscribe(enum_t const sig) const noexcept {
 
     QF_PTR_AT_(QF_subscrList_,sig).rmove(p);  // remove from subscriber-list
 
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 }
 
 //****************************************************************************
@@ -297,19 +295,18 @@ void QActive::unsubscribeAll(void) const noexcept {
 
     for (enum_t sig = Q_USER_SIG; sig < QF_maxPubSignal_; ++sig) {
         QF_CRIT_STAT_
-        QF_CRIT_ENTRY_();
+        QF_CRIT_E_();
         if (QF_PTR_AT_(QF_subscrList_, sig).hasElement(p)) {
             QF_PTR_AT_(QF_subscrList_, sig).rmove(p);
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_UNSUBSCRIBE,
-                             QS::priv_.locFilter[QS::AO_OBJ], this)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_UNSUBSCRIBE, m_prio)
                 QS_TIME_PRE_();     // timestamp
                 QS_SIG_PRE_(sig);   // the signal of this event
                 QS_OBJ_PRE_(this);  // this active object
             QS_END_NOCRIT_PRE_()
 
         }
-        QF_CRIT_EXIT_();
+        QF_CRIT_X_();
 
         // prevent merging critical sections
         QF_CRIT_EXIT_NOP();

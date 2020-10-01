@@ -2,8 +2,8 @@
 /// @brief QF/C++ dynamic event management
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -89,11 +89,11 @@ void QF::poolInit(void * const poolSto,
     Q_REQUIRE_ID(200, QF_maxPool_
                       < static_cast<std::uint_fast8_t>(Q_DIM(QF_pool_)));
 
-    std::uint_fast16_t const lastEvtSize = // last initialized event size
-        ((QF_maxPool_ ==0U)
-         ? 0U
-         : QF_EPOOL_EVENT_SIZE_(
-            QF_pool_[QF_maxPool_ - 1U]));
+    // last initialized event size
+    std::uint_fast16_t const lastEvtSize = ((QF_maxPool_ ==0U)
+                         ? 0U
+                         : QF_EPOOL_EVENT_SIZE_(QF_pool_[QF_maxPool_ - 1U]));
+
     /// @pre please initialize event pools in ascending order of evtSize
     Q_REQUIRE_ID(201, (QF_maxPool_ == 0U)
         || (lastEvtSize < evtSize));
@@ -152,25 +152,41 @@ QEvt *QF::newX_(std::uint_fast16_t const evtSize,
     Q_ASSERT_ID(310, idx < QF_maxPool_);
 
     QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QF_NEW, nullptr, nullptr)
-        QS_TIME_PRE_();       // timestamp
-        QS_EVS_PRE_(evtSize); // the size of the evt
-        QS_SIG_PRE_(sig);     // the signal of the evt
-    QS_END_PRE_()
-
     // get e -- platform-dependent
     QEvt *e;
-    QF_EPOOL_GET_(QF_pool_[idx], e, ((margin != QF_NO_MARGIN) ? margin : 0U));
+
+#ifdef Q_SPY
+    QF_EPOOL_GET_(QF_pool_[idx], e, ((margin != QF_NO_MARGIN) ? margin : 0U),
+                  static_cast<std::uint_fast8_t>(QS_EP_ID) + idx + 1U);
+#else
+    QF_EPOOL_GET_(QF_pool_[idx], e, ((margin != QF_NO_MARGIN) ? margin : 0U),
+                  0U);
+#endif
 
     // was e allocated correctly?
     if (e != nullptr) {
         e->sig     = static_cast<QSignal>(sig); // set the signal
         e->poolId_ = static_cast<std::uint8_t>(idx + 1U); // store pool ID
         e->refCtr_ = 0U; // initialize the reference counter to 0
+
+        QS_BEGIN_PRE_(QS_QF_NEW,
+                      static_cast<std::uint_fast8_t>(QS_EP_ID)
+                         + static_cast<std::uint_fast8_t>(e->poolId_))
+            QS_TIME_PRE_();       // timestamp
+            QS_EVS_PRE_(evtSize); // the size of the evt
+            QS_SIG_PRE_(sig);     // the signal of the evt
+        QS_END_PRE_()
     }
     else {
         // must tolerate bad alloc.
         Q_ASSERT_ID(320, margin != QF_NO_MARGIN);
+
+        QS_BEGIN_PRE_(QS_QF_NEW_ATTEMPT,
+                      static_cast<std::uint_fast8_t>(QS_EP_ID) + idx + 1U)
+            QS_TIME_PRE_();       // timestamp
+            QS_EVS_PRE_(evtSize); // the size of the evt
+            QS_SIG_PRE_(sig);     // the signal of the evt
+        QS_END_PRE_()
     }
     return e; // can't be NULL if we can't tolerate bad allocation
 }
@@ -202,12 +218,14 @@ void QF::gc(QEvt const * const e) noexcept {
     // is it a dynamic event?
     if (e->poolId_ != 0U) {
         QF_CRIT_STAT_
-        QF_CRIT_ENTRY_();
+        QF_CRIT_E_();
 
         // isn't this the last reference?
         if (e->refCtr_ > 1U) {
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC_ATTEMPT, nullptr, nullptr)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC_ATTEMPT,
+                     static_cast<std::uint_fast8_t>(QS_EP_ID)
+                         + static_cast<std::uint_fast8_t>(e->poolId_))
                 QS_TIME_PRE_();        // timestamp
                 QS_SIG_PRE_(e->sig);   // the signal of the event
                 QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr
@@ -215,20 +233,22 @@ void QF::gc(QEvt const * const e) noexcept {
 
             QF_EVT_REF_CTR_DEC_(e); // decrement the ref counter
 
-            QF_CRIT_EXIT_();
+            QF_CRIT_X_();
         }
         // this is the last reference to this event, recycle it
         else {
             std::uint_fast8_t const idx =
                 static_cast<std::uint_fast8_t>(e->poolId_) - 1U;
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC, nullptr, nullptr)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC,
+                     static_cast<std::uint_fast8_t>(QS_EP_ID)
+                         + static_cast<std::uint_fast8_t>(e->poolId_))
                 QS_TIME_PRE_();        // timestamp
                 QS_SIG_PRE_(e->sig);   // the signal of the event
                 QS_2U8_PRE_(e->poolId_, e->refCtr_);
             QS_END_NOCRIT_PRE_()
 
-            QF_CRIT_EXIT_();
+            QF_CRIT_X_();
 
             // pool ID must be in range
             Q_ASSERT_ID(410, idx < QF_maxPool_);
@@ -239,8 +259,15 @@ void QF::gc(QEvt const * const e) noexcept {
             // because it's a pool event
             QF_EVT_CONST_CAST_(e)->~QEvt(); // xtor,
 #endif
+
+#ifdef Q_SPY
             // cast 'const' away, which is OK, because it's a pool event
-            QF_EPOOL_PUT_(QF_pool_[idx], QF_EVT_CONST_CAST_(e));
+            QF_EPOOL_PUT_(QF_pool_[idx], QF_EVT_CONST_CAST_(e),
+                     static_cast<std::uint_fast8_t>(QS_EP_ID)
+                         + static_cast<std::uint_fast8_t>(e->poolId_));
+#else
+            QF_EPOOL_PUT_(QF_pool_[idx], QF_EVT_CONST_CAST_(e), 0U);
+#endif
         }
     }
 }
@@ -268,17 +295,19 @@ QEvt const *QF::newRef_(QEvt const * const e,
                       && (evtRef == nullptr));
 
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
     QF_EVT_REF_CTR_INC_(e); // increments the ref counter
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_NEW_REF, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_NEW_REF,
+                     static_cast<std::uint_fast8_t>(QS_EP_ID)
+                         + static_cast<std::uint_fast8_t>(e->poolId_))
         QS_TIME_PRE_();      // timestamp
         QS_SIG_PRE_(e->sig); // the signal of the event
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
     QS_END_NOCRIT_PRE_()
 
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     return e;
 }
@@ -296,7 +325,9 @@ QEvt const *QF::newRef_(QEvt const * const e,
 void QF::deleteRef_(QEvt const * const evtRef) noexcept {
     QS_CRIT_STAT_
 
-    QS_BEGIN_PRE_(QS_QF_DELETE_REF, nullptr, nullptr)
+    QS_BEGIN_PRE_(QS_QF_DELETE_REF,
+                     static_cast<std::uint_fast8_t>(QS_EP_ID)
+                         + static_cast<std::uint_fast8_t>(evtRef->poolId_))
         QS_TIME_PRE_();           // timestamp
         QS_SIG_PRE_(evtRef->sig); // the signal of the event
         QS_2U8_PRE_(evtRef->poolId_, evtRef->refCtr_); // pool Id & ref Count

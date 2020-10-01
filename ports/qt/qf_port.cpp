@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0 / Qt 5.x
-/// Last updated on  2020-08-11
+/// Last updated for version 6.9.1 / Qt 5.x
+/// Last updated on  2020-09-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -103,7 +103,7 @@ int_t QF::run(void) {
 
     // produce the QS_QF_RUN trace record
     QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_BEGIN_PRE_(QS_QF_RUN, 0U)
     QS_END_PRE_()
 
     // run the Qt event loop (console or GUI)
@@ -117,7 +117,7 @@ void QF::thread_(QActive *act) {
     // event-loop
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
-        act->dispatch(e); // dispatch to the active object's state machine
+        act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
 }
@@ -155,7 +155,7 @@ void QActive::start(std::uint_fast8_t const prio,
 
     QF::add_(this); // make QF aware of this active object
 
-    init(par);      // execute the initial transition
+    init(par, m_prio); // execute the initial transition
     QS_FLUSH();     // flush the trace buffer to the host
 
     AOThread *thread = static_cast<AOThread *>(m_thread);

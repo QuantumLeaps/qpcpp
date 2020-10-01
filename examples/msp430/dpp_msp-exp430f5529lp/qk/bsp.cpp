@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example on MSP-EXP430F5529LP board, preemptive QK kernel
-// Last updated for version 6.3.8
-// Last updated on  2019-01-24
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -121,6 +121,11 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_timer0_ISR);
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
+
+    // setup the QS filters...
+    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
+    //QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
+    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -131,9 +136,9 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
         P1OUT &= ~LED1;  // turn LED1 off
     }
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
-        QS_U8(1, n);                  // Philosopher number
-        QS_STR(stat);                 // Philosopher status
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
+        QS_U8(1, n);   // Philosopher number
+        QS_STR(stat);  // Philosopher status
     QS_END()
 }
 void BSP::displayPaused(uint8_t paused) {
@@ -266,11 +271,6 @@ bool QS::onStartup(void const *arg) {
     UCA1CTL1 &= ~UCSWRST;  // initialize USCI state machine
     UCA1IE |= UCRXIE;      // Enable USCI_A1 RX interrupt
 
-    // setup the QS filters...
-    QS_FILTER_ON(QS_SM_RECORDS);
-    //QS_FILTER_ON(QS_AO_RECORDS);
-    QS_FILTER_ON(QS_UA_RECORDS);
-
     return true; // return success
 }
 //............................................................................
@@ -316,7 +316,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param1;
     (void)param2;
     (void)param3;
-    QS_BEGIN(DPP::COMMAND_STAT, (void *)1)
+    QS_BEGIN_ID(DPP::COMMAND_STAT, 0U)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
         QS_U32(8, param2);

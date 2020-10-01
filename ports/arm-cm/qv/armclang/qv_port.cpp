@@ -3,8 +3,8 @@
 * @brief QV/C++ port to ARM Cortex-M, ARM-CLANG toolset
 * @cond
 ******************************************************************************
-* Last updated for version 6.8.0
-* Last updated on  2020-01-25
+* Last updated for version 6.9.1
+* Last updated on  2020-09-23
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -42,7 +42,7 @@
 
 extern "C" {
 
-#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 ? */
+#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
 
 /* hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction) */
 __attribute__ ((naked))

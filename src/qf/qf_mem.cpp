@@ -2,8 +2,8 @@
 /// @brief QF/C++ memory management services
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -158,7 +158,8 @@ void QMPool::init(void * const poolSto, std::uint_fast32_t poolSize,
 /// @description
 /// Recycle a memory block to the fixed block-size memory pool.
 ///
-/// @param[in]  b  pointer to the memory block that is being recycled
+/// @param[in] b     pointer to the memory block that is being recycled
+/// @param[in] qs_id QS-id of this state machine (for QS local filter)
 ///
 /// @attention
 /// The recycled block must be allocated from the __same__ memory pool
@@ -170,7 +171,7 @@ void QMPool::init(void * const poolSto, std::uint_fast32_t poolSize,
 /// @sa
 /// QP::QMPool::get()
 ///
-void QMPool::put(void * const b) noexcept {
+void QMPool::put(void * const b, std::uint_fast8_t const qs_id) noexcept {
 
     /// @pre # free blocks cannot exceed the total # blocks and
     /// the block pointer must be in range to come from this pool.
@@ -179,20 +180,20 @@ void QMPool::put(void * const b) noexcept {
                       && QF_PTR_RANGE_(b, m_start, m_end));
     QF_CRIT_STAT_
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     static_cast<QFreeBlock*>(b)->m_next =
         static_cast<QFreeBlock *>(m_free_head); // link into the free list
     m_free_head = b; // set as new head of the free list
     ++m_nFree;       // one more free block in this pool
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_PUT,
-                     QS::priv_.locFilter[QS::MP_OBJ], this)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_PUT, qs_id)
         QS_TIME_PRE_();       // timestamp
         QS_OBJ_PRE_(this);    // this memory pool
         QS_MPC_PRE_(m_nFree); // the number of free blocks in the pool
     QS_END_NOCRIT_PRE_()
 
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
+    static_cast<void>(qs_id); // unused parameter, if Q_SPY not defined
 }
 
 //****************************************************************************
@@ -202,6 +203,7 @@ void QMPool::put(void * const b) noexcept {
 ///
 /// @param[in] margin  the minimum number of unused blocks still available
 ///                    in the pool after the allocation.
+/// @param[in] qs_id   QS-id of this state machine (for QS local filter)
 ///
 /// @note
 /// This function can be called from any task level or ISR level.
@@ -219,11 +221,13 @@ void QMPool::put(void * const b) noexcept {
 /// @sa
 /// QP::QMPool::put()
 ///
-void *QMPool::get(std::uint_fast16_t const margin) noexcept {
+void *QMPool::get(std::uint_fast16_t const margin,
+                  std::uint_fast8_t const qs_id) noexcept
+{
     QFreeBlock *fb;
     QF_CRIT_STAT_
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     // have the than margin?
     if (m_nFree > static_cast<QMPoolCtr>(margin)) {
         fb = static_cast<QFreeBlock *>(m_free_head);  // get a free block
@@ -258,8 +262,7 @@ void *QMPool::get(std::uint_fast16_t const margin) noexcept {
 
         m_free_head = fb_next; // set the head to the next free block
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET,
-                         QS::priv_.locFilter[QS::MP_OBJ], this)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET, qs_id)
             QS_TIME_PRE_();        // timestamp
             QS_OBJ_PRE_(this);    // this memory pool
             QS_MPC_PRE_(m_nFree);  // the number of free blocks in the pool
@@ -270,15 +273,16 @@ void *QMPool::get(std::uint_fast16_t const margin) noexcept {
     else {
         fb = nullptr;
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET_ATTEMPT,
-                         QS::priv_.locFilter[QS::MP_OBJ], m_start)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET_ATTEMPT, qs_id)
             QS_TIME_PRE_();        // timestamp
             QS_OBJ_PRE_(m_start);  // the memory managed by this pool
             QS_MPC_PRE_(m_nFree);  // the # free blocks in the pool
             QS_MPC_PRE_(margin);   // the requested margin
         QS_END_NOCRIT_PRE_()
     }
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
+
+    static_cast<void>(qs_id); // unused parameter, if Q_SPY not defined
 
     return fb; // return the block or NULL pointer to the caller
 }
@@ -303,10 +307,10 @@ std::uint_fast16_t QF::getPoolMin(std::uint_fast8_t const poolId) noexcept {
                        && (1U <= poolId)
                        && (poolId <= QF_maxPool_));
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     std::uint_fast16_t const min = static_cast<std::uint_fast16_t>(
         QF_pool_[poolId - 1U].m_nMin);
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     return min;
 }

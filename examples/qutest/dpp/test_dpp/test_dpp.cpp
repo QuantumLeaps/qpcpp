@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QUTEST fixture for the DPP components
-// Last updated for version 6.3.5
-// Last updated on  2018-09-17
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,10 +25,10 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //****************************************************************************
 #include "qpcpp.hpp"
@@ -56,13 +56,15 @@ void QS::onCommand(uint8_t cmdId,
 
     switch (cmdId) {
        case 0U: {
-           QEvt const e = { DPP::PAUSE_SIG, 0U, 0U };
-           DPP::AO_Table->dispatch(&e);
+           QEvt const e_pause = { DPP::PAUSE_SIG, 0U, 0U };
+           DPP::AO_Table->dispatch(&e_pause,
+                              static_cast<std::uint_fast8_t>(param1));
            break;
        }
        case 1U: {
-           QEvt const e = { DPP::SERVE_SIG, 0U, 0U };
-           DPP::AO_Table->dispatch(&e);
+           QEvt const e_serve = { DPP::SERVE_SIG, 0U, 0U };
+           DPP::AO_Table->dispatch(&e_serve,
+                              static_cast<std::uint_fast8_t>(param1));
            break;
        }
        default:
@@ -90,7 +92,7 @@ void QS::onTestPost(void const *sender, QActive *recipient,
         case DPP::EAT_SIG:
         case DPP::DONE_SIG:
         case DPP::HUNGRY_SIG:
-            QS_BEGIN(QUTEST_ON_POST, nullptr) // application-specific record
+            QS_BEGIN_ID(QUTEST_ON_POST, 0U) // application-specific record
                 QS_SIG(e->sig, recipient);
                 QS_U8(0, Q_EVT_CAST(DPP::TableEvt)->philoNum);
             QS_END()

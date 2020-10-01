@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, NUCLEO-H743ZI board, cooperative QV kernel
-// Last Updated for Version: 6.1.1
-// Date of the Last Update:  2018-02-17
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -44,27 +44,6 @@ Q_DEFINE_THIS_FILE // define the name of this file for assertions
 
 // namespace DPP *************************************************************
 namespace DPP {
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-// DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-//
-enum KernelUnawareISRs { // see NOTE1
-    USART3_PRIO,
-    // ...
-    MAX_KERNEL_UNAWARE_CMSIS_PRI  // keep always last
-};
-// "kernel-unaware" interrupts can't overlap "kernel-aware" interrupts
-Q_ASSERT_COMPILE(MAX_KERNEL_UNAWARE_CMSIS_PRI <= QF_AWARE_ISR_CMSIS_PRI);
-
-enum KernelAwareISRs {
-    SYSTICK_PRIO = QF_AWARE_ISR_CMSIS_PRI, // see NOTE00
-    EXTI0_PRIO,
-    // ...
-    MAX_KERNEL_AWARE_CMSIS_PRI // keep always last
-};
-// "kernel-aware" interrupts should not overlap the PendSV priority
-Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
 
 // Local-scope objects -------------------------------------------------------
 static uint32_t l_rnd; // random seed
@@ -211,6 +190,11 @@ void BSP::init(void) {
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(PAUSED_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
+
+    // setup the QS filters...
+    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
+    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
+    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
 }
 /*..........................................................................*/
 void BSP::ledOn(void) {
@@ -229,7 +213,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
         BSP_LED_Off(LED1);
     }
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()          // application-specific record end
@@ -275,23 +259,20 @@ namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
-    // assing all priority bits for preemption-prio. and none to sub-prio.
-    NVIC_SetPriorityGrouping(0U);
-
     // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
     SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
 
     // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
-    // set priorities of ALL ISRs used in the system, see NOTE00
+    // set priorities of ALL ISRs used in the system, see NOTE1
     //
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     //
-    NVIC_SetPriority(USART3_IRQn,  DPP::USART3_PRIO);
-    NVIC_SetPriority(SysTick_IRQn, DPP::SYSTICK_PRIO);
+    NVIC_SetPriority(USART3_IRQn,  0U); // kernel unaware interrupt
+    NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 1U);
     // ...
 
     // enable IRQs...
@@ -394,10 +375,6 @@ bool QS::onStartup(void const *arg) {
     DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
 
-    // setup the QS filters...
-    QS_FILTER_ON(QS_SM_RECORDS);
-    QS_FILTER_ON(QS_UA_RECORDS);
-
     return true; // return success
 }
 //............................................................................
@@ -444,8 +421,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param2;
     (void)param3;
 
-    // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, reinterpret_cast<void *>(1))
+    QS_BEGIN_ID(DPP::COMMAND_STAT, 0U) // app-specific record
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()

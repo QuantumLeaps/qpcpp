@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.6.0" links="1">
+<model version="5.0.4" links="1">
  <documentation>QMsmTst is a test for the QMsm state machine implementation strategy of the state machine design from Chapter 2 of the PSiCC2 book.</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp" license="../../../QPCPP-EVAL.qlc"/>

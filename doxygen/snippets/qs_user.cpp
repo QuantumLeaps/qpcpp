@@ -8,8 +8,9 @@
 void BSP_displayPhilStat(uint8_t n, char const *stat) {
     . . .
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
-        QS_U8(1, n);                  // Philosopher number
-        QS_STR(stat);                 // Philosopher status
+    // application-specific record
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio)
+        QS_U8(1, n);  // Philosopher number
+        QS_STR(stat); // Philosopher status
     QS_END()
 }

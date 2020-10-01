@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: QUTEST fixture for the DPP components
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-04
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -88,13 +88,13 @@ int main(int argc, char *argv[]) {
     // NOTE: You need to start dummy AOs, if you wish to subscribe
     //       them to events.
     for (int_t n = 0; n < N_PHILO; ++n) {
-        AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
+        AO_Philo[n]->start(n + 1U, // QP priority
                     (QP::QEvt const **)0, 0U, nullptr, 0U);
         AO_Philo[n]->subscribe(EAT_SIG);
     }
 
     // start the active object under test (AOUT)...
-    AO_Table->start((uint_fast8_t)(N_PHILO + 1U), // priority
+    AO_Table->start(N_PHILO + 1U, // QP priority
                     tableQueueSto, Q_DIM(tableQueueSto),
                     nullptr, 0U);
 
@@ -123,13 +123,15 @@ void QS::onCommand(uint8_t cmdId,
 
     switch (cmdId) {
        case 0U: {
-           QEvt const e = { PAUSE_SIG, 0U, 0U };
-           AO_Table->dispatch(&e);
+           QEvt const e_pause = { PAUSE_SIG, 0U, 0U };
+           AO_Table->dispatch(&e_pause,
+                              static_cast<std::uint_fast8_t>(param1));
            break;
        }
        case 1U: {
-           QEvt const e = { SERVE_SIG, 0U, 0U };
-           AO_Table->dispatch(&e);
+           QEvt const e_serve = { SERVE_SIG, 0U, 0U };
+           AO_Table->dispatch(&e_serve,
+                              static_cast<std::uint_fast8_t>(param1));
            break;
        }
        default:
@@ -157,7 +159,7 @@ void QS::onTestPost(void const *sender, QActive *recipient,
         case EAT_SIG:
         case DONE_SIG:
         case HUNGRY_SIG:
-            QS_BEGIN(QUTEST_ON_POST, nullptr) // application-specific record
+            QS_BEGIN_ID(QUTEST_ON_POST, 0U) // application-specific record
                 QS_SIG(e->sig, recipient);
                 QS_U8(0, Q_EVT_CAST(TableEvt)->philoNum);
             QS_END()

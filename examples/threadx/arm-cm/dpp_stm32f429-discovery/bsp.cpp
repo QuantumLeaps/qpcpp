@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example, STM32F4-Discovery board, ThreadX kernel
-// Last Updated for Version: 6.3.7
-// Date of the Last Update:  2018-12-17
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -133,6 +133,10 @@ void BSP::init(void) {
         Q_ERROR();
     }
     QS_USR_DICTIONARY(PHILO_STAT);
+
+    // setup the QS filters...
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS);
+    QS_GLB_FILTER(-QP::QS_QF_TICK);
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -155,7 +159,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
     }
     (void)n; // unused parameter (in all but Spy build configuration)
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()
@@ -323,10 +327,6 @@ bool QS::onStartup(void const *arg) {
 
     DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
-
-    // setup the QS filters...
-    QS_FILTER_ON(QS_ALL_RECORDS);
-    QS_FILTER_OFF(QS_QF_TICK);
 
     return true; // return success
 }

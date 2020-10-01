@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example with lwIP and direct screen output
-// Last Updated for Version: 6.8.0
-// Date of the Last Update:  2020-01-24
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -270,7 +270,7 @@ void Table::displayPhilStat(uint8_t n, char const *stat) {
         str[1] = '\0';
         RIT128x96x4StringDraw(str, (6*6 + 3*6*n), 4*8, 15);
     }
-    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()
@@ -287,7 +287,7 @@ void Table::displyCgiText(char const *text) {
     RIT128x96x4StringDraw("               ", 5*6, 6*8, 15); // wipe clean
     RIT128x96x4StringDraw(text,              5*6, 6*8, 15);
 
-    QS_BEGIN(CGI_TEXT, 0) // application-specific record begin
+    QS_BEGIN_ID(CGI_TEXT, 0U) // app-specific record begin
         QS_STR(text);     // User text
     QS_END()
 }
@@ -297,7 +297,7 @@ void Table::displyUdpText(char const *text) {
     RIT128x96x4StringDraw("               ", 5*6, 6*8, 15); // wipe clean
     RIT128x96x4StringDraw(text,              5*6, 6*8, 15);
 
-    QS_BEGIN(UDP_TEXT, 0) // application-specific record begin
+    QS_BEGIN_ID(UDP_TEXT, 0U) // app-specific record begin
         QS_STR(text);     // User text
     QS_END()
 }

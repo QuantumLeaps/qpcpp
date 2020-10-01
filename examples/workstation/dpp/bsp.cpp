@@ -71,8 +71,8 @@ void BSP::init(int argc, char **argv) {
     QS_USR_DICTIONARY(PHILO_STAT);
 
     // setup the QS filters...
-    QS_FILTER_ON(QP::QS_ALL_RECORDS);
-    QS_FILTER_OFF(QP::QS_QF_TICK);
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS);
+    QS_GLB_FILTER(-QP::QS_QF_TICK);
 }
 //............................................................................
 void BSP::terminate(int16_t result) {
@@ -83,7 +83,7 @@ void BSP::terminate(int16_t result) {
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
     PRINTF_S("Philosopher %2d is %s\n", (int)n, stat);
 
-    QS_BEGIN(PHILO_STAT, nullptr) // application-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()

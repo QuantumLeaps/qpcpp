@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-14
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -176,13 +176,13 @@ public: // for access from extern "C" functions
     QF_THREAD_TYPE m_thread;
 #endif
 
+#ifdef QXK_HPP // QXK kernel used?
+    //! QXK dynamic priority (1..#QF_MAX_ACTIVE) of AO/thread.
+    std::uint8_t m_dynPrio;
+#endif
+
     //! QF priority (1..#QF_MAX_ACTIVE) of this active object.
     std::uint8_t m_prio;
-
-#ifdef QXK_HPP // QXK kernel used?
-    //! QF start priority (1..#QF_MAX_ACTIVE) of this active object.
-    std::uint8_t m_startPrio;
-#endif
 
 protected:
     //! protected constructor (abstract class)
@@ -330,9 +330,11 @@ private:
 class QMActive : public QActive {
 public:
     // all the following operations delegate to the QHsm class...
-    void init(void const * const e) override;
-    void init(void) override;
-    void dispatch(QEvt const * const e) override;
+    void init(void const * const e,
+              std::uint_fast8_t const qs_id) override;
+    void init(std::uint_fast8_t const qs_id) override;
+    void dispatch(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) override;
 
     //! Tests if a given state is part of the active state configuration
     bool isInState(QMState const * const st) const noexcept;
@@ -633,9 +635,13 @@ class QTicker : public QActive {
 public:
     explicit QTicker(std::uint_fast8_t const tickRate) noexcept; // ctor
 
-    void init(void const * const e) noexcept override;
-    void init(void) noexcept override { this->init(nullptr); }
-    void dispatch(QEvt const * const e) noexcept override;
+    void init(void const * const e,
+              std::uint_fast8_t const qs_id) noexcept override;
+    void init(std::uint_fast8_t const qs_id) noexcept override {
+        this->init(qs_id);
+    }
+    void dispatch(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) noexcept override;
 #ifndef Q_SPY
     bool post_(QEvt const * const e,
                std::uint_fast16_t const margin) noexcept override;

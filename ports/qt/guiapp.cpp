@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2 / Qt 5.x
-/// Last updated on  2020-07-17
+/// Last updated for version 6.9.1 / Qt 5.x
+/// Last updated on  2020-09-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -79,7 +79,8 @@ void GuiApp::registerAct(void *act) {
 bool GuiApp::event(QEvent *e) {
     if (e->type() == l_qp_event_type) {
         QP::QEvt const *qpevt = (static_cast<QP_Event *>(e))->m_qpevt;
-        static_cast<QP::QActive *>(m_act)->dispatch(qpevt); // dispatch to AO
+        QP::QActive *qpact = static_cast<QP::QActive *>(m_act);
+        qpact->dispatch(qpevt, qpact->m_prio); // dispatch to AO
         QP::QF::gc(qpevt); // garbage collect the QP evt
         return true; // event recognized and handled
     }
@@ -106,7 +107,7 @@ void GuiQActive::start(std::uint_fast8_t const prio,
     QF::add_(this); // make QF aware of this AO
     static_cast<GuiApp *>(QApplication::instance())->registerAct(this);
 
-    this->init(par); // execute initial transition (virtual call)
+    this->init(par, prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 }
 //............................................................................
@@ -120,15 +121,14 @@ bool GuiQActive::post_(QEvt const * const e,
 #endif
 {
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
     // is it a dynamic event?
     if (QF_EVT_POOL_ID_(e) != 0U) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
-                     QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, me_prio)
         QS_TIME_PRE_();              // timestamp
         QS_OBJ_PRE_(sender);         // the sender object
         QS_SIG_PRE_(e->sig);         // the signal of the event
@@ -139,7 +139,7 @@ bool GuiQActive::post_(QEvt const * const e,
         QS_EQC_PRE_(0U);             // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
 
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     // QCoreApplication::postEvent() is thread-safe per Qt documentation
     QCoreApplication::postEvent(QApplication::instance(), new QP_Event(e));
@@ -148,15 +148,14 @@ bool GuiQActive::post_(QEvt const * const e,
 //............................................................................
 void GuiQActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
     // is it a dynamic event?
     if (QF_EVT_POOL_ID_(e) != 0U) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO,
-                     QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, me_prio)
         QS_TIME_PRE_();                  // timestamp
         QS_SIG_PRE_(e->sig);             // the signal of this event
         QS_OBJ_PRE_(this);               // this active object
@@ -166,7 +165,7 @@ void GuiQActive::postLIFO(QEvt const * const e) noexcept {
         QS_EQC_PRE_(0U);                 // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
 
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     // QCoreApplication::postEvent() is thread-safe per Qt documentation
     QCoreApplication::postEvent(QApplication::instance(), new QP_Event(e),
@@ -190,7 +189,7 @@ void GuiQMActive::start(std::uint_fast8_t const prio,
     QF::add_(this); // make QF aware of this active object
     static_cast<GuiApp *>(QApplication::instance())->registerAct(this);
 
-    this->init(par); // execute initial transition (virtual call)
+    this->init(par, prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 }
 //............................................................................
@@ -204,15 +203,14 @@ bool GuiQMActive::post_(QEvt const * const e,
 #endif
 {
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
     // is it a dynamic event?
     if (QF_EVT_POOL_ID_(e) != 0U) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
-                     QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, me_prio)
         QS_TIME_PRE_();              // timestamp
         QS_OBJ_PRE_(sender);         // the sender object
         QS_SIG_PRE_(e->sig);         // the signal of the event
@@ -223,7 +221,7 @@ bool GuiQMActive::post_(QEvt const * const e,
         QS_EQC_PRE_(0U);             // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
 
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     // QCoreApplication::postEvent() is thread-safe per Qt documentation
     QCoreApplication::postEvent(QApplication::instance(), new QP_Event(e));
@@ -232,15 +230,14 @@ bool GuiQMActive::post_(QEvt const * const e,
 //............................................................................
 void GuiQMActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
 
     // is it a dynamic event?
     if (QF_EVT_POOL_ID_(e) != 0U) {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO,
-                     QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, me_prio)
         QS_TIME_PRE_();              // timestamp
         QS_SIG_PRE_(e->sig);         // the signal of this event
         QS_OBJ_PRE_(this);           // this active object
@@ -250,7 +247,7 @@ void GuiQMActive::postLIFO(QEvt const * const e) noexcept {
         QS_EQC_PRE_(0U);             // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
 
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 
     // QCoreApplication::postEvent() is thread-safe per Qt documentation
     QCoreApplication::postEvent(QApplication::instance(), new QP_Event(e),

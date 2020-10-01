@@ -2,8 +2,8 @@
 /// @brief PC-Lint-Plus option file for linting QP/C++ source code
 /// @cond
 ///===========================================================================
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-14
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -49,7 +49,7 @@
 // standards
 -std=c++11         // C++ language standard
 au-autosar.lnt     // AUTOSAR:C++14
-au-ds.lnt           // Dan Saks recommendations
+au-ds.lnt          // Dan Saks recommendations
 //-strong(AXJ)        // Strong type checking
 
 // size/alignment options
@@ -98,6 +98,8 @@ qpcpp.lnt           // QP/C++ options
 
 // MC++R16-0-4 function-like macro
 -esym(9026,
+ QF_CRIT_E_,
+ QF_CRIT_X_,
  QF_EVT_REF_CTR_INC_,
  QF_EVT_REF_CTR_DEC_,
  QF_PTR_AT_,
@@ -161,20 +163,18 @@ qpcpp.lnt           // QP/C++ options
 -emacro(661,
  QF_EPOOL_EVENT_SIZE_)
 
-// M3-R11.5(a) conversion from pointer to void to other pointer type
+// AR-M5-2-8 conversion from pointer to void to other pointer type
 -emacro(9079,
  QF_EPOOL_GET_)
--efunc(9079,
- QF_deleteRef_,
- QMPool_get,
- QMPool_put)
 
-// M3-R11.5(a) conversion from pointer to void to other pointer type
 -efunc(9079,
- QMPool_init,
- QF_tickX_,
- QTimeEvt_armX,
- QTimeEvt_rearm)
+ QP::QF::bzero,
+ QP::QTimeEvt::armX,
+ QP::QTimeEvt::disarm,
+ QP::QTimeEvt::rearm,
+ QP::QMPool::init,
+ QP::QMPool::get,
+ QP::QMPool::put)
 
 // M3-R18.3(r) relational operator <= applied to pointers
 -emacro(946,
@@ -182,29 +182,19 @@ qpcpp.lnt           // QP/C++ options
 
 // M3-R8.13(a) parameter of function could be pointer to const
 -efunc(818,
- QActive_start_,
- QTicker_postLIFO_)
+ QP::QActive::start_,
+ QP::QTicker::postLIFO_)
 
 // definition of macro ends in semi-colon
 -esym(823,
  QF_SCHED_STAT_)
 
-// MC++R5-2-8 conversion from pointer to void to other pointer type
--efunc(9079,
- QP::QF::bzero)
-
-// MC++R5-2-8 conversion from pointer to void to other pointer type
--efunc(9079,
- QP::QMPool::init,
- QP::QMPool::get,
- QP::QMPool::put)
-
 // MC++R0-1-1 statement is unreachable due to unconditional transfer
 // of control (assertion)
--efunc(527,
- QP::QMActive::isIn,
- QP::QMActive::state,
- QP::QMActive::childState)
+//-efunc(527,
+// QP::QMActive::isIn,
+// QP::QMActive::state,
+// QP::QMActive::childState)
 
 // MC++R7-1-1 parameter of function could be declared const
 -esym(952,
@@ -288,7 +278,8 @@ qpcpp.lnt           // QP/C++ options
 
 // MC++R16-0-4 function-like macro
 -esym(9026,
- QS_GLB_FILTER_,
+ QS_CRIT_E_,
+ QS_CRIT_X_,
  QS_PTR_AT_,
  QS_PTR_INC_,
  QS_INSERT_BYTE_,
@@ -375,6 +366,13 @@ qpcpp.lnt           // QP/C++ options
 -esym(9022,
  QS_TEST_PROBE,
  QS_TEST_PROBE_ID)
+
+// AR M5-0-10 the result of the ~ operator applied to an object with an
+// underlying type of 'unsigned char' must be cast to 'unsigned char'
+// in this context
+-efunc(9126,
+ QP::QS::glbFilter_,
+ QP::QS::locFilter_)
 
 // don't report problems within QS_target_info_() function
 -efunc(9130,

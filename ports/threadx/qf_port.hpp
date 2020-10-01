@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.9.1
+/// Last updated on  2019-09-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -58,6 +58,7 @@
 
 #include "qep_port.hpp"  // QEP port
 #include "qequeue.hpp"   // used for event deferral
+#include "qmpool.hpp"    // used for QS-RX
 #include "qpset.hpp"     // used for publish/subscribe
 #include "qf.hpp"        // QF platform-independent public interface
 
@@ -106,21 +107,21 @@
     #define QF_EPOOL_EVENT_SIZE_(pool_) \
         (static_cast<std::uint_fast16_t>((pool_).tx_block_pool_block_size))
 
-    #define QF_EPOOL_GET_(pool_, e_, margin_) do { \
-        QF_CRIT_STAT_ \
-        QF_CRIT_ENTRY_(); \
-        if ((pool_).tx_block_pool_available > (margin_)) { \
-            Q_ALLEGE(tx_block_allocate(&(pool_), \
+    #define QF_EPOOL_GET_(pool_, e_, margin_, qs_id_) do {         \
+        QF_CRIT_STAT_                                              \
+        QF_CRIT_E_();                                              \
+        if ((pool_).tx_block_pool_available > (margin_)) {         \
+            Q_ALLEGE(tx_block_allocate(&(pool_),                   \
                      reinterpret_cast<VOID **>(&(e_)), TX_NO_WAIT) \
-                     == TX_SUCCESS); \
-        } \
-        else { \
-            (e_) = nullptr; \
-        } \
-        QF_CRIT_EXIT_(); \
+                     == TX_SUCCESS);                               \
+        }                                                          \
+        else {                                                     \
+            (e_) = nullptr;                                        \
+        }                                                          \
+        QF_CRIT_X_();                                              \
     } while (false)
 
-    #define QF_EPOOL_PUT_(dummy, e_) \
+    #define QF_EPOOL_PUT_(dummy, e_, qs_id_) \
         Q_ALLEGE(tx_block_release(static_cast<VOID *>(e_)) == TX_SUCCESS)
 
 #endif // ifdef QP_IMPL

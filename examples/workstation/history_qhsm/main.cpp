@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Transition to History Example
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-14
+// Last Updated for Version: 6.9.1
+// Date of the Last Update:  2020-09-22
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -56,7 +56,7 @@ int main() {
            QP::QEP::getVersion());
 
     // instantiate the ToastOven HSM and trigger the initial transition
-    the_oven->init();
+    the_oven->init(0U);
 
     for (;;) {
 
@@ -76,7 +76,7 @@ int main() {
         }
 
         // dispatch the event into the state machine
-        the_oven->dispatch(&e);
+        the_oven->dispatch(&e, 0U);
     }
 
     QF::onCleanup();

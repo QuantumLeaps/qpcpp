@@ -1,13 +1,13 @@
 //***************************************************************************
 // Product: BSP for "Blinky" example
-// Last updated for version 6.3.1
-// Last updated on  2018-05-21
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -50,13 +50,13 @@ void BSP::init() {
 }
 //............................................................................
 void BSP::ledOff(void) {
-    QS_BEGIN(LED, AO_Blinky)
+    QS_BEGIN_ID(LED, AO_Blinky->m_prio)
        QS_U8(1, 0);
     QS_END()
 }
 //............................................................................
 void BSP::ledOn(void) {
-    QS_BEGIN(LED, AO_Blinky)
+    QS_BEGIN_ID(LED, AO_Blinky->m_prio)
        QS_U8(1, 1);
     QS_END()
 }

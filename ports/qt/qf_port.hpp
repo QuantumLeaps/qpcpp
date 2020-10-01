@@ -2,8 +2,8 @@
 /// @brief QP/C++ port to Qt
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.1 / Qt 5.x
-/// Last updated on  2020-04-04
+/// Last updated for version 6.9.1 / Qt 5.x
+/// Last updated on  2020-09-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -133,13 +133,13 @@ void QS_onEvent(void);
         static_cast<QWaitCondition*>((me_)->m_osObject)->wakeOne()
 
     // Qt-specific event pool operations
-    #define QF_EPOOL_TYPE_            QMPool
+    #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-        (p_).init(poolSto_, poolSize_, evtSize_)
+        (p_).init((poolSto_), (poolSize_), (evtSize_))
     #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_))))
-    #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
+    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
 
     #include <QMutex>
     #include <QWaitCondition>

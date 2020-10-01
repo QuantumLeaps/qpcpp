@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on STM32 NUCLEO-L152RE, QK kernel, GNU-ARM
-# Last Updated for Version: 6.5.0
-# Date of the Last Update:  2019-04-15
+# Last Updated for Version: 6.9.1
+# Date of the Last Update:  2020-09-30
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -128,6 +128,7 @@ QP_ASMS :=
 QS_SRCS := \
 	qs.cpp \
 	qs_rx.cpp \
+	qs_64bit.cpp \
 	qs_fp.cpp
 
 LIB_DIRS  :=

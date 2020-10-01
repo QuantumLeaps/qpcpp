@@ -1,4 +1,4 @@
-SET PATH=C:\tools\Keil_v5\ARM\ARMCLANG\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files (x86)\Java\jre1.8.0_241\bin;C:\utils;C:\tools\python38-32\Scripts;C:\tools\Git\cmd;C:\tools\LLVM\bin;C:\qp\qtools\bin;C:\qp\qtools\mingw32\bin
+SET PATH=C:\tools\Keil_v5\ARM\ARMCLANG\Bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Java\jre1.8.0_241\bin;C:\utils;C:\tools\python38-32\Scripts;C:\tools\Git\cmd;C:\tools\LLVM\bin;C:\qp\qtools\bin;C:\qp\qtools\mingw32\bin
 SET CPU_TYPE=STM32F746NGHx
 SET CPU_VENDOR=STMicroelectronics
 SET UV2_TARGET=dpp-spy

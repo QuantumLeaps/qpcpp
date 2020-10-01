@@ -4,7 +4,7 @@
 # preamble...
 def on_reset():
     expect_pause()
-    glb_filter(GRP_ON)
+    glb_filter(GRP_ALL)
     continue_test()
     expect("===RTC===> St-Init  Obj=AO_Philo[0],State=QP::QHsm::top->NULL")
     expect("@timestamp AO-Subsc Obj=AO_Philo[0],Sig=EAT_SIG")
@@ -25,9 +25,9 @@ def on_reset():
     expect("@timestamp BSP_CALL BSP::displayPhilStat 2 thinking")
     expect("@timestamp BSP_CALL BSP::displayPhilStat 3 thinking")
     expect("@timestamp BSP_CALL BSP::displayPhilStat 4 thinking")
-    expect("===RTC===> St-Init  Obj=AO_Table,State=QP::QHsm::top->serving")
-    expect("===RTC===> St-Entry Obj=AO_Table,State=serving")
-    expect("@timestamp Init===> Obj=AO_Table,State=serving")
+    expect("===RTC===> St-Init  Obj=AO_Table,State=QP::QHsm::top->Table::serving")
+    expect("===RTC===> St-Entry Obj=AO_Table,State=Table::serving")
+    expect("@timestamp Init===> Obj=AO_Table,State=Table::serving")
     expect_run()
 
 # tests...

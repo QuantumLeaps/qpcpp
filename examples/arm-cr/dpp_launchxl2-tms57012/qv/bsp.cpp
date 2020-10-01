@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, LAUCHXL2-TMS570LS12 board, cooperative QV kernel
-// Last updated for version 6.8.0
-// Last updated on  2020-01-23
+// Last updated for version 6.9.1
+// Last updated on  2020-09-22
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -180,6 +180,11 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_ssiTest);
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
+
+    // setup the QS filters...
+    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
+    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
+    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -190,7 +195,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
         LED2_PORT->DCLR = (1U << LED2_PIN);
     }
 
-    QS_BEGIN(PHILO_STAT, AO_Philo[n]) // application-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()
@@ -326,20 +331,6 @@ bool QS::onStartup(void const *arg) {
     vimREG->FIRQPR0 |= (1U << 13);   // designate interrupt as FIQ
     vimREG->REQMASKSET0 = (1U << 13); // enable interrupt
 
-    // setup the QS filters...
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_ON(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_ON(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_ON(QS_QEP_UNHANDLED);
-
-    QS_FILTER_ON(DPP::PHILO_STAT);
-    QS_FILTER_ON(DPP::COMMAND_STAT);
-
     return true; // return success
 }
 //............................................................................
@@ -381,15 +372,14 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param2;
     (void)param3;
 
-    // application-specific record
-    QS_BEGIN(DPP::COMMAND_STAT, nullptr)
+    QS_BEGIN_ID(DPP::COMMAND_STAT, 0U) // app-specific record
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()
 
     if ((cmdId == 10U) || (cmdId == 11U)) {
         // report error
-        QS_BEGIN(QS_RX_STATUS, nullptr)
+        QS_BEGIN_ID(QS_RX_STATUS, 0U)
              QP::QS::u8_raw_(0x80U | cmdId); // error
         QS_END()
     }

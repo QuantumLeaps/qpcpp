@@ -29,8 +29,11 @@ When creating a time event, you must commit it to a specific active object 'act'
 m_comp = comp;</code>
   </operation>
   <!--${Cont::CompTimeEvt::dispatchToComp}-->
-  <operation name="dispatchToComp" type="void" visibility="0x00" properties="0x0a">
-   <code>m_comp-&gt;dispatch(this);</code>
+  <operation name="dispatchToComp" type="void" visibility="0x00" properties="0x02">
+   <specifiers>const</specifiers>
+   <!--${Cont::CompTimeEvt::dispatchToComp::qs_id}-->
+   <parameter name="qs_id" type="std::uint_fast8_t const"/>
+   <code>m_comp-&gt;dispatch(this, qs_id);</code>
   </operation>
  </class>
  <!--${Cont::Table}-->
@@ -89,7 +92,7 @@ subscribe(SERVE_SIG);
 subscribe(TEST_SIG);
 
 for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
-    m_philo[n].init(); // top-most initial tran.
+    m_philo[n].init(m_prio); // top-most initial tran.
     m_fork[n] = FREE;
     m_isHungry[n] = false;
     BSP::displayPhilStat(n, THINKING);
@@ -102,7 +105,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
    <state name="active">
     <!--${Cont::Table::SM::active::TIMEOUT}-->
     <tran trig="TIMEOUT">
-     <action>Q_EVT_CAST(CompTimeEvt)-&gt;dispatchToComp();</action>
+     <action>Q_EVT_CAST(CompTimeEvt)-&gt;dispatchToComp(m_prio);</action>
      <tran_glyph conn="2,11,3,-1,14">
       <action box="0,-2,11,4"/>
      </tran_glyph>
@@ -134,7 +137,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
         TableEvt evt;
         evt.sig = EAT_SIG;
         evt.philo = &amp;m_philo[n];
-        m_philo[n].dispatch(&amp;evt);
+        m_philo[n].dispatch(&amp;evt, m_prio);
 
         m_isHungry[n] = false;
         BSP::displayPhilStat(n, EATING);
@@ -159,7 +162,7 @@ m_fork[n] = USED;
 TableEvt evt;
 evt.sig = EAT_SIG;
 evt.philo = &amp;m_philo[n];
-m_philo[n].dispatch(&amp;evt);
+m_philo[n].dispatch(&amp;evt, m_prio);
 
 BSP::displayPhilStat(n, EATING);</action>
        <choice_glyph conn="19,31,5,-1,10">
@@ -203,7 +206,7 @@ if (m_isHungry[m] &amp;&amp; (m_fork[m] == FREE)) {
     TableEvt evt;
     evt.sig = EAT_SIG;
     evt.philo = &amp;m_philo[m];
-    m_philo[m].dispatch(&amp;evt);
+    m_philo[m].dispatch(&amp;evt, m_prio);
 
     BSP::displayPhilStat(m, EATING);
 }
@@ -218,7 +221,7 @@ if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
     TableEvt evt;
     evt.sig = EAT_SIG;
     evt.philo = &amp;m_philo[m];
-    m_philo[m].dispatch(&amp;evt);
+    m_philo[m].dispatch(&amp;evt, m_prio);
 
     BSP::displayPhilStat(m, EATING);
 }</action>

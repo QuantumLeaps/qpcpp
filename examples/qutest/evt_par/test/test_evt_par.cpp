@@ -1,13 +1,13 @@
 //****************************************************************************
 // Purpose: Fixture for QUTEST
-// Last updated for version 6.3.5
-// Last updated on  2018-09-17
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -108,22 +108,22 @@ void QS::onTestEvt(QEvt *e) {
 
     switch (e->sig) {
         case MY_EVT0_SIG:
-            QS_BEGIN(MY_EVT0, nullptr) // user-specific record
+            QS_BEGIN_ID(MY_EVT0, 0U) // application-specific record
             QS_END()
             break;
         case MY_EVT1_SIG:
-            QS_BEGIN(MY_EVT1, nullptr) // user-specific record
+            QS_BEGIN_ID(MY_EVT1, 0U) // application-specific record
                 QS_U32(0, Q_EVT_CAST(MyEvt1)->u32);
             QS_END()
             break;
         case MY_EVT2_SIG:
-            QS_BEGIN(MY_EVT2, nullptr) // user-specific record
+            QS_BEGIN_ID(MY_EVT2, 0U) // application-specific record
                 QS_U32(0, Q_EVT_CAST(MyEvt2)->u32);
                 QS_U32(0, Q_EVT_CAST(MyEvt2)->u16);
             QS_END()
             break;
         case MY_EVT3_SIG:
-            QS_BEGIN(MY_EVT3, nullptr) // user-specific record
+            QS_BEGIN_ID(MY_EVT3, 0U) // application-specific record
                 QS_U32(0, Q_EVT_CAST(MyEvt3)->u32);
                 QS_U32(0, Q_EVT_CAST(MyEvt3)->u16);
                 QS_U32(0, Q_EVT_CAST(MyEvt3)->u8);

@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-11
+/// Last updated for version 6.9.1
+/// Last updated on  2020-08-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -72,7 +72,7 @@ int_t QF::run(void) {
 
     // produce the QS_QF_RUN trace record
     QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QF_RUN, nullptr, nullptr)
+    QS_BEGIN_PRE_(QS_QF_RUN, 0U)
     QS_END_PRE_()
 
     vTaskStartScheduler(); // start the FreeRTOS scheduler
@@ -107,7 +107,7 @@ void QActive::start(std::uint_fast8_t const prio,
 
     m_prio = prio;  // save the QF priority
     QF::add_(this); // make QF aware of this active object
-    init(par);      // thake the top-most initial tran.
+    init(par, m_prio); // thake the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
     // statically create the FreeRTOS task for the AO
@@ -155,7 +155,7 @@ void QF::thread_(QActive *act) {
 #endif
     {
         QEvt const *e = act->get_(); // wait for event
-        act->dispatch(e); // dispatch to the active object's state machine
+        act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
         gc(e); // check if the event is garbage, and collect it if so
     }
 #ifdef QF_ACTIVE_STOP
@@ -200,8 +200,7 @@ bool QActive::postFromISR_(QEvt const * const e,
 
     if (status) { // can post the event?
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST,
-                             QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
             QS_TIME_PRE_();       // timestamp
             QS_OBJ_PRE_(sender);  // the sender object
             QS_SIG_PRE_(e->sig);  // the signal of the event
@@ -243,8 +242,7 @@ bool QActive::postFromISR_(QEvt const * const e,
     }
     else {
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_ATTEMPT,
-                             QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
             QS_TIME_PRE_();       // timestamp
             QS_OBJ_PRE_(sender);  // the sender object
             QS_SIG_PRE_(e->sig);  // the signal of the event
@@ -274,7 +272,7 @@ void QF::publishFromISR_(QEvt const *e, void *par)
 
     UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_PUBLISH, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_PUBLISH, 0U)
         QS_TIME_PRE_();           // the timestamp
         QS_OBJ_PRE_(sender);      // the sender object
         QS_SIG_PRE_(e->sig);      // the signal of the event
@@ -336,7 +334,7 @@ void QF::tickXfromISR_(std::uint_fast8_t const tickRate, void *par)
     QTimeEvt *prev = &timeEvtHead_[tickRate];
     UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_TICK, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_TICK, 0U)
        ++prev->m_ctr;
         QS_TEC_PRE_(prev->m_ctr);  // tick ctr
         QS_U8_PRE_(tickRate);      // tick rate
@@ -393,15 +391,14 @@ void QF::tickXfromISR_(std::uint_fast8_t const tickRate, void *par)
                     // do NOT advance the prev pointer
 
                     QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_AUTO_DISARM,
-                                     QS::priv_.locFilter[QS::TE_OBJ], t)
+                                         act->m_prio)
                         QS_OBJ_PRE_(t);   // this time event object
                         QS_OBJ_PRE_(act); // the target AO
                         QS_U8_PRE_(tickRate);
                     QS_END_NOCRIT_PRE_()
                 }
 
-                QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_POST,
-                                 QS::priv_.locFilter[QS::TE_OBJ], t)
+                QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_POST, act->m_prio)
                     QS_TIME_PRE_();       // timestamp
                     QS_OBJ_PRE_(t);       // the time event object
                     QS_SIG_PRE_(t->sig);  // signal of this time event
@@ -441,21 +438,18 @@ QEvt *QF::newXfromISR_(std::uint_fast16_t const evtSize,
     // cannot run out of registered pools
     Q_ASSERT_ID(710, idx < QF_maxPool_);
 
-#ifdef Q_SPY
-    UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_NEW, nullptr, nullptr)
-        QS_TIME_PRE_();       // timestamp
-        QS_EVS_PRE_(evtSize); // the size of the event
-        QS_SIG_PRE_(sig);     // the signal of the event
-    QS_END_NOCRIT_PRE_()
-    taskEXIT_CRITICAL_FROM_ISR(uxSavedInterruptState);
-#endif // Q_SPY
-
     // get e -- platform-dependent
-    QEvt *e = static_cast<QEvt *>(
+    QEvt *e;
+#ifdef Q_SPY
+    e = static_cast<QEvt *>(
               QF_pool_[idx].getFromISR(((margin != QF_NO_MARGIN)
-                  ? margin
-                  : 0U)));
+                  ? margin : 0U),
+                  static_cast<std::uint_fast8_t>(QS_EP_ID) + idx + 1U));
+#else
+    e = static_cast<QEvt *>(
+              QF_pool_[idx].getFromISR(((margin != QF_NO_MARGIN)
+                  ? margin : 0U), 0U));
+#endif
 
     // was e allocated correctly?
     if (e != nullptr) {
@@ -464,11 +458,33 @@ QEvt *QF::newXfromISR_(std::uint_fast16_t const evtSize,
         e->poolId_ = static_cast<std::uint8_t>(idx + 1U);
         // initialize the reference counter to 0
         e->refCtr_ = 0U;
+
+    #ifdef Q_SPY
+        UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_NEW,
+                             static_cast<uint_fast8_t>(QS_EP_ID) + idx + 1U)
+            QS_TIME_PRE_();       // timestamp
+            QS_EVS_PRE_(evtSize); // the size of the event
+            QS_SIG_PRE_(sig);     // the signal of the event
+        QS_END_NOCRIT_PRE_()
+        taskEXIT_CRITICAL_FROM_ISR(uxSavedInterruptState);
+    #endif // Q_SPY
     }
     else {
         // event was not allocated, assert that the caller provided non-zero
         // margin, which means that they can tollerate bad allocation
         Q_ASSERT_ID(720, margin != QF_NO_MARGIN);
+
+    #ifdef Q_SPY
+        UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_NEW_ATTEMPT,
+                             static_cast<uint_fast8_t>(QS_EP_ID) + idx + 1U)
+            QS_TIME_PRE_();       // timestamp
+            QS_EVS_PRE_(evtSize); // the size of the event
+            QS_SIG_PRE_(sig);     // the signal of the event
+        QS_END_NOCRIT_PRE_()
+        taskEXIT_CRITICAL_FROM_ISR(uxSavedInterruptState);
+    #endif // Q_SPY
     }
     return e;
 }
@@ -482,7 +498,8 @@ void QF::gcFromISR(QEvt const * const e) {
         if (e->refCtr_ > 1U) {
             QF_EVT_REF_CTR_DEC_(e); // decrement the ref counter
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC_ATTEMPT, nullptr, nullptr)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC_ATTEMPT,
+                                 static_cast<uint_fast8_t>(e->poolId_))
                 QS_TIME_PRE_();        // timestamp
                 QS_SIG_PRE_(e->sig);   // the signal of the event
                 QS_2U8_PRE_(e->poolId_, e->refCtr_);// pool Id & refCtr
@@ -495,7 +512,8 @@ void QF::gcFromISR(QEvt const * const e) {
             std::uint_fast8_t idx =
                 static_cast<std::uint_fast8_t>(e->poolId_) - 1U;
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC, nullptr, nullptr)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC,
+                                 static_cast<uint_fast8_t>(e->poolId_))
                 QS_TIME_PRE_();        // timestamp
                 QS_SIG_PRE_(e->sig);   // the signal of the event
                 QS_2U8_PRE_(e->poolId_, e->refCtr_);// pool Id & refCtr
@@ -512,13 +530,19 @@ void QF::gcFromISR(QEvt const * const e) {
             // because it's a pool event
             QF_EVT_CONST_CAST_(e)->~QEvt(); // xtor,
 #endif
+
+#ifdef Q_SPY
             // cast 'const' away, which is OK, because it's a pool event
-            QF_pool_[idx].putFromISR(QF_EVT_CONST_CAST_(e));
+            QF_pool_[idx].putFromISR(QF_EVT_CONST_CAST_(e),
+                static_cast<uint_fast8_t>(QS_EP_ID) + e->poolId_);
+#else
+            QF_pool_[idx].putFromISR(QF_EVT_CONST_CAST_(e), 0U);
+#endif
         }
     }
 }
 //............................................................................
-void QMPool::putFromISR(void *b) {
+void QMPool::putFromISR(void *b, std::uint_fast8_t const qs_id) {
     /// @pre # free blocks cannot exceed the total # blocks and
     /// the block pointer must be in range to come from this pool.
     ///
@@ -531,8 +555,7 @@ void QMPool::putFromISR(void *b) {
     m_free_head = b; // set as new head of the free list
     ++m_nFree;       // one more free block in this pool
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_PUT,
-                         QS::priv_.locFilter[QS::MP_OBJ], m_start)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_PUT, qs_id)
         QS_TIME_PRE_();       // timestamp
         QS_OBJ_PRE_(m_start); // the memory managed by this pool
         QS_MPC_PRE_(m_nFree); // the number of free blocks in the pool
@@ -541,7 +564,9 @@ void QMPool::putFromISR(void *b) {
     taskEXIT_CRITICAL_FROM_ISR(uxSavedInterruptState);
 }
 //............................................................................
-void *QMPool::getFromISR(std::uint_fast16_t const margin) {
+void *QMPool::getFromISR(std::uint_fast16_t const margin,
+                         std::uint_fast8_t const qs_id)
+{
     QFreeBlock *fb;
     UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
 
@@ -578,8 +603,7 @@ void *QMPool::getFromISR(std::uint_fast16_t const margin) {
 
         m_free_head = fb_next; // adjust list head to the next free block
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET,
-                         QS::priv_.locFilter[QS::MP_OBJ], m_start)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET, qs_id)
             QS_TIME_PRE_();        // timestamp
             QS_OBJ_PRE_(m_start);  // the memory managed by this pool
             QS_MPC_PRE_(m_nFree);  // the number of free blocks in the pool
@@ -589,8 +613,7 @@ void *QMPool::getFromISR(std::uint_fast16_t const margin) {
     else {
         fb = nullptr;
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET_ATTEMPT,
-                             QS::priv_.locFilter[QS::MP_OBJ], m_start)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET_ATTEMPT, qs_id)
             QS_TIME_PRE_();        // timestamp
             QS_OBJ_PRE_(m_start);  // the memory managed by this pool
             QS_MPC_PRE_(m_nFree);  // the # free blocks in the pool

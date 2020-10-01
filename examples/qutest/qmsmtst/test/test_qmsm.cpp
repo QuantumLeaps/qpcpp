@@ -1,13 +1,13 @@
 //****************************************************************************
 // Purpose: Fixture for QUTEST
-// Last updated for version 6.7.0
-// Last updated on  2019-12-29
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -23,13 +23,12 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-///
+//
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
-// <info@state-machine.com>
 //****************************************************************************
 
 #include "qpcpp.hpp"
@@ -111,7 +110,7 @@ void QS::onTestPost(void const *sender, QActive *recipient,
 namespace QMSMTST {
 
 void BSP_display(char const *msg) {
-    QS_BEGIN(BSP_DISPLAY, nullptr) // application-specific record
+    QS_BEGIN_ID(BSP_DISPLAY, 0U) // app-specific record
         QS_STR(msg);
     QS_END()
 }

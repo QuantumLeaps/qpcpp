@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-12
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-19
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -39,6 +39,7 @@
 #define QP_IMPL           // this is QP implementation
 #include "qs_port.hpp"    // QS port
 #include "qs_pkg.hpp"     // QS package-scope internal interface
+#include "qstamp.hpp"     // QP time-stamp
 #include "qassert.h"      // QP assertions
 
 namespace QP {
@@ -77,14 +78,9 @@ void QS::initBuf(std::uint8_t * const sto,
     // tracing can start correctly even if the startup code fails to clear
     // any uninitialized data (as is required by the C Standard).
     //
-    QS_FILTER_OFF(QS_ALL_RECORDS); // disable all maskable filters
-
-    priv_.locFilter[SM_OBJ] = nullptr;
-    priv_.locFilter[AO_OBJ] = nullptr;
-    priv_.locFilter[MP_OBJ] = nullptr;
-    priv_.locFilter[EQ_OBJ] = nullptr;
-    priv_.locFilter[TE_OBJ] = nullptr;
-    priv_.locFilter[TE_OBJ] = nullptr;
+    glbFilter_(-QS_ALL_RECORDS);  // all global filters OFF
+    locFilter_(QS_ALL_IDS);       // all local filters ON
+    priv_.locFilter_AP = nullptr; // deprecated "AP-filter"
 
     priv_.buf      = sto;
     priv_.end      = static_cast<QSCtr>(stoSize);
@@ -107,196 +103,308 @@ void QS::initBuf(std::uint8_t * const sto,
 
 //****************************************************************************
 /// @description
-/// This function sets up the QS filter to enable the record type @a rec.
+/// This function sets up the QS filter to enable the record type @a filter.
 /// The argument #QS_ALL_RECORDS specifies to filter-in all records.
-/// This function should be called indirectly through the macro QS_FILTER_ON.
+/// This function should be called indirectly through the macro
+/// QS_GLB_FILTER()
 ///
-/// @note Filtering based on the record-type is only the first layer of
-/// filtering. The second layer is based on the object-type. Both filter
-/// layers must be enabled for the QS record to be inserted in the QS buffer.
+/// @param[in] filter  the QS record-d or group to enable in the filter,
+///                 if positive or disable, if negative. The record-id
+///                 numbers must be in the range -127..127.
+/// @note
+/// Filtering based on the record-type is only the first layer of filtering.
+/// The second layer is based on the object-type. Both filter layers must
+/// be enabled for the QS record to be inserted in the QS buffer.
 ///
-/// @sa QP::QS::filterOff(), QS_FILTER_SM_OBJ, QS_FILTER_AO_OBJ,
-/// QS_FILTER_MP_OBJ, QS_FILTER_EQ_OBJ, and QS_FILTER_TE_OBJ.
+/// @sa QP::QS::locFilter_()
 ///
-void QS::filterOn_(std::uint_fast8_t const rec) noexcept {
-    if (rec == static_cast<std::uint_fast8_t>(QS_ALL_RECORDS)) {
-        // set all global filters (partially unrolled loop)
-        for (std::uint_fast8_t i = 0U; i < Q_DIM(priv_.glbFilter); i += 4U) {
-            priv_.glbFilter[i     ] = 0xFFU;
-            priv_.glbFilter[i + 1U] = 0xFFU;
-            priv_.glbFilter[i + 2U] = 0xFFU;
-            priv_.glbFilter[i + 3U] = 0xFFU;
+void QS::glbFilter_(std::int_fast16_t const filter) noexcept {
+    bool const isRemove = (filter < 0);
+    std::uint16_t const rec = isRemove
+                  ? static_cast<std::uint16_t>(-filter)
+                  : static_cast<std::uint16_t>(filter);
+    switch (rec) {
+        case QS_ALL_RECORDS: {
+            std::uint8_t const tmp = (isRemove ? 0x00U : 0xFFU);
+            std::uint_fast8_t i;
+            // set all global filters (partially unrolled loop)
+            for (i = 0U; i < Q_DIM(priv_.glbFilter); i += 4U) {
+                priv_.glbFilter[i     ] = tmp;
+                priv_.glbFilter[i + 1U] = tmp;
+                priv_.glbFilter[i + 2U] = tmp;
+                priv_.glbFilter[i + 3U] = tmp;
+            }
+            if (isRemove) {
+                // leave the "not maskable" filters enabled,
+                // see qs.h, Miscellaneous QS records (not maskable)
+                //
+                priv_.glbFilter[0] = 0x01U;
+                priv_.glbFilter[7] = 0xFCU;
+                priv_.glbFilter[8] = 0x7FU;
+            }
+            else {
+                // never turn the last 3 records on (0x7D, 0x7E, 0x7F)
+                priv_.glbFilter[15] = 0x1FU;
+            }
+            break;
         }
-        // never turn the last 3 records on (0x7D, 0x7E, 0x7F)
-        priv_.glbFilter[15] = 0x1FU;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_SM_RECORDS)) {
-        priv_.glbFilter[0] |= 0xFEU;
-        priv_.glbFilter[1] |= 0x03U;
-        priv_.glbFilter[6] |= 0x80U;
-        priv_.glbFilter[7] |= 0x03U;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_AO_RECORDS)) {
-        priv_.glbFilter[1] |= 0xFCU;
-        priv_.glbFilter[2] |= 0x07U;
-        priv_.glbFilter[5] |= 0x20U;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_EQ_RECORDS)) {
-        priv_.glbFilter[2] |= 0x78U;
-        priv_.glbFilter[5] |= 0x40U;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_MP_RECORDS)) {
-        priv_.glbFilter[3] |= 0x03U;
-        priv_.glbFilter[5] |= 0x80U;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_QF_RECORDS)) {
-        priv_.glbFilter[3] |= 0xFCU;
-        priv_.glbFilter[4] |= 0xC0U;
-        priv_.glbFilter[5] |= 0x1FU;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_TE_RECORDS)) {
-        priv_.glbFilter[4] |= 0x3FU;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_SC_RECORDS)) {
-        priv_.glbFilter[6] |= 0x7FU;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U0_RECORDS)) {
-        priv_.glbFilter[12] |= 0xF0U;
-        priv_.glbFilter[13] |= 0x01U;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U1_RECORDS)) {
-        priv_.glbFilter[13] |= 0x3EU;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U2_RECORDS)) {
-        priv_.glbFilter[13] |= 0xC0U;
-        priv_.glbFilter[14] |= 0x07U;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U3_RECORDS)) {
-        priv_.glbFilter[14] |= 0xF8U;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U4_RECORDS)) {
-        priv_.glbFilter[15] |= 0x1FU;
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_UA_RECORDS)) {
-        priv_.glbFilter[12] |= 0xF0U;
-        priv_.glbFilter[13] |= 0xFFU;
-        priv_.glbFilter[14] |= 0xFFU;
-        priv_.glbFilter[15] |= 0x1FU;
-    }
-    else {
-        // record numbers can't exceed QS_ESC, so they don't need escaping
-        Q_ASSERT_ID(210, rec < static_cast<std::uint_fast8_t>(QS_ESC));
+        case QS_SM_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[0] &=
+                    static_cast<std::uint8_t>(~0xFEU & 0xFFU);
+                priv_.glbFilter[1] &=
+                    static_cast<std::uint8_t>(~0x03U & 0xFFU);
+                priv_.glbFilter[6] &=
+                    static_cast<std::uint8_t>(~0x80U & 0xFFU);
+                priv_.glbFilter[7] &=
+                    static_cast<std::uint8_t>(~0x03U & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[0] |= 0xFEU;
+                priv_.glbFilter[1] |= 0x03U;
+                priv_.glbFilter[6] |= 0x80U;
+                priv_.glbFilter[7] |= 0x03U;
+            }
+            break;
+        case QS_AO_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[1] &=
+                    static_cast<std::uint8_t>(~0xFCU & 0xFFU);
+                priv_.glbFilter[2] &=
+                    static_cast<std::uint8_t>(~0x07U & 0xFFU);
+                priv_.glbFilter[5] &=
+                    static_cast<std::uint8_t>(~0x20U & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[1] |= 0xFCU;
+                priv_.glbFilter[2] |= 0x07U;
+                priv_.glbFilter[5] |= 0x20U;
+            }
+            break;
+        case QS_EQ_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[2] &=
+                    static_cast<std::uint8_t>(~0x78U & 0xFFU);
+                priv_.glbFilter[5] &=
+                    static_cast<std::uint8_t>(~0x40U & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[2] |= 0x78U;
+                priv_.glbFilter[5] |= 0x40U;
+            }
+            break;
+        case QS_MP_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[3] &=
+                    static_cast<std::uint8_t>(~0x03U & 0xFFU);
+                priv_.glbFilter[5] &=
+                    static_cast<std::uint8_t>(~0x80U & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[3] |= 0x03U;
+                priv_.glbFilter[5] |= 0x80U;
+            }
+            break;
+        case QS_QF_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[2] &=
+                    static_cast<std::uint8_t>(~0x80U & 0xFFU);
+                priv_.glbFilter[3] &=
+                    static_cast<std::uint8_t>(~0xFCU & 0xFFU);
+                priv_.glbFilter[4] &=
+                    static_cast<std::uint8_t>(~0xC0U & 0xFFU);
+                priv_.glbFilter[5] &=
+                    static_cast<std::uint8_t>(~0x1FU & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[2] |= 0x80U;
+                priv_.glbFilter[3] |= 0xFCU;
+                priv_.glbFilter[4] |= 0xC0U;
+                priv_.glbFilter[5] |= 0x1FU;
+            }
+            break;
+        case QS_TE_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[4] &=
+                    static_cast<std::uint8_t>(~0x3FU & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[4] |= 0x3FU;
+            }
+            break;
+        case QS_SC_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[6] &=
+                    static_cast<std::uint8_t>(~0x7FU & 0xFFU);
+            }
+            else {
+               priv_.glbFilter[6] |= 0x7FU;
+            }
+            break;
+        case QS_U0_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[12] &=
+                    static_cast<std::uint8_t>(~0xF0U & 0xFFU);
+                priv_.glbFilter[13] &=
+                    static_cast<std::uint8_t>(~0x01U & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[12] |= 0xF0U;
+                priv_.glbFilter[13] |= 0x01U;
+            }
+            break;
+        case QS_U1_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[13] &=
+                    static_cast<std::uint8_t>(~0x3EU & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[13] |= 0x3EU;
+            }
+            break;
+        case QS_U2_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[13] &=
+                    static_cast<std::uint8_t>(~0xC0U & 0xFFU);
+                priv_.glbFilter[14] &=
+                    static_cast<std::uint8_t>(~0x07U & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[13] |= 0xC0U;
+                priv_.glbFilter[14] |= 0x07U;
+            }
+            break;
+        case QS_U3_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[14] &=
+                    static_cast<std::uint8_t>(~0xF8U & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[14] |= 0xF8U;
+            }
+            break;
+        case QS_U4_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[15] &= 0x1FU;
+            }
+            else {
+                priv_.glbFilter[15] |= 0x1FU;
+            }
+            break;
+        case QS_UA_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[12] &=
+                    static_cast<std::uint8_t>(~0xF0U & 0xFFU);
+                priv_.glbFilter[13] = 0U;
+                priv_.glbFilter[14] = 0U;
+                priv_.glbFilter[15] &=
+                    static_cast<std::uint8_t>(~0x1FU & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[12] |= 0xF0U;
+                priv_.glbFilter[13] |= 0xFFU;
+                priv_.glbFilter[14] |= 0xFFU;
+                priv_.glbFilter[15] |= 0x1FU;
+            }
+            break;
+        default:
+            // QS rec number can't exceed 0x7D, so no need for escaping
+            Q_ASSERT_ID(210, rec < 0x7DU);
 
-        priv_.glbFilter[rec >> 3U] |=
-            static_cast<std::uint8_t>(1U << (rec & 7U));
-
-        // never turn the last 3 records on (0x7D, 0x7E, 0x7F)
-        priv_.glbFilter[15] &= 0x1FU;
+            if (isRemove) {
+                priv_.glbFilter[rec >> 3U]
+                    &= static_cast<std::uint8_t>(~(1U << (rec & 7U)) & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[rec >> 3U]
+                    |= static_cast<std::uint8_t>(1U << (rec & 7U));
+                // never turn the last 3 records on (0x7D, 0x7E, 0x7F)
+                priv_.glbFilter[15] &= 0x1FU;
+            }
+            break;
     }
 }
 
 //****************************************************************************
 /// @description
-/// This function sets up the QS filter to disable the record type @a rec.
-/// The argument #QS_ALL_RECORDS specifies to suppress all records.
-/// This function should be called indirectly through the macro QS_FILTER_OFF.
+/// This function sets up the local QS filter to enable or disable the
+/// given QS object-id or a group of object-ids @a filter.
+/// This function should be called indirectly through the macro
+/// QS_LOC_FILTER()
 ///
-/// @note Filtering records based on the record-type is only the first layer
-/// of filtering. The second layer is based on the object-type. Both filter
-/// layers must be enabled for the QS record to be inserted in the QS buffer.
+/// @param[in] filter  the QS object-id or group to enable in the filter,
+///                 if positive or disable, if negative. The qs_id numbers
+///                 must be in the range 1..127.
+/// @note
+/// Filtering based on the object-id (local filter) is the second layer of
+/// filtering. The first layer is based on the QS record-type (gloabl filter).
+/// Both filter layers must be enabled for the QS record to be inserted into
+/// the QS buffer.
 ///
-void QS::filterOff_(std::uint_fast8_t const rec) noexcept {
-    std::uint_fast8_t tmp;
-
-    if (rec == static_cast<std::uint_fast8_t>(QS_ALL_RECORDS)) {
-        // clear all global filters (partially unrolled loop)
-        for (tmp = 0U; tmp < Q_DIM(priv_.glbFilter); tmp += 4U) {
-            priv_.glbFilter[tmp     ] = 0x00U;
-            priv_.glbFilter[tmp + 1U] = 0x00U;
-            priv_.glbFilter[tmp + 2U] = 0x00U;
-            priv_.glbFilter[tmp + 3U] = 0x00U;
-        }
-        // leave the "not maskable" filters enabled,
-        // see qs.h, Miscellaneous QS records (not maskable)
-        //
-        priv_.glbFilter[0] = 0x01U;
-        priv_.glbFilter[7] = 0xFCU;
-        priv_.glbFilter[8] = 0x7FU;
+/// @sa QP::QS::glbFilter_()
+///
+void QS::locFilter_(std::int_fast16_t const filter) noexcept {
+    bool const isRemove = (filter < 0);
+    std::uint16_t const qs_id = isRemove
+                  ? static_cast<std::uint16_t>(-filter)
+                  : static_cast<std::uint16_t>(filter);
+    std::uint8_t const tmp = (isRemove ? 0x00U : 0xFFU);
+    std::uint_fast8_t i;
+    switch (qs_id) {
+        case QS_ALL_IDS:
+            // set all global filters (partially unrolled loop)
+            for (i = 0U; i < Q_DIM(priv_.locFilter); i += 4U) {
+                priv_.locFilter[i     ] = tmp;
+                priv_.locFilter[i + 1U] = tmp;
+                priv_.locFilter[i + 2U] = tmp;
+                priv_.locFilter[i + 3U] = tmp;
+            }
+            break;
+        case QS_AO_IDS:
+            for (i = 0U; i < 8U; i += 4U) {
+                priv_.locFilter[i     ] = tmp;
+                priv_.locFilter[i + 1U] = tmp;
+                priv_.locFilter[i + 2U] = tmp;
+                priv_.locFilter[i + 3U] = tmp;
+            }
+            break;
+        case QS_EP_IDS:
+            i = 8U;
+            priv_.locFilter[i     ] = tmp;
+            priv_.locFilter[i + 1U] = tmp;
+            break;
+        case QS_AP_IDS:
+            i = 12U;
+            priv_.locFilter[i     ] = tmp;
+            priv_.locFilter[i + 1U] = tmp;
+            priv_.locFilter[i + 2U] = tmp;
+            priv_.locFilter[i + 3U] = tmp;
+            break;
+        default:
+            if (qs_id < 0x7FU) {
+                if (isRemove) {
+                    priv_.locFilter[qs_id >> 3U] &=
+                        static_cast<std::uint8_t>(
+                            ~(1U << (qs_id & 7U)) & 0xFFU);
+                }
+                else {
+                    priv_.locFilter[qs_id >> 3U]
+                        |= (1U << (qs_id & 7U));
+                }
+            }
+            else {
+                Q_ERROR_ID(310); // incorrect qs_id
+            }
+            break;
     }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_SM_RECORDS)) {
-        priv_.glbFilter[0] &= static_cast<std::uint8_t>(~0xFEU);
-        priv_.glbFilter[1] &= static_cast<std::uint8_t>(~0x03U);
-        priv_.glbFilter[6] &= static_cast<std::uint8_t>(~0x80U);
-        priv_.glbFilter[7] &= static_cast<std::uint8_t>(~0x03U);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_AO_RECORDS)) {
-        priv_.glbFilter[1] &= static_cast<std::uint8_t>(~0xFCU);
-        priv_.glbFilter[2] &= static_cast<std::uint8_t>(~0x07U);
-        priv_.glbFilter[5] &= static_cast<std::uint8_t>(~0x20U);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_EQ_RECORDS)) {
-        priv_.glbFilter[2] &= static_cast<std::uint8_t>(~0x78U);
-        priv_.glbFilter[5] &= static_cast<std::uint8_t>(~0x40U);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_MP_RECORDS)) {
-        priv_.glbFilter[3] &= static_cast<std::uint8_t>(~0x03U);
-        priv_.glbFilter[5] &= static_cast<std::uint8_t>(~0x80U);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_QF_RECORDS)) {
-        priv_.glbFilter[3] &= static_cast<std::uint8_t>(~0xFCU);
-        priv_.glbFilter[4] &= static_cast<std::uint8_t>(~0xC0U);
-        priv_.glbFilter[5] &= static_cast<std::uint8_t>(~0x1FU);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_TE_RECORDS)) {
-        priv_.glbFilter[4] &= static_cast<std::uint8_t>(~0x3FU);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_SC_RECORDS)) {
-        priv_.glbFilter[6] &= static_cast<std::uint8_t>(~0x7FU);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U0_RECORDS)) {
-        priv_.glbFilter[12] &= static_cast<std::uint8_t>(~0xF0U);
-        priv_.glbFilter[13] &= static_cast<std::uint8_t>(~0x01U);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U1_RECORDS)) {
-        priv_.glbFilter[13] &= static_cast<std::uint8_t>(~0x3EU);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U2_RECORDS)) {
-        priv_.glbFilter[13] &= static_cast<std::uint8_t>(~0xC0U);
-        priv_.glbFilter[14] &= static_cast<std::uint8_t>(~0x07U);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U3_RECORDS)) {
-        priv_.glbFilter[14] &= static_cast<std::uint8_t>(~0xF8U);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_U4_RECORDS)) {
-        priv_.glbFilter[15] &= static_cast<std::uint8_t>(~0x1FU);
-    }
-    else if (rec == static_cast<std::uint_fast8_t>(QS_UA_RECORDS)) {
-        priv_.glbFilter[12] &= static_cast<std::uint8_t>(~0xF0U);
-        priv_.glbFilter[13] = 0U;
-        priv_.glbFilter[14] = 0U;
-        priv_.glbFilter[15] &= static_cast<std::uint8_t>(~0x1FU);
-    }
-    else {
-        // record IDs can't exceed QS_ESC, so they don't need escaping
-        Q_ASSERT_ID(310, rec < static_cast<std::uint_fast8_t>(QS_ESC));
-
-        priv_.glbFilter[rec >> 3U] &= static_cast<std::uint8_t>(
-                    ~static_cast<std::uint8_t>(1U << (rec & 7U)));
-
-        // leave the "not maskable" filters enabled,
-        // see qs.h, Miscellaneous QS records (not maskable)
-        //
-        priv_.glbFilter[0] |= 0x01U;
-        priv_.glbFilter[7] |= 0xFCU;
-        priv_.glbFilter[8] |= 0x7FU;
-    }
+    priv_.locFilter[0] |= 0x01U; // leave QS_ID == 0 always on
 }
 
 //****************************************************************************
 /// @description
 /// This function must be called at the beginning of each QS record.
-/// This function should be called indirectly through the macro #QS_BEGIN,
-/// or #QS_BEGIN_NOCRIT, depending if it's called in a normal code or from
+/// This function should be called indirectly through the macro QS_BEGIN_ID(),
+/// or QS_BEGIN_NOCRIT(), depending if it's called in a normal code or from
 /// a critical section.
 ///
 void QS::beginRec_(std::uint_fast8_t const rec) noexcept {
@@ -321,8 +429,8 @@ void QS::beginRec_(std::uint_fast8_t const rec) noexcept {
 //****************************************************************************
 /// @description
 /// This function must be called at the end of each QS record.
-/// This function should be called indirectly through the macro #QS_END,
-/// or #QS_END_NOCRIT, depending if it's called in a normal code or from
+/// This function should be called indirectly through the macro QS_END(),
+/// or QS_END_NOCRIT(), depending if it's called in a normal code or from
 /// a critical section.
 ///
 void QS::endRec_(void) noexcept {
@@ -539,12 +647,12 @@ void QS::usr_dict_pre_(enum_t const rec,
                        char_t const * const name) noexcept
 {
     QS_CRIT_STAT_
-    QS_CRIT_ENTRY_();
+    QS_CRIT_E_();
     beginRec_(static_cast<std::uint_fast8_t>(QS_USR_DICT));
     QS_U8_PRE_(rec);
     QS_STR_PRE_(name);
     endRec_();
-    QS_CRIT_EXIT_();
+    QS_CRIT_X_();
     onFlush();
 }
 
@@ -830,13 +938,13 @@ void QS::sig_dict_pre_(enum_t const sig, void const * const obj,
     if (*name == '&') {
         ++name;
     }
-    QS_CRIT_ENTRY_();
+    QS_CRIT_E_();
     beginRec_(static_cast<std::uint_fast8_t>(QS_SIG_DICT));
     QS_SIG_PRE_(sig);
     QS_OBJ_PRE_(obj);
     QS_STR_PRE_(name);
     endRec_();
-    QS_CRIT_EXIT_();
+    QS_CRIT_X_();
     onFlush();
 }
 
@@ -851,12 +959,12 @@ void QS::obj_dict_pre_(void const * const obj,
     if (*name == '&') {
         ++name;
     }
-    QS_CRIT_ENTRY_();
+    QS_CRIT_E_();
     beginRec_(static_cast<std::uint_fast8_t>(QS_OBJ_DICT));
     QS_OBJ_PRE_(obj);
     QS_STR_PRE_(name);
     endRec_();
-    QS_CRIT_EXIT_();
+    QS_CRIT_X_();
     onFlush();
 }
 
@@ -871,12 +979,12 @@ void QS::fun_dict_pre_(void (* const fun)(void),
     if (*name == '&') {
         ++name;
     }
-    QS_CRIT_ENTRY_();
+    QS_CRIT_E_();
     beginRec_(static_cast<std::uint_fast8_t>(QS_FUN_DICT));
     QS_FUN_PRE_(fun);
     QS_STR_PRE_(name);
     endRec_();
-    QS_CRIT_EXIT_();
+    QS_CRIT_X_();
     onFlush();
 }
 
@@ -886,7 +994,7 @@ void QS::fun_dict_pre_(void (* const fun)(void),
 void QS::assertion_pre_(char_t const * const module, int_t const loc,
                         std::uint32_t delay)
 {
-    QS_BEGIN_NOCRIT_PRE_(QP::QS_ASSERT_FAIL, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QP::QS_ASSERT_FAIL, 0U)
         QS_TIME_PRE_();
         QS_U16_PRE_(loc);
         QS_STR_PRE_((module != nullptr) ? module : "?");
@@ -899,7 +1007,7 @@ void QS::assertion_pre_(char_t const * const module, int_t const loc,
 
 //............................................................................
 void QS::crit_entry_pre_(void) {
-    QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_CRIT_ENTRY, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_CRIT_ENTRY, 0U)
         QS_TIME_PRE_();
         ++QS::priv_.critNest;
         QS_U8_PRE_(QS::priv_.critNest);
@@ -908,7 +1016,7 @@ void QS::crit_entry_pre_(void) {
 
 //............................................................................
 void QS::crit_exit_pre_(void) {
-    QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_CRIT_EXIT, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_CRIT_EXIT, 0U)
         QS_TIME_PRE_();
         QS_U8_PRE_(QS::priv_.critNest);
         --QS::priv_.critNest;
@@ -919,7 +1027,7 @@ void QS::crit_exit_pre_(void) {
 void QS::isr_entry_pre_(std::uint8_t const isrnest,
                         std::uint8_t const prio)
 {
-    QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_ISR_ENTRY, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_ISR_ENTRY, 0U)
         QS_TIME_PRE_();
         QS_U8_PRE_(isrnest);
         QS_U8_PRE_(prio);
@@ -930,7 +1038,7 @@ void QS::isr_entry_pre_(std::uint8_t const isrnest,
 void QS::isr_exit_pre_(std::uint8_t const isrnest,
                        std::uint8_t const prio)
 {
-    QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_ISR_EXIT, nullptr, nullptr)
+    QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_ISR_EXIT, 0U)
         QS_TIME_PRE_();
         QS_U8_PRE_(isrnest);
         QS_U8_PRE_(prio);

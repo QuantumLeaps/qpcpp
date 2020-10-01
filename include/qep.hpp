@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2020-08-17
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-15
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XXYZ, where XX is a 2-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      690U
+#define QP_VERSION      691U
 
 //! The current QP version number string of the form XX.Y.Z, where XX is
 // a 2-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "6.9.0"
+#define QP_VERSION_STR  "6.9.1"
 
-//! Encrypted  current QP release (6.9.0) and date (2020-08-21)
-#define QP_RELEASE      0x884D22FDU
+//! Encrypted  current QP release (6.9.1) and date (2020-09-22)
+#define QP_RELEASE      0x883DB9ACU
 
 
 //****************************************************************************
@@ -275,13 +275,17 @@ public:
     virtual ~QHsm() noexcept;
 
     //! executes the top-most initial transition in QP::QHsm
-    virtual void init(void const * const e);
+    virtual void init(void const * const e,
+                      std::uint_fast8_t const qs_id);
 
-    //! overloaded init(void)
-    virtual void init(void) { this->init(nullptr); }
+    //! overloaded init(qs_id)
+    virtual void init(std::uint_fast8_t const qs_id) {
+        this->init(nullptr, qs_id);
+    }
 
     //! Dispatches an event to QHsm
-    virtual void dispatch(QEvt const * const e);
+    virtual void dispatch(QEvt const * const e,
+                          std::uint_fast8_t const qs_id);
 
     //! Tests if a given state is part of the current active state
     //! configuration
@@ -456,7 +460,8 @@ private:
     static constexpr std::int_fast8_t MAX_NEST_DEPTH_{6};
 
     //! internal helper function to take a transition in QP::QHsm
-    std::int_fast8_t hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]);
+    std::int_fast8_t hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
+                              std::uint_fast8_t const qs_id);
 
     friend class QMsm;
     friend class QActive;
@@ -494,11 +499,15 @@ class QMsm : public QHsm {
 public:
     //! Performs the second step of SM initialization by triggering
     /// the top-most initial transition.
-    void init(void const * const e) override;
-    void init(void) override { this->init(nullptr); }
+    void init(void const * const e,
+              std::uint_fast8_t const qs_id) override;
+    void init(std::uint_fast8_t const qs_id) override {
+        this->init(nullptr, qs_id);
+    }
 
     //! Dispatches an event to a HSM
-    void dispatch(QEvt const * const e) override;
+    void dispatch(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) override;
 
     //! Tests if a given state is part of the active state configuration
     bool isInState(QMState const * const st) const noexcept;
@@ -533,14 +542,17 @@ private:
     static QState top(void * const me, QEvt const * const e) noexcept = delete;
 
     //! Internal helper function to execute a transition-action table
-    QState execTatbl_(QMTranActTable const * const tatbl);
+    QState execTatbl_(QMTranActTable const * const tatbl,
+                      std::uint_fast8_t const qs_id);
 
     //! Internal helper function to exit current state to transition source
     void exitToTranSource_(QMState const *s,
-                           QMState const * const ts);
+                           QMState const * const ts,
+                           std::uint_fast8_t const qs_id);
 
     //! Internal helper function to enter state history
-    QState enterHistory_(QMState const * const hist);
+    QState enterHistory_(QMState const * const hist,
+                         std::uint_fast8_t const qs_id);
 
     //! maximum depth of implemented entry levels for transitions to history
     static constexpr std::int_fast8_t MAX_ENTRY_DEPTH_ {4};

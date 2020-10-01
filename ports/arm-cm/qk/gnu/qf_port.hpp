@@ -144,7 +144,7 @@
 //
 // NOTE5:
 // The selective disabling of "QF-aware" interrupts with the BASEPRI register
-// has a problem on ARM Cortex-M7 core r0p1 (see ARM-EPM-064408, errata
+// has a problem on ARM Cortex-M7 core r0p1 (see SDEN-1068427, errata
 // 837070). The workaround recommended by ARM is to surround MSR BASEPRI with
 // the CPSID i/CPSIE i pair, which is implemented in the QF_INT_DISABLE()
 // macro. This workaround works also for Cortex-M3/M4 cores.

@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source files">
+      <UniqueIdentifier>{c6017ab7-6299-4b81-acee-c1763a48750d}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="VisualGDB settings">
+      <UniqueIdentifier>{c919b77d-bd4e-42dd-90aa-1ccb1597d180}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="nucleo-l152re">
+      <UniqueIdentifier>{d32a0836-a71c-48cd-a0dc-003d1237eae2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QS">
+      <UniqueIdentifier>{546cf9df-d280-46a0-8461-b51c82a3baa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QP-port">
+      <UniqueIdentifier>{0d86c7f6-a92e-4327-835c-5bbf87534465}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QP">
+      <UniqueIdentifier>{3c579ef5-dace-45b5-8c74-75413c8bb3b6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="stm32.props">
+      <Filter>nucleo-l152re</Filter>
+    </None>
+    <None Include="dpp-qk-Debug.vgdbsettings">
+      <Filter>VisualGDB settings</Filter>
+    </None>
+    <None Include="dpp-qk-Release.vgdbsettings">
+      <Filter>VisualGDB settings</Filter>
+    </None>
+    <None Include="stm32.xml">
+      <Filter>VisualGDB settings</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\3rd_party\nucleo-l152re\system_stm32l1xx.c">
+      <Filter>nucleo-l152re</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\3rd_party\nucleo-l152re\gnu\startup_stm32l1xx.c">
+      <Filter>nucleo-l152re</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qep_hsm.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qep_msm.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_act.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_actq.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_defer.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_dyn.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_mem.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_ps.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_qact.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_qeq.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_qmact.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qf\qf_time.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\ports\arm-cm\qk\gnu\qk_port.cpp">
+      <Filter>QP-port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qs\qs.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qs\qs_fp.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qs\qs_rx.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\philo.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\table.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\bsp.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\include\qstamp.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\src\qk\qk.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\ports\arm-cm\qk\gnu\qep_port.hpp">
+      <Filter>QP-port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\ports\arm-cm\qk\gnu\qf_port.hpp">
+      <Filter>QP-port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\ports\arm-cm\qk\gnu\qk_port.hpp">
+      <Filter>QP-port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\ports\arm-cm\qk\gnu\qs_port.hpp">
+      <Filter>QP-port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\bsp.hpp">
+      <Filter>Source files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dpp.hpp">
+      <Filter>Source files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\README.txt">
+      <Filter>Source files</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

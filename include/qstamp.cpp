@@ -7,10 +7,9 @@
 /// you to specify a pre-build action, which is the ideal place to delete
 /// the qstamp object file.)
 
-namespace QP {
+#include "qstamp.hpp"
 
-extern char const BUILD_DATE[12];
-extern char const BUILD_TIME[9];
+namespace QP {
 
 //! the calendar date of the last translation of the form: "Mmm dd yyyy"
 char const BUILD_DATE[12] = __DATE__;

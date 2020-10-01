@@ -2,8 +2,8 @@
 /// @brief QP::QEQueue implementation
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-17
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -104,6 +104,8 @@ void QEQueue::init(QEvt const *qSto[],
 /// @param[in] margin number of required free slots in the queue after
 ///                   posting the event. The special value QP::QF_NO_MARGIN
 ///                   means that this function will assert if posting
+/// @param[in] qs_id  QS-id of this state machine (for QS local filter)
+///
 /// @note
 /// The QP::QF_NO_MARGIN value of the @p margin argument is special and
 /// denotes situation when the post() operation is assumed to succeed (event
@@ -118,7 +120,8 @@ void QEQueue::init(QEvt const *qSto[],
 /// @sa QP::QEQueue::postLIFO(), QP::QEQueue::get()
 ///
 bool QEQueue::post(QEvt const * const e,
-                   std::uint_fast16_t const margin) noexcept
+                   std::uint_fast16_t const margin,
+                   std::uint_fast8_t const qs_id) noexcept
 {
     bool status;
     QF_CRIT_STAT_
@@ -126,7 +129,7 @@ bool QEQueue::post(QEvt const * const e,
     /// @pre event must be valid
     Q_REQUIRE_ID(200, e != nullptr);
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     QEQueueCtr nFree = m_nFree; // temporary to avoid UB for volatile access
 
     // margin available?
@@ -144,8 +147,7 @@ bool QEQueue::post(QEvt const * const e,
             m_nMin = nFree; // update minimum so far
         }
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_POST,
-                         QS::priv_.locFilter[QS::EQ_OBJ], this)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_POST, qs_id)
             QS_TIME_PRE_();                     // timestamp
             QS_SIG_PRE_(e->sig);                // the signal of this event
             QS_OBJ_PRE_(this);                  // this queue object
@@ -176,8 +178,7 @@ bool QEQueue::post(QEvt const * const e,
         /// not acceptable
         Q_ASSERT_CRIT_(210, margin != QF_NO_MARGIN);
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_POST_ATTEMPT,
-                         QS::priv_.locFilter[QS::EQ_OBJ], this)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_POST_ATTEMPT, qs_id)
             QS_TIME_PRE_();        // timestamp
             QS_SIG_PRE_(e->sig);   // the signal of this event
             QS_OBJ_PRE_(this);     // this queue object
@@ -188,7 +189,9 @@ bool QEQueue::post(QEvt const * const e,
 
         status = false; // event not posted
     }
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
+
+    static_cast<void>(qs_id); // unused parameter, if Q_SPY not defined
 
     return status;
 }
@@ -198,7 +201,8 @@ bool QEQueue::post(QEvt const * const e,
 /// Post an event to the "raw" thread-safe event queue using the
 /// Last-In-First-Out (LIFO) order.
 ///
-/// @param[in] e   pointer to the event to be posted to the queue
+/// @param[in] e     pointer to the event to be posted to the queue
+/// @param[in] qs_id QS-id of this state machine (for QS local filter)
 ///
 /// @attention
 /// The LIFO policy should be used only with great __caution__,
@@ -214,10 +218,12 @@ bool QEQueue::post(QEvt const * const e,
 /// @sa
 /// QP::QEQueue::post(), QP::QEQueue::get(), QP::QActive::defer()
 ///
-void QEQueue::postLIFO(QEvt const * const e) noexcept {
+void QEQueue::postLIFO(QEvt const * const e,
+                       std::uint_fast8_t const qs_id) noexcept
+{
     QF_CRIT_STAT_
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     QEQueueCtr nFree = m_nFree; // temporary to avoid UB for volatile access
 
     /// @pre the queue must be able to accept the event (cannot overflow)
@@ -234,8 +240,7 @@ void QEQueue::postLIFO(QEvt const * const e) noexcept {
         m_nMin = nFree; // update minimum so far
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_POST_LIFO,
-                     QS::priv_.locFilter[QS::EQ_OBJ], this)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_POST_LIFO, qs_id)
         QS_TIME_PRE_();                      // timestamp
         QS_SIG_PRE_(e->sig);                 // the signal of this event
         QS_OBJ_PRE_(this);                   // this queue object
@@ -256,13 +261,17 @@ void QEQueue::postLIFO(QEvt const * const e) noexcept {
         QF_PTR_AT_(m_ring, m_tail) = frontEvt; // buffer the old front evt
     }
 
-    QF_CRIT_EXIT_();
+    static_cast<void>(qs_id); // unused parameter, if Q_SPY not defined
+
+    QF_CRIT_X_();
 }
 
 //****************************************************************************
 /// @description
 /// Retrieves an event from the front of the "raw" thread-safe queue and
 /// returns a pointer to this event to the caller.
+///
+/// @param[in] qs_id QS-id of this state machine (for QS local filter)
 ///
 /// @returns
 /// pointer to event at the front of the queue, if the queue is
@@ -275,11 +284,11 @@ void QEQueue::postLIFO(QEvt const * const e) noexcept {
 /// @sa
 /// QP::QEQueue::post(), QP::QEQueue::postLIFO(), QP::QActive::recall()
 ///
-QEvt const *QEQueue::get(void) noexcept {
+QEvt const *QEQueue::get(std::uint_fast8_t const qs_id) noexcept {
     QEvt const *e;
     QF_CRIT_STAT_
 
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     e = m_frontEvt;  // always remove the event from the front location
 
     // is the queue not empty?
@@ -295,8 +304,7 @@ QEvt const *QEQueue::get(void) noexcept {
             }
             --m_tail;
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_GET,
-                             QS::priv_.locFilter[QS::EQ_OBJ], this)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_GET, qs_id)
                 QS_TIME_PRE_();              // timestamp
                 QS_SIG_PRE_(e->sig);         // the signal of this event
                 QS_OBJ_PRE_(this);           // this queue object
@@ -310,9 +318,7 @@ QEvt const *QEQueue::get(void) noexcept {
             // all entries in the queue must be free (+1 for fronEvt)
             Q_ASSERT_CRIT_(410, nFree == (m_end + 1U));
 
-            QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_GET_LAST,
-                             QS::priv_.locFilter[QS::EQ_OBJ],
-                             this)
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_GET_LAST, qs_id)
                 QS_TIME_PRE_();              // timestamp
                 QS_SIG_PRE_(e->sig);         // the signal of this event
                 QS_OBJ_PRE_(this);           // this queue object
@@ -320,7 +326,10 @@ QEvt const *QEQueue::get(void) noexcept {
             QS_END_NOCRIT_PRE_()
         }
     }
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
+
+    static_cast<void>(qs_id); // unused parameter, if Q_SPY not defined
+
     return e;
 }
 

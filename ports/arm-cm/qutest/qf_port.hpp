@@ -3,8 +3,8 @@
 /// @ingroup qutest
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.9.1
+/// Last updated on  2019-09-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -90,14 +90,12 @@ extern uint8_t volatile QF_intNest;
 
     // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool
-
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
-
     #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_))))
-    #define QF_EPOOL_PUT_(p_, e_)     ((p_).put(e_))
+    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
 
     #include "qf_pkg.hpp" // internal QF interface
 

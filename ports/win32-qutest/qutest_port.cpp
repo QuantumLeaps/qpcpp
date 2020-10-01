@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-31
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -228,12 +228,13 @@ void QS::onFlush(void) {
             }
             else if (nSent < (int)nBytes) { // sent fewer than requested?
                 Sleep(QS_TIMEOUT_MS); // sleep for the timeout
+
                 // adjust the data and loop back to send() the rest
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
             }
             else {
-                break;
+                break; // break out of the for-ever loop
             }
         }
         // set nBytes for the next call to QS::getBlock()

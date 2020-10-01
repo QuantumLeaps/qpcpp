@@ -2,14 +2,14 @@
 /// @brief QV/C++ port to ARM Cortex-M, ARM-CLANG toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -38,30 +38,41 @@
 #ifndef QV_PORT_HPP
 #define QV_PORT_HPP
 
-#if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1 ?, see NOTE02
+#if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1 (v6-M, v6S-M)?
 
-    // macro to put the CPU to sleep inside QV_onIdle()
+    // macro to put the CPU to sleep inside QV::onIdle()
     #define QV_CPU_SLEEP() do { \
         __asm volatile ("wfi"); \
-        QF_INT_ENABLE(); \
+        QF_INT_ENABLE();        \
     } while (false)
 
-#else // Cortex-M3/M4/M4F
+    #define QV_ARM_ERRATUM_838869() ((void)0)
 
-    // macro to put the CPU to sleep inside QV_onIdle()
+#else // Cortex-M3/M4/M7(v7-M)
+
+    // macro to put the CPU to sleep inside QV::onIdle()
     #define QV_CPU_SLEEP() do { \
-        QF_PRIMASK_DISABLE(); \
-        QF_INT_ENABLE(); \
+        QF_PRIMASK_DISABLE();   \
+        QF_INT_ENABLE();        \
         __asm volatile ("wfi"); \
-        QF_PRIMASK_ENABLE(); \
+        QF_PRIMASK_ENABLE();    \
     } while (false)
 
     // initialization of the QV kernel for Cortex-M3/M4/M4F
     #define QV_INIT() QV_init()
     extern "C" void QV_init(void);
 
+    // The following macro implements the recommended workaround for the
+    // ARM Erratum 838869. Specifically, for Cortex-M3/M4/M7 the DSB
+    // (memory barrier) instruction needs to be added before exiting an ISR.
+    // This macro should be inserted at the end of ISRs.
+    //
+    #define QV_ARM_ERRATUM_838869() \
+        __asm volatile ("dsb 0xf" ::: "memory")
+
 #endif
 
 #include "qv.hpp" // QV platform-independent public interface
 
 #endif // QV_PORT_HPP
+

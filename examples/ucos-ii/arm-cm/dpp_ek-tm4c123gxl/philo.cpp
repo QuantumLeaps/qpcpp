@@ -100,7 +100,7 @@ Philo::Philo()
 
 //.${AOs::Philo::SM} .........................................................
 Q_STATE_DEF(Philo, initial) {
-    //.${AOs::Philo::SM::initial} 
+    //.${AOs::Philo::SM::initial}
     static bool registered = false; // starts off with 0, per C-standard
     (void)e; // suppress the compiler warning about unused parameter
 
@@ -130,24 +130,24 @@ Q_STATE_DEF(Philo, initial) {
 Q_STATE_DEF(Philo, thinking) {
     QP::QState status_;
     switch (e->sig) {
-        //.${AOs::Philo::SM::thinking} 
+        //.${AOs::Philo::SM::thinking}
         case Q_ENTRY_SIG: {
             m_timeEvt.armX(think_time(), 0U);
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Philo::SM::thinking} 
+        //.${AOs::Philo::SM::thinking}
         case Q_EXIT_SIG: {
             (void)m_timeEvt.disarm();
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Philo::SM::thinking::TIMEOUT} 
+        //.${AOs::Philo::SM::thinking::TIMEOUT}
         case TIMEOUT_SIG: {
             status_ = tran(&hungry);
             break;
         }
-        //.${AOs::Philo::SM::thinking::EAT, DONE} 
+        //.${AOs::Philo::SM::thinking::EAT, DONE}
         case EAT_SIG: // intentionally fall through
         case DONE_SIG: {
             // EAT or DONE must be for other Philos than this one
@@ -155,7 +155,7 @@ Q_STATE_DEF(Philo, thinking) {
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Philo::SM::thinking::TEST} 
+        //.${AOs::Philo::SM::thinking::TEST}
         case TEST_SIG: {
             status_ = Q_RET_HANDLED;
             break;
@@ -171,7 +171,7 @@ Q_STATE_DEF(Philo, thinking) {
 Q_STATE_DEF(Philo, hungry) {
     QP::QState status_;
     switch (e->sig) {
-        //.${AOs::Philo::SM::hungry} 
+        //.${AOs::Philo::SM::hungry}
         case Q_ENTRY_SIG: {
             TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
             pe->philoNum = PHILO_ID(this);
@@ -179,9 +179,9 @@ Q_STATE_DEF(Philo, hungry) {
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Philo::SM::hungry::EAT} 
+        //.${AOs::Philo::SM::hungry::EAT}
         case EAT_SIG: {
-            //.${AOs::Philo::SM::hungry::EAT::[Q_EVT_CAST(TableEvt)->philoNum=~} 
+            //.${AOs::Philo::SM::hungry::EAT::[Q_EVT_CAST(TableEvt)->philoNum=~}
             if (Q_EVT_CAST(TableEvt)->philoNum == PHILO_ID(this)) {
                 status_ = tran(&eating);
             }
@@ -190,7 +190,7 @@ Q_STATE_DEF(Philo, hungry) {
             }
             break;
         }
-        //.${AOs::Philo::SM::hungry::DONE} 
+        //.${AOs::Philo::SM::hungry::DONE}
         case DONE_SIG: {
             /* DONE must be for other Philos than this one */
             Q_ASSERT(Q_EVT_CAST(TableEvt)->philoNum != PHILO_ID(this));
@@ -208,13 +208,13 @@ Q_STATE_DEF(Philo, hungry) {
 Q_STATE_DEF(Philo, eating) {
     QP::QState status_;
     switch (e->sig) {
-        //.${AOs::Philo::SM::eating} 
+        //.${AOs::Philo::SM::eating}
         case Q_ENTRY_SIG: {
             m_timeEvt.armX(eat_time(), 0U);
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Philo::SM::eating} 
+        //.${AOs::Philo::SM::eating}
         case Q_EXIT_SIG: {
             TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
             pe->philoNum = PHILO_ID(this);
@@ -223,12 +223,12 @@ Q_STATE_DEF(Philo, eating) {
             status_ = Q_RET_HANDLED;
             break;
         }
-        //.${AOs::Philo::SM::eating::TIMEOUT} 
+        //.${AOs::Philo::SM::eating::TIMEOUT}
         case TIMEOUT_SIG: {
             status_ = tran(&thinking);
             break;
         }
-        //.${AOs::Philo::SM::eating::EAT, DONE} 
+        //.${AOs::Philo::SM::eating::EAT, DONE}
         case EAT_SIG: // intentionally fall through
         case DONE_SIG: {
             // EAT or DONE must be for other Philos than this one

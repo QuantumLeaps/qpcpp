@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: Console-based BSP
-// Last Updated for Version: 6.9.0
-// Date of the Last Update:  2020-08-20
+// Last Updated for Version: 6.9.1
+// Date of the Last Update:  2020-09-22
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -55,8 +55,8 @@ void BSP_init(int argc, char * argv[]) {
     QS_OBJ_DICTIONARY(&l_QF_onClockTick);
 
     // setup the QS filters...
-    QS_FILTER_ON(QP::QS_ALL_RECORDS);
-    QS_FILTER_OFF(QP::QS_QF_TICK);
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS);
+    QS_GLB_FILTER(-QP::QS_QF_TICK);
 }
 //............................................................................
 void QF::onStartup(void) {

@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-14
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -92,12 +92,13 @@ QMsm::QMsm(QStateHandler const initial) noexcept
 /// Executes the top-most initial transition in a MSM.
 ///
 /// @param[in] e   pointer to an extra parameter (might be nullptr)
+/// @param[in]     qs_id QS-id of this state machine (for QS local filter)
 ///
 /// @attention
 /// QP::QMsm::init() must be called exactly __once__ before
 /// QP::QMsm::dispatch()
 ///
-void QMsm::init(void const * const e) {
+void QMsm::init(void const * const e, std::uint_fast8_t const qs_id) {
     QS_CRIT_STAT_
 
     /// @pre the top-most initial transition must be initialized, and the
@@ -111,8 +112,7 @@ void QMsm::init(void const * const e) {
     // initial tran. must be taken
     Q_ASSERT_ID(210, r == Q_RET_TRAN_INIT);
 
-    QS_BEGIN_PRE_(QS_QEP_STATE_INIT,
-                  QS::priv_.locFilter[QS::SM_OBJ], this)
+    QS_BEGIN_PRE_(QS_QEP_STATE_INIT, qs_id)
         QS_OBJ_PRE_(this);  // this state machine object
         QS_FUN_PRE_(m_state.obj->stateHandler);          // source handler
         QS_FUN_PRE_(m_temp.tatbl->target->stateHandler); // target handler
@@ -123,15 +123,16 @@ void QMsm::init(void const * const e) {
 
     // drill down into the state hierarchy with initial transitions...
     do {
-        r = execTatbl_(m_temp.tatbl); // execute the transition-action table
+        r = execTatbl_(m_temp.tatbl, qs_id); // execute the tran-action table
     } while (r >= Q_RET_TRAN_INIT);
 
-    QS_BEGIN_PRE_(QS_QEP_INIT_TRAN,
-                  QS::priv_.locFilter[QS::SM_OBJ], this)
+    QS_BEGIN_PRE_(QS_QEP_INIT_TRAN, qs_id)
         QS_TIME_PRE_();                         // time stamp
         QS_OBJ_PRE_(this);                      // this state machine object
         QS_FUN_PRE_(m_state.obj->stateHandler); // the new current state
     QS_END_PRE_()
+
+    static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
 
 //****************************************************************************
@@ -140,11 +141,12 @@ void QMsm::init(void const * const e) {
 /// The processing of an event represents one run-to-completion (RTC) step.
 ///
 /// @param[in] e  pointer to the event to be dispatched to the MSM
+/// @param[in] qs_id QS-id of this state machine (for QS local filter)
 ///
 /// @note
 /// Must be called after QP::QMsm::init().
 ///
-void QMsm::dispatch(QEvt const * const e) {
+void QMsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     QMState const *s = m_state.obj;  // store the current state
     QMState const *t = s;
     QState r;
@@ -153,8 +155,7 @@ void QMsm::dispatch(QEvt const * const e) {
     /// @pre current state must be initialized
     Q_REQUIRE_ID(300, s != nullptr);
 
-    QS_BEGIN_PRE_(QS_QEP_DISPATCH,
-                  QS::priv_.locFilter[QS::SM_OBJ], this)
+    QS_BEGIN_PRE_(QS_QEP_DISPATCH, qs_id)
         QS_TIME_PRE_();               // time stamp
         QS_SIG_PRE_(e->sig);          // the signal of the event
         QS_OBJ_PRE_(this);            // this state machine object
@@ -180,8 +181,7 @@ void QMsm::dispatch(QEvt const * const e) {
         // event unhandled due to a guard?
         else if (r == Q_RET_UNHANDLED) {
 
-            QS_BEGIN_PRE_(QS_QEP_UNHANDLED,
-                          QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_BEGIN_PRE_(QS_QEP_UNHANDLED, qs_id)
                 QS_SIG_PRE_(e->sig);    // the signal of the event
                 QS_OBJ_PRE_(this);      // this state machine object
                 QS_FUN_PRE_(t->stateHandler); // the current state
@@ -211,17 +211,17 @@ void QMsm::dispatch(QEvt const * const e) {
 
             // was TRAN, TRAN_INIT, or TRAN_EP taken?
             if (r <= Q_RET_TRAN_EP) {
-                exitToTranSource_(s, t);
-                r = execTatbl_(tatbl);
+                exitToTranSource_(s, t, qs_id);
+                r = execTatbl_(tatbl, qs_id);
                 s = m_state.obj;
             }
             // was a transition segment to history taken?
             else if (r == Q_RET_TRAN_HIST) {
                 tmp.obj = m_state.obj; // save history
                 m_state.obj = s; // restore the original state
-                exitToTranSource_(s, t);
-                static_cast<void>(execTatbl_(tatbl));
-                r = enterHistory_(tmp.obj);
+                exitToTranSource_(s, t, qs_id);
+                static_cast<void>(execTatbl_(tatbl, qs_id));
+                r = enterHistory_(tmp.obj, qs_id);
                 s = m_state.obj;
             }
             // was a transition segment to an exit point taken?
@@ -233,9 +233,9 @@ void QMsm::dispatch(QEvt const * const e) {
 #ifdef Q_SPY
                     tmp.tatbl = m_temp.tatbl; // save m_temp
 #endif // Q_SPY
-                    exitToTranSource_(s, t);
+                    exitToTranSource_(s, t, qs_id);
                     // take the tran-to-XP segment inside submachine
-                    static_cast<void>(execTatbl_(tatbl));
+                    static_cast<void>(execTatbl_(tatbl, qs_id));
                     s = m_state.obj;
 #ifdef Q_SPY
                     m_temp.tatbl = tmp.tatbl; // restore m_temp
@@ -247,9 +247,9 @@ void QMsm::dispatch(QEvt const * const e) {
 #ifdef Q_SPY
                     s = m_temp.obj; // save m_temp
 #endif // Q_SPY
-                    exitToTranSource_(m_state.obj, t);
+                    exitToTranSource_(m_state.obj, t, qs_id);
                     // take the tran-to-XP segment inside submachine
-                    static_cast<void>(execTatbl_(tatbl));
+                    static_cast<void>(execTatbl_(tatbl, qs_id));
 #ifdef Q_SPY
                     m_temp.obj = s; // restore me->temp
 #endif // Q_SPY
@@ -270,8 +270,7 @@ void QMsm::dispatch(QEvt const * const e) {
 
         } while (r >= Q_RET_TRAN);
 
-        QS_BEGIN_PRE_(QS_QEP_TRAN,
-                      QS::priv_.locFilter[QS::SM_OBJ], this)
+        QS_BEGIN_PRE_(QS_QEP_TRAN, qs_id)
             QS_TIME_PRE_();                // time stamp
             QS_SIG_PRE_(e->sig);           // the signal of the event
             QS_OBJ_PRE_(this);             // this state machine object
@@ -286,8 +285,7 @@ void QMsm::dispatch(QEvt const * const e) {
         // internal tran. source can't be nullptr
         Q_ASSERT_ID(340, t != nullptr);
 
-        QS_BEGIN_PRE_(QS_QEP_INTERN_TRAN,
-                      QS::priv_.locFilter[QS::SM_OBJ], this)
+        QS_BEGIN_PRE_(QS_QEP_INTERN_TRAN, qs_id)
             QS_TIME_PRE_();               // time stamp
             QS_SIG_PRE_(e->sig);          // the signal of the event
             QS_OBJ_PRE_(this);            // this state machine object
@@ -298,8 +296,7 @@ void QMsm::dispatch(QEvt const * const e) {
     // event bubbled to the 'top' state?
     else if (t == nullptr) {
 
-        QS_BEGIN_PRE_(QS_QEP_IGNORED,
-                      QS::priv_.locFilter[QS::SM_OBJ], this)
+        QS_BEGIN_PRE_(QS_QEP_IGNORED, qs_id)
             QS_TIME_PRE_();               // time stamp
             QS_SIG_PRE_(e->sig);          // the signal of the event
             QS_OBJ_PRE_(this);            // this state machine object
@@ -312,6 +309,8 @@ void QMsm::dispatch(QEvt const * const e) {
     else {
         // empty
     }
+
+    static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
 
 //****************************************************************************
@@ -319,6 +318,7 @@ void QMsm::dispatch(QEvt const * const e) {
 /// Helper function to execute transition sequence in a tran-action table.
 ///
 /// @param[in] tatbl pointer to the transition-action table
+/// @param[in] qs_id QS-id of this state machine (for QS local filter)
 ///
 /// @returns
 /// the status of the last action from the transition-action table.
@@ -327,7 +327,9 @@ void QMsm::dispatch(QEvt const * const e) {
 /// This function is for internal use inside the QEP event processor and
 /// should __not__ be called directly from the applications.
 ///
-QState QMsm::execTatbl_(QMTranActTable const * const tatbl) {
+QState QMsm::execTatbl_(QMTranActTable const * const tatbl,
+                        std::uint_fast8_t const qs_id)
+{
     QActionHandler const *a;
     QState r = Q_RET_NULL;
     QS_CRIT_STAT_
@@ -340,24 +342,21 @@ QState QMsm::execTatbl_(QMTranActTable const * const tatbl) {
 #ifdef Q_SPY
         if (r == Q_RET_ENTRY) {
 
-            QS_BEGIN_PRE_(QS_QEP_STATE_ENTRY,
-                          QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_BEGIN_PRE_(QS_QEP_STATE_ENTRY, qs_id)
                 QS_OBJ_PRE_(this); // this state machine object
                 QS_FUN_PRE_(m_temp.obj->stateHandler); // entered state handler
             QS_END_PRE_()
         }
         else if (r == Q_RET_EXIT) {
 
-            QS_BEGIN_PRE_(QS_QEP_STATE_EXIT,
-                          QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_BEGIN_PRE_(QS_QEP_STATE_EXIT, qs_id)
                 QS_OBJ_PRE_(this); // this state machine object
                 QS_FUN_PRE_(m_temp.obj->stateHandler); // exited state handler
             QS_END_PRE_()
         }
         else if (r == Q_RET_TRAN_INIT) {
 
-            QS_BEGIN_PRE_(QS_QEP_STATE_INIT,
-                          QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_BEGIN_PRE_(QS_QEP_STATE_INIT, qs_id)
                 QS_OBJ_PRE_(this); // this state machine object
                 QS_FUN_PRE_(tatbl->target->stateHandler);        // source
                 QS_FUN_PRE_(m_temp.tatbl->target->stateHandler); // target
@@ -365,8 +364,7 @@ QState QMsm::execTatbl_(QMTranActTable const * const tatbl) {
         }
         else if (r == Q_RET_TRAN_EP) {
 
-            QS_BEGIN_PRE_(QS_QEP_TRAN_EP,
-                          QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_BEGIN_PRE_(QS_QEP_TRAN_EP, qs_id)
                 QS_OBJ_PRE_(this); // this state machine object
                 QS_FUN_PRE_(tatbl->target->stateHandler);        // source
                 QS_FUN_PRE_(m_temp.tatbl->target->stateHandler); // target
@@ -374,8 +372,7 @@ QState QMsm::execTatbl_(QMTranActTable const * const tatbl) {
         }
         else if (r == Q_RET_TRAN_XP) {
 
-            QS_BEGIN_PRE_(QS_QEP_TRAN_XP,
-                          QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_BEGIN_PRE_(QS_QEP_TRAN_XP, qs_id)
                 QS_OBJ_PRE_(this); // this state machine object
                 QS_FUN_PRE_(tatbl->target->stateHandler);        // source
                 QS_FUN_PRE_(m_temp.tatbl->target->stateHandler); // target
@@ -386,6 +383,8 @@ QState QMsm::execTatbl_(QMTranActTable const * const tatbl) {
         }
 #endif // Q_SPY
     }
+
+    static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 
     m_state.obj = (r >= Q_RET_TRAN)
         ? m_temp.tatbl->target
@@ -401,9 +400,11 @@ QState QMsm::execTatbl_(QMTranActTable const * const tatbl) {
 ///
 /// @param[in] s    pointer to the current state
 /// @param[in] ts   pointer to the transition source state
+/// @param[in] qs_id QS-id of this state machine (for QS local filter)
 ///
 void QMsm::exitToTranSource_(QMState const *s,
-                             QMState const * const ts)
+                             QMState const * const ts,
+                             std::uint_fast8_t const qs_id)
 {
     // exit states from the current state to the tran. source state
     while (s != ts) {
@@ -413,8 +414,7 @@ void QMsm::exitToTranSource_(QMState const *s,
             static_cast<void>((*s->exitAction)(this));
 
             QS_CRIT_STAT_
-            QS_BEGIN_PRE_(QS_QEP_STATE_EXIT,
-                      QS::priv_.locFilter[QS::SM_OBJ], this)
+            QS_BEGIN_PRE_(QS_QEP_STATE_EXIT, qs_id)
                 QS_OBJ_PRE_(this);            // this state machine object
                 QS_FUN_PRE_(s->stateHandler); // the exited state handler
             QS_END_PRE_()
@@ -428,6 +428,7 @@ void QMsm::exitToTranSource_(QMState const *s,
             Q_ASSERT_ID(510, s != nullptr);
         }
     }
+    static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
 
 //****************************************************************************
@@ -436,12 +437,15 @@ void QMsm::exitToTranSource_(QMState const *s,
 /// after entering the composite state and
 ///
 /// @param[in] hist pointer to the history substate
+/// @param[in] qs_id QS-id of this state machine (for QS local filter)
 ///
 /// @returns
 /// QP::Q_RET_INIT, if an initial transition has been executed in the last
 /// entered state or QP::Q_RET_NULL if no such transition was taken.
 ///
-QState QMsm::enterHistory_(QMState const * const hist) {
+QState QMsm::enterHistory_(QMState const * const hist,
+                           std::uint_fast8_t const qs_id)
+{
     QMState const *s = hist;
     QMState const *ts = m_state.obj; // transition source
     QMState const *epath[MAX_ENTRY_DEPTH_];
@@ -449,7 +453,7 @@ QState QMsm::enterHistory_(QMState const * const hist) {
     std::uint_fast8_t i = 0U;  // entry path index
     QS_CRIT_STAT_
 
-    QS_BEGIN_PRE_(QS_QEP_TRAN_HIST, QS::priv_.locFilter[QS::SM_OBJ], this)
+    QS_BEGIN_PRE_(QS_QEP_TRAN_HIST, qs_id)
         QS_OBJ_PRE_(this);               // this state machine object
         QS_FUN_PRE_(ts->stateHandler);   // source state handler
         QS_FUN_PRE_(hist->stateHandler); // target state handler
@@ -474,8 +478,7 @@ QState QMsm::enterHistory_(QMState const * const hist) {
         // run entry action in epath[i]
         static_cast<void>((*epath[i]->entryAction)(this));
 
-        QS_BEGIN_PRE_(QS_QEP_STATE_ENTRY,
-                      QS::priv_.locFilter[QS::SM_OBJ], this)
+        QS_BEGIN_PRE_(QS_QEP_STATE_ENTRY, qs_id)
             QS_OBJ_PRE_(this);
             QS_FUN_PRE_(epath[i]->stateHandler); // entered state handler
         QS_END_PRE_()
@@ -490,6 +493,8 @@ QState QMsm::enterHistory_(QMState const * const hist) {
     else {
         r = Q_RET_NULL;
     }
+
+    static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
     return r;
 }
 

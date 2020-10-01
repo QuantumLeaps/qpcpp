@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: QHsmTst Example
-// Last Updated for Version: 6.8.0
-// Date of the Last Update:  2020-04-01
+// Last Updated for Version: 6.9.1
+// Date of the Last Update:  2020-09-22
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -67,7 +67,7 @@ int main(int argc, char *argv[ ]) {
                "QEP: %s.\nPress ESC to quit...\n",
                __DATE__, __TIME__, QP_VERSION_STR);
 
-        the_hsm->init(); // trigger the initial tran. in the test HSM
+        the_hsm->init(0U); // trigger the initial tran. in the test HSM
 
         for (;;) { // event loop
             PRINTF_S("\n>", "");
@@ -90,7 +90,7 @@ int main(int argc, char *argv[ ]) {
                 e.sig = IGNORE_SIG;
             }
 
-            the_hsm->dispatch(&e); // dispatch the event
+            the_hsm->dispatch(&e, 0U); // dispatch the event
         }
     }
     else { // batch version
@@ -98,7 +98,7 @@ int main(int argc, char *argv[ ]) {
         FPRINTF_S(l_outFile,
                 "QHsmTst example, QEP %s\n", QP::QEP::getVersion());
 
-        the_hsm->init(); // trigger the initial tran. in the test HSM
+        the_hsm->init(0U); // trigger the initial tran. in the test HSM
 
         // dynamic transitions
         dispatch(A_SIG);
@@ -151,7 +151,7 @@ static void dispatch(QP::QSignal sig) {
     Q_REQUIRE((A_SIG <= sig) && (sig <= I_SIG));
     FPRINTF_S(l_outFile, "\n%c:", 'A' + sig - A_SIG);
     QP::QEvt e = QEVT_INITIALIZER(sig);
-    the_hsm->dispatch(&e); // dispatch the event
+    the_hsm->dispatch(&e, 0U); // dispatch the event
 }
 
 namespace QP {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.0.2" links="1">
+<model version="5.0.4" links="1">
  <documentation>&quot;Fly 'n' Shoot&quot; game model from Chapters 1 &amp; 9 of PSiCC2 for Qt with GUI
 NOTE: Adapted for QP-Qt integartion</documentation>
  <!--${qpcpp}-->
@@ -76,7 +76,7 @@ extern QActive *AO_Table;
 pe = Q_NEW(TableEvt, HUNGRY_SIG); // dynamically allocate event
 pe-&gt;philNum = num;
 
-AO_Table-&gt;post(pe); // &lt;==</code>
+AO_Table-&gt;post(pe, m_prio); // &lt;==</code>
    </operation>
    <!--${Qt-port::GuiQActive::postLIFO}-->
    <operation name="postLIFO" type="void" visibility="0x00" properties="0x00">
@@ -399,7 +399,7 @@ if ((m_last_mine_x + GAME_MINES_DIST_MIN &lt; GAME_SCREEN_WIDTH)
         // event to dispatch to the Mine
         ObjectPosEvt ope(MINE_PLANT_SIG,
                          m_last_mine_x, m_last_mine_y);
-        m_mines[n]-&gt;dispatch(&amp;ope); // direct dispatch
+        m_mines[n]-&gt;dispatch(&amp;ope, m_prio); // direct dispatch
     }
 }</code>
    </operation>
@@ -435,7 +435,7 @@ for (uint8_t x = 0U; x &lt; w; ++x) {
     <parameter name="e" type="QP::QEvt const *"/>
     <code>for (uint8_t n = 0U; n &lt; GAME_MINES_MAX; ++n) {
     if (m_mines[n] != static_cast&lt;QHsm *&gt;(0)) { // is the mine used?
-        m_mines[n]-&gt;dispatch(e);
+        m_mines[n]-&gt;dispatch(e, m_prio);
     }
 }</code>
    </operation>
@@ -469,21 +469,21 @@ return false;</code>
     <!--${AOs::Tunnel::SM::initial}-->
     <initial target="../1/2">
      <action>for (uint8_t n = 0; n &lt; GAME_MINES_MAX; ++n) {
-   m_mine1_pool[n]-&gt;init();       // take the initial tran. for Mine1
-   m_mine2_pool[n]-&gt;init();       // take the initial tran. for Mine2
+   m_mine1_pool[n]-&gt;init(m_prio); // take the initial tran. for Mine1
+   m_mine2_pool[n]-&gt;init(m_prio); // take the initial tran. for Mine2
 }
 
-randomSeed(1234);                      // seed the pseudo-random generator
+randomSeed(1234); // seed the pseudo-random generator
 
 subscribe(TIME_TICK_SIG);
 subscribe(PLAYER_TRIGGER_SIG);
 subscribe(PLAYER_QUIT_SIG);
 
-QS_OBJ_DICTIONARY(&amp;l_tunnel);       // object dictionary for Tunnel object
+QS_OBJ_DICTIONARY(&amp;l_tunnel); // object dictionary for Tunnel object
 QS_OBJ_DICTIONARY(&amp;l_tunnel.m_blinkTimeEvt);
 QS_OBJ_DICTIONARY(&amp;l_tunnel.m_screenTimeEvt);
 
-QS_FUN_DICTIONARY(&amp;Tunnel::initial);   // fun. dictionaries for Tunnel HSM
+QS_FUN_DICTIONARY(&amp;Tunnel::initial); // fun. dictionaries for Tunnel HSM
 QS_FUN_DICTIONARY(&amp;Tunnel::final);
 QS_FUN_DICTIONARY(&amp;Tunnel::active);
 QS_FUN_DICTIONARY(&amp;Tunnel::playing);
@@ -493,7 +493,8 @@ QS_FUN_DICTIONARY(&amp;Tunnel::screen_saver);
 QS_FUN_DICTIONARY(&amp;Tunnel::screen_saver_hide);
 QS_FUN_DICTIONARY(&amp;Tunnel::screen_saver_show);
 
-QS_SIG_DICTIONARY(BLINK_TIMEOUT_SIG,  &amp;l_tunnel);         // local signals
+// local signals
+QS_SIG_DICTIONARY(BLINK_TIMEOUT_SIG,  &amp;l_tunnel);
 QS_SIG_DICTIONARY(SCREEN_TIMEOUT_SIG, &amp;l_tunnel);
 QS_SIG_DICTIONARY(SHIP_IMG_SIG,       &amp;l_tunnel);
 QS_SIG_DICTIONARY(MISSILE_IMG_SIG,    &amp;l_tunnel);

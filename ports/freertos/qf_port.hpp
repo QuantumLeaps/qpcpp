@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -162,16 +162,16 @@ extern "C" {
     // FreeRTOS blocking for event queue implementation (task level)
     #define QACTIVE_EQUEUE_WAIT_(me_)                   \
         while ((me_)->m_eQueue.m_frontEvt == nullptr) { \
-            QF_CRIT_EXIT_();                            \
+            QF_CRIT_X_();                            \
             ulTaskNotifyTake(pdTRUE, portMAX_DELAY);    \
-            QF_CRIT_ENTRY_();                           \
+            QF_CRIT_E_();                           \
         }
 
     // FreeRTOS signaling (unblocking) for event queue (task level)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do {             \
-        QF_CRIT_EXIT_();                                 \
+        QF_CRIT_X_();                                 \
         xTaskNotifyGive((TaskHandle_t)&(me_)->m_thread); \
-        QF_CRIT_ENTRY_(); \
+        QF_CRIT_E_(); \
     } while (false)
 
     #define QF_SCHED_STAT_
@@ -182,11 +182,10 @@ extern "C" {
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
-    #define QF_EPOOL_EVENT_SIZE_(p_) \
-        static_cast<std::uint_fast16_t>((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_))))
-    #define QF_EPOOL_PUT_(p_, e_) ((p_).put(e_))
+    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
+    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
 
 #endif /* ifdef QP_IMPL */
 

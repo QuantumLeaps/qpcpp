@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -75,10 +75,10 @@ Q_DEFINE_THIS_MODULE("qf_defer")
 /// QP::QActive::recall(), QP::QEQueue, QP::QActive::flushDeferred()
 ///
 bool QActive::defer(QEQueue * const eq, QEvt const * const e) const noexcept {
-    bool const status = eq->post(e, 0U);
+    bool const status = eq->post(e, 0U, m_prio);
     QS_CRIT_STAT_
 
-    QS_BEGIN_PRE_(QS_QF_ACTIVE_DEFER, QS::priv_.locFilter[QS::AO_OBJ], this)
+    QS_BEGIN_PRE_(QS_QF_ACTIVE_DEFER, m_prio)
         QS_TIME_PRE_();      // time stamp
         QS_OBJ_PRE_(this);   // this active object
         QS_OBJ_PRE_(eq);     // the deferred queue
@@ -111,7 +111,7 @@ bool QActive::defer(QEQueue * const eq, QEvt const * const e) const noexcept {
 /// QP::QActive::recall(), QP::QEQueue, QP::QActive::postLIFO_()
 ///
 bool QActive::recall(QEQueue * const eq) noexcept {
-    QEvt const * const e = eq->get(); // try to get evt from deferred queue
+    QEvt const * const e = eq->get(m_prio); // get evt from deferred queue
     bool recalled;
 
     // event available?
@@ -119,7 +119,7 @@ bool QActive::recall(QEQueue * const eq) noexcept {
         QActive::postLIFO(e); // post it to the _front_ of the AO's queue
 
         QF_CRIT_STAT_
-        QF_CRIT_ENTRY_();
+        QF_CRIT_E_();
 
         // is it a dynamic event?
         if (e->poolId_ != 0U) {
@@ -135,8 +135,7 @@ bool QActive::recall(QEQueue * const eq) noexcept {
             QF_EVT_REF_CTR_DEC_(e); // decrement the reference counter
         }
 
-        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_RECALL,
-                         QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_RECALL, m_prio)
             QS_TIME_PRE_();      // time stamp
             QS_OBJ_PRE_(this);   // this active object
             QS_OBJ_PRE_(eq);     // the deferred queue
@@ -144,14 +143,13 @@ bool QActive::recall(QEQueue * const eq) noexcept {
             QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
         QS_END_NOCRIT_PRE_()
 
-        QF_CRIT_EXIT_();
+        QF_CRIT_X_();
         recalled = true;
     }
     else {
         QS_CRIT_STAT_
 
-        QS_BEGIN_PRE_(QS_QF_ACTIVE_RECALL_ATTEMPT,
-                  QS::priv_.locFilter[QS::AO_OBJ], this)
+        QS_BEGIN_PRE_(QS_QF_ACTIVE_RECALL_ATTEMPT, m_prio)
             QS_TIME_PRE_();      // time stamp
             QS_OBJ_PRE_(this);   // this active object
             QS_OBJ_PRE_(eq);     // the deferred queue
@@ -179,7 +177,10 @@ bool QActive::recall(QEQueue * const eq) noexcept {
 ///
 std::uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const noexcept {
     std::uint_fast16_t n = 0U;
-    for (QEvt const *e = eq->get(); e != nullptr; e = eq->get()) {
+    for (QEvt const *e = eq->get(m_prio);
+         e != nullptr;
+         e = eq->get(m_prio))
+    {
         QF::gc(e); // garbage collect
         ++n; // count the flushed event
     }

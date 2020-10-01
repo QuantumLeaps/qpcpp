@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: BSP for PELICAN crossing example for Qt5
-// Last updated for version 6.6.0
-// Last updated on  2019-07-30
+// Last updated for version 6.9.1
+// Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 // along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
-// <www.state-machine.com>
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //****************************************************************************
 #include <QtWidgets>
@@ -67,6 +67,9 @@ Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 void BSP_init(void) {
     Q_ALLEGE(QS_INIT((char *)0));
     QS_OBJ_DICTIONARY(&l_time_tick);
+
+    // set up the QS filters...
+    QS_GLB_FILTER(QP::QS_QF_MPOOL_GET);
 }
 //............................................................................
 void BSP_terminate(int16_t /*result*/) {
@@ -166,9 +169,6 @@ bool QP::QS::onStartup(void const * /*arg*/) {
                 &custParserFun);    // customized parser function
 
     l_time.start();                 // start the time stamp
-
-    // set up the QS filters...
-    QS_FILTER_ON(QS_QF_MPOOL_GET);
 
     return true; // success
 }

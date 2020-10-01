@@ -3,8 +3,8 @@
 /// @ingroup qxk
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-16
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -82,11 +82,15 @@ public:
 
     // virtual function overrides...
     //! Executes the top-most initial transition in HSM
-    void init(void const * const e) noexcept override;
-    void init(void) noexcept override { this->init(nullptr); }
+    void init(void const * const e,
+              std::uint_fast8_t const qs_id) noexcept override;
+    void init(std::uint_fast8_t const qs_id) noexcept override {
+        this->init(nullptr, qs_id);
+    }
 
     //! Dispatches an event to HSM
-    void dispatch(QEvt const * const e) noexcept override;
+    void dispatch(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) noexcept override;
 
     //! Starts execution of an extended thread and registers the thread
     //! with the framework.
