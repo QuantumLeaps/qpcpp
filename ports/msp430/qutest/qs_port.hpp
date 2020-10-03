@@ -1,15 +1,15 @@
 /// @file
-/// @brief QS/C++ port to MSP340 and MSP430X CPUs, generic C compiler
+/// @brief QS/C++ port to MSP340 and MSP430X CPUs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.9.1
+/// Last updated on  2020-10-03
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -39,16 +39,13 @@
 #define QS_PORT_HPP
 
 // QS time-stamp size in bytes
-#define QS_TIME_SIZE     2U
+#define QS_TIME_SIZE     4U
 
 // object pointer size in bytes
-#define QS_OBJ_PTR_SIZE  2U
+#define QS_OBJ_PTR_SIZE  4U
 
 // function pointer size in bytes
 #define QS_FUN_PTR_SIZE  4U
-
-// flush the QS output buffer after each QS record
-#define QS_REC_DONE()  QP::QS::onFlush()
 
 //****************************************************************************
 // NOTE:
@@ -57,7 +54,8 @@
 // and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
 // the QF framework, by simply including "qf_port.hpp" *before* "qs.hpp".
 //
-#include "qf_port.hpp" // use QS with QF
-#include "qs.hpp"      // QS platform-independent public interface
+#include "qf_port.hpp"  // use QS with QF
+#include "qs.hpp"       // QS platform-independent public interface
 
 #endif // QS_PORT_HPP
+

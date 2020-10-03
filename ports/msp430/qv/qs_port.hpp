@@ -2,8 +2,8 @@
 /// @brief QS/C++ port to MSP340 and MSP430X CPUs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.0
-/// Last updated on  2019-08-27
+/// Last updated for version 6.9.1
+/// Last updated on  2020-10-03
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -58,3 +58,4 @@
 #include "qs.hpp"       // QS platform-independent public interface
 
 #endif // QS_PORT_HPP
+
