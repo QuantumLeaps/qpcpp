@@ -117,7 +117,7 @@ bool GuiQActive::post_(QEvt const * const e,
 #else
 bool GuiQActive::post_(QEvt const * const e,
                        std::uint_fast16_t const /*margin*/,
-                       void const * const sender)
+                       void const * const sender) noexcept
 #endif
 {
     QF_CRIT_STAT_
