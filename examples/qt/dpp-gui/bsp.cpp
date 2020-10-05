@@ -170,23 +170,28 @@ static int custParserFun(QSpyRecord * const qrec) {
 //............................................................................
 bool QP::QS::onStartup(void const *) {
     static uint8_t qsBuf[4*1024]; // 4K buffer for Quantum Spy
+    QSpyConfig qsc;
+
     initBuf(qsBuf, sizeof(qsBuf));
 
-    QSPY_config(QP_VERSION,         // version
-                QS_OBJ_PTR_SIZE,    // objPtrSize
-                QS_FUN_PTR_SIZE,    // funPtrSize
-                QS_TIME_SIZE,       // tstampSize
-                Q_SIGNAL_SIZE,      // sigSize,
-                QF_EVENT_SIZ_SIZE,  // evtSize
-                QF_EQUEUE_CTR_SIZE, // queueCtrSize
-                QF_MPOOL_CTR_SIZE,  // poolCtrSize
-                QF_MPOOL_SIZ_SIZE,  // poolBlkSize
-                QF_TIMEEVT_CTR_SIZE,// tevtCtrSize
-                nullptr,          // matFile,
-                nullptr,
-                &custParserFun);    // customized parser function
+    qsc.version      = QP_VERSION;
+    qsc.endianness   = 0U;
+    qsc.objPtrSize   = QS_OBJ_PTR_SIZE;
+    qsc.funPtrSize   = QS_FUN_PTR_SIZE;
+    qsc.tstampSize   = QS_TIME_SIZE;
+    qsc.sigSize      = Q_SIGNAL_SIZE;
+    qsc.evtSize      = QF_EVENT_SIZ_SIZE;
+    qsc.queueCtrSize = QF_EQUEUE_CTR_SIZE;
+    qsc.poolCtrSize  = QF_MPOOL_CTR_SIZE;
+    qsc.poolBlkSize  = QF_MPOOL_SIZ_SIZE;
+    qsc.tevtCtrSize  = QF_TIMEEVT_CTR_SIZE;
 
-    l_time.start();                 // start the time stamp
+    QSPY_config(&qsc,
+                nullptr,          // matFile,
+                nullptr, nullptr, // sequence file and list
+                &custParserFun);  // customized parser function
+
+    l_time.start();               // start the time stamp
 
     return true; // success
 }

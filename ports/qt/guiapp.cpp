@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.1 / Qt 5.x
-/// Last updated on  2020-09-21
+/// Last updated on  2020-10-05
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -41,6 +41,7 @@
 #include "qassert.h"
 #ifdef Q_SPY                // QS software tracing enabled?
     #include "qs_port.hpp"  // include QS port
+    #include "qs_pkg.hpp"   // QS package-scope internal interface
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
@@ -128,7 +129,7 @@ bool GuiQActive::post_(QEvt const * const e,
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, me_prio)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
         QS_TIME_PRE_();              // timestamp
         QS_OBJ_PRE_(sender);         // the sender object
         QS_SIG_PRE_(e->sig);         // the signal of the event
@@ -155,7 +156,7 @@ void GuiQActive::postLIFO(QEvt const * const e) noexcept {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, me_prio)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
         QS_TIME_PRE_();                  // timestamp
         QS_SIG_PRE_(e->sig);             // the signal of this event
         QS_OBJ_PRE_(this);               // this active object
@@ -199,7 +200,7 @@ bool GuiQMActive::post_(QEvt const * const e,
 #else
 bool GuiQMActive::post_(QEvt const * const e,
                         std::uint_fast16_t const /*margin*/,
-                        void const * const sender)
+                        void const * const sender) noexcept
 #endif
 {
     QF_CRIT_STAT_
@@ -210,7 +211,7 @@ bool GuiQMActive::post_(QEvt const * const e,
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, me_prio)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
         QS_TIME_PRE_();              // timestamp
         QS_OBJ_PRE_(sender);         // the sender object
         QS_SIG_PRE_(e->sig);         // the signal of the event
@@ -237,7 +238,7 @@ void GuiQMActive::postLIFO(QEvt const * const e) noexcept {
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, me_prio)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
         QS_TIME_PRE_();              // timestamp
         QS_SIG_PRE_(e->sig);         // the signal of this event
         QS_OBJ_PRE_(this);           // this active object
