@@ -413,6 +413,6 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 //****************************************************************************
 // NOTE1:
 // All ISRs that make system calls MUST be prioritized as "kernel-aware".
-// On Cortex-M3/4/7 this means ISR priorities with numerical valuses higher
+// On Cortex-M3/4/7 this means ISR priorities with numerical values higher
 // or equal CPU_CFG_KA_IPL_BOUNDARY.
 //

@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated for version 6.9.1
+/// Last updated on  2020-10-06
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -55,18 +55,6 @@
 //Q_DEFINE_THIS_MODULE("qutest_port")
 
 using namespace QP;
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-// DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-//
-enum KernelUnawareISRs { // see NOTE00
-    USART0_RX_PRIO,
-    // ...
-    MAX_KERNEL_UNAWARE_CMSIS_PRI  // keep always last
-};
-// "kernel-unaware" interrupts can't overlap "kernel-aware" interrupts
-//Q_ASSERT_COMPILE(MAX_KERNEL_UNAWARE_CMSIS_PRI <= QF_AWARE_ISR_CMSIS_PRI);
 
 // ISRs defined in this BSP --------------------------------------------------
 extern "C" void USART0_RX_IRQHandler(void);
@@ -149,10 +137,8 @@ bool QS::onStartup(void const *arg) {
     USART_IntClear(l_USART0, USART_IF_RXDATAV);
     NVIC_ClearPendingIRQ(USART0_RX_IRQn);
 
-    // Enable RX interrupts
+    // Enable USART RX interrupts
     USART_IntEnable(l_USART0, USART_IF_RXDATAV);
-    // NOTE: do not enable the UART0 interrupt in the NVIC yet.
-    // Wait till QF::onStartup()
 
     // Finally enable the UART
     USART_Enable(l_USART0, usartEnable);
@@ -161,12 +147,11 @@ bool QS::onStartup(void const *arg) {
     USART_IntClear(l_USART0, USART_IF_RXDATAV);
     NVIC_ClearPendingIRQ(USART0_RX_IRQn);
 
-    // Enable RX interrupts
-    USART_IntEnable(l_USART0, USART_IF_RXDATAV);
-
-    // enable the UART RX interrupt...
+    // explicitly set NVIC priorities of all Cortex-M interrupts used
     NVIC_SetPriorityGrouping(0U);
-    NVIC_SetPriority(USART0_RX_IRQn, USART0_RX_PRIO);
+    NVIC_SetPriority(USART0_RX_IRQn, 0U); // kernel unaware interrupt
+
+    // enable the USART RX interrupt...
     NVIC_EnableIRQ(USART0_RX_IRQn); // UART0 interrupt used for QS-RX
 
     return true; // success

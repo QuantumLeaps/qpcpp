@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated for version 6.9.1
+/// Last updated on  2020-10-06
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -55,18 +55,6 @@
 //Q_DEFINE_THIS_MODULE("qutest_port")
 
 using namespace QP;
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-// DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-//
-enum KernelUnawareISRs { // see NOTE00
-    UART0_PRIO,
-    // ...
-    MAX_KERNEL_UNAWARE_CMSIS_PRI  // keep always last
-};
-// "kernel-unaware" interrupts can't overlap "kernel-aware" interrupts
-//Q_ASSERT_COMPILE(MAX_KERNEL_UNAWARE_CMSIS_PRI <= QF_AWARE_ISR_CMSIS_PRI);
 
 // ISRs defined in this BSP --------------------------------------------------
 extern "C" void UART0_IRQHandler(void); // prototype
@@ -189,9 +177,11 @@ bool QS::onStartup(void const *arg) {
     UART0->IM   |= (1U << 4) | (1U << 6); // enable RX and RX-TO interrupt
     UART0->IFLS |= (0x2U << 2);    // interrupt on RX FIFO half-full
 
-    // enable the UART RX interrupt...
+    // explicitly set NVIC priorities of all Cortex-M interrupts used
     NVIC_SetPriorityGrouping(0U);
-    NVIC_SetPriority(UART0_IRQn, UART0_PRIO);
+    NVIC_SetPriority(UART0_IRQn, 0U); // kernel unaware interrupt
+
+    // enable the UART RX interrupt...
     NVIC_EnableIRQ(UART0_IRQn);  // UART0 interrupt used for QS-RX
 
     return true; // return success

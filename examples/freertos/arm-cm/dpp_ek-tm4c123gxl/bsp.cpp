@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, FreeRTOS kernel
 // Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated on  2020-10-06
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -43,9 +43,6 @@
 
 Q_DEFINE_THIS_FILE // define the name of this file for assertions
 
-// namespace DPP *************************************************************
-namespace DPP {
-
 // LEDs and Switches of the EK-TM4C123GXL board ..............................
 #define LED_RED     (1U << 1)
 #define LED_GREEN   (1U << 3)
@@ -53,6 +50,13 @@ namespace DPP {
 
 #define BTN_SW1     (1U << 4)
 #define BTN_SW2     (1U << 0)
+
+// "RTOS-aware" interrupt priorities for FreeRTOS on ARM Cortex-M, NOTE1
+#define RTOS_AWARE_ISR_CMSIS_PRI \
+    (configMAX_SYSCALL_INTERRUPT_PRIORITY >> (8-__NVIC_PRIO_BITS))
+
+// namespace DPP *************************************************************
+namespace DPP {
 
 // Local-scope objects -------------------------------------------------------
 static uint32_t l_rnd; // random seed
@@ -352,8 +356,8 @@ void QF::onStartup(void) {
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     //
     NVIC_SetPriority(UART0_IRQn,     0U); // kernel unaware interrupt
-    NVIC_SetPriority(GPIOA_IRQn,     QF_AWARE_ISR_CMSIS_PRI);
-    NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 1U);
+    NVIC_SetPriority(GPIOA_IRQn,     RTOS_AWARE_ISR_CMSIS_PRI);
+    NVIC_SetPriority(SysTick_IRQn,   RTOS_AWARE_ISR_CMSIS_PRI + 1U);
     // ...
 
     // enable IRQs...
@@ -451,7 +455,9 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
 void QS::onFlush(void) {
     uint16_t fifo = UART_TXFIFO_DEPTH; // Tx FIFO depth
     uint8_t const *block;
+    QF_INT_DISABLE();
     while ((block = getBlock(&fifo)) != nullptr) {
+        QF_INT_ENABLE();
         // busy-wait until TX FIFO empty
         while ((UART0->FR & UART_FR_TXFE) == 0U) {
         }
@@ -460,7 +466,9 @@ void QS::onFlush(void) {
             UART0->DR = *block++; // put into the TX FIFO
         }
         fifo = UART_TXFIFO_DEPTH; // re-load the Tx FIFO depth
+        QF_INT_DISABLE();
     }
+    QF_INT_ENABLE();
 }
 //............................................................................
 //! callback function to reset the target (to be implemented in the BSP)
@@ -478,7 +486,7 @@ void QS::onCommand(uint8_t cmdId,
     (void)param2;
     (void)param3;
 
-    QS_BEGIN_ID(DPP::COMMAND_STAT, 0U) // application-specific record
+    QS_BEGIN_ID(DPP::COMMAND_STAT, 0U) // app-specific record
         QS_U8(2, cmdId);
         QS_U32(8, param1);
         QS_U32(8, param2);
@@ -500,9 +508,10 @@ void QS::onCommand(uint8_t cmdId,
 
 //****************************************************************************
 // NOTE1:
-// The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
-// ISR priority that is disabled by the QF framework. The value is suitable
-// for the NVIC_SetPriority() CMSIS function.
+// The configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY constant from the
+// FreeRTOS configuration file specifies the highest ISR priority that
+// is disabled by the QF framework. The value is suitable for the
+// NVIC_SetPriority() CMSIS function.
 //
 // Only ISRs prioritized at or below the
 // configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY level (i.e.,

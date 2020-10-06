@@ -42,6 +42,10 @@
 
 Q_DEFINE_THIS_FILE // define the name of this file for assertions
 
+// "RTOS-aware" interrupt priorities for FreeRTOS on ARM Cortex-M, NOTE1
+#define RTOS_AWARE_ISR_CMSIS_PRI \
+    (configMAX_SYSCALL_INTERRUPT_PRIORITY >> (8-__NVIC_PRIO_BITS))
+
 // namespace DPP *************************************************************
 namespace DPP {
 
@@ -249,7 +253,7 @@ void BSP::init(void) {
     __HAL_FLASH_ART_ENABLE();
 #endif // ART_ACCLERATOR_ENABLE
 
-    /* Configure the LEDs */
+    // Configure the LEDs
     BSP_LED_Init(LED1);
     BSP_LED_Init(LED2);
     BSP_LED_Init(LED3);
@@ -348,13 +352,13 @@ void QF::onStartup(void) {
 
     // set priorities of ALL ISRs used in the system, see NOTE1
     //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     //
     NVIC_SetPriority(USART3_IRQn,    0U); // kernel unaware interrupt
-    NVIC_SetPriority(EXTI0_IRQn,     QF_AWARE_ISR_CMSIS_PRI);
-    NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 1U);
+    NVIC_SetPriority(EXTI0_IRQn,     RTOS_AWARE_ISR_CMSIS_PRI);
+    NVIC_SetPriority(SysTick_IRQn,   RTOS_AWARE_ISR_CMSIS_PRI + 1U);
     // ...
 
     // enable IRQs...
@@ -484,9 +488,10 @@ void QS::onCommand(uint8_t cmdId,
 
 //****************************************************************************
 // NOTE1:
-// The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
-// ISR priority that is disabled by the QF framework. The value is suitable
-// for the NVIC_SetPriority() CMSIS function.
+// The configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY constant from the
+// FreeRTOS configuration file specifies the highest ISR priority that
+// is disabled by the QF framework. The value is suitable for the
+// NVIC_SetPriority() CMSIS function.
 //
 // Only ISRs prioritized at or below the
 // configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY level (i.e.,
