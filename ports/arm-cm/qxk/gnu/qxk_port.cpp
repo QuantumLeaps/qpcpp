@@ -113,8 +113,6 @@ void QXK_init(void) {
 void QXK_stackInit_(void *thr, QP::QXThreadHandler const handler,
              void * const stkSto, std::uint_fast16_t const stkSize) noexcept
 {
-    extern void QXK_threadRet_(void); /* extended thread return */
-
     /* round down the stack top to the 8-byte boundary
     * NOTE: ARM Cortex-M stack grows down from hi -> low memory
     */
@@ -167,7 +165,7 @@ void QXK_stackInit_(void *thr, QP::QXThreadHandler const handler,
 /*Q_ASSERT_COMPILE(QXK_NEXT == offsetof(QXK_Attr, next));*/
 /*Q_ASSERT_COMPILE(QXK_ACT_PRIO == offsetof(QXK_Attr, actPrio));*/
 
-/* NOTE: keep in synch with the QMActive struct in "qf.hpp/qxk.hpp" !!! */
+/* NOTE: keep in synch with the QActive struct in "qf.hpp/qxk.hpp" !!! */
 #define QACTIVE_OSOBJ    28
 #define QACTIVE_DYN_PRIO 36
 

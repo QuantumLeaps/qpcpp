@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
+/// Last updated on  2020-10-11
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -123,7 +123,7 @@ QHsm::QHsm(QStateHandler const initial) noexcept {
 /// @description
 /// Virtual destructor of the QHsm state machine and any of its subclasses.
 ///
-QHsm::~QHsm() noexcept {
+QHsm::~QHsm() {
 }
 
 //****************************************************************************

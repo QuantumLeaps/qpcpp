@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.6.0" links="1">
+<model version="5.0.4" links="1">
  <documentation>Calc is the model of the Calculator described in Chapter 4 of PSiCC2</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -407,7 +407,8 @@ BSP_insert((int)'.');</action>
        <!--${SMs::Calc::SM::on::operand2::OPER::[BSP_eval()]}-->
        <choice target="../../../6">
         <guard brief="BSP_eval()">BSP_eval(m_operand1, m_operator, BSP_get_value())</guard>
-        <action>m_operand1 = BSP_get_value();</action>
+        <action>m_operand1 = BSP_get_value();
+m_operator = Q_EVT_CAST(CalcEvt)-&gt;key_code;</action>
         <choice_glyph conn="6,77,5,3,16,-5,4">
          <action box="1,1,10,2"/>
         </choice_glyph>
