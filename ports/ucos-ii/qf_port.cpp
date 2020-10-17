@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.1
-/// Last updated on  2020-09-21
+/// Last updated on  2020-10-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -145,10 +145,11 @@ static void task_function(void *pdata) { // uC/OS-II task signature
 }
 //............................................................................
 #ifndef Q_SPY
-bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin)
+bool QActive::post_(QEvt const * const e,
+                    std::uint_fast16_t const margin) noexcept
 #else
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
-                    void const * const sender)
+                    void const * const sender) noexcept
 #endif
 {
     bool status;
@@ -216,7 +217,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     return status;
 }
 //............................................................................
-void QActive::postLIFO(QEvt const * const e) {
+void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
@@ -242,7 +243,7 @@ void QActive::postLIFO(QEvt const * const e) {
         OSQPostFront(m_eQueue, const_cast<QEvt *>(e)) == OS_ERR_NONE);
 }
 //............................................................................
-QEvt const *QActive::get_(void) {
+QEvt const *QActive::get_(void) noexcept {
     INT8U err;
     QS_CRIT_STAT_
 

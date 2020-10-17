@@ -3,7 +3,7 @@
 /// @cond
 ////**************************************************************************
 /// Last updated for version 6.9.1
-/// Last updated on  2020-09-21
+/// Last updated on  2020-10-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -146,10 +146,11 @@ void QActive::setAttr(std::uint32_t attr1, void const * /*attr2*/) {
 }
 //............................................................................
 #ifndef Q_SPY
-bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin)
+bool QActive::post_(QEvt const * const e,
+                    std::uint_fast16_t const margin) noexcept
 #else
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
-                     void const * const sender)
+                     void const * const sender) noexcept
 #endif
 {
     std::uint_fast16_t nFree;
@@ -216,7 +217,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     return status;
 }
 //............................................................................
-void QActive::postLIFO(QEvt const * const e) {
+void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
@@ -241,7 +242,7 @@ void QActive::postLIFO(QEvt const * const e) {
         == static_cast<char>(0));
 }
 //............................................................................
-QEvt const *QActive::get_(void) {
+QEvt const *QActive::get_(void) noexcept {
     QEvt const *e;
     QS_CRIT_STAT_
 

@@ -3,7 +3,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.1
-/// Last updated on  2020-08-21
+/// Last updated on  2020-10-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -169,10 +169,11 @@ void QF::thread_(QActive *act) {
 #ifdef Q_SPY
 bool QActive::postFromISR_(QEvt const * const e,
                            std::uint_fast16_t const margin, void *par,
-                           void const * const sender)
+                           void const * const sender) noexcept
 #else
 bool QActive::postFromISR_(QEvt const * const e,
-                           std::uint_fast16_t const margin, void *par)
+                           std::uint_fast16_t const margin,
+                           void *par) noexcept
 #endif
 {
     /// @pre event pointer must be valid
@@ -262,9 +263,9 @@ bool QActive::postFromISR_(QEvt const * const e,
 /*..........................................................................*/
 #ifdef Q_SPY
 void QF::publishFromISR_(QEvt const *e, void *par,
-                         void const * const sender)
+                         void const * const sender) noexcept
 #else
-void QF::publishFromISR_(QEvt const *e, void *par)
+void QF::publishFromISR_(QEvt const *e, void *par) noexcept
 #endif
 {
     /// @pre the published signal must be within the configured range
@@ -326,9 +327,9 @@ void QF::publishFromISR_(QEvt const *e, void *par)
 //............................................................................
 #ifdef Q_SPY
 void QF::tickXfromISR_(std::uint_fast8_t const tickRate, void *par,
-                       void const * const sender)
+                       void const * const sender) noexcept
 #else
-void QF::tickXfromISR_(std::uint_fast8_t const tickRate, void *par)
+void QF::tickXfromISR_(std::uint_fast8_t const tickRate, void *par) noexcept
 #endif
 {
     QTimeEvt *prev = &timeEvtHead_[tickRate];
@@ -425,7 +426,8 @@ void QF::tickXfromISR_(std::uint_fast8_t const tickRate, void *par)
 }
 //............................................................................
 QEvt *QF::newXfromISR_(std::uint_fast16_t const evtSize,
-                       std::uint_fast16_t const margin, enum_t const sig)
+                       std::uint_fast16_t const margin,
+                       enum_t const sig) noexcept
 {
     std::uint_fast8_t idx;
 
@@ -489,7 +491,7 @@ QEvt *QF::newXfromISR_(std::uint_fast16_t const evtSize,
     return e;
 }
 //............................................................................
-void QF::gcFromISR(QEvt const * const e) {
+void QF::gcFromISR(QEvt const * const e) noexcept {
     // is it a dynamic event?
     if (e->poolId_ != 0U) {
         UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
@@ -542,7 +544,7 @@ void QF::gcFromISR(QEvt const * const e) {
     }
 }
 //............................................................................
-void QMPool::putFromISR(void *b, std::uint_fast8_t const qs_id) {
+void QMPool::putFromISR(void *b, std::uint_fast8_t const qs_id) noexcept {
     /// @pre # free blocks cannot exceed the total # blocks and
     /// the block pointer must be in range to come from this pool.
     ///
@@ -565,7 +567,7 @@ void QMPool::putFromISR(void *b, std::uint_fast8_t const qs_id) {
 }
 //............................................................................
 void *QMPool::getFromISR(std::uint_fast16_t const margin,
-                         std::uint_fast8_t const qs_id)
+                         std::uint_fast8_t const qs_id) noexcept
 {
     QFreeBlock *fb;
     UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();

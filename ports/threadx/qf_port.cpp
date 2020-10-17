@@ -126,10 +126,11 @@ void QActive::start(std::uint_fast8_t const prio,
 }
 //............................................................................
 #ifndef Q_SPY
-bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin)
+bool QActive::post_(QEvt const * const e,
+                    std::uint_fast16_t const margin) noexcept
 #else
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
-                    void const * const sender)
+                    void const * const sender) noexcept
 #endif
 {
     bool status;
@@ -162,7 +163,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
             QS_OBJ_PRE_(sender);  // the sender object
             QS_SIG_PRE_(e->sig);  // the signal of the event
             QS_OBJ_PRE_(this);    // this active object (recipient)
-            QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
+            QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of evt
             QS_EQC_PRE_(nFree);   // # free entries
             QS_EQC_PRE_(0U);      // min # free (unknown)
         QS_END_NOCRIT_PRE_()
@@ -186,7 +187,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
             QS_OBJ_PRE_(sender);  // the sender object
             QS_SIG_PRE_(e->sig);  // the signal of the event
             QS_OBJ_PRE_(this);    // this active object (recipient)
-            QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
+            QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of evt
             QS_EQC_PRE_(nFree);   // # free entries
             QS_EQC_PRE_(0U);      // min # free (unknown)
         QS_END_NOCRIT_PRE_()
@@ -197,7 +198,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     return status;
 }
 //............................................................................
-void QActive::postLIFO(QEvt const * const e) {
+void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
@@ -225,7 +226,7 @@ void QActive::postLIFO(QEvt const * const e) {
         == TX_SUCCESS);
 }
 //............................................................................
-QEvt const *QActive::get_(void) {
+QEvt const *QActive::get_(void) noexcept {
     QEvt const *e;
     QS_CRIT_STAT_
 
