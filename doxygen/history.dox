@@ -276,7 +276,7 @@ Also, this release updates the Windows-GUI examples with the QWIN Prototyping To
 
 __Bugs Fixes:__
 
-- [bug#255 "IAR-ARM "Multi-file Compilation" fails for QK and QXK applications"](https://sourceforg/bugs/255/)
+- [bug#255 "IAR-ARM "Multi-file Compilation" fails for QK and QXK applications"](https://sourceforge.net/p/qpc/bugs/255/)
 
 
 

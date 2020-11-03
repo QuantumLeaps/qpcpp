@@ -243,10 +243,6 @@ void BSP::displayPaused(uint8_t paused) {
 }
 //............................................................................
 uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
-    // The flating point code is to exercise the FPU
-    float volatile x = 3.1415926F;
-    x = x + 2.7182818F;
-
     // lock the scheduler around l_rnd up to the (N_PHILO + 1U) ceiling
     QP::QSchedStatus lockStat = QP::QK::schedLock(N_PHILO + 1U);
     // "Super-Duper" Linear Congruential Generator (LCG)

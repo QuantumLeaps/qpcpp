@@ -32,11 +32,11 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing.</state>
+                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing, without multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>No specifier a, A, no specifier n, no float nor long long, no flags.</state>
+                    <state>No specifier a, A, no specifier n, no float nor long long, no flags, without multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.2.22864</state>
+                    <state>8.50.6.28950</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -82,7 +82,7 @@
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
@@ -116,7 +116,7 @@
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>27</version>
+                    <version>28</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -133,7 +133,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>27</version>
+                    <version>28</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -156,7 +156,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>27</version>
+                    <version>28</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -215,7 +215,7 @@
             <name>ICCARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>35</version>
+                <version>36</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -355,8 +355,8 @@
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\ucos-ii</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Ports\ARM-Cortex-M4\Generic\ARM</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Ports\ARM-Cortex-M\ARMv7-M\IAR</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\CMSIS\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\efm32pg1b</state>
                 </option>
@@ -475,6 +475,10 @@
                 <option>
                     <name>OICompilerExtraOption</name>
                     <state>1</state>
+                </option>
+                <option>
+                    <name>CCStackProtection</name>
+                    <state>0</state>
                 </option>
             </data>
         </settings>
@@ -1181,7 +1185,7 @@
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>27</version>
+                    <version>28</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -1198,7 +1202,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>27</version>
+                    <version>28</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -1221,7 +1225,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>27</version>
+                    <version>28</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -1280,7 +1284,7 @@
             <name>ICCARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>35</version>
+                <version>36</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
                 <option>
@@ -1540,6 +1544,10 @@
                 <option>
                     <name>OICompilerExtraOption</name>
                     <state>1</state>
+                </option>
+                <option>
+                    <name>CCStackProtection</name>
+                    <state>0</state>
                 </option>
             </data>
         </settings>
@@ -2246,7 +2254,7 @@
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>27</version>
+                    <version>28</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -2263,7 +2271,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>27</version>
+                    <version>28</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -2286,7 +2294,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>27</version>
+                    <version>28</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -2345,7 +2353,7 @@
             <name>ICCARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>35</version>
+                <version>36</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -2605,6 +2613,10 @@
                 <option>
                     <name>OICompilerExtraOption</name>
                     <state>1</state>
+                </option>
+                <option>
+                    <name>CCStackProtection</name>
+                    <state>0</state>
                 </option>
             </data>
         </settings>
@@ -3196,9 +3208,6 @@
             <data />
         </settings>
     </configuration>
-    <mfc>
-        <configuration>Debug</configuration>
-    </mfc>
     <group>
         <name>Application</name>
         <file>
@@ -3333,57 +3342,57 @@
         </file>
     </group>
     <group>
-        <name>uCOS-II</name>
+        <name>ucos-ii</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_core.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_core.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_flag.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_flag.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_mbox.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_mbox.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_mem.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_mem.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_mutex.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_mutex.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_q.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_q.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_sem.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_sem.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_task.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_task.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_time.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_time.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\os_tmr.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\os_tmr.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source\ucos_ii.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source\ucos_ii.h</name>
         </file>
     </group>
     <group>
-        <name>uCOS-II_Port</name>
+        <name>ucos-ii_port</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Ports\ARM-Cortex-M4\Generic\IAR\os_cpu.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Ports\ARM-Cortex-M\ARMv7-M\IAR\os_cpu.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Ports\ARM-Cortex-M4\Generic\IAR\os_cpu_a.asm</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Ports\ARM-Cortex-M\ARMv7-M\IAR\os_cpu_a.asm</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Ports\ARM-Cortex-M4\Generic\IAR\os_cpu_c.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Ports\ARM-Cortex-M\ARMv7-M\os_cpu_c.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Ports\ARM-Cortex-M4\Generic\IAR\os_dbg.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Ports\ARM-Cortex-M\ARMv7-M\IAR\os_dbg.c</name>
         </file>
     </group>
 </project>

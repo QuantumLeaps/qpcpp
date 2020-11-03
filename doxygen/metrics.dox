@@ -64,7 +64,7 @@
        6      1     51      5       6 QP::QXThread::start@103-108@..\include\qxthread.hpp
        2      1     15      2       3 QP::QEvt@99-101@..\src\qf\qep_hsm.cpp
        4      1     27      1       4 QP::QHsm::QHsm@117-120@..\src\qf\qep_hsm.cpp
-       2      1      8      0       2 QP::QHsm::~QHsm@126-127@..\src\qf\qep_hsm.cpp
+       2      1      7      0       2 QP::QHsm::~QHsm@126-127@..\src\qf\qep_hsm.cpp
       48      7    329      2      68 QP::QHsm::init@139-206@..\src\qf\qep_hsm.cpp
        5      1     37      2       5 QP::QHsm::top@224-228@..\src\qf\qep_hsm.cpp
      102     15    608      2     149 QP::QHsm::dispatch@242-390@..\src\qf\qep_hsm.cpp
@@ -199,7 +199,7 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
      12       0.0     0.0        0.0         0     ..\include\qv.hpp
      32       0.0     0.0        0.0         0     ..\include\qxk.hpp
      66       4.5     1.0       35.5         2     ..\include\qxthread.hpp
-    315      32.9     5.3      186.8         9     ..\src\qf\qep_hsm.cpp
+    315      32.9     5.3      186.7         9     ..\src\qf\qep_hsm.cpp
     306      36.4     6.4      208.9         8     ..\src\qf\qep_msm.cpp
      62      12.5     3.5       91.8         4     ..\src\qf\qf_act.cpp
     242      25.3     3.7      145.0         9     ..\src\qf\qf_actq.cpp
