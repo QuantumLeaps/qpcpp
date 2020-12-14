@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-19
+/// Last updated for version 6.9.2
+/// Last updated on  2020-12-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -293,6 +293,78 @@ std::uint16_t QS::rxGetNfree(void) noexcept {
                                       - rxPriv_.head);
     }
     return nFree;
+}
+
+//****************************************************************************
+///
+/// @description
+/// This function programmatically sets the "current object" in the Target.
+///
+void QS::setCurrObj(std::uint8_t obj_kind, void *obj_ptr) noexcept {
+
+    Q_REQUIRE_ID(100, obj_kind < Q_DIM(rxPriv_.currObj));
+    rxPriv_.currObj[obj_kind] = obj_ptr;
+}
+
+//****************************************************************************
+///
+/// @description
+/// This function programmatically generates the response to the query for
+/// a "current object".
+///
+void QS::queryCurrObj(std::uint8_t obj_kind) noexcept {
+    Q_REQUIRE_ID(200, obj_kind < Q_DIM(rxPriv_.currObj));
+
+    if (QS::rxPriv_.currObj[obj_kind] != nullptr) {
+        QS_CRIT_STAT_
+        QS_CRIT_E_();
+        QS::beginRec_(static_cast<std::uint_fast8_t>(QS_QUERY_DATA));
+            QS_TIME_PRE_(); // timestamp
+            QS_U8_PRE_(obj_kind);  // object kind
+            QS_OBJ_PRE_(QS::rxPriv_.currObj[obj_kind]); // object pointer
+            switch (obj_kind) {
+                case SM_OBJ: // intentionally fall through
+                case AO_OBJ:
+                    QS_FUN_PRE_(
+                        reinterpret_cast<QHsm *>(
+                            QS::rxPriv_.currObj[obj_kind])->m_state.fun);
+                    break;
+                case QS::MP_OBJ:
+                    QS_MPC_PRE_(reinterpret_cast<QMPool *>(
+                                   QS::rxPriv_.currObj[obj_kind])->m_nFree);
+                    QS_MPC_PRE_(reinterpret_cast<QMPool *>(
+                                   QS::rxPriv_.currObj[obj_kind])->m_nMin);
+                    break;
+                case QS::EQ_OBJ:
+                    QS_EQC_PRE_(reinterpret_cast<QEQueue *>(
+                                   QS::rxPriv_.currObj[obj_kind])->m_nFree);
+                    QS_EQC_PRE_(reinterpret_cast<QEQueue *>(
+                                   QS::rxPriv_.currObj[obj_kind])->m_nMin);
+                    break;
+                case QS::TE_OBJ:
+                    QS_OBJ_PRE_(reinterpret_cast<QTimeEvt *>(
+                                   QS::rxPriv_.currObj[obj_kind])->m_act);
+                    QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(
+                                   QS::rxPriv_.currObj[obj_kind])->m_ctr);
+                    QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(
+                                   QS::rxPriv_.currObj[obj_kind])->m_interval);
+                    QS_SIG_PRE_(reinterpret_cast<QTimeEvt *>(
+                                   QS::rxPriv_.currObj[obj_kind])->sig);
+                    QS_U8_PRE_ (reinterpret_cast<QTimeEvt *>(
+                                   QS::rxPriv_.currObj[obj_kind])->refCtr_);
+                    break;
+                default:
+                    break;
+            }
+        QS::endRec_();
+        QS_CRIT_X_();
+
+        QS_REC_DONE(); // user callback (if defined)
+    }
+    else {
+        rxReportError_(static_cast<std::uint8_t>(QS_RX_AO_FILTER));
+    }
+    // no need to report Done
 }
 
 //****************************************************************************
@@ -965,14 +1037,21 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
         case WAIT4_OBJ_FRAME: {
             i = l_rx.var.obj.kind;
             if (i < static_cast<std::uint8_t>(QS::MAX_OBJ)) {
-                if (l_rx.var.obj.recId == static_cast<std::uint8_t>(QS_RX_CURR_OBJ)) {
-                    rxPriv_.currObj[i] = reinterpret_cast<void *>(l_rx.var.obj.addr);
+                if (l_rx.var.obj.recId
+                    == static_cast<std::uint8_t>(QS_RX_CURR_OBJ))
+                {
+                    rxPriv_.currObj[i] =
+                        reinterpret_cast<void *>(l_rx.var.obj.addr);
                     rxReportAck_(QS_RX_CURR_OBJ);
                 }
-                else if (l_rx.var.obj.recId == static_cast<std::uint8_t>(QS_RX_AO_FILTER)) {
+                else if (l_rx.var.obj.recId
+                         == static_cast<std::uint8_t>(QS_RX_AO_FILTER))
+                {
                     if (l_rx.var.obj.addr != 0U) {
                         std::int_fast16_t filter =
-                           static_cast<std::int_fast16_t>(reinterpret_cast<QActive *>(l_rx.var.obj.addr)->m_prio);
+                            static_cast<std::int_fast16_t>(
+                                reinterpret_cast<QActive *>(
+                                    l_rx.var.obj.addr)->m_prio);
                         locFilter_((i == 0)
                             ? filter
                             :-filter);
@@ -988,7 +1067,9 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
             }
             // both SM and AO
             else if (i == static_cast<std::uint8_t>(QS::SM_AO_OBJ)) {
-                if (l_rx.var.obj.recId == static_cast<std::uint8_t>(QS_RX_CURR_OBJ)) {
+                if (l_rx.var.obj.recId
+                    == static_cast<std::uint8_t>(QS_RX_CURR_OBJ))
+                {
                     rxPriv_.currObj[SM_OBJ] = (void *)l_rx.var.obj.addr;
                     rxPriv_.currObj[AO_OBJ] = (void *)l_rx.var.obj.addr;
                 }
@@ -1001,56 +1082,7 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
             break;
         }
         case WAIT4_QUERY_FRAME: {
-            i = l_rx.var.obj.kind;
-            ptr = reinterpret_cast<std::uint8_t *>(QS::rxPriv_.currObj[i]);
-            if (ptr != nullptr) {
-                QS_CRIT_E_();
-                QS::beginRec_(static_cast<std::uint_fast8_t>(QS_QUERY_DATA));
-                    QS_TIME_PRE_(); // timestamp
-                    QS_U8_PRE_(i);  // object kind
-                    QS_OBJ_PRE_(ptr);
-                    switch (i) {
-                        case SM_OBJ: // intentionally fall through
-                        case AO_OBJ:
-                            QS_FUN_PRE_(
-                                reinterpret_cast<QHsm *>(ptr)->m_state.fun);
-                            break;
-                        case QS::MP_OBJ:
-                            QS_MPC_PRE_(reinterpret_cast<QMPool *>(ptr)
-                                        ->m_nFree);
-                            QS_MPC_PRE_(reinterpret_cast<QMPool *>(ptr)
-                                        ->m_nMin);
-                            break;
-                        case QS::EQ_OBJ:
-                            QS_EQC_PRE_(reinterpret_cast<QEQueue *>(ptr)
-                                        ->m_nFree);
-                            QS_EQC_PRE_(reinterpret_cast<QEQueue *>(ptr)
-                                        ->m_nMin);
-                            break;
-                        case QS::TE_OBJ:
-                            QS_OBJ_PRE_(reinterpret_cast<QTimeEvt *>(ptr)
-                                        ->m_act);
-                            QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(ptr)
-                                        ->m_ctr);
-                            QS_TEC_PRE_(reinterpret_cast<QTimeEvt *>(ptr)
-                                        ->m_interval);
-                            QS_SIG_PRE_(reinterpret_cast<QTimeEvt *>(ptr)
-                                        ->sig);
-                            QS_U8_PRE_ (reinterpret_cast<QTimeEvt *>(ptr)
-                                        ->refCtr_);
-                            break;
-                        default:
-                            break;
-                    }
-                QS::endRec_();
-                QS_CRIT_X_();
-
-                QS_REC_DONE(); // user callback (if defined)
-            }
-            else {
-                rxReportError_(static_cast<std::uint8_t>(QS_RX_AO_FILTER));
-            }
-            // no need to report Done
+            queryCurrObj(l_rx.var.obj.kind);
             break;
         }
         case WAIT4_EVT_FRAME: {

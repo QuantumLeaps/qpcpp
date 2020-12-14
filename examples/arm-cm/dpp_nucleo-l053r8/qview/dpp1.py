@@ -67,10 +67,9 @@ class DPP:
     def on_run(self):
         glb_filter("QS_QEP_TRAN")
 
-        # NOTE: the names of objects for loc_filter() and current_obj()
-        # must match the QS Object Dictionaries produced by the application.
+        # NOTE: the name of object for current_obj() must match the
+        # QS Object Dictionaries produced by the application.
         current_obj(OBJ_AO, "Table::inst")
-        loc_filter(OBJ_TE, "Philo::inst[0].m_timeEvt")
 
         # turn lists into tuples for better performance
         self._philo_obj = tuple(self._philo_obj)

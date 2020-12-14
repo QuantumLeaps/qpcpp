@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-30
+/// Last updated for version 6.9.2
+/// Last updated on  2020-12-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -390,8 +390,14 @@ public:
     //! Obtain the number of free bytes in the QS RX data buffer
     static std::uint16_t rxGetNfree(void) noexcept;
 
-    //! put one byte into the QS RX lock-free buffer
+    //! Put one byte into the QS RX lock-free buffer
     static void rxPut(std::uint8_t const b) noexcept;
+
+    //! Set the "current object" in the Target
+    static void setCurrObj(std::uint8_t obj_kind, void *obj_ptr) noexcept;
+
+    //! Query the "current object" in the Target
+    static void queryCurrObj(std::uint8_t obj_kind) noexcept;
 
     // QS buffer access ......................................................
     //! Byte-oriented interface to the QS data buffer.
@@ -1057,11 +1063,11 @@ extern std::uint8_t volatile QF_intNest;
             QP::QS::getTestProbe_(QP::QS::force_cast<void (*)(void)>(fun_));
 
     //! QS macro to apply a Test-Probe
-    #define QS_TEST_PROBE(code_)                        \
+    #define QS_TEST_PROBE(code_)  \
         if (qs_tp_ != 0U) { code_ }
 
     //! QS macro to apply a Test-Probe
-    #define QS_TEST_PROBE_ID(id_, code_)                  \
+    #define QS_TEST_PROBE_ID(id_, code_)                       \
         if (qs_tp_ == static_cast<std::uint32_t>(id_)) { code_ }
 
     //! QS macro to pause test execution and enter the test event loop

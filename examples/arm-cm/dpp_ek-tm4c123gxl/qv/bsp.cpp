@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, cooperative QV kernel
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated for version 6.9.2
+// Last updated on  2020-12-14
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -424,6 +424,9 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     QS_END()
 
     if (cmdId == 10U) {
+        queryCurrObj(param1);
+    }
+    else if (cmdId == 11U) {
         assert_failed("QS_onCommand", 11);
     }
 }
