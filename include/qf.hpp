@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
+/// Last updated for version 6.9.2
+/// Last updated on  2020-12-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -335,6 +335,11 @@ public:
     void init(std::uint_fast8_t const qs_id) override;
     void dispatch(QEvt const * const e,
                   std::uint_fast8_t const qs_id) override;
+
+#ifdef Q_SPY
+    //! Get the current state handler of the QMsm
+    QStateHandler getStateHandler() noexcept override;
+#endif
 
     //! Tests if a given state is part of the active state configuration
     bool isInState(QMState const * const st) const noexcept;

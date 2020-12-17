@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.2
-/// Last updated on  2020-12-14
+/// Last updated on  2020-12-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -327,7 +327,7 @@ void QS::queryCurrObj(std::uint8_t obj_kind) noexcept {
                 case AO_OBJ:
                     QS_FUN_PRE_(
                         reinterpret_cast<QHsm *>(
-                            QS::rxPriv_.currObj[obj_kind])->m_state.fun);
+                            QS::rxPriv_.currObj[obj_kind])->getStateHandler());
                     break;
                 case QS::MP_OBJ:
                     QS_MPC_PRE_(reinterpret_cast<QMPool *>(

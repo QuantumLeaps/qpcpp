@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-10-11
+/// Last updated for version 6.9.2
+/// Last updated on  2020-12-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -533,6 +533,13 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
     return ip;
 }
+
+//****************************************************************************
+#ifdef Q_SPY
+    QStateHandler QHsm::getStateHandler() noexcept {
+        return m_state.fun;
+    }
+#endif
 
 //****************************************************************************
 /// @description

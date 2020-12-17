@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-10-11
+/// Last updated for version 6.9.2
+/// Last updated on  2020-12-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XXYZ, where XX is a 2-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      691U
+#define QP_VERSION      692U
 
 //! The current QP version number string of the form XX.Y.Z, where XX is
 // a 2-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "6.9.1"
+#define QP_VERSION_STR  "6.9.2"
 
-//! Encrypted  current QP release (6.9.1) and date (2020-09-22)
-#define QP_RELEASE      0x883DB9ACU
+//! Encrypted  current QP release (6.9.2) and date (2020-12-22)
+#define QP_RELEASE      0x880FF2EBU
 
 
 //****************************************************************************
@@ -311,43 +311,43 @@ protected:
 public:
 // facilities for the QHsm implementation strategy...
     //! event passed to the superstate to handle
-    static constexpr QState Q_RET_SUPER     {0};
+    static constexpr QState Q_RET_SUPER     {static_cast<QState>(0)};
 
     //! event passed to submachine superstate
-    static constexpr QState Q_RET_SUPER_SUB {1};
+    static constexpr QState Q_RET_SUPER_SUB {static_cast<QState>(1)};
 
     //! event unhandled due to a guard evaluating to 'false'
-    static constexpr QState Q_RET_UNHANDLED {2};
+    static constexpr QState Q_RET_UNHANDLED {static_cast<QState>(2)};
 
     //! event handled (internal transition)
-    static constexpr QState Q_RET_HANDLED   {3};
+    static constexpr QState Q_RET_HANDLED   {static_cast<QState>(3)};
 
     //! event silently ignored (bubbled up to top)
-    static constexpr QState Q_RET_IGNORED   {4};
+    static constexpr QState Q_RET_IGNORED   {static_cast<QState>(4)};
 
     //! state entry action executed
-    static constexpr QState Q_RET_ENTRY     {5};
+    static constexpr QState Q_RET_ENTRY     {static_cast<QState>(5)};
 
     //! state exit  action executed
-    static constexpr QState Q_RET_EXIT      {6};
+    static constexpr QState Q_RET_EXIT      {static_cast<QState>(6)};
 
     //! return value without any effect
-    static constexpr QState Q_RET_NULL      {7};
+    static constexpr QState Q_RET_NULL      {static_cast<QState>(7)};
 
     //! regular transition taken
-    static constexpr QState Q_RET_TRAN      {8};
+    static constexpr QState Q_RET_TRAN      {static_cast<QState>(8)};
 
     //! initial transition taken
-    static constexpr QState Q_RET_TRAN_INIT {9};
+    static constexpr QState Q_RET_TRAN_INIT {static_cast<QState>(9)};
 
     //! entry-point transition into a submachine
-    static constexpr QState Q_RET_TRAN_EP   {10};
+    static constexpr QState Q_RET_TRAN_EP   {static_cast<QState>(10)};
 
     //! transition to history of a given state
-    static constexpr QState Q_RET_TRAN_HIST {11};
+    static constexpr QState Q_RET_TRAN_HIST {static_cast<QState>(11)};
 
     //! exit-point transition out of a submachine
-    static constexpr QState Q_RET_TRAN_XP   {12};
+    static constexpr QState Q_RET_TRAN_XP   {static_cast<QState>(12)};
 
 protected:
     //! Helper function to specify a state transition
@@ -428,6 +428,9 @@ protected:
         m_temp.obj = s;
         return Q_RET_EXIT;
     }
+
+    //! Get the current state handler of the HSM
+    virtual QStateHandler getStateHandler() noexcept;
 #else
     //! Helper function to specify a state entry in a QM state-handler
     QState qm_entry(QMState const * const s) noexcept {
@@ -524,20 +527,25 @@ protected:
     //! Protected constructor
     explicit QMsm(QStateHandler const initial) noexcept;
 
+#ifdef Q_SPY
+    //! Get the current state handler of the QMsm
+    QStateHandler getStateHandler() noexcept override;
+#endif
+
 private:
-    //! disallow the inhertited isIn() function in QP::QMsm and subclasses
+    //! disallow inhertited isIn() function in QP::QMsm and subclasses
     //! @sa QP::QMsm::isInState()
     bool isIn(QStateHandler const s) noexcept = delete;
 
-    //! disallow the inhertited state() function in QP::QMsm and subclasses
+    //! disallow inhertited state() function in QP::QMsm and subclasses
     //! @sa QP::QMsm::stateObj()
     QStateHandler state(void) const noexcept = delete;
 
-    //! disallow the inhertited childState() function in QP::QMsm and subclasses
+    //! disallow inhertited childState() function in QP::QMsm and subclasses
     //! @sa QP::QMsm::childStateObj()
     QStateHandler childState(QStateHandler const parent) noexcept = delete;
 
-    //! disallow the inhertited top() function in QP::QMsm and subclasses
+    //! disallow inhertited top() function in QP::QMsm and subclasses
     //! @sa QP::QMsm::msm_top_s
     static QState top(void * const me, QEvt const * const e) noexcept = delete;
 

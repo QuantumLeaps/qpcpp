@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
+/// Last updated for version 6.9.2
+/// Last updated on  2020-12-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -312,6 +312,16 @@ void QMsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
 
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
+
+//****************************************************************************
+#ifdef Q_SPY
+    /// @description
+    /// Helper function to get the current state handler of QMsm.
+    ///
+    QStateHandler QMsm::getStateHandler() noexcept {
+        return m_state.obj->stateHandler;
+    }
+#endif
 
 //****************************************************************************
 /// @description

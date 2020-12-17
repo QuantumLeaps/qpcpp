@@ -2,8 +2,8 @@
 /// @brief QMActive::QMActive() and virtual functions
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
+/// Last updated for version 6.9.2
+/// Last updated on  2020-12-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -77,6 +77,7 @@ void QMActive::init(std::uint_fast8_t const qs_id) {
 void QMActive::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::dispatch(e, qs_id);
 }
+
 //............................................................................
 bool QMActive::isInState(QMState const * const st) const noexcept {
     return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)->QMsm::isInState(st);
@@ -87,6 +88,13 @@ QMState const *QMActive::childStateObj(QMState const * const parent)
 {
     return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)->QMsm::childStateObj(parent);
 }
+
+//............................................................................
+#ifdef Q_SPY
+    QStateHandler QMActive::getStateHandler() noexcept {
+        return QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::getStateHandler();
+    }
+#endif
 
 } // namespace QP
 
