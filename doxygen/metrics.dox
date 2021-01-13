@@ -20,13 +20,13 @@
        7      1     40      2       7 QP::QHsm::qm_tran_xp@411-417@..\include\qep.hpp
        4      1     20      1       4 QP::QHsm::qm_entry@421-424@..\include\qep.hpp
        4      1     20      1       4 QP::QHsm::qm_exit@427-430@..\include\qep.hpp
-       4      1     19      1       4 QP::QHsm::qm_entry@433-436@..\include\qep.hpp
-       4      1     19      1       4 QP::QHsm::qm_exit@439-442@..\include\qep.hpp
-       4      1     20      1       4 QP::QHsm::qm_sm_exit@446-449@..\include\qep.hpp
-       4      1     20      1       4 QP::QHsm::qm_super_sub@453-456@..\include\qep.hpp
-       3      1     19      1       3 QP::QMsm::init@504-506@..\include\qep.hpp
-       3      1     13      1       3 QP::QMsm::stateObj@516-518@..\include\qep.hpp
-       3      1     10      1       3 QP::QEP::getVersion@596-598@..\include\qep.hpp
+       4      1     19      1       4 QP::QHsm::qm_entry@436-439@..\include\qep.hpp
+       4      1     19      1       4 QP::QHsm::qm_exit@442-445@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_sm_exit@449-452@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_super_sub@456-459@..\include\qep.hpp
+       3      1     19      1       3 QP::QMsm::init@507-509@..\include\qep.hpp
+       3      1     13      1       3 QP::QMsm::stateObj@519-521@..\include\qep.hpp
+       3      1     10      1       3 QP::QEP::getVersion@604-606@..\include\qep.hpp
        3      1     11      1       3 QP::QEQueue::getNFree@225-227@..\include\qequeue.hpp
        3      1     11      1       3 QP::QEQueue::getNMin@240-242@..\include\qequeue.hpp
        3      1     13      1       3 QP::QEQueue::isEmpty@254-256@..\include\qequeue.hpp
@@ -35,11 +35,11 @@
        3      1     22      1       3 QP::QActive::setPrio@256-258@..\include\qf.hpp
        1      1     10      1       1 QP::QActive::getOsObject@266-266@..\include\qf.hpp
        1      1     10      1       1 QP::QActive::getThread@272-272@..\include\qf.hpp
-       3      1     13      1       3 QP::QMActive::stateObj@343-345@..\include\qf.hpp
-       3      1     17      1       3 QP::QTimeEvt::toActive@459-461@..\include\qf.hpp
-       3      1     17      1       3 QP::QTimeEvt::toTimeEvt@464-466@..\include\qf.hpp
-       3      1     10      1       3 QP::QF::getVersion@495-497@..\include\qf.hpp
-       3      1     18      1       3 QP::QTicker::init@640-642@..\include\qf.hpp
+       3      1     13      1       3 QP::QMActive::stateObj@348-350@..\include\qf.hpp
+       3      1     17      1       3 QP::QTimeEvt::toActive@464-466@..\include\qf.hpp
+       3      1     17      1       3 QP::QTimeEvt::toTimeEvt@469-471@..\include\qf.hpp
+       3      1     10      1       3 QP::QF::getVersion@500-502@..\include\qf.hpp
+       3      1     18      1       3 QP::QTicker::init@645-647@..\include\qf.hpp
        3      1     10      1       3 QP::QK::getVersion@155-157@..\include\qk.hpp
        3      1     11      1       3 QP::QMPool::getBlockSize@150-152@..\include\qmpool.hpp
        3      1     11      1       3 QP::QPSet::setEmpty@81-83@..\include\qpset.hpp
@@ -56,10 +56,10 @@
        8      2     70      1       8 QP::QPSet::insert@162-169@..\include\qpset.hpp
        8      2     74      1       8 QP::QPSet::rmove@175-182@..\include\qpset.hpp
        5      2     40      1       5 QP::QPSet::findMax@185-189@..\include\qpset.hpp
-       7      1     28      1       7 QP::QS::force_cast@518-524@..\include\qs.hpp
-      14      4     87      1      14 QP::QS::rxPut@583-596@..\include\qs.hpp
-       6      1     51      5       6 QP::QActiveDummy::start@617-622@..\include\qs.hpp
-       3      1     18      1       3 QP::QActiveDummy::init@626-628@..\include\qs.hpp
+       7      1     28      1       7 QP::QS::force_cast@524-530@..\include\qs.hpp
+      14      4     87      1      14 QP::QS::rxPut@589-602@..\include\qs.hpp
+       6      1     51      5       6 QP::QActiveDummy::start@623-628@..\include\qs.hpp
+       3      1     18      1       3 QP::QActiveDummy::init@632-634@..\include\qs.hpp
        3      1     20      1       3 QP::QXThread::init@87-89@..\include\qxthread.hpp
        6      1     51      5       6 QP::QXThread::start@103-108@..\include\qxthread.hpp
        2      1     15      2       3 QP::QEvt@99-101@..\src\qf\qep_hsm.cpp
@@ -69,16 +69,18 @@
        5      1     37      2       5 QP::QHsm::top@224-228@..\src\qf\qep_hsm.cpp
      102     15    608      2     149 QP::QHsm::dispatch@242-390@..\src\qf\qep_hsm.cpp
       97     15    464      2     132 QP::QHsm::hsm_tran@404-535@..\src\qf\qep_hsm.cpp
-      16      3     85      1      23 QP::QHsm::isIn@550-572@..\src\qf\qep_hsm.cpp
-      20      4    108      1      29 QP::QHsm::childState@593-621@..\src\qf\qep_hsm.cpp
+       3      1     13      0       3 QP::QHsm::getStateHandler@539-541@..\src\qf\qep_hsm.cpp
+      16      3     85      1      23 QP::QHsm::isIn@557-579@..\src\qf\qep_hsm.cpp
+      20      4    108      1      29 QP::QHsm::childState@600-628@..\src\qf\qep_hsm.cpp
        6      1     29      1       6 QP::QMsm::QMsm@83-88@..\src\qf\qep_msm.cpp
       22      3    168      2      36 QP::QMsm::init@101-136@..\src\qf\qep_msm.cpp
      113     21    661      2     166 QP::QMsm::dispatch@149-314@..\src\qf\qep_msm.cpp
-      51      9    301      2      64 QP::QMsm::execTatbl_@330-393@..\src\qf\qep_msm.cpp
-      21      4    116      3      28 QP::QMsm::exitToTranSource_@405-432@..\src\qf\qep_msm.cpp
-      44      6    247      2      54 QP::QMsm::enterHistory_@446-499@..\src\qf\qep_msm.cpp
-      13      3     59      1      14 QP::QMsm::isInState@514-527@..\src\qf\qep_msm.cpp
-      21      4     90      1      28 QP::QMsm::childStateObj@544-571@..\src\qf\qep_msm.cpp
+       3      1     15      0       3 QP::QMsm::getStateHandler@321-323@..\src\qf\qep_msm.cpp
+      51      9    301      2      64 QP::QMsm::execTatbl_@340-403@..\src\qf\qep_msm.cpp
+      21      4    116      3      28 QP::QMsm::exitToTranSource_@415-442@..\src\qf\qep_msm.cpp
+      44      6    247      2      54 QP::QMsm::enterHistory_@456-509@..\src\qf\qep_msm.cpp
+      13      3     59      1      14 QP::QMsm::isInState@524-537@..\src\qf\qep_msm.cpp
+      21      4     90      1      28 QP::QMsm::childStateObj@554-581@..\src\qf\qep_msm.cpp
        9      3     69      1      10 QP::QF::add_@79-88@..\src\qf\qf_act.cpp
       10      3     80      1      12 QP::QF::remove_@103-114@..\src\qf\qf_act.cpp
        7      2     63      2       7 QP::QF::bzero@129-135@..\src\qf\qf_act.cpp
@@ -118,8 +120,9 @@
        4      1     41      2       4 QP::QMActive::init@68-71@..\src\qf\qf_qmact.cpp
        3      1     24      1       3 QP::QMActive::init@73-75@..\src\qf\qf_qmact.cpp
        3      1     32      2       3 QP::QMActive::dispatch@77-79@..\src\qf\qf_qmact.cpp
-       3      1     27      1       3 QP::QMActive::isInState@81-83@..\src\qf\qf_qmact.cpp
-       5      1     27      1       5 QP::QMActive::childStateObj@85-89@..\src\qf\qf_qmact.cpp
+       3      1     27      1       3 QP::QMActive::isInState@82-84@..\src\qf\qf_qmact.cpp
+       5      1     27      1       5 QP::QMActive::childStateObj@86-90@..\src\qf\qf_qmact.cpp
+       3      1     20      0       3 QP::QMActive::getStateHandler@94-96@..\src\qf\qf_qmact.cpp
       67      7    352      1      99 QP::QF::tickX_@81-179@..\src\qf\qf_time.cpp
       13      3     61      1      13 QP::QF::noTimeEvtsActiveX@206-218@..\src\qf\qf_time.cpp
       16      2    104      3      32 QP::QTimeEvt::QTimeEvt@231-262@..\src\qf\qf_time.cpp
@@ -184,23 +187,23 @@
 NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 --------------------------------------------------------------
       5       0.0     0.0        0.0         0     ..\include\qassert.h
-    226       3.9     1.0       21.1        22     ..\include\qep.hpp
+    228       3.9     1.0       21.1        22     ..\include\qep.hpp
      40       3.0     1.0       11.7         3     ..\include\qequeue.hpp
-    194       2.9     1.0       18.7        10     ..\include\qf.hpp
+    195       2.9     1.0       18.7        10     ..\include\qf.hpp
      32       3.0     1.0       10.0         1     ..\include\qk.hpp
      37       3.0     1.0       11.0         1     ..\include\qmpool.hpp
       1       0.0     0.0        0.0         0     ..\include\qpcpp.h
       4       0.0     0.0        0.0         0     ..\include\qpcpp.hpp
      72       4.3     1.4       34.8        14     ..\include\qpset.hpp
-    338       7.5     1.8       46.0         4     ..\include\qs.hpp
+    340       7.5     1.8       46.0         4     ..\include\qs.hpp
       5       0.0     0.0        0.0         0     ..\include\qstamp.cpp
       4       0.0     0.0        0.0         0     ..\include\qstamp.hpp
       0       0.0     0.0        0.0         0     ..\include\qs_dummy.hpp
      12       0.0     0.0        0.0         0     ..\include\qv.hpp
      32       0.0     0.0        0.0         0     ..\include\qxk.hpp
      66       4.5     1.0       35.5         2     ..\include\qxthread.hpp
-    315      32.9     5.3      186.7         9     ..\src\qf\qep_hsm.cpp
-    306      36.4     6.4      208.9         8     ..\src\qf\qep_msm.cpp
+    318      29.9     4.9      169.3        10     ..\src\qf\qep_hsm.cpp
+    309      32.7     5.8      187.3         9     ..\src\qf\qep_msm.cpp
      62      12.5     3.5       91.8         4     ..\src\qf\qf_act.cpp
     242      25.3     3.7      145.0         9     ..\src\qf\qf_actq.cpp
      64      18.3     2.0       98.3         3     ..\src\qf\qf_defer.cpp
@@ -209,7 +212,7 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
     104      47.0     9.0      315.0         2     ..\src\qf\qf_ps.cpp
      11       8.0     3.0       59.0         1     ..\src\qf\qf_qact.cpp
     159      30.0     4.0      151.4         5     ..\src\qf\qf_qeq.cpp
-     27       3.8     1.0       28.8         6     ..\src\qf\qf_qmact.cpp
+     30       3.7     1.0       27.6         7     ..\src\qf\qf_qmact.cpp
     230      24.2     3.8      132.4         9     ..\src\qf\qf_time.cpp
     184      18.8     4.1      120.7         9     ..\src\qk\qk.cpp
      77      16.2     3.8       98.2         4     ..\src\qv\qv.cpp
@@ -230,6 +233,6 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
-      4021      16.9     3.1      102.9      174            1      0.01    0.04
+      4035      16.7     3.1      101.5      177            1      0.01    0.04
 @endcode
 */

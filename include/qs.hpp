@@ -4,13 +4,13 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.2
-/// Last updated on  2020-12-14
+/// Last updated on  2021-01-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -391,7 +391,7 @@ public:
     static std::uint16_t rxGetNfree(void) noexcept;
 
     //! Put one byte into the QS RX lock-free buffer
-    static void rxPut(std::uint8_t const b) noexcept;
+    static bool rxPut(std::uint8_t const b) noexcept;
 
     //! Set the "current object" in the Target
     static void setCurrObj(std::uint8_t obj_kind, void *obj_ptr) noexcept;
@@ -586,18 +586,21 @@ enum QSpyRxRecords : std::uint8_t {
 };
 
 //! put one byte into the QS RX lock-free buffer
-inline void QS::rxPut(std::uint8_t const b) noexcept {
-    if (rxPriv_.head != 0U) {
-        if ((rxPriv_.head - rxPriv_.tail) != 1U) {
-            rxPriv_.buf[rxPriv_.head] = b;
-            --rxPriv_.head;
-        }
+inline bool QS::rxPut(std::uint8_t const b) noexcept {
+    QSCtr head = rxPriv_.head;
+    if (head != 0U) {
+        --head;
     }
     else {
-        if (rxPriv_.tail != rxPriv_.end) {
-            rxPriv_.buf[0] = b;
-            rxPriv_.head = rxPriv_.end;
-        }
+        head = rxPriv_.end;
+    }
+    if (head != rxPriv_.tail) { // buffer NOT full?
+        rxPriv_.buf[rxPriv_.head] = b;
+        rxPriv_.head = head;
+        return true;  // byte placed in the buffer
+    }
+    else {
+        return false; // byte NOT placed in the buffer
     }
 }
 

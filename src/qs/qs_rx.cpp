@@ -4,13 +4,13 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.2
-/// Last updated on  2020-12-17
+/// Last updated on  2021-01-12
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -245,8 +245,9 @@ void QS::rxInitBuf(std::uint8_t * const sto,
 {
     rxPriv_.buf  = &sto[0];
     rxPriv_.end  = static_cast<QSCtr>(static_cast<QSCtr>(stoSize) - 1U);
-    rxPriv_.head = 0U;
-    rxPriv_.tail = 0U;
+    // establish empty condition
+    rxPriv_.head = rxPriv_.end;
+    rxPriv_.tail = rxPriv_.end;
 
     rxPriv_.currObj[QS::SM_OBJ] = nullptr;
     rxPriv_.currObj[QS::AO_OBJ] = nullptr;
@@ -281,18 +282,16 @@ void QS::rxInitBuf(std::uint8_t * const sto,
 /// be moving, meaning that bytes can be concurrently removed from the buffer.
 ///
 std::uint16_t QS::rxGetNfree(void) noexcept {
-    std::uint16_t nFree;
-    if (rxPriv_.head == rxPriv_.tail) {
-        nFree = static_cast<std::uint16_t>(rxPriv_.end);
+    QSCtr head = rxPriv_.head;
+    if (head == rxPriv_.tail) { // buffer empty?
+        return static_cast<uint16_t>(rxPriv_.end);
     }
-    else if (rxPriv_.head < rxPriv_.tail) {
-        nFree = static_cast<std::uint16_t>(rxPriv_.tail - rxPriv_.head);
+    else if (head < rxPriv_.tail) {
+        return static_cast<uint16_t>(rxPriv_.end + head - rxPriv_.tail);
     }
     else {
-        nFree = static_cast<std::uint16_t>((rxPriv_.tail + rxPriv_.end)
-                                      - rxPriv_.head);
+        return static_cast<uint16_t>(head - rxPriv_.tail - 1U);
     }
-    return nFree;
 }
 
 //****************************************************************************
@@ -369,14 +368,16 @@ void QS::queryCurrObj(std::uint8_t obj_kind) noexcept {
 
 //****************************************************************************
 void QS::rxParse(void) {
-    while (rxPriv_.head != rxPriv_.tail) { // QS-RX buffer not empty?
-        std::uint8_t b = rxPriv_.buf[rxPriv_.tail];
+    QSCtr head = rxPriv_.head;
+    QSCtr tail = rxPriv_.tail;
+    while (head != tail) { // QS-RX buffer NOT empty?
+        std::uint8_t b = rxPriv_.buf[tail];
 
-        if (rxPriv_.tail != 0U) {
-            --rxPriv_.tail;
+        if (tail != 0U) {
+            --tail;
         }
         else {
-             rxPriv_.tail = rxPriv_.end;
+             tail = rxPriv_.end;
         }
 
         if (l_rx.esc != 0U) {  // escaped byte arrived?
@@ -410,6 +411,7 @@ void QS::rxParse(void) {
             rxParseData_(b);
         }
     }
+    rxPriv_.tail = tail;
 }
 
 //****************************************************************************

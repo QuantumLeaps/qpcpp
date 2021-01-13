@@ -123,6 +123,8 @@ Q_STATE_DEF(Philo, initial) {
         QS_FUN_DICTIONARY(&Philo::thinking);
         QS_FUN_DICTIONARY(&Philo::hungry);
         QS_FUN_DICTIONARY(&Philo::eating);
+
+        QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr); // global signals
     }
 
     subscribe(EAT_SIG);

@@ -50,6 +50,8 @@ if (!registered) {
     QS_FUN_DICTIONARY(&amp;Philo::thinking);
     QS_FUN_DICTIONARY(&amp;Philo::hungry);
     QS_FUN_DICTIONARY(&amp;Philo::eating);
+
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr); // global signals
 }
 
 subscribe(EAT_SIG);
