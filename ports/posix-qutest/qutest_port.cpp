@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-31
+/// Last updated for version 6.9.2
+/// Last updated on  2021-01-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -261,29 +261,21 @@ void QS::onTestLoop() {
         struct timeval timeout = {
             (long)0, (long)(QS_TIMEOUT_MS * 1000)
         };
-        int nrec = select(l_sock + 1, &readSet,
+        int status = select(l_sock + 1, &readSet,
                           (fd_set *)0, (fd_set *)0, &timeout);
-        if (nrec < 0) {
+        if (status < 0) {
             FPRINTF_S(stderr, "<TARGET> ERROR socket select,errno=%d\n",
                 errno);
             onCleanup();
             exit(-2);
         }
-        else if ((nrec > 0) && FD_ISSET(l_sock, &readSet)) { // socket ready?
-            uint8_t buf[QS_RX_SIZE];
-            int status = recv(l_sock, (char *)buf, (int)sizeof(buf), 0);
-            while (status > 0) { // any data received?
-                uint8_t *pb;
-                int i = (int)rxGetNfree();
-                if (i > status) {
-                    i = status;
-                }
-                status -= i;
-                // reorder the received bytes into QS-RX buffer
-                for (pb = &buf[0]; i > 0; --i, ++pb) {
-                    rxPut(*pb);
-                }
-                rxParse(); // parse all n-bytes of data
+        else if ((status > 0) && FD_ISSET(l_sock, &readSet)) { //socket ready?
+            status = recv(l_sock,
+                          (char *)QS::rxPriv_.buf, (int)QS::rxPriv_.end, 0);
+            if (status > 0) { // any data received?
+                QS::rxPriv_.tail = 0U;
+                QS::rxPriv_.head = status; // # bytes received
+                QS::rxParse(); // parse all received bytes
             }
         }
 

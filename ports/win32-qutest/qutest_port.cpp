@@ -3,14 +3,14 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-12
+/// Last updated for version 6.9.2
+/// Last updated on  2021-01-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -263,20 +263,12 @@ void QS::onTestLoop() {
             exit(-2);
         }
         else if (FD_ISSET(l_sock, &readSet)) { // socket ready?
-            uint8_t buf[QS_RX_SIZE];
-            status = recv(l_sock, (char *)buf, (int)sizeof(buf), 0);
-            while (status > 0) { // any data received?
-                uint8_t *pb;
-                int i = (int)rxGetNfree();
-                if (i > status) {
-                    i = status;
-                }
-                status -= i;
-                // reorder the received bytes into QS-RX buffer
-                for (pb = &buf[0]; i > 0; --i, ++pb) {
-                    rxPut(*pb);
-                }
-                rxParse(); // parse all n-bytes of data
+            status = recv(l_sock,
+                          (char *)QS::rxPriv_.buf, (int)QS::rxPriv_.end, 0);
+            if (status > 0) { // any data received?
+                QS::rxPriv_.tail = 0U;
+                QS::rxPriv_.head = status; // # bytes received
+                QS::rxParse(); // parse all received bytes
             }
         }
 

@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.2
-/// Last updated on  2021-01-12
+/// Last updated on  2021-01-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -587,12 +587,9 @@ enum QSpyRxRecords : std::uint8_t {
 
 //! put one byte into the QS RX lock-free buffer
 inline bool QS::rxPut(std::uint8_t const b) noexcept {
-    QSCtr head = rxPriv_.head;
-    if (head != 0U) {
-        --head;
-    }
-    else {
-        head = rxPriv_.end;
+    QSCtr head = rxPriv_.head + 1U;
+    if (head == rxPriv_.end) {
+        head = 0U;
     }
     if (head != rxPriv_.tail) { // buffer NOT full?
         rxPriv_.buf[rxPriv_.head] = b;

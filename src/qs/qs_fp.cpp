@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.2
-/// Last updated on  2020-07-18
+/// Last updated for version 6.9.2
+/// Last updated on  2021-01-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -48,7 +48,7 @@ namespace QP {
 ///
 void QS::f32_fmt_(std::uint8_t format, float32_t const d) noexcept {
     union F32Rep {
-        float32_t f;
+        float32_t      f;
         std::uint32_t  u;
     } fu32; // the internal binary representation
     std::uint8_t chksum_  = priv_.chksum;  // put in a temporary (register)
@@ -77,11 +77,8 @@ void QS::f32_fmt_(std::uint8_t format, float32_t const d) noexcept {
 ///
 void QS::f64_fmt_(std::uint8_t format, float64_t const d) noexcept {
     union F64Rep {
-        float64_t d;
-        struct UInt2 {
-            std::uint32_t u1;
-            std::uint32_t u2;
-        } i;
+        float64_t     d;
+        std::uint32_t u[2];
     } fu64;  // the internal binary representation
     std::uint8_t chksum_  = priv_.chksum;
     std::uint8_t * const buf_ = priv_.buf;
@@ -96,29 +93,27 @@ void QS::f64_fmt_(std::uint8_t format, float64_t const d) noexcept {
 
     fu64.d = d;  // assign the binary representation
 
+    // is this a big-endian machine?
+    if (endian.u8 == 0U) {
+        // swap fu64.u[0] <-> fu64.u[1]...
+        i = fu64.u[0];
+        fu64.u[0] = fu64.u[1];
+        fu64.u[1] = i;
+    }
+
     priv_.used += 9U; // 9 bytes about to be added
     QS_INSERT_ESC_BYTE_(format)  // insert the format byte
 
-    // is this a big-endian machine?
-    if (endian.u8 == 0U) {
-        // swap fu64.i.u1 <-> fu64.i.u2...
-        i = fu64.i.u1;
-        fu64.i.u1 = fu64.i.u2;
-        fu64.i.u2 = i;
+    // output 4 bytes from fu64.u[0]...
+    for (i = 4U; i != 0U; --i) {
+        QS_INSERT_ESC_BYTE_(static_cast<std::uint8_t>(fu64.u[0]))
+        fu64.u[0] >>= 8U;
     }
 
-    // output 4 bytes from fu64.i.u1 ...
+    // output 4 bytes from fu64.u[1]...
     for (i = 4U; i != 0U; --i) {
-        format = static_cast<std::uint8_t>(fu64.i.u1);
-        QS_INSERT_ESC_BYTE_(format)
-        fu64.i.u1 >>= 8U;
-    }
-
-    // output 4 bytes from fu64.i.u2 ...
-    for (i = 4U; i != 0U; --i) {
-        format = static_cast<std::uint8_t>(fu64.i.u2);
-        QS_INSERT_ESC_BYTE_(format)
-        fu64.i.u2 >>= 8U;
+        QS_INSERT_ESC_BYTE_(static_cast<std::uint8_t>(fu64.u[1]))
+        fu64.u[1] >>= 8U;
     }
 
     priv_.head   = head_;   // update the head

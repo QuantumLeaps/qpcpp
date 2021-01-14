@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.2
-/// Last updated on  2021-01-12
+/// Last updated on  2021-01-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -245,9 +245,8 @@ void QS::rxInitBuf(std::uint8_t * const sto,
 {
     rxPriv_.buf  = &sto[0];
     rxPriv_.end  = static_cast<QSCtr>(static_cast<QSCtr>(stoSize) - 1U);
-    // establish empty condition
-    rxPriv_.head = rxPriv_.end;
-    rxPriv_.tail = rxPriv_.end;
+    rxPriv_.head = 0U;
+    rxPriv_.tail = 0U;
 
     rxPriv_.currObj[QS::SM_OBJ] = nullptr;
     rxPriv_.currObj[QS::AO_OBJ] = nullptr;
@@ -284,13 +283,14 @@ void QS::rxInitBuf(std::uint8_t * const sto,
 std::uint16_t QS::rxGetNfree(void) noexcept {
     QSCtr head = rxPriv_.head;
     if (head == rxPriv_.tail) { // buffer empty?
-        return static_cast<uint16_t>(rxPriv_.end);
+        return static_cast<std::uint16_t>(rxPriv_.end - 1U);
     }
     else if (head < rxPriv_.tail) {
-        return static_cast<uint16_t>(rxPriv_.end + head - rxPriv_.tail);
+        return static_cast<std::uint16_t>(rxPriv_.tail - head - 1U);
     }
     else {
-        return static_cast<uint16_t>(head - rxPriv_.tail - 1U);
+        return static_cast<std::uint16_t>(rxPriv_.end + rxPriv_.tail
+                                          - head - 1U);
     }
 }
 
@@ -370,14 +370,13 @@ void QS::queryCurrObj(std::uint8_t obj_kind) noexcept {
 void QS::rxParse(void) {
     QSCtr head = rxPriv_.head;
     QSCtr tail = rxPriv_.tail;
+    QSCtr end  = rxPriv_.end;
     while (head != tail) { // QS-RX buffer NOT empty?
         std::uint8_t b = rxPriv_.buf[tail];
 
-        if (tail != 0U) {
-            --tail;
-        }
-        else {
-             tail = rxPriv_.end;
+        ++tail;
+        if (tail == end) {
+            tail = 0U;
         }
 
         if (l_rx.esc != 0U) {  // escaped byte arrived?
