@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-21
+/// Last updated for version 6.9.2
+/// Last updated on  2021-01-13
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -118,7 +118,7 @@ void QS::onCommand(uint8_t cmdId,
         }
         case COMMAND_Z: {
             float32_t f32 = (float32_t)((int32_t)param2/(float32_t)param3);
-            float64_t f64 = (int32_t)param2/(float64_t)param3;
+            float64_t f64 = -6.02214076E23;
             QS_BEGIN_ID(COMMAND_Z, 0U) /* app-specific record */
                 QS_F32(param1, f32);
                 QS_F64(param1, f64);
