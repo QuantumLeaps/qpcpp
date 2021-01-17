@@ -98,6 +98,8 @@ Q_STATE_DEF(Table, initial) {
     //.${AOs::Table::SM::initial}
     (void)e; // suppress the compiler warning about unused parameter
 
+    QS_OBJ_DICTIONARY(&l_table);
+
     subscribe(DONE_SIG);
     subscribe(PAUSE_SIG);
     subscribe(SERVE_SIG);

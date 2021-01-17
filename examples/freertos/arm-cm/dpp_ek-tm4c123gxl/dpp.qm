@@ -35,16 +35,21 @@ subscribe(TEST_SIG);
 if (!registered) {
     registered = true;
 
+    QS_OBJ_DICTIONARY(&amp;l_philo[0]);
     QS_OBJ_DICTIONARY(&amp;l_philo[0].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;l_philo[1]);
     QS_OBJ_DICTIONARY(&amp;l_philo[1].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;l_philo[2]);
     QS_OBJ_DICTIONARY(&amp;l_philo[2].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;l_philo[3]);
     QS_OBJ_DICTIONARY(&amp;l_philo[3].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;l_philo[4]);
     QS_OBJ_DICTIONARY(&amp;l_philo[4].m_timeEvt);
 
-    QS_FUN_DICTIONARY(&amp;initial);
-    QS_FUN_DICTIONARY(&amp;thinking);
-    QS_FUN_DICTIONARY(&amp;hungry);
-    QS_FUN_DICTIONARY(&amp;eating);
+    QS_FUN_DICTIONARY(&amp;Philo::initial);
+    QS_FUN_DICTIONARY(&amp;Philo::thinking);
+    QS_FUN_DICTIONARY(&amp;Philo::hungry);
+    QS_FUN_DICTIONARY(&amp;Philo::eating);
 }
 
 QS_SIG_DICTIONARY(HUNGRY_SIG,  this); // signal for each Philos
@@ -161,6 +166,8 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     <!--${AOs::Table::SM::initial}-->
     <initial target="../1/2">
      <action>(void)e; // suppress the compiler warning about unused parameter
+
+QS_OBJ_DICTIONARY(&amp;l_table);
 
 subscribe(DONE_SIG);
 subscribe(PAUSE_SIG);

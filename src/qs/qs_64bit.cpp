@@ -3,14 +3,14 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-30
+/// Last updated for version 6.9.2
+/// Last updated on  2021-01-16
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -53,7 +53,7 @@ void QS::u64_raw_(std::uint64_t d) noexcept {
     QSCtr   end_    = priv_.end;
 
     priv_.used += 8U; // 8 bytes are about to be added
-    for (int_fast8_t i = 8U; i != 0U; --i) {
+    for (std::int_fast8_t i = 8U; i != 0U; --i) {
         std::uint8_t b = static_cast<std::uint8_t>(d);
         QS_INSERT_ESC_BYTE_(b)
         d >>= 8;

@@ -110,16 +110,21 @@ Q_STATE_DEF(Philo, initial) {
     if (!registered) {
         registered = true;
 
+        QS_OBJ_DICTIONARY(&l_philo[0]);
         QS_OBJ_DICTIONARY(&l_philo[0].m_timeEvt);
+        QS_OBJ_DICTIONARY(&l_philo[1]);
         QS_OBJ_DICTIONARY(&l_philo[1].m_timeEvt);
+        QS_OBJ_DICTIONARY(&l_philo[2]);
         QS_OBJ_DICTIONARY(&l_philo[2].m_timeEvt);
+        QS_OBJ_DICTIONARY(&l_philo[3]);
         QS_OBJ_DICTIONARY(&l_philo[3].m_timeEvt);
+        QS_OBJ_DICTIONARY(&l_philo[4]);
         QS_OBJ_DICTIONARY(&l_philo[4].m_timeEvt);
 
-        QS_FUN_DICTIONARY(&initial);
-        QS_FUN_DICTIONARY(&thinking);
-        QS_FUN_DICTIONARY(&hungry);
-        QS_FUN_DICTIONARY(&eating);
+        QS_FUN_DICTIONARY(&Philo::initial);
+        QS_FUN_DICTIONARY(&Philo::thinking);
+        QS_FUN_DICTIONARY(&Philo::hungry);
+        QS_FUN_DICTIONARY(&Philo::eating);
     }
 
     QS_SIG_DICTIONARY(HUNGRY_SIG,  this); // signal for each Philos
