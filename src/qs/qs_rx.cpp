@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.2
-/// Last updated on  2021-01-14
+/// Last updated on  2021-01-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -728,7 +728,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
         }
         case WAIT4_OBJ_ADDR: {
             l_rx.var.obj.addr |=
-                static_cast<std::uint32_t>(b) << l_rx.var.obj.idx;
+                static_cast<QSObj>(b) << l_rx.var.obj.idx;
             l_rx.var.obj.idx += 8U;
             if (l_rx.var.obj.idx
                 == (8U * static_cast<unsigned>(QS_OBJ_PTR_SIZE)))
@@ -845,7 +845,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
         }
         case WAIT4_TEST_PROBE_DATA: {
             l_rx.var.tp.data |=
-                (static_cast<std::uint32_t>(b) << l_rx.var.tp.idx);
+                (static_cast<QSFun>(b) << l_rx.var.tp.idx);
             l_rx.var.tp.idx += 8U;
             if (l_rx.var.tp.idx == (8U * sizeof(std::uint32_t))) {
                 l_rx.var.tp.addr = 0U;
