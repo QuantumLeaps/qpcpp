@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ///**************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-21
+/// Last updated for version 6.9.2a
+/// Last updated on  2021-01-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -92,10 +92,18 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
+    CHAR tx_name[5]; // name passed to ThreadX queue and thread
+
+    tx_name[0] = 'A';
+    tx_name[1] = 'O';
+    tx_name[2] = '0' + (prio / 10U);
+    tx_name[3] = '0' + (prio % 10U);
+    tx_name[4] = '\0';
+
     // allege that the ThreadX queue is created successfully
     Q_ALLEGE_ID(210,
         tx_queue_create(&m_eQueue,
-            const_cast<CHAR *>("AO"),
+            tx_name,
             TX_1_ULONG,
             static_cast<VOID *>(qSto),
             static_cast<ULONG>(qLen * sizeof(ULONG)))
@@ -113,7 +121,7 @@ void QActive::start(std::uint_fast8_t const prio,
     Q_ALLEGE_ID(220,
         tx_thread_create(
             &m_thread, // ThreadX thread control block
-            const_cast<CHAR *>("AO"), // thread name
+            tx_name,   // thread name
             &thread_function, // thread function
             reinterpret_cast<ULONG>(this), // thread parameter
             stkSto,    // stack start

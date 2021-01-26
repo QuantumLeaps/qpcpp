@@ -359,7 +359,7 @@ void QS::onReset(void) {
 //............................................................................
 //! callback function to execute a user command
 extern "C" void assert_failed(char const *module, int loc); // prototype
-extern void QS_target_info_(uint8_t isReset); // prototype
+extern void QS_target_info_(uint8_t isReset) noexcept; // prototype
 
 void QS::onCommand(uint8_t cmdId, uint32_t param1,
                    uint32_t param2, uint32_t param3)
