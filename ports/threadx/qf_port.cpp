@@ -92,13 +92,14 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    CHAR tx_name[5]; // name passed to ThreadX queue and thread
+    CHAR tx_name[4]; // name passed to ThreadX queue and thread
 
+    // prepare the unique name of the form "Axx",
+    // where xx is a 2-digit QP priority of the Active Object
     tx_name[0] = 'A';
-    tx_name[1] = 'O';
-    tx_name[2] = '0' + (prio / 10U);
-    tx_name[3] = '0' + (prio % 10U);
-    tx_name[4] = '\0';
+    tx_name[1] = '0' + (prio / 10U);
+    tx_name[2] = '0' + (prio % 10U);
+    tx_name[3] = '\0';
 
     // allege that the ThreadX queue is created successfully
     Q_ALLEGE_ID(210,
@@ -121,7 +122,7 @@ void QActive::start(std::uint_fast8_t const prio,
     Q_ALLEGE_ID(220,
         tx_thread_create(
             &m_thread, // ThreadX thread control block
-            tx_name,   // thread name
+            tx_name,   // unique thread name
             &thread_function, // thread function
             reinterpret_cast<ULONG>(this), // thread parameter
             stkSto,    // stack start

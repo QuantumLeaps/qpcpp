@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to embOS RTOS kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-10-17
+/// Last updated for version 6.9.2a
+/// Last updated on  2021-01-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -130,9 +130,17 @@ void QActive::start(std::uint_fast8_t const prio,
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
+    // prepare the unique task name of the form "Axx",
+    // where xx is a 2-digit QP priority of the task
+    char task_name[4];
+    task_name[0] = 'A';
+    task_name[1] = '0' + (prio / 10U);
+    task_name[2] = '0' + (prio % 10U);
+    task_name[3] = '\0'; // zero-terminate
+
     // create an embOS task for the AO
     OS_CreateTaskEx(&m_thread,
-        "AO",
+        task_name, // unique name of the task
         static_cast<OS_PRIO>(prio), // embOS uses same numbering as QP
         &thread_function,
         static_cast<void OS_STACKPTR *>(stkSto),

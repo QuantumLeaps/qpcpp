@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to uC/OS-II RTOS, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-10-17
+/// Last updated for version 6.9.2a
+/// Last updated on  2021-01-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -95,6 +95,14 @@ void QActive::start(std::uint_fast8_t const prio,
     // map from QP to uC/OS-II priority
     INT8U p_ucos = static_cast<INT8U>(QF_MAX_ACTIVE - m_prio);
 
+    // prepare the unique task name of the form "Axx",
+    // where xx is a 2-digit QP priority of the task
+    char task_name[4];
+    task_name[0] = 'A';
+    task_name[1] = '0' + (prio / 10U);
+    task_name[2] = '0' + (prio % 10U);
+    task_name[3] = '\0'; // zero-terminate
+
     // create AO's task...
     //
     // NOTE: The call to uC/OS-II API OSTaskCreateExt() assumes that the
@@ -112,9 +120,9 @@ void QActive::start(std::uint_fast8_t const prio,
 #endif
         p_ucos,                    // uC/OS-II task priority
         static_cast<INT16U>(prio), // the unique QP priority is the task id
-        static_cast<OS_STK *>(stkSto),  // pbos
+        static_cast<OS_STK *>(stkSto), // pbos
         static_cast<INT32U>(stkSize/sizeof(OS_STK)),// size in OS_STK units
-        nullptr,         // pext
+        task_name,                 // pext
         static_cast<INT16U>(m_thread)); // task options, see NOTE1
 
     // uC/OS-II task must be created correctly
