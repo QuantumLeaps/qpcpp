@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.2
-/// Last updated on  2021-01-13
+/// Last updated for version 6.9.2a
+/// Last updated on  2021-01-28
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -90,6 +90,8 @@ void USART0_RX_IRQHandler(void) {
 
 // QS callbacks ==============================================================
 bool QS::onStartup(void const *arg) {
+    (void)arg; // unused parameter
+
     static uint8_t qsTxBuf[2*1024]; // buffer for QS transmit channel
     static uint8_t qsRxBuf[100];    // buffer for QS receive channel
     static USART_InitAsync_TypeDef init = {

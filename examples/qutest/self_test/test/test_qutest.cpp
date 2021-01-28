@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.2
-/// Last updated on  2021-01-13
+/// Last updated for version 6.9.2a
+/// Last updated on  2021-01-28
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -40,7 +40,7 @@
 
 using namespace QP;
 
-Q_DEFINE_THIS_FILE
+Q_DEFINE_THIS_MODULE("test_qutest")
 
 //----------------------------------------------------------------------------
 static uint8_t buffer[100];
@@ -49,6 +49,7 @@ static uint32_t myFun(void);
 enum {
     FIXTURE_SETUP = QS_USER,
     FIXTURE_TEARDOWN,
+    COMMAND_A,
     COMMAND_X,
     COMMAND_Y,
     COMMAND_Z,
@@ -57,6 +58,7 @@ enum {
 
 //----------------------------------------------------------------------------
 int main(int argc, char *argv[]) {
+
     QF::init();  // initialize the framework
 
     // initialize the QS software tracing
@@ -71,6 +73,7 @@ int main(int argc, char *argv[]) {
 
     QS_USR_DICTIONARY(FIXTURE_SETUP);
     QS_USR_DICTIONARY(FIXTURE_TEARDOWN);
+    QS_USR_DICTIONARY(COMMAND_A);
     QS_USR_DICTIONARY(COMMAND_X);
     QS_USR_DICTIONARY(COMMAND_Y);
     QS_USR_DICTIONARY(COMMAND_Z);
@@ -92,14 +95,21 @@ void QS::onTestTeardown(void) {
 
 //............................................................................
 //! callback function to execute user commands
-void QS::onCommand(uint8_t cmdId,
-                   uint32_t param1, uint32_t param2, uint32_t param3)
+void QS::onCommand(std::uint8_t cmdId,
+         std::uint32_t param1, std::uint32_t param2, std::uint32_t param3)
 {
     (void)param1;
     (void)param2;
     (void)param3;
 
     switch (cmdId) {
+        case COMMAND_A: {
+            Q_ASSERT_ID(100, param1 != 0U);
+            QS_BEGIN_ID(COMMAND_A, 0U) // app-specific record
+                QS_U32(0, param1);
+            QS_END()
+            break;
+        }
         case COMMAND_X: {
             uint32_t x = myFun();
             QS_BEGIN_ID(COMMAND_X, 0U) // app-specific record
