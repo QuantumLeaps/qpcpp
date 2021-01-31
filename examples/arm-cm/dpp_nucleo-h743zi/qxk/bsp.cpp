@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, NUCLEO-H743ZI board, dual-mode QXK kernel
-// Last Updated for Version: 6.9.1
-// Date of the Last Update:  2020-09-21
+// Last Updated for Version: 6.9.2a
+// Date of the Last Update:  2021-01-31
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -131,6 +131,7 @@ void USART3_IRQHandler(void) {
         QP::QS::rxPut(b);
         DPP::l_uartHandle.Instance->ISR &= ~USART_ISR_RXNE; // clear interrupt
     }
+    QXK_ARM_ERRATUM_838869();
 }
 #endif // Q_SPY
 

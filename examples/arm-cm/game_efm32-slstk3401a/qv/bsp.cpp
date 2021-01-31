@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: "Fly 'n' Shoot" game example, EFM32-SLSTK3401A board, QV kernel
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated for version 6.9.2a
+// Last updated on  2021-01-31
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -127,12 +127,14 @@ void SysTick_Handler(void) {
             QP::QF::PUBLISH(&trigEvt, &l_SysTick_Handler);
         }
     }
+    QV_ARM_ERRATUM_838869();
 }
 //............................................................................
 void GPIO_EVEN_IRQHandler(void);  // prototype
 void GPIO_EVEN_IRQHandler(void) {
     // for testing...
     AO_Tunnel->POST(Q_NEW(QP::QEvt, MAX_PUB_SIG), &l_GPIO_EVEN_IRQHandler);
+    QV_ARM_ERRATUM_838869();
 }
 
 //............................................................................
@@ -149,6 +151,7 @@ void USART0_RX_IRQHandler(void) {
         uint32_t b = GAME::l_USART0->RXDATA;
         QP::QS::rxPut(b);
     }
+    QV_ARM_ERRATUM_838869();
 }
 #else
 void USART0_RX_IRQHandler(void) {}

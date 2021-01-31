@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L053R8 board, cooperative QV kernel
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated for version 6.9.2a
+// Last updated on  2021-01-31
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -111,6 +111,7 @@ void SysTick_Handler(void) {
             QP::QF::PUBLISH(&serveEvt, &l_SysTick_Handler);
         }
     }
+    QV_ARM_ERRATUM_838869();
 }
 //............................................................................
 void EXTI0_1_IRQHandler(void); // prototype
@@ -118,6 +119,7 @@ void EXTI0_1_IRQHandler(void) {
     // for testing..
     DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),
                         &l_EXTI0_1_IRQHandler);
+    QV_ARM_ERRATUM_838869();
 }
 //............................................................................
 #ifdef Q_SPY
@@ -128,6 +130,7 @@ void USART2_IRQHandler(void) { // used in QS-RX (kernel UNAWARE interrutp)
         uint32_t b = USART2->RDR;
         QP::QS::rxPut(b);
     }
+    QV_ARM_ERRATUM_838869();
 }
 #endif
 

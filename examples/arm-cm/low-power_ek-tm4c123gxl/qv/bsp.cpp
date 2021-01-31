@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: "Low-Power" example, cooperative QV kernel
-// Last Updated for Version: 6.4.0
-// Date of the Last Update:  2019-02-25
+// Last Updated for Version: 6.9.2a
+// Date of the Last Update:  2021-01-31
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -74,11 +74,13 @@ enum {
 // ISRs used in this project =================================================
 void SysTick_Handler(void) {
     QP::QF::TICK_X(0U, nullptr); // process time events for rate 0
+    QV_ARM_ERRATUM_838869();
 }
 //............................................................................
 void Timer0A_IRQHandler(void) {
     TIMER0->ICR |= (1U << 0); // clear the Timer0 interrupt source
     QP::QF::TICK_X(1U, nullptr); // process time events for rate 1
+    QV_ARM_ERRATUM_838869();
 }
 //............................................................................
 void GPIOPortF_IRQHandler(void) {
@@ -87,6 +89,7 @@ void GPIOPortF_IRQHandler(void) {
         QP::QF::PUBLISH(&pressedEvt, &l_SysTick_Handler);
     }
     GPIOF->ICR = 0xFFU; // clear interrupt sources
+    QV_ARM_ERRATUM_838869();
 }
 
 // BSP functions =============================================================

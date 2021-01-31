@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QXK kernel
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated for version 6.9.2a
+// Last updated on  2021-01-31
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -140,6 +140,7 @@ void USART2_IRQHandler(void) { // used in QS-RX (kernel UNAWARE interrupt)
         uint32_t b = USART2->RDR;
         QP::QS::rxPut(b);
     }
+    QXK_ARM_ERRATUM_838869();
 }
 #endif
 
