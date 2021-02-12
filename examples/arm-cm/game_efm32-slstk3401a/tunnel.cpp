@@ -35,12 +35,15 @@ private:
     QP::QHsm * m_mines[GAME_MINES_MAX];
     QP::QHsm * m_mine1_pool[GAME_MINES_MAX];
     QP::QHsm * m_mine2_pool[GAME_MINES_MAX];
-    uint8_t m_blink_ctr;
-    uint8_t m_last_mine_x;
-    uint8_t m_last_mine_y;
-    uint8_t m_wall_thickness_top;
-    uint8_t m_wall_thickness_bottom;
-    uint8_t m_wall_gap;
+    std::uint8_t m_blink_ctr;
+    std::uint8_t m_last_mine_x;
+    std::uint8_t m_last_mine_y;
+    std::uint8_t m_wall_thickness_top;
+    std::uint8_t m_wall_thickness_bottom;
+    std::uint8_t m_wall_gap;
+
+public:
+    static Tunnel inst;
 
 public:
     Tunnel();
@@ -66,36 +69,30 @@ protected:
 } // namespace GAME
 //.$enddecl${AOs::Tunnel} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-namespace GAME {
-
-// local objects -------------------------------------------------------------
-static Tunnel l_tunnel; // the sole instance of the Tunnel active object
-
-} // namespace GAME
-
-// Public-scope objects ------------------------------------------------------
+// Public-scope shared objects -----------------------------------------------
 //.$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //. Check for the minimum required QP version
 #if (QP_VERSION < 680U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
 #error qpcpp version 6.8.0 or higher required
 #endif
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$define${AOs::AO_Tunnel} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//.$define${Shared::AO_Tunnel} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
 
 // opaque pointer
-//.${AOs::AO_Tunnel} .........................................................
-QP::QActive * const AO_Tunnel = &l_tunnel;
+//.${Shared::AO_Tunnel} ......................................................
+QP::QActive * const AO_Tunnel = &Tunnel::inst;
 
 } // namespace GAME
-//.$enddef${AOs::AO_Tunnel} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//.$enddef${Shared::AO_Tunnel} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // Active object definition ==================================================
 //.$define${AOs::Tunnel} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
 //.${AOs::Tunnel} ............................................................
+Tunnel Tunnel::inst;
 //.${AOs::Tunnel::Tunnel} ....................................................
 Tunnel::Tunnel()
   : QActive(&initial),
@@ -219,8 +216,8 @@ Q_STATE_DEF(Tunnel, initial) {
     subscribe(PLAYER_QUIT_SIG);
 
     // object dictionary for Tunnel object...
-    QS_OBJ_DICTIONARY(&l_tunnel.m_blinkTimeEvt);
-    QS_OBJ_DICTIONARY(&l_tunnel.m_screenTimeEvt);
+    QS_OBJ_DICTIONARY(&Tunnel::inst.m_blinkTimeEvt);
+    QS_OBJ_DICTIONARY(&Tunnel::inst.m_screenTimeEvt);
 
     // local signals...
     QS_SIG_DICTIONARY(BLINK_TIMEOUT_SIG,  this);

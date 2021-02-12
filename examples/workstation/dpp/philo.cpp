@@ -35,7 +35,7 @@ private:
     QP::QTimeEvt m_timeEvt;
 
 public:
-    Philo();
+    explicit Philo() noexcept;
 
 protected:
     Q_STATE_DECL(initial);
@@ -75,10 +75,10 @@ inline uint8_t PHILO_ID(Philo const * const me) {
 #error qpcpp version 6.8.0 or higher required
 #endif
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$define${AOs::AO_Philo[N_PHILO]} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//.$define${Shared::AO_Philo[N_PHILO]} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace DPP {
 
-//.${AOs::AO_Philo[N_PHILO]} .................................................
+//.${Shared::AO_Philo[N_PHILO]} ..............................................
 QP::QActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AO
     &Philo::inst[0],
     &Philo::inst[1],
@@ -88,14 +88,14 @@ QP::QActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AO
 };
 
 } // namespace DPP
-//.$enddef${AOs::AO_Philo[N_PHILO]} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//.$enddef${Shared::AO_Philo[N_PHILO]} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //.$define${AOs::Philo} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace DPP {
 
 //.${AOs::Philo} .............................................................
 Philo Philo::inst[N_PHILO];
 //.${AOs::Philo::Philo} ......................................................
-Philo::Philo()
+Philo::Philo() noexcept
   : QActive(&initial),
     m_timeEvt(this, TIMEOUT_SIG, 0U)
 {}

@@ -76,101 +76,64 @@ enum GameBitmapIds {
     MAX_BMP
 };
 
-// obtain instances of the Mines orthogonal components
-QP::QHsm *Mine1_getInst(uint8_t id);
-QP::QHsm *Mine2_getInst(uint8_t id);
-
 } // namespace GAME
 
-//.$declare${Events::ObjectPosEvt} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+// Shared declarations
+//.$declare${Shared} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
-//.${Events::ObjectPosEvt} ...................................................
+//.${Shared::ObjectPosEvt} ...................................................
 class ObjectPosEvt : public QP::QEvt {
 public:
-    uint8_t x;
-    uint8_t y;
+    std::uint8_t x;
+    std::uint8_t y;
 };
-
-} // namespace GAME
-//.$enddecl${Events::ObjectPosEvt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$declare${Events::ObjectImageEvt} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace GAME {
-
-//.${Events::ObjectImageEvt} .................................................
+//.${Shared::ObjectImageEvt} .................................................
 class ObjectImageEvt : public QP::QEvt {
 public:
-    uint8_t x;
-    int8_t y;
-    uint8_t bmp;
+    std::uint8_t x;
+    std::int8_t y;
+    std::uint8_t bmp;
 };
-
-} // namespace GAME
-//.$enddecl${Events::ObjectImageEvt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$declare${Events::MineEvt} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace GAME {
-
-//.${Events::MineEvt} ........................................................
+//.${Shared::MineEvt} ........................................................
 class MineEvt : public QP::QEvt {
 public:
-    uint8_t id;
+    std::uint8_t id;
 
 public:
-    MineEvt(QP::QSignal sig_p, uint8_t id_p)    {
+    MineEvt(QP::QSignal sig_p, std::uint8_t id_p)    {
         sig     = sig_p;
         poolId_ = 0U;
         id      = id_p;
     }
 };
-
-} // namespace GAME
-//.$enddecl${Events::MineEvt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$declare${Events::ScoreEvt} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace GAME {
-
-//.${Events::ScoreEvt} .......................................................
+//.${Shared::ScoreEvt} .......................................................
 class ScoreEvt : public QP::QEvt {
 public:
-    uint16_t score;
+    std::uint16_t score;
 
 public:
-    ScoreEvt(QP::QSignal sig_p, uint16_t score_p)    {
+    ScoreEvt(QP::QSignal sig_p, std::uint16_t score_p)    {
         sig     = sig_p;
         poolId_ = 0U;
         score   = score_p;
     }
 };
 
-} // namespace GAME
-//.$enddecl${Events::ScoreEvt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-// opaque pointers to active objects in the application
-//.$declare${AOs::AO_Tunnel} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace GAME {
-
-
 // opaque pointer
 extern QP::QActive * const AO_Tunnel;
-
-} // namespace GAME
-//.$enddecl${AOs::AO_Tunnel} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$declare${AOs::AO_Ship} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace GAME {
-
 
 // opaque pointer
 extern QP::QActive * const AO_Ship;
 
-} // namespace GAME
-//.$enddecl${AOs::AO_Ship} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$declare${AOs::AO_Missile} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace GAME {
-
-
 // opaque pointer
 extern QP::QActive * const AO_Missile;
+//.${Shared::Mine1_getInst} ..................................................
+QP::QHsm * Mine1_getInst(std::uint8_t id) ;
+//.${Shared::Mine2_getInst} ..................................................
+QP::QHsm * Mine2_getInst(std::uint8_t id) ;
 
 } // namespace GAME
-//.$enddecl${AOs::AO_Missile} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//.$enddecl${Shared} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #endif  // GAME_HPP

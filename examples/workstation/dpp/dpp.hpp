@@ -34,53 +34,32 @@ enum DPPSignals {
     MAX_SIG         // the last signal
 };
 
+// number of philosophers
+constexpr std::uint8_t N_PHILO = 5U;
+
 } // namespace DPP
 
-//.$declare${Events::TableEvt} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//.$declare${Shared} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace DPP {
 
-//.${Events::TableEvt} .......................................................
+//.${Shared::TableEvt} .......................................................
 class TableEvt : public QP::QEvt {
 public:
     uint8_t philoNum;
 };
-
-} // namespace DPP
-//.$enddecl${Events::TableEvt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-// number of philosophers
-#define N_PHILO ((uint8_t)5)
-
-//.$declare${AOs::AO_Philo[N_PHILO]} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace DPP {
-
 extern QP::QActive * const AO_Philo[N_PHILO];
-
-} // namespace DPP
-//.$enddecl${AOs::AO_Philo[N_PHILO]} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$declare${AOs::AO_Table} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace DPP {
-
 extern QP::QActive * const AO_Table;
 
-} // namespace DPP
-//.$enddecl${AOs::AO_Table} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-#ifdef QXK_HPP
-//.$declare${AOs::XT_Test1} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace DPP {
-
+#if QXK_HPP
 extern QP::QXThread * const XT_Test1;
+#endif //  QXK_HPP
 
-} // namespace DPP
-//.$enddecl${AOs::XT_Test1} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$declare${AOs::XT_Test2} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace DPP {
-
+#if QXK_HPP
 extern QP::QXThread * const XT_Test2;
+#endif //  QXK_HPP
+
 
 } // namespace DPP
-//.$enddecl${AOs::XT_Test2} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#endif // QXK_HPP
+//.$enddecl${Shared} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #endif // DPP_HPP

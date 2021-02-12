@@ -32,10 +32,13 @@ namespace GAME {
 //.${AOs::Ship} ..............................................................
 class Ship : public QP::QActive {
 private:
-    uint8_t m_x;
-    uint16_t m_y;
-    uint8_t m_exp_ctr;
-    uint16_t m_score;
+    std::uint8_t m_x;
+    std::uint16_t m_y;
+    std::uint8_t m_exp_ctr;
+    std::uint16_t m_score;
+
+public:
+    static Ship inst;
 
 public:
     Ship();
@@ -51,36 +54,30 @@ protected:
 } // namespace GAME
 //.$enddecl${AOs::Ship} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-namespace GAME {
-
-// local objects -------------------------------------------------------------
-static Ship l_ship; // the sole instance of the Ship active object
-
-} // namespace GAME
-
-// Public-scope objects ------------------------------------------------------
+// Public-scope shared objects -----------------------------------------------
 //.$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //. Check for the minimum required QP version
 #if (QP_VERSION < 680U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
 #error qpcpp version 6.8.0 or higher required
 #endif
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$define${AOs::AO_Ship} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//.$define${Shared::AO_Ship} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
 
 // opaque pointer
-//.${AOs::AO_Ship} ...........................................................
-QP::QActive * const AO_Ship = &l_ship;
+//.${Shared::AO_Ship} ........................................................
+QP::QActive * const AO_Ship = &Ship::inst;
 
 } // namespace GAME
-//.$enddef${AOs::AO_Ship} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//.$enddef${Shared::AO_Ship} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // Active object definition --------------------------------------------------
 //.$define${AOs::Ship} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
 //.${AOs::Ship} ..............................................................
+Ship Ship::inst;
 //.${AOs::Ship::Ship} ........................................................
 Ship::Ship()
   : QActive(&initial),

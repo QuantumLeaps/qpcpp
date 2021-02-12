@@ -47,7 +47,7 @@ public:
     // taking into account the precedence of operands.
     // return: true if evaluation successfull
     // false when error encountered
-    bool eval(double op, uint8_t oper);
+    bool eval(double op, uint8_t oper) noexcept;
 
 protected:
     Q_STATE_DECL(initial);
@@ -95,7 +95,7 @@ Calc::Calc()
 // return: true if evaluation successfull
 // false when error encountered
 //.${SMs::Calc::eval} ........................................................
-bool Calc::eval(double op, uint8_t oper) {
+bool Calc::eval(double op, uint8_t oper) noexcept {
     double result;
     if ((oper == KEY_NULL) || (oper == KEY_PLUS) || (oper == KEY_MINUS)) {
         switch (m_oper2) {

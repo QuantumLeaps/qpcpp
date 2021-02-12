@@ -767,10 +767,16 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
                 case IDC_USER1: {  // USER owner-drawn Button1
                     OutputDebugString("USER1\n");
                     switch (OwnerDrawnButton_draw(&l_userBtn1, pdis)) {
+                        case BTN_DEPRESSED: {
+                             break;
+                        }
+                        case BTN_RELEASED: {
+                            break;
+                        }
                         default: {
                             break;
                         }
-                    }
+                   }
                     break;
                 }
             }

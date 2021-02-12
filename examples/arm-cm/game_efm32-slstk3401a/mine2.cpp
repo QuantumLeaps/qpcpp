@@ -22,16 +22,19 @@
 
 Q_DEFINE_THIS_FILE
 
-// encapsulated delcaration of the Mine1 HSM ---------------------------------
+// encapsulated delcaration of the Mine2 HSM ---------------------------------
 //.$declare${AOs::Mine2} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
 //.${AOs::Mine2} .............................................................
 class Mine2 : public QP::QHsm {
 private:
-    uint8_t m_x;
-    uint8_t m_y;
-    uint8_t m_exp_ctr;
+    std::uint8_t m_x;
+    std::uint8_t m_y;
+    std::uint8_t m_exp_ctr;
+
+public:
+    static Mine2 inst[GAME_MINES_MAX];
 
 public:
     Mine2()
@@ -51,18 +54,9 @@ protected:
 
 namespace GAME {
 
-// local objects -------------------------------------------------------------
-static Mine2 l_mine2[GAME_MINES_MAX]; // a pool of type-2 mines
-
-//............................................................................
-QP::QHsm *Mine2_getInst(uint8_t id) {
-    Q_REQUIRE(id < GAME_MINES_MAX);
-    return &l_mine2[id];
-}
-
 // helper function to provide the ID of this mine ............................
-static inline uint8_t MINE_ID(Mine2 const * const me) {
-    return static_cast<uint8_t>(me - l_mine2);
+static inline std::uint8_t MINE_ID(Mine2 const * const me) {
+    return static_cast<std::uint8_t>(me - &Mine2::inst[0]);
 }
 
 } // namespace GAME
@@ -74,10 +68,22 @@ static inline uint8_t MINE_ID(Mine2 const * const me) {
 #error qpcpp version 6.8.0 or higher required
 #endif
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//.$define${Shared::Mine2_getInst} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace GAME {
+
+//.${Shared::Mine2_getInst} ..................................................
+QP::QHsm * Mine2_getInst(std::uint8_t id) {
+    Q_REQUIRE(id < Q_DIM(Mine2::inst));
+    return &Mine2::inst[id];
+}
+
+} // namespace GAME
+//.$enddef${Shared::Mine2_getInst} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //.$define${AOs::Mine2} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
 //.${AOs::Mine2} .............................................................
+Mine2 Mine2::inst[GAME_MINES_MAX];
 //.${AOs::Mine2::SM} .........................................................
 Q_STATE_DEF(Mine2, initial) {
     //.${AOs::Mine2::SM::initial}
@@ -85,11 +91,11 @@ Q_STATE_DEF(Mine2, initial) {
     if (!dict_sent) {
         dict_sent = true;
         // object dictionaries for Mine2 pool...
-        QS_OBJ_DICTIONARY(&l_mine2[0]);
-        QS_OBJ_DICTIONARY(&l_mine2[1]);
-        QS_OBJ_DICTIONARY(&l_mine2[2]);
-        QS_OBJ_DICTIONARY(&l_mine2[3]);
-        QS_OBJ_DICTIONARY(&l_mine2[4]);
+        QS_OBJ_DICTIONARY(&Mine2::inst[0]);
+        QS_OBJ_DICTIONARY(&Mine2::inst[1]);
+        QS_OBJ_DICTIONARY(&Mine2::inst[2]);
+        QS_OBJ_DICTIONARY(&Mine2::inst[3]);
+        QS_OBJ_DICTIONARY(&Mine2::inst[4]);
 
         // function dictionaries for Mine2 SM...
         QS_FUN_DICTIONARY(&Mine2::initial);

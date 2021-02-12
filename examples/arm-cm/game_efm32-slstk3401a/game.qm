@@ -5,58 +5,87 @@
 NOTE: Requries QP6.</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
- <!--${Events}-->
- <package name="Events" stereotype="0x01" namespace="GAME::">
-  <!--${Events::ObjectPosEvt}-->
+ <!--${Shared}-->
+ <package name="Shared" stereotype="0x01" namespace="GAME::">
+  <!--${Shared::ObjectPosEvt}-->
   <class name="ObjectPosEvt" superclass="qpcpp::QEvt">
-   <!--${Events::ObjectPosEvt::x}-->
-   <attribute name="x" type="uint8_t" visibility="0x00" properties="0x00"/>
-   <!--${Events::ObjectPosEvt::y}-->
-   <attribute name="y" type="uint8_t" visibility="0x00" properties="0x00"/>
+   <!--${Shared::ObjectPosEvt::x}-->
+   <attribute name="x" type="std::uint8_t" visibility="0x00" properties="0x00"/>
+   <!--${Shared::ObjectPosEvt::y}-->
+   <attribute name="y" type="std::uint8_t" visibility="0x00" properties="0x00"/>
   </class>
-  <!--${Events::ObjectImageEvt}-->
+  <!--${Shared::ObjectImageEvt}-->
   <class name="ObjectImageEvt" superclass="qpcpp::QEvt">
-   <!--${Events::ObjectImageEvt::x}-->
-   <attribute name="x" type="uint8_t" visibility="0x00" properties="0x00"/>
-   <!--${Events::ObjectImageEvt::y}-->
-   <attribute name="y" type="int8_t" visibility="0x00" properties="0x00"/>
-   <!--${Events::ObjectImageEvt::bmp}-->
-   <attribute name="bmp" type="uint8_t" visibility="0x00" properties="0x00"/>
+   <!--${Shared::ObjectImageEvt::x}-->
+   <attribute name="x" type="std::uint8_t" visibility="0x00" properties="0x00"/>
+   <!--${Shared::ObjectImageEvt::y}-->
+   <attribute name="y" type="std::int8_t" visibility="0x00" properties="0x00"/>
+   <!--${Shared::ObjectImageEvt::bmp}-->
+   <attribute name="bmp" type="std::uint8_t" visibility="0x00" properties="0x00"/>
   </class>
-  <!--${Events::MineEvt}-->
+  <!--${Shared::MineEvt}-->
   <class name="MineEvt" superclass="qpcpp::QEvt">
-   <!--${Events::MineEvt::id}-->
-   <attribute name="id" type="uint8_t" visibility="0x00" properties="0x00"/>
-   <!--${Events::MineEvt::MineEvt}-->
+   <!--${Shared::MineEvt::id}-->
+   <attribute name="id" type="std::uint8_t" visibility="0x00" properties="0x00"/>
+   <!--${Shared::MineEvt::MineEvt}-->
    <operation name="MineEvt" type="" visibility="0x00" properties="0x02">
     <documentation>This constructor is called only for statically allocated MineEvt
 NOTE: QP can call event constructors in Q_NEW, when the port is configured with the Q_EVT_CTOR macro</documentation>
-    <!--${Events::MineEvt::MineEvt::sig_p}-->
+    <!--${Shared::MineEvt::MineEvt::sig_p}-->
     <parameter name="sig_p" type="QP::QSignal"/>
-    <!--${Events::MineEvt::MineEvt::id_p}-->
-    <parameter name="id_p" type="uint8_t"/>
+    <!--${Shared::MineEvt::MineEvt::id_p}-->
+    <parameter name="id_p" type="std::uint8_t"/>
     <code>sig     = sig_p;
 poolId_ = 0U;
 id      = id_p;</code>
    </operation>
   </class>
-  <!--${Events::ScoreEvt}-->
+  <!--${Shared::ScoreEvt}-->
   <class name="ScoreEvt" superclass="qpcpp::QEvt">
-   <!--${Events::ScoreEvt::score}-->
-   <attribute name="score" type="uint16_t" visibility="0x00" properties="0x00"/>
-   <!--${Events::ScoreEvt::ScoreEvt}-->
+   <!--${Shared::ScoreEvt::score}-->
+   <attribute name="score" type="std::uint16_t" visibility="0x00" properties="0x00"/>
+   <!--${Shared::ScoreEvt::ScoreEvt}-->
    <operation name="ScoreEvt" type="" visibility="0x00" properties="0x02">
     <documentation>This constructor is called only for statically allocated MineEvt
 NOTE: QP can call event constructors in Q_NEW, when the port is configured with the Q_EVT_CTOR macro</documentation>
-    <!--${Events::ScoreEvt::ScoreEvt::sig_p}-->
+    <!--${Shared::ScoreEvt::ScoreEvt::sig_p}-->
     <parameter name="sig_p" type="QP::QSignal"/>
-    <!--${Events::ScoreEvt::ScoreEvt::score_p}-->
-    <parameter name="score_p" type="uint16_t"/>
+    <!--${Shared::ScoreEvt::ScoreEvt::score_p}-->
+    <parameter name="score_p" type="std::uint16_t"/>
     <code>sig     = sig_p;
 poolId_ = 0U;
 score   = score_p;</code>
    </operation>
   </class>
+  <!--${Shared::AO_Tunnel}-->
+  <attribute name="AO_Tunnel" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <documentation>// opaque pointer</documentation>
+   <code>= &amp;Tunnel::inst;</code>
+  </attribute>
+  <!--${Shared::AO_Ship}-->
+  <attribute name="AO_Ship" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <documentation>// opaque pointer</documentation>
+   <code>= &amp;Ship::inst;</code>
+  </attribute>
+  <!--${Shared::AO_Missile}-->
+  <attribute name="AO_Missile" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <documentation>// opaque pointer</documentation>
+   <code>= &amp;Missile::inst;</code>
+  </attribute>
+  <!--${Shared::Mine1_getInst}-->
+  <operation name="Mine1_getInst" type="QP::QHsm *" visibility="0x00" properties="0x00">
+   <!--${Shared::Mine1_getInst::id}-->
+   <parameter name="id" type="std::uint8_t"/>
+   <code>Q_REQUIRE(id &lt; Q_DIM(Mine1::inst));
+return &amp;Mine1::inst[id];</code>
+  </operation>
+  <!--${Shared::Mine2_getInst}-->
+  <operation name="Mine2_getInst" type="QP::QHsm *" visibility="0x00" properties="0x00">
+   <!--${Shared::Mine2_getInst::id}-->
+   <parameter name="id" type="std::uint8_t"/>
+   <code>Q_REQUIRE(id &lt; Q_DIM(Mine2::inst));
+return &amp;Mine2::inst[id];</code>
+  </operation>
  </package>
  <!--${AOs}-->
  <package name="AOs" stereotype="0x02" namespace="GAME::">
@@ -74,17 +103,21 @@ score   = score_p;</code>
    <!--${AOs::Tunnel::m_mine2_pool[GAME_MINES_MAX]}-->
    <attribute name="m_mine2_pool[GAME_MINES_MAX]" type="QP::QHsm *" visibility="0x02" properties="0x00"/>
    <!--${AOs::Tunnel::m_blink_ctr}-->
-   <attribute name="m_blink_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_blink_ctr" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Tunnel::m_last_mine_x}-->
-   <attribute name="m_last_mine_x" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_last_mine_x" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Tunnel::m_last_mine_y}-->
-   <attribute name="m_last_mine_y" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_last_mine_y" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Tunnel::m_wall_thickness_top}-->
-   <attribute name="m_wall_thickness_top" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_wall_thickness_top" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Tunnel::m_wall_thickness_bottom}-->
-   <attribute name="m_wall_thickness_bottom" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_wall_thickness_bottom" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Tunnel::m_wall_gap}-->
-   <attribute name="m_wall_gap" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_wall_gap" type="std::uint8_t" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Tunnel::inst}-->
+   <attribute name="inst" type="Tunnel" visibility="0x00" properties="0x01">
+    <documentation>static instance (Singleton)</documentation>
+   </attribute>
    <!--${AOs::Tunnel::Tunnel}-->
    <operation name="Tunnel" type="" visibility="0x00" properties="0x00">
     <code>  : QActive(&amp;initial),
@@ -207,8 +240,8 @@ subscribe(PLAYER_TRIGGER_SIG);
 subscribe(PLAYER_QUIT_SIG);
 
 // object dictionary for Tunnel object...
-QS_OBJ_DICTIONARY(&amp;l_tunnel.m_blinkTimeEvt);
-QS_OBJ_DICTIONARY(&amp;l_tunnel.m_screenTimeEvt);
+QS_OBJ_DICTIONARY(&amp;Tunnel::inst.m_blinkTimeEvt);
+QS_OBJ_DICTIONARY(&amp;Tunnel::inst.m_screenTimeEvt);
 
 // local signals...
 QS_SIG_DICTIONARY(BLINK_TIMEOUT_SIG,  this);
@@ -560,15 +593,19 @@ QP::QF::stop(); // stop QF and cleanup</entry>
   <class name="Ship" superclass="qpcpp::QActive">
    <documentation>Ship Active Object</documentation>
    <!--${AOs::Ship::m_x}-->
-   <attribute name="m_x" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_x" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Ship::m_y}-->
-   <attribute name="m_y" type="uint16_t" visibility="0x02" properties="0x00">
+   <attribute name="m_y" type="std::uint16_t" visibility="0x02" properties="0x00">
     <documentation>vertical position of the ship in the 8s2 fixed-point notation.</documentation>
    </attribute>
    <!--${AOs::Ship::m_exp_ctr}-->
-   <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_exp_ctr" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Ship::m_score}-->
-   <attribute name="m_score" type="uint16_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_score" type="std::uint16_t" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Ship::inst}-->
+   <attribute name="inst" type="Ship" visibility="0x00" properties="0x01">
+    <documentation>static instance (Singleton)</documentation>
+   </attribute>
    <!--${AOs::Ship::Ship}-->
    <operation name="Ship" type="" visibility="0x00" properties="0x00">
     <code>  : QActive(&amp;initial),
@@ -733,11 +770,15 @@ AO_Tunnel-&gt;POST(gameOver, this);</action>
   <class name="Missile" superclass="qpcpp::QActive">
    <documentation>Missile Active Object</documentation>
    <!--${AOs::Missile::m_x}-->
-   <attribute name="m_x" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_x" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Missile::m_y}-->
-   <attribute name="m_y" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_y" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Missile::m_exp_ctr}-->
    <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Missile::inst}-->
+   <attribute name="inst" type="Missile" visibility="0x00" properties="0x01">
+    <documentation>static instance (Singleton)</documentation>
+   </attribute>
    <!--${AOs::Missile::Missile}-->
    <operation name="Missile" type="" visibility="0x00" properties="0x00">
     <code>  : QActive(&amp;initial)</code>
@@ -857,11 +898,15 @@ AO_Tunnel-&gt;POST(oie, this);</action>
   <class name="Mine1" superclass="qpcpp::QHsm">
    <documentation>The Mine1 orthogonal component</documentation>
    <!--${AOs::Mine1::m_x}-->
-   <attribute name="m_x" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_x" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Mine1::m_y}-->
-   <attribute name="m_y" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_y" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Mine1::m_exp_ctr}-->
-   <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_exp_ctr" type="std::uint8_t" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Mine1::inst[GAME_MINES_MAX]}-->
+   <attribute name="inst[GAME_MINES_MAX]" type="Mine1" visibility="0x00" properties="0x01">
+    <documentation>static instances (Singletons)</documentation>
+   </attribute>
    <!--${AOs::Mine1::Mine1}-->
    <operation name="Mine1" type="" visibility="0x00" properties="0x02">
     <code>  : QHsm(&amp;initial)</code>
@@ -875,11 +920,11 @@ if (!dict_sent) {
     dict_sent = true;
 
     // object dictionaries for Mine1 pool...
-    QS_OBJ_DICTIONARY(&amp;l_mine1[0]);
-    QS_OBJ_DICTIONARY(&amp;l_mine1[1]);
-    QS_OBJ_DICTIONARY(&amp;l_mine1[2]);
-    QS_OBJ_DICTIONARY(&amp;l_mine1[3]);
-    QS_OBJ_DICTIONARY(&amp;l_mine1[4]);
+    QS_OBJ_DICTIONARY(&amp;Mine1::inst[0]);
+    QS_OBJ_DICTIONARY(&amp;Mine1::inst[1]);
+    QS_OBJ_DICTIONARY(&amp;Mine1::inst[2]);
+    QS_OBJ_DICTIONARY(&amp;Mine1::inst[3]);
+    QS_OBJ_DICTIONARY(&amp;Mine1::inst[4]);
 
     // function dictionaries for Mine1 SM
     QS_FUN_DICTIONARY(&amp;Mine1::initial);
@@ -1040,11 +1085,15 @@ AO_Missile-&gt;POST(&amp;mine1_destroyed, this);</action>
   <class name="Mine2" superclass="qpcpp::QHsm">
    <documentation>The Mine2 orthogonal component</documentation>
    <!--${AOs::Mine2::m_x}-->
-   <attribute name="m_x" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_x" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Mine2::m_y}-->
-   <attribute name="m_y" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_y" type="std::uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Mine2::m_exp_ctr}-->
-   <attribute name="m_exp_ctr" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="m_exp_ctr" type="std::uint8_t" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Mine2::inst[GAME_MINES_MAX]}-->
+   <attribute name="inst[GAME_MINES_MAX]" type="Mine2" visibility="0x00" properties="0x01">
+    <documentation>static instances (Singletons)</documentation>
+   </attribute>
    <!--${AOs::Mine2::Mine2}-->
    <operation name="Mine2" type="" visibility="0x00" properties="0x02">
     <code>  : QHsm(&amp;initial)</code>
@@ -1057,11 +1106,11 @@ AO_Missile-&gt;POST(&amp;mine1_destroyed, this);</action>
 if (!dict_sent) {
     dict_sent = true;
     // object dictionaries for Mine2 pool...
-    QS_OBJ_DICTIONARY(&amp;l_mine2[0]);
-    QS_OBJ_DICTIONARY(&amp;l_mine2[1]);
-    QS_OBJ_DICTIONARY(&amp;l_mine2[2]);
-    QS_OBJ_DICTIONARY(&amp;l_mine2[3]);
-    QS_OBJ_DICTIONARY(&amp;l_mine2[4]);
+    QS_OBJ_DICTIONARY(&amp;Mine2::inst[0]);
+    QS_OBJ_DICTIONARY(&amp;Mine2::inst[1]);
+    QS_OBJ_DICTIONARY(&amp;Mine2::inst[2]);
+    QS_OBJ_DICTIONARY(&amp;Mine2::inst[3]);
+    QS_OBJ_DICTIONARY(&amp;Mine2::inst[4]);
 
     // function dictionaries for Mine2 SM...
     QS_FUN_DICTIONARY(&amp;Mine2::initial);
@@ -1218,21 +1267,6 @@ AO_Missile-&gt;POST(&amp;mine2_destroyed, this);</action>
     <state_diagram size="53,68"/>
    </statechart>
   </class>
-  <!--${AOs::AO_Tunnel}-->
-  <attribute name="AO_Tunnel" type="QP::QActive * const" visibility="0x00" properties="0x00">
-   <documentation>// opaque pointer</documentation>
-   <code>= &amp;l_tunnel;</code>
-  </attribute>
-  <!--${AOs::AO_Ship}-->
-  <attribute name="AO_Ship" type="QP::QActive * const" visibility="0x00" properties="0x00">
-   <documentation>// opaque pointer</documentation>
-   <code>= &amp;l_ship;</code>
-  </attribute>
-  <!--${AOs::AO_Missile}-->
-  <attribute name="AO_Missile" type="QP::QActive * const" visibility="0x00" properties="0x00">
-   <documentation>// opaque pointer</documentation>
-   <code>= &amp;l_missile;</code>
-  </attribute>
  </package>
  <!--${.}-->
  <directory name=".">
@@ -1298,21 +1332,10 @@ enum GameBitmapIds {
     MAX_BMP
 };
 
-// obtain instances of the Mines orthogonal components
-QP::QHsm *Mine1_getInst(uint8_t id);
-QP::QHsm *Mine2_getInst(uint8_t id);
-
 } // namespace GAME
 
-$declare${Events::ObjectPosEvt}
-$declare${Events::ObjectImageEvt}
-$declare${Events::MineEvt}
-$declare${Events::ScoreEvt}
-
-// opaque pointers to active objects in the application
-$declare${AOs::AO_Tunnel}
-$declare${AOs::AO_Ship}
-$declare${AOs::AO_Missile}
+// Shared declarations
+$declare${Shared}
 
 #endif  // GAME_HPP</text>
   </file>
@@ -1326,15 +1349,8 @@ $declare${AOs::AO_Missile}
 
 $declare${AOs::Missile}
 
-namespace GAME {
-
-// local objects -------------------------------------------------------------
-static Missile l_missile; // the sole instance of the Missile active object
-
-} // namespace GAME
-
-// Public-scope objects ------------------------------------------------------
-$define${AOs::AO_Missile}
+// Public-scope shared objects -----------------------------------------------
+$define${Shared::AO_Missile}
 
 // Active object definition --------------------------------------------------
 $define${AOs::Missile}</text>
@@ -1353,15 +1369,8 @@ $define${AOs::Missile}</text>
 // encapsulated delcaration of the Ship active object ------------------------
 $declare${AOs::Ship}
 
-namespace GAME {
-
-// local objects -------------------------------------------------------------
-static Ship l_ship; // the sole instance of the Ship active object
-
-} // namespace GAME
-
-// Public-scope objects ------------------------------------------------------
-$define${AOs::AO_Ship}
+// Public-scope shared objects -----------------------------------------------
+$define${Shared::AO_Ship}
 
 // Active object definition --------------------------------------------------
 $define${AOs::Ship}</text>
@@ -1378,15 +1387,8 @@ Q_DEFINE_THIS_FILE
 // declaration of the Tunnel AO ----------------------------------------------
 $declare${AOs::Tunnel}
 
-namespace GAME {
-
-// local objects -------------------------------------------------------------
-static Tunnel l_tunnel; // the sole instance of the Tunnel active object
-
-} // namespace GAME
-
-// Public-scope objects ------------------------------------------------------
-$define${AOs::AO_Tunnel}
+// Public-scope shared objects -----------------------------------------------
+$define${Shared::AO_Tunnel}
 
 // Active object definition ==================================================
 $define${AOs::Tunnel}</text>
@@ -1400,28 +1402,20 @@ $define${AOs::Tunnel}</text>
 Q_DEFINE_THIS_FILE
 
 // encapsulated delcaration of the Mine1 HSM ---------------------------------
-$declare(AOs::Mine1)
+$declare${AOs::Mine1}
 
 namespace GAME {
 
-// local objects -------------------------------------------------------------
-static Mine1 l_mine1[GAME_MINES_MAX]; // a pool of type-1 mines
-
-//............................................................................
-QP::QHsm *Mine1_getInst(uint8_t id) {
-    Q_REQUIRE(id &lt; GAME_MINES_MAX);
-    return &amp;l_mine1[id];
-}
-
 // helper function to provide the ID of this mine ............................
 static inline uint8_t MINE_ID(Mine1 const * const me) {
-    return static_cast&lt;uint8_t&gt;(me - l_mine1);
+    return static_cast&lt;uint8_t&gt;(me - &amp;Mine1::inst[0]);
 }
 
 } // namespace GAME
 
 // Mine1 class definition ----------------------------------------------------
-$define(AOs::Mine1)</text>
+$define${Shared::Mine1_getInst}
+$define${AOs::Mine1}</text>
   </file>
   <!--${.::mine2.cpp}-->
   <file name="mine2.cpp">
@@ -1431,29 +1425,21 @@ $define(AOs::Mine1)</text>
 
 Q_DEFINE_THIS_FILE
 
-// encapsulated delcaration of the Mine1 HSM ---------------------------------
-$declare(AOs::Mine2)
+// encapsulated delcaration of the Mine2 HSM ---------------------------------
+$declare${AOs::Mine2}
 
 namespace GAME {
 
-// local objects -------------------------------------------------------------
-static Mine2 l_mine2[GAME_MINES_MAX]; // a pool of type-2 mines
-
-//............................................................................
-QP::QHsm *Mine2_getInst(uint8_t id) {
-    Q_REQUIRE(id &lt; GAME_MINES_MAX);
-    return &amp;l_mine2[id];
-}
-
 // helper function to provide the ID of this mine ............................
-static inline uint8_t MINE_ID(Mine2 const * const me) {
-    return static_cast&lt;uint8_t&gt;(me - l_mine2);
+static inline std::uint8_t MINE_ID(Mine2 const * const me) {
+    return static_cast&lt;std::uint8_t&gt;(me - &amp;Mine2::inst[0]);
 }
 
 } // namespace GAME
 
 // Mine1 class definition ----------------------------------------------------
-$define(AOs::Mine2)</text>
+$define${Shared::Mine2_getInst}
+$define${AOs::Mine2}</text>
   </file>
  </directory>
 </model>

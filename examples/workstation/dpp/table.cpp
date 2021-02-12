@@ -36,7 +36,7 @@ private:
     bool m_isHungry[N_PHILO];
 
 public:
-    Table();
+    explicit Table() noexcept;
 
 protected:
     Q_STATE_DECL(initial);
@@ -75,21 +75,21 @@ constexpr char_t const * const EATING   = &"eating  "[0];
 #error qpcpp version 6.8.0 or higher required
 #endif
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$define${AOs::AO_Table} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//.$define${Shared::AO_Table} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace DPP {
 
-//.${AOs::AO_Table} ..........................................................
+//.${Shared::AO_Table} .......................................................
 QP::QActive * const AO_Table = &Table::inst; // "opaque" pointer to Table AO
 
 } // namespace DPP
-//.$enddef${AOs::AO_Table} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//.$enddef${Shared::AO_Table} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //.$define${AOs::Table} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace DPP {
 
 //.${AOs::Table} .............................................................
 Table Table::inst;
 //.${AOs::Table::Table} ......................................................
-Table::Table()
+Table::Table() noexcept
   : QActive(&initial)
 {
     for (uint8_t n = 0U; n < N_PHILO; ++n) {

@@ -29,9 +29,12 @@ namespace GAME {
 //.${AOs::Mine1} .............................................................
 class Mine1 : public QP::QHsm {
 private:
-    uint8_t m_x;
-    uint8_t m_y;
-    uint8_t m_exp_ctr;
+    std::uint8_t m_x;
+    std::uint8_t m_y;
+    std::uint8_t m_exp_ctr;
+
+public:
+    static Mine1 inst[GAME_MINES_MAX];
 
 public:
     Mine1()
@@ -51,18 +54,9 @@ protected:
 
 namespace GAME {
 
-// local objects -------------------------------------------------------------
-static Mine1 l_mine1[GAME_MINES_MAX]; // a pool of type-1 mines
-
-//............................................................................
-QP::QHsm *Mine1_getInst(uint8_t id) {
-    Q_REQUIRE(id < GAME_MINES_MAX);
-    return &l_mine1[id];
-}
-
 // helper function to provide the ID of this mine ............................
 static inline uint8_t MINE_ID(Mine1 const * const me) {
-    return static_cast<uint8_t>(me - l_mine1);
+    return static_cast<uint8_t>(me - &Mine1::inst[0]);
 }
 
 } // namespace GAME
@@ -74,10 +68,22 @@ static inline uint8_t MINE_ID(Mine1 const * const me) {
 #error qpcpp version 6.8.0 or higher required
 #endif
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//.$define${Shared::Mine1_getInst} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace GAME {
+
+//.${Shared::Mine1_getInst} ..................................................
+QP::QHsm * Mine1_getInst(std::uint8_t id) {
+    Q_REQUIRE(id < Q_DIM(Mine1::inst));
+    return &Mine1::inst[id];
+}
+
+} // namespace GAME
+//.$enddef${Shared::Mine1_getInst} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //.$define${AOs::Mine1} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
 //.${AOs::Mine1} .............................................................
+Mine1 Mine1::inst[GAME_MINES_MAX];
 //.${AOs::Mine1::SM} .........................................................
 Q_STATE_DEF(Mine1, initial) {
     //.${AOs::Mine1::SM::initial}
@@ -86,11 +92,11 @@ Q_STATE_DEF(Mine1, initial) {
         dict_sent = true;
 
         // object dictionaries for Mine1 pool...
-        QS_OBJ_DICTIONARY(&l_mine1[0]);
-        QS_OBJ_DICTIONARY(&l_mine1[1]);
-        QS_OBJ_DICTIONARY(&l_mine1[2]);
-        QS_OBJ_DICTIONARY(&l_mine1[3]);
-        QS_OBJ_DICTIONARY(&l_mine1[4]);
+        QS_OBJ_DICTIONARY(&Mine1::inst[0]);
+        QS_OBJ_DICTIONARY(&Mine1::inst[1]);
+        QS_OBJ_DICTIONARY(&Mine1::inst[2]);
+        QS_OBJ_DICTIONARY(&Mine1::inst[3]);
+        QS_OBJ_DICTIONARY(&Mine1::inst[4]);
 
         // function dictionaries for Mine1 SM
         QS_FUN_DICTIONARY(&Mine1::initial);

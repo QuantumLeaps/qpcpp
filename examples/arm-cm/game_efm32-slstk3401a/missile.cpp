@@ -28,9 +28,12 @@ namespace GAME {
 //.${AOs::Missile} ...........................................................
 class Missile : public QP::QActive {
 private:
-    uint8_t m_x;
-    uint8_t m_y;
+    std::uint8_t m_x;
+    std::uint8_t m_y;
     uint8_t m_exp_ctr;
+
+public:
+    static Missile inst;
 
 public:
     Missile();
@@ -45,36 +48,30 @@ protected:
 } // namespace GAME
 //.$enddecl${AOs::Missile} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-namespace GAME {
-
-// local objects -------------------------------------------------------------
-static Missile l_missile; // the sole instance of the Missile active object
-
-} // namespace GAME
-
-// Public-scope objects ------------------------------------------------------
+// Public-scope shared objects -----------------------------------------------
 //.$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //. Check for the minimum required QP version
 #if (QP_VERSION < 680U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
 #error qpcpp version 6.8.0 or higher required
 #endif
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//.$define${AOs::AO_Missile} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//.$define${Shared::AO_Missile} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
 
 // opaque pointer
-//.${AOs::AO_Missile} ........................................................
-QP::QActive * const AO_Missile = &l_missile;
+//.${Shared::AO_Missile} .....................................................
+QP::QActive * const AO_Missile = &Missile::inst;
 
 } // namespace GAME
-//.$enddef${AOs::AO_Missile} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//.$enddef${Shared::AO_Missile} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // Active object definition --------------------------------------------------
 //.$define${AOs::Missile} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
 //.${AOs::Missile} ...........................................................
+Missile Missile::inst;
 //.${AOs::Missile::Missile} ..................................................
 Missile::Missile()
   : QActive(&initial)

@@ -3,13 +3,31 @@
  <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
- <!--${Events}-->
- <package name="Events" stereotype="0x01" namespace="DPP::">
-  <!--${Events::TableEvt}-->
+ <!--${Shared}-->
+ <package name="Shared" stereotype="0x00" namespace="DPP::">
+  <!--${Shared::TableEvt}-->
   <class name="TableEvt" superclass="qpcpp::QEvt">
-   <!--${Events::TableEvt::philoNum}-->
+   <!--${Shared::TableEvt::philoNum}-->
    <attribute name="philoNum" type="uint8_t" visibility="0x00" properties="0x00"/>
   </class>
+  <!--${Shared::AO_Philo[N_PHILO]}-->
+  <attribute name="AO_Philo[N_PHILO]" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <code>= { // &quot;opaque&quot; pointers to Philo AO
+    &amp;Philo::inst[0],
+    &amp;Philo::inst[1],
+    &amp;Philo::inst[2],
+    &amp;Philo::inst[3],
+    &amp;Philo::inst[4]
+};</code>
+  </attribute>
+  <!--${Shared::AO_Table}-->
+  <attribute name="AO_Table" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <code>= &amp;Table::inst; // &quot;opaque&quot; pointer to Table AO</code>
+  </attribute>
+  <!--${Shared::XT_Test1}-->
+  <attribute name="XT_Test1? QXK_HPP" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
+  <!--${Shared::XT_Test2}-->
+  <attribute name="XT_Test2? QXK_HPP" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
  </package>
  <!--${AOs}-->
  <package name="AOs" stereotype="0x02" namespace="DPP::">
@@ -22,7 +40,8 @@
    <!--${AOs::Philo::m_timeEvt}-->
    <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
    <!--${AOs::Philo::Philo}-->
-   <operation name="Philo" type="" visibility="0x00" properties="0x00">
+   <operation name="Philo" type="explicit" visibility="0x00" properties="0x00">
+    <specifiers>noexcept</specifiers>
     <code>  : QActive(&amp;initial),
     m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
    </operation>
@@ -159,7 +178,8 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
    <!--${AOs::Table::m_isHungry[N_PHILO]}-->
    <attribute name="m_isHungry[N_PHILO]" type="bool" visibility="0x02" properties="0x00"/>
    <!--${AOs::Table::Table}-->
-   <operation name="Table" type="" visibility="0x00" properties="0x00">
+   <operation name="Table" type="explicit" visibility="0x00" properties="0x00">
+    <specifiers>noexcept</specifiers>
     <code>  : QActive(&amp;initial)
 
 for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
@@ -365,24 +385,6 @@ m_fork[n] = FREE;</action>
     <state_diagram size="50,69"/>
    </statechart>
   </class>
-  <!--${AOs::AO_Philo[N_PHILO]}-->
-  <attribute name="AO_Philo[N_PHILO]" type="QP::QActive * const" visibility="0x00" properties="0x00">
-   <code>= { // &quot;opaque&quot; pointers to Philo AO
-    &amp;Philo::inst[0],
-    &amp;Philo::inst[1],
-    &amp;Philo::inst[2],
-    &amp;Philo::inst[3],
-    &amp;Philo::inst[4]
-};</code>
-  </attribute>
-  <!--${AOs::AO_Table}-->
-  <attribute name="AO_Table" type="QP::QActive * const" visibility="0x00" properties="0x00">
-   <code>= &amp;Table::inst; // &quot;opaque&quot; pointer to Table AO</code>
-  </attribute>
-  <!--${AOs::XT_Test1}-->
-  <attribute name="XT_Test1" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
-  <!--${AOs::XT_Test2}-->
-  <attribute name="XT_Test2" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
  </package>
  <!--${.}-->
  <directory name=".">
@@ -406,20 +408,12 @@ enum DPPSignals {
     MAX_SIG         // the last signal
 };
 
+// number of philosophers
+constexpr std::uint8_t N_PHILO = 5U;
+
 } // namespace DPP
 
-$declare${Events::TableEvt}
-
-// number of philosophers
-#define N_PHILO ((uint8_t)5)
-
-$declare${AOs::AO_Philo[N_PHILO]}
-$declare${AOs::AO_Table}
-
-#ifdef QXK_HPP
-$declare${AOs::XT_Test1}
-$declare${AOs::XT_Test2}
-#endif // QXK_HPP
+$declare${Shared}
 
 #endif // DPP_HPP</text>
   </file>
@@ -456,7 +450,7 @@ inline uint8_t PHILO_ID(Philo const * const me) {
 
 } // namespace DPP
 
-$define${AOs::AO_Philo[N_PHILO]}
+$define${Shared::AO_Philo[N_PHILO]}
 $define${AOs::Philo}</text>
   </file>
   <!--${.::table.cpp}-->
@@ -491,8 +485,8 @@ constexpr char_t const * const EATING   = &amp;&quot;eating  &quot;[0];
 
 } // namespace DPP
 
-$define${AOs::AO_Table}
-$define(AOs::Table)</text>
+$define${Shared::AO_Table}
+$define${AOs::Table}</text>
   </file>
  </directory>
 </model>
