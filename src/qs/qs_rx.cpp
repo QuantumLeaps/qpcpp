@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.2a
-/// Last updated on  2021-01-28
+/// Last updated on  2021-02-19
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -349,8 +349,9 @@ void QS::queryCurrObj(std::uint8_t obj_kind) noexcept {
                                    QS::rxPriv_.currObj[obj_kind])->m_interval);
                     QS_SIG_PRE_(reinterpret_cast<QTimeEvt *>(
                                    QS::rxPriv_.currObj[obj_kind])->sig);
-                    QS_U8_PRE_ (reinterpret_cast<QTimeEvt *>(
-                                   QS::rxPriv_.currObj[obj_kind])->refCtr_);
+                    QS_U8_PRE_ (QF_EVT_REF_CTR_(
+                                   reinterpret_cast<QTimeEvt *>(
+                                       QS::rxPriv_.currObj[obj_kind])));
                     break;
                 default:
                     break;
