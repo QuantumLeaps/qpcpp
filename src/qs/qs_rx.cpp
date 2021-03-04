@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.2a
-/// Last updated on  2021-02-19
+/// Last updated on  2021-01-28
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -349,9 +349,8 @@ void QS::queryCurrObj(std::uint8_t obj_kind) noexcept {
                                    QS::rxPriv_.currObj[obj_kind])->m_interval);
                     QS_SIG_PRE_(reinterpret_cast<QTimeEvt *>(
                                    QS::rxPriv_.currObj[obj_kind])->sig);
-                    QS_U8_PRE_ (QF_EVT_REF_CTR_(
-                                   reinterpret_cast<QTimeEvt *>(
-                                       QS::rxPriv_.currObj[obj_kind])));
+                    QS_U8_PRE_ (reinterpret_cast<QTimeEvt *>(
+                                   QS::rxPriv_.currObj[obj_kind])->refCtr_);
                     break;
                 default:
                     break;
@@ -369,14 +368,15 @@ void QS::queryCurrObj(std::uint8_t obj_kind) noexcept {
 
 //****************************************************************************
 void QS::rxParse(void) {
-    QSCtr head = rxPriv_.head;
-    while (head != rxPriv_.tail) { // QS-RX buffer NOT empty?
-        std::uint8_t b = rxPriv_.buf[rxPriv_.tail];
+    QSCtr tail = rxPriv_.tail;
+    while (rxPriv_.head != tail) { // QS-RX buffer NOT empty?
+        std::uint8_t b = rxPriv_.buf[tail];
 
-        ++rxPriv_.tail;
-        if (rxPriv_.tail == rxPriv_.end) {
-            rxPriv_.tail = 0U;
+        ++tail;
+        if (tail == rxPriv_.end) {
+            tail = 0U;
         }
+        rxPriv_.tail = tail; // update the tail to a *valid* index
 
         if (l_rx.esc != 0U) {  // escaped byte arrived?
             l_rx.esc = 0U;
