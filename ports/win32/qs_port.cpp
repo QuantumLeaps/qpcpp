@@ -3,8 +3,8 @@
 /// @ingroup ports
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.2
-/// Last updated on  2021-01-14
+/// Last updated for version 6.9.3
+/// Last updated on  2021-03-16
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -139,8 +139,8 @@ bool QS::onStartup(void const *arg) {
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         l_sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (l_sock != INVALID_SOCKET) {
-            if (connect(l_sock, rp->ai_addr, rp->ai_addrlen)
-                == SOCKET_ERROR)
+            if (connect(l_sock, rp->ai_addr,
+                        static_cast<int>(rp->ai_addrlen)) == SOCKET_ERROR)
             {
                 closesocket(l_sock);
                 l_sock = INVALID_SOCKET;

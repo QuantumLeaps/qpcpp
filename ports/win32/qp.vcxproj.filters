@@ -77,20 +77,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="qep_port.h">
-      <Filter>QP_port</Filter>
-    </ClInclude>
-    <ClInclude Include="qf_port.h">
-      <Filter>QP_port</Filter>
-    </ClInclude>
     <ClInclude Include="qwin_gui.h">
       <Filter>QWIN-GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\qf\qf_pkg.h">
-      <Filter>QP</Filter>
+    <ClInclude Include="qep_port.hpp">
+      <Filter>QP_port</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\qs\qs_pkg.h">
-      <Filter>QS</Filter>
+    <ClInclude Include="qf_port.hpp">
+      <Filter>QP_port</Filter>
+    </ClInclude>
+    <ClInclude Include="qs_port.hpp">
+      <Filter>QP_port</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
