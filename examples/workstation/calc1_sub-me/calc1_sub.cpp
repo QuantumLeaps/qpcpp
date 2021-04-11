@@ -241,7 +241,7 @@ bool Calc::eval(double op, uint8_t oper) {
 QP::QState Calc::initial(Calc * const me, void const * const par) {
     //.${SMs::Calc::SM::initial}
     BSP_clear();
-    (void)e; // unused parameter
+    (void)par; // unused parameter
 
     QS_FUN_DICTIONARY(&Calc::on);
     QS_FUN_DICTIONARY(&Calc::ready);

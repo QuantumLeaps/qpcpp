@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example, embOS kernel
-// Last updated for version 6.0.4
-// Last updated on  2018-01-08
+// Last updated for version 6.9.3
+// Last updated on  2021-04-09
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -60,6 +60,7 @@ int main() {
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
+        DPP::AO_Philo[n]->setAttr(QP::TASK_NAME_ATTR, "Philo");
         DPP::AO_Philo[n]->start(
             static_cast<uint_fast8_t>(n + 1U), // QP priority of the AO
             philoQueueSto[n],        // event queue storage
@@ -69,7 +70,8 @@ int main() {
     }
 
     // set the embOS task attributes BEFORE starting the AO
-    DPP::AO_Table->setAttr(QF_TASK_USES_FPU, 0);
+    DPP::AO_Table->setAttr(QP::TASK_USES_FPU, 0);
+    DPP::AO_Table->setAttr(QP::TASK_NAME_ATTR, "Table");
     DPP::AO_Table->start(
         static_cast<uint_fast8_t>(N_PHILO + 1U), // QP priority of the AO
         tableQueueSto,         // event queue storage

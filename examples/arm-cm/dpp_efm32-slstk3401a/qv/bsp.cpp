@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, cooperative QV kernel
-// Last updated for version 6.9.2a
-// Last updated on  2021-01-31
+// Last updated for version 6.9.3
+// Last updated on  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -62,9 +62,10 @@ static uint32_t l_rnd; // random seed
     QP::QSTimeCtr QS_tickTime_;
     QP::QSTimeCtr QS_tickPeriod_;
 
-    // QS source IDs
-    static uint8_t const l_SysTick_Handler = (uint8_t)0;
-    static uint8_t const l_GPIO_EVEN_IRQHandler = (uint8_t)0;
+    // QSpy source IDs
+    static QP::QSpyId const l_SysTick_Handler = { 0U };
+    static QP::QSpyId const l_GPIO_EVEN_IRQHandler = { 0U };
+
     static USART_TypeDef * const l_USART0 = ((USART_TypeDef *)(0x40010000UL));
 
     enum AppRecords { // application-specific trace records

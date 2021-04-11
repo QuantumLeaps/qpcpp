@@ -1,6 +1,6 @@
 //****************************************************************************
 // Product: BSP for DPP-console example with Qt5
-// Last updated for version 6.9.1
+// Last updated for version 6.9.2
 // Last updated on  2020-09-21
 //
 //                    Q u a n t u m  L e a P s
@@ -56,8 +56,8 @@ static QTextStream l_stdOutStream(stdout, QIODevice::WriteOnly);
 
 //............................................................................
 void BSP_init(void) {
-    l_stdOutStream << "DPP-Qt console example" << endl
-                   << "QP " << QP::QF::getVersion() << endl;
+    l_stdOutStream << "DPP-Qt console example\n"
+                   << "QP " << QP::QF::getVersion() << '\n';
 
     BSP_randomSeed(1234U);
 
@@ -79,16 +79,16 @@ void BSP_terminate(int) {
 //............................................................................
 void BSP_displayPhilStat(uint8_t n, char const *stat) {
     //qDebug("philo[%d] is %s", n, stat);
-    l_stdOutStream << "philo[" << n << "] is " << stat << endl;
+    l_stdOutStream << "philo[" << n << "] is " << stat << '\n';
 }
 //............................................................................
 void BSP_displayPaused(uint8_t paused) {
     if (paused != 0U) {
-        l_stdOutStream << "PAUSED" << endl;
+        l_stdOutStream << "PAUSED\n";
         //qDebug("PAUSED");
     }
     else {
-        l_stdOutStream << "SERVING" << endl;
+        l_stdOutStream << "SERVING\n";
         //qDebug("SERVING");
     }
 }
@@ -138,21 +138,29 @@ bool QS::onStartup(void const *) {
     static uint8_t qsBuf[4*1024]; // 4K buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
-    QSPY_config(QP_VERSION,         // version
-                QS_OBJ_PTR_SIZE,    // objPtrSize
-                QS_FUN_PTR_SIZE,    // funPtrSize
-                QS_TIME_SIZE,       // tstampSize
-                Q_SIGNAL_SIZE,      // sigSize,
-                QF_EVENT_SIZ_SIZE,  // evtSize
-                QF_EQUEUE_CTR_SIZE, // queueCtrSize
-                QF_MPOOL_CTR_SIZE,  // poolCtrSize
-                QF_MPOOL_SIZ_SIZE,  // poolBlkSize
-                QF_TIMEEVT_CTR_SIZE,// tevtCtrSize
-                nullptr,          // matFile,
-                nullptr,
-                (QSPY_CustParseFun)0); // no customized parser function
+    // QS configuration options for this application...
+    QSpyConfig const config = {
+        QP_VERSION,          // version
+        0U,                  // endianness (little)
+        QS_OBJ_PTR_SIZE,     // objPtrSize
+        QS_FUN_PTR_SIZE,     // funPtrSize
+        QS_TIME_SIZE,        // tstampSize
+        Q_SIGNAL_SIZE,       // sigSize
+        QF_EVENT_SIZ_SIZE,   // evtSize
+        QF_EQUEUE_CTR_SIZE,  // queueCtrSize
+        QF_MPOOL_CTR_SIZE,   // poolCtrSize
+        QF_MPOOL_SIZ_SIZE,   // poolBlkSize
+        QF_TIMEEVT_CTR_SIZE, // tevtCtrSize
+        { 0U, 0U, 0U, 0U, 0U, 0U} // tstamp
+    };
 
-    l_time.start();                 // start the time stamp
+    QSPY_config(&config,
+                nullptr,     // no matFile,
+                nullptr,     // no seqFile
+                nullptr,     // no seqList
+                nullptr);    // no custom parser function
+
+    l_time.start();          // start the time stamp
 
     return true; // success
 }

@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to embOS kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1 / embOS v4.34.1
-/// Last updated on  2020-09-21
+/// Last updated for version 6.9.3 / embOS v4.34.1
+/// Last updated on  2021-04-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -55,8 +55,15 @@
 #define QF_CRIT_ENTRY(dummy) QF_INT_DISABLE()
 #define QF_CRIT_EXIT(dummy)  QF_INT_ENABLE()
 
-// thred options...
-#define QF_TASK_USES_FPU     1U
+namespace QP {
+
+// thread attributes...
+enum EmbOS_TaskAttrs {
+    TASK_NAME_ATTR,
+    TASK_USES_FPU
+};
+
+} // namespace QP
 
 #include "RTOS.h"      // embOS API
 #include "qep_port.hpp"  // QEP port

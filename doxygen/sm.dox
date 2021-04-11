@@ -4,7 +4,7 @@ namespace QP {
 
 @tableofcontents
 
-<p>This section describes how to implement <a class="extern" href="https://www.state-machine.com/doc/concepts#HSM">hierarchical state machines</a> with the QP/C++ real-time embedded framework, which is quite a mechanical process consisting of just a few simple rules. (In fact, the process of coding state machines in QP/C++ has been automated by the QM model-based design and code-generating tool.)
+<p>This section describes how to implement <a class="extern" href="https://www.state-machine.com/fsm/#HSM">hierarchical state machines</a> with the QP/C++ real-time embedded framework, which is quite a mechanical process consisting of just a few simple rules. (In fact, the process of coding state machines in QP/C++ has been automated by the QM model-based design and code-generating tool.)
 </p>
 
 To focus this discussion, this section uses the Calculator example, located in the directory <span class="img folder">qpcpp/examples/workstation/calc</span>. This example has been used in the <a class="extern" href="https://www.state-machine.com/psicc2">PSiCC2 book</a> (Section 4.6 "Summary of Steps for Implementing HSMs with QEP")
@@ -35,11 +35,11 @@ This section explains how to code the following (marked) elements of a hierarchi
 </ul>
 
 @attention
-This section describes the <b>"no me-> pointer"</b> state machine implementation introduced in QP/C++ 6.5.0, where the state-handlers are regular **member** functions of the state machine class. This means that the state-handlers have direct access to all other members of the state machine class via the implicit `this` pointer, without the need for the `me` pointer. This "no me-> pointer" state machine implementation is supported in the <a class="extern" target="_blank" href="https://www.state-machine.com/qm">QM modeling tool</a> starting from version <b>4.5.0</b>.
+This section describes the <b>"no me-> pointer"</b> state machine implementation introduced in QP/C++ 6.5.0, where the state-handlers are regular **member** functions of the state machine class. This means that the state-handlers have direct access to all other members of the state machine class via the implicit `this` pointer, without the need for the `me` pointer. This "no me-> pointer" state machine implementation is supported in the <a class="extern" target="_blank" href="https://www.state-machine.com/products/qm/">QM modeling tool</a> starting from version <b>4.5.0</b>.
 
 
 @note
-This section describes the @ref sm_qhsm_strategy "QHsm state machine implementation strategy", suitable for **manual coding** of hierarchical state machines in QP/C++. The alternative @ref sm_qmsm_strategy "QMsm state machine implementation strategy", which QP/C++ also supports, is not covered in this section, as the code needs to be generated automatically by the <a class="extern" target="_blank" href="https://www.state-machine.com/qm">QM modeling tool</a>.
+This section describes the @ref sm_qhsm_strategy "QHsm state machine implementation strategy", suitable for **manual coding** of hierarchical state machines in QP/C++. The alternative @ref sm_qmsm_strategy "QMsm state machine implementation strategy", which QP/C++ also supports, is not covered in this section, as the code needs to be generated automatically by the <a class="extern" target="_blank" href="https://www.state-machine.com/products/qm/">QM modeling tool</a>.
 
 
 @par <b>Historical Notes</b>

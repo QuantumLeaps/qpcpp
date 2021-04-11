@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, LAUCHXL2-TMS570LS12 board, cooperative QV kernel
-// Last updated for version 6.9.1
-// Last updated on  2020-09-22
+// Last updated for version 6.9.3
+// Last updated on  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -73,8 +73,8 @@ static uint32_t l_rnd; // random seed
 #ifdef Q_SPY
 
     // QS source IDs
-    static uint8_t const l_rtiCompare0 = (uint8_t)0;
-    static uint8_t const l_ssiTest = (uint8_t)0;
+    static QP::QSpyId const l_rtiCompare0 = { 0U };
+    static QP::QSpyId const l_ssiTest = { 0U };
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,

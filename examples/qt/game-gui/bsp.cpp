@@ -50,8 +50,9 @@ static uint8_t l_ship_pos = GAME_SHIP_Y;
         PLAYER_TRIGGER = QP::QS_USER
     };
 
-    static uint8_t const l_time_tick = 0U;
-    static uint8_t const l_bsp = 0U;
+    // QS source IDs
+    static QP::QSpyId const l_time_tick = { 0U };
+    static QP::QSpyId const l_bsp = { 0U };
 #endif
 
 //............................................................................

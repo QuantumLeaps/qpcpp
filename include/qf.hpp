@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.2
-/// Last updated on  2020-12-17
+/// Last updated for version 6.9.3
+/// Last updated on  2021-02-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -536,7 +536,8 @@ public:
 #else
     //! Publish event to the framework.
     static void publish_(QEvt const * const e,
-                         void const * const sender) noexcept;
+                         void const * const sender,
+                         std::uint_fast8_t const qs_id) noexcept;
 
     //! Processes all armed time events at every clock tick.
     static void tickX_(std::uint_fast8_t const tickRate,
@@ -835,7 +836,8 @@ public:
     /// unambiguously identify the publisher of the event.
     ///
     /// @sa QP::QF::publish_()
-    #define PUBLISH(e_, sender_)    publish_((e_), (sender_))
+    #define PUBLISH(e_, sender_) \
+        publish_((e_), (sender_), (sender_)->getPrio())
 
     //! Invoke the direct event posting facility QP::QActive::post_().
     /// @description

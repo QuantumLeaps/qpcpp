@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32F4-Discovery board, preemptive QK kernel
-// Last updated for version 6.9.2a
-// Last updated on  2021-01-31
+// Last updated for version 6.9.3
+// Last updated on  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -67,8 +67,8 @@ static uint32_t l_rnd; // random seed
     QP::QSTimeCtr QS_tickTime_;
     QP::QSTimeCtr QS_tickPeriod_;
 
-    // QS source IDs
-    static uint8_t const l_SysTick = (uint8_t)0;
+    // QSpy source IDs
+    static QP::QSpyId const l_SysTick = { 0U };
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,

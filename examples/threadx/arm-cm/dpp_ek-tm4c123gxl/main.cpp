@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example for ThreadX
-// Last updated for version 6.3.7
-// Last updated on  2018-12-17
+// Last updated for version 6.9.3
+// Last updated on  2021-04-08
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -77,11 +77,14 @@ void tx_application_define(void * /*first_unused_memory*/) {
 
     // start the active objects...
     for (uint8_t n = 0; n < N_PHILO; ++n) {
+        DPP::AO_Philo[n]->setAttr(QP::THREAD_NAME_ATTR, "Philo");
         DPP::AO_Philo[n]->start(
             static_cast<uint_fast8_t>(n + 1),
             l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
             l_philoStk[n], sizeof(l_philoStk[n]));
     }
+
+    DPP::AO_Table->setAttr(QP::THREAD_NAME_ATTR, "Table");
     DPP::AO_Table->start(
         static_cast<uint_fast8_t>(N_PHILO + 1),
         l_tableQueueSto, Q_DIM(l_tableQueueSto),

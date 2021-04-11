@@ -133,7 +133,7 @@ return true;</code>
     <!--${SMs::Calc::SM::initial}-->
     <initial target="../1">
      <action>BSP_clear();
-(void)e; // unused parameter</action>
+(void)par; // unused parameter</action>
      <initial_glyph conn="2,2,5,1,92,4,-2">
       <action box="1,-2,13,4"/>
      </initial_glyph>

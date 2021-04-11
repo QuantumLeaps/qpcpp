@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product:  Calculator Example
-// Last Updated for Version: 6.9.1
-// Date of the Last Update:  2020-09-22
+// Last Updated for Version: 6.9.3
+// Date of the Last Update:  2021-03-18
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -67,9 +67,9 @@ int main() {
         BSP_display(); // show the display
 
         cout << ": ";
-        cout.flush();
 
-        e.key_code = (uint8_t)QF_consoleWaitForKey();
+        e.key_code = static_cast<std::uint8_t>(QF_consoleWaitForKey());
+        cout << static_cast<char>(e.key_code) << ' ';
 
         switch (e.key_code) {
             case 'c': // intentionally fall through

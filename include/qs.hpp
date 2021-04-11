@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.2
-/// Last updated on  2021-01-14
+/// Last updated for version 6.9.3
+/// Last updated on  2021-02-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -240,6 +240,13 @@ enum QSpyIdGroups : std::int16_t {
     QS_AP_IDS  = 0x80 + QS_AP_ID, //!< Application-specific IDs
 };
 
+//! QS ID type for applying local filtering
+struct QSpyId {
+    std::uint8_t m_prio;
+    std::uint_fast8_t getPrio(void) const noexcept {
+        return static_cast<std::uint_fast8_t>(m_prio);
+    }
+};
 
 } // namespace QP ************************************************************
 

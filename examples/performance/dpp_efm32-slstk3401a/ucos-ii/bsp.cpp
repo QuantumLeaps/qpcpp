@@ -1,13 +1,13 @@
 ///***************************************************************************
 // Product: DPP example, EFM32-SLSTK3401A board, uC/OS-II kernel
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated for version 6.9.3
+// Last updated on  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -65,8 +65,9 @@ OS_EVENT *l_rndMutex;  // to protect the random number generator
     QP::QSTimeCtr QS_tickPeriod_;
 
     // QS source IDs
-    static uint8_t const l_SysTick_Handler = (uint8_t)0;
-    static uint8_t const l_GPIO_EVEN_IRQHandler = (uint8_t)0;
+    static QP::QSpyId const l_SysTick_Handler = { 0U };
+    static QP::QSpyId const l_GPIO_EVEN_IRQHandler = { 0U };
+
     static USART_TypeDef * const l_USART0 = ((USART_TypeDef *)(0x40010000UL));
 
     #define UART_BAUD_RATE      115200U

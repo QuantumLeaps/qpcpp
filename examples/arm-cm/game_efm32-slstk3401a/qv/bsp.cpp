@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: "Fly 'n' Shoot" game example, EFM32-SLSTK3401A board, QV kernel
-// Last updated for version 6.9.2a
-// Last updated on  2021-01-31
+// Last updated for version 6.9.3
+// Last updated on  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -73,8 +73,9 @@ static void paintBitsClear(uint8_t x, uint8_t y,
     QP::QSTimeCtr QS_tickPeriod_;
 
     // QS source IDs
-    static uint8_t const l_SysTick_Handler = (uint8_t)0;
-    static uint8_t const l_GPIO_EVEN_IRQHandler = (uint8_t)0;
+    static QP::QSpyId const l_SysTick_Handler = { 0U };
+    static QP::QSpyId const l_GPIO_EVEN_IRQHandler = { 0U };
+
     static USART_TypeDef * const l_USART0 = ((USART_TypeDef *)(0x40010000UL));
 
     enum AppRecords { // application-specific trace records

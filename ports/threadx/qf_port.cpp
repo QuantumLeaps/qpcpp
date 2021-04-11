@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to ThreadX, all supported compilers
 /// @cond
 ///**************************************************************************
-/// Last updated for version 6.9.2a
-/// Last updated on  2021-01-26
+/// Last updated for version 6.9.3
+/// Last updated on  2021-04-08
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -92,19 +92,10 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    CHAR tx_name[4]; // name passed to ThreadX queue and thread
-
-    // prepare the unique name of the form "Axx",
-    // where xx is a 2-digit QP priority of the Active Object
-    tx_name[0] = 'A';
-    tx_name[1] = '0' + (prio / 10U);
-    tx_name[2] = '0' + (prio % 10U);
-    tx_name[3] = '\0';
-
     // allege that the ThreadX queue is created successfully
     Q_ALLEGE_ID(210,
         tx_queue_create(&m_eQueue,
-            tx_name,
+            m_thread.tx_thread_name, // the same name as thread
             TX_1_ULONG,
             static_cast<VOID *>(qSto),
             static_cast<ULONG>(qLen * sizeof(ULONG)))
@@ -122,7 +113,7 @@ void QActive::start(std::uint_fast8_t const prio,
     Q_ALLEGE_ID(220,
         tx_thread_create(
             &m_thread, // ThreadX thread control block
-            tx_name,   // unique thread name
+            m_thread.tx_thread_name,   // unique thread name
             &thread_function, // thread function
             reinterpret_cast<ULONG>(this), // thread parameter
             stkSto,    // stack start
@@ -132,6 +123,20 @@ void QActive::start(std::uint_fast8_t const prio,
             TX_NO_TIME_SLICE,
             TX_AUTO_START)
         == TX_SUCCESS);
+}
+//............................................................................
+void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
+    // this function must be called before QACTIVE_START(),
+    // which implies that me->thread.tx_thread_name must not be used yet;
+    Q_REQUIRE_ID(300, m_thread.tx_thread_name == nullptr);
+    switch (attr1) {
+        case THREAD_NAME_ATTR:
+            // temporarily store the name, cast 'const' away
+            m_thread.tx_thread_name = static_cast<char_t *>(
+                                          const_cast<void *>(attr2));
+            break;
+        // ...
+    }
 }
 //............................................................................
 #ifndef Q_SPY

@@ -86,7 +86,7 @@ void Timer0A_IRQHandler(void) {
 void GPIOPortF_IRQHandler(void) {
     if ((GPIOF->RIS & BTN_SW1) != 0U) { // interrupt caused by SW1?
         static QP::QEvt const pressedEvt = { BTN_PRESSED_SIG, 0U, 0U};
-        QP::QF::PUBLISH(&pressedEvt, &l_SysTick_Handler);
+        QP::QF::PUBLISH(&pressedEvt,nullptr);
     }
     GPIOF->ICR = 0xFFU; // clear interrupt sources
     QV_ARM_ERRATUM_838869();

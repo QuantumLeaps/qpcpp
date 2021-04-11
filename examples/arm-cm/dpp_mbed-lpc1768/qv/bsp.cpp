@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, NXP mbed-LPC1768 board, coopearative QV kernel
-// Last updated for version 6.9.2a
-// Last updated on  2021-01-31
+// Last updated for version 6.9.3
+// Last updated on  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -60,9 +60,9 @@ static unsigned  l_rnd;  // random seed
     QP::QSTimeCtr QS_tickTime_;
     QP::QSTimeCtr QS_tickPeriod_;
 
-    // event-source identifiers used for tracing
-    static uint8_t const l_SysTick_Handler  = 0U;
-    static uint8_t const l_EINT0_IRQHandler = 0U;
+    // QSpy source IDs
+    static QP::QSpyId const l_SysTick_Handler  = { 0U };
+    static QP::QSpyId const l_EINT0_IRQHandler = { 0U };
 
     #define UART_BAUD_RATE      115200U
     #define UART_FR_TXFE        0x80U

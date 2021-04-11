@@ -57,17 +57,17 @@ Gui::Gui(QWidget *parent)
                     c_offColor);
 }
 //............................................................................
-void Gui::onBtnPressed() {                                             // slot
+void Gui::onBtnPressed() { // slot
     m_button->setIcon(QPixmap(":/res/EK-BTN_DWN.png"));
     static QP::QEvt const fireEvt(GAME::PLAYER_TRIGGER_SIG);
-    QP::QF::PUBLISH(&fireEvt, (void*)0);
+    QP::QF::PUBLISH(&fireEvt, nullptr);
 }
 //............................................................................
-void Gui::onBtnReleased() {                                            // slot
+void Gui::onBtnReleased() { // slot
     m_button->setIcon(QPixmap(":/res/EK-BTN_UP.png"));
 }
 //............................................................................
-void Gui::onQuit() {                                                   // slot
+void Gui::onQuit() { // slot
     BSP_terminate(0);
 }
 //............................................................................

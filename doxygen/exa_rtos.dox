@@ -165,7 +165,7 @@ Features:
 Start-Stop example for NUCLEO-H743ZI MCU (Cortex-M7) demonstrates staring and stopping active objects multiple times
 during the runtime, as opposed to starting AOs only at the beginning.
 
-The code for the example is generated automatically by the [QM Model-Based Design tool](https://www.state-machine.com/qm/) (QM version 4.5.0 or higher).
+The code for the example is generated automatically by the [QM Model-Based Design tool](https://www.state-machine.com/products/qm/) (QM version 4.5.0 or higher).
 
 The start-stop application consists of two AOs:
 

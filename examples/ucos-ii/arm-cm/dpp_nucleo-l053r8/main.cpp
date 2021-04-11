@@ -1,13 +1,13 @@
 //****************************************************************************
 // DPP example, uC/OS-II kernel
-// Last updated for version 6.8.1
-// Last updated on  2020-06-08
+// Last updated for version 6.9.3
+// Last updated on  2021-04-08
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -66,6 +66,7 @@ int main() {
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         // NOTE: provide uC/OS-II task attributes for the AO's task
         DPP::AO_Philo[n]->setAttr(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK, 0);
+        DPP::AO_Philo[n]->setAttr(QP::TASK_NAME_ATTR, "Philo");
         DPP::AO_Philo[n]->start(
             n + 1U,                  // QP priority
             philoQueueSto[n],        // storage for the AO's queue
@@ -76,6 +77,7 @@ int main() {
 
     // NOTE: provide uC/OS-II task attributes for the AO's task
     DPP::AO_Table->setAttr(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK, 0);
+    DPP::AO_Table->setAttr(QP::TASK_NAME_ATTR, "Table");
     DPP::AO_Table->start(
         N_PHILO + 1U,            // QP priority
         tableQueueSto,           // storage for the AO's queue

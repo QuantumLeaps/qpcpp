@@ -1,7 +1,7 @@
 //****************************************************************************
 // Product: DPP example (console)
-// Last Updated for Version: 6.3.6
-// Date of the Last Update:  2018-10-14
+// Last Updated for Version: 6.9.3
+// Date of the Last Update:  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -50,7 +50,9 @@ static uint32_t l_rnd; // random seed
     enum {
         PHILO_STAT = QP::QS_USER
     };
-    static uint8_t const l_clock_tick = 0U;
+
+    // QSpy source IDs
+    static QP::QSpyId const l_clock_tick = { 0U };
 #endif
 
 //............................................................................

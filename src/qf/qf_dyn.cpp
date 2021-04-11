@@ -2,14 +2,14 @@
 /// @brief QF/C++ dynamic event management
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
+/// Last updated for version 6.9.3
+/// Last updated on  2021-04-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -90,7 +90,7 @@ void QF::poolInit(void * const poolSto,
                       < static_cast<std::uint_fast8_t>(Q_DIM(QF_pool_)));
 
     // last initialized event size
-    std::uint_fast16_t const lastEvtSize = ((QF_maxPool_ ==0U)
+    std::uint_fast16_t const lastEvtSize = ((QF_maxPool_ == 0U)
                          ? 0U
                          : QF_EPOOL_EVENT_SIZE_(QF_pool_[QF_maxPool_ - 1U]));
 
@@ -178,7 +178,9 @@ QEvt *QF::newX_(std::uint_fast16_t const evtSize,
         QS_END_PRE_()
     }
     else {
-        // must tolerate bad alloc.
+        // This assertion means that the event allocation failed,
+        // and this failure cannot be tolerated. The most frequent
+        // reason is an event leak in the application.
         Q_ASSERT_ID(320, margin != QF_NO_MARGIN);
 
         QS_BEGIN_PRE_(QS_QF_NEW_ATTEMPT,

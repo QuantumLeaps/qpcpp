@@ -4,14 +4,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
+/// Last updated for version 6.9.3
+/// Last updated on  2021-02-26
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -118,7 +118,10 @@ void QF::psInit(QSubscrList * const subscrSto,
 #ifndef Q_SPY
 void QF::publish_(QEvt const * const e) noexcept {
 #else
-void QF::publish_(QEvt const * const e, void const * const sender) noexcept {
+void QF::publish_(QEvt const * const e,
+                  void const * const sender,
+                  std::uint_fast8_t const qs_id) noexcept
+{
 #endif
     /// @pre the published signal must be within the configured range
     Q_REQUIRE_ID(100, static_cast<enum_t>(e->sig) < QF_maxPubSignal_);
@@ -126,7 +129,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_PUBLISH, 0U)
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_PUBLISH, qs_id)
         QS_TIME_PRE_();                      // the timestamp
         QS_OBJ_PRE_(sender);                 // the sender object
         QS_SIG_PRE_(e->sig);                 // the signal of the event

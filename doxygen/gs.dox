@@ -3,7 +3,7 @@
 @section gs_obtain Downloading &amp; Installing QP/C++&trade;
 @tableofcontents
 
-<p>The most recommended way of obtaining QP/C++&trade; is by downloading the <a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><b>QP-bundle&trade;</b></a>, which includes QP/++C&trade; as well as other QP frameworks and also the <a class="extern" target="_blank" href="https://www.state-machine.com/qm/">QM&trade; modeling tool</a> and the <a class="extern" target="_blank" href="https://www.state-machine.com/products/">QTools&trade; collection</a>. The main advantage of obtaining QP/C++&trade; bundled together like that is that you get all components, tools and examples ready to go.
+<p>The most recommended way of obtaining QP/C++&trade; is by downloading the <a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><b>QP-bundle&trade;</b></a>, which includes QP/++C&trade; as well as other QP frameworks and also the <a class="extern" target="_blank" href="https://www.state-machine.com/products/qm/">QM&trade; modeling tool</a> and the <a class="extern" target="_blank" href="https://www.state-machine.com/products/">QTools&trade; collection</a>. The main advantage of obtaining QP/C++&trade; bundled together like that is that you get all components, tools and examples ready to go.
 
 @note
 <a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><strong>QP-bundle&trade;</strong></a> is the **most recommended** way of downloading and installing QP/C++&trade;. However, if you are allergic to installers and GUIs or don't have administrator privileges you can also **download and install QP/C&trade; separately** as described in the Application Note: "Getting Started with QP/C++" below.

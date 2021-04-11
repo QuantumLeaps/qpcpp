@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to uC/OS-II RTOS, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.2a
-/// Last updated on  2021-01-26
+/// Last updated for version 6.9.3
+/// Last updated on  2021-04-08
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -82,6 +82,9 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
+    // task name to be passed to OSTaskCreateExt()
+    void *task_name = static_cast<void *>(m_eQueue);
+
     // create uC/OS-II queue and make sure it was created correctly
     m_eQueue = OSQCreate((void **)qSto, qLen);
     Q_ASSERT_ID(210, m_eQueue != nullptr);
@@ -94,14 +97,6 @@ void QActive::start(std::uint_fast8_t const prio,
 
     // map from QP to uC/OS-II priority
     INT8U p_ucos = static_cast<INT8U>(QF_MAX_ACTIVE - m_prio);
-
-    // prepare the unique task name of the form "Axx",
-    // where xx is a 2-digit QP priority of the task
-    char task_name[4];
-    task_name[0] = 'A';
-    task_name[1] = '0' + (prio / 10U);
-    task_name[2] = '0' + (prio % 10U);
-    task_name[3] = '\0'; // zero-terminate
 
     // create AO's task...
     //
@@ -130,8 +125,21 @@ void QActive::start(std::uint_fast8_t const prio,
 }
 //............................................................................
 // NOTE: This function must be called BEFORE starting an active object
-void QActive::setAttr(std::uint32_t attr1, void const * /*attr2*/) {
-    m_thread = attr1; // use as temporary
+void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
+    switch (attr1) {
+        case TASK_NAME_ATTR:
+           // this function must be called before QACTIVE_START(),
+           // which implies that me->eQueue must not be used yet;
+           Q_ASSERT_ID(300, m_eQueue == nullptr);
+           // temporarily store the name, cast 'const' away
+           m_eQueue = static_cast<OS_EVENT *>(
+                           const_cast<void *>(attr2));
+            break;
+        // ...
+        default:
+            m_thread = attr1;
+            break;
+    }
 }
 
 // thread for active objects -------------------------------------------------

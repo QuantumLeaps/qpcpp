@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, NUCLEO-H743ZI board, dual-mode QXK kernel
-// Last Updated for Version: 6.9.2a
-// Date of the Last Update:  2021-01-31
+// Last Updated for Version: 6.9.3
+// Date of the Last Update:  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -53,9 +53,10 @@ static uint32_t l_rnd; // random seed
     QP::QSTimeCtr QS_tickTime_;
     QP::QSTimeCtr QS_tickPeriod_;
 
-    // QS source IDs
-    static uint8_t const l_SysTick_Handler = (uint8_t)0;
-    static uint8_t const l_EXTI0_IRQHandler = (uint8_t)0;
+    // QSpy source IDs
+    static QP::QSpyId const l_SysTick_Handler = { 0U };
+    static QP::QSpyId const l_EXTI0_IRQHandler = { 0U };
+
     static UART_HandleTypeDef l_uartHandle;
 
     enum AppRecords { // application-specific trace records

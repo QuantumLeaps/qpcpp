@@ -2,14 +2,14 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-21
+/// Last updated for version 6.9.3
+/// Last updated on  2021-04-08
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -59,6 +59,14 @@
 #else
     #error Unsupported uC/OS-II critical section type
 #endif // OS_CRITICAL_METHOD
+
+namespace QP {
+
+enum UCOS2_TaskAttrs {
+    TASK_NAME_ATTR
+};
+
+} // namespace QP
 
 #include "qep_port.hpp"  // QEP port, includes the master uC/OS-II include
 #include "qequeue.hpp"   // used for event deferral

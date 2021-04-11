@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to embOS RTOS kernel, all supported compilers
 /// @cond
 ////**************************************************************************
-/// Last updated for version 6.9.2a
-/// Last updated on  2021-01-26
+/// Last updated for version 6.9.3
+/// Last updated on  2021-04-09
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -104,7 +104,7 @@ static void thread_function(void *pVoid) { // embOS signature
 
 #ifdef __TARGET_FPU_VFP
     // does the task use the FPU? see NOTE1
-    if ((act->getOsObject() & QF_TASK_USES_FPU) != 0U) {
+    if ((act->getOsObject() & TASK_USES_FPU) != 0U) {
         OS_ExtendTaskContext_VFP();
     }
 #endif  // __TARGET_FPU_VFP
@@ -130,17 +130,13 @@ void QActive::start(std::uint_fast8_t const prio,
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
-    // prepare the unique task name of the form "Axx",
-    // where xx is a 2-digit QP priority of the task
-    char task_name[4];
-    task_name[0] = 'A';
-    task_name[1] = '0' + (prio / 10U);
-    task_name[2] = '0' + (prio % 10U);
-    task_name[3] = '\0'; // zero-terminate
-
     // create an embOS task for the AO
     OS_CreateTaskEx(&m_thread,
-        task_name, // unique name of the task
+#if (OS_TRACKNAME != 0)
+                    m_thread.Name, // the configured task name
+#elif
+                    "AO",          // a generic AO task name
+#endif
         static_cast<OS_PRIO>(prio), // embOS uses same numbering as QP
         &thread_function,
         static_cast<void OS_STACKPTR *>(stkSto),
@@ -149,8 +145,21 @@ void QActive::start(std::uint_fast8_t const prio,
         this);
 }
 //............................................................................
-void QActive::setAttr(std::uint32_t attr1, void const * /*attr2*/) {
-    m_osObject = attr1;
+void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
+    switch (attr1) {
+        case TASK_NAME_ATTR:
+#if (OS_TRACKNAME != 0)
+            Q_ASSERT_ID(300, m_thread.Name == nullptr);
+            m_thread.Name = static_cast<char_t const *>(attr2);
+#endif
+            break;
+        case TASK_USES_FPU:
+            m_osObject = attr1;
+            break;
+        /* ... */
+        default:
+            break;
+    }
 }
 //............................................................................
 #ifndef Q_SPY

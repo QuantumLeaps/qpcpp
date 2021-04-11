@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, EK-TM4C123GXL board, uC/OS-II kernel
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated for version 6.9.3
+// Last updated on  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -62,9 +62,9 @@ OS_EVENT *l_rndMutex;  // to protect the random number generator
     QP::QSTimeCtr QS_tickTime_;
     QP::QSTimeCtr QS_tickPeriod_;
 
-    // source IDs for QS for non-QP event producers
-    static uint8_t const l_tickHook = 0U;
-    static uint8_t const l_GPIOPortA_IRQHandler = 0U;
+    // QSpy source IDs
+    static QP::QSpyId const l_tickHook = { 0U };
+    static QP::QSpyId const l_GPIOPortA_IRQHandler = { 0U };
 
     #define UART_BAUD_RATE      115200U
     #define UART_FR_TXFE        0x80U

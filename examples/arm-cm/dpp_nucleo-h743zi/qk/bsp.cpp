@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, NUCLEO-H743ZI board, premptive QK kernel
-// Last updated for version 6.9.2a
-// Last updated on  2021-01-31
+// Last updated for version 6.9.3
+// Last updated on  2021-03-03
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -54,8 +54,9 @@ static uint32_t l_rnd; // random seed
     QP::QSTimeCtr QS_tickPeriod_;
 
     // QS source IDs
-    static uint8_t const l_SysTick_Handler = (uint8_t)0;
-    static uint8_t const l_EXTI0_IRQHandler = (uint8_t)0;
+    static QP::QSpyId const l_SysTick_Handler = { 0U };
+    static QP::QSpyId const l_EXTI0_IRQHandler = { 0U };
+
     static UART_HandleTypeDef l_uartHandle;
 
     enum AppRecords { // application-specific trace records
