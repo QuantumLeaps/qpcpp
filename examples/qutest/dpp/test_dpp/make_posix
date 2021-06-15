@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QUTEST; QP/C++ on POSIX *Target*
-# Last updated for version 6.8.2
-# Last updated on  2020-06-23
+# Last updated for version 6.8.3
+# Last updated on  2021-04-16
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -136,6 +136,15 @@ CPP   := g++
 LINK  := g++   # for C++ programs
 
 #-----------------------------------------------------------------------------
+# QUTest test script utilities (requires QTOOLS):
+#
+ifeq ("$(wildcard $(QUTEST))","")
+QUTEST := python3 $(QTOOLS)/qutest/qutest.py
+endif
+
+TESTS  := *.py
+
+#-----------------------------------------------------------------------------
 # basic utilities:
 
 MKDIR  := mkdir -p
@@ -144,7 +153,7 @@ RM     := rm -f
 #-----------------------------------------------------------------------------
 # build options...
 
-BIN_DIR := build_$(TARGET
+BIN_DIR := build_posix
 
 CFLAGS = -c -g -O -Wall -Wstrict-prototypes -W $(INCLUDES) $(DEFINES) \
 	-DQ_SPY -DQ_UTEST -DQ_HOST
@@ -218,6 +227,8 @@ ifneq ($(MAKECMDGOALS),clean)
   endif
 endif
 
+test :
+	$(QUTEST) $(TESTS) $(TARGET_EXE) $(HOST)
 clean :
 	-$(RM) $(BIN_DIR)/*.o \
 	$(BIN_DIR)/*.d \

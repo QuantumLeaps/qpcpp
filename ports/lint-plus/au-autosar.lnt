@@ -1227,7 +1227,7 @@
 
 /* Rule M6-4-5 (required, implementation, automated) */
 
-    /* 9090 - switch case lacks unconditional break or throw */
+    /* 9090 - switch case lacks unconditional break or throw */  
     +e9090
     +elib(9090)
     -append(9090,[AUTOSAR Rule M6-4-5])

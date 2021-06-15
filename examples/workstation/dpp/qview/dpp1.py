@@ -5,17 +5,14 @@
 # A second click on the button, "un-pauses" the DPP ("forks" are served
 # to all hungry Philosophers).
 #
-# This version of the DPP customization uses the standard QS_QEP_STATE_ENTRY
-# packet, which provides information about the current states of the dining
-# Philosophers. The example also demonstrates how to intercept the QS
-# "dictionary" records QS_OBJ_DICT and QS_FUN_DICT to extract the information
-# about the addresses of the Philosopher objects and the states of their
-# state machines.
+# This version of the DPP customization uses the predefined QS_QEP_TRAN
+# trace record, which provides information about the state transitions of
+# the Dining Philosophers. The example also demonstrates how to intercept
+# the QS "dictionary" records QS_OBJ_DICT and QS_FUN_DICT to extract the
+# information about the addresses of the Philosopher objects and the states
+# of their state machines.
 #
-# This version of the DPP customization uses the application-specific
-# packet QS_USER_00 (PHILO_STAT) produced when the status of a Philo changes.
-#
-# NOTE: this is a desktop appliction, which you cannot reset (and restart).
+# NOTE: this is a desktop appliction, which you cannot reset (and restarted).
 # Therefore, the desktop applications must be started *after* the QView is
 # already running and is attached to the QSPY host application.
 
@@ -63,6 +60,7 @@ class DPP:
         # *after* the QView is already running.
         #reset_target()
 
+
     # on_reset() callback invoked when Target-reset packet is received
     # NOTE: the QS dictionaries are not known at this time yet, so
     # this callback shouild generally not set filters or current objects
@@ -77,8 +75,8 @@ class DPP:
     def on_run(self):
         glb_filter("QS_QEP_TRAN")
 
-        # NOTE: the name of object for current_obj() must match the
-        # QS Object Dictionaries produced by the application.
+        # NOTE: the names of objects for current_obj() must match
+        # the QS Object Dictionaries produced by the application.
         current_obj(OBJ_AO, "Table::inst")
 
         # turn lists into tuples for better performance
@@ -101,9 +99,9 @@ class DPP:
             post("PAUSE_SIG")
             QView.print_text("Table PAUSED")
 
-    # intercept the QS_OBJ_DICT stadard packet
-    # this packet has the following structure:
-    # record-ID, seq-num, Object-ptr, Zero-terminated string
+    # Intercept the QS_OBJ_DICT predefined trace record.
+    # This record has the following structure:
+    # Seq-Num, Record-ID, Object-ptr, Zero-terminated string
     def QS_OBJ_DICT(self, packet):
         data = qunpack("xxOZ", packet)
         try:
@@ -118,9 +116,9 @@ class DPP:
         except:
             pass # dictionary for a different object
 
-    # intercept the QS_FUN_DICT stadard packet
-    # this packet has the following structure:
-    # record-ID, seq-num, Function-ptr, Zero-terminated string
+    # Intercept the QS_FUN_DICT predefined trace record.
+    # This record has the following structure:
+    # Seq-Num, Record-ID, Function-ptr, Zero-terminated string
     def QS_FUN_DICT(self, packet):
         data = qunpack("xxFZ", packet)
         try:
@@ -133,9 +131,9 @@ class DPP:
         except:
             pass # dictionary for a different state
 
-    # intercept the QS_QEP_TRAN stadard packet
-    # this packet has the following structure:
-    # record-ID, seq-num, Timestamp, Signal, Object-ptr,
+    # Intercept the QS_QEP_TRAN predefined trace record.
+    # This record has the following structure (see qep_hsm.c):
+    # Seq-Num, Record-ID, Timestamp, Signal, Object-ptr,
     #     Function-ptr (source state), Function-ptr (new active state)
     def QS_QEP_TRAN(self, packet):
         data = qunpack("xxTSOFF", packet)

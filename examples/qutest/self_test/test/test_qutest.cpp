@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.2a
-/// Last updated on  2021-01-28
+/// Last updated for version 6.9.3
+/// Last updated on  2021-05-31
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -50,6 +50,7 @@ enum {
     FIXTURE_SETUP = QS_USER,
     FIXTURE_TEARDOWN,
     COMMAND_A,
+    COMMAND_B,
     COMMAND_X,
     COMMAND_Y,
     COMMAND_Z,
@@ -74,6 +75,7 @@ int main(int argc, char *argv[]) {
     QS_USR_DICTIONARY(FIXTURE_SETUP);
     QS_USR_DICTIONARY(FIXTURE_TEARDOWN);
     QS_USR_DICTIONARY(COMMAND_A);
+    QS_USR_DICTIONARY(COMMAND_B);
     QS_USR_DICTIONARY(COMMAND_X);
     QS_USR_DICTIONARY(COMMAND_Y);
     QS_USR_DICTIONARY(COMMAND_Z);
@@ -107,6 +109,17 @@ void QS::onCommand(std::uint8_t cmdId,
             Q_ASSERT_ID(100, param1 != 0U);
             QS_BEGIN_ID(COMMAND_A, 0U) // app-specific record
                 QS_U32(0, param1);
+            QS_END()
+            break;
+        }
+        case COMMAND_B: {
+            QS_BEGIN_ID(COMMAND_B, 0U) // app-specific record
+                QS_U8(0, param1);
+                QS_STR("BAR");
+                QS_U16(0, param2);
+                QS_STR("FOO");
+                QS_U32(0, param3);
+                QS_F64(param1, -6.02214076E23);
             QS_END()
             break;
         }
