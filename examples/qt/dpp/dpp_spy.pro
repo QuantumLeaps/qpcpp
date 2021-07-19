@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: DPP console exampe for Qt (console)
-# Last updated for version 6.9.2
-# Last updated on  2021-02-24
+# Last updated for version 6.9.4
+# Last updated on  2021-07-19
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -110,12 +110,12 @@ CONFIG(debug, debug|release) {
     DEFINES += Q_SPY
 
     # QS software tracing sources
-#    SOURCES += \
-#        $$QPCPP/src/qs/qs.cpp \
-#        $$QPCPP/src/qs/qs_fp.cpp \
-#        $$QPCPP/src/qs/qs_64bit.cpp
+    SOURCES += \
+        $$QPCPP/src/qs/qs.cpp \
+        $$QPCPP/src/qs/qs_fp.cpp \
+        $$QPCPP/src/qs/qs_64bit.cpp
 
-#    HEADERS += $$QPCPP/ports/qt/qs_port.hpp
+    HEADERS += $$QPCPP/ports/qt/qs_port.hpp
 
     # NOTE:
     # The "qspy.c" component is needed only when you perform the formatted

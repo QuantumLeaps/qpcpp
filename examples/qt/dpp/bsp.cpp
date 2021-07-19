@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: BSP for DPP-console example with Qt5
-// Last updated for version 6.9.2
-// Last updated on  2020-09-21
+// Last updated for version 6.9.4
+// Last updated on  2021-07-19
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -183,6 +183,10 @@ QSTimeCtr QS::onGetTime(void) {
 }
 
 //............................................................................
+void QS::onReset(void) {
+    //TBD
+}
+//............................................................................
 void QS_onEvent(void) {
     uint16_t nBytes = 1024;
     uint8_t const *block;
@@ -195,6 +199,16 @@ void QS_onEvent(void) {
         QF_CRIT_EXIT(dummy);
     }
 }
+//............................................................................
+void QS::onCommand(uint8_t cmdId, uint32_t param1,
+                   uint32_t param2, uint32_t param3)
+{
+    (void)cmdId;
+    (void)param1;
+    (void)param2;
+    (void)param3;
+}
+
 //............................................................................
 extern "C" void QSPY_onPrintLn(void) {
     qDebug(QSPY_line);

@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.3
-/// Last updated on  2021-02-26
+/// Last updated for version 6.9.4
+/// Last updated on  2021-07-19
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -182,6 +182,7 @@ namespace QP {
         std::uint8_t volatile refCtr_; //!< reference counter
 
         friend class QF;
+        friend class QS;
         friend class QActive;
         friend class QMActive;
         friend class QTimeEvt;
