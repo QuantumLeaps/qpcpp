@@ -1,7 +1,7 @@
 ///***************************************************************************
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QXK kernel
-// Last updated for version 6.9.3
-// Last updated on  2021-03-03
+// Last updated for version 6.9.4
+// Last updated on  2021-08-04
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -59,7 +59,7 @@ static unsigned  l_rnd; // random seed
 
     // QSpy source IDs
     static QP::QSpyId const l_SysTick_Handler = { 0U };
-    static QP::QSpyId const l_EXTI0_IRQHandler = { 0U };
+    static QP::QSpyId const l_EXTI0_1_IRQHandler = { 0U };
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,

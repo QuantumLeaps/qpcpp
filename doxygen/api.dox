@@ -64,11 +64,11 @@ QF is a portable, event-driven, real-time framework for execution of active obje
 
 @subsection api_qf_time Time Events
 - QTimeEvt class
-- QTimeEvt::QTimeEvt(QActive * const, enum_t const, uint_fast8_t const)
+- QTimeEvt::QTimeEvt()
 - QTimeEvt::armX()
 - QTimeEvt::disarm()
 - QTimeEvt::rearm()
-- QTimeEvt::ctr()
+- QTimeEvt::currCtr()
 - QTicker active object
 - %QF:: TICK()
 - %QF:: TICK_X()
