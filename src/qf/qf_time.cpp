@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
+/// Last updated for version 6.9.4
+/// Last updated on  2021-09-03
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -205,6 +205,10 @@ void QF::tickX_(std::uint_fast8_t const tickRate) noexcept
 ///
 bool QF::noTimeEvtsActiveX(std::uint_fast8_t const tickRate) noexcept {
     bool inactive;
+
+    /// @pre the tick rate must be in range
+    Q_REQUIRE_ID(200, tickRate < QF_MAX_TICK_RATE);
+
     if (timeEvtHead_[tickRate].m_next != nullptr) {
         inactive = false;
     }

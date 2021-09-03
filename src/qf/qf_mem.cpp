@@ -2,14 +2,14 @@
 /// @brief QF/C++ memory management services
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
+/// Last updated for version 6.9.4
+/// Last updated on  2021-09-03
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -107,7 +107,7 @@ void QMPool::init(void * const poolSto, std::uint_fast32_t poolSize,
     /// the poolSize must fit at least one free block and
     /// the blockSize must not be too close to the top of the dynamic range
     Q_REQUIRE_ID(100, (poolSto != nullptr)
-        && (poolSize >= sizeof(QFreeBlock))
+        && (poolSize >= static_cast<std::uint_fast32_t>(sizeof(QFreeBlock)))
         && (static_cast<std::uint_fast16_t>(blockSize + sizeof(QFreeBlock))
             > blockSize));
 
