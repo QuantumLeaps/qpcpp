@@ -4,7 +4,7 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.9.4
-/// Last updated on  2021-09-03
+/// Last updated on  2021-09-16
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -305,20 +305,21 @@ QTimeEvt::QTimeEvt() noexcept
 /// a specified interval. If the interval is zero, the time event is armed
 /// for one shot ('one-shot' time event). The time event gets directly posted
 /// (using the FIFO policy) into the event queue of the host active object.
+/// After posting, a one-shot time event gets automatically disarmed
+/// while a periodic time event (interval != 0) is automatically re-armed.
+///
+/// A time event can be disarmed at any time by calling
+/// QP::QTimeEvt::disarm(). Also, a time event can be re-armed to fire in a
+/// different number of clock ticks by calling the QP::QTimeEvt::rearm().
 ///
 /// @param[in] nTicks   number of clock ticks (at the associated rate)
 ///                     to rearm the time event with.
 /// @param[in] interval interval (in clock ticks) for periodic time event.
 ///
-/// @note
-/// After posting, a one-shot time event gets automatically disarmed
-/// while a periodic time event (interval != 0) is automatically re-armed.
-///
-/// @note
-/// A time event can be disarmed at any time by calling
-/// QP::QTimeEvt::disarm(). Also, a time event can be re-armed to fire in a
-/// different number of clock ticks by calling the QP::QTimeEvt::rearm()
-/// function.
+/// @attention
+/// Arming an already armed time event is __not__ allowed and is considered
+/// a programming error. The QP/C++ framework will assert if it detects an
+/// attempt to arm an already armed time event.
 ///
 /// @usage
 /// The following example shows how to arm a one-shot time event from a state

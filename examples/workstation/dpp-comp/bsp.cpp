@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example (console)
-// Last Updated for Version: 6.9.3
-// Date of the Last Update:  2021-03-03
+// Last Updated for Version: 6.9.4
+// Date of the Last Update:  2021-11-05
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -85,7 +85,7 @@ void BSP::terminate(int16_t result) {
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
     PRINTF_S("Philosopher %2d is %s\n", (int)n, stat);
 
-    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Table->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()

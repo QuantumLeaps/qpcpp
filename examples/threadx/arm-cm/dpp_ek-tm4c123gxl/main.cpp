@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: DPP example for ThreadX
-// Last updated for version 6.9.3
-// Last updated on  2021-04-08
+// Last updated for version 6.9.4
+// Last updated on  2021-12-05
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -51,12 +51,13 @@ static ULONG l_tableStk[256];          // stack for the Table
 
 //............................................................................
 int main() {
-    DPP::BSP::init();   // initialize the Board Support Package
     tx_kernel_enter();  // transfet control to the ThreadX RTOS
     return 0; // tx_kernel_enter() does not return
 }
 //............................................................................
 void tx_application_define(void * /*first_unused_memory*/) {
+    DPP::BSP::init();   // initialize the Board Support Package
+
     // initialize the framework and the underlying RT kernel...
     QP::QF::init();
 
@@ -68,12 +69,12 @@ void tx_application_define(void * /*first_unused_memory*/) {
                      sizeof(l_smlPoolSto[0]));
 
     QS_OBJ_DICTIONARY(l_smlPoolSto);
-    QS_OBJ_DICTIONARY(l_tableQueueSto);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[0]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[1]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[2]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[3]);
-    QS_OBJ_DICTIONARY(l_philoQueueSto[4]);
+    QS_OBJ_DICTIONARY(DPP::AO_Table);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[0]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[1]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[2]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
+    QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
 
     // start the active objects...
     for (uint8_t n = 0; n < N_PHILO; ++n) {

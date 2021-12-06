@@ -3,8 +3,8 @@
 /// @ingroup qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.3
-/// Last updated on  2021-02-26
+/// Last updated for version 6.9.4
+/// Last updated on  2021-10-07
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -295,7 +295,7 @@ using QSCtr = std::uint_fast16_t;
 //! QP::QS::getByte() function.
 constexpr std::uint16_t QS_EOD  = 0xFFFFU;
 
-//! QS logging facilities
+//! QS software tracing facilities
 /// @description
 /// This class groups together QS services. It has only static members and
 /// should not be instantiated.

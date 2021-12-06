@@ -1,13 +1,13 @@
 //****************************************************************************
 // Product: DPP example, STM32F4-Discovery board, ThreadX kernel
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated for version 6.9.4
+// Last updated on  2021-12-05
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -67,13 +67,27 @@ static unsigned l_rnd; // random seed
     QP::QSTimeCtr QS_tickPeriod_;
 
     enum AppRecords { // application-specific trace records
-        PHILO_STAT = QP::QS_USER
+        PHILO_STAT = QP::QS_USER,
+        COMMAND_STAT
     };
+
+    // QSpy source IDs
+    static QP::QSpyId const l_clock_tick = { QP::QS_AP_ID };
 #endif
 
 extern "C" {
 
 // ISRs used in this project =================================================
+#ifdef Q_SPY
+//
+// ISR for receiving bytes from the QSPY Back-End
+// NOTE: This ISR is "QF-unaware" meaning that it does not interact with
+// the QF/QK and is not disabled. Such ISRs don't need to call QK_ISR_ENTRY/
+// QK_ISR_EXIT and they cannot post or publish events.
+//
+//TBD...
+
+#endif
 
 } // extern "C"
 
@@ -133,6 +147,7 @@ void BSP::init(void) {
         Q_ERROR();
     }
     QS_USR_DICTIONARY(PHILO_STAT);
+    QS_USR_DICTIONARY(COMMAND_STAT);
 
     // setup the QS filters...
     QS_GLB_FILTER(QP::QS_ALL_RECORDS);
@@ -200,13 +215,19 @@ namespace QP {
 static TX_TIMER l_tick_timer; // ThreadX timer to call QF::tickX_()
 
 #ifdef Q_SPY
-    // ThreadX thread and thread function for QS output, see NOTE1
-    static TX_THREAD l_qs_output_thread;
-    static void qs_thread_function(ULONG thread_input);
-    static ULONG qs_thread_stkSto[64];
+    // ThreadX "idle" thread for QS output, see NOTE1
+    static TX_THREAD idle_thread;
+    static void idle_thread_fun(ULONG thread_input);
+    static ULONG idle_thread_stack[64];
 #endif
 
 // QF callbacks ==============================================================
+extern "C" {
+static VOID timer_expiration(ULONG id) {
+    QP::QF::TICK_X(id, &DPP::l_clock_tick); // QF clock tick processing
+}
+} // extern "C"
+//............................................................................
 void QF::onStartup(void) {
     //
     // NOTE:
@@ -220,8 +241,8 @@ void QF::onStartup(void) {
     // or from active object(s).
     //
     Q_ALLEGE(tx_timer_create(&l_tick_timer, // ThreadX timer object
-        const_cast<CHAR *>("QF_TICK"),    // name of the timer
-        (VOID (*)(ULONG))&QP::QF::tickX_, // expiration fun
+        const_cast<CHAR *>("QF_TICK"), // name of the timer
+        &timer_expiration, // expiration function
         0U,       // expiration function input (tick rate)
         1U,       // initial ticks
         1U,       // reschedule ticks
@@ -229,14 +250,16 @@ void QF::onStartup(void) {
              == TX_SUCCESS);
 
 #ifdef Q_SPY
-    // start a ThreadX timer to perform QS output. See NOTE1...
-    Q_ALLEGE(tx_thread_create(&l_qs_output_thread, // thread control block
-        const_cast<CHAR *>("QS_TX"), // thread name
-        &qs_thread_function,    // thread function
+    //TBD: enable the UART ISR for receiving bytes...
+
+    // start a ThreadX "idle" thread. See NOTE1...
+    Q_ALLEGE(tx_thread_create(&idle_thread, // thread control block
+        const_cast<CHAR *>("idle"), // thread name
+        &idle_thread_fun,       // thread function
         0LU,                    // thread input (unsued)
-        qs_thread_stkSto,       // stack start
-        sizeof(qs_thread_stkSto), // stack size in bytes
-        TX_MAX_PRIORITIES - 1U, // ThreadX priority (lowest possible)
+        idle_thread_stack,       // stack start
+        sizeof(idle_thread_stack), // stack size in bytes
+        TX_MAX_PRIORITIES - 1U, // ThreadX priority (LOWEST possible), NOTE1
         TX_MAX_PRIORITIES - 1U, // preemption threshold disabled
         TX_NO_TIME_SLICE,
         TX_AUTO_START)
@@ -262,10 +285,13 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 #ifdef Q_SPY
 
 //............................................................................
-static void qs_thread_function(ULONG /*thread_input*/) { // see NOTE1
+static void idle_thread_fun(ULONG /*thread_input*/) { // see NOTE1
     for (;;) {
+        // also perform QS RX/TX
+        QP::QS::rxParse();  // parse all the received bytes
+
         // turn the LED6 on an off to visualize the QS activity
-        LED_GPIO_PORT->BSRRL = LED6_PIN; // turn LED on
+        LED_GPIO_PORT->BSRRL = LED6_PIN; /* turn LED on  */
         __NOP(); // wait a little to actually see the LED glow
         __NOP();
         __NOP();
@@ -280,14 +306,14 @@ static void qs_thread_function(ULONG /*thread_input*/) { // see NOTE1
             b = QP::QS::getByte();
             QF_CRIT_EXIT(intStat);
 
-            if (b != QP::QS_EOD) {  // not End-Of-Data?
+            if (b != QS_EOD) {  // not End-Of-Data?
                 USART2->DR  = (b & 0xFFU);  // put into the DR register
             }
         }
-        // no blocking in this thread; see NOTE1
+
+        // no blocking in this "idle" thread; see NOTE1
     }
 }
-
 //............................................................................
 bool QS::onStartup(void const *arg) {
     static uint8_t qsBuf[2*1024]; // buffer for Quantum Spy
@@ -324,6 +350,9 @@ bool QS::onStartup(void const *arg) {
     USART_Init(USART2, &USART_struct);
 
     USART_Cmd(USART2, ENABLE); // enable USART2
+
+    // configure UART interrupts (for the RX channel)
+    //TBD...
 
     DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
     DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
@@ -364,7 +393,7 @@ void QS::onReset(void) {
     //TBD
 }
 //............................................................................
-//! callback function to execute a uesr command (to be implemented in BSP)
+//! callback function to execute a user command (to be implemented in BSP)
 void QS::onCommand(uint8_t cmdId, uint32_t param1,
                    uint32_t param2, uint32_t param3)
 {
@@ -372,23 +401,29 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param1;
     (void)param2;
     (void)param3;
-    //TBD
+
+    QS_BEGIN_ID(DPP::COMMAND_STAT, 0U) // app-specific record
+        QS_U8(2, cmdId);
+        QS_U32(8, param1);
+        QS_U32(8, param2);
+        QS_U32(8, param3);
+    QS_END()
+
 }
 
 #endif // Q_SPY
-
 //----------------------------------------------------------------------------
 
 } // namespace QP
 
 //****************************************************************************
 // NOTE1:
-// This application uses the ThreadX thread of the lowest priority to perform
+// ThreadX apparently does not have a concpet of an "idle" thread, but
+// it can be emulated by a regular, but NON-BLOCKING ThreadX thread of
+// the lowest priority.
+//
+// In the Q_SPY configuration, this "idle" thread is uded to perform
 // the QS data output to the host. This is not the only choice available, and
 // other applications might choose to peform the QS output some other way.
-//
-// The lowest-priority thread does not block, so in effect, it becomes the
-// idle loop. This presents no problems to ThreadX - its idle task in the
-// scheduler does not need to run.
 //
 

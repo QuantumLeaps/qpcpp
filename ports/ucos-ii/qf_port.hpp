@@ -2,8 +2,8 @@
 /// @brief QF/C++ port to uC/OS-II (V2.92) kernel, all supported compilers
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.3
-/// Last updated on  2021-04-08
+/// Last updated for version 6.9.4
+/// Last updated on  2021-12-05
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -102,32 +102,14 @@ enum UCOS2_TaskAttrs {
         } \
     } while (false)
 
-    // uC/OS-II event pool operations...
-    #define QF_EPOOL_TYPE_ OS_MEM*
-    #define QF_EPOOL_INIT_(pool_, poolSto_, poolSize_, evtSize_) do {       \
-        INT8U err;                                                          \
-        (pool_) = OSMemCreate((poolSto_), (INT32U)((poolSize_)/(evtSize_)), \
-                              (INT32U)(evtSize_), &err);                    \
-        Q_ASSERT_ID(105, err == OS_ERR_NONE);                               \
-    } while (false)
-
-    #define QF_EPOOL_EVENT_SIZE_(pool_) ((pool_)->OSMemBlkSize)
-    #define QF_EPOOL_GET_(pool_, e_, m_, qs_id_) do { \
-        QF_CRIT_STAT_                                 \
-        QF_CRIT_E_();                                 \
-        if ((pool_)->OSMemNFree > (m_)) {             \
-            INT8U err;                                \
-            (e_) = (QEvt *)OSMemGet((pool_), &err);   \
-            Q_ASSERT_ID(205, err == OS_ERR_NONE);     \
-        }                                             \
-        else {                                        \
-            (e_) = nullptr;                           \
-        }                                             \
-        QF_CRIT_X_();                                 \
-    } while (false)
-
-    #define QF_EPOOL_PUT_(pool_, e_, qs_id_) \
-        Q_ALLEGE_ID(305, OSMemPut((pool_), (e_)) == OS_ERR_NONE)
+    // native QF event pool operations...
+    #define QF_EPOOL_TYPE_  QMPool
+    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+        (p_).init((poolSto_), (poolSize_), (evtSize_))
+    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
+    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
 
 #endif // ifdef QP_IMPL
 

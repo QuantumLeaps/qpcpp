@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ for Windows and POSIX *HOSTS*
-# Last updated for version 6.8.2
-# Last updated on  2020-06-23
+# Last updated for version 6.9.4
+# Last updated on  2021-11-05
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -56,13 +56,10 @@ PROJECT := dpp
 #
 
 # list of all source directories used by this project
-VPATH = . \
-	cont \
-	comp
+VPATH = .
 
 # list of all include directories needed by this project
-INCLUDES := -I. \
-	-Icont
+INCLUDES := -I.
 
 # location of the QP/C framework (if not provided in an env. variable)
 ifeq ($(QPCPP),)
