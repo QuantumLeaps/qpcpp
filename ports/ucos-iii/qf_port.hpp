@@ -39,8 +39,8 @@
 #define QF_PORT_HPP
 
 // uC/OS-II event queue and thread types
-#define QF_EQUEUE_TYPE       OS_Q*
-#define QF_THREAD_TYPE       OS_TCB*
+#define QF_EQUEUE_TYPE       OS_Q
+#define QF_THREAD_TYPE       OS_TCB
 // The maximum number of active objects in the application
 #define QF_MAX_ACTIVE ((OS_CFG_PRIO_MAX - 2 < 64) ? (OS_CFG_PRIO_MAX - 2) : 64U)
 
