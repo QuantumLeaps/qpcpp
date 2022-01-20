@@ -85,10 +85,9 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    // task name to be passed to OSTaskCreate()
-    void *task_name = static_cast<void *>(m_eQueue);
-    //Task options to be passed to OSTaskCreate()
-    OS_OPT  * task_opt = static_cast<OS_OPT*>(static_cast<void *>(m_thread));
+    /* Retrieve attributes for task indirectly with m_thread data members*/
+    void * task_name = static_cast<void *>( m_thread.StkPtr);
+    OS_OPT  * task_opt = static_cast<OS_OPT*>(static_cast<void *>( m_thread.ExtPtr));
 
     OS_ERR err;
 
@@ -98,16 +97,13 @@ void QActive::start(std::uint_fast8_t const prio,
 
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
-    static OS_TCB task_tcb;
-    m_thread = &task_tcb;
-#if (OS_CFG_TASK_Q_EN == 0u) //If os doesnt use internal Task queue
-    static OS_Q os_q;
-    m_eQueue = &os_q;
+
+#if (OS_CFG_TASK_Q_EN  == 0u) //If os doesnt use internal Task queue
     // create uC/OS-III queue and make sure it was created correctly
     char qName[] = "qAOxx";
     qName[3] = '0' + (m_prio / 10U);
     qName[4] = '0' + (m_prio % 10U);
-    OSQCreate(m_eQueue, qName,qLen,&err);
+    OSQCreate(&m_eQueue, qName,qLen,&err);
     Q_ASSERT_ID(210, err == OS_ERR_NONE);
 #endif
 
@@ -127,7 +123,7 @@ void QActive::start(std::uint_fast8_t const prio,
 #else
     CPU_STK * pStack = &static_cast<CPU_STK*>(stkSto)[stk_size-1];           
 #endif
-    OSTaskCreate(m_thread,
+    OSTaskCreate(&m_thread,
                  static_cast<CPU_CHAR *>(task_name),
                  task_function,
                  this,
@@ -151,19 +147,20 @@ void QActive::start(std::uint_fast8_t const prio,
 //............................................................................
 // NOTE: This function must be called BEFORE starting an active object
 void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
+    // this function must be called before QACTIVE_START(),
+    // which implies that me->m_thread must not be used yet;
     switch (attr1) {
         case TASK_NAME_ATTR:
-           // this function must be called before QACTIVE_START(),
-           // which implies that me->eQueue must not be used yet;
-           Q_ASSERT_ID(300, m_eQueue == nullptr);
-           // temporarily store the name, cast 'const' away
-           m_eQueue = static_cast<OS_Q *>(
+           Q_ASSERT_ID(300, m_thread.StkPtr == nullptr);
+           // temporarily store the name in StkPtr, cast 'const' away
+           m_thread.StkPtr = static_cast<CPU_STK *>(
                            const_cast<void *>(attr2));
+           break;
        case TASK_OPT_ATTR:
        default:
-            // temporarily store the task options, cast 'const' away
-            m_thread = static_cast<OS_TCB *>(
-                           const_cast<void *>(attr2));
+            Q_ASSERT_ID(310, m_thread.ExtPtr == nullptr);
+            // temporarily store the task options in ExtPtr, cast 'const' away
+            m_thread.ExtPtr =  const_cast<void *>(attr2);
             break;
        
     }
@@ -185,7 +182,7 @@ static void task_function(void *pdata) { // uC/OS-III task signature
     QF::thread_(act);
     QF::remove_(act); // remove this object from QF
     OS_ERR err;
-    OSTaskDel(act->m_thread,&err); // make uC/OS-III forget about this task
+    OSTaskDel(&act->m_thread,&err); // make uC/OS-III forget about this task
 }
 //............................................................................
 #ifndef Q_SPY
@@ -203,12 +200,12 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     QF_CRIT_E_();
 #if (OS_CFG_TASK_Q_EN > 0u) //If os uses internal queue
     nFree = static_cast<std::uint_fast16_t>(
-            m_thread->MsgQ.NbrEntriesSize
-             - m_thread->MsgQ.NbrEntries);
+            m_thread.MsgQ.NbrEntriesSize
+             - m_thread.MsgQ.NbrEntries);
 #else
     nFree = static_cast<std::uint_fast16_t>(
-            reinterpret_cast<OS_Q *>(m_eQueue)->MsgQ.NbrEntriesSize
-             - reinterpret_cast<OS_Q *>(m_eQueue)->MsgQ.NbrEntries);
+            m_eQueue.MsgQ.NbrEntriesSize
+             - m_eQueue.MsgQ.NbrEntries);
 #endif
 
   
@@ -247,9 +244,9 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
         QF_CRIT_X_();
         OS_ERR err;
 #if (OS_CFG_TASK_Q_EN > 0u) //If os uses internal queue
-        OSTaskQPost(m_thread,
+        OSTaskQPost(&m_thread,
 #else
-        OSQPost (   m_eQueue,
+        OSQPost (   &m_eQueue,
 #endif
                     const_cast<QEvt *>(e), //Message to send
                     sizeof(QEvt), //Message size
@@ -287,11 +284,11 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
                               // # free entries
 #if (OS_CFG_TASK_Q_EN > 0u) //If os uses internal queue
-        QS_EQC_PRE_(m_thread->MsgQ.NbrEntriesSize
-                    - m_thread->MsgQ.NbrEntries);
+        QS_EQC_PRE_(m_thread.MsgQ.NbrEntriesSize
+                    - m_thread.MsgQ.NbrEntries);
 #else
-        QS_EQC_PRE_(reinterpret_cast<OS_Q *>(m_eQueue)->MsgQ.NbrEntriesSize
-                    - reinterpret_cast<OS_Q *>(m_eQueue)->MsgQ.NbrEntries);
+        QS_EQC_PRE_(m_eQueue.MsgQ.NbrEntriesSize
+                    - m_eQueue.MsgQ.NbrEntries);
 #endif
        
         QS_EQC_PRE_(0U);      // min # free (unknown)
@@ -305,9 +302,9 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     OS_ERR err;
     
 #if (OS_CFG_TASK_Q_EN > 0u) //If os uses internal queue
-    OSTaskQPost(m_thread,
+    OSTaskQPost(&m_thread,
 #else
-    OSQPost (   m_eQueue,
+    OSQPost (   &m_eQueue,
 #endif
                 const_cast<QEvt *>(e), //Message to send
                 sizeof(QEvt), //Message size
@@ -327,7 +324,7 @@ QEvt const *QActive::get_(void) noexcept {
 #if (OS_CFG_TASK_Q_EN > 0u) //If os uses internal queue
     OSTaskQPend(
 #else
-    OSQPend (   m_eQueue,
+    OSQPend (   &m_eQueue,
 #endif
                     0U,         //timeout
                     OS_OPT_PEND_BLOCKING, //Pend type
@@ -343,11 +340,11 @@ QEvt const *QActive::get_(void) noexcept {
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
                               // # free entries
 #if (OS_CFG_TASK_Q_EN > 0u) //If os uses internal queue
-        QS_EQC_PRE_(m_thread->MsgQ.NbrEntriesSize
-                    - m_thread->MsgQ.NbrEntries);
+        QS_EQC_PRE_(m_thread.MsgQ.NbrEntriesSize
+                    - m_thread.MsgQ.NbrEntries);
 #else
-        QS_EQC_PRE_(reinterpret_cast<OS_Q *>(m_eQueue)->MsgQ.NbrEntriesSize
-                    - reinterpret_cast<OS_Q *>(m_eQueue)->MsgQ.NbrEntries);
+        QS_EQC_PRE_(m_eQueue.MsgQ.NbrEntriesSize
+                    - m_eQueue.MsgQ.NbrEntries);
 #endif
     QS_END_PRE_()
 
