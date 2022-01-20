@@ -98,11 +98,9 @@ void QActive::start(std::uint_fast8_t const prio,
 
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
-
-#if (OS_CFG_TASK_Q_EN > 0u) //If os doesnt use internal Task queue
     static OS_TCB task_tcb;
     m_thread = &task_tcb;
-#else
+#if (OS_CFG_TASK_Q_EN == 0u) //If os doesnt use internal Task queue
     static OS_Q os_q;
     m_eQueue = &os_q;
     // create uC/OS-III queue and make sure it was created correctly
@@ -111,7 +109,6 @@ void QActive::start(std::uint_fast8_t const prio,
     qName[4] = '0' + (m_prio % 10U);
     OSQCreate(m_eQueue, qName,qLen,&err);
     Q_ASSERT_ID(210, err == OS_ERR_NONE);
-
 #endif
 
     // map from QP to uC/OS-III priority
