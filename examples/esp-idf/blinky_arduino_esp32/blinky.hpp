@@ -2,7 +2,7 @@
 #define BLINKY_HPP
 
 enum BlinkySignals {
-    TIMEOUT_SIG = 50,
+    TIMEOUT_SIG = QP::Q_USER_SIG,
     MAX_SIG
 };
 
