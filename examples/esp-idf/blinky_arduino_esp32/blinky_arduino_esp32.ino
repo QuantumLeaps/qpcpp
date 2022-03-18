@@ -3,7 +3,7 @@
 #include "bsp.hpp"     // Board Support Package (BSP)
 
 using namespace QP;
-
+static constexpr unsigned stack_size = 1000;
 //............................................................................
 void setup() {
     Serial.begin(115200);
@@ -14,9 +14,13 @@ void setup() {
     // statically allocate event queues for the AOs and start them...
     static QEvt const *blinky_queueSto[30];
     AO_Blinky->start(1U, // priority
-                     blinky_queueSto, Q_DIM(blinky_queueSto),
-                     (void *)0, 1000U); // no stack
-     QF::run(); // run the QF/C++ framework
+                     blinky_queueSto, // queu storage for evets
+                     Q_DIM(blinky_queueSto), //len of queue
+                     nullptr, // No static stack
+                     stack_size); 
+     QF::run(); // Normally QF Run is located in a loop 
+                //but since using Arduino SDK not necessary
+                // Called once to call QF::OnStartup and produce the QS trace 
 }
 
 //............................................................................
