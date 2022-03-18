@@ -64,10 +64,6 @@
 #endif
 
 
-int_t qf_run_active = 0;
-
-
-
 /* Global objects ----------------------------------------------------------*/
 PRIVILEGED_DATA portMUX_TYPE QF_esp32mux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -75,8 +71,6 @@ PRIVILEGED_DATA portMUX_TYPE QF_esp32mux = portMUX_INITIALIZER_UNLOCKED;
 namespace QP {
 
 Q_DEFINE_THIS_MODULE("qf_port")
-
-
 
 /* Local objects -----------------------------------------------------------*/
 static void task_function(void *pvParameters); /* FreeRTOS task signature */
@@ -91,15 +85,10 @@ void QF::init(void) {
 /*..........................................................................*/
 int_t QF::run(void) {
     onStartup();
-
    // produce the QS_QF_RUN trace record
     QS_CRIT_STAT_
     QS_BEGIN_PRE_(QS_QF_RUN, 0U)
     QS_END_PRE_()
-	
-    //vTaskStartScheduler(); /* start the FreeRTOS scheduler */
-    //Q_ERROR_ID(110); /* the FreeRTOS scheduler should never return */
-    qf_run_active = 100;
     return 0; /* dummy return to make the compiler happy */
 }
 /*..........................................................................*/
