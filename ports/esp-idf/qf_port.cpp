@@ -38,7 +38,6 @@
 * @endcond
 */
 #define QP_IMPL           /* this is QP implementation */
-#include <Arduino.h>
 #include "qf_port.hpp"      /* QF port */
 #include "qf_pkg.hpp"
 #include "qassert.h"
