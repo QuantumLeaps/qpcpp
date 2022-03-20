@@ -155,23 +155,6 @@ enum FreeRTOS_TaskAttrs {
 };
 } // namespace QP
 
-// FreeRTOS hooks prototypes (not provided by FreeRTOS)
-extern "C" {
-#if (configUSE_IDLE_HOOK > 0)
-    void vApplicationIdleHook(void);
-#endif
-#if (configUSE_TICK_HOOK > 0)
-    void vApplicationTickHook(void);
-#endif
-#if (configCHECK_FOR_STACK_OVERFLOW > 0)
-    void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
-#endif
-#if (configSUPPORT_STATIC_ALLOCATION > 0)
-    void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
-                                        StackType_t **ppxIdleTaskStackBuffer,
-                                        uint32_t *pulIdleTaskStackSize );
-#endif
-} // extern "C"
 /*****************************************************************************
 * interface used only inside QF, but not in applications
 */
