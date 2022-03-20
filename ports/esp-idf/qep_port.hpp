@@ -3,12 +3,13 @@
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.8.0
-/// Last updated on  2020-01-13
+/// Last updated on  2022-03-20
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
+/// Copyright (C) 2022 Victor Chavez.
 /// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
@@ -41,5 +42,8 @@
 #include <cstdint>  // Exact-width types. C++11 Standard
 
 #include "qep.hpp"  // QEP platform-independent public interface
+
+//! no-return function specifier (GCC)
+#define Q_NORETURN   __attribute__ ((noreturn)) void
 
 #endif // QEP_PORT_HPP
