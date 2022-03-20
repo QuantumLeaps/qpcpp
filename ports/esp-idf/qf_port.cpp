@@ -83,7 +83,7 @@ int_t QF::run(void) {
     QS_BEGIN_PRE_(QS_QF_RUN, 0U)
     QS_END_PRE_()
 #ifndef ARDUINO
-    vTaskDelete(NULL);
+    //vTaskDelete(NULL);
 #endif
     return 0; /* dummy return to make the compiler happy */
 }
