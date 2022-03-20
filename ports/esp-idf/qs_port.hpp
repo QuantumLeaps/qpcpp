@@ -1,5 +1,5 @@
 /// @file
-/// @brief QS/C++ port to ARM Cortex-M, generic compiler
+/// @brief QS/C++ port to Xtensa 32 bit CPU, generic compiler
 /// @cond
 ///***************************************************************************
 /// Last updated for version 6.6.0
