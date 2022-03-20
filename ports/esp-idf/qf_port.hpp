@@ -5,14 +5,14 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.9.4
-* Last updated on  2021-06-29
+* Last updated on  2022-03-20
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
 * Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
-*
+* Copyright (C) 2022 Victor Chavez
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
 * by the Free Software Foundation, either version 3 of the License, or
