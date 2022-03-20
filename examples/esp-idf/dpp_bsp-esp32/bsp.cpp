@@ -22,6 +22,10 @@
 #include <Arduino.h>
 #include "esp_freertos_hooks.h"
 
+#ifndef LED_BUILTIN  //If current ESP32 board does not define LED_BUILTIN
+static constexpr unsigned LED_BUILTIN=13U; 
+#endif
+
 using namespace QP;
 
 //............................................................................
