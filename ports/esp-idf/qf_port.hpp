@@ -74,7 +74,7 @@
 /* global spinlock "mutex" for all critical sections in QF (see NOTE3) */
 extern PRIVILEGED_DATA portMUX_TYPE QF_esp32mux;
 
-
+2 of 6
 #if defined( CONFIG_QP_PINNED_TO_CORE_0 )
     #define QP_CPU_NUM         PRO_CPU_NUM
 #elif defined( CONFIG_QP_PINNED_TO_CORE_0 )
@@ -187,7 +187,7 @@ extern "C" {
     /* FreeRTOS signaling (unblocking) for event queue (task level) */
     #define QACTIVE_EQUEUE_SIGNAL_(me_) do {           \
         QF_CRIT_X_();                                  \
-        xTaskNotifyGive((TaskHandle_t)&(me_)->m_thread); \
+        xTaskNotifyGive((TaskHandle_t)(me_)->m_thread); \
         QF_CRIT_E_();                                  \
     } while (false)
 
