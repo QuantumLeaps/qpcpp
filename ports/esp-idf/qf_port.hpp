@@ -1,6 +1,6 @@
 /**
 * @file
-* @brief "Experimental" QF/C port to Espressif ESP-IDF (version 4.x)
+* @brief "Experimental" QF/CPP port to Espressif ESP-IDF (version 4.x)
 * @ingroup ports
 * @cond
 ******************************************************************************
