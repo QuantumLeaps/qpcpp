@@ -85,32 +85,28 @@ extern PRIVILEGED_DATA portMUX_TYPE QF_esp32mux;
 
 /* the "FromISR" versions of the QF APIs, see NOTE4 */
 #ifdef Q_SPY
-    #define POST_FROM_ISR(e_, pxHigherPrioTaskWoken_, sender_) \
-        postFromISR_((e_), QP::QF_NO_MARGIN,              \
-                                    (pxHigherPrioTaskWoken_), (sender_))
-
-    #define POST_X_FROM_ISR(e_, margin_,                \
-                                    pxHigherPrioTaskWoken_, sender_) \
-        postFromISR_((e_), (margin_),                \
-                              (pxHigherPrioTaskWoken_), (sender_))
-
     #define PUBLISH_FROM_ISR(e_, pxHigherPrioTaskWoken_, sender_) \
         publishFromISR_((e_), (pxHigherPrioTaskWoken_),(sender_))
+
+    #define POST_FROM_ISR(e_, pxHigherPrioTaskWoken_, sender_) \
+        postFromISR_((e_), QP::QF_NO_MARGIN, \
+                      (pxHigherPrioTaskWoken_), (sender_))
+
+    #define POST_X_FROM_ISR(e_, margin_, pxHigherPrioTaskWoken_, sender_) \
+        postFromISR_((e_), (margin_), (pxHigherPrioTaskWoken_), (sender_))
 
     #define TICK_X_FROM_ISR(tickRate_, pxHigherPrioTaskWoken_, sender_) \
         tickXfromISR_((tickRate_), (pxHigherPrioTaskWoken_), (sender_))
 #else
+    #define PUBLISH_FROM_ISR(e_, pxHigherPrioTaskWoken_, dummy) \
+        publishFromISR_((e_), (pxHigherPrioTaskWoken_))
+
     #define POST_FROM_ISR(e_, pxHigherPrioTaskWoken_, dummy) \
-        postFromISR_(((e_), QP::QF_NO_MARGIN,           \
-                                    (pxHigherPrioTaskWoken_))
+        postFromISR_((e_), QP::QF_NO_MARGIN, (pxHigherPrioTaskWoken_))
 
     #define POST_X_FROM_ISR(me_, e_, margin_,               \
                                     pxHigherPrioTaskWoken_,  dummy) \
-        postFromISR_((e_), (margin_),               \
-                              (pxHigherPrioTaskWoken_))
-
-    #define PUBLISH_FROM_ISR(e_, pxHigherPrioTaskWoken_, dummy) \
-        publishFromISR_((e_), (pxHigherPrioTaskWoken_))
+        postFromISR_((e_), (margin_), (pxHigherPrioTaskWoken_))
 
     #define TICK_X_FROM_ISR(tickRate_, pxHigherPrioTaskWoken_, dummy) \
         tickXfromISR_((tickRate_), (pxHigherPrioTaskWoken_))
