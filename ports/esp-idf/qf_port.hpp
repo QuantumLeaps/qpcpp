@@ -74,7 +74,6 @@
 /* global spinlock "mutex" for all critical sections in QF (see NOTE3) */
 extern PRIVILEGED_DATA portMUX_TYPE QF_esp32mux;
 
-2 of 6
 #if defined( CONFIG_QP_PINNED_TO_CORE_0 )
     #define QP_CPU_NUM         PRO_CPU_NUM
 #elif defined( CONFIG_QP_PINNED_TO_CORE_0 )
