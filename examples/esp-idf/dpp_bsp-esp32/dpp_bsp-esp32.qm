@@ -1,0 +1,812 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="5.1.1" links="1">
+ <documentation>This is the Dining Philosopher Problem (DPP) example for the Arduino-DUE board. The example demonstrates:
+
+1. Multiple active objects (5 Philosophers and 1 Table AO)
+2. Two active object classes (Philo and Table inside the package &quot;AOs&quot;)
+2. State machines associated with Philo and Table
+3. The concept of a Board Support Pakage (BSP)
+4. Separate files for every active object class
+
+----
+# Board configuration:
+
+The external LED needs to be connected between the pins GND and 13, with the short LEG leg at the GND pin.
+
+The Serial Monitor should be open
+
+----
+# More info
+
+This example demonstrates the concept of the Board Support Package (BSP), which separates the &quot;What&quot; needs to be done from &quot;How&quot; this is done. The BSP consists of two files &quot;bsp.h&quot; and &quot;bsp.cpp&quot;. The application (active objects) need to include only the &quot;bsp.h&quot; header file and the state machines call only the BSP functions, but don't interact with the hardware directly.
+
+Also, this example demonstrates partitioning of the generated code into separate files for each active object.
+
+This structure of the code is recommended for applications with multiple active objects.</documentation>
+ <!--${qpcpp}-->
+ <framework name="qpcpp"/>
+ <!--${Events}-->
+ <package name="Events" stereotype="0x01">
+  <!--${Events::TableEvt}-->
+  <class name="TableEvt" superclass="qpcpp::QEvt">
+   <!--${Events::TableEvt::philoNum}-->
+   <attribute name="philoNum" type="uint8_t" visibility="0x00" properties="0x00"/>
+  </class>
+ </package>
+ <!--${AOs}-->
+ <package name="AOs" stereotype="0x02">
+  <!--${AOs::Philo}-->
+  <class name="Philo" superclass="qpcpp::QActive">
+   <!--${AOs::Philo::m_timeEvt}-->
+   <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Philo::inst[N_PHILO]}-->
+   <attribute name="inst[N_PHILO]" type="Philo" visibility="0x00" properties="0x01">
+    <documentation>the (static) insts of the Philo class</documentation>
+   </attribute>
+   <!--${AOs::Philo::Philo}-->
+   <operation name="Philo" type="" visibility="0x00" properties="0x00">
+    <code>  : QActive(Q_STATE_CAST(&amp;Philo::initial)),
+    m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
+   </operation>
+   <!--${AOs::Philo::SM}-->
+   <statechart properties="0x00">
+    <!--${AOs::Philo::SM::initial}-->
+    <initial target="../1">
+     <action>(void)e; // unused parameter
+
+subscribe(EAT_SIG);
+subscribe(TEST_SIG);
+
+// QS dictionaries only once for all Philos...
+static bool registered = false;
+if (!registered) { // first time through?
+    registered = true;
+
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[0]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[0].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[1]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[1].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[2]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[2].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[3]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[3].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[4]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[4].m_timeEvt);
+
+    QS_FUN_DICTIONARY(&amp;Philo::initial);
+    QS_FUN_DICTIONARY(&amp;Philo::thinking);
+    QS_FUN_DICTIONARY(&amp;Philo::hungry);
+    QS_FUN_DICTIONARY(&amp;Philo::eating);
+
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr);
+}</action>
+     <initial_glyph conn="2,3,5,1,20,5,-3">
+      <action box="0,-2,6,2"/>
+     </initial_glyph>
+    </initial>
+    <!--${AOs::Philo::SM::thinking}-->
+    <state name="thinking">
+     <entry>m_timeEvt.armX(think_time(), 0U);</entry>
+     <exit>(void)m_timeEvt.disarm();</exit>
+     <!--${AOs::Philo::SM::thinking::TIMEOUT}-->
+     <tran trig="TIMEOUT" target="../../2">
+      <tran_glyph conn="2,13,3,1,20,12,-3">
+       <action box="0,-2,6,2"/>
+      </tran_glyph>
+     </tran>
+     <!--${AOs::Philo::SM::thinking::EAT, DONE}-->
+     <tran trig="EAT, DONE">
+      <action>// EAT or DONE must be for other Philos than this one 
+Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
+      <tran_glyph conn="2,16,3,-1,13">
+       <action box="0,-2,14,2"/>
+      </tran_glyph>
+     </tran>
+     <!--${AOs::Philo::SM::thinking::TEST}-->
+     <tran trig="TEST">
+      <tran_glyph conn="2,19,3,-1,13">
+       <action box="0,-2,11,4"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,5,17,16">
+      <entry box="1,2,5,2"/>
+      <exit box="1,4,5,2"/>
+     </state_glyph>
+    </state>
+    <!--${AOs::Philo::SM::hungry}-->
+    <state name="hungry">
+     <entry>TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
+pe-&gt;philoNum = PHILO_ID(this);
+AO_Table-&gt;POST(pe, this);</entry>
+     <!--${AOs::Philo::SM::hungry::EAT}-->
+     <tran trig="EAT">
+      <!--${AOs::Philo::SM::hungry::EAT::[Q_EVT_CAST(TableEvt)->philoNum=~}-->
+      <choice target="../../../3">
+       <guard>Q_EVT_CAST(TableEvt)-&gt;philoNum == PHILO_ID(this)</guard>
+       <choice_glyph conn="15,30,5,1,7,13,-3">
+        <action box="1,0,19,4"/>
+       </choice_glyph>
+      </choice>
+      <tran_glyph conn="2,30,3,-1,13">
+       <action box="0,-2,14,2"/>
+      </tran_glyph>
+     </tran>
+     <!--${AOs::Philo::SM::hungry::DONE}-->
+     <tran trig="DONE">
+      <action>/* DONE must be for other Philos than this one */
+Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
+      <tran_glyph conn="2,36,3,-1,14">
+       <action box="0,-2,14,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,23,17,16">
+      <entry box="1,2,5,2"/>
+     </state_glyph>
+    </state>
+    <!--${AOs::Philo::SM::eating}-->
+    <state name="eating">
+     <entry>m_timeEvt.armX(eat_time(), 0U);</entry>
+     <exit>TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
+pe-&gt;philoNum = PHILO_ID(this);
+QP::QF::PUBLISH(pe, this);
+(void)m_timeEvt.disarm();</exit>
+     <!--${AOs::Philo::SM::eating::TIMEOUT}-->
+     <tran trig="TIMEOUT" target="../../1">
+      <tran_glyph conn="2,51,3,1,22,-41,-5">
+       <action box="0,-2,6,2"/>
+      </tran_glyph>
+     </tran>
+     <!--${AOs::Philo::SM::eating::EAT, DONE}-->
+     <tran trig="EAT, DONE">
+      <action>// EAT or DONE must be for other Philos than this one
+Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
+      <tran_glyph conn="2,55,3,-1,13">
+       <action box="0,-2,14,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,41,17,18">
+      <entry box="1,2,5,2"/>
+      <exit box="1,4,5,2"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="36,61"/>
+   </statechart>
+  </class>
+  <!--${AOs::Table}-->
+  <class name="Table" superclass="qpcpp::QActive">
+   <!--${AOs::Table::m_fork[N_PHILO]}-->
+   <attribute name="m_fork[N_PHILO]" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Table::m_isHungry[N_PHILO]}-->
+   <attribute name="m_isHungry[N_PHILO]" type="bool" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Table::inst}-->
+   <attribute name="inst" type="Table" visibility="0x00" properties="0x01">
+    <documentation>the (static) inst of the class</documentation>
+   </attribute>
+   <!--${AOs::Table::Table}-->
+   <operation name="Table" type="" visibility="0x00" properties="0x00">
+    <code>  : QActive(Q_STATE_CAST(&amp;Table::initial))
+
+for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
+    m_fork[n] = FREE;
+    m_isHungry[n] = false;
+}</code>
+   </operation>
+   <!--${AOs::Table::SM}-->
+   <statechart properties="0x00">
+    <!--${AOs::Table::SM::initial}-->
+    <initial target="../1/2">
+     <action>(void)e; // unused parameter
+
+subscribe(DONE_SIG);
+subscribe(PAUSE_SIG);
+subscribe(SERVE_SIG);
+subscribe(TEST_SIG);
+
+for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
+    m_fork[n] = FREE;
+    m_isHungry[n] = false;
+    BSP::displayPhilStat(n, THINKING);
+}
+
+// QS dictionaries...
+QS_OBJ_DICTIONARY(&amp;Table::inst);
+
+QS_SIG_DICTIONARY(DONE_SIG,   nullptr);
+QS_SIG_DICTIONARY(EAT_SIG,    nullptr);
+QS_SIG_DICTIONARY(PAUSE_SIG,  nullptr);
+QS_SIG_DICTIONARY(SERVE_SIG,  nullptr);
+QS_SIG_DICTIONARY(TEST_SIG,   nullptr);
+QS_SIG_DICTIONARY(HUNGRY_SIG, nullptr);</action>
+     <initial_glyph conn="3,3,5,1,45,18,-10">
+      <action box="0,-2,6,2"/>
+     </initial_glyph>
+    </initial>
+    <!--${AOs::Table::SM::active}-->
+    <state name="active">
+     <!--${AOs::Table::SM::active::TEST}-->
+     <tran trig="TEST">
+      <tran_glyph conn="2,11,3,-1,14">
+       <action box="0,-2,11,4"/>
+      </tran_glyph>
+     </tran>
+     <!--${AOs::Table::SM::active::EAT}-->
+     <tran trig="EAT">
+      <action>Q_ERROR();</action>
+      <tran_glyph conn="2,15,3,-1,14">
+       <action box="0,-2,10,4"/>
+      </tran_glyph>
+     </tran>
+     <!--${AOs::Table::SM::active::serving}-->
+     <state name="serving">
+      <entry brief="give pending permitions to eat">for (uint8_t n = 0U; n &lt; N_PHILO; ++n) { // give permissions to eat...
+    if (m_isHungry[n]
+        &amp;&amp; (m_fork[LEFT(n)] == FREE)
+        &amp;&amp; (m_fork[n] == FREE))
+    {
+        m_fork[LEFT(n)] = USED;
+        m_fork[n] = USED;
+        TableEvt *te = Q_NEW(TableEvt, EAT_SIG);
+        te-&gt;philoNum = n;
+        QP::QF::PUBLISH(te, this);
+        m_isHungry[n] = false;
+        BSP::displayPhilStat(n, EATING);
+    }
+}</entry>
+      <!--${AOs::Table::SM::active::serving::HUNGRY}-->
+      <tran trig="HUNGRY">
+       <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
+// phil ID must be in range and he must be not hungry
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
+
+BSP::displayPhilStat(n, HUNGRY);
+uint8_t m = LEFT(n);</action>
+       <!--${AOs::Table::SM::active::serving::HUNGRY::[bothfree]}-->
+       <choice>
+        <guard brief="both free">(m_fork[m] == FREE) &amp;&amp; (m_fork[n] == FREE)</guard>
+        <action>m_fork[m] = USED;
+m_fork[n] = USED;
+TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
+pe-&gt;philoNum = n;
+QP::QF::PUBLISH(pe, this);
+BSP::displayPhilStat(n, EATING);</action>
+        <choice_glyph conn="19,26,5,-1,10">
+         <action box="1,0,10,2"/>
+        </choice_glyph>
+       </choice>
+       <!--${AOs::Table::SM::active::serving::HUNGRY::[else]}-->
+       <choice>
+        <guard>else</guard>
+        <action>m_isHungry[n] = true;</action>
+        <choice_glyph conn="19,26,4,-1,5,10">
+         <action box="1,5,6,2"/>
+        </choice_glyph>
+       </choice>
+       <tran_glyph conn="4,26,3,-1,15">
+        <action box="0,-2,8,2"/>
+       </tran_glyph>
+      </tran>
+      <!--${AOs::Table::SM::active::serving::DONE}-->
+      <tran trig="DONE">
+       <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
+// phil ID must be in range and he must be not hungry
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
+
+BSP::displayPhilStat(n, THINKING);
+uint8_t m = LEFT(n);
+// both forks of Phil[n] must be used
+Q_ASSERT((m_fork[n] == USED) &amp;&amp; (m_fork[m] == USED));
+
+m_fork[m] = FREE;
+m_fork[n] = FREE;
+m = RIGHT(n); // check the right neighbor
+
+if (m_isHungry[m] &amp;&amp; (m_fork[m] == FREE)) {
+    m_fork[n] = USED;
+    m_fork[m] = USED;
+    m_isHungry[m] = false;
+    TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
+    pe-&gt;philoNum = m;
+    QP::QF::PUBLISH(pe, this);
+    BSP::displayPhilStat(m, EATING);
+}
+m = LEFT(n); // check the left neighbor
+n = LEFT(m); // left fork of the left neighbor
+if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
+    m_fork[m] = USED;
+    m_fork[n] = USED;
+    m_isHungry[m] = false;
+    TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
+    pe-&gt;philoNum = m;
+    QP::QF::PUBLISH(pe, this);
+    BSP::displayPhilStat(m, EATING);
+}</action>
+       <tran_glyph conn="4,34,3,-1,15">
+        <action box="0,-2,6,2"/>
+       </tran_glyph>
+      </tran>
+      <!--${AOs::Table::SM::active::serving::EAT}-->
+      <tran trig="EAT">
+       <action>Q_ERROR();</action>
+       <tran_glyph conn="4,37,3,-1,15">
+        <action box="0,-2,12,4"/>
+       </tran_glyph>
+      </tran>
+      <!--${AOs::Table::SM::active::serving::PAUSE}-->
+      <tran trig="PAUSE" target="../../3">
+       <tran_glyph conn="4,41,3,1,37,6,-3">
+        <action box="0,-2,7,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="4,19,34,24">
+       <entry box="1,2,27,2"/>
+      </state_glyph>
+     </state>
+     <!--${AOs::Table::SM::active::paused}-->
+     <state name="paused">
+      <entry>BSP::displayPaused(1U);</entry>
+      <exit>BSP::displayPaused(0U);</exit>
+      <!--${AOs::Table::SM::active::paused::SERVE}-->
+      <tran trig="SERVE" target="../../2">
+       <tran_glyph conn="4,57,3,1,39,-29,-5">
+        <action box="0,-2,7,2"/>
+       </tran_glyph>
+      </tran>
+      <!--${AOs::Table::SM::active::paused::HUNGRY}-->
+      <tran trig="HUNGRY">
+       <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
+// philo ID must be in range and he must be not hungry
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
+m_isHungry[n] = true;
+BSP::displayPhilStat(n, HUNGRY);</action>
+       <tran_glyph conn="4,60,3,-1,15">
+        <action box="0,-2,6,2"/>
+       </tran_glyph>
+      </tran>
+      <!--${AOs::Table::SM::active::paused::DONE}-->
+      <tran trig="DONE">
+       <action>uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
+// phil ID must be in range and he must be not hungry
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
+
+BSP::displayPhilStat(n, THINKING);
+uint8_t m = LEFT(n);
+/* both forks of Phil[n] must be used */
+Q_ASSERT((m_fork[n] == USED) &amp;&amp; (m_fork[m] == USED));
+
+m_fork[m] = FREE;
+m_fork[n] = FREE;</action>
+       <tran_glyph conn="4,63,3,-1,15">
+        <action box="0,-2,6,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="4,45,34,20">
+       <entry box="1,2,18,4"/>
+       <exit box="1,6,18,4"/>
+      </state_glyph>
+     </state>
+     <state_glyph node="2,5,44,62"/>
+    </state>
+    <state_diagram size="50,69"/>
+   </statechart>
+  </class>
+  <!--${AOs::AO_Philo[N_PHILO]}-->
+  <attribute name="AO_Philo[N_PHILO]" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <code>= { // &quot;opaque&quot; pointers to Philo AO
+    &amp;Philo::inst[0],
+    &amp;Philo::inst[1],
+    &amp;Philo::inst[2],
+    &amp;Philo::inst[3],
+    &amp;Philo::inst[4]
+};</code>
+  </attribute>
+  <!--${AOs::AO_Table}-->
+  <attribute name="AO_Table" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <code>= &amp;Table::inst; // &quot;opaque&quot; AO pointer</code>
+  </attribute>
+ </package>
+ <!--${.}-->
+ <directory name=".">
+  <!--${.::dpp_bsp-esp32.ino}-->
+  <file name="dpp_bsp-esp32.ino">
+   <text>#include &quot;qpcpp.hpp&quot;  // QP-C++ framework
+#include &quot;dpp.hpp&quot;    // DPP application
+#include &quot;bsp.hpp&quot;    // Board Support Package
+
+using namespace QP;
+static constexpr unsigned stack_size = 1000;
+
+Q_DEFINE_THIS_FILE
+
+//............................................................................
+void setup() {
+    QF::init(); // initialize the framework
+    BSP::init(); // initialize the Board Support Package
+
+    // init publish-subscribe
+    static QSubscrList subscrSto[MAX_PUB_SIG];
+    QF::psInit(subscrSto, Q_DIM(subscrSto));
+
+    // initialize event pools...
+    static QF_MPOOL_EL(TableEvt) smlPoolSto[2*N_PHILO];
+    QF::poolInit(smlPoolSto,
+                 sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+    // start all active objects...
+
+    // start Philos
+    static QP::QEvt const *philoQueueSto[10][N_PHILO];
+    for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
+        AO_Philo[n]-&gt;start((uint_fast8_t)(n + 1U), // priority
+            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
+            (void *)0, stack_size);
+    }
+    // start Table
+    static QP::QEvt const *tableQueueSto[N_PHILO];
+    AO_Table-&gt;start((uint_fast8_t)(N_PHILO + 1U), // priority
+        tableQueueSto, Q_DIM(tableQueueSto),
+        (void *)0, stack_size);
+    QF::run(); // run the QF/C++ framework
+}
+
+//............................................................................
+void loop() {
+    QF::run(); // run the QF/C++ framework
+}
+</text>
+  </file>
+  <!--${.::bsp.hpp}-->
+  <file name="bsp.hpp">
+   <text>#ifndef BSP_HPP
+#define BSP_HPP
+
+class BSP {
+public:
+    enum { TICKS_PER_SEC = CONFIG_FREERTOS_HZ} ;
+    static void init(void);
+    static void displayPaused(uint8_t const paused);
+    static void displayPhilStat(uint8_t const n, char_t const *stat);
+    static void terminate(int16_t const result);
+
+    static void randomSeed(uint32_t const seed); // random seed
+    static uint32_t random(void);                // pseudo-random generator
+    static QP::QTimeEvtCtr think_rnd_time();
+    static QP::QTimeEvtCtr eat_rnd_time();
+
+    static void ledOff(void);
+    static void ledOn(void);
+};
+
+#endif // BSP_HPP
+</text>
+  </file>
+  <!--${.::bsp.cpp}-->
+  <file name="bsp.cpp">
+   <text>#include &quot;qpcpp.hpp&quot;   // QP-C++ framework
+#include &quot;dpp.hpp&quot;     // DPP application
+#include &quot;bsp.hpp&quot;     // Board Support Package
+#include &lt;Arduino.h&gt;
+#include &quot;esp_freertos_hooks.h&quot;
+
+#ifndef LED_BUILTIN  //If current ESP32 board does not define LED_BUILTIN
+static constexpr unsigned LED_BUILTIN=13U; 
+#endif
+
+using namespace QP;
+
+//............................................................................
+// QS facilities
+
+// un-comment if QS instrumentation needed
+//#define QS_ON
+
+enum AppRecords { // application-specific QS trace records
+    PHILO_STAT = QP::QS_USER,
+};
+
+static QP::QSpyId const l_TIMER_ID = { 0U }; // QSpy source ID
+
+//----------------------------------------------------------------------------
+// BSP functions
+
+static void tickHook_ESP32(void); /*Tick hook for QP */
+
+static void tickHook_ESP32(void)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    /* process time events for rate 0 */
+    QF::TICK_FROM_ISR(&amp;xHigherPriorityTaskWoken, &amp;l_TIMER_ID);
+    /* notify FreeRTOS to perform context switch from ISR, if needed */
+    if(xHigherPriorityTaskWoken) {
+        portYIELD_FROM_ISR();
+    }
+#ifndef QS_ON
+    if (Serial.available() &gt; 0) {
+        switch (Serial.read()) { // read the incoming byte
+            case 'p':
+            case 'P':
+                static QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
+                QF::PUBLISH(&amp;pauseEvt, &amp;l_TIMER_ID);
+                break;
+            case 's':
+            case 'S':
+                static QEvt const serveEvt = { SERVE_SIG, 0U, 0U};
+                QF::PUBLISH(&amp;serveEvt, &amp;l_TIMER_ID);
+                break;
+        }
+    }
+#endif
+}
+
+void BSP::init(void) {
+    // initialize the hardware used in this sketch...
+    // NOTE: interrupts are configured and started later in QF::onStartup()
+    pinMode(LED_BUILTIN, OUTPUT);
+    randomSeed(1234); // seed the Random Number Generator
+    Serial.begin(115200); // set the highest stanard baud rate of 115200 bps
+    QS_INIT(nullptr);
+#ifdef QS_ON
+    // output QS dictionaries
+    QS_OBJ_DICTIONARY(&amp;l_TIMER_ID);
+    QS_USR_DICTIONARY(PHILO_STAT);
+
+    // setup the QS filters...
+    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
+    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
+    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
+#else
+    Serial.print(&quot;QP-C++: &quot;);
+    Serial.print(QP_VERSION_STR);
+    Serial.println(&quot;&quot;);
+#endif
+}
+//............................................................................
+void BSP::displayPhilStat(uint8_t n, char_t const *stat) {
+#ifdef QS_ON
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]-&gt;m_prio) // app-specific record begin
+        QS_U8(1, n);  // Philo number
+        QS_STR(stat); // Philo status
+    QS_END()
+#else
+    Serial.print(&quot;Philosopher &quot;);
+    Serial.write(48+n);
+    Serial.print(&quot; &quot;);
+    Serial.println(stat);
+#endif
+}
+//............................................................................
+void BSP::displayPaused(uint8_t paused) {
+    char const *msg = paused ? &quot;Paused ON&quot; : &quot;Paused OFF&quot;;
+#ifndef QS_ON
+    Serial.println(msg);
+#endif
+}
+//............................................................................
+void BSP::ledOff(void) {
+    digitalWrite(LED_BUILTIN, LOW);
+}
+//............................................................................
+void BSP::ledOn(void) {
+    digitalWrite(LED_BUILTIN, HIGH);
+}
+
+//............................................................................
+static uint32_t l_rnd; // random seed
+
+void BSP::randomSeed(uint32_t seed) {
+    l_rnd = seed;
+}
+//............................................................................
+uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
+    // &quot;Super-Duper&quot; Linear Congruential Generator (LCG)
+    // LCG(2^32, 3*7*11*13*23, 0, seed)
+    //
+    uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
+    l_rnd = rnd; // set for the next time
+    return (rnd &gt;&gt; 8);
+}
+
+//............................................................................
+void QSpy_Task(void *) {
+  while(1)
+  {
+    // transmit QS outgoing data (QS-TX)
+    uint16_t len = Serial.availableForWrite();
+    if (len &gt; 0U) { // any space available in the output buffer?
+        uint8_t const *buf = QS::getBlock(&amp;len);
+        if (buf) {
+            Serial.write(buf, len); // asynchronous and non-blocking
+        }
+    }
+
+    // receive QS incoming data (QS-RX)
+    len = Serial.available();
+    if (len &gt; 0U) {
+        do {
+            QP::QS::rxPut(Serial.read());
+        } while (--len &gt; 0U);
+        QS::rxParse();
+    }
+    delay(100);
+  };
+}
+
+void QF::onStartup(void) {
+    esp_register_freertos_tick_hook_for_cpu(tickHook_ESP32, QP_CPU_NUM);
+#ifdef QS_ON
+    xTaskCreatePinnedToCore(
+                    QSpy_Task,   /* Function to implement the task */
+                    &quot;QSPY&quot;, /* Name of the task */
+                    10000,      /* Stack size in words */
+                    NULL,       /* Task input parameter */
+                    configMAX_PRIORITIES-1,          /* Priority of the task */
+                    NULL,       /* Task handle. */
+                    QP_CPU_NUM);  /* Core where the task should run */
+#endif
+}
+//............................................................................
+
+//............................................................................
+extern &quot;C&quot; Q_NORETURN Q_onAssert(char const * const module, int location) {
+    //
+    // NOTE: add here your application-specific error handling
+    //
+    (void)module;
+    (void)location;
+    Serial.print(&quot;QP Assert module:&quot;);
+    Serial.print(module);
+    Serial.print(&quot;,&quot;);
+    Serial.println(location);
+    QF_INT_DISABLE(); // disable all interrupts
+    for (;;) { // sit in an endless loop for now
+    }
+}
+
+//----------------------------------------------------------------------------
+// QS callbacks...
+//............................................................................
+bool QP::QS::onStartup(void const * arg) {
+    static uint8_t qsTxBuf[1024]; // buffer for QS transmit channel (QS-TX)
+    static uint8_t qsRxBuf[128];  // buffer for QS receive channel (QS-RX)
+    initBuf  (qsTxBuf, sizeof(qsTxBuf));
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+    return true; // return success
+}
+//............................................................................
+void QP::QS::onCommand(uint8_t cmdId, uint32_t param1,
+                       uint32_t param2, uint32_t param3)
+{
+}
+//............................................................................
+void QP::QS::onCleanup(void) {
+}
+//............................................................................
+QP::QSTimeCtr QP::QS::onGetTime(void) {
+#ifdef QS_ON
+    return millis();
+#else
+    return 0;
+#endif
+
+}
+//............................................................................
+void QP::QS::onFlush(void) {
+#ifdef QS_ON
+    uint16_t len = 0xFFFFU; // big number to get as many bytes as available
+    uint8_t const *buf = QS::getBlock(&amp;len); // get continguous block of data
+    while (buf != nullptr) { // data available?
+        Serial.write(buf, len); // might poll until all bytes fit
+        len = 0xFFFFU; // big number to get as many bytes as available
+        buf = QS::getBlock(&amp;len); // try to get more data
+    }
+    Serial.flush(); // wait for the transmission of outgoing data to complete
+#endif // QS_ON
+}
+//............................................................................
+void QP::QS::onReset(void) {
+    esp_restart(); 
+}
+</text>
+  </file>
+  <!--${.::dpp.hpp}-->
+  <file name="dpp.hpp">
+   <text>#ifndef DPP_HPP
+#define DPP_HPP
+
+enum Signals {
+    EAT_SIG = QP::Q_USER_SIG, // published by Table to let a Philosopher eat
+    DONE_SIG,       // published by Philosopher when done eating
+    PAUSE_SIG,      // published by BSP to pause the application
+    SERVE_SIG,      // published by BSP to serve re-start serving forks
+    TEST_SIG,       // published by BSP to test the application
+    MAX_PUB_SIG,    // the last published signal
+
+    TIMEOUT_SIG,    // timeout used by Time Events
+    HUNGRY_SIG,     // posted direclty to Table from hungry Philo
+    MAX_SIG         // the last signal
+};
+
+// generate declarations all event classes
+$declare${Events}
+
+// number of philosophers
+enum { N_PHILO = 5 };
+
+// generate declarations of all opaque pointers...
+$declare(AOs::AO_Philo[N_PHILO])
+$declare(AOs::AO_Table)
+
+#endif // DPP_HPP
+</text>
+  </file>
+  <!--${.::philo.cpp}-->
+  <file name="philo.cpp">
+   <text>#include &quot;qpcpp.hpp&quot;   // QP-C++ framework
+#include &quot;dpp.hpp&quot;     // DPP application
+#include &quot;bsp.hpp&quot;     // Board Support Package
+
+Q_DEFINE_THIS_FILE
+
+// generate declaration of the active object ---------------------------------
+$declare${AOs::Philo}
+
+// generate definition of the opaque pointer to the AO -----------------------
+$define${AOs::AO_Philo[N_PHILO]}
+
+// helper function to provide a randomized think time for Philos
+inline QP::QTimeEvtCtr think_time() {
+    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + (BSP::TICKS_PER_SEC/2U));
+}
+
+// helper function to provide a randomized eat time for Philos
+inline QP::QTimeEvtCtr eat_time() {
+    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + BSP::TICKS_PER_SEC);
+}
+
+// helper function to provide the ID of Philo
+inline uint8_t PHILO_ID(Philo const * const philo) {
+    return static_cast&lt;uint8_t&gt;(philo - &amp;Philo::inst[0]);
+}
+
+// generate definition  of the AO --------------------------------------------
+$define${AOs::Philo}</text>
+  </file>
+  <!--${.::table.cpp}-->
+  <file name="table.cpp">
+   <text>#include &quot;qpcpp.hpp&quot;   // QP-C++ framework
+#include &quot;dpp.hpp&quot;     // DPP application
+#include &quot;bsp.hpp&quot;     // Board Support Package
+
+Q_DEFINE_THIS_FILE
+
+// generate declaration of the active object ---------------------------------
+$declare${AOs::Table}
+
+// generate definition of the opaque pointer to the AO -----------------------
+$define${AOs::AO_Table}
+
+// helper function to provide the RIGHT neighbour of a Philo[n]
+inline uint8_t RIGHT(uint8_t const n) {
+    return static_cast&lt;uint8_t&gt;((n + (N_PHILO - 1U)) % N_PHILO);
+}
+
+// helper function to provide the LEFT neighbour of a Philo[n]
+inline uint8_t LEFT(uint8_t const n) {
+    return static_cast&lt;uint8_t&gt;((n + 1U) % N_PHILO);
+}
+
+static uint8_t const FREE = static_cast&lt;uint8_t&gt;(0);
+static uint8_t const USED = static_cast&lt;uint8_t&gt;(1);
+
+static char const * const THINKING = &quot;thinking&quot;;
+static char const * const HUNGRY   = &quot;hungry  &quot;;
+static char const * const EATING   = &quot;eating  &quot;;
+
+
+// generate definition of the AO ---------------------------------------------
+$define${AOs::Table}
+</text>
+  </file>
+ </directory>
+</model>

@@ -75,14 +75,13 @@ Q_STATE_DEF(Blinky, off) {
     switch (e->sig) {
         //.${AOs::Blinky::SM::off}
         case Q_ENTRY_SIG: {
-            Serial.println("ledoff");
+            Serial.println("led off");
             BSP::ledOff();
             status_ = Q_RET_HANDLED;
             break;
         }
         //.${AOs::Blinky::SM::off::TIMEOUT}
         case TIMEOUT_SIG: {
-            Serial.println("t1");
             status_ = tran(&on);
             break;
         }
@@ -99,14 +98,13 @@ Q_STATE_DEF(Blinky, on) {
     switch (e->sig) {
         //.${AOs::Blinky::SM::on}
         case Q_ENTRY_SIG: {
-            Serial.println("ledon");
+            Serial.println("led on");
             BSP::ledOn();
             status_ = Q_RET_HANDLED;
             break;
         }
         //.${AOs::Blinky::SM::on::TIMEOUT}
         case TIMEOUT_SIG: {
-            Serial.println("t2");
             status_ = tran(&off);
             break;
         }

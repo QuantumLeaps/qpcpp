@@ -21,7 +21,7 @@
 
 class BSP {
 public:
-    enum { TICKS_PER_SEC = 1000} ;
+    enum { TICKS_PER_SEC = CONFIG_FREERTOS_HZ } ;
     static void init(void);
     static void displayPaused(uint8_t const paused);
     static void displayPhilStat(uint8_t const n, char_t const *stat);

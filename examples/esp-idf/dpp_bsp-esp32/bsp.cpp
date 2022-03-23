@@ -54,7 +54,7 @@ static void tickHook_ESP32(void)
     if(xHigherPriorityTaskWoken) {
         portYIELD_FROM_ISR();
     }
-    #ifndef QS_ON
+#ifndef QS_ON
     if (Serial.available() > 0) {
         switch (Serial.read()) { // read the incoming byte
             case 'p':
@@ -76,12 +76,10 @@ void BSP::init(void) {
     // initialize the hardware used in this sketch...
     // NOTE: interrupts are configured and started later in QF::onStartup()
     pinMode(LED_BUILTIN, OUTPUT);
-
     randomSeed(1234); // seed the Random Number Generator
-
+    Serial.begin(115200); // set the highest stanard baud rate of 115200 bps
+    QS_INIT(nullptr);
 #ifdef QS_ON
-    QS_INIT(0);
-
     // output QS dictionaries
     QS_OBJ_DICTIONARY(&l_TIMER_ID);
     QS_USR_DICTIONARY(PHILO_STAT);
@@ -90,20 +88,14 @@ void BSP::init(void) {
     QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
     QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
     QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
-
 #else
-
-    Serial.begin(115200); // set the highest stanard baud rate of 115200 bps
     Serial.print("QP-C++: ");
     Serial.print(QP_VERSION_STR);
     Serial.println("");
-
 #endif
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char_t const *stat) {
-    digitalWrite(LED_BUILTIN, (stat[0] == 'e') ? HIGH : LOW);
-
 #ifdef QS_ON
     QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philo number
@@ -111,7 +103,7 @@ void BSP::displayPhilStat(uint8_t n, char_t const *stat) {
     QS_END()
 #else
     Serial.print("Philosopher ");
-    Serial.print(n, DEC);
+    Serial.print(n);
     Serial.print(" ");
     Serial.println(stat);
 #endif
@@ -148,11 +140,10 @@ uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
     return (rnd >> 8);
 }
 
-//----------------------------------------------------------------------------
-bool IdleHook(void) {
-    QF_INT_ENABLE(); // simply re-enable interrupts
-
-#ifdef QS_ON
+//............................................................................
+void QSpy_Task(void *) {
+  while(1)
+  {
     // transmit QS outgoing data (QS-TX)
     uint16_t len = Serial.availableForWrite();
     if (len > 0U) { // any space available in the output buffer?
@@ -170,13 +161,22 @@ bool IdleHook(void) {
         } while (--len > 0U);
         QS::rxParse();
     }
-#endif // QS_ON
-  return false;
+    delay(100);
+  };
 }
-//............................................................................
+
 void QF::onStartup(void) {
-    esp_register_freertos_idle_hook(IdleHook);
     esp_register_freertos_tick_hook_for_cpu(tickHook_ESP32, QP_CPU_NUM);
+#ifdef QS_ON
+    xTaskCreatePinnedToCore(
+                    QSpy_Task,   /* Function to implement the task */
+                    "QSPY", /* Name of the task */
+                    10000,      /* Stack size in words */
+                    NULL,       /* Task input parameter */
+                    configMAX_PRIORITIES-1,          /* Priority of the task */
+                    NULL,       /* Task handle. */
+                    QP_CPU_NUM);  /* Core where the task should run */
+#endif
 }
 //............................................................................
 
@@ -198,15 +198,12 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int location) {
 
 //----------------------------------------------------------------------------
 // QS callbacks...
-#ifdef QS_ON
-
 //............................................................................
 bool QP::QS::onStartup(void const * arg) {
     static uint8_t qsTxBuf[1024]; // buffer for QS transmit channel (QS-TX)
     static uint8_t qsRxBuf[128];  // buffer for QS receive channel (QS-RX)
     initBuf  (qsTxBuf, sizeof(qsTxBuf));
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
-    Serial.begin(115200); // run serial port at 115200 baud rate
     return true; // return success
 }
 //............................................................................
@@ -214,15 +211,13 @@ void QP::QS::onCommand(uint8_t cmdId, uint32_t param1,
                        uint32_t param2, uint32_t param3)
 {
 }
-
-#endif // QS_ON
-
 //............................................................................
 void QP::QS::onCleanup(void) {
 }
 //............................................................................
 QP::QSTimeCtr QP::QS::onGetTime(void) {
     return millis();
+
 }
 //............................................................................
 void QP::QS::onFlush(void) {
@@ -239,5 +234,5 @@ void QP::QS::onFlush(void) {
 }
 //............................................................................
 void QP::QS::onReset(void) {
-   
+    esp_restart(); 
 }
