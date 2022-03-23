@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model version="5.1.1" links="1">
- <documentation>This is the Dining Philosopher Problem (DPP) example for the Arduino-DUE board. The example demonstrates:
+ <documentation>This is the Dining Philosopher Problem (DPP) example for the Arduino-ESP32 board. The example demonstrates:
 
 1. Multiple active objects (5 Philosophers and 1 Table AO)
 2. Two active object classes (Philo and Table inside the package &quot;AOs&quot;)
@@ -450,7 +450,6 @@ void setup() {
 
 //............................................................................
 void loop() {
-    QF::run(); // run the QF/C++ framework
 }
 </text>
   </file>
