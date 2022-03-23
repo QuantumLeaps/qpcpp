@@ -4,12 +4,12 @@
 ///***************************************************************************
 /// Last updated for version 6.8.0
 /// Last updated on  2022-03-20
+/// Copyright (C) 2022 Victor Chavez.
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2022 Victor Chavez.
 /// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
