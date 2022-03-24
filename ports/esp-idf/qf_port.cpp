@@ -141,7 +141,7 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
     switch (attr1) {
         case TASK_NAME_ATTR:
             /* temporarily store the name */
-            m_thread = const_cast<void *>(attr2); /* cast 'const' away */
+            m_thread = reinterpret_cast<QF_THREAD_TYPE>(const_cast<void *>(attr2)); /* cast 'const' away */
             break;
         /* ... */
     }
