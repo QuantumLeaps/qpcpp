@@ -19,6 +19,7 @@
 #include "qpcpp.hpp"   // QP-C++ framework
 #include "dpp.hpp"     // DPP application
 #include "esp_log.h"
+#include "esp_random.h"
 
 
 Q_DEFINE_THIS_FILE
