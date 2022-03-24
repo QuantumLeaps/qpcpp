@@ -100,7 +100,7 @@ void QActive::start(std::uint_fast8_t const prio,
 
     /* task name provided by the user in QF_setTaskName() or default name */
     char_t const *taskName = (m_thread != nullptr)
-                             ? static_cast<char_t const *>(m_thread)
+                             ? reinterpret_cast<char_t const *>(m_thread)
                              : static_cast<char_t const *>("AO");
 
     Q_REQUIRE_ID(200, (0U < prio)
