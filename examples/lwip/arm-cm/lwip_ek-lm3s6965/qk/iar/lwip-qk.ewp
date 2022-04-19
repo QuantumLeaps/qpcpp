@@ -3145,7 +3145,7 @@
     <group>
         <name>ek-lm3s6965</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\..\3rd_party\ek-lm3s6965\lwip_driver\netif\eth_driver.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\..\3rd_party\ek-lm3s6965\lwip_driver\netif_cpp\eth_driver.cpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\..\3rd_party\ek-lm3s6965\lwip_driver\netif\eth_driver.h</name>

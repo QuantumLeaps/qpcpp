@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="5.1.3" links="1">
+ <documentation>Dining Philosopher Problem example with the &quot;Orthogonal Component&quot; state pattern (see https://www.state-machine.com/doc/Pattern_Orthogonal.pdf)
+
+The model demonstrates the following features:
+
+1. Partitioning the application into Container and Components
+2. Packages for Container (cont) and Components (comp)
+3. External packages with speparate QM-package model files
+4. CompTimeEvt class for private time evnents of Components
+5. Container to Component communication via synchronous event dispatching
+6. Component to Container communication via asynchronous event posting using the LIFO policy.</documentation>
+ <!--${qpcpp}-->
+ <framework name="qpcpp"/>
+ <!--${Cont}-->
+ <package name="Cont" stereotype="0x02" namespace="DPP::">
+  <!--${Cont::TableEvt}-->
+  <class name="TableEvt" superclass="qpcpp::QEvt">
+   <!--${Cont::TableEvt::philoNum}-->
+   <attribute name="philoNum" type="std::uint8_t" visibility="0x00" properties="0x00"/>
+  </class>
+  <!--${Cont::Table}-->
+  <class name="Table" superclass="qpcpp::QActive">
+   <!--${Cont::Table::inst}-->
+   <attribute name="inst" type="Table" visibility="0x00" properties="0x01">
+    <documentation>The only static instance of the Table class (Singleton pattern)</documentation>
+   </attribute>
+   <!--${Cont::Table::m_fork[N_PHILO]}-->
+   <attribute name="m_fork[N_PHILO]" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <!--${Cont::Table::m_isHungry[N_PHILO]}-->
+   <attribute name="m_isHungry[N_PHILO]" type="bool" visibility="0x02" properties="0x00"/>
+   <!--${Cont::Table::Table}-->
+   <operation name="Table" type="" visibility="0x00" properties="0x00">
+    <code>  : QActive(Q_STATE_CAST(&amp;Table::initial))
+
+for (std::uint8_t n = 0U; n &lt; N_PHILO; ++n) {
+    m_fork[n] = FREE;
+    m_isHungry[n] = false;
+}</code>
+   </operation>
+   <!--${Cont::Table::SM}-->
+   <statechart properties="0x02">
+    <!--${Cont::Table::SM::initial}-->
+    <initial target="../1/3">
+     <action>(void)e; // unused parameter
+
+QS_OBJ_DICTIONARY(&amp;Table::inst);
+
+subscribe(PAUSE_SIG);
+subscribe(SERVE_SIG);
+subscribe(TEST_SIG);
+
+for (std::uint8_t n = 0U; n &lt; N_PHILO; ++n) {
+    m_fork[n] = FREE;
+    m_isHungry[n] = false;
+
+    SM_Philo[n]-&gt;init(QP::QS_AP_ID + n); // top-most initial tran.
+    BSP::displayPhilStat(n, THINKING);
+}</action>
+     <initial_glyph conn="2,4,5,1,44,23,-8">
+      <action box="0,-2,6,2"/>
+     </initial_glyph>
+    </initial>
+    <!--${Cont::Table::SM::active}-->
+    <state name="active">
+     <!--${Cont::Table::SM::active::EAT}-->
+     <tran trig="EAT">
+      <action>Q_ERROR();</action>
+      <tran_glyph conn="2,16,3,-1,14">
+       <action box="0,-2,10,4"/>
+      </tran_glyph>
+     </tran>
+     <!--${Cont::Table::SM::active::TEST}-->
+     <tran trig="TEST">
+      <tran_glyph conn="2,20,3,-1,14">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <!--${Cont::Table::SM::active::TIMEOUT}-->
+     <tran trig="TIMEOUT">
+      <action>uint16_t n = Q_EVT_CAST(CompTimeEvt)-&gt;compNum;
+SM_Philo[n]-&gt;dispatch(e, QP::QS_AO_ID + n);</action>
+      <tran_glyph conn="2,12,3,-1,14">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <!--${Cont::Table::SM::active::serving}-->
+     <state name="serving">
+      <entry brief="give pending permitions to eat">for (std::uint8_t n = 0U; n &lt; N_PHILO; ++n) { // give permissions to eat...
+    if (m_isHungry[n]
+        &amp;&amp; (m_fork[LEFT(n)] == FREE)
+        &amp;&amp; (m_fork[n] == FREE))
+    {
+        m_fork[LEFT(n)] = USED;
+        m_fork[n] = USED;
+
+        // synchronoulsy dispatch EAT event to the Philo component
+        TableEvt evt;
+        evt.sig = EAT_SIG;
+        evt.philoNum = n;
+        SM_Philo[n]-&gt;dispatch(&amp;evt, QP::QS_AP_ID + n);
+
+        m_isHungry[n] = false;
+        BSP::displayPhilStat(n, EATING);
+    }
+}</entry>
+      <!--${Cont::Table::SM::active::serving::HUNGRY}-->
+      <tran trig="HUNGRY">
+       <action>// find the index of the Philo from the event
+uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
+// philo ID must be in range and he must be not hungry
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
+
+BSP::displayPhilStat(n, HUNGRY);
+uint8_t m = LEFT(n);</action>
+       <!--${Cont::Table::SM::active::serving::HUNGRY::[bothfree]}-->
+       <choice>
+        <guard brief="both free">(m_fork[m] == FREE) &amp;&amp; (m_fork[n] == FREE)</guard>
+        <action>m_fork[m] = USED;
+m_fork[n] = USED;
+
+// synchronoulsy dispatch EAT event to the Philo component
+TableEvt evt;
+evt.sig = EAT_SIG;
+evt.philoNum = n;
+SM_Philo[n]-&gt;dispatch(&amp;evt, QP::QS_AP_ID + n);
+BSP::displayPhilStat(n, EATING);</action>
+        <choice_glyph conn="20,32,5,-1,10">
+         <action box="1,0,10,2"/>
+        </choice_glyph>
+       </choice>
+       <!--${Cont::Table::SM::active::serving::HUNGRY::[else]}-->
+       <choice>
+        <guard>else</guard>
+        <action>m_isHungry[n] = true;</action>
+        <choice_glyph conn="20,32,4,-1,4,10">
+         <action box="1,4,6,2"/>
+        </choice_glyph>
+       </choice>
+       <tran_glyph conn="4,32,3,-1,16">
+        <action box="0,-2,8,2"/>
+       </tran_glyph>
+      </tran>
+      <!--${Cont::Table::SM::active::serving::DONE}-->
+      <tran trig="DONE">
+       <action>// find the index of the Philo from the event
+std::uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
+// philo ID must be in range and he must be not hungry
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
+
+BSP::displayPhilStat(n, THINKING);
+std::uint8_t m = LEFT(n);
+// both forks of Phil[n] must be used
+Q_ASSERT((m_fork[n] == USED) &amp;&amp; (m_fork[m] == USED));
+
+m_fork[m] = FREE;
+m_fork[n] = FREE;
+m = RIGHT(n); // check the right neighbor
+
+TableEvt evt;
+if (m_isHungry[m] &amp;&amp; (m_fork[m] == FREE)) {
+    m_fork[n] = USED;
+    m_fork[m] = USED;
+    m_isHungry[m] = false;
+
+    // synchronoulsy dispatch EAT event to the Philo component
+    evt.sig = EAT_SIG;
+    evt.philoNum = m;
+    SM_Philo[m]-&gt;dispatch(&amp;evt, QP::QS_AP_ID + m);
+
+    BSP::displayPhilStat(m, EATING);
+}
+m = LEFT(n); // check the left neighbor
+n = LEFT(m); // left fork of the left neighbor
+if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
+    m_fork[m] = USED;
+    m_fork[n] = USED;
+    m_isHungry[m] = false;
+
+    // synchronoulsy dispatch EAT event to the Philo component
+    evt.sig = EAT_SIG;
+    evt.philoNum = m;
+    SM_Philo[m]-&gt;dispatch(&amp;evt, QP::QS_AP_ID + m);
+
+    BSP::displayPhilStat(m, EATING);
+}</action>
+       <tran_glyph conn="4,40,3,-1,16">
+        <action box="0,-2,6,2"/>
+       </tran_glyph>
+      </tran>
+      <!--${Cont::Table::SM::active::serving::EAT}-->
+      <tran trig="EAT">
+       <action>Q_ERROR();</action>
+       <tran_glyph conn="4,44,3,-1,16">
+        <action box="0,-2,12,4"/>
+       </tran_glyph>
+      </tran>
+      <!--${Cont::Table::SM::active::serving::PAUSE}-->
+      <tran trig="PAUSE" target="../../4">
+       <tran_glyph conn="4,48,3,1,36,8,-2">
+        <action box="0,-2,7,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="4,24,34,26">
+       <entry box="1,2,27,2"/>
+      </state_glyph>
+     </state>
+     <!--${Cont::Table::SM::active::paused}-->
+     <state name="paused">
+      <entry>BSP::displayPaused(1U);</entry>
+      <exit>BSP::displayPaused(0U);</exit>
+      <!--${Cont::Table::SM::active::paused::SERVE}-->
+      <tran trig="SERVE" target="../../3">
+       <tran_glyph conn="4,66,3,1,38,-32,-4">
+        <action box="0,-2,12,2"/>
+       </tran_glyph>
+      </tran>
+      <!--${Cont::Table::SM::active::paused::HUNGRY}-->
+      <tran trig="HUNGRY">
+       <action>// find the index of the Philo from the event
+std::uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
+// philo ID must be in range and he must be not hungry
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
+
+m_isHungry[n] = true;
+BSP::displayPhilStat(n, HUNGRY);</action>
+       <tran_glyph conn="4,70,3,-1,16">
+        <action box="0,-2,9,2"/>
+       </tran_glyph>
+      </tran>
+      <!--${Cont::Table::SM::active::paused::DONE}-->
+      <tran trig="DONE">
+       <action>// find the index of the Philo from the event
+std::uint8_t n = Q_EVT_CAST(TableEvt)-&gt;philoNum;
+// philo ID must be in range and he must be not hungry
+Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (!m_isHungry[n]));
+
+BSP::displayPhilStat(n, THINKING);
+
+uint8_t m = LEFT(n);
+// both forks of Phil[n] must be used
+Q_ASSERT((m_fork[n] == USED) &amp;&amp; (m_fork[m] == USED));
+
+m_fork[m] = FREE;
+m_fork[n] = FREE;</action>
+       <tran_glyph conn="4,74,3,-1,16">
+        <action box="0,-2,6,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="4,52,34,24">
+       <entry box="1,2,18,4"/>
+       <exit box="1,6,18,4"/>
+      </state_glyph>
+     </state>
+     <state_glyph node="2,6,42,72"/>
+    </state>
+    <state_diagram size="48,82"/>
+   </statechart>
+  </class>
+  <!--${Cont::AO_Table}-->
+  <attribute name="AO_Table" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <code>= &amp;Table::inst; // opaque pointer</code>
+  </attribute>
+ </package>
+ <!--${Comp}-->
+ <package name="Comp" stereotype="0x02" namespace="DPP::">
+  <!--${Comp::CompTimeEvt}-->
+  <class name="CompTimeEvt" superclass="qpcpp::QTimeEvt">
+   <documentation>Specialized time event for components. The time evnet can be owned by a component and can dispatch itself to the component.</documentation>
+   <!--${Comp::CompTimeEvt::compNum}-->
+   <attribute name="compNum" type="std::uint16_t" visibility="0x00" properties="0x00"/>
+   <!--${Comp::CompTimeEvt::CompTimeEvt}-->
+   <operation name="CompTimeEvt" type="" visibility="0x00" properties="0x00">
+    <documentation>The constructor to initialize a Component Time Event.
+
+When creating a Time-Event, you must commit it to a specific active object 'act',  event signal 'sig', and tick rate 'tickRate'. You cannot change these attributes later.</documentation>
+    <!--${Comp::CompTimeEvt::CompTimeEvt::act}-->
+    <parameter name="act" type="QP::QActive *"/>
+    <!--${Comp::CompTimeEvt::CompTimeEvt::num}-->
+    <parameter name="num" type="std::uint16_t"/>
+    <!--${Comp::CompTimeEvt::CompTimeEvt::sig}-->
+    <parameter name="sig" type="enum_t const"/>
+    <!--${Comp::CompTimeEvt::CompTimeEvt::tickRate}-->
+    <parameter name="tickRate" type="std::uint_fast8_t const"/>
+    <code> : QTimeEvt(act, sig, tickRate),
+   compNum(num)</code>
+   </operation>
+  </class>
+  <!--${Comp::Philo}-->
+  <class name="Philo" superclass="qpcpp::QHsm">
+   <!--${Comp::Philo::inst[N_PHILO]}-->
+   <attribute name="inst[N_PHILO]" type="Philo" visibility="0x00" properties="0x01"/>
+   <!--${Comp::Philo::m_timeEvt}-->
+   <attribute name="m_timeEvt" type="CompTimeEvt" visibility="0x02" properties="0x00"/>
+   <!--${Comp::Philo::class Table}-->
+   <attribute name="class Table" type="friend" visibility="0x02" properties="0x00"/>
+   <!--${Comp::Philo::Philo}-->
+   <operation name="Philo" type="" visibility="0x00" properties="0x00">
+    <code>  : QHsm(&amp;initial),
+    m_timeEvt(AO_Table, (this - &amp;Philo::inst[0]), TIMEOUT_SIG, 0U)</code>
+   </operation>
+   <!--${Comp::Philo::SM}-->
+   <statechart properties="0x00">
+    <!--${Comp::Philo::SM::initial}-->
+    <initial target="../1">
+     <action>static_cast&lt;void&gt;(e); // unused parameter
+
+#ifdef Q_SPY
+std::uint8_t n = static_cast&lt;std::uint8_t&gt;(this - &amp;Philo::inst[0]);
+QS_OBJ_ARR_DICTIONARY(&amp;Philo::inst[n], n);
+QS_OBJ_ARR_DICTIONARY(&amp;Philo::inst[n].m_timeEvt, n);
+#endif
+
+static bool registered = false;
+if (!registered) {
+    registered = true;
+    QS_FUN_DICTIONARY(&amp;Philo::initial);
+    QS_FUN_DICTIONARY(&amp;Philo::thinking);
+    QS_FUN_DICTIONARY(&amp;Philo::hungry);
+    QS_FUN_DICTIONARY(&amp;Philo::eating);
+}</action>
+     <initial_glyph conn="2,3,5,1,20,5,-4">
+      <action box="0,-2,6,2"/>
+     </initial_glyph>
+    </initial>
+    <!--${Comp::Philo::SM::thinking}-->
+    <state name="thinking">
+     <entry>m_timeEvt.armX(think_time(), 0U);</entry>
+     <exit>(void)m_timeEvt.disarm();</exit>
+     <!--${Comp::Philo::SM::thinking::TIMEOUT}-->
+     <tran trig="TIMEOUT" target="../../2">
+      <tran_glyph conn="2,14,3,1,20,12,-4">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <!--${Comp::Philo::SM::thinking::TEST}-->
+     <tran trig="TEST">
+      <tran_glyph conn="2,18,3,-1,12">
+       <action box="0,-2,11,4"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,5,16,17">
+      <entry box="1,2,5,2"/>
+      <exit box="1,4,5,2"/>
+     </state_glyph>
+    </state>
+    <!--${Comp::Philo::SM::hungry}-->
+    <state name="hungry">
+     <entry>TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
+pe-&gt;philoNum = static_cast&lt;std::uint8_t&gt;(this - &amp;Philo::inst[0]);
+AO_Table-&gt;postLIFO(pe);</entry>
+     <!--${Comp::Philo::SM::hungry::EAT}-->
+     <tran trig="EAT" target="../../3">
+      <tran_glyph conn="2,31,3,1,19,9,-3">
+       <action box="0,-2,14,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,24,16,12">
+      <entry box="1,2,5,2"/>
+     </state_glyph>
+    </state>
+    <!--${Comp::Philo::SM::eating}-->
+    <state name="eating">
+     <entry>m_timeEvt.armX(eat_time(), 0U);</entry>
+     <exit>(void)m_timeEvt.disarm();
+
+// asynchronously post event to the Container
+TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
+pe-&gt;philoNum = static_cast&lt;std::uint8_t&gt;(this - &amp;Philo::inst[0]);
+AO_Table-&gt;postLIFO(pe);</exit>
+     <!--${Comp::Philo::SM::eating::TIMEOUT}-->
+     <tran trig="TIMEOUT" target="../../1">
+      <tran_glyph conn="2,48,3,1,22,-38,-6">
+       <action box="0,-2,12,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,38,16,14">
+      <entry box="1,2,5,2"/>
+      <exit box="1,4,5,2"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="28,54"/>
+   </statechart>
+  </class>
+  <!--${Comp::SM_Philo[N_PHILO]}-->
+  <attribute name="SM_Philo[N_PHILO]" type="QP::QHsm * const" visibility="0x00" properties="0x00">
+   <code>= { // opaque pointers to Philo instances
+    &amp;Philo::inst[0],
+    &amp;Philo::inst[1],
+    &amp;Philo::inst[2],
+    &amp;Philo::inst[3],
+    &amp;Philo::inst[4]
+};</code>
+  </attribute>
+ </package>
+ <!--${.}-->
+ <directory name=".">
+  <!--${.::dpp.hpp}-->
+  <file name="dpp.hpp">
+   <text>#ifndef DPP_HPP
+#define DPP_HPP
+
+namespace DPP {
+
+enum DPPSignals {
+    TIMEOUT_SIG = QP::Q_USER_SIG, // time event timeout
+    EAT_SIG,        // published by Table to let a philosopher eat
+    DONE_SIG,       // published by Philosopher when done eating
+    PAUSE_SIG,      // published by BSP to pause the application
+    SERVE_SIG,      // published by BSP to serve re-start serving forks
+    TEST_SIG,       // published by BSP to test the application
+    MAX_PUB_SIG,    // the last published signal
+
+    HUNGRY_SIG,     // posted direclty to Table from hungry Philo
+    MAX_SIG         // the last signal
+};
+
+enum {
+    N_PHILO = 5 // number of Philos
+};
+
+} // namespace DPP
+
+$declare ${Cont::TableEvt}
+$declare ${Cont::AO_Table}
+
+$declare ${Comp::CompTimeEvt}
+$declare ${Comp::SM_Philo[N_PHILO]}
+
+#endif // DPP_HPP</text>
+  </file>
+  <!--${.::table.cpp}-->
+  <file name="table.cpp">
+   <text>#include &quot;qpcpp.hpp&quot;
+#include &quot;dpp.hpp&quot;
+#include &quot;bsp.hpp&quot;
+
+Q_DEFINE_THIS_FILE
+
+// Active object class -------------------------------------------------------
+$declare ${Cont::Table}
+
+namespace DPP {
+
+// helper function to provide the RIGHT neighbour of a Philo[n]
+inline uint8_t RIGHT(std::uint8_t const n) {
+    return static_cast&lt;std::uint8_t&gt;((n + (N_PHILO - 1U)) % N_PHILO);
+}
+
+// helper function to provide the LEFT neighbour of a Philo[n]
+inline uint8_t LEFT(std::uint8_t const n) {
+    return static_cast&lt;std::uint8_t&gt;((n + 1U) % N_PHILO);
+}
+
+static std::uint8_t const FREE = static_cast&lt;uint8_t&gt;(0);
+static std::uint8_t const USED = static_cast&lt;uint8_t&gt;(1);
+
+static char const * const THINKING = &quot;thinking&quot;;
+static char const * const HUNGRY   = &quot;hungry  &quot;;
+static char const * const EATING   = &quot;eating  &quot;;
+
+} // namespace DPP
+
+// definition of the whole &quot;Cont&quot; package
+$define ${Cont}</text>
+  </file>
+  <!--${.::philo.cpp}-->
+  <file name="philo.cpp">
+   <text>#include &quot;qpcpp.hpp&quot;
+#include &quot;dpp.hpp&quot;
+#include &quot;bsp.hpp&quot;
+
+Q_DEFINE_THIS_FILE
+
+$declare ${Comp::Philo}
+
+namespace DPP {
+
+// helper function to provide a randomized think time for Philos
+inline QP::QTimeEvtCtr think_time() {
+    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + (BSP::TICKS_PER_SEC/2U));
+}
+
+// helper function to provide a randomized eat time for Philos
+inline QP::QTimeEvtCtr eat_time() {
+    return static_cast&lt;QP::QTimeEvtCtr&gt;((BSP::random() % BSP::TICKS_PER_SEC)
+                                        + BSP::TICKS_PER_SEC);
+}
+
+} // namespace DPP
+
+// definition of the whole &quot;Comp&quot; package
+$define ${Comp}</text>
+  </file>
+ </directory>
+</model>

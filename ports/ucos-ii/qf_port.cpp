@@ -1,39 +1,32 @@
-/// @file
-/// @brief QF/C++ port to uC/OS-II RTOS, all supported compilers
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.3
-/// Last updated on  2021-04-08
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QF/C++ port to uC/OS-II RTOS, generic C++11 compiler
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-01-20
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QF/C++ port to uC/OS-II, generic C++11 compiler
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -56,7 +49,7 @@ static void task_function(void *pdata); // uC/OS-II task signature
 
 //............................................................................
 void QF::init(void) {
-    OSInit();        // initialize uC/OS-II
+    OSInit();  // initialize uC/OS-II
 }
 //............................................................................
 int_t QF::run(void) {
@@ -69,7 +62,7 @@ int_t QF::run(void) {
 
     OSStart();       // start uC/OS-II multitasking
     Q_ERROR_ID(100); // OSStart() should never return
-    return 0; // dummy return to make the compiler happy
+    return 0; // this unreachable return keeps the compiler happy
 }
 //............................................................................
 void QF::stop(void) {
@@ -115,7 +108,11 @@ void QActive::start(std::uint_fast8_t const prio,
 #endif
         p_ucos,                    // uC/OS-II task priority
         static_cast<INT16U>(prio), // the unique QP priority is the task id
+#if OS_STK_GROWTH
         static_cast<OS_STK *>(stkSto), // pbos
+#else
+        &static_cast<OS_STK *>(stkSto)[(stkSize/sizeof(OS_STK)) - 1], // pbos
+#endif
         static_cast<INT32U>(stkSize/sizeof(OS_STK)),// size in OS_STK units
         task_name,                 // pext
         static_cast<INT16U>(m_thread)); // task options, see NOTE1
@@ -178,7 +175,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
          - reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSNMsgs);
 
     if (margin == QF_NO_MARGIN) {
-        if (nFree > static_cast<QEQueueCtr>(0)) {
+        if (nFree > 0U) {
             status = true; // can post
         }
         else {
@@ -282,7 +279,7 @@ QEvt const *QActive::get_(void) noexcept {
 
 } // namespace QP
 
-///***************************************************************************
+//============================================================================
 // NOTE0:
 // The QF_onStartup() should enter the critical section before configuring
 // and starting interrupts and it should NOT exit the critical section.

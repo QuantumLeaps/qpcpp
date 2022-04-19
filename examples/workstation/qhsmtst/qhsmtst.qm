@@ -305,7 +305,7 @@ enum QHsmTstSignals {
     MAX_SIG
 };
 
-extern QP::QHsm * const the_hsm; // opaque pointer to the test HSM
+extern QP::QHsm * const the_sm; // opaque pointer to the test state machine
 
 // BSP functions to dispaly a message and exit
 void BSP_display(char_t const *msg);
@@ -321,10 +321,10 @@ void BSP_terminate(int16_t const result);
 
 $declare(HSMs::QHsmTst)
 
-static QHsmTst l_hsmtst; // the only instance of the QHsmTst class
+static QHsmTst l_sm; // the only instance of the QHsmTst class
 
 // global-scope definitions -----------------------------------------
-QP::QHsm * const the_hsm = &amp;l_hsmtst; // the opaque pointer
+QP::QHsm * const the_sm = &amp;l_sm; // the opaque pointer
 
 $define(HSMs::QHsmTst)
 </text>

@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: "Low-Power" example, cooperative QV kernel
 // Last Updated for Version: 6.9.2a
 // Date of the Last Update:  2021-01-31
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "low_power.hpp"
 #include "bsp.hpp"
@@ -256,7 +256,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // The bitmask l_activeSet is **shared** between the QV idle thread and
 // the application-level threads. Therefore this variable needs to be

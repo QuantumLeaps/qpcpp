@@ -1,41 +1,34 @@
-/// @file
-/// @brief Dummy definitions of the QS macros that avoid code generation from
-/// the QS instrumentation.
-/// @ingroup qs qpspy
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-30
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-02-20
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief Dummy definitions of the QS macros that avoid code generation from
+//! the QS instrumentation.
+//! @ingroup qs qpspy
 
 #ifndef QS_DUMMY_HPP
 #define QS_DUMMY_HPP
@@ -75,6 +68,7 @@
 
 #define QS_SIG_DICTIONARY(sig_, obj_)   static_cast<void>(0)
 #define QS_OBJ_DICTIONARY(obj_)         static_cast<void>(0)
+#define QS_OBJ_ARR_DICTIONARY(obj_, idx_) static_cast<void>(0)
 #define QS_FUN_DICTIONARY(fun_)         static_cast<void>(0)
 #define QS_USR_DICTIONARY(rec_)         static_cast<void>(0)
 #define QS_ASSERTION(module_, loc_, delay_) static_cast<void>(0)
@@ -88,7 +82,36 @@
 #define QS_OUTPUT()                     static_cast<void>(0)
 #define QS_RX_INPUT()                   static_cast<void>(0)
 
-//****************************************************************************
+namespace QP {
+
+//! QS ID offsets for QS_LOC_FILTER()
+enum QSpyIdOffsets : std::int16_t {
+    QS_AO_ID = 0,  //!< offset for AO priorities
+    QS_EP_ID = 64, //!< offset for event-pool IDs
+    QS_EQ_ID = 80, //!< offset for event-queue IDs
+    QS_AP_ID = 96, //!< offset for Appl-spec IDs
+};
+
+//! QS ID groups for QS_LOC_FILTER()
+enum QSpyIdGroups : std::int16_t {
+    QS_ALL_IDS = 0xF0,            //!< all QS IDs
+    QS_AO_IDS  = 0x80 + QS_AO_ID, //!< AO IDs (priorities)
+    QS_EP_IDS  = 0x80 + QS_EP_ID, //!< event-pool IDs
+    QS_EQ_IDS  = 0x80 + QS_EQ_ID, //!< event-queue IDs
+    QS_AP_IDS  = 0x80 + QS_AP_ID, //!< Application-specific IDs
+};
+
+//! QS ID type for applying local filtering
+struct QSpyId {
+    std::uint8_t m_prio;
+    std::uint_fast8_t getPrio(void) const noexcept {
+        return static_cast<std::uint_fast8_t>(m_prio);
+    }
+};
+
+} // namespace QP
+
+//============================================================================
 // internal QS macros used only in the QP components
 
 #ifdef QP_IMPL
@@ -120,4 +143,3 @@
 #endif // QP_IMPL
 
 #endif // QS_DUMMY_HPP
-

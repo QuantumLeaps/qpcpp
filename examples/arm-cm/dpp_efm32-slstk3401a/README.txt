@@ -12,7 +12,7 @@ Please refer to the README files in the sub-directories for specific
 instructions how to use and customize the example to your needs.
 
 
-Support Code for EFM32-SLSTK3401A Board 
+Support Code for EFM32-SLSTK3401A Board
 =======================================
 The directory 3rd_party\efm32pg1b contains the CMSIS-compliant
 device code for the EFM32PG1B200F256GM48 MCU. Please see the README.txt

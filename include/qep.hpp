@@ -1,79 +1,67 @@
-/// @file
-/// @brief QEP/C++ platform-independent public interface.
-/// @ingroup qep
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.4
-/// Last updated on  2021-07-29
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
-
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QEP/C++ platform-independent public interface.
+//! @ingroup qep
+//!
 #ifndef QEP_HPP
 #define QEP_HPP
 
-//****************************************************************************
+//============================================================================
+//! @addtogroup qp
+//! @{
+
 //! The current QP version as a decimal constant XXYZ, where XX is a 2-digit
-// major version number, Y is a 1-digit minor version number, and Z is
-// a 1-digit release number.
-#define QP_VERSION      694U
+//! major version number, Y is a 1-digit minor version number, and Z is
+//! a 1-digit release number.
+#define QP_VERSION      700U
 
 //! The current QP version number string of the form XX.Y.Z, where XX is
-// a 2-digit major version number, Y is a 1-digit minor version number,
-// and Z is a 1-digit release number.
-#define QP_VERSION_STR  "6.9.4"
+//! a 2-digit major version number, Y is a 1-digit minor version number,
+//! and Z is a 1-digit release number.
+#define QP_VERSION_STR  "7.0.0"
 
-//! Encrypted  current QP release (6.9.4) and date (2021-07-31)
-#define QP_RELEASE      0x8264FD99U
+//! Encrypted  current QP release (7.0.0) and date (2022-01-31) */
+#define QP_RELEASE      0x7CCAAA13U
 
-
-//****************************************************************************
+//============================================================================
 #ifndef Q_SIGNAL_SIZE
     //! The size (in bytes) of the signal of an event. Valid values:
     //! 1U, 2U, or 4U; default 2U
-    /// @description
-    /// This macro can be defined in the QEP port file (qep_port.hpp) to
-    /// configure the QP::QSignal type. When the macro is not defined, the
-    /// default of 2 bytes is applied.
+    //! @description
+    //! This macro can be defined in the QEP port file (qep_port.hpp) to
+    //! configure the QP::QSignal type. When the macro is not defined, the
+    //! default of 2 bytes is applied.
     #define Q_SIGNAL_SIZE 2U
 #endif
 
-//****************************************************************************
+//============================================================================
 // Aliases for basic numerical types; MISRA-C++ 2008 rule 3-9-2(req).
-
-//! alias for characters and character strings.
-/// @description
-/// This alias specifies character type for exclusive use in character
-/// strings. Use of this type, rather than plain 'char', is in compliance
-/// with the MISRA-C 2004 Rules 6.1(req), 6.3(adv).
-using char_t = char;
 
 //! alias for line numbers in assertions and return from QF::run()
 using int_t = int;
@@ -82,67 +70,69 @@ using int_t = int;
 using enum_t = int;
 
 //! alias for 32-bit IEEE 754 floating point numbers
-/// @note
-/// QP does not use floating-point types anywhere in the internal
-/// implementation, except in QS software tracing, where utilities for
-/// output of floating-point numbers are provided for application-level
-/// trace records.
-///
+//! @note
+//! QP does not use floating-point types anywhere in the internal
+//! implementation, except in QS software tracing, where utilities for
+//! output of floating-point numbers are provided for application-level
+//! trace records.
+//!
 using float32_t = float;
 
 //! alias for 64-bit IEEE 754 floating point numbers
-/// @note
-/// QP does not use floating-point types anywhere in the internal
-/// implementation, except in QS software tracing, where utilities for
-/// output of floating-point numbers are provided for application-level
-/// trace records.
-///
+//! @note
+//! QP does not use floating-point types anywhere in the internal
+//! implementation, except in QS software tracing, where utilities for
+//! output of floating-point numbers are provided for application-level
+//! trace records.
+//!
 using float64_t = double;
 
+//! @}
+
+//============================================================================
 //! Perform downcast of an event onto a subclass of QEvt @p class_
-/// @description
-/// This macro encapsulates the downcast of QEvt pointers, which violates
-/// MISRA-C 2004 rule 11.4(advisory). This macro helps to localize this
-/// deviation.
-///
+//! @description
+//! This macro encapsulates the downcast of QEvt pointers, which violates
+//! MISRA-C 2004 rule 11.4(advisory). This macro helps to localize this
+//! deviation.
+//!
 #define Q_EVT_CAST(class_)   (static_cast<class_ const *>(e))
 
 //! Perform cast from unsigned integer @p uint_ to pointer of type @p type_.
-/// @description
-/// This macro encapsulates the cast to (type_ *), which QP ports or
-/// application might use to access embedded hardware registers.
-/// Such uses can trigger PC-Lint "Note 923: cast from int to pointer"
-/// and this macro helps to encapsulate this deviation.
-///
+//! @description
+//! This macro encapsulates the cast to (type_ *), which QP ports or
+//! application might use to access embedded hardware registers.
+//! Such uses can trigger PC-Lint "Note 923: cast from int to pointer"
+//! and this macro helps to encapsulate this deviation.
+//!
 #define Q_UINT2PTR_CAST(type_, uint_)  (reinterpret_cast<type_ *>(uint_))
 
 //! Initializer of static constant QEvt instances
-/// @description
-/// This macro encapsulates the ugly casting of enumerated signals
-/// to QSignal and constants for QEvt.poolID and QEvt.refCtr_.
-///
+//! @description
+//! This macro encapsulates the ugly casting of enumerated signals
+//! to QSignal and constants for QEvt.poolID and QEvt.refCtr_.
+//!
 #define QEVT_INITIALIZER(sig_) { static_cast<QP::QSignal>(sig_), 0U, 0U }
 
-
-//****************************************************************************
+//============================================================================
 //! namespace associated with the QP/C++ framework
-/// @ingroup qep qf qs qv qk qxk
+//! @ingroup qep qf qs qv qk qxk
 namespace QP {
 
     //! the current QP version number string based on QP_VERSION_STR
-    constexpr char_t const versionStr[]{QP_VERSION_STR};
+    constexpr char const versionStr[]{QP_VERSION_STR};
 
 #if (Q_SIGNAL_SIZE == 1U)
     using QSignal = std::uint8_t;
 #elif (Q_SIGNAL_SIZE == 2U)
     //! QSignal represents the signal of an event.
-    /// @description
-    /// The relationship between an event and a signal is as follows. A signal
-    /// in UML is the specification of an asynchronous stimulus that triggers
-    /// reactions, and as such is an essential part of an event. (The signal
-    /// conveys the type of the occurrence--what happened?) However, an event
-    /// can also contain additional quantitative information about the
-    /// occurrence in form of event parameters.
+    //! @description
+    //! The relationship between an event and a signal is as follows. A signal
+    //! in UML is the specification of an asynchronous stimulus that triggers
+    //! reactions, and as such is an essential part of an event. (The signal
+    //! conveys the type of the occurrence--what happened?) However, an event
+    //! can also contain additional quantitative information about the
+    //! occurrence in form of event parameters.
     using QSignal = std::uint16_t;
 #elif (Q_SIGNAL_SIZE == 4U)
     using QSignal = std::uint32_t;
@@ -152,7 +142,6 @@ namespace QP {
 
 #ifdef Q_EVT_CTOR // Provide the constructor for the QEvt class?
 
-    //************************************************************************
     class QEvt {
     public:
         //! public constructor (overload for dynamic events)
@@ -197,16 +186,15 @@ namespace QP {
 
 #else // QEvt is a POD (Plain Old Datatype)
 
-    //************************************************************************
     //! QEvt base class.
-    /// @description
-    /// QEvt represents events without parameters and serves as the
-    /// base class for derivation of events with parameters.
-    ///
-    /// @usage
-    /// The following example illustrates how to add an event parameter by
-    /// inheriting from the QEvt class.
-    /// @include qep_qevt.cpp
+    //! @description
+    //! QEvt represents events without parameters and serves as the
+    //! base class for derivation of events with parameters.
+    //!
+    //! @usage
+    //! The following example illustrates how to add an event parameter by
+    //! inheriting from the QEvt class.
+    //! @include qep_qevt.cpp
     struct QEvt {
         QSignal sig;                   //!< signal of the event instance
         std::uint8_t poolId_;          //!< pool ID (0 for static event)
@@ -233,9 +221,9 @@ using QActionHandler = QState (*)(void * const me);
 using QXThreadHandler = void (*)(QXThread * const me);
 
 //! Attribute of for the QHsm class (Hierarchical State Machine).
-/// @description
-/// This union represents possible values stored in the 'state' and 'temp'
-/// attributes of the QHsm and QMsm classes.
+//! @description
+//! This union represents possible values stored in the 'state' and 'temp'
+//! attributes of the QHsm and QMsm classes.
 union QHsmAttr {
     QStateHandler   fun;          //!< pointer to a state handler function
     QActionHandler  act;          //!< pointer to an action-handler function
@@ -244,29 +232,27 @@ union QHsmAttr {
     QMTranActTable  const *tatbl; //!< transition-action table
 };
 
-
-//****************************************************************************
+//============================================================================
 //! Hierarchical State Machine base class
-///
-/// @description
-/// QHsm represents a Hierarchical State Machine (HSM) with full support for
-/// hierarchical nesting of states, entry/exit actions, and initial
-/// transitions in any composite state. QHsm inherits QMsm without adding
-/// new attributes, so it takes the same amount of RAM as QMsm.
-/// @n
-/// QHsm is also the base class for the QMsm state machine, which provides
-/// a superior efficiency, but requries the use of the QM modeling tool to
-/// generate code.
-///
-/// @note
-/// QHsm is not intended to be instantiated directly, but rather serves as
-/// the base class for derivation of state machines in the application code.
-///
-/// @usage
-/// The following example illustrates how to derive a state machine class
-/// from QHsm.
-/// @include qep_qhsm.cpp
-///
+//! @description
+//! QHsm represents a Hierarchical State Machine (HSM) with full support for
+//! hierarchical nesting of states, entry/exit actions, and initial
+//! transitions in any composite state. QHsm inherits QMsm without adding
+//! new attributes, so it takes the same amount of RAM as QMsm.
+//! @n
+//! QHsm is also the base class for the QMsm state machine, which provides
+//! a superior efficiency, but requries the use of the QM modeling tool to
+//! generate code.
+//!
+//! @note
+//! QHsm is not intended to be instantiated directly, but rather serves as
+//! the base class for derivation of state machines in the application code.
+//!
+//! @usage
+//! The following example illustrates how to derive a state machine class
+//! from QHsm.
+//! @include qep_qhsm.cpp
+//!
 class QHsm {
     QHsmAttr m_state;  //!< current active state (state-variable)
     QHsmAttr m_temp;   //!< temporary: transition chain, target state, etc.
@@ -281,7 +267,7 @@ public:
 
     //! overloaded init(qs_id)
     virtual void init(std::uint_fast8_t const qs_id) {
-        this->init(nullptr, qs_id);
+        init(nullptr, qs_id);
     }
 
     //! Dispatches an event to QHsm
@@ -477,36 +463,37 @@ private:
     friend class QXMutex;
     friend class QXSemaphore;
 #ifdef Q_UTEST
+    friend class QHsmDummy;
     friend class QActiveDummy;
 #endif // Q_UTEST
 };
 
-//****************************************************************************
+//============================================================================
 //! QM State Machine implementation strategy
-/// @description
-/// QMsm (QM State Machine) provides a more efficient state machine
-/// implementation strategy than QHsm, but requires the use of the QM
-/// modeling tool, but are the fastest and need the least run-time
-/// support (the smallest event-processor taking up the least code space).
-///
-/// @note
-/// QMsm is not intended to be instantiated directly, but rather serves as
-/// the base class for derivation of state machines in the application code.
-///
-/// @usage
-/// The following example illustrates how to derive a state machine class
-/// from QMsm. Please note that the QMsm member 'super' is defined as the
-/// _first_ member of the derived struct.
-/// @include qep_qmsm.cpp
-///
+//! @description
+//! QMsm (QM State Machine) provides a more efficient state machine
+//! implementation strategy than QHsm, but requires the use of the QM
+//! modeling tool, but are the fastest and need the least run-time
+//! support (the smallest event-processor taking up the least code space).
+//!
+//! @note
+//! QMsm is not intended to be instantiated directly, but rather serves as
+//! the base class for derivation of state machines in the application code.
+//!
+//! @usage
+//! The following example illustrates how to derive a state machine class
+//! from QMsm. Please note that the QMsm member 'super' is defined as the
+//! _first_ member of the derived struct.
+//! @include qep_qmsm.cpp
+//!
 class QMsm : public QHsm {
 public:
     //! Performs the second step of SM initialization by triggering
-    /// the top-most initial transition.
+    //! the top-most initial transition.
     void init(void const * const e,
               std::uint_fast8_t const qs_id) override;
     void init(std::uint_fast8_t const qs_id) override {
-        this->init(nullptr, qs_id);
+        init(nullptr, qs_id);
     }
 
     //! Dispatches an event to a HSM
@@ -573,15 +560,15 @@ private:
 };
 
 //! State object for the QP::QMsm class (QM State Machine).
-/// @description
-/// This class groups together the attributes of a QP::QMsm state, such as
-/// the parent state (state nesting), the associated state handler function
-/// and the exit action handler function. These attributes are used inside
-/// the QP::QMsm::dispatch() and QP::QMsm::init() functions.
-///
-/// @attention
-/// The QP::QMState class is only intended for the QM code generator and
-/// should not be used in hand-crafted code.
+//! @description
+//! This class groups together the attributes of a QP::QMsm state, such as
+//! the parent state (state nesting), the associated state handler function
+//! and the exit action handler function. These attributes are used inside
+//! the QP::QMsm::dispatch() and QP::QMsm::init() functions.
+//!
+//! @attention
+//! The QP::QMState class is only intended for the QM code generator and
+//! should not be used in hand-crafted code.
 struct QMState {
     QMState        const *superstate;   //!< superstate of this state
     QStateHandler  const stateHandler;  //!< state handler function
@@ -596,13 +583,12 @@ struct QMTranActTable {
     QActionHandler const act[1];
 };
 
-
-//****************************************************************************
+//============================================================================
 //! Provides miscellaneous QEP services.
 class QEP {
 public:
     //! get the current QEP version number string of the form "X.Y.Z"
-    static char_t const *getVersion(void) noexcept {
+    static char const *getVersion(void) noexcept {
         return versionStr;
     }
 };
@@ -612,20 +598,20 @@ constexpr enum_t Q_USER_SIG {4};
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // Macros for coding QHsm-style state machines...
 
 //! Macro to generate a declaration of a state-handler, state-caller and
 //! a state-object for a given state in a subclass of QP::QHsm.
-#define Q_STATE_DECL(state_) \
-    QP::QState state_ ## _h(QP::QEvt const * const e); \
+#define Q_STATE_DECL(state_)                                                 \
+    QP::QState state_ ## _h(QP::QEvt const * const e);                       \
     static QP::QState state_(void * const me, QP::QEvt const * const e)
 
 //! Macro to generate a definition of a state-handler for a given state
 //! in a subclass of QP::QHsm.
-#define Q_STATE_DEF(subclass_, state_) \
+#define Q_STATE_DEF(subclass_, state_)                                       \
     QP::QState subclass_::state_(void * const me, QP::QEvt const * const e) {\
-        return static_cast<subclass_ *>(me)->state_ ## _h(e); } \
+        return static_cast<subclass_ *>(me)->state_ ## _h(e); }              \
     QP::QState subclass_::state_ ## _h(QP::QEvt const * const e)
 
 //! Macro to specify that the event was handled
@@ -636,60 +622,59 @@ constexpr enum_t Q_USER_SIG {4};
 #define Q_UNHANDLED()         (Q_RET_UNHANDLED)
 
 //! Macro to perform casting to QStateHandler.
-/// @description
-/// This macro encapsulates the cast of a specific state handler function
-/// pointer to QStateHandler, which violates MISRA-C 2004 rule 11.4(advisory).
-/// This macro helps to localize this deviation.
+//! @description
+//! This macro encapsulates the cast of a specific state handler function
+//! pointer to QStateHandler, which violates MISRA-C 2004 rule 11.4(advisory).
+//! This macro helps to localize this deviation.
 #define Q_STATE_CAST(handler_) \
     (reinterpret_cast<QP::QStateHandler>(handler_))
 
 //! Macro to perform casting to QActionHandler.
-/// @description
-/// This macro encapsulates the cast of a specific action handler function
-/// pointer to QActionHandler, which violates MISRA-C2004 rule 11.4(advisory).
-/// This macro helps to localize this deviation.
+//! @description
+//! This macro encapsulates the cast of a specific action handler function
+//! pointer to QActionHandler, which violates MISRA-C2004 rule 11.4(advisory).
+//! This macro helps to localize this deviation.
 #define Q_ACTION_CAST(act_)   (reinterpret_cast<QP::QActionHandler>(act_))
 
 //! Macro to provide strictly-typed zero-action to terminate action lists
 //! in the transition-action-tables
 #define Q_ACTION_NULL         (nullptr)
 
-
-//****************************************************************************
+//============================================================================
 // Macros for coding QMsm-style state machines...
 
 //! Macro to generate a declaration of a state-handler, state-caller and
 //! a state-object for a given state in a subclass of QP::QMsm.
-#define QM_STATE_DECL(state_) \
-    QP::QState state_ ## _h(QP::QEvt const * const e); \
-    static QP::QState state_(void * const me, QP::QEvt const * const e); \
+#define QM_STATE_DECL(state_)                                                \
+    QP::QState state_ ## _h(QP::QEvt const * const e);                       \
+    static QP::QState state_(void * const me, QP::QEvt const * const e);     \
     static QP::QMState const state_ ## _s
 
 //! Macro to generate a declaration of a state-handler, state-caller and
 //! a state-object for a given *submachine* state in a subclass of QP::QMsm.
-#define QM_SM_STATE_DECL(subm_, state_) \
-    QP::QState state_ ## _h(QP::QEvt const * const e); \
-    static QP::QState state_(void * const me, QP::QEvt const * const e); \
+#define QM_SM_STATE_DECL(subm_, state_)                                      \
+    QP::QState state_ ## _h(QP::QEvt const * const e);                       \
+    static QP::QState state_(void * const me, QP::QEvt const * const e);     \
     static SM_ ## subm_ const state_ ## _s
 
 //! Macro to generate a declaration of an action-handler and action-caller
 //! in a subclass of QP::QMsm.
-#define QM_ACTION_DECL(action_) \
-    QP::QState action_ ## _h(void); \
+#define QM_ACTION_DECL(action_)                                              \
+    QP::QState action_ ## _h(void);                                          \
     static QP::QState action_(void * const me)
 
 //! Macro to generate a definition of a state-caller and state-handler
 //! for a given state in a subclass of QP::QMsm.
-#define QM_STATE_DEF(subclass_, state_) \
+#define QM_STATE_DEF(subclass_, state_)                                      \
     QP::QState subclass_::state_(void * const me, QP::QEvt const * const e) {\
-        return static_cast<subclass_ *>(me)->state_ ## _h(e); } \
+        return static_cast<subclass_ *>(me)->state_ ## _h(e); }              \
     QP::QState subclass_::state_ ## _h(QP::QEvt const * const e)
 
 //! Macro to generate a definition of an action-caller and action-handler
 //! in a subclass of QP::QMsm.
-#define QM_ACTION_DEF(subclass_, action_) \
-    QP::QState subclass_::action_(void * const me) { \
-        return static_cast<subclass_ *>(me)->action_ ## _h(); } \
+#define QM_ACTION_DEF(subclass_, action_)                                    \
+    QP::QState subclass_::action_(void * const me) {                         \
+        return static_cast<subclass_ *>(me)->action_ ## _h(); }              \
     QP::QState subclass_::action_ ## _h(void)
 
 //! Macro for a QM action-handler when it handles the event.
@@ -707,4 +692,3 @@ constexpr enum_t Q_USER_SIG {4};
 #define QM_STATE_NULL         (nullptr)
 
 #endif // QEP_HPP
-

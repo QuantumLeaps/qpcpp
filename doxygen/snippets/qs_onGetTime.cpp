@@ -7,7 +7,6 @@ QSTimeCtr QS::onGetTime(void) { // invoked with interrupts disabled
     }
     return ret;
 }
-
 . . .
 
 #endif // Q_SPY

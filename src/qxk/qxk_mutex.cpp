@@ -1,40 +1,33 @@
-/// @file
-/// @brief Priority-ceiling blocking mutex QP::QXMutex class definition
-/// @ingroup qxk
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-18
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief Priority-ceiling blocking mutex QP::QXMutex class definition
+//! @ingroup qxk
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -52,43 +45,49 @@
     #error "Source file included in a project NOT based on the QXK kernel"
 #endif // QXK_HPP
 
-namespace QP {
+// unnamed namespace for local definitions with internal linkage
+namespace {
 
 Q_DEFINE_THIS_MODULE("qxk_mutex")
 
-//****************************************************************************
-/// @description
-/// Initialize the QXK priority ceiling mutex.
-///
-/// @param[in]  ceiling    the ceiling-priotity of this mutex or zero.
-///
-/// @note
-/// `ceiling == 0` means that the priority-ceiling protocol shall __not__
-/// be used by this mutex. Such mutex will __not__ change (boost) the
-/// priority of the holding thread.
-///
-/// @note
-/// `ceiling > 0` means that the priority-ceiling protocol shall be used
-/// by this mutex. Such mutex __will__ boost the priority of the holding
-/// thread to the `ceiling` level for as long as the thread holds this mutex.
-///
-/// @attention
-/// When the priority-ceiling protocol is used (`ceiling > 0`), the
-/// `ceiling` priority must be unused by any other thread or mutex.
-/// Also, the `ceiling` priority must be higher than priority of any thread
-/// that uses this mutex.
-///
-/// @usage
-/// @include qxk_mutex.cpp
-///
+} // unnamed namespace
+
+namespace QP {
+
+
+//============================================================================
+//! @description
+//! Initialize the QXK priority ceiling mutex.
+//!
+//! @param[in]  ceiling    the ceiling-priotity of this mutex or zero.
+//!
+//! @note
+//! `ceiling == 0` means that the priority-ceiling protocol shall __not__
+//! be used by this mutex. Such mutex will __not__ change (boost) the
+//! priority of the holding thread.
+//!
+//! @note
+//! `ceiling > 0` means that the priority-ceiling protocol shall be used
+//! by this mutex. Such mutex __will__ boost the priority of the holding
+//! thread to the `ceiling` level for as long as the thread holds this mutex.
+//!
+//! @attention
+//! When the priority-ceiling protocol is used (`ceiling > 0`), the
+//! `ceiling` priority must be unused by any other thread or mutex.
+//! Also, the `ceiling` priority must be higher than priority of any thread
+//! that uses this mutex.
+//!
+//! @usage
+//! @include qxk_mutex.cpp
+//!
 void QXMutex::init(std::uint_fast8_t const ceiling) noexcept {
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
-    /// @pre the celiling priority of the mutex must:
-    /// - cannot exceed the maximum #QF_MAX_ACTIVE;
-    /// - the ceiling priority of the mutex must not be already in use;
-    /// (QF requires priority to be **unique**).
+
+    //! @pre the celiling priority of the mutex must:
+    //! - cannot exceed the maximum #QF_MAX_ACTIVE;
+    //! - the ceiling priority of the mutex must not be already in use;
+    //! (QF requires priority to be **unique**).
     Q_REQUIRE_ID(100,
         (ceiling <= QF_MAX_ACTIVE)
         && ((ceiling == 0U)
@@ -106,52 +105,51 @@ void QXMutex::init(std::uint_fast8_t const ceiling) noexcept {
     QF_CRIT_X_();
 }
 
-//****************************************************************************
-/// @description
-/// Lock the QXK priority ceiling mutex QP::QXMutex.
-///
-/// @param[in]  nTicks    number of clock ticks (at the associated rate)
-///                       to wait for the semaphore. The value of
-///                       #QXTHREAD_NO_TIMEOUT indicates that no timeout will
-///                       occur and the semaphore will wait indefinitely.
-/// @returns
-/// 'true' if the mutex has been acquired and 'false' if a timeout occured.
-///
-/// @note
-/// The mutex locks are allowed to nest, meaning that the same extended thread
-/// can lock the same mutex multiple times (< 255). However, each call to
-/// QXMutex::lock() must be ballanced by the matching call to
-/// QXMutex::unlock().
-///
-/// @usage
-/// @include qxk_mutex.cpp
-///
+//============================================================================
+//! @description
+//! Lock the QXK priority ceiling mutex QP::QXMutex.
+//!
+//! @param[in]  nTicks    number of clock ticks (at the associated rate)
+//!                       to wait for the semaphore. The value of
+//!                       #QXTHREAD_NO_TIMEOUT indicates that no timeout will
+//!                       occur and the semaphore will wait indefinitely.
+//! @returns
+//! 'true' if the mutex has been acquired and 'false' if a timeout occured.
+//!
+//! @note
+//! The mutex locks are allowed to nest, meaning that the same extended thread
+//! can lock the same mutex multiple times (< 255). However, each call to
+//! QXMutex::lock() must be ballanced by the matching call to
+//! QXMutex::unlock().
+//!
+//! @usage
+//! @include qxk_mutex.cpp
+//!
 bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
-    bool locked = true; // assume that the mutex will be locked
-    QXThread *curr;
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
-    curr = QXK_PTR_CAST_(QXThread*, QXK_attr_.curr);
 
-    /// @pre this function must:
-    /// - NOT be called from an ISR;
-    /// - be called from an extended thread;
-    /// - the ceiling priority must not be used; or if used
-    ///   - the thread priority must be below the ceiling of the mutex;
-    /// - the ceiling must be in range
-    /// - the thread must NOT be already blocked on any object.
-    ///
+    QXThread * const curr = QXK_PTR_CAST_(QXThread*, QXK_attr_.curr);
+
+    //! @pre this function must:
+    //! - NOT be called from an ISR;
+    //! - be called from an extended thread;
+    //! - the ceiling priority must not be used; or if used
+    //!   - the thread priority must be below the ceiling of the mutex;
+    //! - the ceiling must be in range
+    //! - the thread must NOT be already blocked on any object.
+    //!
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
         && (curr != nullptr)
         && ((m_ceiling == 0U)
             || (curr->m_prio < m_ceiling))
         && (m_ceiling <= QF_MAX_ACTIVE)
         && (curr->m_temp.obj == nullptr)); // not blocked
-    /// @pre also: the thread must NOT be holding a scheduler lock.
+    //! @pre also: the thread must NOT be holding a scheduler lock.
     Q_REQUIRE_ID(201, QXK_attr_.lockHolder != curr->m_prio);
 
     // is the mutex available?
+    bool locked = true; // assume that the mutex will be locked
     if (m_lockNest == 0U) {
         m_lockNest = 1U;
 
@@ -236,46 +234,45 @@ bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
     return locked;
 }
 
-//****************************************************************************
-/// @description
-/// Try to lock the QXK priority ceiling mutex QP::QXMutex.
-///
-/// @returns
-/// 'true' if the mutex was successfully locked and 'false' if the mutex was
-/// unavailable and was NOT locked.
-///
-/// @note
-/// This function **can** be called from both basic threads (active objects)
-/// and extended threads.
-///
-/// @note
-/// The mutex locks are allowed to nest, meaning that the same extended thread
-/// can lock the same mutex multiple times (< 255). However, each successful
-/// call to QXMutex::tryLock() must be ballanced by the matching call to
-/// QXMutex::unlock().
-///
+//============================================================================
+//! @description
+//! Try to lock the QXK priority ceiling mutex QP::QXMutex.
+//!
+//! @returns
+//! 'true' if the mutex was successfully locked and 'false' if the mutex was
+//! unavailable and was NOT locked.
+//!
+//! @note
+//! This function **can** be called from both basic threads (active objects)
+//! and extended threads.
+//!
+//! @note
+//! The mutex locks are allowed to nest, meaning that the same extended thread
+//! can lock the same mutex multiple times (< 255). However, each successful
+//! call to QXMutex::tryLock() must be ballanced by the matching call to
+//! QXMutex::unlock().
+//!
 bool QXMutex::tryLock(void) noexcept {
-    QActive *curr;
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
-    curr = QXK_attr_.curr;
+
+    QActive *curr = QXK_attr_.curr;
     if (curr == nullptr) { // called from a basic thread?
         curr = QF::active_[QXK_attr_.actPrio];
     }
 
-    /// @pre this function must:
-    /// - NOT be called from an ISR;
-    /// - the calling thread must be valid;
-    /// - the ceiling must be not used; or
-    ///   - the thread priority must be below the ceiling of the mutex;
-    /// - the ceiling must be in range
+    //! @pre this function must:
+    //! - NOT be called from an ISR;
+    //! - the calling thread must be valid;
+    //! - the ceiling must be not used; or
+    //!   - the thread priority must be below the ceiling of the mutex;
+    //! - the ceiling must be in range
     Q_REQUIRE_ID(300, (!QXK_ISR_CONTEXT_())
         && (curr != nullptr)
         && ((m_ceiling == 0U)
             || (curr->m_prio < m_ceiling))
         && (m_ceiling <= QF_MAX_ACTIVE));
-    /// @pre also: the thread must NOT be holding a scheduler lock.
+    //! @pre also: the thread must NOT be holding a scheduler lock.
     Q_REQUIRE_ID(301, QXK_attr_.lockHolder != curr->m_prio);
 
     // is the mutex available?
@@ -325,48 +322,47 @@ bool QXMutex::tryLock(void) noexcept {
     return curr != nullptr;
 }
 
-//****************************************************************************
-/// @description
-/// Unlock the QXK priority ceiling mutex.
-///
-/// @note
-/// This function **can** be called from both basic threads (active objects)
-/// and extended threads.
-///
-/// @note
-/// The mutex locks are allowed to nest, meaning that the same extended thread
-/// can lock the same mutex multiple times (< 255). However, each call to
-/// QXMutex::lock() or a _successfull_ call to QXMutex::tryLock() must be
-/// ballanced by the matching call to QXMutex::unlock().
-///
-/// @usage
-/// @include qxk_mutex.cpp
-///
+//============================================================================
+//! @description
+//! Unlock the QXK priority ceiling mutex.
+//!
+//! @note
+//! This function **can** be called from both basic threads (active objects)
+//! and extended threads.
+//!
+//! @note
+//! The mutex locks are allowed to nest, meaning that the same extended thread
+//! can lock the same mutex multiple times (< 255). However, each call to
+//! QXMutex::lock() or a _successfull_ call to QXMutex::tryLock() must be
+//! ballanced by the matching call to QXMutex::unlock().
+//!
+//! @usage
+//! @include qxk_mutex.cpp
+//!
 void QXMutex::unlock(void) noexcept {
-    QActive *curr;
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
-    curr = static_cast<QActive *>(QXK_attr_.curr);
+
+    QActive *curr = static_cast<QActive *>(QXK_attr_.curr);
     if (curr == nullptr) { // called from a basic thread?
         curr = QF::active_[QXK_attr_.actPrio];
     }
 
-    /// @pre this function must:
-    /// - NOT be called from an ISR;
-    /// - the calling thread must be valid;
-    /// - the ceiling must not be used or
-    ///    - the current thread must have priority equal to the mutex ceiling;
-    /// - the ceiling must be in range
-    ///
+    //! @pre this function must:
+    //! - NOT be called from an ISR;
+    //! - the calling thread must be valid;
+    //! - the ceiling must not be used or
+    //!    - the current thread must have priority equal to the mutex ceiling;
+    //! - the ceiling must be in range
+    //!
     Q_REQUIRE_ID(400, (!QXK_ISR_CONTEXT_())
         && (curr != nullptr)
         && ((m_ceiling == 0U)
             || (curr->m_dynPrio == m_ceiling))
         && (m_ceiling <= QF_MAX_ACTIVE));
-    /// @pre also: the mutex must be already locked at least once.
+    //! @pre also: the mutex must be already locked at least once.
     Q_REQUIRE_ID(401, m_lockNest > 0U);
-    /// @pre also: the mutex must be held by this thread.
+    //! @pre also: the mutex must be held by this thread.
     Q_REQUIRE_ID(402, m_holderPrio == curr->m_prio);
 
     // is this the last nesting level?

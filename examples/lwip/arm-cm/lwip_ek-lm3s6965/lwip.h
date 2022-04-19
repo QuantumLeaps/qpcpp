@@ -7,7 +7,7 @@
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -51,7 +51,7 @@
 #include "lwip/dhcp.h"
 
 #include "netif/etharp.h"
-#include "netif/eth_driver.hpp"
+#include "netif/eth_driver.h"
 
 /* utilities added by QL... */
 #ifdef __cplusplus

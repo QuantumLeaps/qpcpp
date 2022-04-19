@@ -499,6 +499,11 @@
               <FilePath>..\..\..\..\..\src\qf\qf_dyn.cpp</FilePath>
             </File>
             <File>
+              <FileName>qf_mem.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qf\qf_mem.cpp</FilePath>
+            </File>
+            <File>
               <FileName>qf_ps.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qf\qf_ps.cpp</FilePath>
@@ -522,11 +527,6 @@
               <FileName>qf_time.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qf\qf_time.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qf_mem.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\src\qf\qf_mem.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1224,6 +1224,11 @@
               <FilePath>..\..\..\..\..\src\qf\qf_dyn.cpp</FilePath>
             </File>
             <File>
+              <FileName>qf_mem.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qf\qf_mem.cpp</FilePath>
+            </File>
+            <File>
               <FileName>qf_ps.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qf\qf_ps.cpp</FilePath>
@@ -1247,11 +1252,6 @@
               <FileName>qf_time.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qf\qf_time.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qf_mem.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\src\qf\qf_mem.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1460,7 +1460,7 @@
       <TargetName>dpp-spy</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -1949,6 +1949,11 @@
               <FilePath>..\..\..\..\..\src\qf\qf_dyn.cpp</FilePath>
             </File>
             <File>
+              <FileName>qf_mem.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qf\qf_mem.cpp</FilePath>
+            </File>
+            <File>
               <FileName>qf_ps.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qf\qf_ps.cpp</FilePath>
@@ -1972,11 +1977,6 @@
               <FileName>qf_time.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qf\qf_time.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qf_mem.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\src\qf\qf_mem.cpp</FilePath>
             </File>
           </Files>
         </Group>

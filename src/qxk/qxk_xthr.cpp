@@ -1,40 +1,33 @@
-/// @file
-/// @brief QXK/C++ preemptive kernel extended (blocking) thread implementation
-/// @ingroup qxk
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-19
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QXK/C++ preemptive kernel extended (blocking) thread implementation
+//! @ingroup qxk
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -52,24 +45,42 @@
     #error "Source file included in a project NOT based on the QXK kernel"
 #endif // QXK_HPP
 
+extern "C" {
+
 Q_DEFINE_THIS_MODULE("qxk_xthr")
 
+} // extern "C"
+
 //! intertnal macro to encapsulate casting of pointers for MISRA deviations */
-///
-/// @description
-/// This macro is specifically and exclusively used for downcasting pointers
-/// to QActive to pointers to QXThread in situations when it is known
-/// that such downcasting is correct.
-/// However, such pointer casting is not compliant with
-/// MISRA C++ Rule 5-2-7 as well as other messages (e.g.,
-/// PC-Lint-Plus warning 826). Defining this specific macro for this purpose
-/// allows to selectively disable the warnings for this particular case.
-///
+//!
+//! @description
+//! This macro is specifically and exclusively used for downcasting pointers
+//! to QActive to pointers to QXThread in situations when it is known
+//! that such downcasting is correct.
+//! However, such pointer casting is not compliant with
+//! MISRA C++ Rule 5-2-7 as well as other messages (e.g.,
+//! PC-Lint-Plus warning 826). Defining this specific macro for this purpose
+//! allows to selectively disable the warnings for this particular case.
+//!
 #define QXTHREAD_CAST_(ptr_) (static_cast<QP::QXThread *>(ptr_))
 
 namespace QP {
 
-//****************************************************************************
+//============================================================================
+//!
+//! @description
+//! Performs the first step of QXThread initialization by assigning the
+//! thread-handler function and the tick rate at which it will handle
+//! the timeouts.
+//!
+//! @param[in]     handler  the thread-handler function
+//! @param[in]     tickRate the ticking rate associated with this thread
+//!                for timeouts in this thread (see QXThread::delay() and
+//!                TICK_X())
+//!
+//! @note
+//! Must be called only ONCE before QXThread::start().
+//!
 QXThread::QXThread(QXThreadHandler const handler,
                    std::uint_fast8_t const tickRate) noexcept
   : QActive(Q_STATE_CAST(handler)),
@@ -79,7 +90,7 @@ QXThread::QXThread(QXThreadHandler const handler,
     m_state.act = nullptr; // mark as extended thread
 }
 
-//****************************************************************************
+//============================================================================
 // QXThread virtual function implementations...
 void QXThread::init(void const * const e,
                     std::uint_fast8_t const qs_id) noexcept
@@ -89,7 +100,7 @@ void QXThread::init(void const * const e,
     Q_ERROR_ID(110);
 }
 
-//****************************************************************************
+//============================================================================
 void QXThread::dispatch(QEvt const * const e,
                         std::uint_fast8_t const qs_id) noexcept
 {
@@ -98,27 +109,27 @@ void QXThread::dispatch(QEvt const * const e,
     Q_ERROR_ID(120);
 }
 
-//****************************************************************************
-///
-/// @description
-/// Starts execution of an extended thread and registers it with the framework.
-/// The extended thread becomes ready-to-run immediately and is scheduled
-/// if the QXK is already running.
-///
-/// @param[in]     prio    priority at which to start the extended thread
-/// @param[in]     qSto    pointer to the storage for the ring buffer of the
-///                        event queue. This cold be NULL, if this extended
-///                        thread does not use the built-in event queue.
-/// @param[in]     qLen    length of the event queue [in events],
-///                        or zero if queue not used
-/// @param[in]     stkSto  pointer to the stack storage (must be provided)
-/// @param[in]     stkSize stack size [in bytes] (must not be zero)
-/// @param[in]     par     pointer to an extra parameter (might be NULL)
-///
-/// @usage
-/// The following example shows starting an extended thread:
-/// @include qxk_start.cpp
-///
+//============================================================================
+//!
+//! @description
+//! Starts execution of an extended thread and registers it with the framework.
+//! The extended thread becomes ready-to-run immediately and is scheduled
+//! if the QXK is already running.
+//!
+//! @param[in]     prio    priority at which to start the extended thread
+//! @param[in]     qSto    pointer to the storage for the ring buffer of the
+//!                        event queue. This cold be NULL, if this extended
+//!                        thread does not use the built-in event queue.
+//! @param[in]     qLen    length of the event queue [in events],
+//!                        or zero if queue not used
+//! @param[in]     stkSto  pointer to the stack storage (must be provided)
+//! @param[in]     stkSize stack size [in bytes] (must not be zero)
+//! @param[in]     par     pointer to an extra parameter (might be NULL)
+//!
+//! @usage
+//! The following example shows starting an extended thread:
+//! @include qxk_start.cpp
+//!
 void QXThread::start(std::uint_fast8_t const prio,
                      QEvt const * * const qSto, std::uint_fast16_t const qLen,
                      void * const stkSto, std::uint_fast16_t const stkSize,
@@ -126,11 +137,11 @@ void QXThread::start(std::uint_fast8_t const prio,
 {
     static_cast<void>(par); // unused parameter
 
-    /// @pre this function must:
-    /// - NOT be called from an ISR;
-    /// - the thread priority cannot exceed #QF_MAX_ACTIVE;
-    /// - the stack storage must be provided;
-    /// - the thread must be instantiated (see QP::QXThread::QXThread()).
+    //! @pre this function must:
+    //! - NOT be called from an ISR;
+    //! - the thread priority cannot exceed #QF_MAX_ACTIVE;
+    //! - the stack storage must be provided;
+    //! - the thread must be instantiated (see #QXThread).
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
         && (prio <= QF_MAX_ACTIVE)
         && (stkSto != nullptr)
@@ -165,38 +176,38 @@ void QXThread::start(std::uint_fast8_t const prio,
 }
 
 #ifdef Q_SPY
-//****************************************************************************
-/// @description
-/// Direct event posting is the simplest asynchronous communication method
-/// available in QF. The following example illustrates how the Philo active
-/// object posts directly the HUNGRY event to the Table active object.@n
-/// @n
-/// The parameter @p margin specifies the minimum number of free slots in
-/// the queue that must be available for posting to succeed. The function
-/// returns 1 (success) if the posting succeeded (with the provided margin)
-/// and 0 (failure) when the posting fails.
-///
-/// @param[in] e      pointer to the event to be posted
-/// @param[in] margin number of required free slots in the queue
-///                   after posting the event. The special value
-///                   QP::QF_NO_MARGIN means that this function will assert
-///                   if posting fails.
-/// @param[in] sender  pointer to a sender object (used in QS only)
-///
-/// @returns
-/// 'true' (success) if the posting succeeded (with the provided margin) and
-/// 'false' (failure) when the posting fails.
-///
-/// @attention
-/// Should be called only via the macro POST() or POST_X().
-///
-/// @note
-/// The QP::QF_NO_MARGIN value of the @p margin parameter is special and
-/// denotes situation when the post() operation is assumed to succeed
-/// (event delivery guarantee). An assertion fires, when the event cannot
-/// be delivered in this case.
-/// delivered in this case.
-///
+//============================================================================
+//! @description
+//! Direct event posting is the simplest asynchronous communication method
+//! available in QF. The following example illustrates how the Philo active
+//! object posts directly the HUNGRY event to the Table active object.@n
+//! @n
+//! The parameter @p margin specifies the minimum number of free slots in
+//! the queue that must be available for posting to succeed. The function
+//! returns 1 (success) if the posting succeeded (with the provided margin)
+//! and 0 (failure) when the posting fails.
+//!
+//! @param[in] e      pointer to the event to be posted
+//! @param[in] margin number of required free slots in the queue
+//!                   after posting the event. The special value
+//!                   QP::QF_NO_MARGIN means that this function will assert
+//!                   if posting fails.
+//! @param[in] sender  pointer to a sender object (used in QS only)
+//!
+//! @returns
+//! 'true' (success) if the posting succeeded (with the provided margin) and
+//! 'false' (failure) when the posting fails.
+//!
+//! @attention
+//! Should be called only via the macro POST() or POST_X().
+//!
+//! @note
+//! The QP::QF_NO_MARGIN value of the @p margin parameter is special and
+//! denotes situation when the post() operation is assumed to succeed
+//! (event delivery guarantee). An assertion fires, when the event cannot
+//! be delivered in this case.
+//! delivered in this case.
+//!
 bool QXThread::post_(QEvt const * const e,
                      std::uint_fast16_t const margin,
                      void const * const sender) noexcept
@@ -205,11 +216,11 @@ bool QXThread::post_(QEvt const * const e,
                      std::uint_fast16_t const margin) noexcept
 #endif
 {
-    bool status;
     QF_CRIT_STAT_
     QS_TEST_PROBE_DEF(&QXThread::post_)
 
     // is it the private time event?
+    bool status;
     if (e == &m_timeEvt) {
         QF_CRIT_E_();
         // the private time event is disarmed and not in any queue,
@@ -225,7 +236,7 @@ bool QXThread::post_(QEvt const * const e,
     // is the event queue provided?
     else if (m_eQueue.m_end != 0U) {
 
-        /// @pre event pointer must be valid
+        //! @pre event pointer must be valid
         Q_REQUIRE_ID(300, e != nullptr);
 
         QF_CRIT_E_();
@@ -292,7 +303,7 @@ bool QXThread::post_(QEvt const * const e,
             // queue is not empty, insert event into the ring-buffer
             else {
                 // insert event into the ring buffer (FIFO)
-                QF_PTR_AT_(m_eQueue.m_ring, m_eQueue.m_head) = e;
+                m_eQueue.m_ring[m_eQueue.m_head] = e;
 
                 // need to wrap the head couner?
                 if (m_eQueue.m_head == 0U) {
@@ -329,56 +340,54 @@ bool QXThread::post_(QEvt const * const e,
     return status;
 }
 
-//****************************************************************************
-/// @description
-/// Last-In-First-Out (LIFO) policy is not supported for extened threads.
-///
-/// @param[in]  e  pointer to the event to post to the queue
-///
-/// @sa
-/// QActive::postLIFO_()
-///
+//============================================================================
+//! @description
+//! Last-In-First-Out (LIFO) policy is not supported for extened threads.
+//!
+//! @param[in]  e  pointer to the event to post to the queue
+//!
+//! @sa
+//! QActive::postLIFO_()
+//!
 void QXThread::postLIFO(QEvt const * const e) noexcept {
     static_cast<void>(e); // unused parameter
     Q_ERROR_ID(410);
 }
 
-//****************************************************************************
-/// @description
-/// The QXThread::queueGet() operation allows the calling extended thread to
-/// receive QP events directly into its own built-in event queue from an ISR,
-/// basic thread (AO), or another extended thread.
-///
-/// If QXThread::queueGet() is called when no events are present in the
-/// thread's private event queue, the operation blocks the current extended
-/// thread until either an event is received, or a user-specified timeout
-/// expires.
-///
-/// @param[in]  nTicks    number of clock ticks (at the associated rate)
-///                       to wait for the event to arrive. The value of
-///                       QXTHREAD_NO_TIMEOUT indicates that no timeout will
-///                       occur and the queue will block indefinitely.
-/// @returns
-/// A pointer to the event. If the pointer is not NULL, the event
-/// was delivered. Otherwise the event pointer of NULL indicates that the
-/// queue has timed out.
-///
+//============================================================================
+//! @description
+//! The QXThread::queueGet() operation allows the calling extended thread to
+//! receive QP events directly into its own built-in event queue from an ISR,
+//! basic thread (AO), or another extended thread.
+//!
+//! If QXThread::queueGet() is called when no events are present in the
+//! thread's private event queue, the operation blocks the current extended
+//! thread until either an event is received, or a user-specified timeout
+//! expires.
+//!
+//! @param[in]  nTicks    number of clock ticks (at the associated rate)
+//!                       to wait for the event to arrive. The value of
+//!                       QXTHREAD_NO_TIMEOUT indicates that no timeout will
+//!                       occur and the queue will block indefinitely.
+//! @returns
+//! A pointer to the event. If the pointer is not nullptr, the event
+//! was delivered. Otherwise the event pointer of nullptr indicates that
+//! the queue has timed out.
+//!
 QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
-    QEQueueCtr nFree;
-    QEvt const *e;
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
+
     QXThread * const thr = QXTHREAD_CAST_(QXK_attr_.curr);
 
-    /// @pre this function must:
-    /// - NOT be called from an ISR;
-    /// - be called from an extended thread;
-    /// - the thread must NOT be already blocked on any object.
+    //! @pre this function must:
+    //! - NOT be called from an ISR;
+    //! - be called from an extended thread;
+    //! - the thread must NOT be already blocked on any object.
     Q_REQUIRE_ID(500, (!QXK_ISR_CONTEXT_())
         && (thr != nullptr)
         && (thr->m_temp.obj == nullptr));
-    /// @pre also: the thread must NOT be holding a scheduler lock.
+    //! @pre also: the thread must NOT be holding a scheduler lock.
     Q_REQUIRE_ID(501, QXK_attr_.lockHolder != thr->m_prio);
 
     // is the queue empty? -- block and wait for event(s)
@@ -402,10 +411,11 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
     }
 
     // is the queue not empty?
+    QEvt const *e;
     if (thr->m_eQueue.m_frontEvt != nullptr) {
-        e = thr->m_eQueue.m_frontEvt; // always remove from the front
+        e = thr->m_eQueue.m_frontEvt; // remove from the front
         // volatile into tmp
-        nFree= thr->m_eQueue.m_nFree + 1U;
+        QEQueueCtr const nFree = thr->m_eQueue.m_nFree + 1U;
         thr->m_eQueue.m_nFree = nFree; // update the number of free
 
         // any events in the ring buffer?
@@ -413,7 +423,7 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
 
             // remove event from the tail
             thr->m_eQueue.m_frontEvt =
-                QF_PTR_AT_(thr->m_eQueue.m_ring, thr->m_eQueue.m_tail);
+                thr->m_eQueue.m_ring[thr->m_eQueue.m_tail];
             if (thr->m_eQueue.m_tail == 0U) {
                 thr->m_eQueue.m_tail = thr->m_eQueue.m_end; // wrap
             }
@@ -449,27 +459,27 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
     return e;
 }
 
-//****************************************************************************
-/// @description
-/// Intenral implementation of blocking the given extended thread.
-///
-/// @note
-/// Must be called from within a critical section
-///
+//============================================================================
+//! @description
+//! Intenral implementation of blocking the given extended thread.
+//!
+//! @note
+//! Must be called from within a critical section
+//!
 void QXThread::block_(void) const noexcept {
-    /// @pre the thread holding the lock cannot block!
+    //! @pre the thread holding the lock cannot block!
     Q_REQUIRE_ID(600, (QXK_attr_.lockHolder != m_prio));
     QXK_attr_.readySet.rmove(static_cast<std::uint_fast8_t>(m_dynPrio));
     static_cast<void>(QXK_sched_());
 }
 
-//****************************************************************************
-/// @description
-/// Intenral implementation of un-blocking the given extended thread.
-///
-/// @note
-/// must be called from within a critical section
-///
+//============================================================================
+//! @description
+//! Intenral implementation of un-blocking the given extended thread.
+//!
+//! @note
+//! must be called from within a critical section
+//!
 void QXThread::unblock_(void) const noexcept {
     QXK_attr_.readySet.insert(static_cast<std::uint_fast8_t>(m_dynPrio));
 
@@ -480,18 +490,18 @@ void QXThread::unblock_(void) const noexcept {
     }
 }
 
-//****************************************************************************
-/// @description
-/// Intenral implementation of arming the private time event for
-/// a given timeout at a given system tick rate.
-///
-/// @note
-/// Must be called from within a critical section
-///
+//============================================================================
+//! @description
+//! Intenral implementation of arming the private time event for
+//! a given timeout at a given system tick rate.
+//!
+//! @note
+//! Must be called from within a critical section
+//!
 void QXThread::teArm_(enum_t const sig,
                       std::uint_fast16_t const nTicks) noexcept
 {
-    /// @pre the time event must be unused
+    //! @pre the time event must be unused
     Q_REQUIRE_ID(700, m_timeEvt.m_ctr == 0U);
 
     m_timeEvt.sig = static_cast<QSignal>(sig);
@@ -522,13 +532,13 @@ void QXThread::teArm_(enum_t const sig,
     }
 }
 
-//****************************************************************************
-/// @description
-/// Intenral implementation of disarming the private time event.
-///
-/// @note
-/// Must be called from within a critical section
-///
+//============================================================================
+//! @description
+//! Intenral implementation of disarming the private time event.
+//!
+//! @note
+//! Must be called from within a critical section
+//!
 bool QXThread::teDisarm_(void) noexcept {
     bool wasArmed;
     // is the time evt running?
@@ -544,22 +554,36 @@ bool QXThread::teDisarm_(void) noexcept {
     return wasArmed;
 }
 
-//****************************************************************************
+//============================================================================
 //! delay (timed blocking of) the current extended thread (static)
+//! @description
+//! Blocking delay for the number of clock tick at the associated tick rate.
+//!
+//! @param[in]  nTicks    number of clock ticks (at the associated rate)
+//!                       to wait for the event to arrive.
+//! @note
+//! For the delay to work, the TICK_X() macro needs to be called
+//! periodicially at the associated clock tick rate.
+//!
+//! @sa #QXThread
+//! @sa TICK_X()
+//!
 bool QXThread::delay(std::uint_fast16_t const nTicks) noexcept {
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
+
     QXThread * const thr = QXK_PTR_CAST_(QXThread*, QXK_attr_.curr);
 
-    /// @pre this function must:
-    /// - NOT be called from an ISR;
-    /// - be called from an extended thread;
-    /// - the thread must NOT be already blocked on any object.
+    //! @pre this function must:
+    //! - NOT be called from an ISR;
+    //! - number of ticks cannot be zero
+    //! - be called from an extended thread;
+    //! - the thread must NOT be already blocked on any object.
     Q_REQUIRE_ID(800, (!QXK_ISR_CONTEXT_())
+        && (nTicks != 0U)
         && (thr != nullptr)
         && (thr->m_temp.obj == nullptr));
-    /// @pre also: the thread must NOT be holding a scheduler lock
+    //! @pre also: the thread must NOT be holding a scheduler lock
     Q_REQUIRE_ID(801, QXK_attr_.lockHolder != thr->m_prio);
 
     // remember the blocking object
@@ -581,13 +605,21 @@ bool QXThread::delay(std::uint_fast16_t const nTicks) noexcept {
     return (thr->m_timeEvt.sig == 0U);
 }
 
-//****************************************************************************
+//============================================================================
 //! cancel the delay
+//! @description
+//! Cancel the blocking delay and cause return from the QXThread::delay()
+//! function.
+//!
+//! @returns
+//! "true" if the thread was actually blocked on QXThread::delay() and
+//! "false" otherwise.
+//!
 bool QXThread::delayCancel(void) noexcept {
-    bool wasArmed;
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
+
+    bool wasArmed;
     if (m_temp.obj == QXK_PTR_CAST_(QMState*, &m_timeEvt)) {
         wasArmed = teDisarm_();
         unblock_();
@@ -603,30 +635,30 @@ bool QXThread::delayCancel(void) noexcept {
 } // namespace QP
 
 
-//****************************************************************************
+//============================================================================
 extern "C" {
 
-/// @description
-/// Called when the extended-thread handler function returns.
-///
-/// @note
-/// Most thread handler functions are structured as endless loops that never
-/// return. But it is also possible to structure threads as one-shot functions
-/// that perform their job and return. In that case this function peforms
-/// cleanup after the thread.
-///
+//! @description
+//! Called when the extended-thread handler function returns.
+//!
+//! @note
+//! Most thread handler functions are structured as endless loops that never
+//! return. But it is also possible to structure threads as one-shot functions
+//! that perform their job and return. In that case this function peforms
+//! cleanup after the thread.
+//!
 void QXK_threadRet_(void) noexcept {
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
-    QP::QXThread * const thr = QXTHREAD_CAST_(QXK_attr_.curr);
 
-    /// @pre this function must:
-    /// - NOT be called from an ISR;
-    /// - be called from an extended thread;
+    QP::QXThread const * const thr = QXTHREAD_CAST_(QXK_attr_.curr);
+
+    //! @pre this function must:
+    //! - NOT be called from an ISR;
+    //! - be called from an extended thread;
     Q_REQUIRE_ID(900, (!QXK_ISR_CONTEXT_())
         && (thr != nullptr));
-    /// @pre also: the thread must NOT be holding a scheduler lock.
+    //! @pre also: the thread must NOT be holding a scheduler lock.
     Q_REQUIRE_ID(901, QXK_attr_.lockHolder != thr->m_prio);
 
     std::uint_fast8_t const p =
@@ -640,4 +672,3 @@ void QXK_threadRet_(void) noexcept {
 }
 
 } // extern "C"
-

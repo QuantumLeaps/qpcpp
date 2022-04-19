@@ -1,5 +1,5 @@
-About this Example
-==================
+About this Example
+==================
 This directory contains the "Fly 'n' Shoot" game example application for
 the EK-LM3S811 board. This directory contains portable code that should
 compile with any C/C++ compiler for ARM Cortex-M.
@@ -11,7 +11,7 @@ Please refer to the README files in the sub-directories for specific
 instructions how to use and customize the example to your needs.
 
 
-Support Code for EK-LM3S811 Board 
+Support Code for EK-LM3S811 Board
 ----------------------------------
 The directory 3rd_party\ek-lm3s811 contains the CMSIS-compliant
 device code for the LM3S811 MCU. Please see the README file in this

@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: Orthogonal Component with QM state pattern example
 // Last Updated for Version: 5.4.0
 // Date of the Last Update:  2015-05-14
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #ifndef BSP_HPP
 #define BSP_HPP
 

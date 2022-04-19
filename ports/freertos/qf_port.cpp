@@ -1,39 +1,39 @@
-/// @file
-/// @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-10-17
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//! @file
+//! @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
+//! @cond
+//============================================================================
+//! Last updated for version 6.9.1
+//! Last updated on  2020-10-17
+//!
+//!                    Q u a n t u m  L e a P s
+//!                    ------------------------
+//!                    Modern Embedded Software
+//!
+//! Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+//!
+//! This program is open source software: you can redistribute it and/or
+//! modify it under the terms of the GNU General Public License as published
+//! by the Free Software Foundation, either version 3 of the License, or
+//! (at your option) any later version.
+//!
+//! Alternatively, this program may be distributed and modified under the
+//! terms of Quantum Leaps commercial licenses, which expressly supersede
+//! the GNU General Public License and are specifically designed for
+//! licensees interested in retaining the proprietary status of their code.
+//!
+//! This program is distributed in the hope that it will be useful,
+//! but WITHOUT ANY WARRANTY; without even the implied warranty of
+//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//! GNU General Public License for more details.
+//!
+//! You should have received a copy of the GNU General Public License
+//! along with this program. If not, see <www.gnu.org/licenses>.
+//!
+//! Contact information:
+//! <www.state-machine.com/licensing>
+//! <info@state-machine.com>
+//============================================================================
+//! @endcond
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -91,9 +91,9 @@ void QActive::start(std::uint_fast8_t const prio,
                     void const * const par)
 {
     // task name provided by the user in QF_setTaskName() or default name
-    char_t const *taskName = (m_thread.pxDummy1 != nullptr)
-                             ? static_cast<char_t const *>(m_thread.pxDummy1)
-                             : static_cast<char_t const *>("AO");
+    char const *taskName = (m_thread.pxDummy1 != nullptr)
+                             ? static_cast<char const *>(m_thread.pxDummy1)
+                             : static_cast<char const *>("AO");
 
     Q_REQUIRE_ID(200, (0U < prio)
         && (prio <= QF_MAX_ACTIVE) /* in range */
@@ -176,7 +176,7 @@ bool QActive::postFromISR_(QEvt const * const e,
                            void *par) noexcept
 #endif
 {
-    /// @pre event pointer must be valid
+    //! @pre event pointer must be valid
     Q_REQUIRE_ID(400, e != nullptr);
 
     UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
@@ -233,7 +233,7 @@ bool QActive::postFromISR_(QEvt const * const e,
         // queue is not empty, insert event into the ring-buffer
         else {
             // insert event into the ring buffer (FIFO)
-            QF_PTR_AT_(m_eQueue.m_ring, m_eQueue.m_head) = e;
+            m_eQueue.m_ring[m_eQueue.m_head] = e;
             if (m_eQueue.m_head == 0U) {
                 m_eQueue.m_head = m_eQueue.m_end; // wrap around
             }
@@ -268,7 +268,7 @@ void QF::publishFromISR_(QEvt const *e, void *par,
 void QF::publishFromISR_(QEvt const *e, void *par) noexcept
 #endif
 {
-    /// @pre the published signal must be within the configured range
+    //! @pre the published signal must be within the configured range
     Q_REQUIRE_ID(500, static_cast<enum_t>(e->sig) < QF_maxPubSignal_);
 
     UBaseType_t uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
@@ -293,7 +293,7 @@ void QF::publishFromISR_(QEvt const *e, void *par) noexcept
     }
 
     // make a local, modifiable copy of the subscriber list
-    QPSet subscrList = QF_PTR_AT_(QF_subscrList_, e->sig);
+    QPSet subscrList = QF_subscrList_[e->sig];
     taskEXIT_CRITICAL_FROM_ISR(uxSavedInterruptState);
 
     if (subscrList.notEmpty()) {
@@ -545,9 +545,9 @@ void QF::gcFromISR(QEvt const * const e) noexcept {
 }
 //............................................................................
 void QMPool::putFromISR(void *b, std::uint_fast8_t const qs_id) noexcept {
-    /// @pre # free blocks cannot exceed the total # blocks and
-    /// the block pointer must be in range to come from this pool.
-    ///
+    //! @pre # free blocks cannot exceed the total # blocks and
+    //! the block pointer must be in range to come from this pool.
+    //!
     Q_REQUIRE_ID(900, (m_nFree < m_nTot)
                       && QF_PTR_RANGE_(b, m_start, m_end));
 

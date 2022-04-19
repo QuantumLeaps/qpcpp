@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: Board Support Package (BSP) for the Calculator example
 // Last Updated for Version: 6.9.0
 // Date of the Last Update:  2020-08-25
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 

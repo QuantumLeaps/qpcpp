@@ -39,7 +39,7 @@ enum QHsmTstSignals {
 extern QP::QHsm * const the_hsm; // opaque pointer to the test HSM
 
 // BSP functions to dispaly a message and exit
-void BSP_display(char_t const *msg);
+void BSP_display(char const *msg);
 void BSP_terminate(int16_t const result);
 
 } // namespace QHSMTST

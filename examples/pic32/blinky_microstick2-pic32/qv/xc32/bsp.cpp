@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // BSP for Blinky example, Microstick II board, cooperative QV kernel, XC32
 // Last updated for version 6.5.1
 // Last updated on  2019-06-10
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "blinky.hpp"
@@ -167,7 +167,7 @@ void QV::onIdle(void) { // NOTE: called with interrupts disabled
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE01:
 // The callback function QV::onIdle() is called with interrupts disabled,
 // because the idle condition can be invalidated by any enabled interrupt

@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: lwIP-Manager Active Object
 // Last Updated for Version: 6.8.0
 // Date of the Last Update:  2020-01-24
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #define LWIP_ALLOWED
 
 #include "qpcpp.hpp"  // QP/C++ API

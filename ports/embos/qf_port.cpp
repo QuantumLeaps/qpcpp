@@ -1,39 +1,39 @@
-/// @file
-/// @brief QF/C++ port to embOS RTOS kernel, all supported compilers
-/// @cond
-////**************************************************************************
-/// Last updated for version 6.9.3
-/// Last updated on  2021-04-09
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-////**************************************************************************
-/// @endcond
+//! @file
+//! @brief QF/C++ port to embOS RTOS kernel, all supported compilers
+//! @cond
+//!/**************************************************************************
+//! Last updated for version 6.9.3
+//! Last updated on  2021-04-09
+//!
+//!                    Q u a n t u m  L e a P s
+//!                    ------------------------
+//!                    Modern Embedded Software
+//!
+//! Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+//!
+//! This program is open source software: you can redistribute it and/or
+//! modify it under the terms of the GNU General Public License as published
+//! by the Free Software Foundation, either version 3 of the License, or
+//! (at your option) any later version.
+//!
+//! Alternatively, this program may be distributed and modified under the
+//! terms of Quantum Leaps commercial licenses, which expressly supersede
+//! the GNU General Public License and are specifically designed for
+//! licensees interested in retaining the proprietary status of their code.
+//!
+//! This program is distributed in the hope that it will be useful,
+//! but WITHOUT ANY WARRANTY; without even the implied warranty of
+//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//! GNU General Public License for more details.
+//!
+//! You should have received a copy of the GNU General Public License
+//! along with this program. If not, see <www.gnu.org/licenses>.
+//!
+//! Contact information:
+//! <www.state-machine.com/licensing>
+//! <info@state-machine.com>
+//!/**************************************************************************
+//! @endcond
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -150,7 +150,7 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
         case TASK_NAME_ATTR:
 #if (OS_TRACKNAME != 0)
             Q_ASSERT_ID(300, m_thread.Name == nullptr);
-            m_thread.Name = static_cast<char_t const *>(attr2);
+            m_thread.Name = static_cast<char const *>(attr2);
 #endif
             break;
         case TASK_USES_FPU:
@@ -278,7 +278,7 @@ QEvt const *QActive::get_(void) noexcept {
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // In case of hardware-supported floating point unit (FPU), a task must
 // preserve the FPU registers accross the context switch. However, this

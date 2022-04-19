@@ -1,43 +1,85 @@
-/// @file
-/// @ingroup qs
-/// @brief Internal (package scope) QS/C++ interface.
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-18
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief Internal (package scope) QS/C++ interface.
+//! @ingroup qs
 
 #ifndef QS_PKG_HPP
 #define QS_PKG_HPP
+
+//============================================================================
+namespace QP {
+
+//! QS received record types (RX channel)
+//! @description
+//! This enumeration specifies the record types for the QS receive channel
+enum QSpyRxRecords : std::uint8_t {
+    QS_RX_INFO,           //!< query Target info (ver, config, tstamp)
+    QS_RX_COMMAND,        //!< execute a user-defined command in the Target
+    QS_RX_RESET,          //!< reset the Target
+    QS_RX_TICK,           //!< call QF_tick()
+    QS_RX_PEEK,           //!< peek Target memory
+    QS_RX_POKE,           //!< poke Target memory
+    QS_RX_FILL,           //!< fill Target memory
+    QS_RX_TEST_SETUP,     //!< test setup
+    QS_RX_TEST_TEARDOWN,  //!< test teardown
+    QS_RX_TEST_PROBE,     //!< set a Test-Probe in the Target
+    QS_RX_GLB_FILTER,     //!< set global filters in the Target
+    QS_RX_LOC_FILTER,     //!< set local  filters in the Target
+    QS_RX_AO_FILTER,      //!< set local AO filter in the Target
+    QS_RX_CURR_OBJ,       //!< set the "current-object" in the Target
+    QS_RX_TEST_CONTINUE,  //!< continue a test after QS_RX_TEST_WAIT()
+    QS_RX_QUERY_CURR,     //!< query the "current object" in the Target
+    QS_RX_EVENT           //!< inject an event to the Target (post/publish)
+};
+
+//! @brief Frame character of the QS output protocol
+constexpr std::uint8_t QS_FRAME = 0x7EU;
+
+//! @brief Escape character of the QS output protocol
+constexpr std::uint8_t QS_ESC   = 0x7DU;
+
+//! @brief Escape modifier of the QS output protocol
+//!
+//! The escaped byte is XOR-ed with the escape modifier before it is inserted
+//! into the QS buffer.
+constexpr std::uint8_t QS_ESC_XOR = 0x20U;
+
+//! @brief Escape character of the QS output protocol
+constexpr std::uint8_t QS_GOOD_CHKSUM = 0xFFU;
+
+//! send the Target info (object sizes, build time-stamp, QP version)
+void QS_target_info_(std::uint8_t const isReset) noexcept;
+
+} // namespace QP
+
+//============================================================================
+// Macros for use inside other macros or internally in the QP code
 
 //! Internal QS macro to insert an un-escaped byte into the QS buffer
 #define QS_INSERT_BYTE_(b_) \
@@ -59,52 +101,49 @@
         ++priv_.used;                             \
     }
 
-//****************************************************************************
-// Macros for use inside other macros or internally in the QP code
-
 //! Internal QS macro to begin a predefined QS record with critical section.
-/// @note
-/// This macro is intended to use only inside QP components and NOT
-/// at the application level.
-/// @sa QS_BEGIN_ID()
-///
+//! @note
+//! This macro is intended to use only inside QP components and NOT
+//! at the application level.
+//! @sa QS_BEGIN_ID()
+//!
 #define QS_BEGIN_PRE_(rec_, qs_id_)                           \
     if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) {       \
         QS_CRIT_E_();                                         \
         QP::QS::beginRec_(static_cast<std::uint_fast8_t>(rec_));
 
 //! Internal QS macro to end a predefined QS record with critical section.
-/// @note
-/// This macro is intended to use only inside QP components and NOT
-/// at the application level.
-/// @sa QS_END()
-///
+//! @note
+//! This macro is intended to use only inside QP components and NOT
+//! at the application level.
+//! @sa QS_END()
+//!
 #define QS_END_PRE_()      \
         QP::QS::endRec_(); \
         QS_CRIT_X_();      \
     }
 
 //! Internal QS macro to begin a predefined QS record without critical section.
-/// @note
-/// This macro is intended to use only inside QP components and NOT
-/// at the application level.
-/// @sa QS_BEGIN_NOCRIT_PRE_()
+//! @note
+//! This macro is intended to use only inside QP components and NOT
+//! at the application level.
+//! @sa QS_BEGIN_NOCRIT_PRE_()
 #define QS_BEGIN_NOCRIT_PRE_(rec_, qs_id_)                    \
     if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) {       \
         QP::QS::beginRec_(static_cast<std::uint_fast8_t>(rec_));
 
 //! Internal QS macro to end a predefiend QS record without critical section.
-/// @note
-/// This macro is intended to use only inside QP components and NOT
-/// at the application level. @sa #QS_END_NOCRIT
+//! @note
+//! This macro is intended to use only inside QP components and NOT
+//! at the application level. @sa #QS_END_NOCRIT
 #define QS_END_NOCRIT_PRE_() \
         QP::QS::endRec_(); \
     }
 
 #if (Q_SIGNAL_SIZE == 1U)
     //! Internal QS macro to output an unformatted event signal data element
-    /// @note
-    /// The size of the pointer depends on the macro #Q_SIGNAL_SIZE.
+    //! @note
+    //! The size of the pointer depends on the macro #Q_SIGNAL_SIZE.
     #define QS_SIG_PRE_(sig_) \
         (QP::QS::u8_raw_(static_cast<std::uint8_t>(sig_)))
 #elif (Q_SIGNAL_SIZE == 2U)
@@ -133,7 +172,7 @@
     (QP::QS::u32_raw_(static_cast<std::uint32_t>(data_)))
 
 //! Internal QS macro to output a zero-terminated ASCII string
-/// data element
+//! data element
 #define QS_STR_PRE_(msg_)     (QP::QS::str_raw_(msg_))
 
 //! Internal QS macro to output object pointer data element
@@ -155,9 +194,9 @@
 
     //! Internal QS macro to output an unformatted function pointer
     //! data element
-    /// @note
-    /// The size of the pointer depends on the macro #QS_FUN_PTR_SIZE.
-    /// If the size is not defined the size of pointer is assumed 4-bytes.
+    //! @note
+    //! The size of the pointer depends on the macro #QS_FUN_PTR_SIZE.
+    //! If the size is not defined the size of pointer is assumed 4-bytes.
     #define QS_FUN_PRE_(fun_) \
         (QP::QS::u32_raw_(reinterpret_cast<std::uint32_t>(fun_)))
 #endif
@@ -166,7 +205,7 @@
 
     //! Internal QS macro to output an unformatted event queue
     //! counter data element
-    /// @note the counter size depends on the macro #QF_EQUEUE_CTR_SIZE.
+    //! @note the counter size depends on the macro #QF_EQUEUE_CTR_SIZE.
     #define QS_EQC_PRE_(ctr_)   \
         QS::u8_raw_(static_cast<std::uint8_t>(ctr_))
 #elif (QF_EQUEUE_CTR_SIZE == 2U)
@@ -184,7 +223,7 @@
 
     //! Internal QS macro to output an unformatted event size
     //! data element
-    /// @note the event size depends on the macro #QF_EVENT_SIZ_SIZE.
+    //! @note the event size depends on the macro #QF_EVENT_SIZ_SIZE.
     #define QS_EVS_PRE_(size_) \
         QS::u8_raw_(static_cast<std::uint8_t>(size_))
 #elif (QF_EVENT_SIZ_SIZE == 2U)
@@ -199,8 +238,8 @@
 #if (QF_MPOOL_SIZ_SIZE == 1U)
 
     //! Internal QS macro to output an unformatted memory pool
-    /// block-size data element
-    /// @note the block-size depends on the macro #QF_MPOOL_SIZ_SIZE.
+    //! block-size data element
+    //! @note the block-size depends on the macro #QF_MPOOL_SIZ_SIZE.
     #define QS_MPS_PRE_(size_) \
         QS::u8_raw_(static_cast<std::uint8_t>(size_))
 #elif (QF_MPOOL_SIZ_SIZE == 2U)
@@ -215,7 +254,7 @@
 
     //! Internal QS macro to output an unformatted memory pool
     //! block-counter data element
-    /// @note the counter size depends on the macro #QF_MPOOL_CTR_SIZE.
+    //! @note the counter size depends on the macro #QF_MPOOL_CTR_SIZE.
     #define QS_MPC_PRE_(ctr_) \
         QS::u8_raw_(static_cast<std::uint8_t>(ctr_))
 #elif (QF_MPOOL_CTR_SIZE == 2U)
@@ -231,7 +270,7 @@
 
     //! Internal QS macro to output an unformatted time event
     //! tick-counter data element
-    /// @note the counter size depends on the macro #QF_TIMEEVT_CTR_SIZE.
+    //! @note the counter size depends on the macro #QF_TIMEEVT_CTR_SIZE.
     #define QS_TEC_PRE_(ctr_) \
         QS::u8_raw_(static_cast<std::uint8_t>(ctr_))
 #elif (QF_TIMEEVT_CTR_SIZE == 2U)
@@ -243,32 +282,10 @@
 #endif
 
 //! Internal QS macro to cast enumerated QS record number to uint8_t
-///
-/// @note Casting from enum to unsigned char violates the MISRA-C++ 2008 rules
-/// 5-2-7, 5-2-8 and 5-2-9. Encapsulating this violation in a macro allows to
-/// selectively suppress this specific deviation.
+//!
+//! @note Casting from enum to unsigned char violates the MISRA-C++ 2008 rules
+//! 5-2-7, 5-2-8 and 5-2-9. Encapsulating this violation in a macro allows to
+//! selectively suppress this specific deviation.
 #define QS_REC_NUM_(enum_) (static_cast<std::uint_fast8_t>(enum_))
-
-namespace QP {
-
-/// @brief Frame character of the QS output protocol
-constexpr std::uint8_t QS_FRAME = 0x7EU;
-
-/// @brief Escape character of the QS output protocol
-constexpr std::uint8_t QS_ESC   = 0x7DU;
-
-/// @brief Escape modifier of the QS output protocol
-///
-/// The escaped byte is XOR-ed with the escape modifier before it is inserted
-/// into the QS buffer.
-constexpr std::uint8_t QS_ESC_XOR = 0x20U;
-
-/// @brief Escape character of the QS output protocol
-constexpr std::uint8_t QS_GOOD_CHKSUM = 0xFFU;
-
-//! send the Target info (object sizes, build time-stamp, QP version)
-void QS_target_info_(std::uint8_t const isReset) noexcept;
-
-} // namespace QP
 
 #endif // QS_PKG_HPP

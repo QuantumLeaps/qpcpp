@@ -1,41 +1,41 @@
-/// @file
-/// @brief QF/C++ port to Win32 API (multi-threaded)
-/// @ingroup qf
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-08-21
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
-///
+//! @file
+//! @brief QF/C++ port to Win32 API (multi-threaded)
+//! @ingroup qf
+//! @cond
+//============================================================================
+//! Last updated for version 6.9.1
+//! Last updated on  2020-08-21
+//!
+//!                    Q u a n t u m  L e a P s
+//!                    ------------------------
+//!                    Modern Embedded Software
+//!
+//! Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+//!
+//! This program is open source software: you can redistribute it and/or
+//! modify it under the terms of the GNU General Public License as published
+//! by the Free Software Foundation, either version 3 of the License, or
+//! (at your option) any later version.
+//!
+//! Alternatively, this program may be distributed and modified under the
+//! terms of Quantum Leaps commercial licenses, which expressly supersede
+//! the GNU General Public License and are specifically designed for
+//! licensees interested in retaining the proprietary status of their code.
+//!
+//! This program is distributed in the hope that it will be useful,
+//! but WITHOUT ANY WARRANTY; without even the implied warranty of
+//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//! GNU General Public License for more details.
+//!
+//! You should have received a copy of the GNU General Public License
+//! along with this program. If not, see <www.gnu.org/licenses>.
+//!
+//! Contact information:
+//! <www.state-machine.com/licensing>
+//! <info@state-machine.com>
+//============================================================================
+//! @endcond
+//!
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
 #include "qf_pkg.hpp"       // QF package-scope interface
@@ -61,7 +61,7 @@ static DWORD l_tickMsec = 10U; // clock tick in msec (argument for Sleep())
 static int_t l_tickPrio = 50;  // default priority of the "ticker" thread
 static bool  l_isRunning;      // flag indicating when QF is running
 
-//****************************************************************************
+//============================================================================
 void QF::init(void) {
     InitializeCriticalSection(&l_win32CritSect);
 
@@ -70,19 +70,19 @@ void QF::init(void) {
     InitializeCriticalSection(&l_startupCritSect);
     EnterCriticalSection(&l_startupCritSect);
 }
-//****************************************************************************
+//============================================================================
 void QF_enterCriticalSection_(void) {
     EnterCriticalSection(&l_win32CritSect);
 }
-//****************************************************************************
+//============================================================================
 void QF_leaveCriticalSection_(void) {
     LeaveCriticalSection(&l_win32CritSect);
 }
-//****************************************************************************
+//============================================================================
 void QF::stop(void) {
     l_isRunning = false; // terminate the main (ticker) thread
 }
-//****************************************************************************
+//============================================================================
 void QF::thread_(QActive *act) {
     // block this thread until the startup critical section is exited
     // from QF::run()
@@ -103,13 +103,13 @@ void QF::thread_(QActive *act) {
     remove_(act); // remove this object from QF
 #endif
 }
-//****************************************************************************
+//============================================================================
 // helper function to match the signature expeced by CreateThread() Win32 API
 static DWORD WINAPI ao_thread(LPVOID me) {
     QF::thread_(static_cast<QActive *>(me));
     return static_cast<DWORD>(0); // return success
 }
-//****************************************************************************
+//============================================================================
 int_t QF::run(void) {
 
     onStartup(); // application-specific startup callback
@@ -147,13 +147,13 @@ int_t QF::run(void) {
     //DeleteCriticalSection(&l_win32CritSect);
     return 0; // return success
 }
-//****************************************************************************
+//============================================================================
 void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
     Q_REQUIRE_ID(600, ticksPerSec != 0U);
     l_tickMsec = 1000UL / ticksPerSec;
     l_tickPrio = tickPrio;
 }
-//****************************************************************************
+//============================================================================
 void QF_setWin32Prio(QActive *act, int_t win32Prio) {
     HANDLE win32thread = static_cast<HANDLE>(act->getThread());
 
@@ -180,7 +180,7 @@ int QF_consoleWaitForKey(void) {
     return static_cast<int>(_getwch());
 }
 
-//****************************************************************************
+//============================================================================
 void QActive::start(std::uint_fast8_t const prio,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,

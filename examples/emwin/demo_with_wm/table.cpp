@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+//============================================================================
 // Product: DPP example with emWin/uC/GUI, NO Window Manager
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//////////////////////////////////////////////////////////////////////////////
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"

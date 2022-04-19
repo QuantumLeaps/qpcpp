@@ -1,40 +1,40 @@
-/// @file
-/// @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.4
-/// Last updated on  2021-06-17
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
-///
+//! @file
+//! @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
+//! @cond
+//============================================================================
+//! Last updated for: @ref qpcpp_7_0_0
+//! Last updated on  2021-06-17
+//!
+//!                    Q u a n t u m  L e a P s
+//!                    ------------------------
+//!                    Modern Embedded Software
+//!
+//! Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+//!
+//! This program is open source software: you can redistribute it and/or
+//! modify it under the terms of the GNU General Public License as published
+//! by the Free Software Foundation, either version 3 of the License, or
+//! (at your option) any later version.
+//!
+//! Alternatively, this program may be distributed and modified under the
+//! terms of Quantum Leaps commercial licenses, which expressly supersede
+//! the GNU General Public License and are specifically designed for
+//! licensees interested in retaining the proprietary status of their code.
+//!
+//! This program is distributed in the hope that it will be useful,
+//! but WITHOUT ANY WARRANTY; without even the implied warranty of
+//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//! GNU General Public License for more details.
+//!
+//! You should have received a copy of the GNU General Public License
+//! along with this program. If not, see <www.gnu.org/licenses>.
+//!
+//! Contact information:
+//! <www.state-machine.com/licensing>
+//! <info@state-machine.com>
+//============================================================================
+//! @endcond
+//!
 
 // expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
 #define _POSIX_C_SOURCE 200809L
@@ -80,7 +80,7 @@ enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 static void *ticker_thread(void *arg);
 static void sigIntHandler(int /* dummy */);
 
-//****************************************************************************
+//============================================================================
 void QF::init(void) {
     // lock memory so we're never swapped out to disk
     //mlockall(MCL_CURRENT | MCL_FUTURE); // uncomment when supported
@@ -102,16 +102,16 @@ void QF::init(void) {
     sigaction(SIGINT, &sig_act, NULL);
 }
 
-//****************************************************************************
+//============================================================================
 void QF_enterCriticalSection_(void) {
     pthread_mutex_lock(&l_pThreadMutex);
 }
-//****************************************************************************
+//============================================================================
 void QF_leaveCriticalSection_(void) {
     pthread_mutex_unlock(&l_pThreadMutex);
 }
 
-//****************************************************************************
+//============================================================================
 int_t QF::run(void) {
     onStartup(); // application-specific startup callback
 
@@ -212,7 +212,7 @@ int_t QF::run(void) {
 
     return 0; // return success
 }
-//****************************************************************************
+//============================================================================
 void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
     if (ticksPerSec != 0U) {
         l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
@@ -259,7 +259,7 @@ int QF_consoleWaitForKey(void) {
     return getchar();
 }
 
-//****************************************************************************
+//============================================================================
 void QActive::start(std::uint_fast8_t const prio,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
@@ -294,7 +294,7 @@ void QActive::stop(void) {
 }
 #endif
 
-//****************************************************************************
+//============================================================================
 static void *ticker_thread(void * /*arg*/) { // for pthread_create()
     while (l_isRunning) { // the clock tick loop...
         nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
@@ -303,7 +303,7 @@ static void *ticker_thread(void * /*arg*/) { // for pthread_create()
     return nullptr; // return success
 }
 
-//****************************************************************************
+//============================================================================
 static void sigIntHandler(int /* dummy */) {
     QF::onCleanup();
     exit(-1);
@@ -311,7 +311,7 @@ static void sigIntHandler(int /* dummy */) {
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE01:
 // In Linux, the scheduler policy closest to real-time is the SCHED_FIFO
 // policy, available only with superuser privileges. QF::run() attempts to set

@@ -1,26 +1,28 @@
 /*! @page gs Getting Started
-
-@section gs_obtain Downloading &amp; Installing QP/C++&trade;
 @tableofcontents
+@nav{index,struct}
 
-<p>The most recommended way of obtaining QP/C++&trade; is by downloading the <a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><b>QP-bundle&trade;</b></a>, which includes QP/++C&trade; as well as other QP frameworks and also the <a class="extern" target="_blank" href="https://www.state-machine.com/products/qm/">QM&trade; modeling tool</a> and the <a class="extern" target="_blank" href="https://www.state-machine.com/products/">QTools&trade; collection</a>. The main advantage of obtaining QP/C++&trade; bundled together like that is that you get all components, tools and examples ready to go.
+@section gs_obtain Downloading &amp; Installing QP&trade;/C++
+The most recommended way of obtaining QP/C++&trade; is by downloading the @webref{#Downloads, <b>QP-bundle&trade;</b>}, which includes QP&trade;/C++ as well as other QP&trade; frameworks and also the @webref{products/qm, QM&trade; modeling tool} and the @webref{products/qtools, QTools&trade; collection}. The main advantage of obtaining QP&trade;/C++ bundled together like that is that you get all components, tools and examples ready to go.
+
+[![QP-bundle Downloads](qp-bundle.png)](https://www.state-machine.com/#Downloads)
 
 @note
-<a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><strong>QP-bundle&trade;</strong></a> is the **most recommended** way of downloading and installing QP/C++&trade;. However, if you are allergic to installers and GUIs or don't have administrator privileges you can also **download and install QP/C&trade; separately** as described in the Application Note: "Getting Started with QP/C++" below.
+<a target="_blank" href="https://github.com/QuantumLeaps/qpcpp" title="QP&trade;/C++ on GitHub"><img style="float:right; clear:right;" src="img/github-corner.png"></a>
+<a class="extern" target="_blank" href="https://github.com/QuantumLeaps/qpcpp"><strong>GitHub QP&trade;/C++ repository</strong></a>
+If you are allergic to installers and GUIs or don't have administrator privileges you can also **download and install QP&trade;/C++ separately** from the <a class="extern" target="_blank" href="https://github.com/QuantumLeaps/qpcpp"><b>QP&trade;/C++ GitHub repository</b></a>.
 
 
+@section gs_video Getting Started with QP&trade; Video
+The YouTube Video <a class="extern" target="_blank" href="https://youtu.be/O7ER6_VqIH0"><strong>Getting Started with QP&trade; Frameworks</strong></a> provides instructions on how to download, install and get started with QP quickly.
 
-@section gs_an Getting Started with QP/C++ App Note
-The Quantum Leaps Application Note <a class="extern" target="_blank" href="https://www.state-machine.com/doc/AN_Getting_Started_with_QPC.pdf"><strong>Getting Started with QP/C++</strong></a> provides step-by-step instructions on how to download, install, and get started with QP/C++ quickly.
+[![Video: Getting Started with QP&trade; Real-Time Embedded Framework](getting-started-with-qp.jpg)](https://youtu.be/O7ER6_VqIH0)
 
-@htmlonly
-<div class="image">
-<a target="_blank" href="https://www.state-machine.com/doc/AN_Getting_Started_with_QPCpp.pdf"><img border="0" src="img/AN_Getting_Started_with_QPCpp.jpg" title="Download PDF"></a>
-<div class="caption">
-Application Note: Getting Started with QP/C++&trade;
-</div>
-</div>
-@endhtmlonly
 
-@next{struct}
+@section gs_an Getting Started with QP&trade; AppNote
+The Quantum Leaps Application Note @webref{doc/AN_Getting_Started_with_QP.pdf, <strong>Getting Started with QP&trade;/C++</strong>} provides instructions on how to download, install and get started with QP&trade;/C++ quickly. The application note also contains a **QP&trade;/C++ Tutorial**, in which you build a simple "Blinky" application.
+
+[![Application Note: Getting Started with QP&trade; Real-Time Embedded Framework](AN_Getting-Started.png)](https://www.state-machine.com/doc/AN_Getting_Started_with_QP.pdf)
+
+@nav{index,struct}
 */

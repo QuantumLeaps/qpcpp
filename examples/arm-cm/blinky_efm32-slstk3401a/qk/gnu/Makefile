@@ -1,6 +1,6 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on EMF32-SLSTK3401A, QK kernel, GNU-ARM
-# Last Updated for Version: 6.9.4
+# Last Updated for Version: 7.0.0
 # Date of the Last Update:  2021-07-01
 #
 #                    Q u a n t u m  L e a P s
@@ -101,7 +101,7 @@ C_SRCS := \
 	em_gpio.c
 
 # C++ source files
-CPP_SRCS :=	 \
+CPP_SRCS := \
 	blinky.cpp \
 	bsp.cpp \
 	main.cpp

@@ -1,25 +1,20 @@
-// state handler function for the Bomb FSM ..................................
-QState Bomb::setting(Bomb * const me, QEvt const *e) {
+// state handler function for the Blinky HSM ..................................
+Q_STATE_DEF(Blinky, off) {
+    QState status;
     switch (e->sig) {
-        . . .
-        case ARM_SIG: {
-            return Q_TRAN(&Bomb::timing);
+        case Q_ENTRY_SIG: {
+            BSP_ledOff();
+            status = Q_RET_HANDLED;
+            break;
+        }
+        case TIMEOUT_SIG: {
+            status = tran(&on); // <--- transition
+            break;
+        }
+        default: {
+            status = super(&top);
+            break;
         }
     }
-    return Q_IGNORED();
+    return status;
 }
-
-// state handler function for the Calc HSM ..................................
-QState Calc::begin(Calc * const me, QEvt const *e) {
-    switch (e->sig) {
-        . . .
-        case OPER_SIG: {
-            if (((CalcEvt *)e)->keyId == KEY_MINUS) {
-                return Q_TRAN(&Calc::negated1);
-            }
-            return Q_HANDLED();
-        }
-    }
-    return Q_SUPER(&Calc::ready);
-}
-

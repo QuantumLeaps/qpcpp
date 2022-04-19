@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: BSP for DPP application with lwIP on EV-LM3S9665 board
 // Last Updated for Version: 4.4.00
 // Date of the Last Update:  Apr 19, 2012
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          https://state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//****************************************************************************
+//============================================================================
 #ifndef BSP_HPP
 #define BSP_HPP
 

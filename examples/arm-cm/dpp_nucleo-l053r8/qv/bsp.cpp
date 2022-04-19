@@ -1,4 +1,4 @@
-///***************************************************************************
+//============================================================================
 // Product: DPP example, STM32 NUCLEO-L053R8 board, cooperative QV kernel
 // Last updated for version 6.9.3
 // Last updated on  2021-03-03
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -59,7 +59,7 @@ static unsigned  l_rnd; // random seed
 
     // QSpy source IDs
     static QP::QSpyId const l_SysTick_Handler = { 0U };
-    static QP::QSpyId const l_EXTI0_IRQHandler = { 0U };
+    static QP::QSpyId const l_EXTI0_1_IRQHandler = { 0U };
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER
@@ -397,7 +397,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE00:
 // The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
 // ISR priority that is disabled by the QF framework. The value is suitable

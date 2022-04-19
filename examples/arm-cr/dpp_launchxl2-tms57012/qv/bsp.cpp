@@ -1,4 +1,4 @@
-///***************************************************************************
+//============================================================================
 // Product: DPP example, LAUCHXL2-TMS570LS12 board, cooperative QV kernel
 // Last updated for version 6.9.3
 // Last updated on  2021-03-03
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -390,7 +390,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE00:
 // The FIQ-type interrupts are never disabled in this QP port, therefore
 // they can always preempt any code, including the IRQ-handlers (ISRs).

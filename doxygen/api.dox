@@ -24,7 +24,6 @@ QEP is a universal, UML-compliant event processor that enables developers to cod
 - Q_EVT_CAST()
 
 
-
 @section api_qf QF (Active Object Framework)
 QF is a portable, event-driven, real-time framework for execution of active objects (concurrent state machines) specifically designed for real-time embedded (RTE) systems.
 
@@ -259,7 +258,18 @@ QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that e
 - QXK_TLS()
 
 
-@next{exa}
+@section api_dep Deprecated APIs
+
+See also the list of @subpage deprecated "deprecated QP/C++ APIs".
+
+
+@next{deprecated}
+*/
+/*##########################################################################*/
+/*! @page deprecated Deprecated APIs
+
+__The following QP/C++ APIs are now deprecated:__
+
 */
 
 } // namespace QP

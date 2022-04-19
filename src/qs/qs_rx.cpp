@@ -1,40 +1,33 @@
-/// @file
-/// @brief QS receive channel services
-/// @ingroup qs
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.2a
-/// Last updated on  2021-01-28
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses/>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QS receive channel services
+//! @ingroup qs
 
 #define QP_IMPL           // this is QP implementation
 #include "qs_port.hpp"    // QS port
@@ -42,14 +35,20 @@
 #include "qf_pkg.hpp"     // QF package-scope internal interface
 #include "qassert.h"      // QP assertions
 
-namespace QP {
+// unnamed namespace for local definitions with internal linkage
+namespace {
 
 Q_DEFINE_THIS_MODULE("qs_rx")
 
-//****************************************************************************
+} // unnamed namespace
+
+namespace QP {
+
+
+//============================================================================
 struct QS::QSrxPriv QS::rxPriv_; // QS-RX private data
 
-//****************************************************************************
+//============================================================================
 #if (QS_OBJ_PTR_SIZE == 1U)
     using QSObj = std::uint8_t;
 #elif (QS_OBJ_PTR_SIZE == 2U)
@@ -60,19 +59,9 @@ struct QS::QSrxPriv QS::rxPriv_; // QS-RX private data
     using QSObj = std::uint64_t;
 #endif
 
-#if (QS_FUN_PTR_SIZE == 1U)
-    using QSFun = std::uint8_t;
-#elif (QS_FUN_PTR_SIZE == 2U)
-    using QSFun = std::uint16_t;
-#elif (QS_FUN_PTR_SIZE == 4U)
-    using QSFun = std::uint32_t;
-#elif (QS_FUN_PTR_SIZE == 8U)
-    using QSFun = std::uint64_t;
-#endif
-
-/// @cond
-/// Exlcude the following internals from the Doxygen documentation
-/// Extended-state variables used for parsing various QS-RX Records
+//! @cond
+//! Exlcude the following internals from the Doxygen documentation
+//! Extended-state variables used for parsing various QS-RX Records
 struct CmdVar {
     std::uint32_t param1;
     std::uint32_t param2;
@@ -114,16 +103,6 @@ struct ObjVar {
     std::uint8_t recId;
 };
 
-struct TPVar {  // Test-Probe
-    QSFun    addr;
-    std::uint32_t data;
-    std::uint8_t  idx;
-};
-
-struct AFltVar {
-    std::uint8_t prio;
-};
-
 struct EvtVar {
     QEvt    *e;
     std::uint8_t *p;
@@ -133,6 +112,31 @@ struct EvtVar {
     std::uint8_t  idx;
 };
 
+#ifdef Q_UTEST
+    #if (QS_FUN_PTR_SIZE == 1U)
+        using QSFun = std::uint8_t;
+    #elif (QS_FUN_PTR_SIZE == 2U)
+        using QSFun = std::uint16_t;
+    #elif (QS_FUN_PTR_SIZE == 4U)
+        using QSFun = std::uint32_t;
+    #elif (QS_FUN_PTR_SIZE == 8U)
+        using QSFun = std::uint64_t;
+    #endif
+
+    struct TPVar {  // Test-Probe
+        QSFun    addr;
+        std::uint32_t data;
+        std::uint8_t  idx;
+    };
+
+    static struct TestData {
+        TPVar     tpBuf[16]; // buffer of Test-Probes received so far
+        std::uint8_t tpNum;  // current number of Test-Probes
+        QSTimeCtr testTime;  // test time (tick counter)
+    } l_testData;
+
+#endif // Q_UTEST
+
 // extended-state variables for the current QS-RX state
 static struct ExtState {
     union Variant {
@@ -141,10 +145,11 @@ static struct ExtState {
         PeekVar  peek;
         PokeVar  poke;
         FltVar   flt;
-        AFltVar  aFlt;
         ObjVar   obj;
         EvtVar   evt;
+#ifdef Q_UTEST
         TPVar    tp;
+#endif // Q_UTEST
     } var;
     std::uint8_t state;
     std::uint8_t esc;
@@ -153,6 +158,7 @@ static struct ExtState {
 } l_rx;
 
 enum RxStateEnum : std::uint8_t {
+    ERROR_STATE,
     WAIT4_SEQ,
     WAIT4_REC,
     WAIT4_INFO_FRAME,
@@ -188,22 +194,16 @@ enum RxStateEnum : std::uint8_t {
     WAIT4_EVT_LEN,
     WAIT4_EVT_PAR,
     WAIT4_EVT_FRAME,
+
+#ifdef Q_UTEST
     WAIT4_TEST_SETUP_FRAME,
     WAIT4_TEST_TEARDOWN_FRAME,
     WAIT4_TEST_PROBE_DATA,
     WAIT4_TEST_PROBE_ADDR,
     WAIT4_TEST_PROBE_FRAME,
     WAIT4_TEST_CONTINUE_FRAME,
-    ERROR_STATE
-};
-
-#ifdef Q_UTEST
-    static struct TestData {
-        TPVar     tpBuf[16]; // buffer of Test-Probes received so far
-        std::uint8_t tpNum;  // current number of Test-Probes
-        QSTimeCtr testTime;  // test time (tick counter)
-    } l_testData;
 #endif // Q_UTEST
+};
 
 // internal helper functions...
 static void rxParseData_(std::uint8_t const b) noexcept;
@@ -217,29 +217,28 @@ static void rxPoke_(void) noexcept;
 static inline void tran_(RxStateEnum const target) noexcept {
     l_rx.state = static_cast<std::uint8_t>(target);
 }
-/// @endcond
+//! @endcond
 
-
-//****************************************************************************
-/// @description
-/// This function should be called from QS::onStartup() to provide QS-RX with
-/// the receive data buffer.
-///
-/// @param[in]  sto[]   the address of the memory block
-/// @param[in]  stoSize the size of this block [bytes]. The size of the
-///                     QS RX buffer cannot exceed 64KB.
-///
-/// @note QS-RX can work with quite small data buffers, but you will start
-/// losing data if the buffer is not drained fast enough in the idle task.
-///
-/// @note If the data input rate exceeds the QS-RX processing rate, the data
-/// will be lost, but the QS protocol will notice that:
-/// (1) that the checksum in the incomplete QS records will fail; and
-/// (2) the sequence counter in QS records will show discontinuities.
-///
-/// The QS-RX channel will report any data errors by sending the
-/// QS_RX_DATA_ERROR trace record.
-///
+//============================================================================
+//! @description
+//! This function should be called from QS::onStartup() to provide QS-RX with
+//! the receive data buffer.
+//!
+//! @param[in]  sto[]   the address of the memory block
+//! @param[in]  stoSize the size of this block [bytes]. The size of the
+//!                     QS RX buffer cannot exceed 64KB.
+//!
+//! @note QS-RX can work with quite small data buffers, but you will start
+//! losing data if the buffer is not drained fast enough in the idle task.
+//!
+//! @note If the data input rate exceeds the QS-RX processing rate, the data
+//! will be lost, but the QS protocol will notice that:
+//! (1) that the checksum in the incomplete QS records will fail; and
+//! (2) the sequence counter in QS records will show discontinuities.
+//!
+//! The QS-RX channel will report any data errors by sending the
+//! QS_RX_DATA_ERROR trace record.
+//!
 void QS::rxInitBuf(std::uint8_t * const sto,
                    std::uint16_t const stoSize) noexcept
 {
@@ -272,16 +271,16 @@ void QS::rxInitBuf(std::uint8_t * const sto,
 #endif // Q_UTEST
 }
 
-//****************************************************************************
-/// @description
-/// This function is intended to be called from the ISR that reads the QS-RX
-/// bytes from the QSPY application. The function returns the conservative
-/// number of free bytes currently available in the buffer, assuming that
-/// the head pointer is not being moved concurrently. The tail pointer might
-/// be moving, meaning that bytes can be concurrently removed from the buffer.
-///
+//============================================================================
+//! @description
+//! This function is intended to be called from the ISR that reads the QS-RX
+//! bytes from the QSPY application. The function returns the conservative
+//! number of free bytes currently available in the buffer, assuming that
+//! the head pointer is not being moved concurrently. The tail pointer might
+//! be moving, meaning that bytes can be concurrently removed from the buffer.
+//!
 std::uint16_t QS::rxGetNfree(void) noexcept {
-    QSCtr head = rxPriv_.head;
+    QSCtr const head = rxPriv_.head;
     if (head == rxPriv_.tail) { // buffer empty?
         return static_cast<std::uint16_t>(rxPriv_.end - 1U);
     }
@@ -294,23 +293,22 @@ std::uint16_t QS::rxGetNfree(void) noexcept {
     }
 }
 
-//****************************************************************************
-///
-/// @description
-/// This function programmatically sets the "current object" in the Target.
-///
+//============================================================================
+//!
+//! @description
+//! This function programmatically sets the "current object" in the Target.
+//!
 void QS::setCurrObj(std::uint8_t obj_kind, void *obj_ptr) noexcept {
-
     Q_REQUIRE_ID(100, obj_kind < Q_DIM(rxPriv_.currObj));
     rxPriv_.currObj[obj_kind] = obj_ptr;
 }
 
-//****************************************************************************
-///
-/// @description
-/// This function programmatically generates the response to the query for
-/// a "current object".
-///
+//============================================================================
+//!
+//! @description
+//! This function programmatically generates the response to the query for
+//! a "current object".
+//!
 void QS::queryCurrObj(std::uint8_t obj_kind) noexcept {
     Q_REQUIRE_ID(200, obj_kind < Q_DIM(rxPriv_.currObj));
 
@@ -363,10 +361,9 @@ void QS::queryCurrObj(std::uint8_t obj_kind) noexcept {
     else {
         rxReportError_(static_cast<std::uint8_t>(QS_RX_AO_FILTER));
     }
-    // no need to report Done
 }
 
-//****************************************************************************
+//============================================================================
 void QS::rxParse(void) {
     QSCtr tail = rxPriv_.tail;
     while (rxPriv_.head != tail) { // QS-RX buffer NOT empty?
@@ -400,7 +397,7 @@ void QS::rxParse(void) {
             }
             else { // bad checksum
                 l_rx.chksum = 0U;
-                rxReportError_(0x00U);
+                rxReportError_(0x41U);
                 rxHandleBadFrame_(b);
             }
         }
@@ -411,7 +408,7 @@ void QS::rxParse(void) {
     }
 }
 
-//****************************************************************************
+//============================================================================
 static void rxParseData_(std::uint8_t const b) noexcept {
     switch (l_rx.state) {
         case WAIT4_SEQ: {
@@ -794,7 +791,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
                     if (l_rx.var.evt.e != nullptr) {
                         l_rx.var.evt.p =
                             reinterpret_cast<std::uint8_t *>(l_rx.var.evt.e);
-                        l_rx.var.evt.p += sizeof(QEvt);
+                        l_rx.var.evt.p = &l_rx.var.evt.p[sizeof(QEvt)];
                         if (l_rx.var.evt.len > 0U) {
                             tran_(WAIT4_EVT_PAR);
                         }
@@ -881,7 +878,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
     }
 }
 
-//****************************************************************************
+//============================================================================
 void QS::rxHandleGoodFrame_(std::uint8_t const state) {
     std::uint8_t i;
     std::uint8_t *ptr;
@@ -929,9 +926,9 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
             // no need to report Ack or Done
             QS_CRIT_E_();
             QS::beginRec_(static_cast<std::uint_fast8_t>(QS_PEEK_DATA));
-                ptr = (static_cast<std::uint8_t*>(
-                           QS::rxPriv_.currObj[QS::AP_OBJ])
-                       + l_rx.var.peek.offs);
+                ptr = static_cast<std::uint8_t*>(
+                          QS::rxPriv_.currObj[QS::AP_OBJ]);
+                ptr = &ptr[l_rx.var.peek.offs];
                 QS_TIME_PRE_();                  // timestamp
                 QS_U16_PRE_(l_rx.var.peek.offs); // data offset
                 QS_U8_PRE_(l_rx.var.peek.size);  // data size
@@ -939,15 +936,15 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
                 for (i = 0U; i < l_rx.var.peek.num; ++i) {
                     switch (l_rx.var.peek.size) {
                         case 1:
-                            QS_U8_PRE_(*(ptr + i));
+                            QS_U8_PRE_(ptr[i]);
                             break;
                         case 2:
                             QS_U16_PRE_(
-                                *(reinterpret_cast<std::uint16_t*>(ptr) + i));
+                                reinterpret_cast<std::uint16_t*>(ptr)[i]);
                             break;
                         case 4:
                             QS_U32_PRE_(
-                                *(reinterpret_cast<std::uint32_t*>(ptr) + i));
+                                reinterpret_cast<std::uint32_t*>(ptr)[i]);
                             break;
                         default:
                             break;
@@ -971,21 +968,21 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
         }
         case WAIT4_FILL_FRAME: {
             rxReportAck_(QS_RX_FILL);
-            ptr = (static_cast<std::uint8_t *>(
-                       QS::rxPriv_.currObj[QS::AP_OBJ])
-                   + l_rx.var.poke.offs);
+            ptr = static_cast<std::uint8_t *>(
+                      QS::rxPriv_.currObj[QS::AP_OBJ]);
+            ptr = &ptr[l_rx.var.poke.offs];
             for (i = 0U; i < l_rx.var.poke.num; ++i) {
                 switch (l_rx.var.poke.size) {
                     case 1:
-                        *(ptr + i) =
+                        ptr[i] =
                             static_cast<std::uint8_t>(l_rx.var.poke.data);
                         break;
                     case 2:
-                        *(reinterpret_cast<std::uint16_t *>(ptr) + i) =
+                        reinterpret_cast<std::uint16_t *>(ptr)[i] =
                             static_cast<std::uint16_t>(l_rx.var.poke.data);
                         break;
                     case 4:
-                        *(reinterpret_cast<std::uint32_t *>(ptr) + i) =
+                        reinterpret_cast<std::uint32_t *>(ptr)[i] =
                             l_rx.var.poke.data;
                         break;
                     default:
@@ -1047,7 +1044,7 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
                          == static_cast<std::uint8_t>(QS_RX_AO_FILTER))
                 {
                     if (l_rx.var.obj.addr != 0U) {
-                        std::int_fast16_t filter =
+                        std::int_fast16_t const filter =
                             static_cast<std::int_fast16_t>(
                                 reinterpret_cast<QActive *>(
                                     l_rx.var.obj.addr)->m_prio);
@@ -1057,7 +1054,7 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
                         rxReportAck_(QS_RX_AO_FILTER);
                     }
                     else {
-                        rxReportError_(QS_RX_AO_FILTER);
+                        rxReportError_(static_cast<enum_t>(QS_RX_AO_FILTER));
                     }
                 }
                 else {
@@ -1069,8 +1066,10 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
                 if (l_rx.var.obj.recId
                     == static_cast<std::uint8_t>(QS_RX_CURR_OBJ))
                 {
-                    rxPriv_.currObj[SM_OBJ] = (void *)l_rx.var.obj.addr;
-                    rxPriv_.currObj[AO_OBJ] = (void *)l_rx.var.obj.addr;
+                    rxPriv_.currObj[SM_OBJ]
+                        = reinterpret_cast<void *>(l_rx.var.obj.addr);
+                    rxPriv_.currObj[AO_OBJ]
+                        = reinterpret_cast<void *>(l_rx.var.obj.addr);
                 }
                 rxReportAck_(
                     static_cast<enum QSpyRxRecords>(l_rx.var.obj.recId));
@@ -1222,7 +1221,7 @@ void QS::rxHandleGoodFrame_(std::uint8_t const state) {
     }
 }
 
-//****************************************************************************
+//============================================================================
 static void rxHandleBadFrame_(std::uint8_t const state) noexcept {
     rxReportError_(0x50U); // error for all bad frames
     switch (state) {
@@ -1237,7 +1236,7 @@ static void rxHandleBadFrame_(std::uint8_t const state) noexcept {
     }
 }
 
-//****************************************************************************
+//============================================================================
 static void rxReportAck_(enum QSpyRxRecords const recId) noexcept {
     QS_CRIT_STAT_
     QS_CRIT_E_();
@@ -1249,7 +1248,7 @@ static void rxReportAck_(enum QSpyRxRecords const recId) noexcept {
     QS_REC_DONE(); // user callback (if defined)
 }
 
-//****************************************************************************
+//============================================================================
 static void rxReportError_(std::uint8_t const code) noexcept {
     QS_CRIT_STAT_
     QS_CRIT_E_();
@@ -1261,7 +1260,7 @@ static void rxReportError_(std::uint8_t const code) noexcept {
     QS_REC_DONE(); // user callback (if defined)
 }
 
-//****************************************************************************
+//============================================================================
 static void rxReportDone_(enum QSpyRxRecords const recId) noexcept {
     QS_CRIT_STAT_
     QS_CRIT_E_();
@@ -1274,11 +1273,11 @@ static void rxReportDone_(enum QSpyRxRecords const recId) noexcept {
     QS_REC_DONE(); // user callback (if defined)
 }
 
-//****************************************************************************
+//============================================================================
 static void rxPoke_(void) noexcept {
-    std::uint8_t * const ptr =
-        (static_cast<std::uint8_t *>(QS::rxPriv_.currObj[QS::AP_OBJ])
-         + l_rx.var.poke.offs);
+    std::uint8_t * ptr =
+        static_cast<std::uint8_t *>(QS::rxPriv_.currObj[QS::AP_OBJ]);
+    ptr = &ptr[l_rx.var.poke.offs];
     switch (l_rx.var.poke.size) {
         case 1:
             *ptr = static_cast<std::uint8_t>(l_rx.var.poke.data);
@@ -1303,18 +1302,18 @@ static void rxPoke_(void) noexcept {
 //============================================================================
 #ifdef Q_UTEST
 
-//****************************************************************************
-/// @description
-/// This function obtains the Test-Probe for a given API.
-///
-/// @param[in]  api  pointer to the API function that requests its Test-Probe
-///
-/// @returns Test-Probe data that has been received for the given API
-/// from the Host (running qutest). For any ginve API, the function returns
-/// the Test-Probe data in the same order as it was received from the Host.
-/// If there is no Test-Probe for a ginve API, or no more Test-Probes for
-/// a given API, the function returns zero.
-///
+//============================================================================
+//! @description
+//! This function obtains the Test-Probe for a given API.
+//!
+//! @param[in]  api  pointer to the API function that requests its Test-Probe
+//!
+//! @returns Test-Probe data that has been received for the given API
+//! from the Host (running qutest). For any ginve API, the function returns
+//! the Test-Probe data in the same order as it was received from the Host.
+//! If there is no Test-Probe for a ginve API, or no more Test-Probes for
+//! a given API, the function returns zero.
+//!
 std::uint32_t QS::getTestProbe_(void (* const api)(void)) noexcept {
     std::uint32_t data = 0U;
     for (std::uint8_t i = 0U; i < l_testData.tpNum; ++i) {
@@ -1343,7 +1342,7 @@ std::uint32_t QS::getTestProbe_(void (* const api)(void)) noexcept {
     return data;
 }
 
-//****************************************************************************
+//============================================================================
 QSTimeCtr QS::onGetTime(void) {
     return (++l_testData.testTime);
 }
@@ -1351,4 +1350,3 @@ QSTimeCtr QS::onGetTime(void) {
 #endif // Q_UTEST
 
 } // namespace QP
-

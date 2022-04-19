@@ -2,6 +2,13 @@ namespace QP {
 
 /** @page history Revision History
 
+@section qpcpp_7_0_0 Version 7.0.0, 2022-04-30
+
+- removed unused `ARM_ARCH` symbol from Makefiles for GNU-ARM
+- restructured the Doxygen documentation
+  + introudced new styling for the HTML documentation
+  + updated links in the documentation
+
 @section qpcpp_6_9_3 Version 6.9.3, 2021-04-12
 
 __Feature Requests:__

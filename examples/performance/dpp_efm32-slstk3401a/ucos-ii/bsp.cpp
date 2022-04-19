@@ -1,4 +1,4 @@
-///***************************************************************************
+//============================================================================
 // Product: DPP example, EFM32-SLSTK3401A board, uC/OS-II kernel
 // Last updated for version 6.9.3
 // Last updated on  2021-03-03
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "test.h"
@@ -490,7 +490,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE01:
 // The User LED is used to visualize the idle loop activity. The brightness
 // of the LED is proportional to the frequency of invcations of the idle loop.

@@ -73,7 +73,7 @@ The NUCLEO boards appear as a USB-flash drive in the file system.
 Programming of the board is done by simply copying the binary into
 thy flash drive letter.
 
-For example, assuming that the NUCLEO board appears as drive E:, 
+For example, assuming that the NUCLEO board appears as drive E:,
 you program it with the following command:
 
 copy dbg\start-stop.bin E:

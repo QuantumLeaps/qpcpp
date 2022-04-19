@@ -1,45 +1,38 @@
-/// @file
-/// @brief QP::QActive native queue operations (based on QP::QEQueue)
-///
-/// @note
-/// this source file is only included in the QF library when the native
-/// QF active object queue is used (instead of a message queue of an RTOS).
-///
-/// @ingroup qf
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QP::QActive native queue operations (based on QP::QEQueue)
+//!
+//! @note
+//! this source file is only included in the QF library when the native
+//! QF active object queue is used (instead of a message queue of an RTOS).
+//!
+//! @ingroup qf
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -52,41 +45,46 @@
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-namespace QP {
+// unnamed namespace for local definitions with internal linkage
+namespace {
 
 Q_DEFINE_THIS_MODULE("qf_actq")
 
+} // unnamed namespace
+
+namespace QP {
+
 #ifdef Q_SPY
-//****************************************************************************
-/// @description
-/// Direct event posting is the simplest asynchronous communication method
-/// available in QF.
-///
-/// @param[in,out] e      pointer to the event to be posted
-/// @param[in]     margin number of required free slots in the queue
-///                after posting the event. The special value QP::QF_NO_MARGIN
-///                means that this function will assert if posting fails.
-/// @param[in]     sender pointer to a sender object (used in QS only)
-///
-/// @returns
-/// 'true' (success) if the posting succeeded (with the provided margin) and
-/// 'false' (failure) when the posting fails.
-///
-/// @attention
-/// Should be called only via the macro POST() or POST_X().
-///
-/// @note
-/// The QP::QF_NO_MARGIN value of the @p margin argument is special and
-/// denotes situation when the post() operation is assumed to succeed (event
-/// delivery guarantee). An assertion fires, when the event cannot be
-/// delivered in this case.
-///
-/// @usage
-/// @include qf_post.cpp
-///
-/// @sa
-/// QActive::postLIFO()
-///
+//============================================================================
+//! @description
+//! Direct event posting is the simplest asynchronous communication method
+//! available in QF.
+//!
+//! @param[in,out] e      pointer to the event to be posted
+//! @param[in]     margin number of required free slots in the queue
+//!                after posting the event. The special value QP::QF_NO_MARGIN
+//!                means that this function will assert if posting fails.
+//! @param[in]     sender pointer to a sender object (used in QS only)
+//!
+//! @returns
+//! 'true' (success) if the posting succeeded (with the provided margin) and
+//! 'false' (failure) when the posting fails.
+//!
+//! @attention
+//! Should be called only via the macro POST() or POST_X().
+//!
+//! @note
+//! The QP::QF_NO_MARGIN value of the @p margin argument is special and
+//! denotes situation when the post() operation is assumed to succeed (event
+//! delivery guarantee). An assertion fires, when the event cannot be
+//! delivered in this case.
+//!
+//! @usage
+//! @include qf_post.cpp
+//!
+//! @sa
+//! QActive::postLIFO()
+//!
 bool QActive::post_(QEvt const * const e,
                     std::uint_fast16_t const margin,
                     void const * const sender) noexcept
@@ -95,21 +93,20 @@ bool QActive::post_(QEvt const * const e,
                     std::uint_fast16_t const margin) noexcept
 #endif
 {
-    bool status;
-    QF_CRIT_STAT_
-    QS_TEST_PROBE_DEF(&QActive::post_)
-
-    /// @pre event pointer must be valid
+    //! @pre event pointer must be valid
     Q_REQUIRE_ID(100, e != nullptr);
 
+    QF_CRIT_STAT_
     QF_CRIT_E_();
     QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into the temporary
 
     // test-probe#1 for faking queue overflow
+    QS_TEST_PROBE_DEF(&QActive::post_)
     QS_TEST_PROBE_ID(1,
         nFree = 0U;
     )
 
+    bool status;
     if (margin == QF_NO_MARGIN) {
         if (nFree > 0U) {
             status = true; // can post
@@ -154,9 +151,7 @@ bool QActive::post_(QEvt const * const e,
         // as producing the #QS_QF_ACTIVE_POST trace record, which are:
         // the local filter for this AO ('me->prio') is set
         //
-        if ((QS::priv_.locFilter[m_prio >> 3U]
-             & static_cast<std::uint8_t>(1U << (m_prio & 7U))) != 0U)
-        {
+        if (QS_LOC_CHECK_(m_prio)) {
             QS::onTestPost(sender, this, e, status);
         }
 #endif
@@ -168,7 +163,7 @@ bool QActive::post_(QEvt const * const e,
         // queue is not empty, insert event into the ring-buffer
         else {
             // insert event pointer e into the buffer (FIFO)
-            QF_PTR_AT_(m_eQueue.m_ring, m_eQueue.m_head) = e;
+            m_eQueue.m_ring[m_eQueue.m_head] = e;
 
             // need to wrap head?
             if (m_eQueue.m_head == 0U) {
@@ -196,9 +191,7 @@ bool QActive::post_(QEvt const * const e,
         // as producing the #QS_QF_ACTIVE_POST trace record, which are:
         // the local filter for this AO ('me->prio') is set
         //
-        if ((QS::priv_.locFilter[m_prio >> 3U]
-             & static_cast<std::uint8_t>(1U << (m_prio & 7U))) != 0U)
-        {
+        if (QS_LOC_CHECK_(m_prio)) {
             QS::onTestPost(sender, this, e, status);
         }
 #endif
@@ -211,27 +204,27 @@ bool QActive::post_(QEvt const * const e,
     return status;
 }
 
-//****************************************************************************
-/// @description
-/// posts an event to the event queue of the active object  using the
-/// Last-In-First-Out (LIFO) policy.
-///
-/// @note
-/// The LIFO policy should be used only for self-posting and with caution,
-/// because it alters order of events in the queue.
-///
-/// @param[in]  e  pointer to the event to post to the queue
-///
-/// @sa
-/// QActive::post_()
-///
+//============================================================================
+//! @description
+//! posts an event to the event queue of the active object  using the
+//! Last-In-First-Out (LIFO) policy.
+//!
+//! @note
+//! The LIFO policy should be used only for self-posting and with caution,
+//! because it alters order of events in the queue.
+//!
+//! @param[in]  e  pointer to the event to post to the queue
+//!
+//! @sa
+//! QActive::post_()
+//!
 void QActive::postLIFO(QEvt const * const e) noexcept {
-    QF_CRIT_STAT_
-    QS_TEST_PROBE_DEF(&QActive::postLIFO)
 
+    QF_CRIT_STAT_
     QF_CRIT_E_();
     QEQueueCtr nFree = m_eQueue.m_nFree;// tmp to avoid UB for volatile access
 
+    QS_TEST_PROBE_DEF(&QActive::postLIFO)
     QS_TEST_PROBE_ID(1,
         nFree = 0U;
     )
@@ -264,9 +257,7 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     // as producing the #QS_QF_ACTIVE_POST trace record, which are:
     // the local filter for this AO ('me->prio') is set
     //
-    if ((QS::priv_.locFilter[m_prio >> 3U]
-         & static_cast<std::uint8_t>(1U << (m_prio & 7U))) != 0U)
-    {
+    if (QS_LOC_CHECK_(m_prio)) {
         QS::onTestPost(nullptr, this, e, true);
     }
 #endif
@@ -286,33 +277,33 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
             m_eQueue.m_tail = 0U; // wrap around
         }
 
-        QF_PTR_AT_(m_eQueue.m_ring, m_eQueue.m_tail) = frontEvt;
+        m_eQueue.m_ring[m_eQueue.m_tail] = frontEvt;
     }
     QF_CRIT_X_();
 }
 
-//****************************************************************************
-/// @description
-/// The behavior of this function depends on the kernel used in the QF port.
-/// For built-in kernels (Vanilla or QK) the function can be called only when
-/// the queue is not empty, so it doesn't block. For a blocking kernel/OS
-/// the function can block and wait for delivery of an event.
-///
-/// @returns
-/// A pointer to the received event. The returned pointer is guaranteed to be
-/// valid (can't be NULL).
-///
-/// @note
-/// This function is used internally by a QF port to extract events from
-/// the event queue of an active object. This function depends on the event
-/// queue implementation and is sometimes customized in the QF port
-/// (file qf_port.hpp). Depending on the definition of the macro
-/// QACTIVE_EQUEUE_WAIT_(), the function might block the calling thread when
-/// no events are available.
-///
+//============================================================================
+//! @description
+//! The behavior of this function depends on the kernel used in the QF port.
+//! For built-in kernels (Vanilla or QK) the function can be called only when
+//! the queue is not empty, so it doesn't block. For a blocking kernel/OS
+//! the function can block and wait for delivery of an event.
+//!
+//! @returns
+//! A pointer to the received event. The returned pointer is guaranteed to be
+//! valid (can't be NULL).
+//!
+//! @note
+//! This function is used internally by a QF port to extract events from
+//! the event queue of an active object. This function depends on the event
+//! queue implementation and is sometimes customized in the QF port
+//! (file qf_port.hpp). Depending on the definition of the macro
+//! QACTIVE_EQUEUE_WAIT_(), the function might block the calling thread when
+//! no events are available.
+//!
 QEvt const *QActive::get_(void) noexcept {
-    QF_CRIT_STAT_
 
+    QF_CRIT_STAT_
     QF_CRIT_E_();
     QACTIVE_EQUEUE_WAIT_(this); // wait for event to arrive directly
 
@@ -325,7 +316,7 @@ QEvt const *QActive::get_(void) noexcept {
     if (nFree <= m_eQueue.m_end) {
 
         // remove event from the tail
-        m_eQueue.m_frontEvt = QF_PTR_AT_(m_eQueue.m_ring, m_eQueue.m_tail);
+        m_eQueue.m_frontEvt = m_eQueue.m_ring[m_eQueue.m_tail];
         if (m_eQueue.m_tail == 0U) { // need to wrap?
             m_eQueue.m_tail = m_eQueue.m_end; // wrap around
         }
@@ -357,24 +348,24 @@ QEvt const *QActive::get_(void) noexcept {
     return e;
 }
 
-//****************************************************************************
-/// @description
-/// Queries the minimum of free ever present in the given event queue of
-/// an active object with priority @p prio, since the active object
-/// was started.
-///
-/// @note
-/// QP::QF::getQueueMin() is available only when the native QF event
-/// queue implementation is used. Requesting the queue minimum of an unused
-/// priority level raises an assertion in the QF. (A priority level becomes
-/// used in QF after the call to the QP::QF::add_() function.)
-///
-/// @param[in] prio  Priority of the active object, whose queue is queried
-///
-/// @returns
-/// the minimum of free ever present in the given event queue of an active
-/// object with priority @p prio, since the active object was started.
-///
+//============================================================================
+//! @description
+//! Queries the minimum of free ever present in the given event queue of
+//! an active object with priority @p prio, since the active object
+//! was started.
+//!
+//! @note
+//! QP::QF::getQueueMin() is available only when the native QF event
+//! queue implementation is used. Requesting the queue minimum of an unused
+//! priority level raises an assertion in the QF. (A priority level becomes
+//! used in QF after the call to the QP::QF::add_() function.)
+//!
+//! @param[in] prio  Priority of the active object, whose queue is queried
+//!
+//! @returns
+//! the minimum of free ever present in the given event queue of an active
+//! object with priority @p prio, since the active object was started.
+//!
 std::uint_fast16_t QF::getQueueMin(std::uint_fast8_t const prio) noexcept {
 
     Q_REQUIRE_ID(400, (prio <= QF_MAX_ACTIVE)
@@ -389,7 +380,7 @@ std::uint_fast16_t QF::getQueueMin(std::uint_fast8_t const prio) noexcept {
     return min;
 }
 
-//****************************************************************************
+//============================================================================
 QTicker::QTicker(std::uint_fast8_t const tickRate) noexcept
   : QActive(nullptr)
 {
@@ -423,10 +414,10 @@ void QTicker::dispatch(QEvt const * const e,
 }
 //............................................................................
 #ifdef Q_SPY
-//****************************************************************************
-/// @sa
-/// QActive::post_()
-///
+//============================================================================
+//! @sa
+//! QActive::post_()
+//!
 bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
 #else
@@ -470,11 +461,10 @@ bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin)
     return true; // the event is always posted correctly
 }
 
-//****************************************************************************
+//============================================================================
 void QTicker::postLIFO(QEvt const * const e) noexcept {
     static_cast<void>(e); // unused parameter
     Q_ERROR_ID(900); // operation not allowed
 }
 
 } // namespace QP
-

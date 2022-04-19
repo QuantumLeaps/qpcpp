@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: Console-based BSP, MinGW
 // Last Updated for Version: 5.1.1
 // Date of the Last Update:  Oct 09, 2013
@@ -7,7 +7,7 @@
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 // Quantum Leaps Web sites: http://www.quantum-leaps.com
 //                          https://state-machine.com
 // e-mail:                  info@quantum-leaps.com
-//****************************************************************************
+//============================================================================
 #ifndef BSP_HPP
 #define BSP_HPP
 

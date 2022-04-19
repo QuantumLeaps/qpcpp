@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: QUTEST fixture for the DPP components
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,20 +30,24 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "dpp.hpp"
 
+namespace DPP {
+
 // instantiate dummy collaborator AOs...
 static QP::QActiveDummy l_dummyPhilo[N_PHILO];
-QP::QActive * const DPP::AO_Philo[N_PHILO] = {
+QP::QActive * const AO_Philo[N_PHILO] = {
     &l_dummyPhilo[0],
     &l_dummyPhilo[1],
     &l_dummyPhilo[2],
     &l_dummyPhilo[3],
     &l_dummyPhilo[4]
 };
+
+} // namespace DPP
 
 using namespace DPP;
 
@@ -139,7 +143,7 @@ void QS::onCommand(uint8_t cmdId,
     }
 }
 
-//****************************************************************************
+//============================================================================
 // callback function to "massage" the event, if necessary
 void QS::onTestEvt(QEvt *e) {
     (void)e;

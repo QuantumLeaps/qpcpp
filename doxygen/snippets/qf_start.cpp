@@ -1,10 +1,10 @@
-static Philo l_philo[N];  // N Philosopher active objects
-static QEvt const *l_philQueueSto[N][N]; // storage for Philo event queues
-static int l_philoStk[N][256]; // stacks for the Philosopher active objects
 
 main() {
     . . .
-    for (n = 0U; n < N; ++n) {
+    static Philo l_philo[N];  // N Philosopher active objects
+    static QEvt const *l_philQueueSto[N][N]; // storage for Philo event queues
+    static int l_philoStk[N][256]; // stacks for the Philosopher active objects
+    for (std::uint8_t n = 0U; n < N; ++n) {
         uint32_t options = 0x1234U;
         ie.philNum = n;
         l_philo[n].start(

@@ -34,10 +34,10 @@ enum QHsmTstSignals {
     MAX_SIG
 };
 
-extern QP::QHsm * const the_hsm; // opaque pointer to the test HSM
+extern QP::QHsm * const the_sm; // opaque pointer to the test state machine
 
 // BSP functions to dispaly a message and exit
-void BSP_display(char_t const *msg);
+void BSP_display(char const *msg);
 void BSP_terminate(int16_t const result);
 
 #endif // QHSMTST_HPP

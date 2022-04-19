@@ -1,40 +1,33 @@
-/// @file
-/// @brief QP::QActive::defer() and QP::QActive::recall() definitions.
-/// @ingroup qf
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-17
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QP::QActive::defer() and QP::QActive::recall() definitions.
+//! @ingroup qf
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -47,33 +40,38 @@
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-namespace QP {
+// unnamed namespace for local definitions with internal linkage
+namespace {
 
 Q_DEFINE_THIS_MODULE("qf_defer")
 
-//****************************************************************************
-/// @description
-/// This function is part of the event deferral support. An active object
-/// uses this function to defer an event @p e to the QF-supported native
-/// event queue @p eq. QF correctly accounts for another outstanding
-/// reference to the event and will not recycle the event at the end of
-/// the RTC step. Later, the active object might recall one event at a
-/// time from the event queue.
-///
-/// @param[in] eq  pointer to a "raw" thread-safe queue to recall
-///                an event from.
-/// @param[in] e   pointer to the event to be deferred
-///
-/// @returns
-/// 'true' (success) when the event could be deferred and 'false'
-/// (failure) if event deferral failed due to overflowing the queue.
-///
-/// An active object can use multiple event queues to defer events of
-/// different kinds.
-///
-/// @sa
-/// QP::QActive::recall(), QP::QEQueue, QP::QActive::flushDeferred()
-///
+} // unnamed namespace
+
+namespace QP {
+
+//============================================================================
+//! @description
+//! This function is part of the event deferral support. An active object
+//! uses this function to defer an event @p e to the QF-supported native
+//! event queue @p eq. QF correctly accounts for another outstanding
+//! reference to the event and will not recycle the event at the end of
+//! the RTC step. Later, the active object might recall one event at a
+//! time from the event queue.
+//!
+//! @param[in] eq  pointer to a "raw" thread-safe queue to recall
+//!                an event from.
+//! @param[in] e   pointer to the event to be deferred
+//!
+//! @returns
+//! 'true' (success) when the event could be deferred and 'false'
+//! (failure) if event deferral failed due to overflowing the queue.
+//!
+//! An active object can use multiple event queues to defer events of
+//! different kinds.
+//!
+//! @sa
+//! QP::QActive::recall(), QP::QEQueue, QP::QActive::flushDeferred()
+//!
 bool QActive::defer(QEQueue * const eq, QEvt const * const e) const noexcept {
     bool const status = eq->post(e, 0U, m_prio);
     QS_CRIT_STAT_
@@ -89,27 +87,27 @@ bool QActive::defer(QEQueue * const eq, QEvt const * const e) const noexcept {
     return status;
 }
 
-//****************************************************************************
-/// @description
-/// This function is part of the event deferral support. An active object
-/// uses this function to recall a deferred event from a given QF
-/// event queue. Recalling an event means that it is removed from the
-/// deferred event queue @p eq and posted (LIFO) to the event queue of
-/// the active object.
-///
-/// @param[in]  eq  pointer to a "raw" thread-safe queue to recall
-///                 an event from.
-///
-/// @returns
-/// 'true' if an event has been recalled and 'false' if not.
-///
-/// @note
-/// An active object can use multiple event queues to defer events of
-/// different kinds.
-///
-/// @sa
-/// QP::QActive::recall(), QP::QEQueue, QP::QActive::postLIFO_()
-///
+//============================================================================
+//! @description
+//! This function is part of the event deferral support. An active object
+//! uses this function to recall a deferred event from a given QF
+//! event queue. Recalling an event means that it is removed from the
+//! deferred event queue @p eq and posted (LIFO) to the event queue of
+//! the active object.
+//!
+//! @param[in]  eq  pointer to a "raw" thread-safe queue to recall
+//!                 an event from.
+//!
+//! @returns
+//! 'true' if an event has been recalled and 'false' if not.
+//!
+//! @note
+//! An active object can use multiple event queues to defer events of
+//! different kinds.
+//!
+//! @sa
+//! QP::QActive::recall(), QP::QEQueue, QP::QActive::postLIFO_()
+//!
 bool QActive::recall(QEQueue * const eq) noexcept {
     QEvt const * const e = eq->get(m_prio); // get evt from deferred queue
     bool recalled;
@@ -160,21 +158,21 @@ bool QActive::recall(QEQueue * const eq) noexcept {
     return recalled;
 }
 
-//****************************************************************************
-/// @description
-/// This function is part of the event deferral support. An active object
-/// can use this function to flush a given QF event queue. The function makes
-/// sure that the events are not leaked.
-///
-/// @param[in]  eq  pointer to a "raw" thread-safe queue to flush.
-///
-/// @returns
-/// the number of events actually flushed from the queue.
-///
-///
-/// @sa
-/// QP::QActive::defer(), QP::QActive::recall(), QP::QEQueue
-///
+//============================================================================
+//! @description
+//! This function is part of the event deferral support. An active object
+//! can use this function to flush a given QF event queue. The function makes
+//! sure that the events are not leaked.
+//!
+//! @param[in]  eq  pointer to a "raw" thread-safe queue to flush.
+//!
+//! @returns
+//! the number of events actually flushed from the queue.
+//!
+//!
+//! @sa
+//! QP::QActive::defer(), QP::QActive::recall(), QP::QEQueue
+//!
 std::uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const noexcept {
     std::uint_fast16_t n = 0U;
     for (QEvt const *e = eq->get(m_prio);
@@ -188,4 +186,3 @@ std::uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const noexcept {
 }
 
 } // namespace QP
-

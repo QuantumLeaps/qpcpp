@@ -1,4 +1,4 @@
-///***************************************************************************
+//============================================================================
 // Product: DPP example, NUCLEO-L053R8 board, uC/OS-II RTOS
 // Last updated for version 6.9.3
 // Last updated on  2021-03-03
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"

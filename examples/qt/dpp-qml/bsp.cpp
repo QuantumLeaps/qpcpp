@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: BSP for DPP-GUI example with Qt5
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "gui.hpp"
 //-----------------
 #include "qpcpp.hpp"
@@ -125,7 +125,7 @@ Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     qFatal("Assertion failed in module %s, location %d", module, loc);
 }
 
-//****************************************************************************
+//============================================================================
 #ifdef Q_SPY
 
 #include "qspy.h"

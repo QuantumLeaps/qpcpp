@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: DPP example with lwIP and direct screen output
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"  // QP/C++ API
 #include "dpp.hpp"    // application events and active objects
 #include "bsp.hpp"    // Board Support Package header file

@@ -1,6 +1,6 @@
-//****************************************************************************
+//============================================================================
 // Product: DPP example, EK-TM4C123GXL board, ThreadX kernel
-// Last updated for version 6.9.4
+// Last updated for: @qpcpp_7_0_0
 // Last updated on  2021-12-05
 //
 //                    Q u a n t u m  L e a P s
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -402,7 +402,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // ThreadX apparently does not have a concpet of an "idle" thread, but
 // it can be emulated by a regular, but NON-BLOCKING ThreadX thread of

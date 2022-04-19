@@ -1,51 +1,44 @@
-/// @file
-/// @brief QMActive::QMActive() and virtual functions
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.2
-/// Last updated on  2020-12-17
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QMActive::QMActive() and virtual functions
 
 #define QP_IMPL           // this is QP implementation
 #include "qf_port.hpp"    // QF port
 #include "qassert.h"      // QP embedded systems-friendly assertions
 
 //! Internal macro to cast a QP::QMActive pointer @p qact_ to QP::QMsm*
-/// @note
-/// Casting pointer to pointer pointer violates the MISRA-C++ 2008 Rule 5-2-7,
-/// cast from pointer to pointer. Additionally this cast violates the MISRA-
-/// C++ 2008 Rule 5-2-8 Unusual pointer cast (incompatible indirect types).
-/// Encapsulating these violations in a macro allows to selectively suppress
-/// this specific deviation.
+//! @note
+//! Casting pointer to pointer pointer violates the MISRA-C++ 2008 Rule 5-2-7,
+//! cast from pointer to pointer. Additionally this cast violates the MISRA-
+//! C++ 2008 Rule 5-2-8 Unusual pointer cast (incompatible indirect types).
+//! Encapsulating these violations in a macro allows to selectively suppress
+//! this specific deviation.
 #define QF_QMACTIVE_TO_QMSM_CAST_(qact_) \
     reinterpret_cast<QMsm *>((qact_))
 
@@ -53,9 +46,14 @@
 #define QF_QMACTIVE_TO_QMSM_CONST_CAST_(qact_) \
     reinterpret_cast<QMsm const *>((qact_))
 
-namespace QP {
+// unnamed namespace for local definitions with internal linkage
+namespace {
 
 //Q_DEFINE_THIS_MODULE("qf_qmact")
+
+} // unnamed namespace
+
+namespace QP {
 
 //............................................................................
 QMActive::QMActive(QStateHandler const initial) noexcept
@@ -97,4 +95,3 @@ QMState const *QMActive::childStateObj(QMState const * const parent)
 #endif
 
 } // namespace QP
-

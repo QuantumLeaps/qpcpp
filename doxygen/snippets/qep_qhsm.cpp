@@ -1,14 +1,14 @@
-class Calc : public QHsm {  // derived from QHsm
+class Calc : public QP::QHsm {  // inherits QP::QHsm
 private:
     double  m_operand1;
     double  m_operand2;
     char    m_display[DISP_WIDTH + 1];
-    uint8_t m_len;
-    uint8_t m_opKey;
+    std::uint8_t m_len;
+    std::uint8_t m_opKey;
 
 public:
     Calc()             // constructor
-      : QHsm(Calc)) {  // superclass' constructor
+      : QP::QHsm(Calc)) {  // superclass' constructor
     }
 
 protected:

@@ -1,41 +1,34 @@
-/// @file
-/// @brief QXK/C++ preemptive kernel core functions
-/// public interface.
-/// @ingroup qxk
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-18
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QXK/C++ preemptive kernel core functions
+//! public interface.
+//! @ingroup qxk
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -53,11 +46,14 @@
     #error "Source file included in a project NOT based on the QXK kernel"
 #endif // QXK_HPP
 
-Q_DEFINE_THIS_MODULE("qxk")
 
 // Public-scope objects ******************************************************
 extern "C" {
-    QXK_Attr QXK_attr_;   // global attributes of the QXK kernel
+
+Q_DEFINE_THIS_MODULE("qxk")
+
+QXK_Attr QXK_attr_;   // global attributes of the QXK kernel
+
 } // extern "C"
 
 namespace QP {
@@ -71,17 +67,16 @@ public:
 
 static QXKIdleThread l_idleThread;
 
-
-//****************************************************************************
-/// @description
-/// Initializes QF and must be called exactly once before any other QF
-/// function. Typically, QF::init() is called from main() even before
-/// initializing the Board Support Package (BSP).
-///
-/// @note QF::init() clears the internal QF variables, so that the framework
-/// can start correctly even if the startup code fails to clear the
-/// uninitialized data (as is required by the C++ Standard).
-///
+//============================================================================
+//! @description
+//! Initializes QF and must be called exactly once before any other QF
+//! function. Typically, QF::init() is called from main() even before
+//! initializing the Board Support Package (BSP).
+//!
+//! @note QF::init() clears the internal QF variables, so that the framework
+//! can start correctly even if the startup code fails to clear the
+//! uninitialized data (as is required by the C++ Standard).
+//!
 void QF::init(void) {
     QF_maxPool_      = 0U;
     QF_subscrList_   = nullptr;
@@ -105,28 +100,28 @@ void QF::init(void) {
 #endif
 }
 
-//****************************************************************************
-/// @description
-/// This function stops the QF application. After calling this function,
-/// QF attempts to gracefully stop the application. This graceful shutdown
-/// might take some time to complete. The typical use of this function is
-/// for terminating the QF application to return back to the operating
-/// system or for handling fatal errors that require shutting down
-/// (and possibly re-setting) the system.
-///
-/// @attention
-/// After calling QF::stop() the application must terminate and cannot
-/// continue. In particular, QF::stop() is **not** intended to be followed
-/// by a call to QF::init() to "resurrect" the application.
-///
-/// @sa QF::onCleanup()
-///
+//============================================================================
+//! @description
+//! This function stops the QF application. After calling this function,
+//! QF attempts to gracefully stop the application. This graceful shutdown
+//! might take some time to complete. The typical use of this function is
+//! for terminating the QF application to return back to the operating
+//! system or for handling fatal errors that require shutting down
+//! (and possibly re-setting) the system.
+//!
+//! @attention
+//! After calling QF::stop() the application must terminate and cannot
+//! continue. In particular, QF::stop() is **not** intended to be followed
+//! by a call to QF::init() to "resurrect" the application.
+//!
+//! @sa QF::onCleanup()
+//!
 void QF::stop(void) {
     onCleanup(); // application-specific cleanup callback
     // nothing else to do for the preemptive QXK kernel
 }
 
-//****************************************************************************
+//============================================================================
 //! process all events posted during initialization
 static void initial_events(void); // prototype
 static void initial_events(void) {
@@ -138,13 +133,13 @@ static void initial_events(void) {
     }
 }
 
-//****************************************************************************
-/// @description
-/// QF::run() is typically called from main() after you initialize
-/// the QF and start at least one active object with QActive::start().
-///
-/// @returns In QXK, the QF::run() function does not return.
-///
+//============================================================================
+//! @description
+//! QF::run() is typically called from main() after you initialize
+//! the QF and start at least one active object with QActive::start().
+//!
+//! @returns In QXK, the QF::run() function does not return.
+//!
 int_t QF::run(void) {
     QF_INT_DISABLE();
     initial_events(); // process all events posted during initialization
@@ -166,31 +161,31 @@ int_t QF::run(void) {
 #endif
 }
 
-//****************************************************************************
-// @description
-// Starts execution of the AO and registers the AO with the framework.
-// Also takes the top-most initial transition in the AO's state machine.
-// This initial transition is taken in the callee's thread of execution.
-//
-// @param[in] prio    priority at which to start the active object
-// @param[in] qSto    pointer to the storage for the ring buffer of the
-//                    event queue (used only with the built-in QP::QEQueue)
-// @param[in] qLen    length of the event queue [events]
-// @param[in] stkSto  pointer to the stack storage (used only when
-//                    per-AO stack is needed)
-// @param[in] stkSize stack size [bytes]
-// @param[in] par     pointer to an extra parameter (might be NULL)
-//
+//============================================================================
+//! @description
+//! Starts execution of the AO and registers the AO with the framework.
+//! Also takes the top-most initial transition in the AO's state machine.
+//! This initial transition is taken in the callee's thread of execution.
+//!
+//! @param[in] prio    priority at which to start the active object
+//! @param[in] qSto    pointer to the storage for the ring buffer of the
+//!                    event queue (used only with the built-in QP::QEQueue)
+//! @param[in] qLen    length of the event queue [events]
+//! @param[in] stkSto  pointer to the stack storage (used only when
+//!                    per-AO stack is needed)
+//! @param[in] stkSize stack size [bytes]
+//! @param[in] par     pointer to an extra parameter (might be NULL)
+//!
 void QActive::start(std::uint_fast8_t const prio,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    /// @pre AO cannot be started:
-    /// - from an ISR;
-    /// - the priority must be in range;
-    /// - the stack storage must NOT be provided (because the QXK kernel does
-    /// not need per-AO stacks).
+    //! @pre AO cannot be started:
+    //! - from an ISR;
+    //! - the priority must be in range;
+    //! - the stack storage must NOT be provided (because the QXK kernel does
+    //! not need per-AO stacks).
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
         && (0U < prio) && (prio <= QF_MAX_ACTIVE)
         && (stkSto == nullptr)
@@ -214,37 +209,37 @@ void QActive::start(std::uint_fast8_t const prio,
     QF_CRIT_X_();
 }
 
-//****************************************************************************
-/// @description
-/// This function locks the QXK scheduler to the specified ceiling.
-///
-/// @param[in]   ceiling    priority ceiling to which the QXK scheduler
-///                         needs to be locked
-///
-/// @returns
-/// The previous QXK Scheduler lock status, which is to be used to unlock
-/// the scheduler by restoring its previous lock status in QXK::schedUnlock().
-///
-/// @note
-/// QXK::schedLock() must be always followed by the corresponding
-/// QXK::schedUnlock().
-///
-/// @sa QXK::schedUnlock()
-///
-/// @usage
-/// The following example shows how to lock and unlock the QXK scheduler:
-/// @include qxk_lock.cpp
-///
+//============================================================================
+//! @description
+//! This function locks the QXK scheduler to the specified ceiling.
+//!
+//! @param[in]   ceiling    priority ceiling to which the QXK scheduler
+//!                         needs to be locked
+//!
+//! @returns
+//! The previous QXK Scheduler lock status, which is to be used to unlock
+//! the scheduler by restoring its previous lock status in QXK::schedUnlock().
+//!
+//! @note
+//! QXK::schedLock() must be always followed by the corresponding
+//! QXK::schedUnlock().
+//!
+//! @sa QXK::schedUnlock()
+//!
+//! @usage
+//! The following example shows how to lock and unlock the QXK scheduler:
+//! @include qxk_lock.cpp
+//!
 QSchedStatus QXK::schedLock(std::uint_fast8_t const ceiling) noexcept {
-    QSchedStatus stat;
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
-    /// @pre The QXK scheduler lock:
-    /// - cannot be called from an ISR;
+    //! @pre The QXK scheduler lock:
+    //! - cannot be called from an ISR;
     Q_REQUIRE_ID(400, !QXK_ISR_CONTEXT_());
 
     // first store the previous lock prio if below the ceiling
+    QSchedStatus stat;
     if (static_cast<std::uint_fast8_t>(QXK_attr_.lockPrio) < ceiling) {
         stat = (static_cast<QSchedStatus>(QXK_attr_.lockPrio) << 8U);
         QXK_attr_.lockPrio = static_cast<std::uint8_t>(ceiling);
@@ -269,27 +264,27 @@ QSchedStatus QXK::schedLock(std::uint_fast8_t const ceiling) noexcept {
     return stat; // return the status to be saved in a stack variable
 }
 
-//****************************************************************************
-///
-/// @description
-/// This function unlocks the QXK scheduler to the previous status.
-///
-/// @param[in]   stat       previous QXK Scheduler lock status returned from
-///                         QXK::schedLock()
-/// @note
-/// A QXK scheduler can be locked from both basic threads (AOs) and
-/// extended threads and the scheduler locks can nest.
-///
-/// @note
-/// QXK::schedUnlock() must always follow the corresponding
-/// QXK::schedLock().
-///
-/// @sa QXK::schedLock()
-///
-/// @usage
-/// The following example shows how to lock and unlock the QXK scheduler:
-/// @include qxk_lock.cpp
-///
+//============================================================================
+//!
+//! @description
+//! This function unlocks the QXK scheduler to the previous status.
+//!
+//! @param[in]   stat       previous QXK Scheduler lock status returned from
+//!                         QXK::schedLock()
+//! @note
+//! A QXK scheduler can be locked from both basic threads (AOs) and
+//! extended threads and the scheduler locks can nest.
+//!
+//! @note
+//! QXK::schedUnlock() must always follow the corresponding
+//! QXK::schedLock().
+//!
+//! @sa QXK::schedLock()
+//!
+//! @usage
+//! The following example shows how to lock and unlock the QXK scheduler:
+//! @include qxk_lock.cpp
+//!
 void QXK::schedUnlock(QSchedStatus const stat) noexcept {
     // has the scheduler been actually locked by the last QXK_schedLock()?
     if (stat != 0xFFU) {
@@ -300,9 +295,9 @@ void QXK::schedUnlock(QSchedStatus const stat) noexcept {
         QF_CRIT_STAT_
         QF_CRIT_E_();
 
-        /// @pre The scheduler cannot be unlocked:
-        /// - from the ISR context; and
-        /// - the current lock priority must be greater than the previous
+        //! @pre The scheduler cannot be unlocked:
+        //! - from the ISR context; and
+        //! - the current lock priority must be greater than the previous
         Q_REQUIRE_ID(500, (!QXK_ISR_CONTEXT_())
                           && (lockPrio > prevPrio));
 
@@ -331,18 +326,18 @@ void QXK::schedUnlock(QSchedStatus const stat) noexcept {
 //============================================================================
 extern "C" {
 
-//****************************************************************************
-/// @description
-/// The QXK scheduler finds the priority of the highest-priority thread
-/// that is ready to run.
-///
-/// @returns the 1-based priority of the the active object to run next,
-/// or zero if no eligible active object is found.
-///
-/// @attention
-/// QXK_sched_() must be always called with interrupts **disabled** and
-/// returns with interrupts **disabled**.
-///
+//============================================================================
+//! @description
+//! The QXK scheduler finds the priority of the highest-priority thread
+//! that is ready to run.
+//!
+//! @returns the 1-based priority of the the active object to run next,
+//! or zero if no eligible active object is found.
+//!
+//! @attention
+//! QXK_sched_() must be always called with interrupts **disabled** and
+//! returns with interrupts **disabled**.
+//!
 std::uint_fast8_t QXK_sched_(void) noexcept {
     // find the highest-prio thread ready to run
     std::uint_fast8_t p = QXK_attr_.readySet.findMax();
@@ -411,15 +406,15 @@ std::uint_fast8_t QXK_sched_(void) noexcept {
     return p;
 }
 
-//****************************************************************************
-/// @attention
-/// QXK_activate_() must be always called with interrupts **disabled** and
-/// returns with interrupts **disabled**.
-///
-/// @note
-/// The activate function might enable interrupts internally, but it always
-/// returns with interrupts **disabled**.
-///
+//============================================================================
+//! @attention
+//! QXK_activate_() must be always called with interrupts **disabled** and
+//! returns with interrupts **disabled**.
+//!
+//! @note
+//! The activate function might enable interrupts internally, but it always
+//! returns with interrupts **disabled**.
+//!
 void QXK_activate_(void) {
     std::uint_fast8_t const pin =
         static_cast<std::uint_fast8_t>(QXK_attr_.actPrio);
@@ -430,7 +425,7 @@ void QXK_activate_(void) {
     std::uint_fast8_t pprev = pin;
 #endif // QXK_ON_CONTEXT_SW || Q_SPY
 
-    /// @pre QXK_attr_.next must be valid
+    //! @pre QXK_attr_.next must be valid
     Q_REQUIRE_ID(700, (a != nullptr) && (pin < QF_MAX_ACTIVE));
 
     // dynamic priority of the next AO
@@ -551,17 +546,15 @@ void QXK_activate_(void) {
 #endif // QXK_ON_CONTEXT_SW || Q_SPY
 }
 
-//****************************************************************************
+//============================================================================
 QP::QActive *QXK_current(void) noexcept {
-    QP::QActive *curr;
-    QF_CRIT_STAT_
-
-    QF_CRIT_E_();
-
-    /// @pre the QXK kernel must be running
+    //! @pre the QXK kernel must be running
     Q_REQUIRE_ID(800, QXK_attr_.lockPrio <= QF_MAX_ACTIVE);
 
-    curr = QXK_attr_.curr;
+    QF_CRIT_STAT_
+    QF_CRIT_E_();
+
+    QP::QActive *curr = QXK_attr_.curr;
     if (curr == nullptr) { // basic thread?
         curr = QP::QF::active_[QXK_attr_.actPrio];
     }
@@ -574,4 +567,3 @@ QP::QActive *QXK_current(void) noexcept {
 }
 
 } // extern "C"
-

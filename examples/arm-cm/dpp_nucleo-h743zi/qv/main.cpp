@@ -1,13 +1,13 @@
-//****************************************************************************
+//============================================================================
 // DPP example
-// Last updated for version 6.3.3
-// Last updated on  2018-06-23
+// Last updated for: @qpcpp_7_0_0
+// Last updated on  2022-02-28
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,18 +25,15 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
-
-static QP::QTicker l_ticker0(0); // ticker for tick rate 0
-QP::QActive *DPP::the_Ticker0 = &l_ticker0;
 
 //............................................................................
 int main() {
@@ -45,7 +42,8 @@ int main() {
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
     static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO];
 
-    QP::QF::init();  // initialize the framework and the underlying RT kernel
+    QP::QF::init();   // initialize the framework and the underlying RT kernel
+    DPP::BSP::init(); // initialize the Board Support Package
 
     // init publish-subscribe
     QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
@@ -53,14 +51,6 @@ int main() {
     // initialize event pools...
     QP::QF::poolInit(smlPoolSto,
                      sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
-
-    // initialize the Board Support Package
-    // NOTE: BSP::init() is called *after* initializing publish-subscribe and
-    // event pools, to make the system ready to accept SysTick interrupts.
-    // Unfortunately, the STM32Cube code that must be called from BSP,
-    // configures and starts SysTick.
-    //
-    DPP::BSP::init();
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {

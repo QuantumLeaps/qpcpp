@@ -1,13 +1,13 @@
-//****************************************************************************
+//============================================================================
 // Product: QHsmTst Example
-// Last Updated for Version: 6.9.1
-// Date of the Last Update:  2020-09-22
+// Last updated for: @ref qpcpp_7_0_0
+// Last updated on: 2021-12-18
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "qhsmtst.hpp"
 
@@ -48,13 +48,22 @@ static void dispatch(QP::QSignal sig);
 //............................................................................
 int main(int argc, char *argv[ ]) {
 
-#ifdef Q_SPY
-    uint8_t qsBuf[128];
-    QS::initBuf(qsBuf, sizeof(qsBuf));
-#endif
-
     QF::init();
     QF::onStartup();
+
+    Q_ALLEGE(QS_INIT(nullptr));
+    QS_OBJ_DICTIONARY(the_sm);
+    QS_SIG_DICTIONARY(A_SIG, nullptr);
+    QS_SIG_DICTIONARY(B_SIG, nullptr);
+    QS_SIG_DICTIONARY(C_SIG, nullptr);
+    QS_SIG_DICTIONARY(D_SIG, nullptr);
+    QS_SIG_DICTIONARY(E_SIG, nullptr);
+    QS_SIG_DICTIONARY(F_SIG, nullptr);
+    QS_SIG_DICTIONARY(G_SIG, nullptr);
+    QS_SIG_DICTIONARY(H_SIG, nullptr);
+    QS_SIG_DICTIONARY(I_SIG, nullptr);
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS);
+    QS_GLB_FILTER(-QP::QS_QF_TICK);
 
     if (argc > 1) { // file name provided?
         l_outFile = fopen(argv[1], "w");
@@ -67,10 +76,11 @@ int main(int argc, char *argv[ ]) {
                "QEP: %s.\nPress ESC to quit...\n",
                __DATE__, __TIME__, QP_VERSION_STR);
 
-        the_hsm->init(0U); // trigger the initial tran. in the test HSM
+        the_sm->init(0U); // trigger the initial tran. in the test HSM
 
         for (;;) { // event loop
-            PRINTF_S("\n>", "");
+            PRINTF_S("\n%c", '>');
+            QS_OUTPUT(); // handle the QS output
 
             int c;
             c = (uint8_t)QP::QF_consoleWaitForKey();
@@ -90,7 +100,7 @@ int main(int argc, char *argv[ ]) {
                 e.sig = IGNORE_SIG;
             }
 
-            the_hsm->dispatch(&e, 0U); // dispatch the event
+            the_sm->dispatch(&e, 0U); // dispatch the event
         }
     }
     else { // batch version
@@ -98,7 +108,7 @@ int main(int argc, char *argv[ ]) {
         FPRINTF_S(l_outFile,
                 "QHsmTst example, QEP %s\n", QP::QEP::getVersion());
 
-        the_hsm->init(0U); // trigger the initial tran. in the test HSM
+        the_sm->init(0U); // trigger the initial tran. in the test HSM
 
         // dynamic transitions
         dispatch(A_SIG);
@@ -151,7 +161,8 @@ static void dispatch(QP::QSignal sig) {
     Q_REQUIRE((A_SIG <= sig) && (sig <= I_SIG));
     FPRINTF_S(l_outFile, "\n%c:", 'A' + sig - A_SIG);
     QP::QEvt e = QEVT_INITIALIZER(sig);
-    the_hsm->dispatch(&e, 0U); // dispatch the event
+    the_sm->dispatch(&e, 0U); // dispatch the event
+    QS_OUTPUT(); // handle the QS output
 }
 
 namespace QP {
@@ -171,24 +182,16 @@ void QF_onClockTick(void) {
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
 
-//! callback function to execute user commands
+//! callback function to execute user commands (dummy definition)
 void QS::onCommand(uint8_t cmdId,
      uint32_t param1, uint32_t param2, uint32_t param3)
 {
-    switch (cmdId) {
-       case 0U: {
-           break;
-       }
-       default:
-           break;
-    }
-
     /* unused parameters */
+    (void)cmdId;
     (void)param1;
     (void)param2;
     (void)param3;
 }
-
 
 #endif // Q_SPY
 //----------------------------------------------------------------------------

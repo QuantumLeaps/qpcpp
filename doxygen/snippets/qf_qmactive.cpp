@@ -1,12 +1,12 @@
-class Philo : public QMActive { // derives from QMActive
+class Philo : public QP::QMActive { // inherits QP::QMActive
 private:
-    uint8_t  m_num;             // number of this philosopher
     QTimeEvt m_timeEvt;         // to timeout thining or eating
+    std::uint8_t m_num;         // number of this philosopher
 
 public:
     Philo::Philo()              // constructor
-    : QMActive(&initial),       // superclass' constructor
-      m_timeEvt(TIMEOUT_SIG, this, 0U)
+      : QMActive(&initial),     // superclass' constructor
+        m_timeEvt(TIMEOUT_SIG, this, 0U)
     {}
 
 protected:

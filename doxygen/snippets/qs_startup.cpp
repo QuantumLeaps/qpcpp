@@ -1,8 +1,11 @@
 #ifdef Q_SPY
 
 bool QS::onStartup(void const *arg) {
-    static uint8_t qsBuf[4*1024];  // 4K buffer for Quantum Spy
-    initBuf(qsBuf, sizeof(qsBuf));
+    static uint8_t qsTxBuf[1024]; // buffer for QS transmit channel
+    static uint8_t qsRxBuf[100];  // buffer for QS receive channel
+
+    initBuf(qsTxBuf, sizeof(qsTxBuf));
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     // configure UART 0/1 for QSPY output ...
     if (*(char const *)arg == '0') { // use UART 0

@@ -1,6 +1,6 @@
 ##############################################################################
 # Product: Makefile for QP/C++ for Windows and POSIX *HOSTS*
-# Last updated for version 6.9.4
+# Last updated for version 7.0.0
 # Last updated on  2021-11-05
 #
 #                    Q u a n t u m  L e a P s

@@ -75,7 +75,7 @@ VPATH = \
 	$(QP_PORT_DIR) \
 	$(QPCPP)/3rd_party/ek-lm3s6965 \
 	$(QPCPP)/3rd_party/ek-lm3s6965/gnu \
-	$(QPCPP)/3rd_party/ek-lm3s6965/lwip_driver/netif \
+	$(QPCPP)/3rd_party/ek-lm3s6965/lwip_driver/netif_cpp \
 	$(QPCPP)/3rd_party/lwip/apps/webserver_raw
 
 # list of all include directories needed by this project

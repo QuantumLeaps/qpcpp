@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: QUTEST fixture for the Philo AO
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,14 +30,18 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "dpp.hpp"
 
+namespace DPP {
+
 // instantiate dummy collaborator AOs...
 static QP::QActiveDummy l_dummyTable;
-QP::QActive * const DPP::AO_Table = &l_dummyTable;
+QP::QActive * const AO_Table = &l_dummyTable;
+
+} // namespace DPP
 
 using namespace DPP;
 
@@ -127,7 +131,7 @@ void QS::onCommand(uint8_t cmdId,
     }
 }
 
-//****************************************************************************
+//============================================================================
 // callback function to "massage" the event, if necessary
 void QS::onTestEvt(QEvt *e) {
     (void)e;

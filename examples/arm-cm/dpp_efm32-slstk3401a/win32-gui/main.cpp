@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // DPP example for Windows
 // Last updated for version 5.7.5
 // Last updated on  2016-11-08
@@ -30,7 +30,7 @@
 // Contact information:
 // https://state-machine.com
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -69,7 +69,7 @@ int main() {
     return QP::QF::run(); // run the QF application
 }
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // Windows is not a deterministic real-time system, which means that the
 // system can occasionally and unexpectedly "choke and freeze" for a number

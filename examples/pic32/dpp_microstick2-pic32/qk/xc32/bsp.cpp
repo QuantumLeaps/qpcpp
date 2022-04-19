@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // BSP for DPP example, Microstick II board, preemptive QK kernel, XC32
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "dpp.hpp"

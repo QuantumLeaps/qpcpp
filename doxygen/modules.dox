@@ -1,3 +1,15 @@
+/*! @defgroup qp QP
+
+@brief
+Real-Time Embedded Framework
+
+QP Real-Time Embedded Framework (RTEF) is a reusable architecture for building real-time embedded (RTE) software as a system of collaborating, @ref srs_ed "event-driven" @ref srs_ao "Active Objects" (a.k.a. Actors).
+
+The internal behavior of Active Objects is specified in QP by means of @ref srs_sm "Hierarchical State Machines" (UML statecharts). The QP framework supports manual coding of Hierarchical State Machines in as well as Model-Based Design (MBD) and automatic code generation.
+*/
+
+/*##########################################################################*/
+
 /*! @defgroup qep QEP
 
 @brief
@@ -50,7 +62,7 @@ The QV scheduler can also very easily detect when all event queues are empty, at
 Given the simplicity, portability, and low-resource consumption, the QV scheduler is very attractive. It allows you to partition the problem into active objects and execute these active objects orderly. The thread-level response of this scheduler is the longest RTC step in the whole system, but because event-driven active objects don’t block, the RTC steps tend to be very short (typically just a few microseconds). Also, often you can break up longer RTC steps into shorter pieces, by posting an event to self and returning (“Reminder” state pattern). The self-posted event then triggers the continuation of longer processing.
 
 @remarks
-Sometimes it is not practical to break up long RTC steps, and consequently the thread-level response of the simple @ref "QV kernel" might be too slow. In this cases you need to use a *preemptive* kernel. The big advantage of preemptive kernel is that it effectively decouples high-priority thread from low-priority threads in the time domain. The timeliness of execution of high-priority thread is almost independent on the low-priority threads. But of course there is no such thing as a free lunch. Preemptive kernels open the whole new class of problems related to race conditions. So you need to be very careful about sharing any resources.
+Sometimes it is not practical to break up long RTC steps, and consequently the thread-level response of the simple @ref qv "QV kernel" might be too slow. In this cases you need to use a *preemptive* kernel. The big advantage of preemptive kernel is that it effectively decouples high-priority thread from low-priority threads in the time domain. The timeliness of execution of high-priority thread is almost independent on the low-priority threads. But of course there is no such thing as a free lunch. Preemptive kernels open the whole new class of problems related to race conditions. So you need to be very careful about sharing any resources.
 
 
 @next{qk}
@@ -88,7 +100,7 @@ When a lower-priority thread posts an event to a higher-priority thread, the ker
 <ul class="tag">
   <li><span class="tag">2</span>
 When an interrupt posts an event to a higher-priority thread than the interrupted thread, upon completion of the ISR the kernel must start execution of the higher-priority thread instead of resuming the lower-priority thread. This type of preemption is called <b>asynchronous preemption</b> because it can happen asynchronously, any time interrupts are not explicitly disabled.
-> NOTE: The stack usage during asynchronous preemption on ARM Cortex-M is slightly simplified in the diagram below. A more detailed stack usage diagram is discussed later in the section explaining the @ref "Detailed stack allocation in QK for ARM Cortex-M".
+> NOTE: The stack usage during asynchronous preemption on ARM Cortex-M is slightly simplified in the diagram below. A more detailed stack usage diagram is discussed later in the section explaining the @ref arm-cm_qk_port-asm_pendsv "Detailed stack allocation in QK for ARM Cortex-M".
   </li>
 </ul>
 
@@ -159,7 +171,7 @@ The figure below shows the main classes introduced in the QXK kernel and their r
   <li><span class="tag">0</span> The abstract QP::QActive class represents active objects in QP. This class contains the @c thread object of the underlying kernel (QXK thread-control-block in this case) as well as the event queue and the unique priority of the active object.
   </li>
 
-  <li><span class="tag">1</span> The QP::QXThread class represents the extended (blocking) threads of the QXK kernel. It inherits QP::QActive, so that extended-threads can be treated as active objects internally in the framework. However, the extended-threads do not implement state machines. Instead, the data fields used for storing the current state in active objects are re-used to store the private stack of the extended-thread. The QP::QXThread class also contains the @c timeEvt object (see QP::QTimeEvt) for generating timeouts when the extended-thread is blocked.
+  <li><span class="tag">1</span> The QP::QXThread class represents the extended (blocking) threads of the QXK kernel. It inherits QP::QActive, so that extended-threads can be treated as active objects internally in the framework. However, the extended-threads **do not implement state machines**. Instead, the data fields used for storing the current state in active objects are re-used to store the private stack of the extended-thread. The QP::QXThread class also contains the @c timeEvt object (see QP::QTimeEvt) for generating timeouts when the extended-thread is blocked.
   </li>
 
   <li><span class="tag">2</span> The QP::QXMutex class represents the @ref QP::QXMutex "priority-ceiling mutex" of the QXK kernel. The mutex can block and can be used only in the extended-threads  and the QXK kernel would assert if an active object (basic thread) would attempt to lock a mutex. The mutex is recursive, meaning that it can be locked multiple times from the same extended thread (but it needs to be unlocked equal number of times).
@@ -209,7 +221,6 @@ As you can see in the list below, <span class="highlight">QXK provides most feat
 > **NOTE:** Priority-ceiling protocol implemented in QXK is immune to priority-inversions, but requires a unique QP thread priority level (the ceiling priority) to be assigned to the mutex. This ceiling priority is unavailable to QP threads.@n
 
 > **NOTE:** A QXK mutex can be configured not to use the priority-ceiling protocol (when initialized with a zero priority-ceiling). In that case, the mutex does not require a separate priority level.
-
 
 <li><span class="bullet">&gt;</span>Counting Semaphores with optional timeout that can block multiple extended-threads;
 </li>

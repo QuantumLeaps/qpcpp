@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: QP-lwIP demonstration
 // Last Updated for Version: 5.4.0
 // Date of the Last Update:  2015-05-12
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"

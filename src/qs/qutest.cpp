@@ -1,40 +1,33 @@
-/// @file
-/// @brief QF/C++ stub for QUTEST unit testing
-/// @ingroup qs
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-21
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses/>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-02-15
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QF/C++ stub for QUTEST unit testing
+//! @ingroup qs
 
 // only build when Q_UTEST is defined
 #ifdef Q_UTEST
@@ -46,18 +39,23 @@
 #include "qs_port.hpp"  // QS port
 #include "qs_pkg.hpp"   // QS package-scope internal interface
 
-namespace QP {
+// unnamed namespace for local definitions with internal linkage
+namespace {
 
 Q_DEFINE_THIS_MODULE("qutest")
+
+} // unnamed namespace
+
+namespace QP {
 
 // Global objects ============================================================
 std::uint8_t volatile QF_intNest;
 
 // QF functions ==============================================================
 void QF::init(void) {
-    /// Clear the internal QF variables, so that the framework can start
-    /// correctly even if the startup code fails to clear the uninitialized
-    /// data (as is required by the C++ Standard).
+    //! Clear the internal QF variables, so that the framework can start
+    //! correctly even if the startup code fails to clear the uninitialized
+    //! data (as is required by the C++ Standard).
     QF_maxPool_      = 0U;
     QF_subscrList_   = nullptr;
     QF_maxPubSignal_ = 0;
@@ -115,7 +113,37 @@ void QActive::stop(void) {
 }
 #endif
 
-//****************************************************************************
+//============================================================================
+QHsmDummy::QHsmDummy(void)
+  : QHsm(nullptr)
+{}
+//............................................................................
+void QHsmDummy::init(void const * const e,
+                     std::uint_fast8_t const qs_id) noexcept
+{
+    static_cast<void>(e); // unused paramter
+
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QEP_STATE_INIT, qs_id)
+        QS_OBJ_PRE_(this);        // this state machine object
+        QS_FUN_PRE_(m_state.fun); // the source state
+        QS_FUN_PRE_(m_temp.fun);  // the target of the initial transition
+    QS_END_PRE_()
+}
+//............................................................................
+void QHsmDummy::dispatch(QEvt const * const e,
+                         std::uint_fast8_t const qs_id) noexcept
+{
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QEP_DISPATCH, qs_id)
+        QS_TIME_PRE_();           // time stamp
+        QS_SIG_PRE_(e->sig);      // the signal of the event
+        QS_OBJ_PRE_(this);        // this state machine object
+        QS_FUN_PRE_(m_state.fun); // the current state
+    QS_END_PRE_()
+}
+
+//============================================================================
 QActiveDummy::QActiveDummy(void)
   : QActive(nullptr)
 {}
@@ -136,18 +164,18 @@ void QActiveDummy::start(std::uint_fast8_t const prio,
 
     QF::add_(this); // make QF aware of this AO
 
-    this->init(par, m_prio); // take the top-most initial tran. (virtual)
-    //QS_FLUSH(); // flush the trace buffer to the host
+    QHsm::init(par, m_prio); // take the top-most initial tran. (virtual)
+    //QS_FLUSH();
 }
 //............................................................................
 void QActiveDummy::init(void const * const e,
                         std::uint_fast8_t const qs_id) noexcept
 {
     static_cast<void>(e); // unused paramter
-    static_cast<void>(qs_id); // unused paramter (if Q_SPY not defined)
+    static_cast<void>(qs_id); // unused paramter
 
     QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QEP_STATE_INIT, qs_id)
+    QS_BEGIN_PRE_(QS_QEP_STATE_INIT, m_prio)
         QS_OBJ_PRE_(this);        // this state machine object
         QS_FUN_PRE_(m_state.fun); // the source state
         QS_FUN_PRE_(m_temp.fun);  // the target of the initial transition
@@ -157,11 +185,10 @@ void QActiveDummy::init(void const * const e,
 void QActiveDummy::dispatch(QEvt const * const e,
                             std::uint_fast8_t const qs_id) noexcept
 {
-    static_cast<void>(e); // unused paramter
-    static_cast<void>(qs_id); // unused paramter (if Q_SPY not defined)
+    static_cast<void>(qs_id); // unused paramter
 
     QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QEP_DISPATCH, qs_id)
+    QS_BEGIN_PRE_(QS_QEP_DISPATCH, m_prio)
         QS_TIME_PRE_();           // time stamp
         QS_SIG_PRE_(e->sig);      // the signal of the event
         QS_OBJ_PRE_(this);        // this state machine object
@@ -173,10 +200,10 @@ bool QActiveDummy::post_(QEvt const * const e,
                          std::uint_fast16_t const margin,
                          void const * const sender) noexcept
 {
-    bool status = true;
     QS_TEST_PROBE_DEF(&QActive::post_)
 
     // test-probe#1 for faking queue overflow
+    bool status = true;
     QS_TEST_PROBE_ID(1,
         status = false;
         if (margin == QF_NO_MARGIN) {
@@ -193,7 +220,7 @@ bool QActiveDummy::post_(QEvt const * const e,
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
-    std::uint_fast8_t rec =
+    std::uint_fast8_t const rec =
         (status ? static_cast<std::uint8_t>(QS_QF_ACTIVE_POST)
                 : static_cast<std::uint8_t>(QS_QF_ACTIVE_POST_ATTEMPT));
     QS_BEGIN_NOCRIT_PRE_(rec, m_prio)
@@ -266,7 +293,7 @@ void QActiveDummy::postLIFO(QEvt const * const e) noexcept {
     QF::gc(e);
 }
 
-//****************************************************************************
+//============================================================================
 void QS::processTestEvts_(void) {
     QS_TEST_PROBE_DEF(&QS::processTestEvts_)
 
@@ -302,11 +329,9 @@ void QS::processTestEvts_(void) {
 void QS::tickX_(std::uint_fast8_t const tickRate,
                 void const * const sender) noexcept
 {
-    QTimeEvt *t;
-    QActive *act;
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
+
     QTimeEvt *prev = &QF::timeEvtHead_[tickRate];
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_TICK, 0U)
@@ -316,13 +341,14 @@ void QS::tickX_(std::uint_fast8_t const tickRate,
     QS_END_NOCRIT_PRE_()
 
     // is current Time Event object provided?
-    t = static_cast<QTimeEvt *>(QS::rxPriv_.currObj[QS::TE_OBJ]);
+    QTimeEvt *t = static_cast<QTimeEvt *>(QS::rxPriv_.currObj[QS::TE_OBJ]);
     if (t != nullptr) {
 
         // the time event must be armed
         Q_ASSERT_ID(810, t->m_ctr != 0U);
 
-        act = static_cast<QActive *>(t->m_act); // temp. for volatile
+        // temp. for volatile
+        QActive * const act = static_cast<QActive *>(t->m_act);
 
         // the recipient AO must be provided
         Q_ASSERT_ID(820, act != nullptr);
@@ -404,17 +430,27 @@ void QS::tickX_(std::uint_fast8_t const tickRate,
     QF_CRIT_X_();
 }
 
+//............................................................................
+// 1. send the QS_TEST_PAUSED trace record
+// 2. Enter the QUTest event loop
+void QS::test_pause_(void) {
+    beginRec_(static_cast<std::uint_fast8_t>(QP::QS_TEST_PAUSED));
+    endRec_();
+    onTestLoop();
+}
+
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 extern "C" {
 
-Q_NORETURN Q_onAssert(char_t const * const module, int_t const location) {
+Q_NORETURN Q_onAssert(char const * const module, int_t const location) {
     QS_BEGIN_NOCRIT_PRE_(QP::QS_ASSERT_FAIL, 0U)
         QS_TIME_PRE_();
         QS_U16_PRE_(location);
         QS_STR_PRE_((module != nullptr) ? module : "?");
     QS_END_NOCRIT_PRE_()
+
     QP::QS::onFlush(); // flush the assertion record to the host
     QP::QS::onTestLoop(); // loop to wait for commands (typically reset)
     QP::QS::onReset(); // in case the QUTEST loop ever returns, reset manually
@@ -425,4 +461,3 @@ Q_NORETURN Q_onAssert(char_t const * const module, int_t const location) {
 } // extern "C"
 
 #endif // Q_UTEST
-

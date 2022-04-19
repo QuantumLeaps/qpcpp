@@ -1,4 +1,4 @@
-///***************************************************************************
+//============================================================================
 // Product: DPP example, EK-TM4C123GXL board, FreeRTOS kernel
 // Last updated for version 6.9.1
 // Last updated on  2020-10-06
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -506,7 +506,7 @@ void QS::onCommand(uint8_t cmdId,
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // The configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY constant from the
 // FreeRTOS configuration file specifies the highest ISR priority that

@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: "Blinky" on LAUCHXL2-TMS570LS12 board, cooperative QV kernel
 // Last Updated for Version: 5.7.0
 // Date of the Last Update:  2016-08-31
@@ -30,7 +30,7 @@
 // Contact information:
 // https://state-machine.com
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "blinky.hpp"
 #include "bsp.hpp"
@@ -157,7 +157,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     systemREG1->SYSECR = 0; // perform system reset
 }
 
-///***************************************************************************
+//============================================================================
 // NOTE00:
 // The FIQ-type interrupts are never disabled in this QP port, therefore
 // they can always preempt any code, including the IRQ-handlers (ISRs).

@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: "Fly 'n' Shoot" game example for Windows
 // Last updated for version 6.3.3
 // Last updated on  2018-06-23
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "game.hpp"
@@ -91,7 +91,7 @@ int main() {
 }
 
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // Windows is not a deterministic real-time system, which means that the
 // system can occasionally and unexpectedly "choke and freeze" for a number

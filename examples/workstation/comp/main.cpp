@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: "Orthogonal Component" state pattern example
 // Last Updated for Version: 6.3.6
 // Date of the Last Update:  2018-10-14
@@ -28,7 +28,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "alarm.hpp"

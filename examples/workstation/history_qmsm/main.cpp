@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: Transition to History Example
 // Last Updated for Version: 6.9.1
 // Date of the Last Update:  2020-09-22
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"   // QP API
 #include "history.hpp"
 

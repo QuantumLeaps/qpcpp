@@ -1,41 +1,34 @@
-/// @file
-/// @brief QXK/C++ preemptive extended (blocking) kernel, platform-independent
-/// public interface.
-/// @ingroup qxk
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-15
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QXK/C++ preemptive extended (blocking) kernel, platform-independent
+//! public interface.
+//! @ingroup qxk
 
 #ifndef QXK_HPP
 #define QXK_HPP
@@ -44,7 +37,7 @@
 #include "qmpool.hpp"   // QXK kernel uses the native QF memory pool
 #include "qpset.hpp"    // QXK kernel uses the native QF priority set
 
-//****************************************************************************
+//============================================================================
 // QF configuration for QXK -- data members of the QActive class...
 
 // QXK event-queue used for AOs
@@ -62,12 +55,12 @@
 #define QXK_TLS(type_) (static_cast<type_>(QXK_current()->m_thread))
 
 
-//****************************************************************************
+//============================================================================
 namespace QP {
     class QActive; // forward declaration
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 extern "C" {
 
 //! attributes of the QXK kernel
@@ -99,48 +92,48 @@ QP::QActive *QXK_current(void) noexcept;
 #ifdef QXK_ON_CONTEXT_SW
 
     //! QXK context switch callback (customized in BSPs for QXK)
-    ///
-    /// @description
-    /// This callback function provides a mechanism to perform additional
-    /// custom operations when QXK switches context from one thread to
-    /// another.
-    ///
-    /// @param[in] prev   pointer to the previous thread (active object)
-    ///                   (prev==0 means that @p prev was the QXK idle thread)
-    /// @param[in] next   pointer to the next thread (active object)
-    ///                   (next==0) means that @p next is the QXK idle thread)
-    /// @attention
-    /// QXK_onContextSw() is invoked with interrupts **disabled** and must also
-    /// return with interrupts **disabled**.
-    ///
-    /// @note
-    /// This callback is enabled by defining the macro #QXK_ON_CONTEXT_SW.
-    ///
-    /// @include qxk_oncontextsw.cpp
-    ///
+    //!
+    //! @description
+    //! This callback function provides a mechanism to perform additional
+    //! custom operations when QXK switches context from one thread to
+    //! another.
+    //!
+    //! @param[in] prev   pointer to the previous thread (active object)
+    //!                   (prev==0 means that @p prev was the QXK idle thread)
+    //! @param[in] next   pointer to the next thread (active object)
+    //!                   (next==0) means that @p next is the QXK idle thread)
+    //! @attention
+    //! QXK_onContextSw() is invoked with interrupts **disabled** and must also
+    //! return with interrupts **disabled**.
+    //!
+    //! @note
+    //! This callback is enabled by defining the macro #QXK_ON_CONTEXT_SW.
+    //!
+    //! @include qxk_oncontextsw.cpp
+    //!
     void QXK_onContextSw(QP::QActive *prev, QP::QActive *next);
 
 #endif // QXK_ON_CONTEXT_SW
 
 } // extern "C"
 
-//****************************************************************************
+//============================================================================
 namespace QP {
 
 //! The scheduler lock status
 using QSchedStatus = std::uint_fast16_t;
 
-//****************************************************************************
+//============================================================================
 //! QXK services.
-/// @description
-/// This class groups together QXK services. It has only static members and
-/// should not be instantiated.
-///
-/// @note The QXK initialization and the QXK scheduler belong conceptually
-/// to the QXK class (as static class members). However, to avoid C++
-/// potential name-mangling problems in assembly language, these elements
-/// are defined outside of the QXK class and outside the QP namespace with
-/// the extern "C" linkage specification.
+//! @description
+//! This class groups together QXK services. It has only static members and
+//! should not be instantiated.
+//!
+//! @note The QXK initialization and the QXK scheduler belong conceptually
+//! to the QXK class (as static class members). However, to avoid C++
+//! potential name-mangling problems in assembly language, these elements
+//! are defined outside of the QXK class and outside the QP namespace with
+//! the extern "C" linkage specification.
 class QXK {
 public:
     //! QXK selective scheduler lock
@@ -150,22 +143,22 @@ public:
     static void schedUnlock(QSchedStatus const stat) noexcept;
 
     //! QXK idle callback (customized in BSPs for QXK)
-    /// @description
-    /// QP::QXK::onIdle() is called continously by the QXK idle loop. This
-    /// callback gives the application an opportunity to enter a power-saving
-    /// CPU mode, or perform some other idle processing.
-    ///
-    /// @note QP::QXK::onIdle() is invoked with interrupts enabled and must
-    /// also return with interrupts enabled.
-    ///
-    /// @sa QP::QF::onIdle()
+    //! @description
+    //! QP::QXK::onIdle() is called continously by the QXK idle loop. This
+    //! callback gives the application an opportunity to enter a power-saving
+    //! CPU mode, or perform some other idle processing.
+    //!
+    //! @note QP::QXK::onIdle() is invoked with interrupts enabled and must
+    //! also return with interrupts enabled.
+    //!
+    //! @sa QP::QF::onIdle()
     static void onIdle(void);
 };
 
 } // namespace QP
 
 
-//****************************************************************************
+//============================================================================
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
@@ -173,8 +166,8 @@ public:
     #ifndef QXK_ISR_CONTEXT_
         //! Internal port-specific macro that reports the execution context
         // (ISR vs. thread).
-        /// @returns true if the code executes in the ISR context and false
-        /// otherwise
+        //! @returns true if the code executes in the ISR context and false
+        //! otherwise
         #define QXK_ISR_CONTEXT_() \
             (QXK_attr_.intNest != 0U)
     #endif // QXK_ISR_CONTEXT_
@@ -219,7 +212,7 @@ public:
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
-    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
+    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).m_blockSize)
     #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
     #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
@@ -227,4 +220,3 @@ public:
 #endif // QP_IMPL
 
 #endif // QXK_HPP
-

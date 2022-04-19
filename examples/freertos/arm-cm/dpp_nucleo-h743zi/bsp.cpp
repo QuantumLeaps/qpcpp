@@ -1,4 +1,4 @@
-///***************************************************************************
+//============================================================================
 // Product: DPP example, NUCLEO-H743ZI board, FreeRTOS kernel
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -99,10 +99,10 @@ void EXTI0_IRQHandler(void) {
 void USART3_IRQHandler(void); // prototype
 void USART3_IRQHandler(void) {
     // is RX register NOT empty?
-    if ((DPP::l_uartHandle.Instance->ISR & USART_ISR_RXNE) != 0) {
+    if ((DPP::l_uartHandle.Instance->ISR & USART_ISR_RXNE_RXFNE) != 0) {
         uint32_t b = DPP::l_uartHandle.Instance->RDR;
         QP::QS::rxPut(b);
-        DPP::l_uartHandle.Instance->ISR &= ~USART_ISR_RXNE; // clear interrupt
+        DPP::l_uartHandle.Instance->ISR &= ~USART_ISR_RXNE_RXFNE; // clear int
     }
 }
 #endif
@@ -486,7 +486,7 @@ void QS::onCommand(uint8_t cmdId,
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // The configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY constant from the
 // FreeRTOS configuration file specifies the highest ISR priority that

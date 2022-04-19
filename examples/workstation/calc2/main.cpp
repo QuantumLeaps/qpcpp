@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product:  Calculator Example
 // Last Updated for Version: 6.9.3
 // Date of the Last Update:  2021-03-18
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp" // QP API
 #include "bsp.hpp"   // board support package
 #include "calc2.hpp" // application

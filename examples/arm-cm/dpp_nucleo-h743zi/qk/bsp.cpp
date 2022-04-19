@@ -1,13 +1,13 @@
-///***************************************************************************
+//============================================================================
 // Product: DPP example, NUCLEO-H743ZI board, premptive QK kernel
-// Last updated for version 6.9.3
-// Last updated on  2021-03-03
+// Last updated for: @qpcpp_7_0_0
+// Last updated on  2022-02-28
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -55,7 +55,6 @@ static uint32_t l_rnd; // random seed
 
     // QS source IDs
     static QP::QSpyId const l_SysTick_Handler = { 0U };
-    static QP::QSpyId const l_EXTI0_IRQHandler = { 0U };
 
     static UART_HandleTypeDef l_uartHandle;
 
@@ -63,7 +62,7 @@ static uint32_t l_rnd; // random seed
         PHILO_STAT = QP::QS_USER,
         PAUSED_STAT,
         COMMAND_STAT,
-        ON_CONTEXT_SW
+        CONTEXT_SW
     };
 
 #endif
@@ -97,7 +96,7 @@ void SysTick_Handler(void) {
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
     // and Michael Barr, page 71.
     //
-    current = BSP_PB_GetState(BUTTON_KEY); // read the Key button
+    current = BSP_PB_GetState(BUTTON_USER); // read the User button
     tmp = buttons.depressed; // save the debounced depressed buttons
     buttons.depressed |= (buttons.previous & current); // set depressed
     buttons.depressed &= (buttons.previous | current); // clear released
@@ -127,10 +126,10 @@ void USART3_IRQHandler(void); // prototype
 //
 void USART3_IRQHandler(void) {
     // is RX register NOT empty?
-    if ((DPP::l_uartHandle.Instance->ISR & USART_ISR_RXNE) != 0) {
+    if ((DPP::l_uartHandle.Instance->ISR & USART_ISR_RXNE_RXFNE) != 0) {
         uint32_t b = DPP::l_uartHandle.Instance->RDR;
         QP::QS::rxPut(b);
-        DPP::l_uartHandle.Instance->ISR &= ~USART_ISR_RXNE; // clear interrupt
+        DPP::l_uartHandle.Instance->ISR &= ~USART_ISR_RXNE_RXFNE; // clear int.
     }
     QK_ARM_ERRATUM_838869();
 }
@@ -184,7 +183,7 @@ void BSP::init(void) {
     BSP_LED_Init(LED3);
 
     // Configure the User Button in GPIO Mode
-    BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
+    BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
 
     //...
     BSP::randomSeed(1234U);
@@ -193,12 +192,20 @@ void BSP::init(void) {
     if (!QS_INIT(nullptr)) {
         Q_ERROR();
     }
+
+    /* object dictionaries... */
+    QS_OBJ_DICTIONARY(AO_Table);
+    QS_OBJ_DICTIONARY(AO_Philo[0]);
+    QS_OBJ_DICTIONARY(AO_Philo[1]);
+    QS_OBJ_DICTIONARY(AO_Philo[2]);
+    QS_OBJ_DICTIONARY(AO_Philo[3]);
+    QS_OBJ_DICTIONARY(AO_Philo[4]);
+
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
-    QS_OBJ_DICTIONARY(&l_EXTI0_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(PAUSED_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
-    QS_USR_DICTIONARY(ON_CONTEXT_SW);
+    QS_USR_DICTIONARY(CONTEXT_SW);
 
     // setup the QS filters...
     QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
@@ -287,7 +294,6 @@ void QF::onStartup(void) {
     // ...
 
     // enable IRQs...
-    NVIC_EnableIRQ(EXTI0_IRQn);
 #ifdef Q_SPY
     NVIC_EnableIRQ(USART3_IRQn); // UART interrupt used for QS-RX
 #endif
@@ -305,7 +311,7 @@ void QK_onContextSw(QActive *prev, QActive *next) {
     if (next != (QActive *)0) {
         //_impure_ptr = next->thread; // switch to next TLS
     }
-    QS_BEGIN_NOCRIT(DPP::ON_CONTEXT_SW, 0U) // no critical section!
+    QS_BEGIN_NOCRIT(DPP::CONTEXT_SW, 0U) // no critical section!
         QS_OBJ(prev);
         QS_OBJ(next);
     QS_END_NOCRIT()
@@ -461,7 +467,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
 // ISR priority that is disabled by the QF framework. The value is suitable

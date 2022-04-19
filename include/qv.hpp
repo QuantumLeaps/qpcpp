@@ -1,40 +1,33 @@
-/// @file
-/// @brief QV/C++ platform-independent public interface.
-/// @ingroup qv
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-15
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QV/C++ platform-independent public interface.
+//! @ingroup qv
 
 #ifndef QV_HPP
 #define QV_HPP
@@ -43,49 +36,49 @@
 #include "qmpool.hpp"  // QV kernel uses the native QF memory pool
 #include "qpset.hpp"   // QV kernel uses the native QF priority set
 
-//****************************************************************************
+//============================================================================
 // QF configuration for QK
 
 // QV event-queue used for AOs
 #define QF_EQUEUE_TYPE       QEQueue
 
 
-//****************************************************************************
+//============================================================================
 namespace QP {
 
 //! QV services.
-/// @description
-/// This class groups together QV services. It has only static members and
-/// should not be instantiated.
-///
+//! @description
+//! This class groups together QV services. It has only static members and
+//! should not be instantiated.
+//!
 // @note The QV ready set, etc. belong conceptually to the QV class (as static
-/// class members). However, to avoid C++ potential name-mangling problems in
-/// assembly language, these elements are defined outside of the QK class and
-/// use the extern "C" linkage specification.
+//! class members). However, to avoid C++ potential name-mangling problems in
+//! assembly language, these elements are defined outside of the QK class and
+//! use the extern "C" linkage specification.
 class QV {
 public:
 
     //! QV idle callback (customized in BSPs for QK)
-    /// @description
-    /// QV::onIdle() must be called with interrupts DISABLED because
-    /// the determination of the idle condition (no events in the
-    /// queues) can change at any time by an interrupt posting events
-    /// to a queue. QV::onIdle() MUST enable interrupts internally,
-    /// perhaps at the same time as putting the CPU into a power-saving
-    /// mode.
-    ///
-    /// @sa QP::QK::onIdle()
+    //! @description
+    //! QV::onIdle() must be called with interrupts DISABLED because
+    //! the determination of the idle condition (no events in the
+    //! queues) can change at any time by an interrupt posting events
+    //! to a queue. QV::onIdle() MUST enable interrupts internally,
+    //! perhaps at the same time as putting the CPU into a power-saving
+    //! mode.
+    //!
+    //! @sa QP::QK::onIdle()
     static void onIdle(void);
 };
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 extern "C" {
     extern QP::QPSet QV_readySet_;  //!< ready set of AOs
 } // extern "C"
 
-//****************************************************************************
+//============================================================================
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
@@ -105,7 +98,7 @@ extern "C" {
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
-    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
+    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).m_blockSize)
     #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
     #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
@@ -113,4 +106,3 @@ extern "C" {
 #endif // QP_IMPL
 
 #endif // QV_HPP
-

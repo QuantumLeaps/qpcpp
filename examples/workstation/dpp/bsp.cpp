@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: DPP example (console)
 // Last Updated for Version: 6.9.3
 // Date of the Last Update:  2021-03-02
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -40,7 +40,7 @@
 
 Q_DEFINE_THIS_FILE
 
-//****************************************************************************
+//============================================================================
 namespace DPP {
 
 // Local objects -------------------------------------------------------------
@@ -69,8 +69,20 @@ void BSP::init(int argc, char **argv) {
     (void)argc;
     (void)argv;
     Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
+
+    // global signals
+    QS_SIG_DICTIONARY(DONE_SIG,      nullptr);
+    QS_SIG_DICTIONARY(EAT_SIG,       nullptr);
+    QS_SIG_DICTIONARY(PAUSE_SIG,     nullptr);
+    QS_SIG_DICTIONARY(SERVE_SIG,     nullptr);
+    QS_SIG_DICTIONARY(TEST_SIG,      nullptr);
+    QS_SIG_DICTIONARY(HUNGRY_SIG,    nullptr);
+    QS_SIG_DICTIONARY(HUNGRY_SIG,    nullptr);
+    QS_SIG_DICTIONARY(TIMEOUT_SIG,   nullptr);
+
     QS_OBJ_DICTIONARY(&l_clock_tick); // must be called *after* QF::init()
     QS_USR_DICTIONARY(PHILO_STAT);
+    QS_FUN_DICTIONARY(&QP::QHsm::top);
 
     // setup the QS filters...
     QS_GLB_FILTER(QP::QS_ALL_RECORDS);
@@ -110,7 +122,7 @@ void BSP::randomSeed(uint32_t seed) {
 } // namespace DPP
 
 
-//****************************************************************************
+//============================================================================
 namespace QP {
 
 //............................................................................

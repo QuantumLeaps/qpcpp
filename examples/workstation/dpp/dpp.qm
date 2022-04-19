@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.0" links="1">
+<model version="5.1.3" links="1">
  <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -12,6 +12,7 @@
   </class>
   <!--${Shared::AO_Philo[N_PHILO]}-->
   <attribute name="AO_Philo[N_PHILO]" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <documentation>// opaque pointers to the Philo AOs</documentation>
    <code>= { // &quot;opaque&quot; pointers to Philo AO
     &amp;Philo::inst[0],
     &amp;Philo::inst[1],
@@ -49,32 +50,26 @@
    <statechart properties="0x00">
     <!--${AOs::Philo::SM::initial}-->
     <initial target="../1">
-     <action>static bool registered = false; // starts off with 0, per C-standard
-(void)e; // suppress the compiler warning about unused parameter
+     <action>static_cast&lt;void&gt;(e); // unused parameter
+
+#ifdef Q_SPY
+std::uint8_t n = PHILO_ID(this);
+QS_OBJ_ARR_DICTIONARY(&amp;Philo::inst[n], n);
+QS_OBJ_ARR_DICTIONARY(&amp;Philo::inst[n].m_timeEvt, n);
+#endif
+
+subscribe(EAT_SIG);
+subscribe(TEST_SIG);
+
+static bool registered = false; // starts off with 0, per C-standard
 if (!registered) {
     registered = true;
-
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[0]);
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[0].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[1]);
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[1].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[2]);
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[2].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[3]);
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[3].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[4]);
-    QS_OBJ_DICTIONARY(&amp;Philo::inst[4].m_timeEvt);
 
     QS_FUN_DICTIONARY(&amp;Philo::initial);
     QS_FUN_DICTIONARY(&amp;Philo::thinking);
     QS_FUN_DICTIONARY(&amp;Philo::hungry);
     QS_FUN_DICTIONARY(&amp;Philo::eating);
-
-    QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr); // global signals
-}
-
-subscribe(EAT_SIG);
-subscribe(TEST_SIG);</action>
+}</action>
      <initial_glyph conn="2,3,5,1,20,5,-3">
       <action box="0,-2,6,2"/>
      </initial_glyph>
@@ -191,17 +186,9 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
    <statechart properties="0x02">
     <!--${AOs::Table::SM::initial}-->
     <initial target="../1/2">
-     <action>(void)e; // suppress the compiler warning about unused parameter
+     <action>static_cast&lt;void&gt;(e); // unused parameter
 
 QS_OBJ_DICTIONARY(&amp;Table::inst);
-
-QS_SIG_DICTIONARY(DONE_SIG,      nullptr); // global signals
-QS_SIG_DICTIONARY(EAT_SIG,       nullptr);
-QS_SIG_DICTIONARY(PAUSE_SIG,     nullptr);
-QS_SIG_DICTIONARY(SERVE_SIG,     nullptr);
-QS_SIG_DICTIONARY(TEST_SIG,      nullptr);
-
-QS_SIG_DICTIONARY(HUNGRY_SIG,    this); // signal just for Table
 
 subscribe(DONE_SIG);
 subscribe(PAUSE_SIG);
@@ -413,7 +400,7 @@ constexpr std::uint8_t N_PHILO = 5U;
 
 } // namespace DPP
 
-$declare${Shared}
+$declare ${Shared}
 
 #endif // DPP_HPP</text>
   </file>
@@ -479,9 +466,9 @@ inline uint8_t LEFT(uint8_t const n) {
 constexpr uint8_t FREE = static_cast&lt;uint8_t&gt;(0);
 constexpr uint8_t USED = static_cast&lt;uint8_t&gt;(1);
 
-constexpr char_t const * const THINKING = &amp;&quot;thinking&quot;[0];
-constexpr char_t const * const HUNGRY   = &amp;&quot;hungry  &quot;[0];
-constexpr char_t const * const EATING   = &amp;&quot;eating  &quot;[0];
+constexpr char const * const THINKING = &amp;&quot;thinking&quot;[0];
+constexpr char const * const HUNGRY   = &amp;&quot;hungry  &quot;[0];
+constexpr char const * const EATING   = &amp;&quot;eating  &quot;[0];
 
 } // namespace DPP
 

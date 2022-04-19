@@ -1,6 +1,6 @@
 ##############################################################################
-# Product: Makefile for QP/C++ on STM32F746G-Discovery, QV kernel, GNU-ARM
-# Last Updated for Version: 6.9.4
+# Product: Makefile for QP/C++ on NUCLEO-H743ZI, QV kernel, GNU-ARM
+# Last Updated for Version: 7.0.0
 # Date of the Last Update:  2021-07-01
 #
 #                    Q u a n t u m  L e a P s
@@ -73,10 +73,10 @@ VPATH = \
 	$(QPCPP)/src/qv \
 	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
-	$(QPCPP)/3rd_party/nucleo-h743zi \
-	$(QPCPP)/3rd_party/nucleo-h743zi/gnu \
-	$(QPCPP)/3rd_party/nucleo-h743zi/Drivers/BSP/STM32H7xx_Nucleo_144 \
-	$(QPCPP)/3rd_party/nucleo-h743zi/Drivers/STM32H7xx_HAL_Driver/Src
+	$(QPCPP)/3rd_party/STM32CubeH7/nucleo-h743zi/gnu \
+	$(QPCPP)/3rd_party/STM32CubeH7/Drivers/BSP\STM32H7xx_Nucleo_144 \
+	$(QPCPP)/3rd_party/STM32CubeH7/Drivers/STM32H7xx_HAL_Driver/Src \
+	$(QPCPP)/3rd_party/STM32CubeH7/Drivers/CMSIS/Device/ST/STM32H7xx/Source/Templates
 
 # list of all include directories needed by this project
 INCLUDES  = \
@@ -85,9 +85,9 @@ INCLUDES  = \
 	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
-	-I$(QPCPP)/3rd_party/nucleo-h743zi \
-	-I$(QPCPP)/3rd_party/nucleo-h743zi/Drivers/BSP/STM32H7xx_Nucleo_144 \
-	-I$(QPCPP)/3rd_party/nucleo-h743zi/Drivers/STM32H7xx_HAL_Driver/Inc
+	-I$(QPCPP)/3rd_party/STM32CubeH7/Drivers/CMSIS/Device/ST/STM32H7xx/Include \
+	-I$(QPCPP)/3rd_party/STM32CubeH7/Drivers/BSP/STM32H7xx_Nucleo_144 \
+	-I$(QPCPP)/3rd_party/STM32CubeH7/Drivers/STM32H7xx_HAL_Driver/Inc
 
 #-----------------------------------------------------------------------------
 # files
@@ -189,7 +189,7 @@ MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build options for various configurations for ARM Cortex-M4F
+# build options for various configurations for ARM Cortex-M
 #
 
 # combine all the soruces...

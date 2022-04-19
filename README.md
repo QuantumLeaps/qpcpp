@@ -6,6 +6,7 @@ product, all QP frameworks can be
 in which case you don't use any open source license and you do not violate
 your policy.
 
+
 ---------------------------------------------------------------------------
 # What's New?
 View QP/C++ Revision History at: https://www.state-machine.com/qpcpp/history.html
@@ -13,12 +14,12 @@ View QP/C++ Revision History at: https://www.state-machine.com/qpcpp/history.htm
 
 ---------------------------------------------------------------------------
 # Documentation
-The offline HTML documentation for **this** particular version of QP/C++
-is located in the folder html/. To view the offline documentation, open
-the file html/index.html in your web browser.
-
 The online HTML documention for the **latest** version of QP/C++ is located
-at: https://www.state-machine.com/qpcpp/
+at: https://www.state-machine.com/qpcpp
+
+The offline HTML documentation for **this** particular version of QP/C++
+is located in the sub-folder [html](html). To view the offline documentation,
+open the file [html/index.html](html/index.html) in your web browser.
 
 
 ---------------------------------------------------------------------------
@@ -82,11 +83,11 @@ model of concurrency with hierarchical state machines.
 
 ---------------------------------------------------------------------------
 # Getting Started with QP/C++
-The [QP/C++ Reference Manual](https://www.state-machine.com/qpcpp/) provides
-instructions on how to download, install, and get started with QP/C++ quickly.
+- The [Video: "Getting Started with QP Real-Time Embedded Frameworks"][Video]
+provides instructions on how to download, install, and get started with QP.
 
-The [AppNote: "Getting Started with QP/C++"][AN] contains also a tutorial,
-in which you build a simple "Blinky" application.
+- The [AppNote: "Getting Started with QP Real-Time Embedded Frameworks"][AN]
+contains also a tutorial, in which you build a simple "Blinky" application.
 
 
 ---------------------------------------------------------------------------
@@ -95,16 +96,16 @@ QP/C++ is licensed under the increasingly popular [dual licensing model][Lic],
 in which both the open source software distribution mechanism and
 traditional closed source software distribution models are combined.
 
-> **NOTE:** If your company has a policy forbidding open source in your product,
-all QP frameworks can be [licensed commercially][Lic], in which case you don't
-use any open source license and you do not violate your policy.
+> **NOTE:** If your company has a policy forbidding open source in your
+product, all QP frameworks can be [licensed commercially][Lic], in which case
+you don't use any open source license and you do not violate your policy.
 
 ---------------------------------------------------------------------------
 # QP/C++ Documentation
 The **QP/C++ Manual** is located online at: https://www.state-machine.com/qpcpp
 
 ---------------------------------------------------------------------------
-# How to get help?
+# How to Get Help?
 - [Free Support Forum](https://sourceforge.net/p/qpc/discussion/668726)
 - [Bug Reports](https://sourceforge.net/p/qpc/bugs/)
 - [Feature Requests](https://sourceforge.net/p/qpc/feature-requests/)
@@ -120,4 +121,5 @@ The **QP/C++ Manual** is located online at: https://www.state-machine.com/qpcpp
    [Active]: <https://www.state-machine.com/active-object>
    [HSM]: <https://www.state-machine.com/fsm#HSM>
    [Lic]: <https://www.state-machine.com/licensing>
-   [AN]: <https://www.state-machine.com/doc/AN_Getting_Started_with_QPCpp.pdf>
+   [AN]: <https://www.state-machine.com/doc/AN_Getting_Started_with_QP.pdf>
+   [Video]: <https://youtu.be/O7ER6_VqIH0>

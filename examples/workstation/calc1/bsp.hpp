@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product:  Board Support Package (BSP) for the Calculator example
 // Last Updated for Version: 6.5.0
 // Date of the Last Update:  2019-03-21
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #ifndef BSP_HPP
 #define BSP_HPP
 

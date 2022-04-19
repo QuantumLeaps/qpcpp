@@ -1,45 +1,38 @@
-/// @file
-/// @brief QF/C++ platform-independent public interface.
-/// @ingroup qf
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.3
-/// Last updated on  2021-02-26
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QF/C++ platform-independent public interface.
+//! @ingroup qf
 
 #ifndef QF_HPP
 #define QF_HPP
 
-//****************************************************************************
+//============================================================================
 #ifndef QPSET_HPP
 #include "qpset.hpp"
 #endif
@@ -48,7 +41,7 @@
 #include <new>  // for placement new
 #endif // Q_EVT_CTOR
 
-//****************************************************************************
+//============================================================================
 // apply defaults for all undefined configuration parameters
 //
 #ifndef QF_EVENT_SIZ_SIZE
@@ -76,7 +69,7 @@
 #endif
 
 
-//****************************************************************************
+//============================================================================
 namespace QP {
 
 #if (QF_EVENT_SIZ_SIZE == 1U)
@@ -84,9 +77,9 @@ namespace QP {
 #elif (QF_EVENT_SIZ_SIZE == 2U)
     //! The data type to store the block-size defined based on
     //! the macro #QF_EVENT_SIZ_SIZE.
-    /// @description
-    /// The dynamic range of this data type determines the maximum block
-    /// size that can be managed by the pool.
+    //! @description
+    //! The dynamic range of this data type determines the maximum block
+    //! size that can be managed by the pool.
     using QEvtSize = std::uint16_t;
 #elif (QF_EVENT_SIZ_SIZE == 4U)
     using QEvtSize = std::uint32_t;
@@ -94,18 +87,18 @@ namespace QP {
     #error "QF_EVENT_SIZ_SIZE defined incorrectly, expected 1U, 2U, or 4U"
 #endif
 
-//****************************************************************************
+//============================================================================
 #if (QF_TIMEEVT_CTR_SIZE == 1U)
     using QTimeEvtCtr = std::uint8_t;
 #elif (QF_TIMEEVT_CTR_SIZE == 2U)
     //! type of the Time Event counter, which determines the dynamic
     //! range of the time delays measured in clock ticks.
-    /// @description
-    /// This alias is configurable via the preprocessor switch
-    /// #QF_TIMEEVT_CTR_SIZE. The other possible values of this type are
-    /// as follows: @n
-    /// std::uint8_t when (QF_TIMEEVT_CTR_SIZE == 1U), and @n
-    /// std::uint32_t when (QF_TIMEEVT_CTR_SIZE == 4U).
+    //! @description
+    //! This alias is configurable via the preprocessor switch
+    //! #QF_TIMEEVT_CTR_SIZE. The other possible values of this type are
+    //! as follows: @n
+    //! std::uint8_t when (QF_TIMEEVT_CTR_SIZE == 1U), and @n
+    //! std::uint32_t when (QF_TIMEEVT_CTR_SIZE == 4U).
     using QTimeEvtCtr = std::uint16_t;
 #elif (QF_TIMEEVT_CTR_SIZE == 4U)
     using QTimeEvtCtr = std::uint32_t;
@@ -115,64 +108,64 @@ namespace QP {
 
 class QEQueue; // forward declaration
 
-//****************************************************************************
+//============================================================================
 //! QActive active object (based on QP::QHsm implementation)
-/// @description
-/// Active objects in QP are encapsulated tasks (each embedding a state
-/// machine and an event queue) that communicate with one another
-/// asynchronously by sending and receiving events. Within an active object,
-/// events are processed in a run-to-completion (RTC) fashion, while QF
-/// encapsulates all the details of thread-safe event exchange and queuing.
-/// @n@n
-/// QP::QActive represents an active object that uses the QP::QHsm-style
-/// implementation strategy for state machines. This strategy is tailored
-/// to manual coding, but it is also supported by the QM modeling tool.
-/// The resulting code is slower than in the QP::QMsm-style implementation
-/// strategy.
-///
-/// @note
-/// QP::QActive is not intended to be instantiated directly, but rather serves
-/// as the base class for derivation of active objects in the applications.
-///
-/// @sa QP::QMActive
-///
-/// @usage
-/// The following example illustrates how to derive an active object from
-/// QP::QActive.
-/// @include qf_qactive.cpp
-///
+//! @description
+//! Active objects in QP are encapsulated tasks (each embedding a state
+//! machine and an event queue) that communicate with one another
+//! asynchronously by sending and receiving events. Within an active object,
+//! events are processed in a run-to-completion (RTC) fashion, while QF
+//! encapsulates all the details of thread-safe event exchange and queuing.
+//! @n@n
+//! QP::QActive represents an active object that uses the QP::QHsm-style
+//! implementation strategy for state machines. This strategy is tailored
+//! to manual coding, but it is also supported by the QM modeling tool.
+//! The resulting code is slower than in the QP::QMsm-style implementation
+//! strategy.
+//!
+//! @note
+//! QP::QActive is not intended to be instantiated directly, but rather serves
+//! as the base class for derivation of active objects in the applications.
+//!
+//! @sa QP::QMActive
+//!
+//! @usage
+//! The following example illustrates how to derive an active object from
+//! QP::QActive.
+//! @include qf_qactive.cpp
+//!
 class QActive : public QHsm {
 public: // for access from extern "C" functions
 #ifdef QF_EQUEUE_TYPE
     //! OS-dependent event-queue type.
-    /// @description
-    /// The type of the queue depends on the underlying operating system or
-    /// a kernel. Many kernels support "message queues" that can be adapted
-    /// to deliver QF events to the active object. Alternatively, QF provides
-    /// a native event queue implementation that can be used as well.
-    ///
-    /// @note
-    /// The native QF event queue is configured by defining the macro
-    /// #QF_EQUEUE_TYPE as QP::QEQueue.
+    //! @description
+    //! The type of the queue depends on the underlying operating system or
+    //! a kernel. Many kernels support "message queues" that can be adapted
+    //! to deliver QF events to the active object. Alternatively, QF provides
+    //! a native event queue implementation that can be used as well.
+    //!
+    //! @note
+    //! The native QF event queue is configured by defining the macro
+    //! #QF_EQUEUE_TYPE as QP::QEQueue.
     QF_EQUEUE_TYPE m_eQueue;
 #endif
 
 #ifdef QF_OS_OBJECT_TYPE
     //! OS-dependent per-thread object.
-    /// @description
-    /// This data might be used in various ways, depending on the QF port.
-    /// In some ports m_osObject is used to block the calling thread when
-    /// the native QF queue is empty. In other QF ports the OS-dependent
-    /// object might be used differently.
+    //! @description
+    //! This data might be used in various ways, depending on the QF port.
+    //! In some ports m_osObject is used to block the calling thread when
+    //! the native QF queue is empty. In other QF ports the OS-dependent
+    //! object might be used differently.
     QF_OS_OBJECT_TYPE m_osObject;
 #endif
 
 #ifdef QF_THREAD_TYPE
     //! OS-dependent representation of the thread of the active object.
-    /// @description
-    /// This data might be used in various ways, depending on the QF port.
-    /// In some ports m_thread is used store the thread handle. In other ports
-    /// m_thread can be a pointer to the Thread-Local-Storage (TLS).
+    //! @description
+    //! This data might be used in various ways, depending on the QF port.
+    //! In some ports m_thread is used store the thread handle. In other ports
+    //! m_thread can be a pointer to the Thread-Local-Storage (TLS).
     QF_THREAD_TYPE m_thread;
 #endif
 
@@ -207,11 +200,11 @@ public:
 #ifdef QF_ACTIVE_STOP
     //! Stops execution of an active object and removes it from the
     //! framework's supervision.
-    /// @attention
-    /// QActive::stop() must be called only from the AO that is about
-    /// to stop its execution. By that time, any pointers or references
-    /// to the AO are considered invalid (dangling) and it becomes
-    /// illegal for the rest of the application to post events to the AO.
+    //! @attention
+    //! QActive::stop() must be called only from the AO that is about
+    //! to stop its execution. By that time, any pointers or references
+    //! to the AO are considered invalid (dangling) and it becomes
+    //! illegal for the rest of the application to post events to the AO.
     void stop(void);
 #endif
 
@@ -306,27 +299,27 @@ private:
 #endif // Q_UTEST
 };
 
-//****************************************************************************
+//============================================================================
 //! QMActive active object (based on QP::QMsm implementation)
-/// @description
-/// QP::QMActive represents an active object that uses the QP::QMsm-style
-/// state machine implementation strategy. This strategy requires the use of
-/// the QM modeling tool to generate state machine code automatically, but
-/// the code is faster than in the QP::QHsm-style implementation strategy
-/// and needs less run-time support (smaller event-processor).
-///
-/// @note
-/// QP::QMActive is not intended to be instantiated directly, but rather
-/// serves as the base class for derivation of active objects in the
-/// applications.
-///
-/// @sa QP::QActive
-///
-/// @usage
-/// The following example illustrates how to derive an active object from
-/// QP::QMActive.
-/// @include qf_qmactive.cpp
-///
+//! @description
+//! QP::QMActive represents an active object that uses the QP::QMsm-style
+//! state machine implementation strategy. This strategy requires the use of
+//! the QM modeling tool to generate state machine code automatically, but
+//! the code is faster than in the QP::QHsm-style implementation strategy
+//! and needs less run-time support (smaller event-processor).
+//!
+//! @note
+//! QP::QMActive is not intended to be instantiated directly, but rather
+//! serves as the base class for derivation of active objects in the
+//! applications.
+//!
+//! @sa QP::QActive
+//!
+//! @usage
+//! The following example illustrates how to derive an active object from
+//! QP::QMActive.
+//! @include qf_qmactive.cpp
+//!
 class QMActive : public QActive {
 public:
     // all the following operations delegate to the QHsm class...
@@ -363,44 +356,43 @@ private:
     using QHsm::childState;
 };
 
-
-//****************************************************************************
+//============================================================================
 //! Time Event class
-/// @description
-/// Time events are special QF events equipped with the notion of time
-/// passage. The basic usage model of the time events is as follows. An
-/// active object allocates one or more QTimeEvt objects (provides the
-/// storage for them). When the active object needs to arrange for a timeout,
-/// it arms one of its time events to fire either just once (one-shot) or
-/// periodically. Each time event times out independently from the others,
-/// so a QF application can make multiple parallel timeout requests (from the
-/// same or different active objects). When QF detects that the appropriate
-/// moment has arrived, it inserts the time event directly into the
-/// recipient's event queue. The recipient then processes the time event just
-/// like any other event.@n
-/// @n
-/// Time events, as any other QF events derive from the QP::QEvt base
-/// class. Typically, you will use a time event as-is, but you can also
-/// further derive more specialized time events from it by adding some more
-/// data members and/or specialized functions that operate on the specialized
-/// time events.@n
-/// @n
-/// Internally, the armed time events are organized into a bi-directional
-/// linked list. This linked list is scanned in every invocation of the
-/// QP::QF::tickX_() function. Only armed (timing out) time events are in the
-/// list, so only armed time events consume CPU cycles.
-///
-/// @note
-/// QF manages the time events in the macro TICK_X(), which must be called
-/// periodically, from the clock tick ISR or from the special QP::QTicker
-/// active object.
-///
-/// @note
-/// Even though QP::QTimeEvt is a subclass of QP::QEvt, QP::QTimeEvt instances
-/// can NOT be allocated dynamically from event pools. In other words, it is
-/// illegal to allocate QP::QTimeEvt instances with the Q_NEW() or Q_NEW_X()
-/// macros.
-///
+//! @description
+//! Time events are special QF events equipped with the notion of time
+//! passage. The basic usage model of the time events is as follows. An
+//! active object allocates one or more QTimeEvt objects (provides the
+//! storage for them). When the active object needs to arrange for a timeout,
+//! it arms one of its time events to fire either just once (one-shot) or
+//! periodically. Each time event times out independently from the others,
+//! so a QF application can make multiple parallel timeout requests (from the
+//! same or different active objects). When QF detects that the appropriate
+//! moment has arrived, it inserts the time event directly into the
+//! recipient's event queue. The recipient then processes the time event just
+//! like any other event.@n
+//! @n
+//! Time events, as any other QF events derive from the QP::QEvt base
+//! class. Typically, you will use a time event as-is, but you can also
+//! further derive more specialized time events from it by adding some more
+//! data members and/or specialized functions that operate on the specialized
+//! time events.@n
+//! @n
+//! Internally, the armed time events are organized into a bi-directional
+//! linked list. This linked list is scanned in every invocation of the
+//! QP::QF::tickX_() function. Only armed (timing out) time events are in the
+//! list, so only armed time events consume CPU cycles.
+//!
+//! @note
+//! QF manages the time events in the macro TICK_X(), which must be called
+//! periodically, from the clock tick ISR or from the special QP::QTicker
+//! active object.
+//!
+//! @note
+//! Even though QP::QTimeEvt is a subclass of QP::QEvt, QP::QTimeEvt instances
+//! can NOT be allocated dynamically from event pools. In other words, it is
+//! illegal to allocate QP::QTimeEvt instances with the Q_NEW() or Q_NEW_X()
+//! macros.
+//!
 class QTimeEvt : public QEvt {
 private:
 
@@ -408,24 +400,24 @@ private:
     QTimeEvt * volatile m_next;
 
     //! the active object that receives the time events
-    /// @description
-    /// The m_act pointer is reused inside the QP implementation to hold
-    /// the head of the list of newly armed time events.
+    //! @description
+    //! The m_act pointer is reused inside the QP implementation to hold
+    //! the head of the list of newly armed time events.
     void * volatile m_act;
 
     //! the internal down-counter of the time event.
-    /// @description
-    /// The down-counter is decremented by 1 in every TICK_X()
-    /// invocation. The time event fires (gets posted or published) when
-    /// the down-counter reaches zero.
+    //! @description
+    //! The down-counter is decremented by 1 in every TICK_X()
+    //! invocation. The time event fires (gets posted or published) when
+    //! the down-counter reaches zero.
     QTimeEvtCtr volatile m_ctr;
 
     //! the interval for the periodic time event (zero for the one-shot
     //! time event).
-    /// @description
-    /// The value of the interval is re-loaded to the internal
-    /// down-counter when the time event expires, so that the time event
-    /// keeps timing out periodically.
+    //! @description
+    //! The value of the interval is re-loaded to the internal
+    //! down-counter when the time event expires, so that the time event
+    //! keeps timing out periodically.
     QTimeEvtCtr m_interval;
 
 public:
@@ -479,25 +471,25 @@ private:
 };
 
 
-//****************************************************************************
+//============================================================================
 //! Subscriber List
-/// @description
-/// This data type represents a set of active objects that subscribe to
-/// a given signal. The set is represented as priority-set, where each
-/// bit corresponds to the unique priority of an active object.
+//! @description
+//! This data type represents a set of active objects that subscribe to
+//! a given signal. The set is represented as priority-set, where each
+//! bit corresponds to the unique priority of an active object.
 using QSubscrList = QPSet;
 
 
-//****************************************************************************
+//============================================================================
 //! QF services.
-/// @description
-/// This class groups together QF services. It has only static members and
-/// should not be instantiated.
+//! @description
+//! This class groups together QF services. It has only static members and
+//! should not be instantiated.
 class QF {
 public:
 
     //! get the current QF version number string of the form X.Y.Z
-    static char_t const *getVersion(void) noexcept {
+    static char const *getVersion(void) noexcept {
         return versionStr;
     }
 
@@ -627,16 +619,20 @@ private:
 std::uint_fast16_t const QF_NO_MARGIN = 0xFFFFU;
 
 
-//****************************************************************************
-//! Ticker Active Object class
-/// @description
-/// QP::QTicker is an efficient active object specialized to process
-/// QF system clock tick at a specified tick frequency [0..#QF_MAX_TICK_RATE].
-/// Placing system clock tick processing in an active object allows you
-/// to remove the non-deterministic TICK_X() processing from the interrupt
-/// level and move it into the thread-level, where you can prioritize it
-/// as low as you wish.
-///
+//============================================================================
+//! "Ticker" Active Object class
+//! @description
+//! QP::QTicker is an efficient active object specialized to process
+//! QF system clock tick at a specified tick frequency [0..#QF_MAX_TICK_RATE].
+//! Placing system clock tick processing in an active object allows you
+//! to remove the non-deterministic TICK_X() processing from the interrupt
+//! level and move it into the thread-level, where you can prioritize it
+//! as low as you wish.
+//!
+//! @usage
+//! The following example illustrates use of QP::QTicker active objects:
+//! @include qf_ticker.cpp
+//!
 class QTicker : public QActive {
 public:
     explicit QTicker(std::uint_fast8_t const tickRate) noexcept; // ctor
@@ -660,21 +656,21 @@ public:
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 #ifndef QF_CRIT_EXIT_NOP
     //! No-operation for exiting a critical section
-    /// @description
-    /// In some QF ports the critical section exit takes effect only on the
-    /// next machine instruction. If this next instruction is another entry
-    /// to a critical section, the critical section won't be really exited,
-    /// but rather the two adjecent critical sections would be merged.
-    /// The #QF_CRIT_EXIT_NOP() macro contains minimal code required to
-    /// prevent such merging of critical sections in such merging of
-    /// critical sections in QF ports, in which it can occur.
+    //! @description
+    //! In some QF ports the critical section exit takes effect only on the
+    //! next machine instruction. If this next instruction is another entry
+    //! to a critical section, the critical section won't be really exited,
+    //! but rather the two adjecent critical sections would be merged.
+    //! The #QF_CRIT_EXIT_NOP() macro contains minimal code required to
+    //! prevent such merging of critical sections in such merging of
+    //! critical sections in QF ports, in which it can occur.
     #define QF_CRIT_EXIT_NOP()   (static_cast<void>(0))
 #endif
 
-//****************************************************************************
+//============================================================================
 // Provide the constructor for the QEvt class?
 #ifdef Q_EVT_CTOR
 
@@ -693,206 +689,206 @@ public:
 #else // QEvt is a POD (Plain Old Datatype)
 
     //! Allocate a dynamic event.
-    /// @description
-    /// The macro calls the internal QF function QP::QF::newX_() with
-    /// margin == QP::QF_NO_MARGIN, which causes an assertion when the event
-    /// cannot be successfully allocated.
-    ///
-    /// @param[in] evtT_ event type (class name) of the event to allocate
-    /// @param[in] sig_  signal to assign to the newly allocated event
-    ///
-    /// @returns a valid event pointer cast to the type @p evtT_.
-    ///
-    /// @note
-    /// If #Q_EVT_CTOR is defined, the Q_NEW() macro becomes variadic and
-    /// takes all the arguments needed by the constructor of the event
-    /// class being allocated. The constructor is then called by means
-    /// of the placement-new operator.
-    ///
-    /// @usage
-    /// The following example illustrates dynamic allocation of an event:
-    /// @include qf_post.cpp
+    //! @description
+    //! The macro calls the internal QF function QP::QF::newX_() with
+    //! margin == QP::QF_NO_MARGIN, which causes an assertion when the event
+    //! cannot be successfully allocated.
+    //!
+    //! @param[in] evtT_ event type (class name) of the event to allocate
+    //! @param[in] sig_  signal to assign to the newly allocated event
+    //!
+    //! @returns a valid event pointer cast to the type @p evtT_.
+    //!
+    //! @note
+    //! If #Q_EVT_CTOR is defined, the Q_NEW() macro becomes variadic and
+    //! takes all the arguments needed by the constructor of the event
+    //! class being allocated. The constructor is then called by means
+    //! of the placement-new operator.
+    //!
+    //! @usage
+    //! The following example illustrates dynamic allocation of an event:
+    //! @include qf_post.cpp
     #define Q_NEW(evtT_, sig_) (static_cast<evtT_ *>( \
          QP::QF::newX_(sizeof(evtT_), QP::QF_NO_MARGIN, (sig_))))
 
     //! Allocate a dynamic event (non-asserting version).
-    /// @description
-    /// This macro allocates a new event and sets the pointer @p e_, while
-    /// leaving at least @p margin_ of events still available in the pool
-    ///
-    /// @param[out] e_     pointer to the newly allocated event
-    /// @param[in] evtT_   event type (class name) of the event to allocate
-    /// @param[in] margin_ number of events that must remain available
-    ///                    in the given pool after this allocation. The
-    ///                    special value QP::QF_NO_MARGIN causes asserting
-    ///                    failure in case event allocation fails.
-    /// @param[in] sig_    signal to assign to the newly allocated event
-    ///
-    /// @returns an event pointer cast to the type @p evtT_ or NULL if the
-    /// event cannot be allocated with the specified @p margin.
-    ///
-    /// @note
-    /// If #Q_EVT_CTOR is defined, the Q_NEW_X() macro becomes variadic and
-    /// takes all the arguments needed by the constructor of the event
-    /// class being allocated. The constructor is then called by means
-    /// of the placement-new operator.
-    ///
-    /// @usage
-    /// The following example illustrates dynamic allocation of an event:
-    /// @include qf_postx.cpp
+    //! @description
+    //! This macro allocates a new event and sets the pointer @p e_, while
+    //! leaving at least @p margin_ of events still available in the pool
+    //!
+    //! @param[out] e_     pointer to the newly allocated event
+    //! @param[in] evtT_   event type (class name) of the event to allocate
+    //! @param[in] margin_ number of events that must remain available
+    //!                    in the given pool after this allocation. The
+    //!                    special value QP::QF_NO_MARGIN causes asserting
+    //!                    failure in case event allocation fails.
+    //! @param[in] sig_    signal to assign to the newly allocated event
+    //!
+    //! @returns an event pointer cast to the type @p evtT_ or NULL if the
+    //! event cannot be allocated with the specified @p margin.
+    //!
+    //! @note
+    //! If #Q_EVT_CTOR is defined, the Q_NEW_X() macro becomes variadic and
+    //! takes all the arguments needed by the constructor of the event
+    //! class being allocated. The constructor is then called by means
+    //! of the placement-new operator.
+    //!
+    //! @usage
+    //! The following example illustrates dynamic allocation of an event:
+    //! @include qf_postx.cpp
     #define Q_NEW_X(e_, evtT_, margin_, sig_)        \
         ((e_) = static_cast<evtT_ *>(QP::QF::newX_(  \
                     sizeof(evtT_), (margin_), (sig_))))
 #endif
 
 //! Create a new reference of the current event `e` */
-/// @description
-/// The current event processed by an active object is available only for
-/// the duration of the run-to-completion (RTC) step. After that step, the
-/// current event is no longer available and the framework might recycle
-/// (garbage-collect) the event. The macro Q_NEW_REF() explicitly creates
-/// a new reference to the current event that can be stored and used beyond
-/// the current RTC step, until the reference is explicitly recycled by
-/// means of the macro Q_DELETE_REF().
-///
-/// @param[in,out] evtRef_  event reference to create
-/// @param[in]     evtT_    event type (class name) of the event refrence
-///
-/// @usage
-/// The example **defer** in the directory `examples/win32/defer` illustrates
-/// the use of Q_NEW_REF()
-///
-/// @sa Q_DELETE_REF()
-///
+//! @description
+//! The current event processed by an active object is available only for
+//! the duration of the run-to-completion (RTC) step. After that step, the
+//! current event is no longer available and the framework might recycle
+//! (garbage-collect) the event. The macro Q_NEW_REF() explicitly creates
+//! a new reference to the current event that can be stored and used beyond
+//! the current RTC step, until the reference is explicitly recycled by
+//! means of the macro Q_DELETE_REF().
+//!
+//! @param[in,out] evtRef_  event reference to create
+//! @param[in]     evtT_    event type (class name) of the event refrence
+//!
+//! @usage
+//! The example **defer** in the directory `examples/win32/defer` illustrates
+//! the use of Q_NEW_REF()
+//!
+//! @sa Q_DELETE_REF()
+//!
 #define Q_NEW_REF(evtRef_, evtT_)  \
     ((evtRef_) = static_cast<evtT_ const *>(QP::QF::newRef_(e, (evtRef_))))
 
 //! Delete the event reference */
-/// @description
-/// Every event reference created with the macro Q_NEW_REF() needs to be
-/// eventually deleted by means of the macro Q_DELETE_REF() to avoid leaking
-/// the event.
-///
-/// @param[in,out] evtRef_  event reference to delete
-///
-/// @usage
-/// The example **defer** in the directory `examples/win32/defer` illustrates
-/// the use of Q_DELETE_REF()
-///
-/// @sa Q_NEW_REF()
-///
+//! @description
+//! Every event reference created with the macro Q_NEW_REF() needs to be
+//! eventually deleted by means of the macro Q_DELETE_REF() to avoid leaking
+//! the event.
+//!
+//! @param[in,out] evtRef_  event reference to delete
+//!
+//! @usage
+//! The example **defer** in the directory `examples/win32/defer` illustrates
+//! the use of Q_DELETE_REF()
+//!
+//! @sa Q_NEW_REF()
+//!
 #define Q_DELETE_REF(evtRef_) do { \
     QP::QF::deleteRef_((evtRef_)); \
     (evtRef_) = 0U;                \
 } while (false)
 
 
-//****************************************************************************
+//============================================================================
 // QS software tracing integration, only if enabled
 #ifdef Q_SPY
 
     //! Invoke the system clock tick processing QP::QF::tickX_().
-    /// @description
-    /// This macro is the recommended way of invoking clock tick processing,
-    /// because it provides the vital information for software tracing and
-    /// avoids any overhead when the tracing is disabled.
-    ///
-    /// @param[in] tickRate_ clock tick rate to be serviced through this call
-    /// @param[in] sender_   pointer to the sender object. This parameter
-    ///            is actually only used when QS software tracing is enabled
-    ///            (macro #Q_SPY is defined)
-    /// @note
-    /// When QS software tracing is disabled, the macro calls QF_tickX_()
-    /// without the @p sender parameter, so the overhead of passing this
-    /// extra parameter is entirely avoided.
-    ///
-    /// @note
-    /// The pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, when TICK_X() is called from
-    /// an interrupt, you would create a unique object just to unambiguously
-    /// identify the ISR as the sender of the time events.
-    ///
-    /// @sa QP::QF::tickX_()
+    //! @description
+    //! This macro is the recommended way of invoking clock tick processing,
+    //! because it provides the vital information for software tracing and
+    //! avoids any overhead when the tracing is disabled.
+    //!
+    //! @param[in] tickRate_ clock tick rate to be serviced through this call
+    //! @param[in] sender_   pointer to the sender object. This parameter
+    //!            is actually only used when QS software tracing is enabled
+    //!            (macro #Q_SPY is defined)
+    //! @note
+    //! When QS software tracing is disabled, the macro calls QF_tickX_()
+    //! without the @p sender parameter, so the overhead of passing this
+    //! extra parameter is entirely avoided.
+    //!
+    //! @note
+    //! The pointer to the sender object is not necessarily a pointer
+    //! to an active object. In fact, when TICK_X() is called from
+    //! an interrupt, you would create a unique object just to unambiguously
+    //! identify the ISR as the sender of the time events.
+    //!
+    //! @sa QP::QF::tickX_()
     #define TICK_X(tickRate_, sender_) tickX_((tickRate_), (sender_))
 
     //! Invoke the event publishing facility QP::QF::publish_(). This macro
-    /// @description
-    /// This macro is the recommended way of publishing events, because it
-    /// provides the vital information for software tracing and avoids any
-    /// overhead when the tracing is disabled.
-    ///
-    /// @param[in] e_      pointer to the posted event
-    /// @param[in] sender_ pointer to the sender object. This parameter is
-    ///          actually only used when QS software tracing is enabled
-    ///          (macro #Q_SPY is defined). When QS software tracing is
-    ///          disabled, the macro calls QF_publish_() without the
-    ///          @p sender_ parameter, so the overhead of passing this
-    ///          extra parameter is entirely avoided.
-    ///
-    /// @note
-    /// The pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, if QF_PUBLISH() is called from an
-    /// interrupt or other context, you can create a unique object just to
-    /// unambiguously identify the publisher of the event.
-    ///
-    /// @sa QP::QF::publish_()
+    //! @description
+    //! This macro is the recommended way of publishing events, because it
+    //! provides the vital information for software tracing and avoids any
+    //! overhead when the tracing is disabled.
+    //!
+    //! @param[in] e_      pointer to the posted event
+    //! @param[in] sender_ pointer to the sender object. This parameter is
+    //!          actually only used when QS software tracing is enabled
+    //!          (macro #Q_SPY is defined). When QS software tracing is
+    //!          disabled, the macro calls QF_publish_() without the
+    //!          @p sender_ parameter, so the overhead of passing this
+    //!          extra parameter is entirely avoided.
+    //!
+    //! @note
+    //! The pointer to the sender object is not necessarily a pointer
+    //! to an active object. In fact, if QF_PUBLISH() is called from an
+    //! interrupt or other context, you can create a unique object just to
+    //! unambiguously identify the publisher of the event.
+    //!
+    //! @sa QP::QF::publish_()
     #define PUBLISH(e_, sender_) \
         publish_((e_), (sender_), (sender_)->getPrio())
 
     //! Invoke the direct event posting facility QP::QActive::post_().
-    /// @description
-    /// This macro asserts if the queue overflows and cannot accept the event.
-    ///
-    /// @param[in] e_      pointer to the event to post
-    /// @param[in] sender_ pointer to the sender object.
-    ///
-    /// @note
-    /// The @p sendedr_ parameter is actually only used when QS tracing
-    /// is enabled (macro #Q_SPY is defined). When QS software tracing is
-    /// disenabled, the POST() macro does not pass the @p sender_
-    /// parameter, so the overhead of passing this extra parameter is entirely
-    /// avoided.
-    ///
-    /// @note the pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, if POST() is called from an interrupt
-    /// or other context, you can create a unique object just to
-    /// unambiguously identify the sender of the event.
-    ///
-    /// @sa QP::QActive::post_()
+    //! @description
+    //! This macro asserts if the queue overflows and cannot accept the event.
+    //!
+    //! @param[in] e_      pointer to the event to post
+    //! @param[in] sender_ pointer to the sender object.
+    //!
+    //! @note
+    //! The @p sendedr_ parameter is actually only used when QS tracing
+    //! is enabled (macro #Q_SPY is defined). When QS software tracing is
+    //! disenabled, the POST() macro does not pass the @p sender_
+    //! parameter, so the overhead of passing this extra parameter is entirely
+    //! avoided.
+    //!
+    //! @note the pointer to the sender object is not necessarily a pointer
+    //! to an active object. In fact, if POST() is called from an interrupt
+    //! or other context, you can create a unique object just to
+    //! unambiguously identify the sender of the event.
+    //!
+    //! @sa QP::QActive::post_()
     #define POST(e_, sender_) post_((e_), QP::QF_NO_MARGIN, (sender_))
 
     //! Invoke the direct event posting facility QP::QActive::post_()
     //! without delivery guarantee.
-    /// @description
-    /// This macro does not assert if the queue overflows and cannot accept
-    /// the event with the specified margin of free slots remaining.
-    ///
-    /// @param[in]  e_      pointer to the event to post
-    /// @param[in]  margin_ the minimum free slots in the queue, which
-    ///                     must still be available after posting the event.
-    ///                     The special value QP::QF_NO_MARGIN causes
-    ///                     asserting failure in case event posting fails.
-    /// @param[in]  sender_ pointer to the sender object.
-    ///
-    /// @returns
-    /// 'true' if the posting succeeded, and 'false' if the posting
-    /// failed due to insufficient margin of free entries available in
-    /// the queue.
-    ///
-    /// @note
-    /// The @p sender_ parameter is actually only used when QS tracing
-    /// is enabled (macro #Q_SPY is defined). When QS software tracing is
-    /// disabled, the POST_X() macro does not pass the @p sender_ parameter,
-    /// so the overhead of passing this extra parameter is entirely avoided.
-    ///
-    /// @note
-    /// The pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, if POST_X() is called from an
-    /// interrupt or other context, you can create a unique object just to
-    /// unambiguously identify the sender of the event.
-    ///
-    /// @usage
-    /// @include qf_postx.cpp
+    //! @description
+    //! This macro does not assert if the queue overflows and cannot accept
+    //! the event with the specified margin of free slots remaining.
+    //!
+    //! @param[in]  e_      pointer to the event to post
+    //! @param[in]  margin_ the minimum free slots in the queue, which
+    //!                     must still be available after posting the event.
+    //!                     The special value QP::QF_NO_MARGIN causes
+    //!                     asserting failure in case event posting fails.
+    //! @param[in]  sender_ pointer to the sender object.
+    //!
+    //! @returns
+    //! 'true' if the posting succeeded, and 'false' if the posting
+    //! failed due to insufficient margin of free entries available in
+    //! the queue.
+    //!
+    //! @note
+    //! The @p sender_ parameter is actually only used when QS tracing
+    //! is enabled (macro #Q_SPY is defined). When QS software tracing is
+    //! disabled, the POST_X() macro does not pass the @p sender_ parameter,
+    //! so the overhead of passing this extra parameter is entirely avoided.
+    //!
+    //! @note
+    //! The pointer to the sender object is not necessarily a pointer
+    //! to an active object. In fact, if POST_X() is called from an
+    //! interrupt or other context, you can create a unique object just to
+    //! unambiguously identify the sender of the event.
+    //!
+    //! @usage
+    //! @include qf_postx.cpp
     #define POST_X(e_, margin_, sender_) \
         post_((e_), (margin_), (sender_))
 
@@ -906,8 +902,7 @@ public:
 #endif // Q_SPY
 
 //! Invoke the system clock tick processing for rate 0
-/// @sa TICK_X()
+//! @sa TICK_X()
 #define TICK(sender_) TICK_X(0U, (sender_))
 
 #endif // QF_HPP
-

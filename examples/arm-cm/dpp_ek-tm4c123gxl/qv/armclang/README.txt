@@ -19,7 +19,7 @@ is moved to different relative location.
 
 Adjusting Stack and Heap Sizes
 ==============================
-The stack and heap sizes are determined in this project by the 
+The stack and heap sizes are determined in this project by the
 command-line options for the ARM assembler (see the Asm tab in
 the "Options for Target" dialog box in uVision). Specifically,
 you should define symbols: Stack_Size=xxx Heap_Size=yyy, where
@@ -29,8 +29,8 @@ numerical value of the heap size.
 ***
 NOTE:
 C++ programs seem not to tolerate heap size of 0. Therefore it is
-recommended to set the Heap_Size symbol to a minimal value of 16.  
-***   
+recommended to set the Heap_Size symbol to a minimal value of 16.
+***
 
 Startup Code
 ============
@@ -45,7 +45,7 @@ ARM Cortex-M microcontrollers.
 
 The startup file typically does not need to be modified or adapted for
 applications. It provides only weak definitions of all exception and
-interrupt handlers, as well as the assert_failed() function.  
+interrupt handlers, as well as the assert_failed() function.
 
 The weak function assert_failed() defined in this file might be re-defined
 in the application to customize it for the application-specific error-

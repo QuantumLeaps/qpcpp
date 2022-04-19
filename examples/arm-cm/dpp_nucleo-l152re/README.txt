@@ -1,5 +1,5 @@
-About this Example
-==================
+About this Example
+==================
 This directory contains the "Dining Philosophers Problem" (DPP) example
 running on the STM32 NUCLEO-L152RE board (ARM Cortex-M3). The following
 versions of the example are provided:
@@ -45,7 +45,7 @@ NOTE:
 The whole build process and loading the image to the mbed board can
 be executed directly from the QM modeling (by means of external tools).
 The provided QM model (dpp.qm) comes pre-configured with tools
-setup to build (via make) and copy the code to the mbed board. 
+setup to build (via make) and copy the code to the mbed board.
 ***
 
 

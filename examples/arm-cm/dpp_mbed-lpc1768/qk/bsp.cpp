@@ -1,4 +1,4 @@
-///***************************************************************************
+//============================================================================
 // Product: DPP example, NXP mbed-LPC1768 board, preemptive QK kernel
 // Last updated for version 6.9.3
 // Last updated on  2021-03-03
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -489,7 +489,7 @@ static void UART0_setBaudrate(uint32_t baud) {
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE00:
 // The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
 // ISR priority that is disabled by the QF framework. The value is suitable

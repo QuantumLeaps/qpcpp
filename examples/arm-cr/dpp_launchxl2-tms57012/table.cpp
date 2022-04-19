@@ -63,9 +63,9 @@ inline uint8_t LEFT(uint8_t const n) {
 constexpr uint8_t FREE = static_cast<uint8_t>(0);
 constexpr uint8_t USED = static_cast<uint8_t>(1);
 
-constexpr char_t const * const THINKING = &"thinking"[0];
-constexpr char_t const * const HUNGRY   = &"hungry  "[0];
-constexpr char_t const * const EATING   = &"eating  "[0];
+constexpr char const * const THINKING = &"thinking"[0];
+constexpr char const * const HUNGRY   = &"hungry  "[0];
+constexpr char const * const EATING   = &"eating  "[0];
 
 } // namespace DPP
 

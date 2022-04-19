@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // DPP example
 // Last Updated for Version: 6.3.6
 // Date of the Last Update:  2018-10-20
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -55,15 +55,6 @@ int main(int argc, char *argv[]) {
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(AO_Table);
-
-    // signal dictionaries...
-    QS_SIG_DICTIONARY(DONE_SIG,    nullptr);
-    QS_SIG_DICTIONARY(EAT_SIG,     nullptr);
-    QS_SIG_DICTIONARY(PAUSE_SIG,   nullptr);
-    QS_SIG_DICTIONARY(SERVE_SIG,   nullptr);
-    QS_SIG_DICTIONARY(TEST_SIG,    nullptr);
-    QS_SIG_DICTIONARY(HUNGRY_SIG,  nullptr);
-    QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr);
 
     // start the active objects...
     AO_Table->start((uint8_t)1,

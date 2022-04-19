@@ -15,7 +15,7 @@ relative location.
 Stack Size and Heap Size
 ------------------------
 In this project, the size of the C stack and heap are determined in
-the linker script (.icf file, see the next section). 
+the linker script (.icf file, see the next section).
 
 
 Linker Script
@@ -31,15 +31,15 @@ Startup Code
 The startup code for the STM32F746NG MCU used in this project is
 located in the "3rd_party" folder in the following location:
 
-3rd_party\stm32f7-discovery\iar\startup_stm32f746xx.s
+3rd_party\3rd_party\STM32CubeH7\nucleo-h743zi\iar\startup_stm32h743xx.s
 
-The file startup_stm32f746xx.s provides a template of the recommended
+The file startup_stm32h743xx.s provides a template of the recommended
 startup for QP applications and should be easily customizable for other
 ARM Cortex-M microcontrollers.
 
 The startup file typically does not need to be modified or adapted for
 applications. It provides only weak definitions of all exception and
-interrupt handlers, as well as the assert_failed() function.  
+interrupt handlers, as well as the assert_failed() function.
 
 The weak function assert_failed() defined in this file might be re-defined
 in the application to customize it for the application-specific error-

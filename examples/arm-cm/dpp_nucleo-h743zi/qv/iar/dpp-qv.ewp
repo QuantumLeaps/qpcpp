@@ -352,9 +352,9 @@
                     <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\CMSIS\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\BSP\STM32H7xx_Nucleo_144</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\CMSIS\Device\ST\STM32H7xx/Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\BSP\STM32H7xx_Nucleo_144</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1386,9 +1386,9 @@
                     <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\CMSIS\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\BSP\STM32H7xx_Nucleo_144</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\CMSIS\Device\ST\STM32H7xx/Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\BSP\STM32H7xx_Nucleo_144</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2420,9 +2420,9 @@
                     <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\CMSIS\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\BSP\STM32H7xx_Nucleo_144</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\CMSIS\Device\ST\STM32H7xx/Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\BSP\STM32H7xx_Nucleo_144</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -3108,10 +3108,10 @@
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
+            <name>$PROJ_DIR$\..\..\bsp.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\dpp.h</name>
+            <name>$PROJ_DIR$\..\..\dpp.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\main.cpp</name>
@@ -3129,13 +3129,7 @@
     <group>
         <name>nucleo-h743zi</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\iar\startup_stm32h743xx.s</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\stm32h743xx.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\stm32h7xx.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\nucleo-h743zi\iar\startup_stm32h743xx.s</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\stm32h7xx_hal_conf.h</name>
@@ -3144,16 +3138,10 @@
             <name>$PROJ_DIR$\..\..\stm32h7xx_hal_msp.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\BSP\STM32H7xx_Nucleo_144\stm32h7xx_nucleo_144.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\BSP\STM32H7xx_Nucleo_144\stm32h7xx_nucleo_144.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\BSP\STM32H7xx_Nucleo_144\stm32h7xx_nucleo_144.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\system_stm32h7xx.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\system_stm32h7xx.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\CMSIS\Device\ST\STM32H7xx\Source\Templates\system_stm32h7xx.c</name>
         </file>
     </group>
     <group>
@@ -3201,19 +3189,19 @@
     <group>
         <name>QP_port</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar\qep_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar\qep_port.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar\qf_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar\qf_port.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar\qs_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar\qv_port.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar\qv_port.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar\qv_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qv\iar\qs_port.hpp</name>
         </file>
     </group>
     <group>
@@ -3235,25 +3223,28 @@
     <group>
         <name>STM32H7xx_HAL_Driver</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_cortex.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_cortex.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_gpio.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_dma.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_pwr.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_gpio.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_rcc.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_pwr.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_rcc_ex.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_rcc.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\nucleo-h743zi\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_uart.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_rcc_ex.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\STM32CubeH7\Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_uart.c</name>
         </file>
     </group>
 </project>

@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: "Blinky" example, EK-TM4C123GXL board, preemptive QK kernel
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "blinky.hpp"
 #include "bsp.hpp"
@@ -181,7 +181,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     NVIC_SystemReset();
 }
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
 // ISR priority that is disabled by the QF framework. The value is suitable

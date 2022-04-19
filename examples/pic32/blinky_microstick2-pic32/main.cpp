@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: Simple Blinky example
 // Last Updated for Version: 5.4.0
 // Date of the Last Update:  2015-05-04
@@ -7,7 +7,7 @@
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "blinky.hpp"

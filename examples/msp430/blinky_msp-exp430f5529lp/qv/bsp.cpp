@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: "Blinky" example on MSP-EXP430F5529LP board, cooperative QV kernel
 // Last updated for version 6.3.7
 // Last updated on  2018-11-30
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "blinky.hpp"
 #include "bsp.hpp"
@@ -135,7 +135,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     // return from function does the reset
 }
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // With the cooperative QV kernel for MSP430, it is necessary to explicitly
 // turn the low-power mode OFF in the interrupt, because the return

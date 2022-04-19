@@ -23,6 +23,7 @@
 *.pdb
 *.ncb
 *.suo
+*.sdf
 *.chw
 *.sfr
 *.ewt
@@ -30,13 +31,10 @@
 *.avrsuo
 *.Debug
 *.Release
-lint*.txt
-*.Miro
 *.bak
 *.qlc
 JLink*.*
 version-*
-metrics.dox
 
 html/
 test_priv/

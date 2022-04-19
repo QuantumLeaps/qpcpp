@@ -1,6 +1,6 @@
-//****************************************************************************
+//============================================================================
 // Product: BSP for DPP-console example with Qt5
-// Last updated for version 6.9.4
+// Last updated for: @qpcpp_7_0_0
 // Last updated on  2021-07-19
 //
 //                    Q u a n t u m  L e a P s
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include <QCoreApplication>
 #include <QTextStream>
 #include <QTime>
@@ -105,13 +105,13 @@ void BSP_randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 
-//****************************************************************************
+//============================================================================
 Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     QS_ASSERTION(module, loc, 10000U); // send assertion info to the QS trace
     qFatal("Assertion failed in module %s, location %d", module, loc);
 }
 
-//****************************************************************************
+//============================================================================
 namespace QP {
 
 //............................................................................

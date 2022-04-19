@@ -1,40 +1,33 @@
-/// @file
-/// @brief QXK/C++ extended (blocking) thread
-/// @ingroup qxk
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-18
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QXK/C++ extended (blocking) thread
+//! @ingroup qxk
 
 #ifndef QXTHREAD_HPP
 #define QXTHREAD_HPP
@@ -44,25 +37,25 @@ namespace QP {
 //! no-timeout sepcification when blocking on queues or semaphores
 static constexpr std::uint_fast16_t QXTHREAD_NO_TIMEOUT = 0U;
 
-//****************************************************************************
+//============================================================================
 //! Extended (blocking) thread of the QXK preemptive kernel
-/// @description
-/// QP::QXThread represents the extended (blocking) thread of the QXK kernel.
-/// Each blocking thread in the application must be represented by the
-/// corresponding QP::QXThread instance
-///
-/// @note
-/// Typically QP::QXThread is instantiated directly in the application code.
-/// The customization of the thread occurs in the constructor, where you
-/// provide the thred-handler function as the parameter.
-///
-/// @sa QP::QActive
-///
-/// @usage
-/// The following example illustrates how to instantiate and use an extended
-/// thread in your application.
-/// @include qxk_thread.cpp
-///
+//! @description
+//! QP::QXThread represents the extended (blocking) thread of the QXK kernel.
+//! Each blocking thread in the application must be represented by the
+//! corresponding QP::QXThread instance
+//!
+//! @note
+//! Typically QP::QXThread is instantiated directly in the application code.
+//! The customization of the thread occurs in the constructor, where you
+//! provide the thred-handler function as the parameter.
+//!
+//! @sa QP::QActive
+//!
+//! @usage
+//! The following example illustrates how to instantiate and use an extended
+//! thread in your application.
+//! @include qxk_thread.cpp
+//!
 class QXThread : public QActive {
 public:
 
@@ -135,21 +128,21 @@ private:
     friend class QXMutex;
 };
 
-//****************************************************************************
+//============================================================================
 //! Counting Semaphore of the QXK preemptive kernel
-///
-/// @description
-/// QP::QXSemaphore is a blocking mechanism intended primarily for signaling
-/// @ref QP::QXThread "extended threads". The semaphore is initialized with
-/// the maximum count (see QP::QXSemaphore::init()), which allows you to
-/// create a binary semaphore (when the maximum count is 1) and
-/// counting semaphore when the maximum count is > 1.
-///
-/// @usage
-/// The following example illustrates how to instantiate and use the semaphore
-/// in your application.
-/// @include qxk_sema.cpp
-///
+//!
+//! @description
+//! QP::QXSemaphore is a blocking mechanism intended primarily for signaling
+//! @ref QP::QXThread "extended threads". The semaphore is initialized with
+//! the maximum count (see QP::QXSemaphore::init()), which allows you to
+//! create a binary semaphore (when the maximum count is 1) and
+//! counting semaphore when the maximum count is > 1.
+//!
+//! @usage
+//! The following example illustrates how to instantiate and use the semaphore
+//! in your application.
+//! @include qxk_sema.cpp
+//!
 class QXSemaphore {
 public:
     //! initialize the counting semaphore
@@ -171,42 +164,42 @@ private:
     std::uint16_t m_max_count; //!< maximum value of the semaphore counter
 };
 
-//****************************************************************************
+//============================================================================
 //! Priority Ceiling Mutex the QXK preemptive kernel
-///
-/// @description
-/// QP::QXMutex is a blocking mutual exclusion mechanism that can also apply
-/// the **priority ceiling protocol** to avoid unbounded priority inversion
-/// (if initialized with a non-zero ceiling priority, see QP::QXMutex::init()).
-/// In that case, QP::QXMutex requires its own uinque QP priority level, which
-/// cannot be used by any thread or any other QP::QXMutex.
-/// If initialzied with zero ceiling priority, QP::QXMutex does **not** use
-/// the priority ceiling protocol and does not require a unique QP priority
-/// (see QP::QXMutex::init()).
-/// QP::QXMutex is **recursive** (reentrant), which means that it can be
-/// locked mutiliple times (up to 255 levels) by the *same* thread without
-/// causing deadlock.
-/// QP::QXMutex is primarily intended for the @ref QP::QXThread
-/// "extened (blocking) threads", but can also be used by the @ref QP::QActive
-/// "basic threads" through the non-blocking QP::QXMutex::tryLock() API.
-///
-/// @note
-/// QP::QXMutex should be used in situations when at least one of the extended
-/// threads contending for the mutex blocks while holding the mutex (between
-/// the QP::QXMutex::lock() and QP::QXMutex::unlock() operations). If no
-/// blocking is needed while holding the mutex, the more efficient
-/// non-blocking mechanism of @ref QP::QXK::schedLock() "selective QXK
-/// scheduler locking" should be used instead. @ref QP::QXK::schedLock()
-/// "Selective scheduler locking" is available for both @ref QP::QActive
-/// "basic threads" and @ref QP::QXThread "extended threads", so it is
-/// applicable to situations where resources are shared among all
-/// these threads.
-///
-/// @usage
-/// The following example illustrates how to instantiate and use the mutex
-/// in your application.
-/// @include qxk_mutex.cpp
-///
+//!
+//! @description
+//! QP::QXMutex is a blocking mutual exclusion mechanism that can also apply
+//! the **priority ceiling protocol** to avoid unbounded priority inversion
+//! (if initialized with a non-zero ceiling priority, see QP::QXMutex::init()).
+//! In that case, QP::QXMutex requires its own uinque QP priority level, which
+//! cannot be used by any thread or any other QP::QXMutex.
+//! If initialzied with zero ceiling priority, QP::QXMutex does **not** use
+//! the priority ceiling protocol and does not require a unique QP priority
+//! (see QP::QXMutex::init()).
+//! QP::QXMutex is **recursive** (reentrant), which means that it can be
+//! locked mutiliple times (up to 255 levels) by the *same* thread without
+//! causing deadlock.
+//! QP::QXMutex is primarily intended for the @ref QP::QXThread
+//! "extened (blocking) threads", but can also be used by the @ref QP::QActive
+//! "basic threads" through the non-blocking QP::QXMutex::tryLock() API.
+//!
+//! @note
+//! QP::QXMutex should be used in situations when at least one of the extended
+//! threads contending for the mutex blocks while holding the mutex (between
+//! the QP::QXMutex::lock() and QP::QXMutex::unlock() operations). If no
+//! blocking is needed while holding the mutex, the more efficient
+//! non-blocking mechanism of @ref QP::QXK::schedLock() "selective QXK
+//! scheduler locking" should be used instead. @ref QP::QXK::schedLock()
+//! "Selective scheduler locking" is available for both @ref QP::QActive
+//! "basic threads" and @ref QP::QXThread "extended threads", so it is
+//! applicable to situations where resources are shared among all
+//! these threads.
+//!
+//! @usage
+//! The following example illustrates how to instantiate and use the mutex
+//! in your application.
+//! @include qxk_mutex.cpp
+//!
 class QXMutex {
 public:
     //! initialize the QXK priority-ceiling mutex QP::QXMutex
@@ -231,4 +224,3 @@ private:
 } // namespace QP
 
 #endif // QXTHREAD_HPP
-

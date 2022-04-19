@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: DPP example on MSP-EXP430F5529LP board, cooperative QV kernel
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -325,7 +325,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // With the cooperative QV kernel for MSP430, it is necessary to explicitly
 // turn the low-power mode OFF in the interrupt, because the return

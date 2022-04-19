@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: "Low-Power" example, dual-mode QXK kernel
 // Last Updated for Version: 6.7.0
 // Date of the Last Update:  2019-12-27
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "low_power.hpp"
 #include "bsp.hpp"

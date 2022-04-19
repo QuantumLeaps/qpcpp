@@ -1,40 +1,33 @@
-/// @file
-/// @brief QXK/C++ preemptive kernel counting semaphore implementation
-/// @ingroup qxk
-/// @cond
-////**************************************************************************
-/// Last updated for version 6.9.1
-/// Last updated on  2020-09-19
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-////**************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QXK/C++ preemptive kernel counting semaphore implementation
+//! @ingroup qxk
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -52,32 +45,38 @@
     #error "Source file included in a project NOT based on the QXK kernel"
 #endif // QXK_HPP
 
-namespace QP {
+// unnamed namespace for local definitions with internal linkage
+namespace {
 
 Q_DEFINE_THIS_MODULE("qxk_sema")
 
-//****************************************************************************
-/// @description
-/// Initializes a semaphore with the specified count and maximum count.
-/// If the semaphore is used for resource sharing, both the initial count
-/// and maximum count should be set to the number of identical resources
-/// guarded by the semaphore. If the semaphore is used as a signaling
-/// mechanism, the initial count should set to 0 and maximum count to 1
-/// (binary semaphore).
-///
-/// @param[in]     count  initial value of the semaphore counter
-/// @param[in]     max_count  maximum value of the semaphore counter.
-///                The purpose of the max_count is to limit the counter
-///                so that the semaphore cannot unblock more times than
-///                the maximum.
-/// @note
-/// QXSemaphore::init() must be called **before** the semaphore can be used
-/// (signaled or waited on).
-///
+} // unnamed namespace
+
+namespace QP {
+
+
+//============================================================================
+//! @description
+//! Initializes a semaphore with the specified count and maximum count.
+//! If the semaphore is used for resource sharing, both the initial count
+//! and maximum count should be set to the number of identical resources
+//! guarded by the semaphore. If the semaphore is used as a signaling
+//! mechanism, the initial count should set to 0 and maximum count to 1
+//! (binary semaphore).
+//!
+//! @param[in]     count  initial value of the semaphore counter
+//! @param[in]     max_count  maximum value of the semaphore counter.
+//!                The purpose of the max_count is to limit the counter
+//!                so that the semaphore cannot unblock more times than
+//!                the maximum.
+//! @note
+//! QXSemaphore::init() must be called **before** the semaphore can be used
+//! (signaled or waited on).
+//!
 void QXSemaphore::init(std::uint_fast16_t const count,
                        std::uint_fast16_t const max_count) noexcept
 {
-    /// @pre max_count must be greater than zero
+    //! @pre max_count must be greater than zero
     Q_REQUIRE_ID(100, max_count > 0U);
 
     m_count     = static_cast<std::uint16_t>(count);
@@ -85,47 +84,48 @@ void QXSemaphore::init(std::uint_fast16_t const count,
     m_waitSet.setEmpty();
 }
 
-//****************************************************************************
-/// @description
-/// When an extended thread calls QXSemaphore::wait() and the value of the
-/// semaphore counter is greater than 0, QXSemaphore_wait() decrements the
-/// semaphore counter and returns (true) to its caller. However, if the value
-/// of the semaphore counter is 0, the function places the calling thread in
-/// the waiting list for the semaphore. The thread waits until the semaphore
-/// is signaled by calling QXSemaphore::signal(), or the specified timeout
-/// expires. If the semaphore is signaled before the timeout expires, QXK
-/// resumes the highest-priority extended thread waiting for the semaphore.
-///
-/// @param[in]  nTicks    number of clock ticks (at the associated rate)
-///                       to wait for the semaphore. The value of
-///                       QXTHREAD_NO_TIMEOUT indicates that no timeout will
-///                       occur and the semaphore will wait indefinitely.
-/// @returns
-/// true if the semaphore has been signaled, and false if the timeout occured.
-///
-/// @note
-/// Multiple extended threads can wait for a given semahpre.
-///
+//============================================================================
+//! @description
+//! When an extended thread calls QXSemaphore::wait() and the value of the
+//! semaphore counter is greater than 0, QXSemaphore_wait() decrements the
+//! semaphore counter and returns (true) to its caller. However, if the value
+//! of the semaphore counter is 0, the function places the calling thread in
+//! the waiting list for the semaphore. The thread waits until the semaphore
+//! is signaled by calling QXSemaphore::signal(), or the specified timeout
+//! expires. If the semaphore is signaled before the timeout expires, QXK
+//! resumes the highest-priority extended thread waiting for the semaphore.
+//!
+//! @param[in]  nTicks    number of clock ticks (at the associated rate)
+//!                       to wait for the semaphore. The value of
+//!                       QXTHREAD_NO_TIMEOUT indicates that no timeout will
+//!                       occur and the semaphore will wait indefinitely.
+//! @returns
+//! true if the semaphore has been signaled, and false if the timeout occured.
+//!
+//! @note
+//! Multiple extended threads can wait for a given semahpre.
+//!
 bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
-    bool signaled = true; // assume that the semaphore will be signaled
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
+
+    // volatile into temp.
     QXThread * const curr = QXK_PTR_CAST_(QXThread*, QXK_attr_.curr);
 
-    /// @pre this function must:
-    /// - NOT be called from an ISR;
-    /// - the semaphore must be initialized
-    /// - be called from an extended thread;
-    /// - the thread must NOT be already blocked on any object.
-    ///
+    //! @pre this function must:
+    //! - NOT be called from an ISR;
+    //! - the semaphore must be initialized
+    //! - be called from an extended thread;
+    //! - the thread must NOT be already blocked on any object.
+    //!
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
         && (m_max_count > 0U)
         && (curr != nullptr)
         && (curr->m_temp.obj == nullptr)); // NOT blocked
-    /// @pre also: the thread must NOT be holding a scheduler lock.
+    //! @pre also: the thread must NOT be holding a scheduler lock.
     Q_REQUIRE_ID(201, QXK_attr_.lockHolder != curr->m_prio);
 
+    bool signaled = true; // assume that the semaphore will be signaled
     if (m_count > 0U) {
         --m_count;
     }
@@ -175,27 +175,27 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
     return signaled;
 }
 
-//****************************************************************************
-///
-/// @description
-/// This operation checks if the semaphore counter is greater than 0,
-/// in which case the counter is decremented.
-///
-/// @returns
-/// 'true' if the semaphore has count available and 'false' NOT available.
-///
-/// @note
-/// This function can be called from any context, including ISRs and basic
-/// threds (active objects).
-///
+//============================================================================
+//!
+//! @description
+//! This operation checks if the semaphore counter is greater than 0,
+//! in which case the counter is decremented.
+//!
+//! @returns
+//! 'true' if the semaphore has count available and 'false' NOT available.
+//!
+//! @note
+//! This function can be called from any context, including ISRs and basic
+//! threds (active objects).
+//!
 bool QXSemaphore::tryWait(void) noexcept {
-    bool isAvailable;
-    QF_CRIT_STAT_
-
-    /// @pre the semaphore must be initialized
+    //! @pre the semaphore must be initialized
     Q_REQUIRE_ID(300, m_max_count > 0U);
 
+    QF_CRIT_STAT_
     QF_CRIT_E_();
+
+    bool isAvailable;
     // is the semaphore available?
     if (m_count > 0U) {
         --m_count;
@@ -209,32 +209,32 @@ bool QXSemaphore::tryWait(void) noexcept {
     return isAvailable;
 }
 
-//****************************************************************************
-/// @description
-/// If the semaphore counter value is 0 or more, it is incremented, and this
-/// function returns to its caller. If the extended threads are waiting for
-/// the semaphore to be signaled, QXSemaphore_signal() removes the highest-
-/// priority thread waiting for the semaphore from the waiting list and makes
-/// this thread ready-to-run. The QXK scheduler is then called to determine
-/// if the awakened thread is now the highest-priority thread that is
-/// ready-to-run.
-///
-/// @returns
-/// 'true' when the semaphore gets signaled and 'false' when the semaphore
-/// count exceeded the maximum.
-///
-/// @note
-/// A semaphore can be signaled from many places, including from ISRs, basic
-/// threads (AOs), and extended threads.
-///
+//============================================================================
+//! @description
+//! If the semaphore counter value is 0 or more, it is incremented, and this
+//! function returns to its caller. If the extended threads are waiting for
+//! the semaphore to be signaled, QXSemaphore_signal() removes the highest-
+//! priority thread waiting for the semaphore from the waiting list and makes
+//! this thread ready-to-run. The QXK scheduler is then called to determine
+//! if the awakened thread is now the highest-priority thread that is
+//! ready-to-run.
+//!
+//! @returns
+//! 'true' when the semaphore gets signaled and 'false' when the semaphore
+//! count exceeded the maximum.
+//!
+//! @note
+//! A semaphore can be signaled from many places, including from ISRs, basic
+//! threads (AOs), and extended threads.
+//!
 bool QXSemaphore::signal(void) noexcept {
-    bool signaled = true; // assume that the semaphore will be signaled
-    QF_CRIT_STAT_
-
-    /// @pre the semaphore must be initialized
+    //! @pre the semaphore must be initialized
     Q_REQUIRE_ID(400, m_max_count > 0U);
 
+    QF_CRIT_STAT_
     QF_CRIT_E_();
+
+    bool signaled = true; // assume that the semaphore will be signaled
     if (m_count < m_max_count) {
 
         ++m_count; // increment the semaphore count
@@ -275,4 +275,3 @@ bool QXSemaphore::signal(void) noexcept {
 }
 
 } // namespace QP
-

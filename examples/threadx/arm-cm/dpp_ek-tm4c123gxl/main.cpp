@@ -1,6 +1,6 @@
-//////////////////////////////////////////////////////////////////////////////
+//============================================================================
 // Product: DPP example for ThreadX
-// Last updated for version 6.9.4
+// Last updated for: @qpcpp_7_0_0
 // Last updated on  2021-12-05
 //
 //                    Q u a n t u m  L e a P s
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//////////////////////////////////////////////////////////////////////////////
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"

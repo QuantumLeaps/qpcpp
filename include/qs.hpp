@@ -1,40 +1,33 @@
-/// @file
-/// @brief QS/C++ platform-independent public interface.
-/// @ingroup qs
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.4
-/// Last updated on  2021-10-07
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QS/C++ platform-independent public interface.
+//! @ingroup qs
 
 #ifndef QS_HPP
 #define QS_HPP
@@ -43,22 +36,22 @@
     #error "Q_SPY must be defined to include qs.hpp"
 #endif
 
-//****************************************************************************
+//============================================================================
 namespace QP {
 
-//! Quantum Spy record types.
-/// @description
-/// This enumeration specifies the record types used in the QP components.
-/// You can specify your own record types starting from QP::QS_USER offset.
-/// Currently, the maximum of all records cannot exceed 125.
-///
-/// @note
-/// The QS records labeled as "not maskable" are always enabled and cannot
-/// be turend off with the QS_GLB_FILTER() macro. Other QS trace records
-/// can be disabled by means of the "global filters"
-///
-/// @sa QS_GLB_FILTER() macro
-
+//! QS pre-defined record types (TX channel)
+//! @description
+//! This enumeration specifies the record types used in the QP components.
+//! You can specify your own record types starting from QP::QS_USER offset.
+//! Currently, the maximum of all records cannot exceed 125.
+//!
+//! @note
+//! The QS records labeled as "not maskable" are always enabled and cannot
+//! be turend off with the QS_GLB_FILTER() macro. Other QS trace records
+//! can be disabled by means of the "global filters"
+//!
+//! @sa QS_GLB_FILTER() macro
+//!
 enum QSpyRecords : std::int8_t {
     // [0] QS session (not maskable)
     QS_EMPTY,             //!< QS record for cleanly starting a session
@@ -160,40 +153,16 @@ enum QSpyRecords : std::int8_t {
     QS_PEEK_DATA,         //!< reports the data from the PEEK query
     QS_ASSERT_FAIL,       //!< assertion failed in the code
     QS_QF_RUN,            //!< QF_run() was entered
+};
 
-    // [71] Reserved QS records
-    QS_RESERVED_71,
-    QS_RESERVED_72,
-    QS_RESERVED_73,
-    QS_RESERVED_74,
-    QS_RESERVED_75,
-    QS_RESERVED_76,
-    QS_RESERVED_77,
-    QS_RESERVED_78,
-    QS_RESERVED_79,
-    QS_RESERVED_80,
-    QS_RESERVED_81,
-    QS_RESERVED_82,
-    QS_RESERVED_83,
-    QS_RESERVED_84,
-    QS_RESERVED_85,
-    QS_RESERVED_86,
-    QS_RESERVED_87,
-    QS_RESERVED_88,
-    QS_RESERVED_89,
-    QS_RESERVED_90,
-    QS_RESERVED_91,
-    QS_RESERVED_92,
-    QS_RESERVED_93,
-    QS_RESERVED_94,
-    QS_RESERVED_95,
-    QS_RESERVED_96,
-    QS_RESERVED_97,
-    QS_RESERVED_98,
-    QS_RESERVED_99,
-
-    // [100] Application-specific (User) QS records
-    QS_USER               //!< the first record available to QS users
+//! QS user record group offsets for QS_GLB_FILTER()
+enum QSpyUserOffsets : std::int16_t {
+    QS_USER  = 100,          //!< the first record available to QS users
+    QS_USER0 = QS_USER,      //!< offset for User Group 0
+    QS_USER1 = QS_USER0 + 5, //!< offset of Group 1
+    QS_USER2 = QS_USER1 + 5, //!< offset of Group 2
+    QS_USER3 = QS_USER2 + 5, //!< offset of Group 3
+    QS_USER4 = QS_USER3 + 5, //!< offset of Group 4
 };
 
 //! QS record groups for QS_GLB_FILTER()
@@ -212,15 +181,6 @@ enum QSpyRecordGroups : std::int16_t {
     QS_U3_RECORDS,  //!< User Group 115-119 records
     QS_U4_RECORDS,  //!< User Group 120-124 records
     QS_UA_RECORDS   //!< All User records
-};
-
-//! QS user record group offsets for QS_GLB_FILTER()
-enum QSpyUserOffsets : std::int16_t {
-    QS_USER0 = QS_USER,      //!< offset for User Group 0
-    QS_USER1 = QS_USER0 + 5, //!< offset of Group 1
-    QS_USER2 = QS_USER1 + 5, //!< offset of Group 2
-    QS_USER3 = QS_USER2 + 5, //!< offset of Group 3
-    QS_USER4 = QS_USER3 + 5, //!< offset of Group 4
 };
 
 //! QS ID offsets for QS_LOC_FILTER()
@@ -254,10 +214,10 @@ struct QSpyId {
 
     //! The size (in bytes) of the QS time stamp. Valid values: 1U, 2U,
     //! or 4U; default 4U.
-    /// @description
-    /// This macro can be defined in the QS port file (qs_port.hpp) to
-    /// configure the QP::QSTimeCtr type. Here the macro is not defined so
-    /// the default of 4 byte is chosen.
+    //! @description
+    //! This macro can be defined in the QS port file (qs_port.hpp) to
+    //! configure the QP::QSTimeCtr type. Here the macro is not defined so
+    //! the default of 4 byte is chosen.
 
     #define QS_TIME_SIZE 4U
 #endif
@@ -273,8 +233,7 @@ struct QSpyId {
     #error "QS_TIME_SIZE defined incorrectly, expected 1U, 2U, or 4U"
 #endif
 
-
-//****************************************************************************
+//============================================================================
 namespace QP {
 
 #if (QS_TIME_SIZE == 1U)
@@ -296,9 +255,9 @@ using QSCtr = std::uint_fast16_t;
 constexpr std::uint16_t QS_EOD  = 0xFFFFU;
 
 //! QS software tracing facilities
-/// @description
-/// This class groups together QS services. It has only static members and
-/// should not be instantiated.
+//! @description
+//! This class groups together QS services. It has only static members and
+//! should not be instantiated.
 class QS {
 public:
     //! Initialize the QS data buffer.
@@ -338,7 +297,7 @@ public:
     static void obj_raw_(void const * const obj) noexcept;
 
     //! Output zero-terminated ASCII string element without format information
-    static void str_raw_(char_t const *s) noexcept;
+    static void str_raw_(char const *s) noexcept;
 
 
     // formatted data elements output ........................................
@@ -360,7 +319,7 @@ public:
     static void f64_fmt_(std::uint8_t format, float64_t const d) noexcept;
 
     //! Output zero-terminated ASCII string element with format information
-    static void str_fmt_(char_t const *s) noexcept;
+    static void str_fmt_(char const *s) noexcept;
 
     //! Output memory block of up to 255-bytes with format information
     static void mem_fmt_(std::uint8_t const *blk, std::uint8_t size) noexcept;
@@ -373,19 +332,24 @@ public:
 
     //! Output signal dictionary record
     static void sig_dict_pre_(enum_t const sig, void const * const obj,
-                              char_t const *name) noexcept;
+                              char const * const name) noexcept;
 
     //! Output object dictionary record
     static void obj_dict_pre_(void const * const obj,
-                              char_t const *name) noexcept;
+                              char const * const name) noexcept;
+
+    //! Output predefined object-array dictionary record
+    static void obj_arr_dict_pre_(void const * const obj,
+                                  std::uint_fast16_t const idx,
+                                  char const * const name) noexcept;
 
     //! Output function dictionary record
     static void fun_dict_pre_(void (* const fun)(void),
-                              char_t const *name) noexcept;
+                              char const * const name) noexcept;
 
     //! Output user dictionary record
     static void usr_dict_pre_(enum_t const rec,
-                              char_t const * const name) noexcept;
+                              char const * const name) noexcept;
 
     //! Initialize the QS RX data buffer
     static void rxInitBuf(std::uint8_t * const sto,
@@ -441,8 +405,8 @@ public:
     static void rxHandleGoodFrame_(std::uint8_t const state);
 
     //! internal function to produce the assertion failure trace record
-    static void assertion_pre_(char_t const * const module, int_t const loc,
-                               std::uint32_t delay);
+    static void assertion_pre_(char const * const module, int_t const loc,
+                               std::uint32_t const delay);
 
     //! internal function to produce the critical section entry record
     static void crit_entry_pre_(void);
@@ -485,12 +449,15 @@ public:
     //! internal function to get the Test-Probe for a given API
     static std::uint32_t getTestProbe_(void (* const api)(void)) noexcept;
 
+    //! internal function to pause test and enter the test event loop
+    static void test_pause_(void);
+
 #endif // Q_UTEST
 
     //! Enumerates data formats recognized by QS
-    /// @description
-    /// QS uses this enumeration is used only internally for the formatted
-    /// user data elements.
+    //! @description
+    //! QS uses this enumeration is used only internally for the formatted
+    //! user data elements.
     enum QSType : std::uint8_t {
         I8_T,         //!< signed 8-bit integer format
         U8_T,         //!< unsigned 8-bit integer format
@@ -542,55 +509,31 @@ public:
     void const *locFilter_AP; //!< deprecated local QS filter
     std::uint8_t *buf;    //!< pointer to the start of the ring buffer
     QSCtr    end;         //!< offset of the end of the ring buffer
-    QSCtr    head;        //!< offset to where next byte will be inserted
-    QSCtr    tail;        //!< offset of where next record will be extracted
-    QSCtr    used;        //!< number of bytes currently in the ring buffer
-    std::uint8_t  seq;    //!< the record sequence number
-    std::uint8_t  chksum; //!< the checksum of the current record
-    std::uint8_t  full;   //!< the ring buffer is temporarily full
+    QSCtr volatile head;  //!< offset to where next byte will be inserted
+    QSCtr volatile tail;  //!< offset of where next record will be extracted
+    QSCtr volatile used;  //!< number of bytes currently in the ring buffer
+    std::uint8_t volatile seq;    //!< the record sequence number
+    std::uint8_t volatile chksum; //!< the checksum of the current record
 
-    std::uint_fast8_t critNest; //!< critical section nesting level
+    std::uint_fast8_t volatile critNest; //!< critical section nesting level
 
     static QS priv_;
 
     static struct QSrxPriv {
         void *currObj[MAX_OBJ]; //!< current objects
         std::uint8_t *buf;      //!< pointer to the start of the ring buffer
-        QSCtr end;        //!< offset of the end of the ring buffer
-        QSCtr head;       //!< offset to where next byte will be inserted
-        QSCtr tail;       //!< offset of where next byte will be extracted
+        QSCtr end;           //!< offset of the end of the ring buffer
+        QSCtr volatile head; //!< offset to where next byte will be inserted
+        QSCtr volatile tail; //!< offset of where next byte will be extracted
 #ifdef Q_UTEST
-        QP::QPSet readySet; //!< QUTEST ready-set of active objects
-        bool inTestLoop;    //!< QUTest event loop is running
+        QP::QPSet readySet;  //!< QUTEST ready-set of active objects
+        bool inTestLoop;     //!< QUTest event loop is running
 #endif
     } rxPriv_;
 };
 
-//****************************************************************************
+//============================================================================
 // QS receive channel
-
-//! Quantum Spy Receive (RX) record types
-/// @description
-/// This enumeration specifies the record types for the QS receive channel
-enum QSpyRxRecords : std::uint8_t {
-    QS_RX_INFO,           //!< query Target info (ver, config, tstamp)
-    QS_RX_COMMAND,        //!< execute a user-defined command in the Target
-    QS_RX_RESET,          //!< reset the Target
-    QS_RX_TICK,           //!< call QF_tick()
-    QS_RX_PEEK,           //!< peek Target memory
-    QS_RX_POKE,           //!< poke Target memory
-    QS_RX_FILL,           //!< fill Target memory
-    QS_RX_TEST_SETUP,     //!< test setup
-    QS_RX_TEST_TEARDOWN,  //!< test teardown
-    QS_RX_TEST_PROBE,     //!< set a Test-Probe in the Target
-    QS_RX_GLB_FILTER,     //!< set global filters in the Target
-    QS_RX_LOC_FILTER,     //!< set local  filters in the Target
-    QS_RX_AO_FILTER,      //!< set local AO filter in the Target
-    QS_RX_CURR_OBJ,       //!< set the "current-object" in the Target
-    QS_RX_TEST_CONTINUE,  //!< continue a test after QS_RX_TEST_WAIT()
-    QS_RX_QUERY_CURR,     //!< query the "current object" in the Target
-    QS_RX_EVENT           //!< inject an event to the Target (post/publish)
-};
 
 //! put one byte into the QS RX lock-free buffer
 inline bool QS::rxPut(std::uint8_t const b) noexcept {
@@ -608,15 +551,32 @@ inline bool QS::rxPut(std::uint8_t const b) noexcept {
     }
 }
 
-
-//****************************************************************************
+//============================================================================
 #ifdef Q_UTEST
 
+//! Dummy HSM class
+//! @description
+//! QHsmDummy is a test double for the role of "Orthogonal Components"
+//! HSM objects in QUTest unit testing.
+//!
+class QHsmDummy : public QHsm {
+public:
+    QHsmDummy(void); // ctor
+
+    void init(void const * const e,
+              std::uint_fast8_t const qs_id) noexcept override;
+    void init(std::uint_fast8_t const qs_id) noexcept override {
+        init(nullptr, qs_id);
+    }
+    void dispatch(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) noexcept override;
+};
+
 //! Dummy Active Object class
-/// @description
-/// QActiveDummy is a test double for the role of collaborating active
-/// objects in QUTest unit testing.
-///
+//! @description
+//! QActiveDummy is a test double for the role of collaborating active
+//! objects in QUTest unit testing.
+//!
 class QActiveDummy : public QActive {
 public:
     QActiveDummy(void); // ctor
@@ -631,13 +591,13 @@ public:
                QEvt const * * const qSto, std::uint_fast16_t const qLen,
                void * const stkSto, std::uint_fast16_t const stkSize) override
     {
-        this->start(prio, qSto, qLen, stkSto, stkSize, nullptr);
+        start(prio, qSto, qLen, stkSto, stkSize, nullptr);
     }
 
     void init(void const * const e,
               std::uint_fast8_t const qs_id) noexcept override;
     void init(std::uint_fast8_t const qs_id) noexcept override {
-        this->init(qs_id);
+        init(nullptr, qs_id);
     }
     void dispatch(QEvt const * const e,
                   std::uint_fast8_t const qs_id) noexcept override;
@@ -656,59 +616,58 @@ extern std::uint8_t volatile QF_intNest;
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // Macros for adding QS instrumentation to the client code
 
 //! Initialize the QS facility.
-/// @description
-/// This macro provides an indirection layer to invoke the QS initialization
-/// routine if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
-/// @sa QP::QS::onStartup(), example of setting up a QS filter in
-/// QS_GLB_FILTER()
+//! @description
+//! This macro provides an indirection layer to invoke the QS initialization
+//! routine if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
+//! @sa QP::QS::onStartup(), example of setting up a QS filter in
+//! QS_GLB_FILTER()
 #define QS_INIT(arg_)           (QP::QS::onStartup(arg_))
 
 //! Cleanup the QS facility.
-/// @description
-/// This macro provides an indirection layer to invoke the QS cleanup
-/// routine if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
-/// @sa QP::QS::onCleanup()
+//! @description
+//! This macro provides an indirection layer to invoke the QS cleanup
+//! routine if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
+//! @sa QP::QS::onCleanup()
 #define QS_EXIT()               (QP::QS::onCleanup())
 
 //! Global Filter ON for a given record type @p rec.
-/// @description
-/// This macro provides an indirection layer to call QP::QS::filterOn()
-/// if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
-///
-/// @usage
-/// The following example shows how to use QS filters:
-/// @include qs_filter.cpp
+//! @description
+//! This macro provides an indirection layer to call QP::QS::filterOn()
+//! if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
+//!
+//! @usage
+//! The following example shows how to use QS filters:
+//! @include qs_filter.cpp
 #define QS_GLB_FILTER(rec_) \
     (QP::QS::glbFilter_(static_cast<std::int_fast16_t>(rec_)))
 
 //! Local Filter for a given state machine object @p qs_id.
-/// @description
-/// This macro provides an indirection layer to call QS_locFilter_()
-/// if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
-///
-/// The following example shows how to use QS filters:
-/// @include qs_filter.cpp
+//! @description
+//! This macro provides an indirection layer to call QS_locFilter_()
+//! if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
+//!
+//! The following example shows how to use QS filters:
+//! @include qs_filter.cpp
 #define QS_LOC_FILTER(qs_id_)  \
     (QP::QS::locFilter_(static_cast<std::int_fast16_t>(qs_id_)))
 
-
-//****************************************************************************
+//============================================================================
 // Macros to generate application-specific (user) QS records
 
 //! Begin a user QS record with entering critical section.
-/// @description
-/// The following example shows how to build a user QS record using the
-/// macros QS_BEGIN_ID(), QS_END(), and the formatted output macros:
-/// QS_U8(), QS_STR(), etc.
-///
-/// @note
-/// Must always be used in pair with QS_END()
-///
-/// @include qs_user.cpp
+//! @description
+//! The following example shows how to build a user QS record using the
+//! macros QS_BEGIN_ID(), QS_END(), and the formatted output macros:
+//! QS_U8(), QS_STR(), etc.
+//!
+//! @note
+//! Must always be used in pair with QS_END()
+//!
+//! @include qs_user.cpp
 #define QS_BEGIN_ID(rec_, qs_id_)                                \
     if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) {          \
         QS_CRIT_STAT_                                            \
@@ -717,8 +676,8 @@ extern std::uint8_t volatile QF_intNest;
         QS_TIME_PRE_();
 
 //! End a QS record with exiting critical section.
-/// @sa example for QS_BEGIN_ID()
-/// @note Must always be used in pair with QS_BEGIN_ID()
+//! @sa example for QS_BEGIN_ID()
+//! @note Must always be used in pair with QS_BEGIN_ID()
 #define QS_END()           \
         QP::QS::endRec_(); \
         QS_CRIT_X_();      \
@@ -741,19 +700,20 @@ extern std::uint8_t volatile QF_intNest;
 #endif // QS_REC_DONE
 
 //! helper macro for checking the global QS filter
-#define QS_GLB_CHECK_(rec_)                                              \
-    ((QP::QS::priv_.glbFilter[static_cast<std::uint_fast8_t>(rec_) >> 3] \
-      & static_cast<std::uint8_t>(1U                                     \
-             << (static_cast<std::uint_fast8_t>(rec_) & 7U))) != 0U)
+#define QS_GLB_CHECK_(rec_)                                     \
+    ((static_cast<std::uint_fast8_t>(QP::QS::priv_.glbFilter[   \
+                static_cast<std::uint_fast8_t>(rec_) >> 3U])    \
+          & (static_cast<std::uint_fast8_t>(1U)                 \
+            << (static_cast<std::uint_fast8_t>(rec_) & 7U))) != 0U)
 
 //! helper macro for checking the local QS filter
-#define QS_LOC_CHECK_(qs_id_)                                              \
-    ((QP::QS::priv_.locFilter[static_cast<std::uint_fast8_t>(qs_id_) >> 3] \
-      & static_cast<std::uint8_t>(1U                                       \
-             << (static_cast<std::uint_fast8_t>(qs_id_) & 7U))) != 0U)
+#define QS_LOC_CHECK_(qs_id_)                                   \
+    ((static_cast<std::uint_fast8_t>(QP::QS::priv_.locFilter    \
+                [static_cast<std::uint_fast8_t>(qs_id_) >> 3U]) \
+          & (static_cast<std::uint_fast8_t>(1U)                 \
+            << (static_cast<std::uint_fast8_t>(qs_id_) & 7U))) != 0U)
 
-
-//****************************************************************************
+//============================================================================
 // Facilities for QS ciritical section
 
 // QS-specific critical section
@@ -773,33 +733,33 @@ extern std::uint8_t volatile QF_intNest;
 #ifndef QF_CRIT_STAT_TYPE
     //! This is an internal macro for defining the critical section
     //! status type.
-    /// @description
-    /// The purpose of this macro is to enable writing the same code for the
-    /// case when critical section status type is defined and when it is not.
-    /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
-    /// provides the definition of the critical section status variable.
-    /// Otherwise this macro is empty.
-    /// @sa #QF_CRIT_STAT_TYPE
+    //! @description
+    //! The purpose of this macro is to enable writing the same code for the
+    //! case when critical section status type is defined and when it is not.
+    //! If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
+    //! provides the definition of the critical section status variable.
+    //! Otherwise this macro is empty.
+    //! @sa #QF_CRIT_STAT_TYPE
     #define QS_CRIT_STAT_
 
     //! This is an internal macro for entering a critical section.
-    /// @description
-    /// The purpose of this macro is to enable writing the same code for the
-    /// case when critical section status type is defined and when it is not.
-    /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
-    /// invokes #QF_CRIT_ENTRY passing the key variable as the parameter.
-    /// Otherwise #QF_CRIT_ENTRY is invoked with a dummy parameter.
-    /// @sa #QF_CRIT_ENTRY
+    //! @description
+    //! The purpose of this macro is to enable writing the same code for the
+    //! case when critical section status type is defined and when it is not.
+    //! If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
+    //! invokes #QF_CRIT_ENTRY passing the key variable as the parameter.
+    //! Otherwise #QF_CRIT_ENTRY is invoked with a dummy parameter.
+    //! @sa #QF_CRIT_ENTRY
     #define QS_CRIT_E_()    QF_CRIT_ENTRY(dummy)
 
     //! This is an internal macro for exiting a critical section.
-    /// @description
-    /// The purpose of this macro is to enable writing the same code for the
-    /// case when critical section status type is defined and when it is not.
-    /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
-    /// invokes #QF_CRIT_EXIT passing the key variable as the parameter.
-    /// Otherwise #QF_CRIT_EXIT is invoked with a dummy parameter.
-    /// @sa #QF_CRIT_EXIT
+    //! @description
+    //! The purpose of this macro is to enable writing the same code for the
+    //! case when critical section status type is defined and when it is not.
+    //! If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
+    //! invokes #QF_CRIT_EXIT passing the key variable as the parameter.
+    //! Otherwise #QF_CRIT_EXIT is invoked with a dummy parameter.
+    //! @sa #QF_CRIT_EXIT
     #define QS_CRIT_X_()     QF_CRIT_EXIT(dummy); QS_REC_DONE()
 
 #elif (!defined QS_CRIT_STAT_)
@@ -810,14 +770,13 @@ extern std::uint8_t volatile QF_intNest;
 
 #endif // separate QS critical section not defined
 
-
-//****************************************************************************
+//============================================================================
 // Macros for use in the client code
 
 //! Output formatted std::int8_t to the QS record
 #define QS_I8(width_, data_)                                \
     (QP::QS::u8_fmt_(static_cast<std::uint8_t>(             \
-        (static_cast<std::uint8_t>(width_) << 4))           \
+        (static_cast<std::uint8_t>((width_) << 4))          \
         | static_cast<std::uint8_t>(QP::QS::I8_T)), (data_)))
 
 //! Output formatted std::uint8_t to the QS record
@@ -938,87 +897,101 @@ extern std::uint8_t volatile QF_intNest;
         QP::QS::obj_raw_(obj_)
 #endif
 
-
-//////////////////////////////////////////////////////////////////////////////
-
+//============================================================================
 //! Output signal dictionary record
-///
-/// A signal dictionary record associates the numerical value of the signal
-/// and the binary address of the state machine that consumes that signal
-/// with the human-readable name of the signal.
-///
-/// Providing a signal dictionary QS record can vastly improve readability of
-/// the QS log, because instead of dealing with cryptic machine addresses the
-/// QSpy host utility can display human-readable names.
-///
-/// A signal dictionary entry is associated with both the signal value @p sig_
-/// and the state machine @p obj_, because signals are required to be unique
-/// only within a given state machine and therefore the same numerical values
-/// can represent different signals in different state machines.
-///
-/// For the "global" signals that have the same meaning in all state machines
-/// (such as globally published signals), you can specify a signal dictionary
-/// entry with the @p obj_ parameter set to NULL.
-///
-/// The following example shows the definition of signal dictionary entries
-/// in the initial transition of the Table active object. Please note that
-/// signals HUNGRY_SIG and DONE_SIG are associated with the Table state
-/// machine only ("me" @p obj_ pointer). The EAT_SIG signal, on the other
-/// hand, is global (0 @p obj_ pointer):
-/// @include qs_sigDic.cpp
-///
-/// @note The QSpy log utility must capture the signal dictionary record
-/// in order to use the human-readable information. You need to connect to
-/// the target before the dictionary entries have been transmitted.
-///
-/// The following QSpy log example shows the signal dictionary records
-/// generated from the Table initial transition and subsequent records that
-/// show human-readable names of the signals:
-/// @include qs_sigLog.txt
-///
-/// The following QSpy log example shows the same sequence of records, but
-/// with dictionary records removed. The human-readable signal names are not
-/// available.
-/// @include qs_sigLog0.txt
+//!
+//! A signal dictionary record associates the numerical value of the signal
+//! and the binary address of the state machine that consumes that signal
+//! with the human-readable name of the signal.
+//!
+//! Providing a signal dictionary QS record can vastly improve readability of
+//! the QS log, because instead of dealing with cryptic machine addresses the
+//! QSpy host utility can display human-readable names.
+//!
+//! A signal dictionary entry is associated with both the signal value @p sig_
+//! and the state machine @p obj_, because signals are required to be unique
+//! only within a given state machine and therefore the same numerical values
+//! can represent different signals in different state machines.
+//!
+//! For the "global" signals that have the same meaning in all state machines
+//! (such as globally published signals), you can specify a signal dictionary
+//! entry with the @p obj_ parameter set to NULL.
+//!
+//! The following example shows the definition of signal dictionary entries
+//! in the initial transition of the Table active object. Please note that
+//! signals HUNGRY_SIG and DONE_SIG are associated with the Table state
+//! machine only ("me" @p obj_ pointer). The EAT_SIG signal, on the other
+//! hand, is global (0 @p obj_ pointer):
+//! @include qs_sigDic.cpp
+//!
+//! @note The QSpy log utility must capture the signal dictionary record
+//! in order to use the human-readable information. You need to connect to
+//! the target before the dictionary entries have been transmitted.
+//!
+//! The following QSpy log example shows the signal dictionary records
+//! generated from the Table initial transition and subsequent records that
+//! show human-readable names of the signals:
+//! @include qs_sigLog.txt
+//!
+//! The following QSpy log example shows the same sequence of records, but
+//! with dictionary records removed. The human-readable signal names are not
+//! available.
+//! @include qs_sigLog0.txt
 #define QS_SIG_DICTIONARY(sig_, obj_) \
     (QP::QS::sig_dict_pre_((sig_), (obj_), #sig_))
 
 //! Output object dictionary record
-///
-/// An object dictionary record associates the binary address of an object
-/// in the target's memory with the human-readable name of the object.
-///
-/// Providing an object dictionary QS record can vastly improve readability of
-/// the QS log, because instead of dealing with cryptic machine addresses the
-/// QSpy host utility can display human-readable object names.
-///
-/// The following example shows the definition of object dictionary entry
-/// for the Table active object:
-/// @include qs_objDic.cpp
+//!
+//! An object dictionary record associates the binary address of an object
+//! in the target's memory with the human-readable name of the object.
+//!
+//! Providing an object dictionary QS record can vastly improve readability of
+//! the QS log, because instead of dealing with cryptic machine addresses the
+//! QSpy host utility can display human-readable object names.
+//!
+//! The following example shows the definition of object dictionary entry
+//! for the Table active object:
+//! @include qs_objDic.cpp
 #define QS_OBJ_DICTIONARY(obj_) \
     (QP::QS::obj_dict_pre_((obj_), #obj_))
 
+//! Output object-array dictionary record
+//! @description
+//! An object array dictionary record associates the binary address of the
+//! object element in the target's memory with the human-readable name
+//! of the object.
+//!
+//! Providing a dictionary QS record can vastly improve readability of
+//! the QS log, because instead of dealing with cryptic machine addresses the
+//! QSpy host utility can display human-readable object names.
+//!
+//! The following example shows the definition of object dictionary entry
+//! for the Table active object:
+//! @include qs_objDic.cpp
+#define QS_OBJ_ARR_DICTIONARY(obj_, idx_) \
+    (QP::QS::obj_arr_dict_pre_((obj_), (idx_), #obj_))
+
 //! Output function dictionary record
-///
-/// A function dictionary record associates the binary address of a function
-/// in the target's memory with the human-readable name of the function.
-///
-/// Providing a function dictionary QS record can vastly improve readability
-/// of the QS log, because instead of dealing with cryptic machine addresses
-/// the QSpy host utility can display human-readable function names.
-///
-/// The example from #QS_SIG_DICTIONARY shows the definition of a function
-/// dictionary.
+//!
+//! A function dictionary record associates the binary address of a function
+//! in the target's memory with the human-readable name of the function.
+//!
+//! Providing a function dictionary QS record can vastly improve readability
+//! of the QS log, because instead of dealing with cryptic machine addresses
+//! the QSpy host utility can display human-readable function names.
+//!
+//! The example from #QS_SIG_DICTIONARY shows the definition of a function
+//! dictionary.
 #define QS_FUN_DICTIONARY(fun_) \
     (QP::QS::fun_dict_pre_(     \
         QP::QS::force_cast<void (*)(void)>(fun_), #fun_))
 
 //! Output user QS record dictionary record
-///
-/// A user QS record dictionary record associates the numerical value of a
-/// user record with the human-readable identifier.
+//!
+//! A user QS record dictionary record associates the numerical value of a
+//! user record with the human-readable identifier.
 #define QS_USR_DICTIONARY(rec_) do {              \
-    static char_t const usr_name_[] = #rec_;      \
+    static char const usr_name_[] = #rec_;      \
     QP::QS::usr_dict_pre_((rec_), &usr_name_[0]); \
 } while (false)
 
@@ -1041,11 +1014,11 @@ extern std::uint8_t volatile QF_intNest;
     (QP::QS::isr_exit_pre_((isrnest_), (prio_)))
 
 //! Flush the QS trace data to the host
-///
-/// This macro invokes the QP::QS::flush() platform-dependent callback
-/// function to flush the QS trace buffer to the host. The function
-/// typically busy-waits until all the data in the buffer is sent to
-/// the host. This is acceptable only in the initial transient.
+//!
+//! This macro invokes the QP::QS::flush() platform-dependent callback
+//! function to flush the QS trace buffer to the host. The function
+//! typically busy-waits until all the data in the buffer is sent to
+//! the host. This is acceptable only in the initial transient.
 #define QS_FLUSH()   (QP::QS::onFlush())
 
 //! Execute an action that is only necessary for QS output
@@ -1059,8 +1032,7 @@ extern std::uint8_t volatile QF_intNest;
 //! NOTE: if this macro is used, the application must define QS_rx_input().
 #define QS_RX_INPUT() (QS_rx_input())
 
-
-//****************************************************************************
+//============================================================================
 // Macros for use in QUTest only
 
 #ifdef Q_UTEST
@@ -1078,12 +1050,7 @@ extern std::uint8_t volatile QF_intNest;
         if (qs_tp_ == static_cast<std::uint32_t>(id_)) { code_ }
 
     //! QS macro to pause test execution and enter the test event loop
-    #define QS_TEST_PAUSE() do {                                 \
-        QP::QS::beginRec_(                                       \
-            static_cast<std::uint_fast8_t>(QP::QS_TEST_PAUSED)); \
-        QP::QS::endRec_();                                       \
-        QP::QS::onTestLoop();                                    \
-    } while (false)
+    #define QS_TEST_PAUSE() (QP::QS::test_pause_())
 
 #else
     // dummy definitions when not building for QUTEST
@@ -1094,4 +1061,3 @@ extern std::uint8_t volatile QF_intNest;
 #endif // Q_UTEST
 
 #endif // QS_HPP
-

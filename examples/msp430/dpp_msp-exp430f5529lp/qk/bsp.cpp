@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: DPP example on MSP-EXP430F5529LP board, preemptive QK kernel
 // Last updated for version 6.9.1
 // Last updated on  2020-09-21
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
@@ -328,7 +328,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 
 } // namespace QP
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // With the preemptive QK kernel for MSP430, the idle callback QK::onIdle()
 // will execute only ONCE, if the low-power mode is not explicitly turned OFF

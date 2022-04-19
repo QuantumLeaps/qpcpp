@@ -101,7 +101,7 @@ QP::QActive * const AO_Tunnel = &l_tunnel; // opaque pointer
 //     x....x....x.......x....x....x..x.x..x..x...x..x..x.x..x
 //     x....x.....xxx.xxx..xxx.....xxx...xxx...x...x..xx..x..x
 //     .......................................................
-///
+//!
 static uint8_t const press_button_bits[] = {
     0x7F, 0x09, 0x09, 0x06, 0x00, 0x7C, 0x08, 0x04, 0x04, 0x00,
     0x38, 0x54, 0x54, 0x58, 0x00, 0x48, 0x54, 0x54, 0x24, 0x00,
@@ -116,7 +116,7 @@ static uint8_t const press_button_bits[] = {
 //     x....
 //     xxx..
 //     xxxxx
-///
+//!
 static uint8_t const ship_bits[] = {
     0x07, 0x06, 0x06, 0x04, 0x04
 };
@@ -124,7 +124,7 @@ static uint8_t const ship_bits[] = {
 // bitmap of the Missile:
 //
 //     xxx
-///
+//!
 static uint8_t const missile_bits[] = {
     0x01, 0x01, 0x01
 };
@@ -134,7 +134,7 @@ static uint8_t const missile_bits[] = {
 //     .x.
 //     xxx
 //     .x.
-///
+//!
 static uint8_t const mine1_bits[] = {
     0x02, 0x07, 0x02
 };
@@ -145,7 +145,7 @@ static uint8_t const mine1_bits[] = {
 //     .xx.
 //     .xx.
 //     x..x
-///
+//!
 static uint8_t const mine2_bits[] = {
     0x09, 0x06, 0x06, 0x09
 };
@@ -159,7 +159,7 @@ static uint8_t const mine2_bits[] = {
 //     .xx.
 //     .xx.
 //     ....
-///
+//!
 static uint8_t const mine2_missile_bits[] = {
     0x00, 0x06, 0x06, 0x00
 };
@@ -173,7 +173,7 @@ static uint8_t const mine2_missile_bits[] = {
 //     ...x...
 //     .......
 //     .......
-///
+//!
 static uint8_t const explosion0_bits[] = {
     0x00, 0x00, 0x08, 0x14, 0x08, 0x00, 0x00
 };
@@ -187,7 +187,7 @@ static uint8_t const explosion0_bits[] = {
 //     ..x.x..
 //     .......
 //     .......
-///
+//!
 static uint8_t const explosion1_bits[] = {
     0x00, 0x00, 0x14, 0x08, 0x14, 0x00, 0x00
 };
@@ -201,7 +201,7 @@ static uint8_t const explosion1_bits[] = {
 //     ..x.x..
 //     .x...x.
 //     .......
-///
+//!
 static uint8_t const explosion2_bits[] = {
     0x00, 0x22, 0x14, 0x08, 0x14, 0x22, 0x00
 };
@@ -215,7 +215,7 @@ static uint8_t const explosion2_bits[] = {
 //     ..x.x..
 //     .x.x.x.
 //     x..x..x
-///
+//!
 static uint8_t const explosion3_bits[] = {
     0x49, 0x2A, 0x14, 0x6B, 0x14, 0x2A, 0x49
 };

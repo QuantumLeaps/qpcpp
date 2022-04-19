@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"  // QP/C++ framework API
 #include "blinky.hpp" // Blinky application
 #include "bsp.hpp"    // Board Support Package interface

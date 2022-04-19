@@ -41,10 +41,10 @@ protected:
 };
 //.$enddecl${HSMs::QHsmTst} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-static QHsmTst l_hsmtst; // the only instance of the QHsmTst class
+static QHsmTst l_sm; // the only instance of the QHsmTst class
 
 // global-scope definitions -----------------------------------------
-QP::QHsm * const the_hsm = &l_hsmtst; // the opaque pointer
+QP::QHsm * const the_sm = &l_sm; // the opaque pointer
 
 //.$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //. Check for the minimum required QP version

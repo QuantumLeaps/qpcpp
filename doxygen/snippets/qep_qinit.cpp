@@ -1,21 +1,30 @@
-// initial pseudostate of the Bomb FSM ......................................
-QState Bomb::initial(Bomb * const me, void const *e) {
-    Q_REQUIRE(e != nullptr); // initialization event expected
-    me->updateState("top-INIT");
-    me->timeout_ = INIT_TIMEOUT;
-    me->defuse_ = Q_EVT_CAST(BombInitEvt)->defuse;
-    return Q_TRAN(&Bomb::setting);
+// initial pseudostate of the Blinky HSM ......................................
+Q_STATE_DEF(Blinky, initial) {
+    static_cast<void>(e); // unused parameter
+
+    // arm the time event to expire in half a second and every half second
+    m_timeEvt.armX(BSP_TICKS_PER_SEC/2U, BSP_TICKS_PER_SEC/2U);
+
+    return tran(&off);
 }
 
-// state handler function for the Calc HSM ..................................
-QState Calc::on(Calc * const me, QEvt const *e) {
+// state handler for the Blinky HSM ..................................
+Q_STATE_DEF(Blinky, off) {
+    QState status;
     switch (e->sig) {
-        . . .
-        case Q_INIT_SIG: {
-            me->updateState("on-INIT");
-            return Q_TRAN(&Calc::ready);
+        case Q_ENTRY_SIG: {
+            BSP_ledOff();
+            status = Q_RET_HANDLED;
+            break;
         }
-        . . .
+        case TIMEOUT_SIG: {
+            status = tran(&on);
+            break;
+        }
+        default: {
+            status = super(&top);
+            break;
+        }
     }
-    return Q_SUPER(&QHsm::top);
+    return status;
 }

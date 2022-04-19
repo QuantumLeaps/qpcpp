@@ -1,4 +1,4 @@
-//****************************************************************************
+//============================================================================
 // Product: "Blinky" example on MSP-EXP430F5529LP board, preemptive QK kernel
 // Last updated for version 6.3.7
 // Last updated on  2018-11-30
@@ -30,7 +30,7 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//****************************************************************************
+//============================================================================
 #include "qpcpp.hpp"
 #include "blinky.hpp"
 #include "bsp.hpp"
@@ -138,7 +138,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     WDTCTL = 0xDEAD;
 }
 
-//****************************************************************************
+//============================================================================
 // NOTE1:
 // With the preemptive QK kernel for MSP430, the idle callback QK::onIdle()
 // will execute only ONCE, if the low-power mode is not explicitly turned OFF

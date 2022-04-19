@@ -1,40 +1,34 @@
-/// @file
-/// @brief QP::QHsm implementation
-/// @ingroup qep
-/// @cond
-///***************************************************************************
-/// Last updated for version 6.9.2
-/// Last updated on  2020-12-17
-///
-///                    Q u a n t u m  L e a P s
-///                    ------------------------
-///                    Modern Embedded Software
-///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-///
-/// This program is open source software: you can redistribute it and/or
-/// modify it under the terms of the GNU General Public License as published
-/// by the Free Software Foundation, either version 3 of the License, or
-/// (at your option) any later version.
-///
-/// Alternatively, this program may be distributed and modified under the
-/// terms of Quantum Leaps commercial licenses, which expressly supersede
-/// the GNU General Public License and are specifically designed for
-/// licensees interested in retaining the proprietary status of their code.
-///
-/// This program is distributed in the hope that it will be useful,
-/// but WITHOUT ANY WARRANTY; without even the implied warranty of
-/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-/// GNU General Public License for more details.
-///
-/// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <www.gnu.org/licenses>.
-///
-/// Contact information:
-/// <www.state-machine.com/licensing>
-/// <info@state-machine.com>
-///***************************************************************************
-/// @endcond
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-23
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
+//! @file
+//! @brief QP::QHsm implementation
+//! @ingroup qep
+//! @tr{RQP103} @tr{RQP120}
 
 #define QP_IMPL             // this is QP implementation
 #include "qep_port.hpp"     // QEP port
@@ -46,6 +40,7 @@
 #endif // Q_SPY
 #include "qassert.h"        // QP embedded systems-friendly assertions
 
+// local helper macros...
 
 //! helper macro to trigger internal event in an HSM
 #define QEP_TRIG_(state_, sig_) \
@@ -71,32 +66,31 @@
     } \
 } while (false)
 
-
-namespace QP {
+// unnamed namespace for local definitions with internal linkage
+namespace {
 
 Q_DEFINE_THIS_MODULE("qep_hsm")
 
-//****************************************************************************
-//char_t const versionStr[7] = QP_VERSION_STR;
-
-//****************************************************************************
-enum : QSignal {
+//============================================================================
+enum : QP::QSignal {
     //! empty signal for internal use only
     QEP_EMPTY_SIG_ = 0U
 };
 
-//****************************************************************************
-/// @description
-/// Static, preallocated standard events that the QEP event processor sends
-/// to state handler functions of QP::QHsm and QP::QFsm subclasses to execute
-/// entry actions, exit actions, and initial transitions.
-///
-static QEvt const QEP_reservedEvt_[4] {
+//============================================================================
+//! @description
+//! Static, preallocated standard events that the QEP event processor sends
+//! to state handler functions of QP::QHsm-style state machine to execute entry
+//! actions, exit actions, and initial transitions.
+//!
+//! @tr{RQP002B}
+//!
+static QP::QEvt const QEP_reservedEvt_[4] {
 #ifdef Q_EVT_CTOR // Is the QEvt constructor provided?
-    QEvt(0U, QEvt::STATIC_EVT),
-    QEvt(1U, QEvt::STATIC_EVT),
-    QEvt(2U, QEvt::STATIC_EVT),
-    QEvt(3U, QEvt::STATIC_EVT)
+    QP::QEvt(0U, QP::QEvt::STATIC_EVT),
+    QP::QEvt(1U, QP::QEvt::STATIC_EVT),
+    QP::QEvt(2U, QP::QEvt::STATIC_EVT),
+    QP::QEvt(3U, QP::QEvt::STATIC_EVT)
 #else // QEvt is a POD (Plain Old Datatype)
     { 0U, 0U, 0U },
     { 1U, 0U, 0U },
@@ -105,41 +99,49 @@ static QEvt const QEP_reservedEvt_[4] {
 #endif
 };
 
+} // unnamed namespace
 
-//****************************************************************************
-/// @description
-/// Performs the first step of HSM initialization by assigning the initial
-/// pseudostate to the currently active state of the state machine.
-///
-/// @param[in] initial pointer to the top-most initial state-handler
-///                    function in the derived state machine
-///
+namespace QP {
+
+//============================================================================
+//char const versionStr[7] = QP_VERSION_STR;
+
+//============================================================================
+//! @description
+//! Performs the first step of HSM initialization by assigning the initial
+//! pseudostate to the currently active state of the state machine.
+//!
+//! @param[in] initial pointer to the top-most initial state-handler
+//!                    function in the derived state machine
+//!
 QHsm::QHsm(QStateHandler const initial) noexcept {
     m_state.fun = Q_STATE_CAST(&top);
     m_temp.fun  = initial;
 }
 
-//****************************************************************************
-/// @description
-/// Virtual destructor of the QHsm state machine and any of its subclasses.
-///
+//============================================================================
+//! @description
+//! Virtual destructor of the QHsm state machine and any of its subclasses.
+//!
 QHsm::~QHsm() {
 }
 
-//****************************************************************************
-/// @description
-/// Executes the top-most initial transition in a HSM.
-///
-/// @param[in] e   pointer to an extra parameter (might be NULL)
-/// @param[in] qs_id QS-id of this state machine (for QS local filter)
-///
-/// @note
-/// Must be called exactly __once__ before the QP::QHsm::dispatch().
-///
+//============================================================================
+//! @description
+//! Executes the top-most initial transition in a HSM.
+//!
+//! @param[in] e   pointer to an extra parameter (might be NULL)
+//! @param[in] qs_id QS-id of this state machine (for QS local filter)
+//!
+//! @note
+//! Must be called exactly __once__ before the QP::QHsm::dispatch().
+//!
 void QHsm::init(void const * const e, std::uint_fast8_t const qs_id) {
+    static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
+
     QStateHandler t = m_state.fun;
 
-    /// @pre ctor must have been executed and initial tran NOT taken
+    //! @pre ctor must have been executed and initial tran NOT taken
     Q_REQUIRE_ID(200, (m_temp.fun != nullptr)
                       && (t == Q_STATE_CAST(&top)));
 
@@ -165,8 +167,7 @@ void QHsm::init(void const * const e, std::uint_fast8_t const qs_id) {
         static_cast<void>(QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_));
         while (m_temp.fun != t) {
             ++ip;
-            Q_ASSERT_ID(220,
-                        ip < static_cast<std::int_fast8_t>(Q_DIM(path)));
+            Q_ASSERT_ID(220, ip < MAX_NEST_DEPTH_);
             path[ip] = m_temp.fun;
             static_cast<void>(QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_));
         }
@@ -202,49 +203,48 @@ void QHsm::init(void const * const e, std::uint_fast8_t const qs_id) {
 
     m_state.fun = t; // change the current active state
     m_temp.fun  = t; // mark the configuration as stable
-    static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
 
 //***************************************************************************/
-/// @description
-/// The QP::QHsm::top() state handler is the ultimate root of state hierarchy
-/// in all HSMs derived from QP::QHsm.
-///
-/// @param[in] me pointer to the HSM instance
-/// @param[in] e  pointer to the event to be dispatched to the HSM
-///
-/// @returns
-/// Always returns #Q_RET_IGNORED, which means that the top state ignores
-/// all events.
-///
-/// @note
-/// The arguments to this state handler are not used. They are provided for
-/// conformance with the state-handler function signature QP::QStateHandler.
-///
+//! @description
+//! The QP::QHsm::top() state handler is the ultimate root of state hierarchy
+//! in all HSMs derived from QP::QHsm.
+//!
+//! @param[in] me pointer to the HSM instance
+//! @param[in] e  pointer to the event to be dispatched to the HSM
+//!
+//! @returns
+//! Always returns #Q_RET_IGNORED, which means that the top state ignores
+//! all events.
+//!
+//! @note
+//! The arguments to this state handler are not used. They are provided for
+//! conformance with the state-handler function signature QP::QStateHandler.
+//!
 QState QHsm::top(void * const me, QEvt const * const e) noexcept {
     static_cast<void>(me); // unused parameter
     static_cast<void>(e);  // unused parameter
     return Q_RET_IGNORED; // the top state ignores all events
 }
 
-//****************************************************************************
-/// @description
-/// Dispatches an event for processing to a hierarchical state machine (HSM).
-/// The processing of an event represents one run-to-completion (RTC) step.
-///
-/// @param[in] e  pointer to the event to be dispatched to the HSM
-/// @param[in] qs_id QS-id of this state machine (for QS local filter)
-///
-/// @note
-/// This state machine must be initialized by calling QP::QHsm::init() exactly
-/// __once__ before calling QP::QHsm::dispatch().
-///
+//============================================================================
+//! @description
+//! Dispatches an event for processing to a hierarchical state machine (HSM).
+//! The processing of an event represents one run-to-completion (RTC) step.
+//!
+//! @param[in] e  pointer to the event to be dispatched to the HSM
+//! @param[in] qs_id QS-id of this state machine (for QS local filter)
+//!
+//! @note
+//! This state machine must be initialized by calling QP::QHsm::init() exactly
+//! __once__ before calling QP::QHsm::dispatch().
+//!
 void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     QStateHandler t = m_state.fun;
     QS_CRIT_STAT_
 
-    /// @pre the current state must be initialized and
-    /// the state configuration must be stable
+    //! @pre the current state must be initialized and
+    //! the state configuration must be stable
     Q_REQUIRE_ID(400, (t != nullptr)
                        && (t == m_temp.fun));
 
@@ -258,6 +258,7 @@ void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     QStateHandler s;
     QState r;
     // process the event hierarchically...
+    //! @tr{RQP120A}
     do {
         s = m_temp.fun;
         r = (*s)(this, e); // invoke state handler s
@@ -274,7 +275,8 @@ void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
         }
     } while (r == Q_RET_SUPER);
 
-    // transition taken?
+    // regular transition taken?
+    //! @tr{RQP120E}
     if (r >= Q_RET_TRAN) {
         QStateHandler path[MAX_NEST_DEPTH_];
 
@@ -283,6 +285,7 @@ void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
         path[2] = s;
 
         // exit current state to transition source s...
+        //! @tr{RQP120C}
         for (; t != s; t = m_temp.fun) {
             // exit handled?
             if (QEP_TRIG_(t, Q_EXIT_SIG) == Q_RET_HANDLED) {
@@ -389,26 +392,24 @@ void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
 
-//****************************************************************************
-/// @description
-/// helper function to execute transition sequence in a hierarchical state
-/// machine (HSM).
-///
-/// @param[in,out] path array of pointers to state-handler functions
-///                     to execute the entry actions
-/// @param[in]     qs_id QS-id of this state machine (for QS local filter)
-///
-/// @returns
-/// the depth of the entry path stored in the @p path parameter.
-////
+//============================================================================
+//! @description
+//! helper function to execute transition sequence in a hierarchical state
+//! machine (HSM).
+//!
+//! @param[in,out] path array of pointers to state-handler functions
+//!                     to execute the entry actions
+//! @param[in]     qs_id QS-id of this state machine (for QS local filter)
+//!
+//! @returns
+//! the depth of the entry path stored in the @p path parameter.
+//!/
 std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
                                 std::uint_fast8_t const qs_id)
 {
     std::int_fast8_t ip = -1; // transition entry path index
-    std::int_fast8_t iq; // helper transition entry path index
     QStateHandler t = path[0];
     QStateHandler const s = path[2];
-    QState r;
     QS_CRIT_STAT_
 
     // (a) check source==target (transition to self)
@@ -442,14 +443,13 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
                 else {
                     // (e) check rest of source==target->super->super..
                     // and store the entry path along the way
-
-                    iq = 0; // indicate that the LCA was not found
+                    std::int_fast8_t iq = 0; // indicate that LCA was found
                     ip = 1; // enter target and its superstate
                     path[1] = t; // save the superstate of target
                     t = m_temp.fun; // save source->super
 
                     // find target->super->super
-                    r = QEP_TRIG_(path[1], QEP_EMPTY_SIG_);
+                    QState r = QEP_TRIG_(path[1], QEP_EMPTY_SIG_);
                     while (r == Q_RET_SUPER) {
                         ++ip;
                         path[ip] = m_temp.fun; // store the entry path
@@ -534,35 +534,35 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
     return ip;
 }
 
-//****************************************************************************
+//============================================================================
 #ifdef Q_SPY
     QStateHandler QHsm::getStateHandler() noexcept {
         return m_state.fun;
     }
 #endif
 
-//****************************************************************************
-/// @description
-/// Tests if a state machine derived from QHsm is-in a given state.
-///
-/// @note
-/// For a HSM, to "be in a state" means also to be in a superstate of
-/// of the state.
-///
-/// @param[in] s pointer to the state-handler function to be tested
-///
-/// @returns
-/// 'true' if the HSM is in the @p state and 'false' otherwise
-///
+//============================================================================
+//! @description
+//! Tests if a state machine derived from QHsm is-in a given state.
+//!
+//! @note
+//! For a HSM, to "be in a state" means also to be in a superstate of
+//! of the state.
+//!
+//! @param[in] s pointer to the state-handler function to be tested
+//!
+//! @returns
+//! 'true' if the HSM is in the @p state and 'false' otherwise
+//!
 bool QHsm::isIn(QStateHandler const s) noexcept {
 
-    /// @pre state configuration must be stable
+    //! @pre state configuration must be stable
     Q_REQUIRE_ID(600, m_temp.fun == m_state.fun);
 
     bool inState = false;  // assume that this HSM is not in 'state'
-    QState r;
 
     // scan the state hierarchy bottom-up
+    QState r;
     do {
         // do the states match?
         if (m_temp.fun == s) {
@@ -578,32 +578,34 @@ bool QHsm::isIn(QStateHandler const s) noexcept {
     return inState; // return the status
 }
 
-//****************************************************************************
-///
-/// @description
-/// Finds the child state of the given @c parent, such that this child state
-/// is an ancestor of the currently active state. The main purpose of this
-/// function is to support **shallow history** transitions in state machines
-/// derived from QHsm.
-///
-/// @param[in] parent pointer to the state-handler function
-///
-/// @returns
-/// the child of a given @c parent state, which is an ancestor of the
-/// currently active state
-///
-/// @note
-/// this function is designed to be called during state transitions, so it
-/// does not necessarily start in a stable state configuration.
-/// However, the function establishes stable state configuration upon exit.
-///
+//============================================================================
+//!
+//! @description
+//! Finds the child state of the given @c parent, such that this child state
+//! is an ancestor of the currently active state. The main purpose of this
+//! function is to support **shallow history** transitions in state machines
+//! derived from QHsm.
+//!
+//! @param[in] parent pointer to the state-handler function
+//!
+//! @returns
+//! the child of a given @c parent state, which is an ancestor of the
+//! currently active state
+//!
+//! @note
+//! this function is designed to be called during state transitions, so it
+//! does not necessarily start in a stable state configuration.
+//! However, the function establishes stable state configuration upon exit.
+//!
+//! @tr{RQP120H}
+
 QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
     QStateHandler child = m_state.fun; // start with the current state
     bool isFound = false; // start with the child not found
-    QState r;
 
     // establish stable state configuration
     m_temp.fun = m_state.fun;
+    QState r;
     do {
         // is this the parent of the current child?
         if (m_temp.fun == parent) {
@@ -617,7 +619,7 @@ QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
     } while (r != Q_RET_IGNORED); // QHsm::top() state not reached
     m_temp.fun = m_state.fun; // establish stable state configuration
 
-    /// @post the child must be confirmed
+    //! @post the child must be confirmed
     Q_ENSURE_ID(810, isFound);
 #ifdef Q_NASSERT
     // avoid compiler warning about unused variable
@@ -628,4 +630,3 @@ QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
 }
 
 } // namespace QP
-

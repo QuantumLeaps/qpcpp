@@ -1,20 +1,20 @@
-extern QActive *AO_Table;
+extern QActive * const AO_Table;
 
-QP::QState Philo::hungry(Philo * const me, QP::QEvt const * const e) {
-    QP::QState status;
+Q_STATE_DEF(Philo, hungry) {
+    QP::QState status_;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             TableEvt *pe = Q_NEW(TableEvt, HUNGRY_SIG);
-            pe->philoNum = PHILO_ID(me);
-            AO_Table->POST(pe, me);
-            status = Q_HANDLED();
+            pe->philoNum = PHILO_ID(this);
+            AO_Table->POST(pe, this); // <----
+            status_ = Q_RET_HANDLED;
             break;
         }
         . . .
         default: {
-            status = Q_SUPER(&QHsm::top);
+            status_ = super(&top);
             break;
         }
     }
-    return status;
+    return status_;
 }
