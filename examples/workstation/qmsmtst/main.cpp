@@ -51,7 +51,7 @@ int main(int argc, char *argv[ ]) {
     QF::init();
     QF::onStartup();
 
-    Q_ALLEGE(QS_INIT(nullptr));
+    Q_ALLEGE(QS_INIT(argv));
     QS_OBJ_DICTIONARY(the_sm);
     QS_SIG_DICTIONARY(A_SIG, nullptr);
     QS_SIG_DICTIONARY(B_SIG, nullptr);

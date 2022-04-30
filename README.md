@@ -13,6 +13,30 @@ View QP/C++ Revision History at: https://www.state-machine.com/qpcpp/history.htm
 
 
 ---------------------------------------------------------------------------
+# Getting Started with QP/C++
+The most recommended way of obtaining QP/C++ is by downloading the
+[QP-bundle](https://www.state-machine.com/#Downloads), which includes QP/C++
+as well as the QM modeling tool and the QTools collection. The main advantage of
+obtaining QP/C++ bundled together like that is that you get all components,
+tools and examples ready to go.
+
+><span style="background:yellow;"><strong>NOTE:</strong></span>
+If you're interested in the latest QP/C++ version from Git,
+it is highly recommened that you download the latest
+[QP/C++ Release](https://github.com/QuantumLeaps/qpcpp/releases)
+as opposed to cloning the repo directy. This is because the `3rd_party`
+directory needed to build the examples is no longer provided in the
+`qpcpp` repository (and is provided in the QP/C++ release).
+
+### Getting Started Resources
+- [Video: "Getting Started with QP Real-Time Embedded Frameworks"][Video]
+provides instructions on how to download, install, and get started with QP.
+
+- [AppNote: "Getting Started with QP Real-Time Embedded Frameworks"][AN]
+contains also a tutorial, in which you build a simple "Blinky" application.
+
+
+---------------------------------------------------------------------------
 # Documentation
 The online HTML documention for the **latest** version of QP/C++ is located
 at: https://www.state-machine.com/qpcpp
@@ -80,15 +104,6 @@ With 60,000 downloads a year, the [QP] family is the most popular such
 solution on the embedded software market. It provides a modern, reusable
 architecture for embedded applications, which combines the active-object
 model of concurrency with hierarchical state machines.
-
----------------------------------------------------------------------------
-# Getting Started with QP/C++
-- The [Video: "Getting Started with QP Real-Time Embedded Frameworks"][Video]
-provides instructions on how to download, install, and get started with QP.
-
-- The [AppNote: "Getting Started with QP Real-Time Embedded Frameworks"][AN]
-contains also a tutorial, in which you build a simple "Blinky" application.
-
 
 ---------------------------------------------------------------------------
 # QP/C++ Licensing

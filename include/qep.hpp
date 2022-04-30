@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-04-30
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -267,7 +267,7 @@ public:
 
     //! overloaded init(qs_id)
     virtual void init(std::uint_fast8_t const qs_id) {
-        init(nullptr, qs_id);
+        init(nullptr, qs_id); // virtual call
     }
 
     //! Dispatches an event to QHsm
@@ -492,9 +492,6 @@ public:
     //! the top-most initial transition.
     void init(void const * const e,
               std::uint_fast8_t const qs_id) override;
-    void init(std::uint_fast8_t const qs_id) override {
-        init(nullptr, qs_id);
-    }
 
     //! Dispatches an event to a HSM
     void dispatch(QEvt const * const e,

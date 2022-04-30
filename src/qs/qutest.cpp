@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-02-15
+//! @date Last updated on: 2022-04-29
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -164,7 +164,7 @@ void QActiveDummy::start(std::uint_fast8_t const prio,
 
     QF::add_(this); // make QF aware of this AO
 
-    QHsm::init(par, m_prio); // take the top-most initial tran. (virtual)
+    QActiveDummy::init(par, m_prio); // take the top-most initial tran.
     //QS_FLUSH();
 }
 //............................................................................

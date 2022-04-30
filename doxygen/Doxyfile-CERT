@@ -8,21 +8,3 @@
 
 ENABLED_SECTIONS += CERT
 
-#---------------------------------------------------------------------------
-# minimal build of documentation only (delete eventually...)
-INPUT                  = main.dox \
-                         gs.dox \
-                         api.dox \
-                         modules.dox \
-                         macros.h \
-                         ../include \
-                         ../src/qf/qep_msm.cpp \
-                         ../ports/lint-plus \
-                         ../ports/lint-plus/qxk \
-                         ../../cert-pack/cert-qpcpp.dox \
-                         ../../cert-pack/srs.dox \
-                         ../../cert-pack/sas.dox \
-                         ../../cert-pack/sds.dox \
-                         ../../ql-doxygen/help.dox
-
-HAVE_DOT               = NO

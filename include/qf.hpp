@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-04-30
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -325,7 +325,6 @@ public:
     // all the following operations delegate to the QHsm class...
     void init(void const * const e,
               std::uint_fast8_t const qs_id) override;
-    void init(std::uint_fast8_t const qs_id) override;
     void dispatch(QEvt const * const e,
                   std::uint_fast8_t const qs_id) override;
 
@@ -639,9 +638,6 @@ public:
 
     void init(void const * const e,
               std::uint_fast8_t const qs_id) noexcept override;
-    void init(std::uint_fast8_t const qs_id) noexcept override {
-        this->init(qs_id);
-    }
     void dispatch(QEvt const * const e,
                   std::uint_fast8_t const qs_id) noexcept override;
 #ifndef Q_SPY

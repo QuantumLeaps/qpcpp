@@ -123,17 +123,13 @@ WARN_LOGFILE           =
 INPUT                  = modules.dox \
                          main.dox \
                          gs.dox \
-                         struct.dox \
-                         sm.dox \
                          ../../cert-pack/srs.dox \
                          ../../cert-pack/sas.dox \
                          ../../cert-pack/sds.dox \
-                         ../../cert-pack/misra.dox \
+                         ../../cert-pack/autosar.dox \
                          api.dox \
                          exa.dox \
-                         exa_apps.dox \
                          exa_native.dox \
-                         exa_low-power.dox \
                          exa_rtos.dox \
                          exa_os.dox \
                          exa_qutest.dox \
@@ -145,6 +141,8 @@ INPUT                  = modules.dox \
                          ports_os.dox \
                          metrics.dox \
                          history.dox \
+                         modules.dox \
+                         dir.dox \
                          macros.h \
                          ../include/qpc.hpp \
                          ../include/qep.hpp \
@@ -159,8 +157,6 @@ INPUT                  = modules.dox \
                          ../include/qs.hpp \
                          ../include \
                          ../src \
-                         ../ports/lint-plus \
-                         ../ports/lint-plus/qxk \
                          ../../ql-doxygen/help.dox
 
 INPUT_ENCODING         = UTF-8
@@ -175,6 +171,7 @@ FILE_PATTERNS          = *.dox \
 
 RECURSIVE              = YES
 EXCLUDE                = ../include/qs_dummy.h
+
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        = QP_IMPL
@@ -188,6 +185,7 @@ EXAMPLE_PATH           = snippets \
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = images \
+                         ../../ql-doxygen/images \
                          ../../cert-pack/images
 INPUT_FILTER           =
 FILTER_PATTERNS        =

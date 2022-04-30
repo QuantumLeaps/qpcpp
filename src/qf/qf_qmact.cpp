@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-04-30
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -68,11 +68,9 @@ void QMActive::init(void const * const e, std::uint_fast8_t const qs_id) {
     QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(e, qs_id);
 }
 //............................................................................
-void QMActive::init(std::uint_fast8_t const qs_id) {
-    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(qs_id);
-}
-//............................................................................
-void QMActive::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
+void QMActive::dispatch(QEvt const * const e,
+                          std::uint_fast8_t const qs_id)
+{
     QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::dispatch(e, qs_id);
 }
 
@@ -84,14 +82,17 @@ bool QMActive::isInState(QMState const * const st) const noexcept {
 QMState const *QMActive::childStateObj(QMState const * const parent)
     const noexcept
 {
-    return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)->QMsm::childStateObj(parent);
+    return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)
+               ->QMsm::childStateObj(parent);
 }
 
 //............................................................................
 #ifdef Q_SPY
-    QStateHandler QMActive::getStateHandler() noexcept {
-        return QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::getStateHandler();
-    }
+
+QStateHandler QMActive::getStateHandler() noexcept {
+    return QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::getStateHandler();
+}
+
 #endif
 
 } // namespace QP

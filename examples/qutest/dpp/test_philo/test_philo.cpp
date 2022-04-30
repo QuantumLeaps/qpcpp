@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
     AO_Philo[n]->start(n + 1U, // QP priority
                        philoQueueSto[n], Q_DIM(philoQueueSto[n]),
                        nullptr, 0U);
-    AO_Table->start(6U, // QP priority of the dummy
+    AO_Table->start(N_PHILO + 1U, // QP priority of the dummy
                     nullptr, 0U, nullptr, 0U);
 
     return QP::QF::run(); // run the QF application
