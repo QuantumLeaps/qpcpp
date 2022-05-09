@@ -1,6 +1,5 @@
 //! @file
 //! @brief QF/C++ port for QUIT unit internal test, Win32 with GNU/VisualC++
-//! @ingroup ports
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.2

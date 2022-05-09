@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QP::QActive services and QF support code
-//! @ingroup qf
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port

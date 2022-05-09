@@ -27,8 +27,7 @@
 //!
 //! @file
 //! @brief QP::QHsm implementation
-//! @ingroup qep
-//! @tr{RQP103} @tr{RQP120}
+//! @tr{RQP103} @tr{RQP104} @tr{RQP120} @tr{RQP130}
 
 #define QP_IMPL             // this is QP implementation
 #include "qep_port.hpp"     // QEP port
@@ -113,6 +112,7 @@ namespace QP {
 //!
 //! @param[in] initial pointer to the top-most initial state-handler
 //!                    function in the derived state machine
+//! @tr{RQP103}
 //!
 QHsm::QHsm(QStateHandler const initial) noexcept {
     m_state.fun = Q_STATE_CAST(&top);
@@ -135,6 +135,8 @@ QHsm::~QHsm() {
 //!
 //! @note
 //! Must be called exactly __once__ before the QP::QHsm::dispatch().
+//!
+//! @tr{RQP103} @tr{RQP120I} @tr{RQP120D}
 //!
 void QHsm::init(void const * const e, std::uint_fast8_t const qs_id) {
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
@@ -218,8 +220,11 @@ void QHsm::init(void const * const e, std::uint_fast8_t const qs_id) {
 //! all events.
 //!
 //! @note
-//! The arguments to this state handler are not used. They are provided for
+//! The parameters to this state handler are not used. They are provided for
 //! conformance with the state-handler function signature QP::QStateHandler.
+//!
+//!
+//! @tr{RQP103} @tr{RQP120T}
 //!
 QState QHsm::top(void * const me, QEvt const * const e) noexcept {
     static_cast<void>(me); // unused parameter
@@ -238,6 +243,9 @@ QState QHsm::top(void * const me, QEvt const * const e) noexcept {
 //! @note
 //! This state machine must be initialized by calling QP::QHsm::init() exactly
 //! __once__ before calling QP::QHsm::dispatch().
+//!
+//! @tr{RQP103}
+//! @tr{RQP120A} @tr{RQP120B} @tr{RQP120C} @tr{RQP120D} @tr{RQP120E}
 //!
 void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     QStateHandler t = m_state.fun;
@@ -313,7 +321,8 @@ void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
         }
 #endif // Q_SPY
 
-        // retrace the entry path in reverse (desired) order...
+        // execute state entry actions in the desired order...
+        //! @tr{RQP120B}
         for (; ip >= 0; --ip) {
             QEP_ENTER_(path[ip]); // enter path[ip]
         }
@@ -321,6 +330,7 @@ void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
         m_temp.fun = t; // update the next state
 
         // drill into the target hierarchy...
+        //! @tr{RQP120I}
         while (QEP_TRIG_(t, Q_INIT_SIG) == Q_RET_TRAN) {
 
             QS_BEGIN_PRE_(QS_QEP_STATE_INIT, qs_id)
@@ -403,7 +413,10 @@ void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
 //!
 //! @returns
 //! the depth of the entry path stored in the @p path parameter.
-//!/
+//!
+//! @tr{RQP103}
+//! @tr{RQP120E} @tr{RQP120F}
+//!
 std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
                                 std::uint_fast8_t const qs_id)
 {
@@ -554,6 +567,9 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
 //! @returns
 //! 'true' if the HSM is in the @p state and 'false' otherwise
 //!
+//! @tr{RQP103}
+//! @tr{RQP120S}
+//!
 bool QHsm::isIn(QStateHandler const s) noexcept {
 
     //! @pre state configuration must be stable
@@ -597,8 +613,9 @@ bool QHsm::isIn(QStateHandler const s) noexcept {
 //! does not necessarily start in a stable state configuration.
 //! However, the function establishes stable state configuration upon exit.
 //!
+//! @tr{RQP103}
 //! @tr{RQP120H}
-
+//!
 QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
     QStateHandler child = m_state.fun; // start with the current state
     bool isFound = false; // start with the child not found
@@ -630,3 +647,4 @@ QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
 }
 
 } // namespace QP
+

@@ -1,6 +1,5 @@
 //! @file
 //! @brief QF/C++ port for QUTEST Unit Test, ARM Cortex-M with GNU or Visual C++
-//! @ingroup qutest
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.1

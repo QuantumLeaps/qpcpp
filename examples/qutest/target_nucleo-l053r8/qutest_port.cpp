@@ -1,6 +1,5 @@
 //! @file
 //! @brief QUTEST port for NUCLEO-L053R8 board
-//! @ingroup qs
 //! @cond
 //============================================================================
 //! Last updated for: @qpcpp_7_0_0

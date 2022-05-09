@@ -1,7 +1,6 @@
 /**
 * @file
 * @brief "safe" <stdio.h> and <string.h> facilities
-* @ingroup qpspy
 * @cond
 ******************************************************************************
 * Last updated for version 6.9.0

@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QXK/C++ extended (blocking) thread
-//! @ingroup qxk
 
 #ifndef QXTHREAD_HPP
 #define QXTHREAD_HPP

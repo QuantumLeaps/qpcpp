@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QXK/C++ preemptive kernel extended (blocking) thread implementation
-//! @ingroup qxk
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port

@@ -1,6 +1,5 @@
 //! @file
 //! @brief QUTEST port for POSIX
-//! @ingroup ports
 //! @cond
 //============================================================================
 //! Last updated for: @ref qpcpp_7_0_0

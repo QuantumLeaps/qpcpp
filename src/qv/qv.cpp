@@ -28,7 +28,6 @@
 //! @file
 //! @brief Cooperative QV kernel, definition of QP::QV_readySet_ and
 //! implementation of kernel-specific functions.
-//! @ingroup qv
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port

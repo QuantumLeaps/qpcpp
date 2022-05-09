@@ -1,6 +1,5 @@
 //! @file
 //! @brief QF/C++ port to FreeRTOS 10.x, ARM Cortex-M, IAR-ARM toolset
-//! @ingroup ports
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.1

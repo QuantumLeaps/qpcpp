@@ -30,7 +30,6 @@
 //! @description
 //! This header file must be included directly or indirectly
 //! in all application modules (*.cpp files) that use QP/C++.
-//! @ingroup qp
 
 #ifndef qpcpp_h
 #define qpcpp_h

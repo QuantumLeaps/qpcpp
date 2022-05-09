@@ -26,7 +26,6 @@
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
-//! @ingroup qxk
 //! @brief QXK/C++ port example, Generic C++ compiler
 //! @description
 //! This is an example QP/C++ port with the documentation for the main

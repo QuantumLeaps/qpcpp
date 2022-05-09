@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QS software tracing services
-//! @ingroup qs
 
 #define QP_IMPL           // this is QP implementation
 #include "qs_port.hpp"    // QS port

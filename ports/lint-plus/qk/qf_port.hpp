@@ -1,6 +1,5 @@
 //! @file
 //! @brief QF/C++ port for QK kernel, Generic C++ compiler
-//! @ingroup qk
 //! @cond
 //============================================================================
 //! Last updated for version 6.8.2

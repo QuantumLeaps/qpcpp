@@ -1,6 +1,5 @@
 //! @file
 //! @brief QUTEST port for the EK-TM4C123GXL board
-//! @ingroup qs
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.2a

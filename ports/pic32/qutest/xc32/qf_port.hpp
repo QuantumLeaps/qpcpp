@@ -1,6 +1,5 @@
 //! @file
 //! @brief QF/C++ port for QUTEST Unit Test, PIC32
-//! @ingroup qutest
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.1

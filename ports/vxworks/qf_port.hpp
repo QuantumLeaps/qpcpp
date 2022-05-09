@@ -1,6 +1,5 @@
 //! @file
 //! @brief QF/C++ port to VxWorks API
-//! @ingroup ports
 //! @cond
 //============================================================================
 //! Last updated for version 6.6.0

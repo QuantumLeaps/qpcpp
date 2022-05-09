@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief Internal (package scope) QS/C++ interface.
-//! @ingroup qs
 
 #ifndef QS_PKG_HPP
 #define QS_PKG_HPP

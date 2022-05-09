@@ -26,7 +26,6 @@
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
-//! @ingroup qf
 //! @brief QF/C++ port example, Generic C++11 compiler
 //! @description
 //! This is an example QP/C++ port with the documentation for the main

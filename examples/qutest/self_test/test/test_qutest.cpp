@@ -1,6 +1,5 @@
 //! @file
 //! @brief Fixture for QUTEST self-test
-//! @ingroup qs
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.3

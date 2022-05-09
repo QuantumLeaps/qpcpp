@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QK/C++ platform-independent public interface.
-//! @ingroup qk
 
 #ifndef QK_HPP
 #define QK_HPP

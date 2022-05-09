@@ -1,6 +1,5 @@
 //! @file
 //! @brief QF/C++ port to Win32 API (multi-threaded)
-//! @ingroup qf
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.1

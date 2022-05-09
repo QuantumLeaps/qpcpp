@@ -1,6 +1,5 @@
 //! @file
 //! @brief QS/C++ port to Win32 API
-//! @ingroup ports
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.3

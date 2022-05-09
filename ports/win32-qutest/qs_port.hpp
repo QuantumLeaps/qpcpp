@@ -1,6 +1,5 @@
 //! @file
 //! @brief QS/C++ port to QUTEST, Win32 API
-//! @ingroup qf
 //! @cond
 //============================================================================
 //! Last updated for version 6.6.0

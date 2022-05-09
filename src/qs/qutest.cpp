@@ -22,12 +22,11 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-04-29
+//! @date Last updated on: 2022-05-02
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
 //! @brief QF/C++ stub for QUTEST unit testing
-//! @ingroup qs
 
 // only build when Q_UTEST is defined
 #ifdef Q_UTEST
@@ -131,6 +130,10 @@ void QHsmDummy::init(void const * const e,
     QS_END_PRE_()
 }
 //............................................................................
+void QHsmDummy::init(std::uint_fast8_t const qs_id) noexcept {
+    QHsmDummy::init(nullptr, qs_id);
+}
+//............................................................................
 void QHsmDummy::dispatch(QEvt const * const e,
                          std::uint_fast8_t const qs_id) noexcept
 {
@@ -180,6 +183,10 @@ void QActiveDummy::init(void const * const e,
         QS_FUN_PRE_(m_state.fun); // the source state
         QS_FUN_PRE_(m_temp.fun);  // the target of the initial transition
     QS_END_PRE_()
+}
+//............................................................................
+void QActiveDummy::init(std::uint_fast8_t const qs_id) noexcept {
+    QActiveDummy::init(nullptr, qs_id);
 }
 //............................................................................
 void QActiveDummy::dispatch(QEvt const * const e,

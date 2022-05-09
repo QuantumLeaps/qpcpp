@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief Priority-ceiling blocking mutex QP::QXMutex class definition
-//! @ingroup qxk
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port

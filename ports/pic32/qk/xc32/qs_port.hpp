@@ -1,6 +1,5 @@
 //! @file
 //! @brief QS/C++ port to 32-bit CPU, generic C++ compiler
-//! @ingroup qep
 //! @cond
 //============================================================================
 //! Last updated for version 6.6.0

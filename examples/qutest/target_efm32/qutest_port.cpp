@@ -1,6 +1,5 @@
 //! @file
 //! @brief QUTEST port for the EFM32-SLSTK3401A board
-//! @ingroup qs
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.2a

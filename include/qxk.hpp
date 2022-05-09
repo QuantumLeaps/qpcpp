@@ -28,7 +28,6 @@
 //! @file
 //! @brief QXK/C++ preemptive extended (blocking) kernel, platform-independent
 //! public interface.
-//! @ingroup qxk
 
 #ifndef QXK_HPP
 #define QXK_HPP

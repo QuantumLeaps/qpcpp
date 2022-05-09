@@ -1,6 +1,5 @@
 //! @file
 //! @brief QUTEST port for Win32
-//! @ingroup ports
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.3

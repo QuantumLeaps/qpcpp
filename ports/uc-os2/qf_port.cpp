@@ -76,7 +76,7 @@ void QActive::start(std::uint_fast8_t const prio,
                     void const * const par)
 {
     // task name to be passed to OSTaskCreateExt()
-    void *task_name = static_cast<void *>(m_eQueue);
+    void * const task_name = static_cast<void *>(m_eQueue);
 
     // create uC-OS2 queue and make sure it was created correctly
     m_eQueue = OSQCreate((void **)qSto, qLen);
@@ -89,7 +89,7 @@ void QActive::start(std::uint_fast8_t const prio,
     QS_FLUSH();     // flush the trace buffer to the host
 
     // map from QP to uC-OS2 priority
-    INT8U p_ucos = static_cast<INT8U>(QF_MAX_ACTIVE - m_prio);
+    INT8U const p_ucos = static_cast<INT8U>(QF_MAX_ACTIVE - m_prio);
 
     // create AO's task...
     //
@@ -98,7 +98,7 @@ void QActive::start(std::uint_fast8_t const prio,
     // stack memory. This is correct only for CPUs with downward-growing
     // stack, but must be changed for CPUs with upward-growing stack
     //
-    INT8U err = OSTaskCreateExt(
+    INT8U const err = OSTaskCreateExt(
         &task_function, // the task function
         this,     // the 'pdata' parameter
 #if OS_STK_GROWTH
@@ -165,15 +165,14 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
 #endif
 {
-    bool status;
-    std::uint_fast16_t nFree;
     QF_CRIT_STAT_
 
     QF_CRIT_E_();
-    nFree = static_cast<std::uint_fast16_t>(
+    std::uint_fast16_t const nFree = static_cast<std::uint_fast16_t>(
         reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSQSize
          - reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSNMsgs);
 
+    bool status;
     if (margin == QF_NO_MARGIN) {
         if (nFree > 0U) {
             status = true; // can post
@@ -258,12 +257,11 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
 //............................................................................
 QEvt const *QActive::get_(void) noexcept {
     INT8U err;
-    QS_CRIT_STAT_
-
     QEvt const *e = static_cast<QEvt const *>(
         OSQPend(static_cast<OS_EVENT *>(m_eQueue), 0U, &err));
     Q_ASSERT_ID(910, err == OS_ERR_NONE);
 
+    QS_CRIT_STAT_
     QS_BEGIN_PRE_(QS_QF_ACTIVE_GET, m_prio)
         QS_TIME_PRE_();       // timestamp
         QS_SIG_PRE_(e->sig);  // the signal of this event

@@ -28,7 +28,6 @@
 //! @file
 //! @brief Dummy definitions of the QS macros that avoid code generation from
 //! the QS instrumentation.
-//! @ingroup qs qpspy
 
 #ifndef QS_DUMMY_HPP
 #define QS_DUMMY_HPP

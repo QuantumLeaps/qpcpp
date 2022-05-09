@@ -68,6 +68,11 @@ void QMActive::init(void const * const e, std::uint_fast8_t const qs_id) {
     QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(e, qs_id);
 }
 //............................................................................
+void QMActive::init(std::uint_fast8_t const qs_id) {
+    m_state.obj = &QMsm::msm_top_s;
+    QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(qs_id);
+}
+//............................................................................
 void QMActive::dispatch(QEvt const * const e,
                           std::uint_fast8_t const qs_id)
 {

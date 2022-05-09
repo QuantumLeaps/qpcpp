@@ -1,6 +1,5 @@
 //! @file
 //! @brief QF/C++ port to PIC32, preemptive QK kernel, XC32 toolchain
-//! @ingroup qep
 //! @cond
 //============================================================================
 //! Last updated for version 6.8.0

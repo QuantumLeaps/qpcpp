@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief platform-independent memory pool QP::QMPool interface.
-//! @ingroup qf
 
 #ifndef QMPOOL_HPP
 #define QMPOOL_HPP

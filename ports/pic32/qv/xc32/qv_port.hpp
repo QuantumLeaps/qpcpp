@@ -1,6 +1,5 @@
 //! @file
 //! @brief QV/C++ port to PIC32, cooperative QV kernel, XC32 toolchain
-//! @ingroup qep
 //! @cond
 //============================================================================
 //! Last updated for version 6.6.0

@@ -27,15 +27,11 @@
 //!
 //! @file
 //! @brief QEP/C++ platform-independent public interface.
-//! @ingroup qep
 //!
 #ifndef QEP_HPP
 #define QEP_HPP
 
 //============================================================================
-//! @addtogroup qp
-//! @{
-
 //! The current QP version as a decimal constant XXYZ, where XX is a 2-digit
 //! major version number, Y is a 1-digit minor version number, and Z is
 //! a 1-digit release number.
@@ -46,7 +42,7 @@
 //! and Z is a 1-digit release number.
 #define QP_VERSION_STR  "7.0.0"
 
-//! Encrypted  current QP release (7.0.0) and date (2022-01-31) */
+//! Encrypted  current QP release (7.0.0) and date (2022-01-31)
 #define QP_RELEASE      0x7CCAAA13U
 
 //============================================================================
@@ -87,8 +83,6 @@ using float32_t = float;
 //!
 using float64_t = double;
 
-//! @}
-
 //============================================================================
 //! Perform downcast of an event onto a subclass of QEvt @p class_
 //! @description
@@ -116,7 +110,6 @@ using float64_t = double;
 
 //============================================================================
 //! namespace associated with the QP/C++ framework
-//! @ingroup qep qf qs qv qk qxk
 namespace QP {
 
     //! the current QP version number string based on QP_VERSION_STR
@@ -267,7 +260,7 @@ public:
 
     //! overloaded init(qs_id)
     virtual void init(std::uint_fast8_t const qs_id) {
-        init(nullptr, qs_id); // virtual call
+        init(nullptr, qs_id);
     }
 
     //! Dispatches an event to QHsm
@@ -492,6 +485,9 @@ public:
     //! the top-most initial transition.
     void init(void const * const e,
               std::uint_fast8_t const qs_id) override;
+
+    //! overloaded init(qs_id)
+    void init(std::uint_fast8_t const qs_id) override;
 
     //! Dispatches an event to a HSM
     void dispatch(QEvt const * const e,

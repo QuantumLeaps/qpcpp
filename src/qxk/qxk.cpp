@@ -28,7 +28,6 @@
 //! @file
 //! @brief QXK/C++ preemptive kernel core functions
 //! public interface.
-//! @ingroup qxk
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port

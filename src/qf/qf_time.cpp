@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QF/C++ time events and time management services
-//! @ingroup qf
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port

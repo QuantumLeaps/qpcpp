@@ -3,14 +3,39 @@ namespace QP {
 /** @page history Revision History
 
 @section qpcpp_7_0_0 Version 7.0.0, 2022-04-30
+This major focus of this release is the adaptation of the code and documentation to better support safety certification (see [QP Certification Pack](https://www.state-machine.com/products/qp#CERT))
 
+__Modified QP/C++ source code:__
+- updated QP/C++ source code for AUTOSAR:C++14
+- made the compliant with the updated [Quantum Leaps Embedded C/C++ Coding Style (QL-C/C++:2022)](https://github.com/QuantumLeaps/embedded-coding-style)
+- added traceability links between QP/C++ source code and requirements, architecture, design, and MISRA deviation permits.
+- modified the top-level file comments now have standard-compliant license specification (SPDX-License-Identifiers). This allows QP/C++ to be included in automatic generation of Software Bill Of Materials (SBOM).
+
+__Modified QP/C++ ports:__
+- modified the QK and QXK ports to ARM Cortex-M to allow compile-time selection between using either NMI or an unused IRQ (via macro QK_USE_IRQ_HANDLER) as a mechanism to return to the thread mode
 - removed unused `ARM_ARCH` symbol from Makefiles for GNU-ARM
-- restructured the Doxygen documentation
-  + introudced new styling for the HTML documentation
-  + updated links in the documentation
+- fixed the following bugs in QXK port to ARM Cortex-M
+  + [bug#305 Floating-point context corruption in QXK](https://sourceforge.net/p/qpc/bugs/305)
+  + [bug#306 QXK_ON_CONTEXT_SW option is not compatible with soft-float](https://sourceforge.net/p/qpc/bugs/306)
+
+__Modified GitHub repository:__
+- removed the `3rd_party` directory from the [qpcpp GitHub repository](https://github.com/QuantumLeaps/qpcpp) to avoid tracking changes caused by updates to the 3rd-party components. (The QP/C++ releases still have the `3rd_party` directory, because it is needed for building the examples).
+
+__Added/Modified examples:__
+- modified examples for ARM Cortex-M7 (to integrate better with STM32CubeH7)
+- added examples for ARM Cortex-M33 (for STM32 NUCLEO-L552ZE and STM32CubeL5)
+- added `qutest` examples for Unity (comparison between Unity and QUTest)
+
+__Modified QP/C++ documentation:__
+- restructured the Doxygen documentation for traceability
+- added the @ref gs_tut "QP/C++ Tutorial"
+- added the @ref srs "QP Certification Pack"
+
+@remark
+The [QP Certification Pack](https://www.state-machine.com/products/qp#CERT) is still work in progress in this release, but the remaining work is limited to documentation only and no code restructuring is anticipated for that.
+
 
 @section qpcpp_6_9_3 Version 6.9.3, 2021-04-12
-
 __Feature Requests:__
 - [feature#191 "Add QS local filtering to QF_PUBLISH()"](https://sourceforge.net/p/qpc/feature-requests/191/)
 
@@ -91,7 +116,7 @@ __Modified QP/C++ ports:__
 - `qpcpp/ports/embos/` - added missing `noexcept` specifiers
 - `qpcpp/ports/freertos/` - added missing `noexcept` specifiers
 - `qpcpp/ports/threadx/` - added missing `noexcept` specifiers
-- `qpcpp/ports/ucos-ii/` - added missing `noexcept` specifiers
+- `qpcpp/ports/uc-os2/` - added missing `noexcept` specifiers
 - `qpcpp/ports/qt/` - added missing `noexcept` specifiers
 
 
@@ -259,14 +284,14 @@ __Source code changes:__
 
 __Updated Ports:__
   + enabled #QF_ACTIVE_STOP in the ports: Win32, Win32-QV, Win32-QUTEST, POSIX, POSIX-QV, and POSIX-QUTEST.
-  + @ref ucos-ii "port to uC/OS-II" has been adapted to the new uC/OS-II v2.93.00 (recently released by Silicon Labs under the open source Apache 2.0 license).
+  + @ref uc-os2 "port to uC/OS-II" has been adapted to the new uC/OS-II v2.93.00 (recently released by Silicon Labs under the open source Apache 2.0 license).
 
 
 __Updated Examples:__
 
   + Modidfied `Makefile`s for the workstation examples to add the `-no-pie` linker option only when `GCC_OLD` environment variable is NOT defined. This is to accommodates older POSIX platforms with older GCC distribution.
   + Modified all ARM-KEIL uVision projects for ARM-CLANG to use the startup code in the ARM-ASM syntax.
-  + New uC/OS-II example @ref ucos-ii_dpp_nucleo-l053r8 (Cortex-M0+)
+  + New uC/OS-II example @ref uc-os2_dpp_nucleo-l053r8 (Cortex-M0+)
   + Removed uC/OS-II example for the STM32-NUCLEO-L152RE (Cortex-M3)
   + Added QM model files: `workstation/defer/defer.qm` and `workstation/reminder2/reminder2.qm`
 
@@ -639,7 +664,7 @@ Additionally, this release modifies all IAR-ARM example projects by adding compi
 
 Additionally, this release fixes some problems with the native examples for STM32F4 and STM32F7 boards.
 
-Additionally, this release adds a generic function QP::QActive::setAttr() to set thread attributes in various QP ports to 3rd-party RTOSes. This function is then used in the @ref embos "embOS port" and the @ref ucos-ii "uC/OS-II port".
+Additionally, this release adds a generic function QP::QActive::setAttr() to set thread attributes in various QP ports to 3rd-party RTOSes. This function is then used in the @ref embos "embOS port" and the @ref uc-os2 "uC/OS-II port".
 
 Finally, this release fixes the following bug in the @ref threadx "ThreadX port":
 
@@ -1439,7 +1464,7 @@ Changes in detail:
 
 11. Added @ref threadx "port to Thread-X". Example is available for the Thread-X demo with Visual Studio on Windows.
 
-12. Updated port to @ref ucos-ii "uC/OS-II" for the latest version v2.92. Examples are available for TI EK-TM4C123GLX and STM32 NUCLEO-L152RE boards with ARM-KEIL and IAR-ARM toolsets.
+12. Updated port to @ref uc-os2 "uC/OS-II" for the latest version v2.92. Examples are available for TI EK-TM4C123GLX and STM32 NUCLEO-L152RE boards with ARM-KEIL and IAR-ARM toolsets.
 
 13. Updated @ref win32 "port to Win32" (Windows). Modified the port to apply a generous "fudge factor" in over-sizing QP event queues and event pools, to minimize the risk of overflowing queues/pools due to non-deterministic Windows behavior.
 

@@ -32,7 +32,6 @@
 //! this source file is only included in the QF library when the native
 //! QF active object queue is used (instead of a message queue of an RTOS).
 //!
-//! @ingroup qf
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -411,6 +410,10 @@ void QTicker::dispatch(QEvt const * const e,
     for (; nTicks > 0U; --nTicks) {
         QF::TICK_X(static_cast<std::uint_fast8_t>(m_eQueue.m_head), this);
     }
+}
+//............................................................................
+void QTicker::init(std::uint_fast8_t const qs_id) noexcept {
+    QTicker::init(nullptr, qs_id);
 }
 //............................................................................
 #ifdef Q_SPY

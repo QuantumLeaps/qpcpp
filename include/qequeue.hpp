@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief platform-independent fast "raw" thread-safe event queue interface
-//! @ingroup qf
 
 #ifndef QEQUEUE_HPP
 #define QEQUEUE_HPP

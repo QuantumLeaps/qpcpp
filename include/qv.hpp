@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QV/C++ platform-independent public interface.
-//! @ingroup qv
 
 #ifndef QV_HPP
 #define QV_HPP

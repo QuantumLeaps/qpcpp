@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QS floating point output implementation
-//! @ingroup qs
 
 #define QP_IMPL           // this is QF/QK implementation
 #include "qs_port.hpp"    // QS port

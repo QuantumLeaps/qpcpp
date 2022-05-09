@@ -1,5 +1,4 @@
 //! @file
-//! @ingroup qf
 //! @brief Internal (package scope) QF/C++ interface.
 //! @cond
 //============================================================================

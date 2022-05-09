@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QS/C++ platform-independent public interface.
-//! @ingroup qs
 
 #ifndef QS_HPP
 #define QS_HPP
@@ -565,6 +564,7 @@ public:
 
     void init(void const * const e,
               std::uint_fast8_t const qs_id) noexcept override;
+    void init(std::uint_fast8_t const qs_id) noexcept override;
     void dispatch(QEvt const * const e,
                   std::uint_fast8_t const qs_id) noexcept override;
 };
@@ -593,6 +593,7 @@ public:
 
     void init(void const * const e,
               std::uint_fast8_t const qs_id) noexcept override;
+    void init(std::uint_fast8_t const qs_id) noexcept override;
     void dispatch(QEvt const * const e,
                   std::uint_fast8_t const qs_id) noexcept override;
     bool post_(QEvt const * const e,
@@ -959,9 +960,9 @@ extern std::uint8_t volatile QF_intNest;
 //! the QS log, because instead of dealing with cryptic machine addresses the
 //! QSpy host utility can display human-readable object names.
 //!
-//! The following example shows the definition of object dictionary entry
-//! for the Table active object:
-//! @include qs_objDic.cpp
+//! The following example shows the definition of object array dictionary
+//! for `Philo::inst[n]` and `Philo::inst[n].m_timeEvt`:
+//! @include qs_objObjDic.cpp
 #define QS_OBJ_ARR_DICTIONARY(obj_, idx_) \
     (QP::QS::obj_arr_dict_pre_((obj_), (idx_), #obj_))
 

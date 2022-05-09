@@ -1,4 +1,4 @@
-# Native QP/C++ Ports to ARM Cortex-M
+# Native QP/C Ports to ARM Cortex-M
 
 ## Supported ARM Cortex-M Architectures:
 
@@ -6,7 +6,7 @@
 - ARMv7-M (**ARM Cortex-M3/M4/M7**)
 - ARMv8-M (**ARM Cortex-M23/M33**)
 
-## Supported QP/C++ Kernels and Toolchains:
+## Supported QP/C Kernels and Toolchains:
 - [Cooperative QV kernel](https://www.state-machine.com/qpcpp/group__qv.html)
   + ARM/KEIL MDK, ARM Compiler 6 (ARM-CLANG)
   + IAR-ARM
@@ -22,6 +22,6 @@
 
 ## Documentation:
 
-Detailed documentation for these ports is available in the QP/C++ Manual at:
+Detailed documentation for these ports is available in the QP/C Manual at:
 
 - https://www.state-machine.com/qpcpp/arm-cm.html

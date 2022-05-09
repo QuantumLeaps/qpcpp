@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief platform-independent priority sets of 8 or 64 elements.
-//! @ingroup qf
 
 #ifndef QPSET_HPP
 #define QPSET_HPP

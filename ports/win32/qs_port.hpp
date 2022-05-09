@@ -1,6 +1,5 @@
 //! @file
 //! @brief QS/C++ port to Win32 with GNU or Visual C++ compilers
-//! @ingroup qf
 //! @cond
 //============================================================================
 //! Last updated for version 6.6.0

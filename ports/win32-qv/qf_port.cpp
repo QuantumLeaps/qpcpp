@@ -1,6 +1,5 @@
 //! @file
 //! @brief QF/C++ port to Win32 API (single-threaded, like the QV kernel)
-//! @ingroup ports
 //! @cond
 //============================================================================
 //! Last updated for version 6.9.1

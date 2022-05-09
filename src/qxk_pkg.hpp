@@ -1,6 +1,5 @@
 //! @file
 //! @brief Internal (package scope) QXK/C++ interface.
-//! @ingroup qxk
 //! @cond
 //============================================================================
 //! Last updated for version 6.8.0

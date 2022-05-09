@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QP::QMsm implementation
-//! @ingroup qep
 
 #define QP_IMPL             // this is QP implementation
 #include "qep_port.hpp"     // QEP port
@@ -125,6 +124,20 @@ void QMsm::init(void const * const e, std::uint_fast8_t const qs_id) {
     QS_END_PRE_()
 
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
+}
+
+//============================================================================
+//! @description
+//! Executes the top-most initial transition in a MSM (overloaded).
+//!
+//! @param[in]     qs_id QS-id of this state machine (for QS local filter)
+//!
+//! @attention
+//! QP::QMsm::init() must be called exactly __once__ before
+//! QP::QMsm::dispatch()
+//!
+void QMsm::init(std::uint_fast8_t const qs_id) {
+    QMsm::init(nullptr, qs_id);
 }
 
 //============================================================================

@@ -1,8 +1,8 @@
 @namespace QP {
 
 /*! @page api API Reference
-
 @tableofcontents
+@nav_next{deprecated}
 
 @section api_qep QEP (Hierarchical State Machines)
 QEP is a universal, UML-compliant event processor that enables developers to code UML state machines in highly readable ANSI-C, in which every state machine element is mapped to code precisely, unambiguously, and exactly once (traceability). QEP fully supports hierarchical state nesting, which is the fundamental mechanism for reusing behavior across many states instead of repeating the same actions and transitions over and over again.
@@ -21,7 +21,6 @@ QEP is a universal, UML-compliant event processor that enables developers to cod
 - QMsm::isInState()
 - QMsm::stateObj()
 - Q_STATE_CAST()
-- Q_EVT_CAST()
 
 
 @section api_qf QF (Active Object Framework)
@@ -52,13 +51,14 @@ QF is a portable, event-driven, real-time framework for execution of active obje
 - QActive::unsubscribeAll()
 
 
-@subsection api_qf_evt Dynamic Events
+@subsection api_qf_evt Event Management
 - QEvt class
 - Q_NEW()
 - Q_NEW_X()
 - Q_NEW_REF()
 - Q_DELETE_REF()
 - QF::gc()
+- Q_EVT_CAST()
 
 
 @subsection api_qf_time Time Events
@@ -92,7 +92,6 @@ QF is a portable, event-driven, real-time framework for execution of active obje
 - QMPool::put()
 
 
-
 @section api_qs QS ("Quantum Spy" Software Tracing)
 QS is a software tracing system that enables developers to monitor live event-driven QP applications with minimal target system resources and without stopping or significantly slowing down the code. QS is an ideal tool for testing, troubleshooting, and optimizing QP applications. QS can even be used to support acceptance testing in product manufacturing.
 
@@ -116,26 +115,22 @@ QS is a software tracing system that enables developers to monitor live event-dr
 
 
 @subsection api_qs_filter QS Filters
-- QS_FILTER_ON()
-- QS_FILTER_OFF()
-- QS_FILTER_SM_OBJ()
-- QS_FILTER_AO_OBJ()
-- QS_FILTER_MP_OBJ()
-- QS_FILTER_EQ_OBJ()
-- QS_FILTER_TE_OBJ()
+- QS_GLB_FILTER()
+- QS_LOC_FILTER()
 - QS_FILTER_AP_OBJ()
 
 
 @subsection api_qs_dict QS Dictionaries
 - QS_SIG_DICTIONARY()
 - QS_OBJ_DICTIONARY()
+- QS_OBJ_ARR_DICTIONARY()
 - QS_FUN_DICTIONARY()
 - QS_USR_DICTIONARY()
 
 
 @subsection api_qs_user QS Application-Specific Records
 - ::QS_USER enumeration
-- QS_BEGIN()
+- QS_BEGIN_ID()
 - QS_END()
 - QS_U8() / QS_I8()
 - QS_U16() / QS_I16()
@@ -143,7 +138,6 @@ QS is a software tracing system that enables developers to monitor live event-dr
 - QS_U32_HEX()
 - QS_STR()
 - QS_MEM()
-
 
 
 @section api_qv QV (Cooperative Kernel)
@@ -163,13 +157,10 @@ Given the simplicity, portability, and low-resource consumption, the QV schedule
 - <a href="qv_8c.html#a779a1bc9482e2d489dc87751cd100fdb"><b>QF_run()</b></a>
 - QV::onIdle()
 - QV_CPU_SLEEP()
-- QV::getVersion()
-
 
 
 @section api_qk QK (Preemptive Run-to-Completion Kernel)
 QK is a tiny **preemptive**, priority-based, non-blocking kernel designed specifically for executing active objects. QK runs active objects in the same way as prioritized interrupt controller (such as NVIC in ARM Cortex-M) runs interrupts using the single stack. Active objects process their events in run-to-completion (RTC) fashion and remove themselves from the call stack, the same way as nested interrupts remove themselves from the stack upon completion. At the same time high-priority active objects can preempt lower-priority active objects, just like interrupts can preempt each other under a prioritized interrupt controller. QK meets all the requirement of the Rate Monotonic Scheduling (a.k.a. Rate Monotonic Analysis RMA) and can be used in hard real-time systems.
-
 
 
 @subsection api_qk_ctrl Kernel Initialization and Control
@@ -178,8 +169,6 @@ QK is a tiny **preemptive**, priority-based, non-blocking kernel designed specif
 - QK::onIdle()
 - QK::schedLock()
 - QK::schedUnlock()
-- QK::getVersion()
-
 
 
 @subsection api_qk_isr Interrupt Management
@@ -187,10 +176,8 @@ QK is a tiny **preemptive**, priority-based, non-blocking kernel designed specif
 - QK_ISR_EXIT()
 
 
-
 @section api_qxk QXK (Preemptive Dual-Mode Run-to-Completion/Blocking RTOS Kernel)
 QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that executes active objects like the @ref qk "QK kernel", but can also execute traditional __blocking__ threads (extended threads). In this respect, QXK behaves exactly as a conventional __RTOS__ (Real-Time Operating System). QXK has been designed specifically for mixing event-driven active objects with traditional blocking code, such as commercial middleware (TCP/IP stacks, UDP stacks, embedded file systems, etc.) or legacy software.
-
 
 
 @subsection api_qxk_ctrl Kernel Initialization and Control
@@ -199,14 +186,11 @@ QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that e
 - QXK::onIdle()
 - QXK::schedLock()
 - QXK::schedUnlock()
-- QXK::getVersion()
-
 
 
 @subsection api_qxk_isr Interrupt Management
 - QXK_ISR_ENTRY()
 - QXK_ISR_EXIT()
-
 
 
 @subsection api_qxk_xthr Extended Thread Management
@@ -217,7 +201,8 @@ QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that e
 - QXThread::delayCancel()
 - QXThread::queueGet()
 - Q_XTHREAD_CAST()
-
+- QXK_current()
+- QXK_TLS()
 
 
 @subsection api_qxk_sema Semaphores
@@ -228,7 +213,6 @@ QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that e
 - QXSemaphore::signal()
 
 
-
 @subsection api_qxk_mutex Mutexes
 - QXMutex class (Mutex Control Block)
 - QXMutex::init()
@@ -237,12 +221,10 @@ QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that e
 - QXMutex::unlock()
 
 
-
 @subsection api_qxk_queue Message Queues
 - %QXThread:: POST()
 - %QXThread:: POST_X()
 - QXThread::queueGet() - waiting (blocking) on message queue
-
 
 
 @subsection api_qxk_mem Memory Pools
@@ -251,19 +233,8 @@ QXK is a small, preemptive, priority-based, dual-mode **blocking** kernel that e
 - QMPool::get()
 - QMPool::put()
 
-
-
-@subsection api_qxk_tls Thread-Local Storage
-- QXK_current()
-- QXK_TLS()
-
-
-@section api_dep Deprecated APIs
-
-See also the list of @subpage deprecated "deprecated QP/C++ APIs".
-
-
-@next{deprecated}
+<br>
+@nav_next{deprecated}
 */
 /*##########################################################################*/
 /*! @page deprecated Deprecated APIs

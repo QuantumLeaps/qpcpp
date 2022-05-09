@@ -27,7 +27,6 @@
 //!
 //! @file
 //! @brief QS long-long (64-bit) output
-//! @ingroup qs
 
 #define QP_IMPL           // this is QF/QK implementation
 #include "qs_port.hpp"    // QS port

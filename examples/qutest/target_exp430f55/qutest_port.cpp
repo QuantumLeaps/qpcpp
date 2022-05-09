@@ -1,6 +1,5 @@
 //! @file
 //! @brief QUTEST port for the MSP-EXP430F5529LP board
-//! @ingroup qs
 //! @cond
 //============================================================================
 //! Last updated for version 6.8.0
