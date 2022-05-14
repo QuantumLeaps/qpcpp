@@ -97,7 +97,7 @@ void QS_target_info_(std::uint8_t const isReset) noexcept;
     else {                                        \
         QS_INSERT_BYTE_(QS_ESC)                   \
         QS_INSERT_BYTE_(static_cast<std::uint8_t>((b_) ^ QS_ESC_XOR)) \
-        ++priv_.used;                             \
+        priv_.used = (priv_.used + 1U);           \
     }
 
 //! Internal QS macro to begin a predefined QS record with critical section.

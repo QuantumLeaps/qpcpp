@@ -27,6 +27,7 @@
 //!
 //! @file
 //! @brief QP::QHsm implementation
+//!
 //! @tr{RQP103} @tr{RQP104} @tr{RQP120} @tr{RQP130}
 
 #define QP_IMPL             // this is QP implementation
@@ -81,8 +82,6 @@ enum : QP::QSignal {
 //! Static, preallocated standard events that the QEP event processor sends
 //! to state handler functions of QP::QHsm-style state machine to execute entry
 //! actions, exit actions, and initial transitions.
-//!
-//! @tr{RQP002B}
 //!
 static QP::QEvt const QEP_reservedEvt_[4] {
 #ifdef Q_EVT_CTOR // Is the QEvt constructor provided?

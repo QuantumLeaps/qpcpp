@@ -2,6 +2,10 @@ namespace QP {
 
 /** @page history Revision History
 
+@section qpcpp_7_0_1 Version 7.0.1, 2022-05-14
+Adapted QP/C++ source code to avoid warings from the new C++20 standard about: "compound assignment with 'volatile'-qualified left operand is deprecated".
+
+
 @section qpcpp_7_0_0 Version 7.0.0, 2022-04-30
 This major focus of this release is the adaptation of the code and documentation to better support safety certification (see [QP Certification Pack](https://www.state-machine.com/products/qp#CERT))
 

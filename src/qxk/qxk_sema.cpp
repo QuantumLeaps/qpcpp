@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-05-13
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -99,10 +99,11 @@ void QXSemaphore::init(std::uint_fast16_t const count,
 //!                       QXTHREAD_NO_TIMEOUT indicates that no timeout will
 //!                       occur and the semaphore will wait indefinitely.
 //! @returns
-//! true if the semaphore has been signaled, and false if the timeout occured.
+//! true if the semaphore has been signaled, and false if the timeout
+//! occurred.
 //!
 //! @note
-//! Multiple extended threads can wait for a given semahpre.
+//! Multiple extended threads can wait for a given semaphore.
 //!
 bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
     QF_CRIT_STAT_
@@ -126,7 +127,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
 
     bool signaled = true; // assume that the semaphore will be signaled
     if (m_count > 0U) {
-        --m_count;
+        m_count = (m_count - 1U); // take semaphore: decrement
     }
     else {
         std::uint_fast8_t const p =
@@ -148,7 +149,8 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
 
         QF_CRIT_E_();   // AFTER unblocking...
         // the blocking object must be this semaphore
-        Q_ASSERT_ID(240, curr->m_temp.obj == QXK_PTR_CAST_(QMState*, this));
+        Q_ASSERT_ID(240, curr->m_temp.obj
+                          == QXK_PTR_CAST_(QMState*, this));
 
         // did the blocking time-out? (signal of zero means that it did)
         if (curr->m_timeEvt.sig == 0U) {
@@ -158,14 +160,14 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
                 // semaphore NOT taken: do NOT decrement the count
             }
             else { // semaphore was both signaled and timed out
-                --m_count; // semaphore signaled: decrement the count
+                m_count = (m_count - 1U); // take semaphore: decrement
             }
         }
         else { // blocking did NOT time out
             // the thread must NOT be waiting on this semaphore
             Q_ASSERT_ID(250, !m_waitSet.hasElement(p));
 
-            --m_count; // semaphore signaled: decrement the count
+            m_count = (m_count - 1U); // semaphore taken: decrement
         }
         curr->m_temp.obj = nullptr; // clear blocked obj.
     }
@@ -185,7 +187,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
 //!
 //! @note
 //! This function can be called from any context, including ISRs and basic
-//! threds (active objects).
+//! threads (active objects).
 //!
 bool QXSemaphore::tryWait(void) noexcept {
     //! @pre the semaphore must be initialized
@@ -197,7 +199,7 @@ bool QXSemaphore::tryWait(void) noexcept {
     bool isAvailable;
     // is the semaphore available?
     if (m_count > 0U) {
-        --m_count;
+        m_count = (m_count - 1U); // take semaphore: decrement
         isAvailable = true;
     }
     else { // the semaphore is NOT available (would block)
@@ -235,8 +237,7 @@ bool QXSemaphore::signal(void) noexcept {
 
     bool signaled = true; // assume that the semaphore will be signaled
     if (m_count < m_max_count) {
-
-        ++m_count; // increment the semaphore count
+        m_count = (m_count + 1U); // signal semaphore: increment
 
         if (m_waitSet.notEmpty()) {
 

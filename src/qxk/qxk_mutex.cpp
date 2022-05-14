@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-05-13
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -181,7 +181,7 @@ bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
         // the nesting level must not exceed the dynamic range of uint8_t
         Q_ASSERT_ID(220, m_lockNest < 0xFFU);
 
-        ++m_lockNest;
+        m_lockNest = (m_lockNest + 1U); // lock one level
     }
     else { // the mutex is alredy locked by a different thread
 
@@ -306,7 +306,7 @@ bool QXMutex::tryLock(void) noexcept {
         // the nesting level must not exceed  the dynamic range of uint8_t
         Q_ASSERT_ID(320, m_lockNest < 0xFFU);
 
-        ++m_lockNest;
+        m_lockNest = (m_lockNest + 1U); // lock one level
     }
     else { // the mutex is alredy locked by a different thread
         if (m_ceiling != 0U) {
@@ -446,7 +446,7 @@ void QXMutex::unlock(void) noexcept {
         }
     }
     else { // releasing the mutex
-        --m_lockNest; // release one level
+        m_lockNest = (m_lockNest - 1U); // unlock one level
     }
     QF_CRIT_X_();
 }

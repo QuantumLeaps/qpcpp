@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-05-13
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -165,7 +165,7 @@ bool QEQueue::post(QEvt const * const e,
             if (m_head == 0U) {
                 m_head = m_end; // wrap around
             }
-            --m_head;
+            m_head = (m_head - 1U);
         }
         status = true; // event posted successfully
     }
@@ -251,7 +251,7 @@ void QEQueue::postLIFO(QEvt const * const e,
 
     // was the queue not empty?
     if (frontEvt != nullptr) {
-        ++m_tail;
+        m_tail = (m_tail + 1U);
         if (m_tail == m_end) { // need to wrap the tail?
             m_tail = 0U; // wrap around
         }
@@ -283,7 +283,7 @@ QEvt const *QEQueue::get(std::uint_fast8_t const qs_id) noexcept {
 
     QF_CRIT_STAT_
     QF_CRIT_E_();
-    QEvt const * const e  = m_frontEvt; // always remove event from the front
+    QEvt const * const e  = m_frontEvt; // always remove evt from the front
 
     // is the queue not empty?
     if (e != nullptr) {
@@ -296,7 +296,7 @@ QEvt const *QEQueue::get(std::uint_fast8_t const qs_id) noexcept {
             if (m_tail == 0U) { // need to wrap?
                 m_tail = m_end; // wrap around
             }
-            --m_tail;
+            m_tail = (m_tail - 1U);
 
             QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_GET, qs_id)
                 QS_TIME_PRE_();              // timestamp

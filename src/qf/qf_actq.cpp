@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-05-13
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -168,7 +168,8 @@ bool QActive::post_(QEvt const * const e,
             if (m_eQueue.m_head == 0U) {
                 m_eQueue.m_head = m_eQueue.m_end; // wrap around
             }
-            --m_eQueue.m_head; // advance the head (counter clockwise)
+            // advance the head (counter clockwise)
+            m_eQueue.m_head = (m_eQueue.m_head - 1U);
         }
 
         QF_CRIT_X_();
@@ -271,7 +272,7 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     }
     // queue was not empty, leave the event in the ring-buffer
     else {
-        ++m_eQueue.m_tail;
+        m_eQueue.m_tail = (m_eQueue.m_tail + 1U);
         if (m_eQueue.m_tail == m_eQueue.m_end) { // need to wrap the tail?
             m_eQueue.m_tail = 0U; // wrap around
         }
@@ -319,7 +320,7 @@ QEvt const *QActive::get_(void) noexcept {
         if (m_eQueue.m_tail == 0U) { // need to wrap?
             m_eQueue.m_tail = m_eQueue.m_end; // wrap around
         }
-        --m_eQueue.m_tail;
+        m_eQueue.m_tail = (m_eQueue.m_tail - 1U);
 
         QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_GET, m_prio)
             QS_TIME_PRE_();                      // timestamp
@@ -442,12 +443,13 @@ bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin)
 #endif // Q_EVT_CTOR
 
         m_eQueue.m_frontEvt = &tickEvt; // deliver event directly
-        --m_eQueue.m_nFree; // one less free event
+        m_eQueue.m_nFree = (m_eQueue.m_nFree - 1U); // one less free event
 
         QACTIVE_EQUEUE_SIGNAL_(this); // signal the event queue
     }
 
-    ++m_eQueue.m_tail; // account for one more tick event
+    // account for one more tick event
+    m_eQueue.m_tail = (m_eQueue.m_tail + 1U);
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
         QS_TIME_PRE_();      // timestamp

@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-05-13
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -50,7 +50,7 @@ void QS::f32_fmt_(std::uint8_t format, float32_t const d) noexcept {
 
     fu32.f = d; // assign the binary representation
 
-    priv_.used += 5U; // 5 bytes about to be added
+    priv_.used = (priv_.used + 5U); // 5 bytes about to be added
     QS_INSERT_ESC_BYTE_(format)  // insert the format byte
 
     for (std::uint_fast8_t i = 4U; i != 0U; --i) {
@@ -93,7 +93,7 @@ void QS::f64_fmt_(std::uint8_t format, float64_t const d) noexcept {
         fu64.u[1] = i;
     }
 
-    priv_.used += 9U; // 9 bytes about to be added
+    priv_.used = (priv_.used + 9U); // 9 bytes about to be added
     QS_INSERT_ESC_BYTE_(format)  // insert the format byte
 
     // output 4 bytes from fu64.u[0]...

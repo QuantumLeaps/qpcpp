@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-05-13
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -308,7 +308,8 @@ bool QXThread::post_(QEvt const * const e,
                 if (m_eQueue.m_head == 0U) {
                     m_eQueue.m_head = m_eQueue.m_end; // wrap around
                 }
-                --m_eQueue.m_head; // advance the head (counter clockwise)
+                // advance the head (counter clockwise)
+                m_eQueue.m_head = (m_eQueue.m_head - 1U);
             }
 
             QF_CRIT_X_();
@@ -426,7 +427,8 @@ QEvt const *QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
             if (thr->m_eQueue.m_tail == 0U) {
                 thr->m_eQueue.m_tail = thr->m_eQueue.m_end; // wrap
             }
-            --thr->m_eQueue.m_tail;
+            // advance the tail (counter clockwise)
+            thr->m_eQueue.m_tail = (thr->m_eQueue.m_tail - 1U);
 
             QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_GET, thr->m_prio)
                 QS_TIME_PRE_();      // timestamp
@@ -513,10 +515,14 @@ void QXThread::teArm_(enum_t const sig,
         // NOTE: For the duration of a single clock tick of the specified tick
         // rate a time event can be disarmed and yet still linked in the list,
         // because un-linking is performed exclusively in QF::tickX().
-        if ((m_timeEvt.refCtr_ & TE_IS_LINKED) == 0U) {
+        if (static_cast<std::uint8_t>(m_timeEvt.refCtr_ & TE_IS_LINKED) == 0U)
+        {
             std::uint_fast8_t const tickRate =
                 static_cast<std::uint_fast8_t>(m_timeEvt.refCtr_);
-            m_timeEvt.refCtr_ |= TE_IS_LINKED; // mark as linked
+
+            // mark as linked
+            m_timeEvt.refCtr_ = static_cast<std::uint8_t>(
+                m_timeEvt.refCtr_ | TE_IS_LINKED);
 
             // The time event is initially inserted into the separate
             // "freshly armed" list based on QF::timeEvtHead_[tickRate].act.

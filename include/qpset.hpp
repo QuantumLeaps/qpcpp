@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-05-13
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -91,7 +91,7 @@ struct QPSet {
 
     //! insert element @p n into the set, n = 1..QF_MAX_ACTIVE
     void insert(std::uint_fast8_t const n) noexcept {
-        m_bits |= (1U << (n - 1U));
+        m_bits = (m_bits | (1U << (n - 1U)));
     }
 
     //! remove element @p n from the set, n = 1..QF_MAX_ACTIVE
@@ -99,8 +99,8 @@ struct QPSet {
     //! intentionally misspelled ("rmove") to avoid collision with
     //! the C++ standard library facility "remove"
     void rmove(std::uint_fast8_t const n) noexcept {
-        m_bits &=
-           static_cast<QPSetBits>(~(static_cast<QPSetBits>(1) << (n - 1U)));
+        m_bits = (m_bits &
+           static_cast<QPSetBits>(~(static_cast<QPSetBits>(1) << (n - 1U))));
     }
 
     std::uint_fast8_t findMax(void) const noexcept {
@@ -153,10 +153,12 @@ struct QPSet {
     //! insert element @p n into the set, n = 1..64
     void insert(std::uint_fast8_t const n) noexcept {
         if (n <= 32U) {
-            m_bits[0] |= (static_cast<std::uint32_t>(1) << (n - 1U));
+            m_bits[0] = (m_bits[0]
+                | (static_cast<std::uint32_t>(1) << (n - 1U)));
         }
         else {
-            m_bits[1] |= (static_cast<std::uint32_t>(1) << (n - 33U));
+            m_bits[1] = (m_bits[1]
+                | (static_cast<std::uint32_t>(1) << (n - 33U)));
         }
     }
 
@@ -166,10 +168,12 @@ struct QPSet {
     //! the C++ standard library facility "remove"
     void rmove(std::uint_fast8_t const n) noexcept {
         if (n <= 32U) {
-            (m_bits[0] &= ~(static_cast<std::uint32_t>(1) << (n - 1U)));
+            (m_bits[0] = (m_bits[0]
+                & ~(static_cast<std::uint32_t>(1) << (n - 1U))));
         }
         else {
-            (m_bits[1] &= ~(static_cast<std::uint32_t>(1) << (n - 33U)));
+            (m_bits[1] = (m_bits[1]
+                & ~(static_cast<std::uint32_t>(1) << (n - 33U))));
         }
     }
 

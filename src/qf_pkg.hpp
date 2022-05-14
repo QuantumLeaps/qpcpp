@@ -1,39 +1,32 @@
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-05-13
+//! @version Last updated for: @ref qpcpp_7_0_0
+//!
 //! @file
 //! @brief Internal (package scope) QF/C++ interface.
-//! @cond
-//============================================================================
-//! Last updated for version 6.9.1
-//! Last updated on  2020-09-17
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
 
 #ifndef QF_PKG_HPP
 #define QF_PKG_HPP
@@ -84,9 +77,9 @@
 // Assertions inside the crticial section ------------------------------------
 #ifdef Q_NASSERT // Q_NASSERT defined--assertion checking disabled
 
-    #define Q_ASSERT_CRIT_(id_, test_)  ((void)0)
-    #define Q_REQUIRE_CRIT_(id_, test_) ((void)0)
-    #define Q_ERROR_CRIT_(id_)          ((void)0)
+    #define Q_ASSERT_CRIT_(id_, test_)  static_cast<void>(0)
+    #define Q_REQUIRE_CRIT_(id_, test_) static_cast<void>(0)
+    #define Q_ERROR_CRIT_(id_)          static_cast<void>(0)
 
 #else  // Q_NASSERT not defined--assertion checking enabled
 
@@ -128,9 +121,9 @@ struct QFreeBlock {
 // is NOT used for reference counting in time events, because the @c poolId_
 // attribute is zero ("static events").
 //
-constexpr std::uint_fast8_t TE_IS_LINKED    = 1U << 7U;  // flag
-constexpr std::uint_fast8_t TE_WAS_DISARMED = 1U << 6U;  // flag
-constexpr std::uint_fast8_t TE_TICK_RATE    = 0x0FU;     // bitmask
+constexpr std::uint8_t TE_IS_LINKED    = 1U << 7U;  // flag
+constexpr std::uint8_t TE_WAS_DISARMED = 1U << 6U;  // flag
+constexpr std::uint8_t TE_TICK_RATE    = 0x0FU;     // bitmask
 
 //============================================================================
 // internal helper inline functions
@@ -147,12 +140,12 @@ inline std::uint8_t QF_EVT_REF_CTR_ (QEvt const * const e) noexcept {
 
 //! increment the refCtr_ of an event @p e
 inline void QF_EVT_REF_CTR_INC_(QEvt const * const e) noexcept {
-    ++(QF_EVT_CONST_CAST_(e))->refCtr_;
+    (QF_EVT_CONST_CAST_(e))->refCtr_ = (QF_EVT_CONST_CAST_(e))->refCtr_ + 1U;
 }
 
 //! decrement the refCtr_ of an event @p e
 inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) noexcept {
-    --(QF_EVT_CONST_CAST_(e))->refCtr_;
+    (QF_EVT_CONST_CAST_(e))->refCtr_ = (QF_EVT_CONST_CAST_(e))->refCtr_ - 1U;
 }
 
 } // namespace QP

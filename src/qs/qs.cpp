@@ -412,7 +412,7 @@ void QS::beginRec_(std::uint_fast8_t const rec) noexcept {
     QSCtr const end_ = priv_.end;   // put in a temporary (register)
 
     priv_.seq = b; // store the incremented sequence num
-    priv_.used += 2U; // 2 bytes about to be added
+    priv_.used = (priv_.used + 2U); // 2 bytes about to be added
 
     QS_INSERT_ESC_BYTE_(b)
 
@@ -437,7 +437,7 @@ void QS::endRec_(void) noexcept {
     std::uint8_t b = priv_.chksum;
     b ^= 0xFFU; // invert the bits in the checksum
 
-    priv_.used += 2U; // 2 bytes about to be added
+    priv_.used = (priv_.used + 2U); // 2 bytes about to be added
 
     if ((b != QS_FRAME) && (b != QS_ESC)) {
         QS_INSERT_BYTE_(b)
@@ -445,7 +445,7 @@ void QS::endRec_(void) noexcept {
     else {
         QS_INSERT_BYTE_(QS_ESC)
         QS_INSERT_BYTE_(b ^ QS_ESC_XOR)
-        ++priv_.used; // account for the ESC byte
+        priv_.used = (priv_.used + 1U); // account for the ESC byte
     }
 
     QS_INSERT_BYTE_(QS_FRAME) // do not escape this QS_FRAME
@@ -579,7 +579,7 @@ void QS::u8_fmt_(std::uint8_t const format, std::uint8_t const d) noexcept {
     QSCtr   head_   = priv_.head;    // put in a temporary (register)
     QSCtr const end_= priv_.end;     // put in a temporary (register)
 
-    priv_.used += 2U; // 2 bytes about to be added
+    priv_.used = (priv_.used + 2U); // 2 bytes about to be added
 
     QS_INSERT_ESC_BYTE_(format)
     QS_INSERT_ESC_BYTE_(d)
@@ -599,7 +599,7 @@ void QS::u16_fmt_(std::uint8_t format, std::uint16_t d) noexcept {
     QSCtr   head_   = priv_.head;   // put in a temporary (register)
     QSCtr const end_= priv_.end;    // put in a temporary (register)
 
-    priv_.used += 3U; // 3 bytes about to be added
+    priv_.used = (priv_.used + 3U); // 3 bytes about to be added
 
     QS_INSERT_ESC_BYTE_(format)
 
@@ -624,7 +624,7 @@ void QS::u32_fmt_(std::uint8_t format, std::uint32_t d) noexcept {
     QSCtr   head_   = priv_.head;    // put in a temporary (register)
     QSCtr const end_= priv_.end;     // put in a temporary (register)
 
-    priv_.used += static_cast<QSCtr>(5); // 5 bytes about to be added
+    priv_.used = (priv_.used + 5U); // 5 bytes about to be added
     QS_INSERT_ESC_BYTE_(format) // insert the format byte
 
     for (std::uint_fast8_t i = 4U; i != 0U; --i) {
@@ -664,8 +664,7 @@ void QS::mem_fmt_(std::uint8_t const *blk, std::uint8_t size) noexcept {
     QSCtr head_     = priv_.head;         // put in a temporary (register)
     QSCtr const end_= priv_.end;          // put in a temporary (register)
 
-    // size+2 bytes to be added
-    priv_.used += static_cast<std::uint8_t>(size + 2U);
+    priv_.used = (priv_.used + size + 2U); // size+2 bytes to be added
 
     QS_INSERT_BYTE_(b)
     QS_INSERT_ESC_BYTE_(size)
@@ -722,7 +721,7 @@ void QS::u8_raw_(std::uint8_t const d) noexcept {
     QSCtr   head_   = priv_.head;     // put in a temporary (register)
     QSCtr const end_= priv_.end;      // put in a temporary (register)
 
-    priv_.used += 1U;  // 1 byte about to be added
+    priv_.used = (priv_.used + 1U);  // 1 byte about to be added
     QS_INSERT_ESC_BYTE_(d)
 
     priv_.head   = head_;   // save the head
@@ -739,7 +738,7 @@ void QS::u8u8_raw_(std::uint8_t const d1, std::uint8_t const d2) noexcept {
     QSCtr   head_   = priv_.head;     // put in a temporary (register)
     QSCtr const end_= priv_.end;      // put in a temporary (register)
 
-    priv_.used += 2U; // 2 bytes about to be added
+    priv_.used = (priv_.used + 2U); // 2 bytes about to be added
     QS_INSERT_ESC_BYTE_(d1)
     QS_INSERT_ESC_BYTE_(d2)
 
@@ -758,7 +757,7 @@ void QS::u16_raw_(std::uint16_t d) noexcept {
     QSCtr   head_   = priv_.head;     // put in a temporary (register)
     QSCtr const end_= priv_.end;      // put in a temporary (register)
 
-    priv_.used += 2U; // 2 bytes about to be added
+    priv_.used = (priv_.used + 2U); // 2 bytes about to be added
 
     QS_INSERT_ESC_BYTE_(b)
 
@@ -780,7 +779,7 @@ void QS::u32_raw_(std::uint32_t d) noexcept {
     QSCtr   head_   = priv_.head;     // put in a temporary (register)
     QSCtr const end_= priv_.end;      // put in a temporary (register)
 
-    priv_.used += 4U; // 4 bytes about to be added
+    priv_.used = (priv_.used + 4U); // 4 bytes about to be added
     for (std::uint_fast8_t i = 4U; i != 0U; --i) {
         std::uint8_t const b = static_cast<std::uint8_t>(d);
         QS_INSERT_ESC_BYTE_(b)
@@ -863,7 +862,7 @@ std::uint16_t QS::getByte(void) noexcept {
             tail_ = 0U;
         }
         priv_.tail = tail_;  // update the tail
-        --priv_.used;        // one less byte used
+        priv_.used = (priv_.used - 1U); // one less byte used
     }
     return ret;  // return the byte or EOD
 }
@@ -914,8 +913,8 @@ std::uint8_t const *QS::getBlock(std::uint16_t * const pNbytes) noexcept {
         buf_ = priv_.buf;
         buf_ = &buf_[tail_]; // the bytes are at the tail
 
-        priv_.used -= n;
-        tail_      += n;
+        priv_.used = (priv_.used - n);
+        tail_     += n;
         if (tail_ == end_) {
             tail_ = 0U;
         }
@@ -1054,7 +1053,8 @@ void QS::assertion_pre_(char const * const module, int_t const loc,
         QS_STR_PRE_((module != nullptr) ? module : "?");
     QS_END_NOCRIT_PRE_()
     QP::QS::onFlush();
-    for (std::uint32_t volatile ctr = delay; ctr > 0U; --ctr) {
+    for (std::uint32_t volatile ctr = delay; ctr > 0U; ) {
+        ctr = (ctr - 1U);
     }
     QP::QS::onCleanup();
 }
@@ -1063,7 +1063,7 @@ void QS::assertion_pre_(char const * const module, int_t const loc,
 void QS::crit_entry_pre_(void) {
     QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_CRIT_ENTRY, 0U)
         QS_TIME_PRE_();
-        ++QS::priv_.critNest;
+        QS::priv_.critNest = (QS::priv_.critNest + 1U);
         QS_U8_PRE_(QS::priv_.critNest);
     QS_END_NOCRIT_PRE_()
 }
@@ -1073,7 +1073,7 @@ void QS::crit_exit_pre_(void) {
     QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_CRIT_EXIT, 0U)
         QS_TIME_PRE_();
         QS_U8_PRE_(QS::priv_.critNest);
-        --QS::priv_.critNest;
+        QS::priv_.critNest = (QS::priv_.critNest - 1U);
     QS_END_NOCRIT_PRE_()
 }
 

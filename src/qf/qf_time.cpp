@@ -84,7 +84,7 @@ void QF::tickX_(std::uint_fast8_t const tickRate) noexcept
     QF_CRIT_E_();
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_TICK, 0U)
-        ++prev->m_ctr;
+        prev->m_ctr = (prev->m_ctr + 1U);
         QS_TEC_PRE_(prev->m_ctr); // tick ctr
         QS_U8_PRE_(tickRate);     // tick rate
     QS_END_NOCRIT_PRE_()
@@ -114,7 +114,8 @@ void QF::tickX_(std::uint_fast8_t const tickRate) noexcept
         if (t->m_ctr == 0U) {
             prev->m_next = t->m_next;
             // mark time event 't' as NOT linked
-            t->refCtr_ &= static_cast<std::uint8_t>(~TE_IS_LINKED);
+            t->refCtr_ = static_cast<std::uint8_t>(t->refCtr_
+                & static_cast<std::uint8_t>(~TE_IS_LINKED));
             // do NOT advance the prev pointer
             QF_CRIT_X_(); // exit crit. section to reduce latency
 
@@ -122,11 +123,11 @@ void QF::tickX_(std::uint_fast8_t const tickRate) noexcept
             QF_CRIT_EXIT_NOP();
         }
         else {
-            --t->m_ctr;
+            t->m_ctr = (t->m_ctr - 1U);
 
             // is time evt about to expire?
             if (t->m_ctr == 0U) {
-                QActive * const act = t->toActive(); // temporary for volatile
+                QActive * const act = t->toActive(); // temp for volatile
 
                 // periodic time evt?
                 if (t->m_interval != 0U) {
@@ -138,7 +139,8 @@ void QF::tickX_(std::uint_fast8_t const tickRate) noexcept
                     prev->m_next = t->m_next;
 
                     // mark time event 't' as NOT linked
-                    t->refCtr_ &= static_cast<std::uint8_t>(~TE_IS_LINKED);
+                    t->refCtr_ = static_cast<std::uint8_t>(t->refCtr_
+                        & static_cast<std::uint8_t>(~TE_IS_LINKED));
                     // do NOT advance the prev pointer
 
                     QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_AUTO_DISARM,
@@ -342,7 +344,8 @@ void QTimeEvt::armX(QTimeEvtCtr const nTicks,
     if (static_cast<std::uint_fast8_t>(
            static_cast<std::uint_fast8_t>(refCtr_) & TE_IS_LINKED) == 0U)
     {
-        refCtr_ |= TE_IS_LINKED; // mark as linked
+        // mark as linked
+        refCtr_ = static_cast<std::uint8_t>(refCtr_ | TE_IS_LINKED);
 
         // The time event is initially inserted into the separate
         // "freshly armed" link list based on QF::timeEvtHead_[tickRate].act.
@@ -398,7 +401,7 @@ bool QTimeEvt::disarm(void) noexcept {
     bool wasArmed;
     if (m_ctr != 0U) {
         wasArmed = true;
-        refCtr_ |= TE_WAS_DISARMED;
+        refCtr_ = static_cast<std::uint8_t>(refCtr_ | TE_WAS_DISARMED);
 
         QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_DISARM, qs_id)
             QS_TIME_PRE_();            // timestamp
@@ -413,7 +416,8 @@ bool QTimeEvt::disarm(void) noexcept {
     }
     else { // the time event was already disarmed automatically
         wasArmed = false;
-        refCtr_ &= static_cast<std::uint8_t>(~TE_WAS_DISARMED);
+        refCtr_ = static_cast<std::uint8_t>(refCtr_
+            & static_cast<std::uint8_t>(~TE_WAS_DISARMED));
 
         QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_DISARM_ATTEMPT, qs_id)
             QS_TIME_PRE_();            // timestamp
@@ -473,8 +477,9 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) noexcept {
         // the list, because unlinking is performed exclusively in the
         // QF::tickX() function.
         //
-        if ((refCtr_ & TE_IS_LINKED) == 0U) {
-            refCtr_ |= TE_IS_LINKED; // mark as linked
+        if (static_cast<std::uint8_t>(refCtr_ & TE_IS_LINKED) == 0U) {
+            // mark as linked
+            refCtr_ = static_cast<std::uint8_t>(refCtr_ | TE_IS_LINKED);
 
             // The time event is initially inserted into the separate
             // "freshly armed" list based on QF_timeEvtHead_[tickRate].act.
@@ -532,7 +537,8 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) noexcept {
 //!
 bool QTimeEvt::wasDisarmed(void) noexcept {
     std::uint8_t const isDisarmed = refCtr_ & TE_WAS_DISARMED;
-    refCtr_ |= TE_WAS_DISARMED; // set the flag
+    // mark as disarmed
+    refCtr_ = static_cast<std::uint8_t>(refCtr_ | TE_WAS_DISARMED);
     return isDisarmed != 0U;
 }
 

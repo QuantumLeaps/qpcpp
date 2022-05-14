@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
+//! @date Last updated on: 2022-05-13
 //! @version Last updated for: @ref qpcpp_7_0_0
 //!
 //! @file
@@ -181,7 +181,7 @@ void QMPool::put(void * const b, std::uint_fast8_t const qs_id) noexcept {
     static_cast<QFreeBlock*>(b)->m_next =
         static_cast<QFreeBlock *>(m_free_head); // link into the free list
     m_free_head = b; // set as new head of the free list
-    ++m_nFree;       // one more free block in this pool
+    m_nFree = (m_nFree + 1U); // one more free block in this pool
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_PUT, qs_id)
         QS_TIME_PRE_();       // timestamp
@@ -241,7 +241,7 @@ void *QMPool::get(std::uint_fast16_t const margin,
         void * const fb_next = fb->m_next;
 
         // is the pool becoming empty?
-        --m_nFree;  // one free block less
+        m_nFree = (m_nFree - 1U); // one free block less
         if (m_nFree == 0U) {
             // pool is becoming empty, so the next free block must be NULL
             Q_ASSERT_CRIT_(320, fb_next == nullptr);
