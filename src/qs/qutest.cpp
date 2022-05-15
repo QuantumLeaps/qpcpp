@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-05-02
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-05-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ stub for QUTEST unit testing
@@ -342,7 +342,7 @@ void QS::tickX_(std::uint_fast8_t const tickRate,
     QTimeEvt *prev = &QF::timeEvtHead_[tickRate];
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_TICK, 0U)
-        ++prev->m_ctr;
+        prev->m_ctr = (prev->m_ctr + 1U);
         QS_TEC_PRE_(prev->m_ctr); // tick ctr
         QS_U8_PRE_(tickRate);     // tick rate
     QS_END_NOCRIT_PRE_()
@@ -366,8 +366,9 @@ void QS::tickX_(std::uint_fast8_t const tickRate,
         }
         else { // one-shot time event: automatically disarm
             t->m_ctr = 0U; // auto-disarm
-            // mark as unlinked
-            t->refCtr_ &= static_cast<std::uint8_t>(~TE_IS_LINKED);
+            // mark time event 't' as NOT linked
+            t->refCtr_ = static_cast<std::uint8_t>(t->refCtr_
+                         & static_cast<std::uint8_t>(~TE_IS_LINKED));
 
             QS_BEGIN_NOCRIT_PRE_(QS_QF_TIMEEVT_AUTO_DISARM, act->m_prio)
                 QS_OBJ_PRE_(t);       // this time event object
@@ -417,7 +418,8 @@ void QS::tickX_(std::uint_fast8_t const tickRate,
         if (t->m_ctr == 0U) {
             prev->m_next = t->m_next;
             // mark time event 't' as NOT linked
-            t->refCtr_ &= static_cast<std::uint8_t>(~TE_IS_LINKED);
+            t->refCtr_ = static_cast<std::uint8_t>(t->refCtr_
+                         & static_cast<std::uint8_t>(~TE_IS_LINKED));
             // do NOT advance the prev pointer
             QF_CRIT_X_(); // exit crit. section to reduce latency
 

@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-05-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QS long-long (64-bit) output
@@ -44,7 +44,7 @@ void QS::u64_raw_(std::uint64_t d) noexcept {
     QSCtr head_      = priv_.head;
     QSCtr const end_ = priv_.end;
 
-    priv_.used += 8U; // 8 bytes are about to be added
+    priv_.used = (priv_.used + 8U); // 8 bytes are about to be added
     for (std::int_fast8_t i = 8U; i != 0U; --i) {
         std::uint8_t const b = static_cast<std::uint8_t>(d);
         QS_INSERT_ESC_BYTE_(b)
@@ -65,7 +65,7 @@ void QS::u64_fmt_(std::uint8_t format, std::uint64_t d) noexcept {
     QSCtr head_      = priv_.head;
     QSCtr const end_ = priv_.end;
 
-    priv_.used += static_cast<QSCtr>(9); // 9 bytes are about to be added
+    priv_.used = (priv_.used + 9U); // 9 bytes are about to be added
     QS_INSERT_ESC_BYTE_(format)  // insert the format byte
 
     for (std::int_fast8_t i = 8U; i != 0U; --i) {

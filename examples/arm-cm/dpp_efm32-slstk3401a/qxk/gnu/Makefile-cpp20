@@ -137,7 +137,8 @@ QP_ASMS := \
 QS_SRCS := \
 	qs.cpp \
 	qs_rx.cpp \
-	qs_fp.cpp
+	qs_fp.cpp \
+	qs_64bit.cpp
 
 LIB_DIRS  :=
 LIBS      :=

@@ -23,7 +23,7 @@
 // <info@state-machine.com>
 //============================================================================
 //! @date Last updated on: 2022-05-13
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QP::QEQueue implementation
