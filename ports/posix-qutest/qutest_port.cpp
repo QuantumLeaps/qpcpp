@@ -70,13 +70,17 @@
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR   -1
 
-namespace QP {
+namespace { // unnamed local namespace
 
 //Q_DEFINE_THIS_MODULE("qutest_port")
 
 // local variables ...........................................................
 static int l_sock = INVALID_SOCKET;
 static void sigIntHandler(int dummy);
+
+}
+
+namespace QP {
 
 //............................................................................
 bool QS::onStartup(void const *arg) {

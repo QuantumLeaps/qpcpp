@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QV/C++ platform-independent public interface.
@@ -39,25 +39,27 @@
 // QF configuration for QK
 
 // QV event-queue used for AOs
-#define QF_EQUEUE_TYPE       QEQueue
-
+#define QF_EQUEUE_TYPE  QEQueue
 
 //============================================================================
 namespace QP {
 
-//! QV services.
+//! QV non-preemptive (cooperative) run-to-completion kernel
+//!
 //! @description
 //! This class groups together QV services. It has only static members and
 //! should not be instantiated.
 //!
-// @note The QV ready set, etc. belong conceptually to the QV class (as static
+//! @note
+//! The QV ready set, etc. belong conceptually to the QV class (as static
 //! class members). However, to avoid C++ potential name-mangling problems in
-//! assembly language, these elements are defined outside of the QK class and
+//! assembly language, these elements are defined outside of the QV class and
 //! use the extern "C" linkage specification.
+//!
 class QV {
 public:
-
-    //! QV idle callback (customized in BSPs for QK)
+    //! QV idle callback (customized in BSPs for QV)
+    //!
     //! @description
     //! QV::onIdle() must be called with interrupts DISABLED because
     //! the determination of the idle condition (no events in the

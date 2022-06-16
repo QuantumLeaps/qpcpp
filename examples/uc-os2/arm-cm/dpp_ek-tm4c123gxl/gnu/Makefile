@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on EK-TM4C123GXL, uC/OS-II kernel, GNU-ARM
-# Last Updated for Version: 7.0.0
-# Date of the Last Update:  2021-12-05
+# Last Updated for Version: 7.0.1
+# Date of the Last Update:  2022-05-23
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -81,7 +81,6 @@ VPATH = \
 INCLUDES  = \
 	-I.. \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/uC-OS2/Source \
 	-I$(QPCPP)/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU \

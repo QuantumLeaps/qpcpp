@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief Internal (package scope) QS/C++ interface.
@@ -35,6 +35,7 @@
 namespace QP {
 
 //! QS received record types (RX channel)
+//!
 //! @description
 //! This enumeration specifies the record types for the QS receive channel
 enum QSpyRxRecords : std::uint8_t {
@@ -65,6 +66,7 @@ constexpr std::uint8_t QS_ESC   = 0x7DU;
 
 //! @brief Escape modifier of the QS output protocol
 //!
+//! @description
 //! The escaped byte is XOR-ed with the escape modifier before it is inserted
 //! into the QS buffer.
 constexpr std::uint8_t QS_ESC_XOR = 0x20U;
@@ -122,7 +124,8 @@ void QS_target_info_(std::uint8_t const isReset) noexcept;
         QS_CRIT_X_();      \
     }
 
-//! Internal QS macro to begin a predefined QS record without critical section.
+//! Internal QS macro to begin a predefined QS record without critical section
+//!
 //! @note
 //! This macro is intended to use only inside QP components and NOT
 //! at the application level.
@@ -131,7 +134,8 @@ void QS_target_info_(std::uint8_t const isReset) noexcept;
     if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) {       \
         QP::QS::beginRec_(static_cast<std::uint_fast8_t>(rec_));
 
-//! Internal QS macro to end a predefiend QS record without critical section.
+//! Internal QS macro to end a predefiend QS record without critical section
+//!
 //! @note
 //! This macro is intended to use only inside QP components and NOT
 //! at the application level. @sa #QS_END_NOCRIT
@@ -193,6 +197,7 @@ void QS_target_info_(std::uint8_t const isReset) noexcept;
 
     //! Internal QS macro to output an unformatted function pointer
     //! data element
+    //!
     //! @note
     //! The size of the pointer depends on the macro #QS_FUN_PTR_SIZE.
     //! If the size is not defined the size of pointer is assumed 4-bytes.
@@ -222,6 +227,7 @@ void QS_target_info_(std::uint8_t const isReset) noexcept;
 
     //! Internal QS macro to output an unformatted event size
     //! data element
+    //!
     //! @note the event size depends on the macro #QF_EVENT_SIZ_SIZE.
     #define QS_EVS_PRE_(size_) \
         QS::u8_raw_(static_cast<std::uint8_t>(size_))

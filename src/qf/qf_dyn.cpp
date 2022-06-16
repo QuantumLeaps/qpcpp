@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ dynamic event management
@@ -46,39 +46,14 @@ Q_DEFINE_THIS_MODULE("qf_dyn")
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
 // Package-scope objects *****************************************************
 QF_EPOOL_TYPE_ QF_pool_[QF_MAX_EPOOL]; // allocate the event pools
 std::uint_fast8_t QF_maxPool_; // number of initialized event pools
 
-//============================================================================
-//! @description
-//! This function initializes one event pool at a time and must be called
-//! exactly once for each event pool before the pool can be used.
-//!
-//! @param[in] poolSto  pointer to the storage for the event pool
-//! @param[in] poolSize size of the storage for the pool in bytes
-//! @param[in] evtSize  the block-size of the pool in bytes, which determines
-//!                     the maximum size of events that can be allocated
-//!                     from the pool
-//! @note
-//! You might initialize many event pools by making many consecutive calls
-//! to the QF_poolInit() function. However, for the simplicity of the internal
-//! implementation, you must initialize event pools in the ascending order of
-//! the event size.
-//!
-//! @note The actual number of events available in the pool might be actually
-//! less than (@p poolSize / @p evtSize) due to the internal alignment
-//! of the blocks that the pool might perform. You can always check the
-//! capacity of the pool by calling QF_getPoolMin().
-//!
-//! @note The dynamic allocation of events is optional, meaning that you might
-//! choose not to use dynamic events. In that case calling QP::QF::poolInit()
-//! and using up memory for the memory blocks is unnecessary.
-//!
-//! @sa QF initialization example for QP::QF::init()
-//!
+//............................................................................
 void QF::poolInit(void * const poolSto,
                   std::uint_fast32_t const poolSize,
                   std::uint_fast16_t const evtSize) noexcept
@@ -105,31 +80,6 @@ void QF::poolInit(void * const poolSto,
 }
 
 //============================================================================
-//! @description
-//! Allocates an event dynamically from one of the QF event pools.
-//!
-//! @param[in] evtSize the size (in bytes) of the event to allocate
-//! @param[in] margin  the number of un-allocated events still available
-//!                    in a given event pool after the allocation completes
-//!                    The special value QP::QF_NO_MARGIN means that this
-//!                    function will assert if allocation fails.
-//! @param[in] sig     the signal to be assigned to the allocated event
-//!
-//! @returns
-//! pointer to the newly allocated event. This pointer can be NULL
-//! only if margin!=0 and the event cannot be allocated with the specified
-//! margin still available in the given pool.
-//!
-//! @note
-//! The internal QF function QP::QF::newX_() raises an assertion when
-//! the margin argument is QP::QF_NO_MARGIN and allocation of the event turns
-//! out to be impossible due to event pool depletion, or incorrect (too big)
-//! size of the requested event.
-//!
-//! @note
-//! The application code should not call this function directly.
-//! The only allowed use is thorough the macros Q_NEW() or Q_NEW_X().
-//!
 QEvt *QF::newX_(std::uint_fast16_t const evtSize,
                 std::uint_fast16_t const margin, enum_t const sig) noexcept
 {
@@ -187,28 +137,6 @@ QEvt *QF::newX_(std::uint_fast16_t const evtSize,
 }
 
 //============================================================================
-//! @description
-//! This function implements a simple garbage collector for dynamic events.
-//! Only dynamic events are candidates for recycling. (A dynamic event is one
-//! that is allocated from an event pool, which is determined as non-zero
-//! e->poolId_ attribute.) Next, the function decrements the reference counter
-//! of the event (e->refCtr_), and recycles the event only if the counter
-//! drops to zero (meaning that no more references are outstanding for this
-//! event). The dynamic event is recycled by returning it to the pool from
-//! which it was originally allocated.
-//!
-//! @param[in]  e  pointer to the event to recycle
-//!
-//! @note
-//! QF invokes the garbage collector at all appropriate contexts, when
-//! an event can become garbage (automatic garbage collection), so the
-//! application code should have no need to call QP::QF::gc() directly.
-//! The QP::QF::gc() function is exposed only for special cases when your
-//! application sends dynamic events to the "raw" thread-safe queues
-//! (see QP::QEQueue). Such queues are processed outside of QF and the
-//! automatic garbage collection is **NOT** performed for these events.
-//! In this case you need to call QP::QF::gc() explicitly.
-//!
 void QF::gc(QEvt const * const e) noexcept {
     // is it a dynamic event?
     if (e->poolId_ != 0U) {
@@ -248,7 +176,7 @@ void QF::gc(QEvt const * const e) noexcept {
             // pool ID must be in range
             Q_ASSERT_ID(410, idx < QF_maxPool_);
 
-#ifdef Q_EVT_VIRTUAL
+#ifdef Q_EVT_XTOR
             // explicitly exectute the destructor'
             // NOTE: casting 'const' away is legitimate,
             // because it's a pool event
@@ -268,19 +196,6 @@ void QF::gc(QEvt const * const e) noexcept {
 }
 
 //============================================================================
-//! @description
-//! Creates and returns a new reference to the current event e
-//!
-//! @param[in] e       pointer to the current event
-//! @param[in] evtRef  the event reference
-//!
-//! @returns
-//! the newly created reference to the event `e`
-//!
-//! @note
-//! The application code should not call this function directly.
-//! The only allowed use is thorough the macro Q_NEW_REF().
-//!
 QEvt const *QF::newRef_(QEvt const * const e,
                         QEvt const * const evtRef) noexcept
 {
@@ -308,15 +223,6 @@ QEvt const *QF::newRef_(QEvt const * const e,
 }
 
 //============================================================================
-//! @description
-//! Deletes an existing reference to the event e
-//!
-//! @param[in] evtRef  the event reference
-//!
-//! @note
-//! The application code should not call this function directly.
-//! The only allowed use is thorough the macro Q_DELETE_REF().
-//!
 void QF::deleteRef_(QEvt const * const evtRef) noexcept {
     QS_CRIT_STAT_
 

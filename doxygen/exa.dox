@@ -1,5 +1,4 @@
 /*! @page exa Examples
-@tableofcontents
 
 @section exa_gen General Comments
 The QP/C++ distribution contains many @subpage exa_ref "example projects" to demonstrate various QP/C++ features. Each example project is described on its own dedicated page that you can find using several criteria (see @ref exa_ref). The example projects have the following main goals:
@@ -302,9 +301,6 @@ To work with QP/C++ effectively, you need to learn a bit more about active objec
 /*##########################################################################*/
 /*! @page exa_ref Cross-Reference
 
-@tableofcontents
-
-
 @section exa_ref_kernel Native Examples (by Built-in Kernel)
 - @ref exa_qv
 - @ref exa_qk
@@ -312,8 +308,6 @@ To work with QP/C++ effectively, you need to learn a bit more about active objec
 
 
 @section exa_ref_tool Native Examples (by Development Toolchain)
-@n
-
 
 @subsection exa_ref_arm-clang ARM-Clang Toolchain (ARM Compiler 6)
 - @ref arm-cm_blinky_efm32-slstk3401a <a class="preview board" href="bd_EFM32-SLSTK3401A.jpg" title="EFM32-SLSTK3401A"></a> &nbsp; (Cortex-M4)

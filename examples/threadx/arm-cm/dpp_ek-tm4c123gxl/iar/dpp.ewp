@@ -78,7 +78,7 @@
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
@@ -146,7 +146,7 @@
                 </option>
                 <option>
                     <name>OgLibHeap</name>
-                    <state>0</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>OGLibAdditionalLocale</name>
@@ -336,7 +336,6 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\threadx</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\threadx\common\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\threadx\ports\cortex_m4\iar\inc</state>
@@ -1389,7 +1388,6 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\threadx</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\threadx\common\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\threadx\ports\cortex_m4\iar\inc</state>
@@ -2442,7 +2440,6 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\threadx</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\threadx\common\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\threadx\ports\cortex_m4\iar\inc</state>

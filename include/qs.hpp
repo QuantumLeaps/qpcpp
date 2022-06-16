@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-04-30
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QS/C++ platform-independent public interface.
@@ -38,7 +38,524 @@
 //============================================================================
 namespace QP {
 
+#if (QS_TIME_SIZE == 1U)
+    using QSTimeCtr = std::uint8_t;
+#elif (QS_TIME_SIZE == 2U)
+    using QSTimeCtr = std::uint16_t;
+#elif (QS_TIME_SIZE == 4U)
+    //! The type of the QS time stamp. This type determines the dynamic
+    // range of QS time stamps
+    //
+    using QSTimeCtr = std::uint32_t;
+#endif
+
+//! QS ring buffer counter and offset type
+using QSCtr = std::uint_fast16_t;
+
+//! QS software tracing parameters for input (QS-RX)
+//!
+struct QSrx {
+        void *currObj[8];    //!< current objects
+        std::uint8_t *buf;   //!< pointer to the start of the ring buffer
+        QSCtr end;           //!< offset of the end of the ring buffer
+        QSCtr volatile head; //!< offset to where next byte will be inserted
+        QSCtr volatile tail; //!< offset of where next byte will be extracted
+#ifdef Q_UTEST
+        QP::QPSet readySet;  //!< QUTEST ready-set of active objects
+        bool inTestLoop;     //!< QUTest event loop is running
+#endif
+};
+
+//! QS software tracing facilities for output (QS-TX)
+//!
+//! @description
+//! This class groups together QS services. It has only static members and
+//! should not be instantiated.
+class QS {
+public:
+    //! Initialize the QS data buffer
+    //!
+    //! @description
+    //! This function should be called from QP::QS::onStartup() to provide
+    //! QS with the data buffer. The first argument `sto[]` is the address
+    //! of the memory block, and the second argument `stoSize` is the size
+    //! of this block [in bytes]. Currently the size of the QS buffer cannot
+    //! exceed 64KB.
+    //!
+    //! @note
+    //! QS can work with quite small data buffers, but you will start losing
+    //! data if the buffer is too small for the bursts of tracing activity.
+    //! The right size of the buffer depends on the data production rate and
+    //! the data output rate. QS offers flexible filtering to reduce the data
+    //! production rate.
+    //!
+    //! @note
+    //! If the data output rate cannot keep up with the production rate,
+    //! QS will start overwriting the older data with newer data. This is
+    //! consistent with the "last-is-best" QS policy. The record sequence
+    //! counters and check sums on each record allow the QSPY host utility
+    //! to easily detect any data loss.
+    //!
+    static void initBuf(std::uint8_t * const sto,
+                        std::uint_fast16_t const stoSize) noexcept;
+
+    //! Set/clear the global Filter for a given QS record
+    //!  or a group of records
+    //!
+    //! @description
+    //! This function sets up the QS filter to enable record types specified
+    //! in the `filter` parameter. The value #QS_ALL_RECORDS specifies to
+    //! filter-in all records. This function should be called indirectly
+    //! through the macro QS_GLB_FILTER()
+    //!
+    //! @param[in] filter  the QS record-d or group to enable in the filter,
+    //!                 if positive or disable, if negative. The record-id
+    //!                 numbers must be in the range -127..127.
+    //! @note
+    //! Filtering based on the record-type is only the first layer of
+    //! filtering. The second layer is based on the object-type. Both filter
+    //! layers must be enabled for the QS record to be inserted in the
+    //! QS buffer.
+    //!
+    //! @sa QP::QS::locFilter_()
+    //!
+    static void glbFilter_(std::int_fast16_t const filter) noexcept;
+
+    //! Set/clear the local Filter for a given object-id
+    //!  or a group of object-ids
+    //!
+    //! @description
+    //! This function sets up the local QS filter to enable or disable the
+    //! given QS object-id or a group of object-ids @a filter.
+    //! This function should be called indirectly through the macro
+    //! QS_LOC_FILTER()
+    //!
+    //! @param[in] filter  the QS object-id or group to enable in the filter,
+    //!                 if positive or disable, if negative. The qs_id numbers
+    //!                 must be in the range 1..127.
+    //! @note
+    //! Filtering based on the object-id (local filter) is the second layer
+    //! of filtering. The first layer is based on the QS record-type (global
+    //! filter). Both filter layers must be enabled for the QS record to be
+    //! inserted into the QS buffer.
+    //!
+    //! @sa QP::QS::glbFilter_()
+    //!
+    static void locFilter_(std::int_fast16_t const filter) noexcept;
+
+    //! Mark the begin of a QS record `rec`
+    //!
+    //! @description
+    //! This function must be called at the beginning of each QS record.
+    //! This function should be called indirectly through the macro
+    //! QS_BEGIN_ID(), or QS_BEGIN_NOCRIT(), depending if it's called in
+    //! a normal code or from a critical section.
+    //!
+    static void beginRec_(std::uint_fast8_t const rec) noexcept;
+
+    //! Mark the end of a QS record `rec`
+    //!
+    //! @description
+    //! This function must be called at the end of each QS record.
+    //! This function should be called indirectly through the macro QS_END(),
+    //! or QS_END_NOCRIT(), depending if it's called in a normal code or from
+    //! a critical section.
+    //!
+    static void endRec_(void) noexcept;
+
+    // raw (unformatted) output of data elements .............................
+
+    //! output std::uint8_t data element without format information
+    static void u8_raw_(std::uint8_t const d) noexcept;
+
+    //! output two std::uint8_t data elements without format information
+    static void u8u8_raw_(std::uint8_t const d1,
+                          std::uint8_t const d2) noexcept;
+
+    //! Output std::uint16_t data element without format information
+    static void u16_raw_(std::uint16_t d) noexcept;
+
+    //! Output std::uint32_t data element without format information
+    static void u32_raw_(std::uint32_t d) noexcept;
+
+    //! Output obj pointer data element without format information
+    static void obj_raw_(void const * const obj) noexcept;
+
+    //! Output zero-terminated ASCII string element without format information
+    static void str_raw_(char const *s) noexcept;
+
+
+    // formatted data elements output ........................................
+
+    //! Output std::uint8_t data element with format information
+    //!
+    //! @note
+    //! This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void u8_fmt_(std::uint8_t const format,
+                        std::uint8_t const d) noexcept;
+
+    //! output std::uint16_t data element with format information
+    //!
+    //! @note
+    //! This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void u16_fmt_(std::uint8_t format, std::uint16_t d) noexcept;
+
+    //! Output std::uint32_t data element with format information
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void u32_fmt_(std::uint8_t format, std::uint32_t d) noexcept;
+
+    //! Output 32-bit floating point data element with format information
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void f32_fmt_(std::uint8_t format, float32_t const d) noexcept;
+
+    //! Output 64-bit floating point data element with format information
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void f64_fmt_(std::uint8_t format, float64_t const d) noexcept;
+
+    //! Output zero-terminated ASCII string element with format information
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void str_fmt_(char const *s) noexcept;
+
+    //! Output memory block of up to 255-bytes with format information
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void mem_fmt_(std::uint8_t const *blk, std::uint8_t size) noexcept;
+
+    //! Output uint64_t data element without format information
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void u64_raw_(std::uint64_t d) noexcept;
+
+    //! Output uint64_t data element with format information
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void u64_fmt_(std::uint8_t format, std::uint64_t d) noexcept;
+
+    //! Output signal dictionary record
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void sig_dict_pre_(enum_t const sig, void const * const obj,
+                              char const * const name) noexcept;
+
+    //! Output object dictionary record
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void obj_dict_pre_(void const * const obj,
+                              char const * const name) noexcept;
+
+    //! Output predefined object-array dictionary record
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void obj_arr_dict_pre_(void const * const obj,
+                                  std::uint_fast16_t const idx,
+                                  char const * const name) noexcept;
+
+    //! Output function dictionary record
+    static void fun_dict_pre_(void (* const fun)(void),
+                              char const * const name) noexcept;
+
+    //! Output user dictionary record
+    //!
+    //! @note This function is only to be used through macros, never in the
+    //! client code directly.
+    //!
+    static void usr_dict_pre_(enum_t const rec,
+                              char const * const name) noexcept;
+
+    //! Initialize the QS RX data buffer
+    //!
+    //! @description
+    //! This function should be called from QS::onStartup() to provide QS-RX
+    //! with the receive data buffer.
+    //!
+    //! @param[in]  sto[]   the address of the memory block
+    //! @param[in]  stoSize the size of this block [bytes]. The size of the
+    //!                     QS RX buffer cannot exceed 64KB.
+    //!
+    //! @note
+    //! QS-RX can work with quite small data buffers, but you will start
+    //! losing data if the buffer is not drained fast enough (e.g., in the
+    //! idle task).
+    //!
+    //! @note
+    //! If the data input rate exceeds the QS-RX processing rate, the data
+    //! will be lost, but the QS protocol will notice that:
+    //! (1) that the checksum in the incomplete QS records will fail; and
+    //! (2) the sequence counter in QS records will show discontinuities.
+    //!
+    //! The QS-RX channel will report any data errors by sending the
+    //! QS_RX_DATA_ERROR trace record.
+    //!
+    static void rxInitBuf(std::uint8_t * const sto,
+                          std::uint16_t const stoSize) noexcept;
+
+    //! Parse all bytes present in the QS RX data buffer
+    static void rxParse(void);
+
+    //! Obtain the number of free bytes in the QS RX data buffer
+    //!
+    //! @description
+    //! This function is intended to be called from the ISR that reads the
+    //! QS-RX bytes from the QSPY application. The function returns the
+    //! conservative number of free bytes currently available in the buffer,
+    //! assuming that the head pointer is not being moved concurrently.
+    //! The tail pointer might be moving, meaning that bytes can be
+    //! concurrently removed from the buffer.
+    //!
+    static std::uint16_t rxGetNfree(void) noexcept;
+
+    //! Put one byte into the QS RX lock-free buffer
+    static bool rxPut(std::uint8_t const b) noexcept;
+
+    //! Set the "current object" in the Target
+    //!
+    //! @description
+    //! This function sets the "current object" in the Target.
+    //!
+    static void setCurrObj(std::uint8_t obj_kind, void *obj_ptr) noexcept;
+
+    //! Query the "current object" in the Target
+    //!
+    //!
+    //! @description
+    //! This function programmatically generates the response to the query
+    //! for the "current object".
+    //!
+    static void queryCurrObj(std::uint8_t obj_kind) noexcept;
+
+    // QS buffer access ......................................................
+    //! Byte-oriented interface to the QS data buffer
+    //!
+    //! @description
+    //! This function delivers one byte at a time from the QS data buffer.
+    //!
+    //! @returns
+    //! the byte in the least-significant 8-bits of the 16-bit return
+    //! value if the byte is available. If no more data is available at the
+    //! time, the function returns QP::QS_EOD (End-Of-Data).
+    //!
+    //! @note
+    //! QP::QS::getByte() is __not__ protected with a critical section.
+    //!
+    static std::uint16_t getByte(void) noexcept;
+
+    //! Block-oriented interface to the QS data buffer
+    //!
+    //! @description
+    //! This function delivers a contiguous block of data from the QS data
+    //! buffer. The function returns the pointer to the beginning of the
+    //! block, and writes the number of bytes in the block to the location
+    //! pointed to by `pNbytes`. The argument `pNbytes` is also used as
+    //! input to provide the maximum size of the data block that the caller
+    //! can accept.
+    //!
+    //! @returns
+    //! if data is available, the function returns pointer to the
+    //! contiguous block of data and sets the value pointed to by `pNbytes`
+    //! to the # available bytes. If data is available at the time the
+    //! function is called, the function returns NULL pointer and sets the
+    //! value pointed to by `pNbytes` to zero.
+    //!
+    //! @note
+    //! Only the NULL return from QP::QS::getBlock() indicates that the QS
+    //! buffer is empty at the time of the call. The non-NULL return often
+    //! means that the block is at the end of the buffer and you need to call
+    //! QP::QS::getBlock() again to obtain the rest of the data that
+    //! "wrapped around" to the beginning of the QS data buffer.
+    //!
+    //! @note QP::QS::getBlock() is __not__ protected with a critical section.
+    //!
+    static std::uint8_t const *getBlock(
+                               std::uint16_t * const pNbytes) noexcept;
+
+    // platform-dependent callback functions to be implemented by clients ....
+
+    //! Callback to startup the QS facility
+    static bool onStartup(void const *arg);
+
+    //! Callback to cleanup the QS facility
+    static void onCleanup(void);
+
+    //! Callback to flush the QS trace data to the host
+    static void onFlush(void);
+
+    //! Callback to obtain a timestamp for a QS record.
+    static QSTimeCtr onGetTime(void);
+
+    //! callback function to reset the Target (to be implemented in the BSP)
+    static void onReset(void);
+
+    //! Callback function to execute user commands (to be implemented in BSP)
+    static void onCommand(std::uint8_t cmdId,
+                          std::uint32_t param1,
+                          std::uint32_t param2,
+                          std::uint32_t param3);
+
+    //! internal function to handle incoming (QS-RX) packet
+    static void rxHandleGoodFrame_(std::uint8_t const state);
+
+    //! internal function to produce the assertion failure trace record
+    static void assertion_pre_(char const * const module, int_t const loc,
+                               std::uint32_t const delay);
+
+    //! internal function to produce the critical section entry record
+    static void crit_entry_pre_(void);
+
+    //! internal function to produce the critical section exit record
+    static void crit_exit_pre_(void);
+
+    //! internal function to produce the ISR entry record
+    static void isr_entry_pre_(std::uint8_t const isrnest,
+                               std::uint8_t const prio);
+
+    //! internal function to produce the ISR exit record
+    static void isr_exit_pre_(std::uint8_t const isrnest,
+                              std::uint8_t const prio);
+
+#ifdef Q_UTEST
+    //! callback to setup a unit test inside the Target
+    static void onTestSetup(void);
+
+    //! callback to teardown after a unit test inside the Target
+    static void onTestTeardown(void);
+
+    //! callback to "massage" the test event before dispatching/posting it
+    static void onTestEvt(QEvt *e);
+
+    // callback to examine an event that is about to be posted
+    static void onTestPost(void const *sender, QActive *recipient,
+                           QEvt const *e, bool status);
+
+    //! callback to run the test loop
+    static void onTestLoop(void);
+
+    //! internal function to process posted events during test
+    static void processTestEvts_(void);
+
+    //! internal function to process armed time events during test
+    static void tickX_(std::uint_fast8_t const tickRate,
+                       void const * const sender) noexcept;
+
+    //! internal function to get the Test-Probe for a given API
+    //!
+    //! @description
+    //! This function obtains the Test-Probe for a given API.
+    //!
+    //! @param[in]  api  pointer to the API function that requests its
+    //!                  Test-Probe
+    //!
+    //! @returns Test-Probe data that has been received for the given API
+    //! from the Host (running qutest). For any ginve API, the function
+    //! returns the Test-Probe data in the same order as it was received
+    //! from the Host. If there is no Test-Probe for a ginve API, or no more
+    //! Test-Probes for a given API, the function returns zero.
+    //!
+    static std::uint32_t getTestProbe_(void (* const api)(void)) noexcept;
+
+    //! internal function to pause test and enter the test event loop
+    static void test_pause_(void);
+
+#endif // Q_UTEST
+
+    //! Enumerates data formats recognized by QS
+    //!
+    //! @description
+    //! QS uses this enumeration is used only internally for the formatted
+    //! user data elements.
+    enum QSType : std::uint8_t {
+        I8_T,         //!< signed 8-bit integer format
+        U8_T,         //!< unsigned 8-bit integer format
+        I16_T,        //!< signed 16-bit integer format
+        U16_T,        //!< unsigned 16-bit integer format
+        I32_T,        //!< signed 32-bit integer format
+        U32_T,        //!< unsigned 32-bit integer format
+        F32_T,        //!< 32-bit floating point format
+        F64_T,        //!< 64-bit floating point format
+        STR_T,        //!< zero-terminated ASCII string format
+        MEM_T,        //!< up to 255-bytes memory block format
+        SIG_T,        //!< event signal format
+        OBJ_T,        //!< object pointer format
+        FUN_T,        //!< function pointer format
+        I64_T,        //!< signed 64-bit integer format
+        U64_T,        //!< unsigned 64-bit integer format
+        HEX_FMT       //!< HEX format for the "width" filed
+    };
+
+    //! Kinds of objects used in QS
+    enum QSpyObjKind : std::uint8_t {
+        SM_OBJ,       //!< state machine object for QEP
+        AO_OBJ,       //!< active object
+        MP_OBJ,       //!< event pool object
+        EQ_OBJ,       //!< raw queue object
+        TE_OBJ,       //!< time event object
+        AP_OBJ,       //!< generic Application-specific object
+        MAX_OBJ
+    };
+
+    enum OSpyObjCombnation : std::uint8_t {
+        SM_AO_OBJ = MAX_OBJ //!< combination of SM and AO
+    };
+
+    //! template for forcing cast of member functions for function
+    //! dictionaries and test probes.
+    template<typename T_OUT, typename T_IN>
+    static T_OUT force_cast(T_IN in) {
+        union TCast {
+            T_IN  in;
+            T_OUT out;
+        } u = { in };
+        return u.out;
+    }
+
+    // private QS attributes .................................................
+    std::uint8_t glbFilter[16];  //!< global on/off QS filter
+    std::uint8_t locFilter[16];  //!< local  on/off QS filter
+    void const *locFilter_AP; //!< deprecated local QS filter
+    std::uint8_t *buf;    //!< pointer to the start of the ring buffer
+    QSCtr    end;         //!< offset of the end of the ring buffer
+    QSCtr volatile head;  //!< offset to where next byte will be inserted
+    QSCtr volatile tail;  //!< offset of where next record will be extracted
+    QSCtr volatile used;  //!< number of bytes currently in the ring buffer
+    std::uint8_t volatile seq;    //!< the record sequence number
+    std::uint8_t volatile chksum; //!< the checksum of the current record
+
+    std::uint_fast8_t volatile critNest; //!< critical section nesting level
+
+    static QS priv_;
+
+    static QSrx rxPriv_;
+};
+
 //! QS pre-defined record types (TX channel)
+//!
 //! @description
 //! This enumeration specifies the record types used in the QP components.
 //! You can specify your own record types starting from QP::QS_USER offset.
@@ -213,6 +730,7 @@ struct QSpyId {
 
     //! The size (in bytes) of the QS time stamp. Valid values: 1U, 2U,
     //! or 4U; default 4U.
+    //!
     //! @description
     //! This macro can be defined in the QS port file (qs_port.hpp) to
     //! configure the QP::QSTimeCtr type. Here the macro is not defined so
@@ -235,306 +753,13 @@ struct QSpyId {
 //============================================================================
 namespace QP {
 
-#if (QS_TIME_SIZE == 1U)
-    using QSTimeCtr = std::uint8_t;
-#elif (QS_TIME_SIZE == 2U)
-    using QSTimeCtr = std::uint16_t;
-#elif (QS_TIME_SIZE == 4U)
-    //! The type of the QS time stamp. This type determines the dynamic
-    // range of QS time stamps
-    //
-    using QSTimeCtr = std::uint32_t;
-#endif
-
-//! QS ring buffer counter and offset type
-using QSCtr = std::uint_fast16_t;
-
 //! Constant representing End-Of-Data condition returned from the
 //! QP::QS::getByte() function.
 constexpr std::uint16_t QS_EOD  = 0xFFFFU;
 
-//! QS software tracing facilities
-//! @description
-//! This class groups together QS services. It has only static members and
-//! should not be instantiated.
-class QS {
-public:
-    //! Initialize the QS data buffer.
-    static void initBuf(std::uint8_t * const sto,
-                        std::uint_fast16_t const stoSize) noexcept;
-
-    //! Set/clear the global Filter for a given QS record
-    //  or a group of records.
-    static void glbFilter_(std::int_fast16_t const filter) noexcept;
-
-    //! Set/clear the local Filter for a given object-id
-    //  or a group of object-ids.
-    static void locFilter_(std::int_fast16_t const filter) noexcept;
-
-    //! Mark the begin of a QS record @p rec
-    static void beginRec_(std::uint_fast8_t const rec) noexcept;
-
-    //! Mark the end of a QS record @p rec
-    static void endRec_(void) noexcept;
-
-    // raw (unformatted) output of data elements .............................
-
-    //! output std::uint8_t data element without format information
-    static void u8_raw_(std::uint8_t const d) noexcept;
-
-    //! output two std::uint8_t data elements without format information
-    static void u8u8_raw_(std::uint8_t const d1,
-                          std::uint8_t const d2) noexcept;
-
-    //! Output std::uint16_t data element without format information
-    static void u16_raw_(std::uint16_t d) noexcept;
-
-    //! Output std::uint32_t data element without format information
-    static void u32_raw_(std::uint32_t d) noexcept;
-
-    //! Output obj pointer data element without format information
-    static void obj_raw_(void const * const obj) noexcept;
-
-    //! Output zero-terminated ASCII string element without format information
-    static void str_raw_(char const *s) noexcept;
-
-
-    // formatted data elements output ........................................
-
-    //! Output std::uint8_t data element with format information
-    static void u8_fmt_(std::uint8_t const format,
-                        std::uint8_t const d) noexcept;
-
-    //! output std::uint16_t data element with format information
-    static void u16_fmt_(std::uint8_t format, std::uint16_t d) noexcept;
-
-    //! Output std::uint32_t data element with format information
-    static void u32_fmt_(std::uint8_t format, std::uint32_t d) noexcept;
-
-    //! Output 32-bit floating point data element with format information
-    static void f32_fmt_(std::uint8_t format, float32_t const d) noexcept;
-
-    //! Output 64-bit floating point data element with format information
-    static void f64_fmt_(std::uint8_t format, float64_t const d) noexcept;
-
-    //! Output zero-terminated ASCII string element with format information
-    static void str_fmt_(char const *s) noexcept;
-
-    //! Output memory block of up to 255-bytes with format information
-    static void mem_fmt_(std::uint8_t const *blk, std::uint8_t size) noexcept;
-
-    //! Output uint64_t data element without format information
-    static void u64_raw_(std::uint64_t d) noexcept;
-
-    //! Output uint64_t data element with format information
-    static void u64_fmt_(std::uint8_t format, std::uint64_t d) noexcept;
-
-    //! Output signal dictionary record
-    static void sig_dict_pre_(enum_t const sig, void const * const obj,
-                              char const * const name) noexcept;
-
-    //! Output object dictionary record
-    static void obj_dict_pre_(void const * const obj,
-                              char const * const name) noexcept;
-
-    //! Output predefined object-array dictionary record
-    static void obj_arr_dict_pre_(void const * const obj,
-                                  std::uint_fast16_t const idx,
-                                  char const * const name) noexcept;
-
-    //! Output function dictionary record
-    static void fun_dict_pre_(void (* const fun)(void),
-                              char const * const name) noexcept;
-
-    //! Output user dictionary record
-    static void usr_dict_pre_(enum_t const rec,
-                              char const * const name) noexcept;
-
-    //! Initialize the QS RX data buffer
-    static void rxInitBuf(std::uint8_t * const sto,
-                          std::uint16_t const stoSize) noexcept;
-
-    //! Parse all bytes present in the QS RX data buffer
-    static void rxParse(void);
-
-    //! Obtain the number of free bytes in the QS RX data buffer
-    static std::uint16_t rxGetNfree(void) noexcept;
-
-    //! Put one byte into the QS RX lock-free buffer
-    static bool rxPut(std::uint8_t const b) noexcept;
-
-    //! Set the "current object" in the Target
-    static void setCurrObj(std::uint8_t obj_kind, void *obj_ptr) noexcept;
-
-    //! Query the "current object" in the Target
-    static void queryCurrObj(std::uint8_t obj_kind) noexcept;
-
-    // QS buffer access ......................................................
-    //! Byte-oriented interface to the QS data buffer.
-    static std::uint16_t getByte(void) noexcept;
-
-    //! Block-oriented interface to the QS data buffer.
-    static std::uint8_t const *getBlock(
-                               std::uint16_t * const pNbytes) noexcept;
-
-    // platform-dependent callback functions to be implemented by clients ....
-
-    //! Callback to startup the QS facility
-    static bool onStartup(void const *arg);
-
-    //! Callback to cleanup the QS facility
-    static void onCleanup(void);
-
-    //! Callback to flush the QS trace data to the host
-    static void onFlush(void);
-
-    //! Callback to obtain a timestamp for a QS record.
-    static QSTimeCtr onGetTime(void);
-
-    //! callback function to reset the Target (to be implemented in the BSP)
-    static void onReset(void);
-
-    //! Callback function to execute user commands (to be implemented in BSP)
-    static void onCommand(std::uint8_t cmdId,
-                          std::uint32_t param1,
-                          std::uint32_t param2,
-                          std::uint32_t param3);
-
-    //! internal function to handle incoming (QS-RX) packet
-    static void rxHandleGoodFrame_(std::uint8_t const state);
-
-    //! internal function to produce the assertion failure trace record
-    static void assertion_pre_(char const * const module, int_t const loc,
-                               std::uint32_t const delay);
-
-    //! internal function to produce the critical section entry record
-    static void crit_entry_pre_(void);
-
-    //! internal function to produce the critical section exit record
-    static void crit_exit_pre_(void);
-
-    //! internal function to produce the ISR entry record
-    static void isr_entry_pre_(std::uint8_t const isrnest,
-                               std::uint8_t const prio);
-
-    //! internal function to produce the ISR exit record
-    static void isr_exit_pre_(std::uint8_t const isrnest,
-                              std::uint8_t const prio);
-
-#ifdef Q_UTEST
-    //! callback to setup a unit test inside the Target
-    static void onTestSetup(void);
-
-    //! callback to teardown after a unit test inside the Target
-    static void onTestTeardown(void);
-
-    //! callback to "massage" the test event before dispatching/posting it
-    static void onTestEvt(QEvt *e);
-
-    // callback to examine an event that is about to be posted
-    static void onTestPost(void const *sender, QActive *recipient,
-                           QEvt const *e, bool status);
-
-    //! callback to run the test loop
-    static void onTestLoop(void);
-
-    //! internal function to process posted events during test
-    static void processTestEvts_(void);
-
-    //! internal function to process armed time events during test
-    static void tickX_(std::uint_fast8_t const tickRate,
-                       void const * const sender) noexcept;
-
-    //! internal function to get the Test-Probe for a given API
-    static std::uint32_t getTestProbe_(void (* const api)(void)) noexcept;
-
-    //! internal function to pause test and enter the test event loop
-    static void test_pause_(void);
-
-#endif // Q_UTEST
-
-    //! Enumerates data formats recognized by QS
-    //! @description
-    //! QS uses this enumeration is used only internally for the formatted
-    //! user data elements.
-    enum QSType : std::uint8_t {
-        I8_T,         //!< signed 8-bit integer format
-        U8_T,         //!< unsigned 8-bit integer format
-        I16_T,        //!< signed 16-bit integer format
-        U16_T,        //!< unsigned 16-bit integer format
-        I32_T,        //!< signed 32-bit integer format
-        U32_T,        //!< unsigned 32-bit integer format
-        F32_T,        //!< 32-bit floating point format
-        F64_T,        //!< 64-bit floating point format
-        STR_T,        //!< zero-terminated ASCII string format
-        MEM_T,        //!< up to 255-bytes memory block format
-        SIG_T,        //!< event signal format
-        OBJ_T,        //!< object pointer format
-        FUN_T,        //!< function pointer format
-        I64_T,        //!< signed 64-bit integer format
-        U64_T,        //!< unsigned 64-bit integer format
-        HEX_FMT       //!< HEX format for the "width" filed
-    };
-
-    //! Kinds of objects used in QS
-    enum QSpyObjKind : std::uint8_t {
-        SM_OBJ,       //!< state machine object for QEP
-        AO_OBJ,       //!< active object
-        MP_OBJ,       //!< event pool object
-        EQ_OBJ,       //!< raw queue object
-        TE_OBJ,       //!< time event object
-        AP_OBJ,       //!< generic Application-specific object
-        MAX_OBJ
-    };
-
-    enum OSpyObjCombnation : std::uint8_t {
-        SM_AO_OBJ = MAX_OBJ //!< combination of SM and AO
-    };
-
-    //! template for forcing cast of member functions for function
-    //! dictionaries and test probes.
-    template<typename T_OUT, typename T_IN>
-    static T_OUT force_cast(T_IN in) {
-        union TCast {
-            T_IN  in;
-            T_OUT out;
-        } u = { in };
-        return u.out;
-    }
-
-    // private QS attributes .................................................
-    std::uint8_t glbFilter[16];  //!< global on/off QS filter
-    std::uint8_t locFilter[16];  //!< lobal  on/off QS filter
-    void const *locFilter_AP; //!< deprecated local QS filter
-    std::uint8_t *buf;    //!< pointer to the start of the ring buffer
-    QSCtr    end;         //!< offset of the end of the ring buffer
-    QSCtr volatile head;  //!< offset to where next byte will be inserted
-    QSCtr volatile tail;  //!< offset of where next record will be extracted
-    QSCtr volatile used;  //!< number of bytes currently in the ring buffer
-    std::uint8_t volatile seq;    //!< the record sequence number
-    std::uint8_t volatile chksum; //!< the checksum of the current record
-
-    std::uint_fast8_t volatile critNest; //!< critical section nesting level
-
-    static QS priv_;
-
-    static struct QSrxPriv {
-        void *currObj[MAX_OBJ]; //!< current objects
-        std::uint8_t *buf;      //!< pointer to the start of the ring buffer
-        QSCtr end;           //!< offset of the end of the ring buffer
-        QSCtr volatile head; //!< offset to where next byte will be inserted
-        QSCtr volatile tail; //!< offset of where next byte will be extracted
-#ifdef Q_UTEST
-        QP::QPSet readySet;  //!< QUTEST ready-set of active objects
-        bool inTestLoop;     //!< QUTest event loop is running
-#endif
-    } rxPriv_;
-};
-
 //============================================================================
 // QS receive channel
 
-//! put one byte into the QS RX lock-free buffer
 inline bool QS::rxPut(std::uint8_t const b) noexcept {
     QSCtr head = rxPriv_.head + 1U;
     if (head == rxPriv_.end) {
@@ -553,7 +778,8 @@ inline bool QS::rxPut(std::uint8_t const b) noexcept {
 //============================================================================
 #ifdef Q_UTEST
 
-//! Dummy HSM class
+//! Dummy HSM class for testing (inherits QP::QHsm)
+//!
 //! @description
 //! QHsmDummy is a test double for the role of "Orthogonal Components"
 //! HSM objects in QUTest unit testing.
@@ -569,7 +795,8 @@ public:
                   std::uint_fast8_t const qs_id) noexcept override;
 };
 
-//! Dummy Active Object class
+//! Dummy Active Object class for testing (inherits QP::QActive)
+//!
 //! @description
 //! QActiveDummy is a test double for the role of collaborating active
 //! objects in QUTest unit testing.
@@ -614,7 +841,8 @@ extern std::uint8_t volatile QF_intNest;
 //============================================================================
 // Macros for adding QS instrumentation to the client code
 
-//! Initialize the QS facility.
+//! Initialize the QS facility
+//!
 //! @description
 //! This macro provides an indirection layer to invoke the QS initialization
 //! routine if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
@@ -622,17 +850,23 @@ extern std::uint8_t volatile QF_intNest;
 //! QS_GLB_FILTER()
 #define QS_INIT(arg_)           (QP::QS::onStartup(arg_))
 
-//! Cleanup the QS facility.
+//! Cleanup the QS facility
+//!
 //! @description
 //! This macro provides an indirection layer to invoke the QS cleanup
 //! routine if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
 //! @sa QP::QS::onCleanup()
 #define QS_EXIT()               (QP::QS::onCleanup())
 
-//! Global Filter ON for a given record type @p rec.
+//! Global Filter ON for a given record type `rec_`
+//!
 //! @description
 //! This macro provides an indirection layer to call QP::QS::filterOn()
 //! if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
+//!
+//! @sa
+//! - QP::QSpyRecordGroups - QS record groups that can be used as `rec_`
+//! - QP::QSpyRecords - individual QS records that can be used as `rec_`
 //!
 //! @usage
 //! The following example shows how to use QS filters:
@@ -640,10 +874,14 @@ extern std::uint8_t volatile QF_intNest;
 #define QS_GLB_FILTER(rec_) \
     (QP::QS::glbFilter_(static_cast<std::int_fast16_t>(rec_)))
 
-//! Local Filter for a given state machine object @p qs_id.
+//! Local Filter for a given state machine object `qs_id`
 //! @description
 //! This macro provides an indirection layer to call QS_locFilter_()
 //! if #Q_SPY is defined, or do nothing if #Q_SPY is not defined.
+//!
+//! @sa
+//! - QP::QSpyIdGroups - QS ID groups that can be used as @p qs_id_
+//! - QP::QSpyIdOffsets - QS ID offsets for @p qs_id_ (e.g., QS_AP_IDS + 5)
 //!
 //! The following example shows how to use QS filters:
 //! @include qs_filter.cpp
@@ -653,7 +891,8 @@ extern std::uint8_t volatile QF_intNest;
 //============================================================================
 // Macros to generate application-specific (user) QS records
 
-//! Begin a user QS record with entering critical section.
+//! Begin a user QS record with entering critical section
+//!
 //! @description
 //! The following example shows how to build a user QS record using the
 //! macros QS_BEGIN_ID(), QS_END(), and the formatted output macros:
@@ -727,7 +966,8 @@ extern std::uint8_t volatile QF_intNest;
 #else // separate QS critical section not defined--use the QF definition
 #ifndef QF_CRIT_STAT_TYPE
     //! This is an internal macro for defining the critical section
-    //! status type.
+    //! status type
+    //!
     //! @description
     //! The purpose of this macro is to enable writing the same code for the
     //! case when critical section status type is defined and when it is not.
@@ -737,7 +977,8 @@ extern std::uint8_t volatile QF_intNest;
     //! @sa #QF_CRIT_STAT_TYPE
     #define QS_CRIT_STAT_
 
-    //! This is an internal macro for entering a critical section.
+    //! This is an internal macro for entering a critical section
+    //!
     //! @description
     //! The purpose of this macro is to enable writing the same code for the
     //! case when critical section status type is defined and when it is not.
@@ -747,7 +988,8 @@ extern std::uint8_t volatile QF_intNest;
     //! @sa #QF_CRIT_ENTRY
     #define QS_CRIT_E_()    QF_CRIT_ENTRY(dummy)
 
-    //! This is an internal macro for exiting a critical section.
+    //! This is an internal macro for exiting a critical section
+    //!
     //! @description
     //! The purpose of this macro is to enable writing the same code for the
     //! case when critical section status type is defined and when it is not.
@@ -895,6 +1137,7 @@ extern std::uint8_t volatile QF_intNest;
 //============================================================================
 //! Output signal dictionary record
 //!
+//! @description
 //! A signal dictionary record associates the numerical value of the signal
 //! and the binary address of the state machine that consumes that signal
 //! with the human-readable name of the signal.
@@ -937,6 +1180,7 @@ extern std::uint8_t volatile QF_intNest;
 
 //! Output object dictionary record
 //!
+//! @description
 //! An object dictionary record associates the binary address of an object
 //! in the target's memory with the human-readable name of the object.
 //!
@@ -951,6 +1195,7 @@ extern std::uint8_t volatile QF_intNest;
     (QP::QS::obj_dict_pre_((obj_), #obj_))
 
 //! Output object-array dictionary record
+//!
 //! @description
 //! An object array dictionary record associates the binary address of the
 //! object element in the target's memory with the human-readable name
@@ -968,6 +1213,7 @@ extern std::uint8_t volatile QF_intNest;
 
 //! Output function dictionary record
 //!
+//! @description
 //! A function dictionary record associates the binary address of a function
 //! in the target's memory with the human-readable name of the function.
 //!
@@ -983,6 +1229,7 @@ extern std::uint8_t volatile QF_intNest;
 
 //! Output user QS record dictionary record
 //!
+//! @description
 //! A user QS record dictionary record associates the numerical value of a
 //! user record with the human-readable identifier.
 #define QS_USR_DICTIONARY(rec_) do {              \
@@ -1010,6 +1257,7 @@ extern std::uint8_t volatile QF_intNest;
 
 //! Flush the QS trace data to the host
 //!
+//! @description
 //! This macro invokes the QP::QS::flush() platform-dependent callback
 //! function to flush the QS trace buffer to the host. The function
 //! typically busy-waits until all the data in the buffer is sent to

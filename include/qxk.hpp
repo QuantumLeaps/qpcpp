@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QXK/C++ preemptive extended (blocking) kernel, platform-independent
@@ -78,11 +78,31 @@ struct QXK_Attr {
 extern QXK_Attr QXK_attr_;
 
 //! QXK scheduler finds the highest-priority thread ready to run
+//!
+//! @description
+//! The QXK scheduler finds the priority of the highest-priority thread
+//! that is ready to run.
+//!
+//! @returns the 1-based priority of the the active object to run next,
+//! or zero if no eligible active object is found.
+//!
+//! @attention
+//! QXK_sched_() must be always called with interrupts **disabled** and
+//! returns with interrupts **disabled**.
+//!
 std::uint_fast8_t QXK_sched_(void) noexcept;
 
 //! QXK activator activates the next active object. The activated AO preempts
-// the currently executing AOs.
-//
+//! the currently executing AOs
+//!
+//! @attention
+//! QXK_activate_() must be always called with interrupts **disabled** and
+//! returns with interrupts **disabled**.
+//!
+//! @note
+//! The activate function might enable interrupts internally, but it always
+//! returns with interrupts **disabled**.
+//!
 void QXK_activate_(void);
 
 //! return the currently executing active-object/thread
@@ -123,7 +143,8 @@ namespace QP {
 using QSchedStatus = std::uint_fast16_t;
 
 //============================================================================
-//! QXK services.
+//! QXK preemptive, dual-mode (blocking/non-blocking) real-time kernel
+//!
 //! @description
 //! This class groups together QXK services. It has only static members and
 //! should not be instantiated.
@@ -133,15 +154,59 @@ using QSchedStatus = std::uint_fast16_t;
 //! potential name-mangling problems in assembly language, these elements
 //! are defined outside of the QXK class and outside the QP namespace with
 //! the extern "C" linkage specification.
+//!
 class QXK {
 public:
     //! QXK selective scheduler lock
+    //!
+    //! @description
+    //! This function locks the QXK scheduler to the specified ceiling.
+    //!
+    //! @param[in]   ceiling    priority ceiling to which the QXK scheduler
+    //!                         needs to be locked
+    //!
+    //! @returns
+    //! The previous QXK Scheduler lock status, which is to be used to unlock
+    //! the scheduler by restoring its previous lock status in
+    //! QXK::schedUnlock().
+    //!
+    //! @note
+    //! QXK::schedLock() must be always followed by the corresponding
+    //! QXK::schedUnlock().
+    //!
+    //! @sa QXK::schedUnlock()
+    //!
+    //! @usage
+    //! The following example shows how to lock and unlock the QXK scheduler:
+    //! @include qxk_lock.cpp
+    //!
     static QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept;
 
     //! QXK selective scheduler unlock
+    //!
+    //! @description
+    //! This function unlocks the QXK scheduler to the previous status.
+    //!
+    //! @param[in]   stat       previous QXK Scheduler lock status returned
+    //!                         from QXK::schedLock()
+    //! @note
+    //! A QXK scheduler can be locked from both basic threads (AOs) and
+    //! extended threads and the scheduler locks can nest.
+    //!
+    //! @note
+    //! QXK::schedUnlock() must always follow the corresponding
+    //! QXK::schedLock().
+    //!
+    //! @sa QXK::schedLock()
+    //!
+    //! @usage
+    //! The following example shows how to lock and unlock the QXK scheduler:
+    //! @include qxk_lock.cpp
+    //!
     static void schedUnlock(QSchedStatus const stat) noexcept;
 
     //! QXK idle callback (customized in BSPs for QXK)
+    //!
     //! @description
     //! QP::QXK::onIdle() is called continously by the QXK idle loop. This
     //! callback gives the application an opportunity to enter a power-saving

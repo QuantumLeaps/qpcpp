@@ -22,17 +22,18 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief Application build time-stamp
+//!
 //! @note
-//! This module needs to be re-compiled in every new software build. To achive
-//! this, it is recommended to delete the object file (qstamp.o or qstamp.obj)
-//! in the build directory before each build. (Most development tools allow
-//! you to specify a pre-build action, which is the ideal place to delete
-//! the qstamp object file.)
+//! This module needs to be re-compiled in every new software build.
+//! To achieve this, it is recommended to delete the object file
+//! (qstamp.o or qstamp.obj) in the build directory before each build.
+//! (Most development tools allow you to specify a pre-build action,
+//! which is the ideal place to delete the qstamp object file.)
 
 #include "qstamp.hpp"
 

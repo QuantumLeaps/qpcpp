@@ -35,7 +35,8 @@ The QP&trade;/C++ Real-Time Embedded Framework (RTEF) is a unique offering on th
 
 
 @subsection over_oop Object Orientation
-QP&trade;/C++ is fundamentally an **object-oriented** framework, which means that the framework itself and your applications derived from the framework are fundamentally composed of <a href="https://en.wikipedia.org/wiki/Class_(computer_programming)" target="_blank" class="extern">classes</a> and only classes can have @ref srs_sm "state machines" associated with them.
+@anchor oop
+QP&trade;/C++ is fundamentally an **object-oriented** framework, which means that the framework itself and your applications derived from the framework are fundamentally composed of @ref sas_core "classes" and only classes can have @ref srs_sm "state machines" associated with them.
 
 @subsection over_hsms Hierarchical State Machines
 The behavior of active objects is specified in QP&trade;/C++ by means of @webref{fsm/#HSM, hierarchical state machines (UML statecharts)}. The framework supports @ref sds_sm "manual coding of UML state machines in C++" as well as fully **automatic code generation** by means of the free graphical @webref{products/qm, QM&trade; model-based design (MBD) tool}.

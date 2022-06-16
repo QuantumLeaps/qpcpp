@@ -1,9 +1,9 @@
 //! @file
-//! @brief Internal (package scope) QXK/C++ interface.
+//! @brief QF/C++ port for QK kernel, Generic C++ compiler
 //! @cond
 //============================================================================
-//! Last updated for version 6.8.0
-//! Last updated on  2020-01-16
+//! Last updated for version 6.8.2
+//! Last updated on  2020-07-17
 //!
 //!                    Q u a n t u m  L e a P s
 //!                    ------------------------
@@ -35,45 +35,30 @@
 //============================================================================
 //! @endcond
 
-#ifndef QXK_PKG_HPP
-#define QXK_PKG_HPP
+#ifndef QF_PORT_HPP
+#define QF_PORT_HPP
 
-namespace QP {
+// interrupt disabling mechanism
+#define QF_INT_DISABLE()            intDisable()
+#define QF_INT_ENABLE()             intEnable()
 
-//! timeout signals
-enum QXK_Timeouts : std::uint8_t {
-    QXK_DELAY_SIG = Q_USER_SIG,
-    QXK_QUEUE_SIG,
-    QXK_SEMA_SIG
-};
+// QF critical section mechansim
+#define QF_CRIT_STAT_TYPE           unsigned
+#define QF_CRIT_ENTRY(stat_)        ((stat_) = critEntry())
+#define QF_CRIT_EXIT(stat_)         critExit(stat_)
 
-} // namespace QP
+#include "qep_port.hpp" // QEP port
+#include "qk_port.hpp"  // QK port
+#include "qf.hpp"       // QF platform-independent public interface
 
-//============================================================================
 extern "C" {
 
-//! initialize the private stack of a given AO
-void QXK_stackInit_(void *thr, QP::QXThreadHandler const handler,
-             void * const stkSto, std::uint_fast16_t const stkSize) noexcept;
+void intDisable(void);
+void intEnable(void);
 
-//! called when a thread function returns
-void QXK_threadRet_(void) noexcept;
+QF_CRIT_STAT_TYPE critEntry(void);
+void critExit(QF_CRIT_STAT_TYPE stat);
 
 } // extern "C"
 
-//! intertnal macro to encapsulate casting of pointers for MISRA deviations
-//
-//! @description
-//! This macro is specifically and exclusively used for casting pointers
-//! that are never de-referenced, but only used for internal bookkeeping and
-//! checking (via assertions) the correct operation of the QXK kernel.
-//! Such pointer casting is not compliant with MISRA C++ Rule 5-2-7
-//! as well as other messages (e.g., PC-Lint-Plus warning 826).
-//! Defining this specific macro for this purpose allows to selectively
-//! disable the warnings for this particular case.
-//!
-#define QXK_PTR_CAST_(type_, ptr_) (reinterpret_cast<type_>(ptr_))
-
-#include "qf_pkg.hpp"  // QF package-scope interface
-
-#endif // QXK_PKG_HPP
+#endif // QF_PORT_HPP

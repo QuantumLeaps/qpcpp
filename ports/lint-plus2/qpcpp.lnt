@@ -1,0 +1,462 @@
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2021-12-31
+//! @version Last updated for version: 7.0.0
+//!
+//! @file
+//! @brief PC-Lint-Plus option file for linting QP/C++ __Applications__
+
+// Assertions ----------------------------------------------------------------
+
+// old-style c comment [AUTOSAR Rule A2-8-4]
+-efile(1904,
+ -qassert.h)
+
+// give Q_onAssert() the semantics of "exit"
+-function(exit,
+ Q_onAssert)
+
+// C-style array type [AUTOSAR Rule A18-1-1]
+-esym(9436,
+ QP::versionStr)
+
+// MC++R16-0-4 function-like macro
+-esym(9026,
+ Q_ASSERT,
+ Q_ASSERT_ID,
+ Q_ALLEGE,
+ Q_ALLEGE_ID,
+ Q_ERROR,
+ Q_ERROR_ID,
+ Q_REQUIRE,
+ Q_REQUIRE_ID,
+ Q_ENSURE,
+ Q_ENSURE_ID,
+ Q_INVARIANT,
+ Q_INVARIANT_ID,
+ Q_ASSERT_STATIC,
+ Q_ASSERT_COMPILE,
+ Q_DEFINE_THIS_MODULE)
+
+// use of c-style cast to void [AS-A5-2-2]
+-emacro(1954,
+ Q_ASSERT,
+ Q_ASSERT_ID,
+ Q_ALLEGE,
+ Q_ALLEGE_ID,
+ Q_ERROR,
+ Q_ERROR_ID,
+ Q_REQUIRE,
+ Q_REQUIRE_ID,
+ Q_ENSURE,
+ Q_ENSURE_ID,
+ Q_INVARIANT,
+ Q_INVARIANT_ID)
+
+// MC++R10-0-6 unparenthesized macro parameter 'class_' in definition of macro
+-esym(9022,
+ Q_DEFINE_THIS_FILE,
+ Q_DEFINE_THIS_MODULE)
+
+// definition of macro ends in semi-colon
+-esym(823,
+ Q_DEFINE_THIS_FILE,
+ Q_DEFINE_THIS_MODULE)
+
+// MC++R7-3-1 global declaration of symbol 'Q_this_module_'
+-esym(9141,
+ Q_this_module_)
+
+// MC++R16-0-4 function-like macro
+-esym(9026,
+ Q_DIM,
+ Q_UINT2PTR_CAST)
+
+// MC++R5-2-4 use of c-style cast
+-emacro(1924,
+ Q_ASSERT,
+ Q_ASSERT_ID,
+ Q_ERROR,
+ Q_ERROR_ID)
+
+
+// QEP -----------------------------------------------------------------------
+
+// MC++R7-3-1 global declaration of symbol
+-esym(9141,
+ char_t,
+ int_t,
+ enum_t,
+ float32_t,
+ float64_t)
+
+// MC++R16-0-4 function-like macro
+-esym(9026,
+ QEVT_INITIALIZER,
+ Q_STATE_DECL,
+ Q_STATE_DEF,
+ QM_STATE_DECL,
+ QM_STATE_DEF,
+ QM_SM_STATE_DECL,
+ QM_ACTION_DECL,
+ QM_ACTION_DEF,
+ QHSM_INIT,
+ QHSM_DISPATCH,
+ Q_TRAN,
+ Q_TRAN_HIST,
+ Q_SUPER,
+ Q_HANDLED,
+ Q_UNHANDLED,
+ QM_ENTRY,
+ QM_EXIT,
+ QM_SM_EXIT,
+ QM_TRAN,
+ QM_TRAN_INIT,
+ QM_TRAN_HIST,
+ QM_TRAN_EP,
+ QM_TRAN_XP,
+ QM_SUPER,
+ QM_SUPER_SUB,
+ QM_HANDLED,
+ QM_UNHANDLED,
+ Q_HSM_UPCAST,
+ Q_EVT_CAST,
+ Q_UINT2PTR_CAST,
+ Q_STATE_CAST,
+ Q_ACTION_CAST)
+
+// MC++R5-2-8 conversion from pointer to other pointer type
+-emacro(9079,
+ Q_EVT_CAST)
+
+// MC++R5-2-2 casting from base class 'QP::QEvt' to derived class
+-emacro(1939,
+ Q_EVT_CAST)
+
+// MC++R10-0-6 unparenthesized macro parameter 'class_' in definition of macro
+-esym(9022,
+ Q_EVT_CAST,
+ Q_UINT2PTR_CAST,
+ Q_STATE_DECL,
+ Q_STATE_DEF,
+ QM_STATE_DECL,
+ QM_STATE_DEF,
+ QM_SM_STATE_DECL,
+ QM_ACTION_DECL,
+ QM_ACTION_DEF,
+ QEP_TRIG_,
+ QEP_ENTER_,
+ QEP_EXIT_)
+
+// MC++16-3-1 multiple use of stringize/pasting operators in definition of macro
+-esym(9023,
+ Q_STATE_DECL,
+ Q_STATE_DEF,
+ QM_STATE_DECL,
+ QM_STATE_DEF,
+ QM_SM_STATE_DECL,
+ QM_ACTION_DEF)
+
+// MC++16-3-2 pasting operator used in definition of function-like macro
+-esym(9024,
+ Q_STATE_DECL,
+ Q_STATE_DEF,
+ QM_STATE_DECL,
+ QM_STATE_DEF,
+ QM_SM_STATE_DECL,
+ QM_ACTION_DECL,
+ QM_ACTION_DEF)
+
+// MC++R5-2-8  conversion from pointer to void to other pointer type
+-emacro(9079,
+ Q_STATE_DEF,
+ QM_STATE_DEF,
+ QM_ACTION_DEF)
+
+ // MC++R9-3-3 member function could be made const
+-emacro(1762,
+ Q_STATE_DEF,
+ QM_STATE_DEF)
+
+// MC++9-5-1 union declared
+-esym(9018,
+ QP::QHsmAttr)
+
+// MC++5-2-8 conversion from integer type (0) to pointer type
+-emacro(9010,
+ Q_STATE_CAST,
+ Q_ACTION_CAST)
+
+// public virtual function 'QP::QHsm::...'
+-esym(1731,
+ QP::QHsm::*,
+ QP::QMsm::*)
+
+
+// QF ------------------------------------------------------------------------
+// MC++R16-0-4 function-like macro
+-esym(9026,
+ POST,
+ POST_X,
+ PUBLISH,
+ TICK,
+ TICK_X,
+ QF_CRIT_ENTRY,
+ QF_CRIT_EXIT,
+ QF_INT_DISABLE,
+ QF_INT_ENABLE,
+ QF_CRIT_EXIT_NOP,
+ QF_LOG2,
+ Q_NEW,
+ Q_NEW_X,
+ Q_NEW_REF,
+ Q_DELETE_REF,
+ QF_INT_DISABLE,
+ QF_INT_ENABLE,
+ QF_CRIT_ENTRY,
+ QF_CRIT_EXIT,
+ QF_QS_CRIT_ENTRY,
+ QF_QS_CRIT_EXIT,
+ QF_QS_ISR_ENTRY,
+ QF_QS_ISR_EXIT,
+ QF_QS_ACTION,
+ QF_MPOOL_EL)
+
+// MC++R11-0-1 non-private data member within a non-POD structure
+// NOTE: public access needed for extern "C" functions
+-esym(9150,
+ QP::QActive::*)
+
+// MC++R0-3-2  ignoring return value of function
+-emacro(534,
+ POST)
+
+// MC++R5-2-7 pointer type converted to unrelated pointer type
+-emacro(9176,
+ QF_QMACTIVE_TO_QMSM_CAST_,
+ QF_QMACTIVE_TO_QMSM_CONST_CAST_)
+
+// MC++R5-2-2 casting from base class 'QP::QEvt' to derived class
+-emacro(1939,
+ Q_NEW,
+ Q_NEW_X)
+
+// MC++R10-0-6 unparenthesized macro parameter in definition of macro
+-esym(9022,
+ Q_NEW,
+ Q_NEW_X,
+ Q_NEW_REF)
+
+// implicit conversion (call) from 'enum ...' to 'const enum_t'
+-emacro(713,
+ Q_NEW,
+ Q_NEW_X)
+
+// implicit conversion of 'enum ...' to integral type 'enum_t'
+-emacro(641,
+ Q_NEW,
+ Q_NEW_X)
+
+// public virtual function 'QP::QHsm::...'
+-esym(1731,
+ QP::QActive::*,
+ QP::QMActive::*,
+ QP::QTicker::*)
+
+// public base 'QP::QEvt' has no non-destructor virtual functions
+-esym(1790,
+ QP::QEvt)
+
+
+// QK ------------------------------------------------------------------------
+
+// MC++R16-0-4 function-like macro
+-esym(9026,
+ QK_ISR_ENTRY,
+ QK_ISR_EXIT)
+
+// MC++R7-3-1 global declaration of symbol
+-esym(9141,
+ QK_Attr)
+
+// MC++R11-0-1 non-private data member within a non-POD structure
+// NOTE: public access needed for extern "C" functions
+-esym(9150,
+ QK_Attr::*)
+
+
+// QXK -----------------------------------------------------------------------
+// MC++R16-0-4 function-like macro
+-esym(9026,
+ QXK_ISR_ENTRY,
+ QXK_ISR_EXIT,
+ QXK_TLS)
+
+// MC++R7-3-1 global declaration of symbol
+-esym(9141,
+ QXK_Attr)
+
+// MC++R10-0-6 unparenthesized macro parameter in definition of macro
+-esym(9022,
+ QXK_TLS)
+
+// MC++R5-2-8 conversion from pointer to void to other pointer type
+-emacro(9079,
+ QXK_PTR_CAST_)
+
+// MC++R5-2-2 casting from base class 'QP::QActive' to derived class 'QP::QXThread'
+-emacro(1939,
+ QXTHREAD_CAST_)
+
+// MC++R5-2-3 downcast of polymorphic type 'QP::QActive' to type 'QP::QXThread'
+-emacro(9171,
+ QXTHREAD_CAST_)
+
+// MC++R17-0-2 the name 'signal' is reserved to the compiler
+-esym(9093,
+ signal)
+
+// public virtual function 'QP::QXThread::...'
+-esym(1731,
+ QP::QXThread::*)
+
+
+// QS ------------------------------------------------------------------------
+
+// MC++R16-0-4 function-like macro
+-esym(9026,
+ QS_INIT,
+ QS_EXIT,
+ QS_DUMP,
+ QS_RESET,
+ QS_GLB_FILTER,
+ QS_LOC_FILTER,
+ QS_FILTER_AP_OBJ,
+ QS_GET_BYTE,
+ QS_GET_BLOCK,
+ QS_BEGIN_ID,
+ QS_END,
+ QS_BEGIN_NOCRIT,
+ QS_END_NOCRIT,
+ QS_I8,
+ QS_U8,
+ QS_I16,
+ QS_U16,
+ QS_I32,
+ QS_I64,
+ QS_U32,
+ QS_F32,
+ QS_F64,
+ QS_U64,
+ QS_U32_HEX,
+ QS_STR,
+ QS_OBJ,
+ QS_FUN,
+ QS_SIG_DICTIONARY,
+ QS_OBJ_DICTIONARY,
+ QS_OBJ_ARR_DICTIONARY,
+ QS_FUN_DICTIONARY,
+ QS_USR_DICTIONARY,
+ QS_ASSERTION,
+ QS_FLUSH,
+ QS_MEM,
+ QS_SIG,
+ QS_PTR_AT_,
+ QS_RX_PUT,
+ QS_OUTPUT,
+ QS_RX_INPUT,
+ QS_TEST_PAUSE,
+ QS_TEST_PROBE_DEF,
+ QS_TEST_PROBE,
+ QS_TEST_PROBE_ID)
+
+// MC++R16-0-4 function-like macro
+-esym(9026,
+ QS_GLB_CHECK_,
+ QS_LOC_CHECK_,
+ QS_BEGIN_PRE_,
+ QS_END_PRE_,
+ QS_BEGIN_NOCRIT_PRE_,
+ QS_END_NOCRIT_PRE_,
+ QS_U8_PRE_,
+ QS_2U8_PRE_,
+ QS_U16_PRE_,
+ QS_U32_PRE_,
+ QS_STR_PRE_,
+ QS_TIME_PRE_,
+ QS_SIG_PRE_,
+ QS_EVS_PRE_,
+ QS_OBJ_PRE_,
+ QS_FUN_PRE_,
+ QS_EQC_PRE_,
+ QS_MPC_PRE_,
+ QS_MPS_PRE_,
+ QS_TEC_PRE_)
+
+// MC++R16-0-4 function-like macro
+-esym(9026,
+ QS_REC_DONE)
+
+// definition of macro ends in semi-colon
+-esym(823,
+ QS_TEST_PROBE_DEF)
+
+// M3-R11.1(r) conversion between pointer to function type
+-emacro(9074,
+ QS_FUN_DICTIONARY,
+ QS_TEST_PROBE_DEF)
+
+// M3-R20.10(a) stringize operator
+-esym(9024,
+ QS_OBJ_DICTIONARY,
+ QS_OBJ_ARR_DICTIONARY,
+ QS_FUN_DICTIONARY,
+ QS_SIG_DICTIONARY,
+ QS_USR_DICTIONARY)
+
+// MC++R9-5-1 union 'TCast' declared
+-esym(9018,
+ TCast)
+
+// M3-R10.3(r) cannot assign enum to different essential type
+-emacro(9034,
+ QS_SIG_DICTIONARY)
+
+// implicit conversion of enum to integral type 'int'
+-emacro(641,
+ QS_SIG_DICTIONARY)
+
+// MC++R11-0-1 non-private data member within a non-POD structure
+-esym(9150,
+ QP::QActive::*,
+ QP::QS::QSrxPriv::*)
+
+// MC++9-5-1 union declared
+-esym(9018,
+ F32Rep,
+ F64Rep,
+ U32Rep)
+
+

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on NUCLEO-H743ZI, FreeRTOS, GNU-ARM
-# Last Updated for Version: 7.0.0
-# Date of the Last Update:  2021-07-01
+# Last Updated for Version: 7.0.1
+# Date of the Last Update:  2022-05-23
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -87,7 +87,6 @@ VPATH = \
 INCLUDES  = \
 	-I.. \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(FREERTOS)/Source/include \
 	-I$(FREERTOS)/Source/portable/GCC/ARM_CM4F \

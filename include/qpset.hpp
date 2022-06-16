@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-05-13
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief platform-independent priority sets of 8 or 64 elements.
@@ -52,13 +52,23 @@ namespace QP {
 //============================================================================
 // Log-base-2 calculations ...
 #ifndef QF_LOG2
-    extern "C" std::uint_fast8_t QF_LOG2(QPSetBits x) noexcept;
+
+//! function that returns (log2(x) + 1), where @p x is a 32-bit bitmask
+//!
+//! @description
+//! This function returns the 1-based number of the most significant 1-bit
+//! of a 32-bit bitmask. This function can be replaced in the QP ports, if
+//! the CPU has special instructions, such as CLZ (count leading zeros).
+//!
+extern "C" std::uint_fast8_t QF_LOG2(QPSetBits x) noexcept;
+
 #endif // QF_LOG2
 
 //============================================================================
 #if (QF_MAX_ACTIVE <= 32)
 //! Priority Set of up to 32 elements */
 //!
+//! @description
 //! The priority set represents the set of active objects that are ready to
 //! run and need to be considered by the scheduling algorithm. The set is
 //! capable of storing up to 32 priority levels. QP::QPSet is specifically
@@ -95,6 +105,7 @@ struct QPSet {
     }
 
     //! remove element @p n from the set, n = 1..QF_MAX_ACTIVE
+    //!
     //! @note
     //! intentionally misspelled ("rmove") to avoid collision with
     //! the C++ standard library facility "remove"
@@ -112,6 +123,7 @@ struct QPSet {
 
 //! Priority Set of up to 64 elements
 //!
+//! @description
 //! The priority set represents the set of active objects that are ready to
 //! run and need to be considered by the scheduling algorithm. The set is
 //! capable of storing up to 64 priority levels. QP::QPSet is specifically
@@ -163,6 +175,7 @@ struct QPSet {
     }
 
     //! remove element @p n from the set, n = 1..64
+    //!
     //! @note
     //! intentionally misspelled ("rmove") to avoid collision with
     //! the C++ standard library facility "remove"

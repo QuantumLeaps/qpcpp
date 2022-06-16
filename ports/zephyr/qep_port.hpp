@@ -22,29 +22,17 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-07
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
-//! @brief QS/C++ port to a 32-bit CPU, generic C++ compiler
-//! @description
-//! This is an example QP/C++ port with the documentation for the main
-//! items, such as configuration macros, functions, and includes.
+//! @brief QEP/C++ port, generic C++11 compiler
 
-#ifndef QS_PORT_HPP
-#define QS_PORT_HPP
+#ifndef QEP_PORT_HPP
+#define QEP_PORT_HPP
 
-#define QS_TIME_SIZE        4U
-#define QS_OBJ_PTR_SIZE     4U
-#define QS_FUN_PTR_SIZE     4U
+#include <cstdint>  // Exact-width types. C++11 Standard
 
-//============================================================================
-// NOTE: QS might be used with or without other QP components, in which case
-// the separate definitions of the macros QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY,
-// and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
-// the QF framework, by simply including "qf_port.hpp" *before* "qs.hpp".
-//
-#include "qf_port.hpp" // use QS with QF
-#include "qs.hpp"      // QS platform-independent public interface
+#include "qep.hpp"  // QEP platform-independent public interface
 
-#endif // QS_PORT_HPP
+#endif // QEP_PORT_HPP

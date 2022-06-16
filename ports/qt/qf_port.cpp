@@ -50,7 +50,9 @@
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-Q_DEFINE_THIS_MODULE("qf_port")
+namespace {
+    Q_DEFINE_THIS_MODULE("qf_port")
+}
 
 //============================================================================
 namespace QP {

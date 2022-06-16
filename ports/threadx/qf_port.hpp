@@ -1,39 +1,32 @@
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-12
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
 //! @brief QF/C++ port to ThreadX kernel, all supported compilers
-//! @cond
-//============================================================================
-//! Last updated for: @ref qpcpp_7_0_0
-//! Last updated on  2021-12-05
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
 
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
@@ -78,11 +71,11 @@ enum ThreadX_ThreadAttrs {
 
     // ThreadX-specific scheduler locking (implemented in qf_port.cpp)
     #define QF_SCHED_STAT_ QFSchedLock lockStat_;
-    #define QF_SCHED_LOCK_(prio_) do {       \
-        if (_tx_thread_system_state != 0U) { \
-            lockStat_.m_lockPrio = 0U;       \
-        } else {                             \
-            lockStat_.lock((prio_));         \
+    #define QF_SCHED_LOCK_(prio_) do {            \
+        if (TX_THREAD_GET_SYSTEM_STATE() != 0U) { \
+            lockStat_.m_lockPrio = 0U;            \
+        } else {                                  \
+            lockStat_.lock((prio_));              \
         } \
     } while (false)
     #define QF_SCHED_UNLOCK_() do {       \
@@ -102,7 +95,7 @@ enum ThreadX_ThreadAttrs {
         };
     } // namespace QP
     extern "C" {
-        // internal TX interrupt counter
+        // internal TX interrupt counter for TX_THREAD_GET_SYSTEM_STATE()
         extern ULONG volatile _tx_thread_system_state;
     }
 

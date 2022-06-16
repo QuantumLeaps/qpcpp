@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QK/C++ platform-independent public interface.
@@ -40,12 +40,12 @@
 // QF configuration for QK -- data members of the QActive class...
 
 // QK event-queue used for AOs
-#define QF_EQUEUE_TYPE      QEQueue
+#define QF_EQUEUE_TYPE  QEQueue
 
 // QK thread type used for AOs
 // QK uses this member to store the private Thread-Local Storage pointer.
 //
-#define QF_THREAD_TYPE      void*
+#define QF_THREAD_TYPE  void*
 
 
 //============================================================================
@@ -65,14 +65,36 @@ struct QK_Attr {
     QP::QPSet readySet; //!< QK ready-set of AOs and "naked" threads
 };
 
-//! global attributes of the QK kernel
+//! global attributes of the QK kernel (extern "C" to be accessible from C)
 extern QK_Attr QK_attr_;
 
 //! QK scheduler finds the highest-priority thread ready to run
+//!
+//! @description
+//! The QK scheduler finds out the priority of the highest-priority AO
+//! that (1) has events to process and (2) has priority that is above the
+//! current priority.
+//!
+//! @returns the 1-based priority of the the active object, or zero if
+//! no eligible active object is ready to run.
+//!
+//! @attention
+//! QK_sched_() must be always called with interrupts **disabled** and
+//! returns with interrupts **disabled**.
+//!
 std::uint_fast8_t QK_sched_(void) noexcept;
 
 //! QK activator activates the next active object. The activated AO preempts
-// the currently executing AOs.
+//! the currently executing AOs
+//!
+//! @description
+//! QK_activate_() activates ready-to run AOs that are above the initial
+//! active priority (QK_attr_.actPrio).
+//!
+//! @note
+//! The activator might enable interrupts internally, but always returns with
+//! interrupts **disabled**.
+//!
 void QK_activate_(void) noexcept;
 
 #ifdef QK_ON_CONTEXT_SW
@@ -110,7 +132,8 @@ namespace QP {
 using QSchedStatus = std::uint_fast16_t;
 
 //============================================================================
-//! QK services.
+//! QK preemptive run-to-completion (non-blocking) kernel
+//!
 //! @description
 //! This class groups together QK services. It has only static members and
 //! should not be instantiated.
@@ -124,12 +147,51 @@ class QK {
 public:
     // QK scheduler locking...
     //! QK selective scheduler lock
+    //!
+    //! @description
+    //! This function locks the QK scheduler to the specified ceiling.
+    //!
+    //! @param[in]   ceiling    priority ceiling to which the QK scheduler
+    //!                         needs to be locked
+    //!
+    //! @returns
+    //! The previous QK Scheduler lock status, which is to be used to unlock
+    //! the scheduler by restoring its previous lock status in
+    //! QP::QK::schedUnlock().
+    //!
+    //! @note
+    //! QP::QK::schedLock() must be always followed by the corresponding
+    //! QP::QK::schedUnlock().
+    //!
+    //! @sa QK_schedUnlock()
+    //!
+    //! @usage
+    //! The following example shows how to lock and unlock the QK scheduler:
+    //! @include qk_lock.cpp
+    //!
     static QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept;
 
     //! QK selective scheduler unlock
+    //!
+    //! @description
+    //! This function unlocks the QK scheduler to the previous status.
+    //!
+    //! @param[in]   stat       previous QK Scheduler lock status returned from
+    //!                         QP::QK::schedLock()
+    //! @note
+    //! QP::QK::schedUnlock() must always follow the corresponding
+    //! QP::QK::schedLock().
+    //!
+    //! @sa QP::QK::schedLock()
+    //!
+    //! @usage
+    //! The following example shows how to lock and unlock the QK scheduler:
+    //! @include qk_lock.cpp
+    //!
     static void schedUnlock(QSchedStatus const stat) noexcept;
 
     //! QK idle callback (customized in BSPs for QK)
+    //!
     //! @description
     //! QP::QK::onIdle() is called continously by the QK idle loop. This
     //! callback gives the application an opportunity to enter a power-saving

@@ -46,7 +46,9 @@
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-Q_DEFINE_THIS_MODULE("guiapp")
+namespace {
+    Q_DEFINE_THIS_MODULE("guiapp")
+}
 
 //============================================================================
 namespace QP {

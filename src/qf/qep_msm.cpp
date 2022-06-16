@@ -1,4 +1,5 @@
-//============================================================================
+//............................................................................
+
 // QP/C++ Real-Time Embedded Framework (RTEF)
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -21,9 +22,10 @@
 // Contact information:
 // <www.state-machine.com>
 // <info@state-machine.com>
-//============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//............................................................................
+
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QP::QMsm implementation
@@ -45,9 +47,9 @@ Q_DEFINE_THIS_MODULE("qep_msm")
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
-//============================================================================
 QMState const QMsm::msm_top_s = {
     nullptr,
     nullptr,
@@ -56,21 +58,7 @@ QMState const QMsm::msm_top_s = {
     nullptr
 };
 
-//============================================================================
-//! @description
-//! Performs the first step of initialization by assigning the initial
-//! pseudostate to the currently active state of the state machine.
-//!
-//! @param[in] initial  the top-most initial transition for the MSM.
-//!
-//! @note
-//! The constructor is protected to prevent direct instantiating of the
-//! QP::QMsm objects. This class is intended for subclassing only.
-//!
-//! @sa
-//! The QP::QMsm example illustrates how to use the QMsm constructor
-//! in the constructor initializer list of the derived state machines.
-//!
+//............................................................................
 QMsm::QMsm(QStateHandler const initial) noexcept
   : QHsm(initial)
 {
@@ -78,17 +66,7 @@ QMsm::QMsm(QStateHandler const initial) noexcept
     m_temp.fun  = initial;
 }
 
-//============================================================================
-//! @description
-//! Executes the top-most initial transition in a MSM.
-//!
-//! @param[in] e   pointer to an extra parameter (might be nullptr)
-//! @param[in]     qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @attention
-//! QP::QMsm::init() must be called exactly __once__ before
-//! QP::QMsm::dispatch()
-//!
+//............................................................................
 void QMsm::init(void const * const e, std::uint_fast8_t const qs_id) {
     QS_CRIT_STAT_
 
@@ -126,31 +104,12 @@ void QMsm::init(void const * const e, std::uint_fast8_t const qs_id) {
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
 
-//============================================================================
-//! @description
-//! Executes the top-most initial transition in a MSM (overloaded).
-//!
-//! @param[in]     qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @attention
-//! QP::QMsm::init() must be called exactly __once__ before
-//! QP::QMsm::dispatch()
-//!
+//............................................................................
 void QMsm::init(std::uint_fast8_t const qs_id) {
     QMsm::init(nullptr, qs_id);
 }
 
-//============================================================================
-//! @description
-//! Dispatches an event for processing to a meta state machine (MSM).
-//! The processing of an event represents one run-to-completion (RTC) step.
-//!
-//! @param[in] e  pointer to the event to be dispatched to the MSM
-//! @param[in] qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @note
-//! Must be called after QP::QMsm::init().
-//!
+//............................................................................
 void QMsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     QMState const *s = m_state.obj;  // store the current state
     QMState const *t = s;
@@ -318,7 +277,7 @@ void QMsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
 
-//============================================================================
+//----------------------------------------------------------------------------
 #ifdef Q_SPY
     //! @description
     //! Helper function to get the current state handler of QMsm.
@@ -328,20 +287,7 @@ void QMsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     }
 #endif
 
-//============================================================================
-//! @description
-//! Helper function to execute transition sequence in a tran-action table.
-//!
-//! @param[in] tatbl pointer to the transition-action table
-//! @param[in] qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @returns
-//! the status of the last action from the transition-action table.
-//!
-//! @note
-//! This function is for internal use inside the QEP event processor and
-//! should __not__ be called directly from the applications.
-//!
+//............................................................................
 QState QMsm::execTatbl_(QMTranActTable const * const tatbl,
                         std::uint_fast8_t const qs_id)
 {
@@ -407,16 +353,7 @@ QState QMsm::execTatbl_(QMTranActTable const * const tatbl,
     return r;
 }
 
-//============================================================================
-//! @description
-//! Helper function to exit the current state configuration to the
-//! transition source, which is a hierarchical state machine might be a
-//! superstate of the current state.
-//!
-//! @param[in] s    pointer to the current state
-//! @param[in] ts   pointer to the transition source state
-//! @param[in] qs_id QS-id of this state machine (for QS local filter)
-//!
+//............................................................................
 void QMsm::exitToTranSource_(QMState const *s,
                              QMState const * const ts,
                              std::uint_fast8_t const qs_id)
@@ -446,18 +383,7 @@ void QMsm::exitToTranSource_(QMState const *s,
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
 
-//============================================================================
-//! @description
-//! Static helper function to execute the segment of transition to history
-//! after entering the composite state and
-//!
-//! @param[in] hist pointer to the history substate
-//! @param[in] qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @returns
-//! QP::Q_RET_INIT, if an initial transition has been executed in the last
-//! entered state or QP::Q_RET_NULL if no such transition was taken.
-//!
+//............................................................................
 QState QMsm::enterHistory_(QMState const * const hist,
                            std::uint_fast8_t const qs_id)
 {
@@ -513,19 +439,7 @@ QState QMsm::enterHistory_(QMState const * const hist,
     return r;
 }
 
-//============================================================================
-//! @description
-//! Tests if a state machine derived from QMsm is-in a given state.
-//!
-//! @note
-//! For a MSM, to "be-in" a state means also to "be-in" a superstate of
-//! of the state.
-//!
-//! @param[in] st  pointer to the QMState object that corresponds to the
-//!                tested state.
-//! @returns
-//! 'true' if the MSM is in the \c st and 'false' otherwise
-//!
+//............................................................................
 bool QMsm::isInState(QMState const * const st) const noexcept {
     bool inState = false; // assume that this MSM is not in 'state'
 
@@ -541,21 +455,7 @@ bool QMsm::isInState(QMState const * const st) const noexcept {
     return inState;
 }
 
-//============================================================================
-//!
-//! @description
-//! Finds the child state of the given @c parent, such that this child state
-//! is an ancestor of the currently active state. The main purpose of this
-//! function is to support **shallow history** transitions in state machines
-//! derived from QMsm.
-//!
-//! @param[in] parent pointer to the state-handler object
-//!
-//! @returns
-//! the child of a given @c parent state, which is an ancestor of the
-//! currently active state. For the corner case when the currently active
-//! state is the given @c parent state, function returns the @c parent state.
-//!
+//............................................................................
 QMState const *QMsm::childStateObj(QMState const * const parent)
     const noexcept
 {

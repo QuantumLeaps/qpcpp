@@ -43,15 +43,19 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h> // Win32 API
 
-namespace QP {
+namespace { // unnamed local namespace
 
 //Q_DEFINE_THIS_MODULE("quit_port")
 
-// Global objects ============================================================
-std::uint8_t volatile QF_intNest;
-
-//............................................................................
 static int l_test_count;
+
+}
+
+//============================================================================
+namespace QP {
+
+// Global objects ............................................................
+std::uint8_t volatile QF_intNest;
 
 //............................................................................
 void QUIT_fail_(char const *cond, char const *file, int line) {
@@ -105,29 +109,27 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 
 } // namespace QP
 
+//============================================================================
+extern "C" Q_NORETURN Q_onAssert(char const * const module,
+                                 int_t const location)
+{
+    QP::QUIT_fail_("Q_onAssert", module, location);
+    for (;;) { // explicitly make it "noreturn"
+    }
+}
+
 //............................................................................
 int main(void) {
     printf_s("\n%s\n", "QP Unit Internal Testing -- QUIT");
 
     QP::onRunTests();
 
-    if (QP::l_test_count > 0) {
+    if (l_test_count > 0) {
         printf_s("%s\n", " PASSED");
     }
     printf_s("---------------------------------------------\n"
-        "%d test(s)\nOK\n", QP::l_test_count);
+        "%d test(s)\nOK\n", l_test_count);
 
     return 0; // success
 }
-
-/*==========================================================================*/
-extern "C" Q_NORETURN Q_onAssert(char const * const module,
-                                 int_t const location)
-{
-    QP::QUIT_fail_("Q_onAssert", module, location);
-    for (;;) { // explicitly make it "noreturn
-    }
-}
-
-/*==========================================================================*/
 

@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QS software tracing services
@@ -41,30 +41,12 @@ Q_DEFINE_THIS_MODULE("qs")
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
-//============================================================================
 QS QS::priv_; // QS private data
 
-//============================================================================
-//! @description
-//! This function should be called from QP::QS::onStartup() to provide QS with
-//! the data buffer. The first argument @a sto[] is the address of the memory
-//! block, and the second argument @a stoSize is the size of this block
-//! in bytes. Currently the size of the QS buffer cannot exceed 64KB.
-//!
-//! @note QS can work with quite small data buffers, but you will start losing
-//! data if the buffer is too small for the bursts of tracing activity.
-//! The right size of the buffer depends on the data production rate and
-//! the data output rate. QS offers flexible filtering to reduce the data
-//! production rate.
-//!
-//! @note If the data output rate cannot keep up with the production rate,
-//! QS will start overwriting the older data with newer data. This is
-//! consistent with the "last-is-best" QS policy. The record sequence counters
-//! and check sums on each record allow the QSPY host uitiliy to easily detect
-//! any data loss.
-//!
+//............................................................................
 void QS::initBuf(std::uint8_t * const sto,
                  std::uint_fast16_t const stoSize) noexcept
 {
@@ -98,23 +80,7 @@ void QS::initBuf(std::uint8_t * const sto,
     // wait with flushing after successfull initialization (see QS_INIT())
 }
 
-//============================================================================
-//! @description
-//! This function sets up the QS filter to enable the record type @a filter.
-//! The argument #QS_ALL_RECORDS specifies to filter-in all records.
-//! This function should be called indirectly through the macro
-//! QS_GLB_FILTER()
-//!
-//! @param[in] filter  the QS record-d or group to enable in the filter,
-//!                 if positive or disable, if negative. The record-id
-//!                 numbers must be in the range -127..127.
-//! @note
-//! Filtering based on the record-type is only the first layer of filtering.
-//! The second layer is based on the object-type. Both filter layers must
-//! be enabled for the QS record to be inserted in the QS buffer.
-//!
-//! @sa QP::QS::locFilter_()
-//!
+//............................................................................
 void QS::glbFilter_(std::int_fast16_t const filter) noexcept {
     bool const isRemove = (filter < 0);
     std::uint16_t const rec = isRemove
@@ -322,24 +288,7 @@ void QS::glbFilter_(std::int_fast16_t const filter) noexcept {
     }
 }
 
-//============================================================================
-//! @description
-//! This function sets up the local QS filter to enable or disable the
-//! given QS object-id or a group of object-ids @a filter.
-//! This function should be called indirectly through the macro
-//! QS_LOC_FILTER()
-//!
-//! @param[in] filter  the QS object-id or group to enable in the filter,
-//!                 if positive or disable, if negative. The qs_id numbers
-//!                 must be in the range 1..127.
-//! @note
-//! Filtering based on the object-id (local filter) is the second layer of
-//! filtering. The first layer is based on the QS record-type (gloabl filter).
-//! Both filter layers must be enabled for the QS record to be inserted into
-//! the QS buffer.
-//!
-//! @sa QP::QS::glbFilter_()
-//!
+//............................................................................
 void QS::locFilter_(std::int_fast16_t const filter) noexcept {
     bool const isRemove = (filter < 0);
     std::uint16_t const qs_id = isRemove
@@ -397,13 +346,7 @@ void QS::locFilter_(std::int_fast16_t const filter) noexcept {
     priv_.locFilter[0] |= 0x01U; // leave QS_ID == 0 always on
 }
 
-//============================================================================
-//! @description
-//! This function must be called at the beginning of each QS record.
-//! This function should be called indirectly through the macro QS_BEGIN_ID(),
-//! or QS_BEGIN_NOCRIT(), depending if it's called in a normal code or from
-//! a critical section.
-//!
+//............................................................................
 void QS::beginRec_(std::uint_fast8_t const rec) noexcept {
     std::uint8_t const b = priv_.seq + 1U;
     std::uint8_t chksum_ = 0U; // reset the checksum
@@ -423,13 +366,7 @@ void QS::beginRec_(std::uint_fast8_t const rec) noexcept {
     priv_.chksum = chksum_; // save the checksum
 }
 
-//============================================================================
-//! @description
-//! This function must be called at the end of each QS record.
-//! This function should be called indirectly through the macro QS_END(),
-//! or QS_END_NOCRIT(), depending if it's called in a normal code or from
-//! a critical section.
-//!
+//............................................................................
 void QS::endRec_(void) noexcept {
     std::uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
     QSCtr head_ = priv_.head;
@@ -457,7 +394,9 @@ void QS::endRec_(void) noexcept {
     }
 }
 
-//============================================================================
+//............................................................................
+//! Helper function to output the predefined Target-info trace record.
+//!
 void QS_target_info_(std::uint8_t const isReset) noexcept {
     static constexpr std::uint8_t ZERO = static_cast<std::uint8_t>('0');
     static std::uint8_t const * const TIME =
@@ -568,11 +507,7 @@ void QS_target_info_(std::uint8_t const isReset) noexcept {
     QS::endRec_();
 }
 
-//============================================================================
-//! @description
-//! @note This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::u8_fmt_(std::uint8_t const format, std::uint8_t const d) noexcept {
     std::uint8_t chksum_ = priv_.chksum;  // put in a temporary (register)
     std::uint8_t *const buf_ = priv_.buf; // put in a temporary (register)
@@ -588,11 +523,7 @@ void QS::u8_fmt_(std::uint8_t const format, std::uint8_t const d) noexcept {
     priv_.chksum = chksum_; // save the checksum
 }
 
-//============================================================================
-//! @description
-//! This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::u16_fmt_(std::uint8_t format, std::uint16_t d) noexcept {
     std::uint8_t chksum_ = priv_.chksum; // put in a temporary (register)
     std::uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
@@ -614,10 +545,7 @@ void QS::u16_fmt_(std::uint8_t format, std::uint16_t d) noexcept {
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//============================================================================
-//! @note This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::u32_fmt_(std::uint8_t format, std::uint32_t d) noexcept {
     std::uint8_t chksum_ = priv_.chksum;  // put in a temporary (register)
     std::uint8_t * const buf_= priv_.buf; // put in a temporary (register)
@@ -637,9 +565,7 @@ void QS::u32_fmt_(std::uint8_t format, std::uint32_t d) noexcept {
     priv_.chksum = chksum_; // save the checksum
 }
 
-//============================================================================
-//! @note This function is only to be used through macro QS_USR_DICTIONARY()
-//!
+//............................................................................
 void QS::usr_dict_pre_(enum_t const rec,
                        char const * const name) noexcept
 {
@@ -653,10 +579,7 @@ void QS::usr_dict_pre_(enum_t const rec,
     onFlush();
 }
 
-//============================================================================
-//! @note This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::mem_fmt_(std::uint8_t const *blk, std::uint8_t size) noexcept {
     std::uint8_t b = static_cast<std::uint8_t>(MEM_T);
     std::uint8_t chksum_ = priv_.chksum + b;
@@ -680,10 +603,7 @@ void QS::mem_fmt_(std::uint8_t const *blk, std::uint8_t size) noexcept {
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//============================================================================
-//! @note This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::str_fmt_(char const *s) noexcept {
     std::uint8_t b       = static_cast<std::uint8_t>(*s);
     std::uint8_t chksum_ = static_cast<std::uint8_t>(
@@ -711,10 +631,7 @@ void QS::str_fmt_(char const *s) noexcept {
     priv_.used   = used_;   // save # of used buffer space
 }
 
-//============================================================================
-//! @note This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::u8_raw_(std::uint8_t const d) noexcept {
     std::uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
     std::uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
@@ -728,10 +645,7 @@ void QS::u8_raw_(std::uint8_t const d) noexcept {
     priv_.chksum = chksum_; // save the checksum
 }
 
-//============================================================================
-//! @note This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::u8u8_raw_(std::uint8_t const d1, std::uint8_t const d2) noexcept {
     std::uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
     std::uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
@@ -746,7 +660,7 @@ void QS::u8u8_raw_(std::uint8_t const d1, std::uint8_t const d2) noexcept {
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//============================================================================
+//............................................................................
 //! @note This function is only to be used through macros, never in the
 //! client code directly.
 //!
@@ -769,10 +683,7 @@ void QS::u16_raw_(std::uint16_t d) noexcept {
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//============================================================================
-//! @note This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::u32_raw_(std::uint32_t d) noexcept {
     std::uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
     std::uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
@@ -790,10 +701,7 @@ void QS::u32_raw_(std::uint32_t d) noexcept {
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//============================================================================
-//! @note This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::obj_raw_(void const * const obj) noexcept {
 #if (QS_OBJ_PTR_SIZE == 1U)
     u8_raw_(reinterpret_cast<std::uint8_t>(obj));
@@ -808,10 +716,7 @@ void QS::obj_raw_(void const * const obj) noexcept {
 #endif
 }
 
-//============================================================================
-//! @note This function is only to be used through macros, never in the
-//! client code directly.
-//!
+//............................................................................
 void QS::str_raw_(char const *s) noexcept {
     std::uint8_t b = static_cast<std::uint8_t>(*s);
     std::uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
@@ -835,16 +740,7 @@ void QS::str_raw_(char const *s) noexcept {
     priv_.used   = used_;    // save # of used buffer space
 }
 
-//============================================================================
-//! @description
-//! This function delivers one byte at a time from the QS data buffer.
-//!
-//! @returns the byte in the least-significant 8-bits of the 16-bit return
-//! value if the byte is available. If no more data is available at the time,
-//! the function returns QP::QS_EOD (End-Of-Data).
-//!
-//! @note QP::QS::getByte() is __not__ protected with a critical section.
-//!
+//............................................................................
 std::uint16_t QS::getByte(void) noexcept {
     std::uint16_t ret;
     if (priv_.used == 0U) {
@@ -867,29 +763,7 @@ std::uint16_t QS::getByte(void) noexcept {
     return ret;  // return the byte or EOD
 }
 
-//============================================================================
-//! @description
-//! This function delivers a contiguous block of data from the QS data buffer.
-//! The function returns the pointer to the beginning of the block, and writes
-//! the number of bytes in the block to the location pointed to by @a pNbytes.
-//! The argument @a pNbytes is also used as input to provide the maximum size
-//! of the data block that the caller can accept.
-//!
-//! @returns if data is available, the function returns pointer to the
-//! contiguous block of data and sets the value pointed to by @p pNbytes
-//! to the # available bytes. If data is available at the time the function is
-//! called, the function returns NULL pointer and sets the value pointed to by
-//! @p pNbytes to zero.
-//!
-//! @note
-//! Only the NULL return from QP::QS::getBlock() indicates that the QS buffer
-//! is empty at the time of the call. The non-NULL return often means that
-//! the block is at the end of the buffer and you need to call
-//! QP::QS::getBlock() again to obtain the rest of the data that
-//! "wrapped around" to the beginning of the QS data buffer.
-//!
-//! @note QP::QS::getBlock() is __not__ protected with a critical section.
-//!
+//............................................................................
 std::uint8_t const *QS::getBlock(std::uint16_t * const pNbytes) noexcept {
     QSCtr const used_ = priv_.used; // put in a temporary (register)
     std::uint8_t *buf_;
@@ -923,9 +797,7 @@ std::uint8_t const *QS::getBlock(std::uint16_t * const pNbytes) noexcept {
     return buf_;
 }
 
-//============================================================================
-//! @note This function is only to be used through macro QS_SIG_DICTIONARY()
-//!
+//............................................................................
 void QS::sig_dict_pre_(enum_t const sig, void const * const obj,
                        char const * const name) noexcept
 {
@@ -941,9 +813,7 @@ void QS::sig_dict_pre_(enum_t const sig, void const * const obj,
     onFlush();
 }
 
-//============================================================================
-//! @note This function is only to be used through macro QS_OBJ_DICTIONARY()
-//!
+//............................................................................
 void QS::obj_dict_pre_(void const * const obj,
                        char const * const name) noexcept
 {
@@ -958,10 +828,7 @@ void QS::obj_dict_pre_(void const * const obj,
     onFlush();
 }
 
-//============================================================================
-//! @note This function is only to be used through macro
-//! QS_OBJ_ARR_DICTIONARY()
-//!
+//............................................................................
 void QS::obj_arr_dict_pre_(void const * const obj,
                            std::uint_fast16_t const idx,
                            char const * const name) noexcept
@@ -1024,9 +891,7 @@ void QS::obj_arr_dict_pre_(void const * const obj,
     onFlush();
 }
 
-//============================================================================
-//! @note This function is only to be used through macro QS_FUN_DICTIONARY()
-//!
+//............................................................................
 void QS::fun_dict_pre_(void (* const fun)(void),
                        char const * const name) noexcept
 {
@@ -1041,9 +906,7 @@ void QS::fun_dict_pre_(void (* const fun)(void),
     onFlush();
 }
 
-//============================================================================
-//! @note This function is only to be used through macro QS_ASSERTION()
-//!
+//............................................................................
 void QS::assertion_pre_(char const * const module, int_t const loc,
                         std::uint32_t const delay)
 {

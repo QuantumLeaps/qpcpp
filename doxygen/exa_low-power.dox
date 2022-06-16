@@ -1,8 +1,6 @@
 /*##########################################################################*/
 /*! @page arm-cm_low-power Low-Power Example
 
-@tableofcontents
-
 <p>The main principle of low-power design for software is to keep the hardware in the most appropriate low-power sleep mode for as long as possible. Most commonly, the software enters a low-power sleep mode from the **idle callback** (a.k.a. "idle hook"), which is called when the software has nothing left to do and is waiting for an interrupt to deliver more work. The QP/C and QP/C++ Real-Time Embedded Frameworks (RTEFs) support the *idle callback* in all of the built-in real-time kernels, such as the cooperative @ref qv "QV kernel", the preemptive non-blocking @ref qk "QK kernel" and the preemptive blocking @ref qxk "QXK kernel". Also, such an *idle callback* is provided in all 3rd-party traditional RTOS kernels that QP/C/C++ have been @ref ports_rtos "ported to".
 </p>
 

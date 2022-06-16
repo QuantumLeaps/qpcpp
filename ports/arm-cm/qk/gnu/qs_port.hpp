@@ -1,3 +1,4 @@
+//============================================================================
 // QP/C++ Real-Time Embedded Framework (RTEF)
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -21,12 +22,12 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-04-10
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-12
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QS/C++ port to ARM Cortex-M, generic compiler
-//!
+
 #ifndef QS_PORT_HPP
 #define QS_PORT_HPP
 
@@ -45,7 +46,10 @@
 // and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
 // the other QP component, by simply including "qf_port.hpp" *before* "qs.hpp".
 //
+#ifndef QF_PORT_HPP
 #include "qf_port.hpp" // use QS with QF
+#endif
+
 #include "qs.hpp"      // QS platform-independent public interface
 
 #endif // QS_PORT_HPP

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ port to VxWorks, MinGW toolset
-# Last updated for version 6.3.6
-# Last updated on  2018-10-13
+# Last updated for version 7.0.1
+# Last updated on  2022-05-23
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -73,7 +73,6 @@ VPATH = \
 # list of all include directories needed by this project
 INCLUDES  = \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/vxworks
 

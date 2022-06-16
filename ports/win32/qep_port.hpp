@@ -52,7 +52,7 @@
 
 // uncomment to provide QEvt constructors
 //#define Q_EVT_CTOR    1
-//#define Q_EVT_VIRTUAL 1
+//#define Q_EVT_XTOR 1
 
 #include <cstdint>  // Exact-width types. C++11 Standard
 

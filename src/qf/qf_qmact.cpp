@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-04-30
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-07
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QMActive::QMActive() and virtual functions
@@ -53,6 +53,7 @@ namespace {
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
 //............................................................................
@@ -91,7 +92,7 @@ QMState const *QMActive::childStateObj(QMState const * const parent)
                ->QMsm::childStateObj(parent);
 }
 
-//............................................................................
+//============================================================================
 #ifdef Q_SPY
 
 QStateHandler QMActive::getStateHandler() noexcept {

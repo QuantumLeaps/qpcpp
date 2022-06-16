@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ Publish-Subscribe services
@@ -47,41 +47,14 @@ Q_DEFINE_THIS_MODULE("qf_ps")
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
-// Package-scope objects *****************************************************
+// Package-scope objects .....................................................
 QSubscrList *QF_subscrList_;
 enum_t QF_maxPubSignal_;
 
-//============================================================================
-//! @description
-//! This function initializes the publish-subscribe facilities of QF and must
-//! be called exactly once before any subscriptions/publications occur in
-//! the application.
-//!
-//! @param[in] subscrSto pointer to the array of subscriber lists
-//! @param[in] maxSignal the dimension of the subscriber array and at
-//!                      the same time the maximum signal that can be
-//!                      published or subscribed.
-//!
-//! The array of subscriber-lists is indexed by signals and provides a mapping
-//! between the signals and subscriber-lists. The subscriber-lists are
-//! bitmasks of type QP::QSubscrList, each bit in the bit mask corresponding
-//! to the unique priority of an active object. The size of the
-//! QP::QSubscrList bitmask depends on the value of the #QF_MAX_ACTIVE macro.
-//!
-//! @note
-//! The publish-subscribe facilities are optional, meaning that you might
-//! choose not to use publish-subscribe. In that case calling QF::psInit()
-//! and using up memory for the subscriber-lists is unnecessary.
-//!
-//! @sa
-//! QP::QSubscrList
-//!
-//! @usage
-//! The following example shows the typical initialization sequence of QF:
-//! @include qf_main.cpp
-//!
+//............................................................................
 void QF::psInit(QSubscrList * const subscrSto,
                 enum_t const maxSignal) noexcept
 {
@@ -94,23 +67,7 @@ void QF::psInit(QSubscrList * const subscrSto,
     bzero(subscrSto, static_cast<unsigned>(maxSignal) * sizeof(QSubscrList));
 }
 
-//============================================================================
-//! @description
-//! This function posts (using the FIFO policy) the event @a e to **all**
-//! active objects that have subscribed to the signal @a e->sig, which is
-//! called _multicasting_. The multicasting performed in this function is
-//! very efficient based on reference-counting inside the published event
-//! ("zero-copy" event multicasting). This function is designed to be
-//! callable from any part of the system, including ISRs, device drivers,
-//! and active objects.
-//!
-//! @note
-//! To avoid any unexpected re-ordering of events posted into AO queues,
-//! the event multicasting is performed with scheduler __locked__. However,
-//! the scheduler is locked only up to the priority level of the highest-
-//! priority subscriber, so any AOs of even higher priority, which did not
-//! subscribe to this event are _not_ affected.
-//!
+//............................................................................
 #ifndef Q_SPY
 void QF::publish_(QEvt const * const e) noexcept {
 #else
@@ -179,24 +136,7 @@ void QF::publish_(QEvt const * const e,
     gc(e);
 }
 
-
-//============================================================================
-//! @description
-//! This function is part of the Publish-Subscribe event delivery mechanism
-//! available in QF. Subscribing to an event means that the framework will
-//! start posting all published events with a given signal @p sig to the
-//! event queue of the active object.
-//!
-//! @param[in] sig event signal to subscribe
-//!
-//! The following example shows how the Table active object subscribes
-//! to three signals in the initial transition:
-//! @include qf_subscribe.cpp
-//!
-//! @sa
-//! QP::QF::publish_(), QP::QActive::unsubscribe(), and
-//! QP::QActive::unsubscribeAll()
-//!
+//............................................................................
 void QActive::subscribe(enum_t const sig) const noexcept {
     std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
 
@@ -218,34 +158,11 @@ void QActive::subscribe(enum_t const sig) const noexcept {
     QF_CRIT_X_();
 }
 
-//============================================================================
-//! @description
-//! This function is part of the Publish-Subscribe event delivery mechanism
-//! available in QF. Un-subscribing from an event means that the framework
-//! will stop posting published events with a given signal @p sig to the
-//! event queue of the active object.
-//!
-//! @param[in] sig event signal to unsubscribe
-//!
-//! @note
-//! Due to the latency of event queues, an active object should NOT
-//! assume that a given signal @p sig will never be dispatched to the
-//! state machine of the active object after un-subscribing from that signal.
-//! The event might be already in the queue, or just about to be posted
-//! and the un-subscribe operation will not flush such events.
-//!
-//! @note
-//! Un-subscribing from a signal that has never been subscribed in the
-//! first place is considered an error and QF will raise an assertion.
-//!
-//! @sa
-//! QP::QF::publish_(), QP::QActive::subscribe(), and
-//! QP::QActive::unsubscribeAll()
-//!
+//............................................................................
 void QActive::unsubscribe(enum_t const sig) const noexcept {
     std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
 
-    //! @pre the singal and the prioriy must be in ragne, the AO must also
+    //! @pre the signal and the priority must be in range, the AO must also
     // be registered with the framework
     Q_REQUIRE_ID(400, (Q_USER_SIG <= sig)
                       && (sig < QF_maxPubSignal_)
@@ -266,27 +183,7 @@ void QActive::unsubscribe(enum_t const sig) const noexcept {
     QF_CRIT_X_();
 }
 
-//============================================================================
-//! @description
-//! This function is part of the Publish-Subscribe event delivery mechanism
-//! available in QF. Un-subscribing from all events means that the framework
-//! will stop posting any published events to the event queue of the active
-//! object.
-//!
-//! @note
-//! Due to the latency of event queues, an active object should NOT
-//! assume that no events will ever be dispatched to the state machine of
-//! the active object after un-subscribing from all events.
-//! The events might be already in the queue, or just about to be posted
-//! and the un-subscribe operation will not flush such events. Also, the
-//! alternative event-delivery mechanisms, such as direct event posting or
-//! time events, can be still delivered to the event queue of the active
-//! object.
-//!
-//! @sa
-//! QP::QF::publish_(), QP::QActive::subscribe(), and
-//! QP::QActive::unsubscribe()
-//!
+//............................................................................
 void QActive::unsubscribeAll(void) const noexcept {
     std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
 

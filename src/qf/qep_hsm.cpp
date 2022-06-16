@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QP::QHsm implementation
@@ -52,8 +52,8 @@
         QS_BEGIN_PRE_(QS_QEP_STATE_EXIT, qs_id)           \
             QS_OBJ_PRE_(this);                            \
             QS_FUN_PRE_(state_);                          \
-        QS_END_PRE_() \
-    } \
+        QS_END_PRE_()                                     \
+    }                                                     \
 } while (false)
 
 //! helper macro to trigger entry action in an HSM
@@ -62,8 +62,8 @@
         QS_BEGIN_PRE_(QS_QEP_STATE_ENTRY, qs_id)           \
             QS_OBJ_PRE_(this);                             \
             QS_FUN_PRE_(state_);                           \
-        QS_END_PRE_() \
-    } \
+        QS_END_PRE_()                                      \
+    }                                                      \
 } while (false)
 
 // unnamed namespace for local definitions with internal linkage
@@ -71,17 +71,18 @@ namespace {
 
 Q_DEFINE_THIS_MODULE("qep_hsm")
 
-//============================================================================
+//............................................................................
 enum : QP::QSignal {
     //! empty signal for internal use only
     QEP_EMPTY_SIG_ = 0U
 };
 
-//============================================================================
+//............................................................................
+//! reserved event instances for internal use
 //! @description
-//! Static, preallocated standard events that the QEP event processor sends
-//! to state handler functions of QP::QHsm-style state machine to execute entry
-//! actions, exit actions, and initial transitions.
+//! Static, pre-allocated standard events that the QEP event processor sends
+//! to state handler functions of QP::QHsm-style state machine to execute
+//! entry actions, exit actions, and initial transitions.
 //!
 static QP::QEvt const QEP_reservedEvt_[4] {
 #ifdef Q_EVT_CTOR // Is the QEvt constructor provided?
@@ -99,44 +100,18 @@ static QP::QEvt const QEP_reservedEvt_[4] {
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
-//============================================================================
 //char const versionStr[7] = QP_VERSION_STR;
 
-//============================================================================
-//! @description
-//! Performs the first step of HSM initialization by assigning the initial
-//! pseudostate to the currently active state of the state machine.
-//!
-//! @param[in] initial pointer to the top-most initial state-handler
-//!                    function in the derived state machine
-//! @tr{RQP103}
-//!
+//............................................................................
 QHsm::QHsm(QStateHandler const initial) noexcept {
     m_state.fun = Q_STATE_CAST(&top);
     m_temp.fun  = initial;
 }
 
-//============================================================================
-//! @description
-//! Virtual destructor of the QHsm state machine and any of its subclasses.
-//!
-QHsm::~QHsm() {
-}
-
-//============================================================================
-//! @description
-//! Executes the top-most initial transition in a HSM.
-//!
-//! @param[in] e   pointer to an extra parameter (might be NULL)
-//! @param[in] qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @note
-//! Must be called exactly __once__ before the QP::QHsm::dispatch().
-//!
-//! @tr{RQP103} @tr{RQP120I} @tr{RQP120D}
-//!
+//............................................................................
 void QHsm::init(void const * const e, std::uint_fast8_t const qs_id) {
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 
@@ -206,46 +181,14 @@ void QHsm::init(void const * const e, std::uint_fast8_t const qs_id) {
     m_temp.fun  = t; // mark the configuration as stable
 }
 
-//***************************************************************************/
-//! @description
-//! The QP::QHsm::top() state handler is the ultimate root of state hierarchy
-//! in all HSMs derived from QP::QHsm.
-//!
-//! @param[in] me pointer to the HSM instance
-//! @param[in] e  pointer to the event to be dispatched to the HSM
-//!
-//! @returns
-//! Always returns #Q_RET_IGNORED, which means that the top state ignores
-//! all events.
-//!
-//! @note
-//! The parameters to this state handler are not used. They are provided for
-//! conformance with the state-handler function signature QP::QStateHandler.
-//!
-//!
-//! @tr{RQP103} @tr{RQP120T}
-//!
+//............................................................................
 QState QHsm::top(void * const me, QEvt const * const e) noexcept {
     static_cast<void>(me); // unused parameter
     static_cast<void>(e);  // unused parameter
     return Q_RET_IGNORED; // the top state ignores all events
 }
 
-//============================================================================
-//! @description
-//! Dispatches an event for processing to a hierarchical state machine (HSM).
-//! The processing of an event represents one run-to-completion (RTC) step.
-//!
-//! @param[in] e  pointer to the event to be dispatched to the HSM
-//! @param[in] qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @note
-//! This state machine must be initialized by calling QP::QHsm::init() exactly
-//! __once__ before calling QP::QHsm::dispatch().
-//!
-//! @tr{RQP103}
-//! @tr{RQP120A} @tr{RQP120B} @tr{RQP120C} @tr{RQP120D} @tr{RQP120E}
-//!
+//............................................................................
 void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     QStateHandler t = m_state.fun;
     QS_CRIT_STAT_
@@ -401,21 +344,7 @@ void QHsm::dispatch(QEvt const * const e, std::uint_fast8_t const qs_id) {
     static_cast<void>(qs_id); // unused parameter (if Q_SPY not defined)
 }
 
-//============================================================================
-//! @description
-//! helper function to execute transition sequence in a hierarchical state
-//! machine (HSM).
-//!
-//! @param[in,out] path array of pointers to state-handler functions
-//!                     to execute the entry actions
-//! @param[in]     qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @returns
-//! the depth of the entry path stored in the @p path parameter.
-//!
-//! @tr{RQP103}
-//! @tr{RQP120E} @tr{RQP120F}
-//!
+//............................................................................
 std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
                                 std::uint_fast8_t const qs_id)
 {
@@ -553,22 +482,7 @@ std::int_fast8_t QHsm::hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
     }
 #endif
 
-//============================================================================
-//! @description
-//! Tests if a state machine derived from QHsm is-in a given state.
-//!
-//! @note
-//! For a HSM, to "be in a state" means also to be in a superstate of
-//! of the state.
-//!
-//! @param[in] s pointer to the state-handler function to be tested
-//!
-//! @returns
-//! 'true' if the HSM is in the @p state and 'false' otherwise
-//!
-//! @tr{RQP103}
-//! @tr{RQP120S}
-//!
+//............................................................................
 bool QHsm::isIn(QStateHandler const s) noexcept {
 
     //! @pre state configuration must be stable
@@ -593,28 +507,7 @@ bool QHsm::isIn(QStateHandler const s) noexcept {
     return inState; // return the status
 }
 
-//============================================================================
-//!
-//! @description
-//! Finds the child state of the given @c parent, such that this child state
-//! is an ancestor of the currently active state. The main purpose of this
-//! function is to support **shallow history** transitions in state machines
-//! derived from QHsm.
-//!
-//! @param[in] parent pointer to the state-handler function
-//!
-//! @returns
-//! the child of a given @c parent state, which is an ancestor of the
-//! currently active state
-//!
-//! @note
-//! this function is designed to be called during state transitions, so it
-//! does not necessarily start in a stable state configuration.
-//! However, the function establishes stable state configuration upon exit.
-//!
-//! @tr{RQP103}
-//! @tr{RQP120H}
-//!
+//............................................................................
 QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
     QStateHandler child = m_state.fun; // start with the current state
     bool isFound = false; // start with the child not found

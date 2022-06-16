@@ -1,39 +1,32 @@
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-07
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
 //! @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
-//! @cond
-//============================================================================
-//! Last updated for: @ref qpcpp_7_0_0
-//! Last updated on  2021-06-17
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
 //!
 
 // expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
@@ -61,13 +54,9 @@
 #include <unistd.h>
 #include <signal.h>
 
-namespace QP {
+namespace { // unnamed local namespace
 
 Q_DEFINE_THIS_MODULE("qf_port")
-
-/* Global objects ==========================================================*/
-QPSet  QV_readySet_;        // QV-ready set of active objects
-pthread_cond_t QV_condVar_; // Cond.var. to signal events
 
 // Local objects *************************************************************
 static pthread_mutex_t l_pThreadMutex; // POSIX mutex for the QF crit. section
@@ -77,10 +66,32 @@ static struct timespec l_tick;
 static int_t l_tickPrio;
 enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 
-static void *ticker_thread(void *arg);
-static void sigIntHandler(int /* dummy */);
+//............................................................................
+static void *ticker_thread(void *arg); // prototype
+static void *ticker_thread(void * /*arg*/) { // for pthread_create()
+    while (l_isRunning) { // the clock tick loop...
+        nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
+        QF_onClockTick(); // clock tick callback (must call QF_TICK_X())
+    }
+    return nullptr; // return success
+}
+//............................................................................
+static void sigIntHandler(int /* dummy */); // prototype
+static void sigIntHandler(int /* dummy */) {
+    QF::onCleanup();
+    exit(-1);
+}
+
+} // unnamed local namespace
 
 //============================================================================
+namespace QP {
+
+// Global objects ............................................................
+QPSet  QV_readySet_;        // QV-ready set of active objects
+pthread_cond_t QV_condVar_; // Cond.var. to signal events
+
+//............................................................................
 void QF::init(void) {
     // lock memory so we're never swapped out to disk
     //mlockall(MCL_CURRENT | MCL_FUTURE); // uncomment when supported
@@ -102,16 +113,16 @@ void QF::init(void) {
     sigaction(SIGINT, &sig_act, NULL);
 }
 
-//============================================================================
+//............................................................................
 void QF_enterCriticalSection_(void) {
     pthread_mutex_lock(&l_pThreadMutex);
 }
-//============================================================================
+//............................................................................
 void QF_leaveCriticalSection_(void) {
     pthread_mutex_unlock(&l_pThreadMutex);
 }
 
-//============================================================================
+//............................................................................
 int_t QF::run(void) {
     onStartup(); // application-specific startup callback
 
@@ -178,7 +189,7 @@ int_t QF::run(void) {
 
             // perform the run-to-completion (RTS) step...
             // 1. retrieve the event from the AO's event queue, which by this
-            //    time must be non-empty and The "Vanialla" kernel asserts it.
+            //    time must be non-empty and The "QV" kernel asserts it.
             // 2. dispatch the event to the AO's state machine.
             // 3. determine if event is garbage and collect it if so
             //
@@ -212,7 +223,7 @@ int_t QF::run(void) {
 
     return 0; // return success
 }
-//============================================================================
+//............................................................................
 void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
     if (ticksPerSec != 0U) {
         l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
@@ -254,12 +265,12 @@ int QF_consoleGetKey(void) {
     }
     return 0; // no input at this time
 }
-/*..........................................................................*/
+//............................................................................
 int QF_consoleWaitForKey(void) {
     return getchar();
 }
 
-//============================================================================
+//............................................................................
 void QActive::start(std::uint_fast8_t const prio,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
@@ -269,8 +280,8 @@ void QActive::start(std::uint_fast8_t const prio,
 
     Q_REQUIRE_ID(600, (0U < prio)  /* priority...*/
         && (prio <= QF_MAX_ACTIVE) /*.. in range */
-        && (stkSto == nullptr));   // statck storage must NOT...
-                                    // ... be provided
+        && (stkSto == nullptr));   // stack storage must NOT...
+                                   // ... be provided
 
     m_eQueue.init(qSto, qLen);
     m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
@@ -294,31 +305,16 @@ void QActive::stop(void) {
 }
 #endif
 
-//============================================================================
-static void *ticker_thread(void * /*arg*/) { // for pthread_create()
-    while (l_isRunning) { // the clock tick loop...
-        nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
-        QF_onClockTick(); // clock tick callback (must call QF_TICK_X())
-    }
-    return nullptr; // return success
-}
-
-//============================================================================
-static void sigIntHandler(int /* dummy */) {
-    QF::onCleanup();
-    exit(-1);
-}
-
 } // namespace QP
 
 //============================================================================
 // NOTE01:
 // In Linux, the scheduler policy closest to real-time is the SCHED_FIFO
-// policy, available only with superuser privileges. QF::run() attempts to set
-// this policy as well as to maximize its priority, so that the ticking
-// occurrs in the most timely manner (as close to an interrupt as possible).
-// However, setting the SCHED_FIFO policy might fail, most probably due to
-// insufficient privileges.
+// policy, available only with superuser privileges. QF::run() attempts
+// to set this policy as well as to maximize its priority, so that the
+// ticking occurs in the most timely manner (as close to an interrupt as
+// possible). However, setting the SCHED_FIFO policy might fail, most
+// probably due to insufficient privileges.
 //
 // NOTE02:
 // On some Linux systems nanosleep() might actually not deliver the finest
@@ -329,9 +325,9 @@ static void sigIntHandler(int /* dummy */) {
 //
 // NOTE03:
 // Any blocking system call, such as nanosleep() or select() system call can
-// be interrupted by a signal, such as ^C from the keyboard. In this case this
-// QF port breaks out of the event-loop and returns to main() that exits and
-// terminates all spawned p-threads.
+// be interrupted by a signal, such as ^C from the keyboard. In this case
+// this QF port breaks out of the event-loop and returns to main() that
+// exits and terminates all spawned p-threads.
 //
 // NOTE04:
 // According to the man pages (for pthread_attr_setschedpolicy) the only value

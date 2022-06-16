@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ time events and time management services
@@ -46,32 +46,15 @@ Q_DEFINE_THIS_MODULE("qf_time")
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
-// Package-scope objects *****************************************************
+// Package-scope objects .....................................................
 QTimeEvt QF::timeEvtHead_[QF_MAX_TICK_RATE]; // heads of time event lists
 
 #ifdef Q_SPY
-//============================================================================
-//! @description
-//! This function must be called periodically from a time-tick ISR or from
-//! a task so that QF can manage the timeout events assigned to the given
-//! system clock tick rate.
-//!
-//! @param[in] tickRate  system clock tick rate serviced in this call [1..15].
-//! @param[in] sender    pointer to a sender object (used in QS only).
-//!
-//! @note
-//! this function should be called only via the macro TICK_X()
-//!
-//! @note
-//! the calls to QP::QF::tickX_() with different @p tickRate parameter can
-//! preempt each other. For example, higher clock tick rates might be
-//! serviced from interrupts while others from tasks (active objects).
-//!
-//! @sa
-//! QP::QTimeEvt.
-//!
+
+//............................................................................
 void QF::tickX_(std::uint_fast8_t const tickRate,
                 void const * const sender) noexcept
 #else
@@ -177,19 +160,7 @@ void QF::tickX_(std::uint_fast8_t const tickRate) noexcept
     QF_CRIT_X_();
 }
 
-//============================================================================
-//! @description
-//! Find out if any time events are armed at the given clock tick rate.
-//!
-//! @param[in]  tickRate  system clock tick rate to find out about.
-//!
-//! @returns
-//! 'true' if no time events are armed at the given tick rate and
-//! 'false' otherwise.
-//!
-//! @note
-//! This function should be called in critical section.
-//!
+//............................................................................
 bool QF::noTimeEvtsActiveX(std::uint_fast8_t const tickRate) noexcept {
 
     //! @pre the tick rate must be in range
@@ -208,7 +179,7 @@ bool QF::noTimeEvtsActiveX(std::uint_fast8_t const tickRate) noexcept {
     return inactive;
 }
 
-//============================================================================
+//............................................................................
 //! @description
 //! When creating a time event, you must commit it to a specific active object
 //! @p act, tick rate @p tickRate and event signal @p sgnl. You cannot change
@@ -252,10 +223,7 @@ QTimeEvt::QTimeEvt(QActive * const act,
     refCtr_ = static_cast<std::uint8_t>(tickRate);
 }
 
-//============================================================================
-//! @note
-//! private default ctor for internal use only
-//!
+//............................................................................
 QTimeEvt::QTimeEvt() noexcept
     :
 #ifdef Q_EVT_CTOR
@@ -286,33 +254,7 @@ QTimeEvt::QTimeEvt() noexcept
 
 }
 
-//============================================================================
-//! @description
-//! Arms a time event to fire in a specified number of clock ticks and with
-//! a specified interval. If the interval is zero, the time event is armed
-//! for one shot ('one-shot' time event). The time event gets directly posted
-//! (using the FIFO policy) into the event queue of the host active object.
-//! After posting, a one-shot time event gets automatically disarmed
-//! while a periodic time event (interval != 0) is automatically re-armed.
-//!
-//! A time event can be disarmed at any time by calling
-//! QP::QTimeEvt::disarm(). Also, a time event can be re-armed to fire in a
-//! different number of clock ticks by calling the QP::QTimeEvt::rearm().
-//!
-//! @param[in] nTicks   number of clock ticks (at the associated rate)
-//!                     to rearm the time event with.
-//! @param[in] interval interval (in clock ticks) for periodic time event.
-//!
-//! @attention
-//! Arming an already armed time event is __not__ allowed and is considered
-//! a programming error. The QP/C++ framework will assert if it detects an
-//! attempt to arm an already armed time event.
-//!
-//! @usage
-//! The following example shows how to arm a one-shot time event from a state
-//! machine of an active object:
-//! @include qf_state.cpp
-//!
+//............................................................................
 void QTimeEvt::armX(QTimeEvtCtr const nTicks,
                     QTimeEvtCtr const interval) noexcept
 {
@@ -374,22 +316,7 @@ void QTimeEvt::armX(QTimeEvtCtr const nTicks,
     QF_CRIT_X_();
 }
 
-//============================================================================
-//! @description
-//! Disarm the time event so it can be safely reused.
-//!
-//! @returns
-//! 'true' if the time event was truly disarmed, that is, it was running.
-//! The return of 'false' means that the time event was not truly disarmed,
-//! because it was not running. The 'false' return is only possible for one-
-//!shot time events that have been automatically disarmed upon expiration.
-//! In this case the 'false' return means that the time event has already
-//! been posted or published and should be expected in the active object's
-//! state machine.
-//!
-//! @note
-//! there is no harm in disarming an already disarmed time event
-//!
+//............................................................................
 bool QTimeEvt::disarm(void) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -432,26 +359,7 @@ bool QTimeEvt::disarm(void) noexcept {
     return wasArmed;
 }
 
-//============================================================================
-//!
-//! @description
-//! Rearms a time event with a new number of clock ticks. This function can
-//! be used to adjust the current period of a periodic time event or to
-//! prevent a one-shot time event from expiring (e.g., a watchdog time event).
-//! Rearming a periodic timer leaves the interval unchanged and is a
-//! convenient method to adjust the phasing of a periodic time event.
-//!
-//! @param[in] nTicks number of clock ticks (at the associated rate)
-//!                   to rearm the time event with.
-//!
-//! @returns
-//! 'true' if the time event was running as it was re-armed. The 'false'
-//! return means that the time event was not truly rearmed because it was
-//! not running. The 'false' return is only possible for one-shot time events
-//! that have been automatically disarmed upon expiration. In this case the
-//! 'false' return means that the time event has already been posted or
-//! published and should be expected in the active object's state machine.
-//!
+//............................................................................
 bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) noexcept {
     std::uint8_t const tickRate = refCtr_ & TE_TICK_RATE;
 
@@ -515,26 +423,7 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) noexcept {
     return wasArmed;
 }
 
-//============================================================================
-//!
-//! @description
-//! Useful for checking whether a one-shot time event was disarmed in the
-//! QTimeEvt_disarm() operation.
-//!
-//! @returns
-//! 'true' if the time event was truly disarmed in the last QTimeEvt::disarm()
-//! operation. The 'false' return means that the time event was not truly
-//! disarmed, because it was not running at that time. The 'false' return is
-//! only possible for one-shot time events that have been automatically
-//! disarmed upon expiration. In this case the 'false' return means that the
-//! time event has already been posted or published and should be expected
-//! in the active object's event queue.
-//!
-//! @note
-//! This function has a **side effect** of setting the "was disarmed" status,
-//! which means that the second and subsequent times this function is called
-//! the function will return 'true'.
-//!
+//............................................................................
 bool QTimeEvt::wasDisarmed(void) noexcept {
     std::uint8_t const isDisarmed = refCtr_ & TE_WAS_DISARMED;
     // mark as disarmed
@@ -542,7 +431,7 @@ bool QTimeEvt::wasDisarmed(void) noexcept {
     return isDisarmed != 0U;
 }
 
-//============================================================================
+//............................................................................
 //! @description
 //! Useful for checking how many clock ticks (at the tick rate associated
 //! with the time event) remain until the time event expires.

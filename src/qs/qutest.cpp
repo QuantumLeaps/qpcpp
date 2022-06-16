@@ -45,12 +45,13 @@ Q_DEFINE_THIS_MODULE("qutest")
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
-// Global objects ============================================================
+// Global objects ............................................................
 std::uint8_t volatile QF_intNest;
 
-// QF functions ==============================================================
+//............................................................................
 void QF::init(void) {
     //! Clear the internal QF variables, so that the framework can start
     //! correctly even if the startup code fails to clear the uninitialized

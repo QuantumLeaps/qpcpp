@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-05-13
+//! @date Last updated on: 2022-06-15
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -51,39 +51,12 @@ Q_DEFINE_THIS_MODULE("qf_actq")
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
 #ifdef Q_SPY
-//============================================================================
-//! @description
-//! Direct event posting is the simplest asynchronous communication method
-//! available in QF.
-//!
-//! @param[in,out] e      pointer to the event to be posted
-//! @param[in]     margin number of required free slots in the queue
-//!                after posting the event. The special value QP::QF_NO_MARGIN
-//!                means that this function will assert if posting fails.
-//! @param[in]     sender pointer to a sender object (used in QS only)
-//!
-//! @returns
-//! 'true' (success) if the posting succeeded (with the provided margin) and
-//! 'false' (failure) when the posting fails.
-//!
-//! @attention
-//! Should be called only via the macro POST() or POST_X().
-//!
-//! @note
-//! The QP::QF_NO_MARGIN value of the @p margin argument is special and
-//! denotes situation when the post() operation is assumed to succeed (event
-//! delivery guarantee). An assertion fires, when the event cannot be
-//! delivered in this case.
-//!
-//! @usage
-//! @include qf_post.cpp
-//!
-//! @sa
-//! QActive::postLIFO()
-//!
+
+//............................................................................
 bool QActive::post_(QEvt const * const e,
                     std::uint_fast16_t const margin,
                     void const * const sender) noexcept
@@ -204,22 +177,8 @@ bool QActive::post_(QEvt const * const e,
     return status;
 }
 
-//============================================================================
-//! @description
-//! posts an event to the event queue of the active object  using the
-//! Last-In-First-Out (LIFO) policy.
-//!
-//! @note
-//! The LIFO policy should be used only for self-posting and with caution,
-//! because it alters order of events in the queue.
-//!
-//! @param[in]  e  pointer to the event to post to the queue
-//!
-//! @sa
-//! QActive::post_()
-//!
+//............................................................................
 void QActive::postLIFO(QEvt const * const e) noexcept {
-
     QF_CRIT_STAT_
     QF_CRIT_E_();
     QEQueueCtr nFree = m_eQueue.m_nFree;// tmp to avoid UB for volatile access
@@ -282,25 +241,7 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_X_();
 }
 
-//============================================================================
-//! @description
-//! The behavior of this function depends on the kernel used in the QF port.
-//! For built-in kernels (Vanilla or QK) the function can be called only when
-//! the queue is not empty, so it doesn't block. For a blocking kernel/OS
-//! the function can block and wait for delivery of an event.
-//!
-//! @returns
-//! A pointer to the received event. The returned pointer is guaranteed to be
-//! valid (can't be NULL).
-//!
-//! @note
-//! This function is used internally by a QF port to extract events from
-//! the event queue of an active object. This function depends on the event
-//! queue implementation and is sometimes customized in the QF port
-//! (file qf_port.hpp). Depending on the definition of the macro
-//! QACTIVE_EQUEUE_WAIT_(), the function might block the calling thread when
-//! no events are available.
-//!
+//............................................................................
 QEvt const *QActive::get_(void) noexcept {
 
     QF_CRIT_STAT_
@@ -348,24 +289,7 @@ QEvt const *QActive::get_(void) noexcept {
     return e;
 }
 
-//============================================================================
-//! @description
-//! Queries the minimum of free ever present in the given event queue of
-//! an active object with priority @p prio, since the active object
-//! was started.
-//!
-//! @note
-//! QP::QF::getQueueMin() is available only when the native QF event
-//! queue implementation is used. Requesting the queue minimum of an unused
-//! priority level raises an assertion in the QF. (A priority level becomes
-//! used in QF after the call to the QP::QF::add_() function.)
-//!
-//! @param[in] prio  Priority of the active object, whose queue is queried
-//!
-//! @returns
-//! the minimum of free ever present in the given event queue of an active
-//! object with priority @p prio, since the active object was started.
-//!
+//............................................................................
 std::uint_fast16_t QF::getQueueMin(std::uint_fast8_t const prio) noexcept {
 
     Q_REQUIRE_ID(400, (prio <= QF_MAX_ACTIVE)
@@ -416,12 +340,11 @@ void QTicker::dispatch(QEvt const * const e,
 void QTicker::init(std::uint_fast8_t const qs_id) noexcept {
     QTicker::init(nullptr, qs_id);
 }
-//............................................................................
-#ifdef Q_SPY
+
 //============================================================================
-//! @sa
-//! QActive::post_()
-//!
+#ifdef Q_SPY
+
+//............................................................................
 bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
 #else
@@ -466,7 +389,7 @@ bool QTicker::post_(QEvt const * const e, std::uint_fast16_t const margin)
     return true; // the event is always posted correctly
 }
 
-//============================================================================
+//............................................................................
 void QTicker::postLIFO(QEvt const * const e) noexcept {
     static_cast<void>(e); // unused parameter
     Q_ERROR_ID(900); // operation not allowed

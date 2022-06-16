@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QUTEST, QP/C++, Win32, MinGW toolset
-# Last updated for version 6.4.0
-# Last updated on  2019-01-09
+# Last updated for version 7.0.1
+# Last updated on  2022-05-23
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -68,7 +68,6 @@ VPATH = \
 # list of all include directories needed by this project
 INCLUDES  = \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR)
 
 #-----------------------------------------------------------------------------

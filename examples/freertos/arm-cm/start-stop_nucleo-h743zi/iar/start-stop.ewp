@@ -339,7 +339,6 @@
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\freertos</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\FreeRTOS\Source\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1</state>
@@ -1399,7 +1398,6 @@
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\freertos</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\FreeRTOS\Source\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1</state>
@@ -2459,7 +2457,6 @@
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\freertos</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\FreeRTOS\Source\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1</state>

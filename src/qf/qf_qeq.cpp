@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-05-13
+//! @date Last updated on: 2022-06-15
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -46,12 +46,9 @@ Q_DEFINE_THIS_MODULE("qf_qeq")
 
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
 
-//============================================================================
-//! @description
-//! Default constructor
-//!
 QEQueue::QEQueue(void) noexcept
   : m_frontEvt(nullptr),
     m_ring(nullptr),
@@ -62,22 +59,7 @@ QEQueue::QEQueue(void) noexcept
     m_nMin(0U)
 {}
 
-//============================================================================
-//! @description
-//! Initialize the event queue by giving it the storage for the ring buffer.
-//!
-//! @param[in] qSto an array of pointers to QP::QEvt to sereve as the
-//!                 ring buffer for the event queue
-//! @param[in] qLen the length of the qSto[] buffer (in QP::QEvt pointers)
-//!
-//! @note
-//! The actual capacity of the queue is qLen + 1, because of the extra
-//! location forntEvt.
-//!
-//! @note This function is also used to initialize the event queues of active
-//! objects in the built-int QV, QK and QXK kernels, as well as other
-//! QP ports to OSes/RTOSes that do provide a suitable message queue.
-//!
+//............................................................................
 void QEQueue::init(QEvt const *qSto[],
                    std::uint_fast16_t const qLen) noexcept
 {
@@ -92,30 +74,7 @@ void QEQueue::init(QEvt const *qSto[],
     m_nMin     = m_nFree;
 }
 
-//============================================================================
-//! @description
-//! Post an event to the "raw" thread-safe event queue using the
-//! First-In-First-Out (FIFO) order.
-//!
-//! @param[in] e      pointer to the event to be posted to the queue
-//! @param[in] margin number of required free slots in the queue after
-//!                   posting the event. The special value QP::QF_NO_MARGIN
-//!                   means that this function will assert if posting
-//! @param[in] qs_id  QS-id of this state machine (for QS local filter)
-//!
-//! @note
-//! The QP::QF_NO_MARGIN value of the @p margin argument is special and
-//! denotes situation when the post() operation is assumed to succeed (event
-//! delivery guarantee). An assertion fires, when the event cannot be
-//! delivered in this case.
-//!
-//! @returns 'true' (success) when the posting succeeded with the provided
-//! margin and 'false' (failure) when the posting fails.
-//!
-//! @note This function can be called from any task context or ISR context.
-//!
-//! @sa QP::QEQueue::postLIFO(), QP::QEQueue::get()
-//!
+//............................................................................
 bool QEQueue::post(QEvt const * const e,
                    std::uint_fast16_t const margin,
                    std::uint_fast8_t const qs_id) noexcept
@@ -192,28 +151,7 @@ bool QEQueue::post(QEvt const * const e,
     return status;
 }
 
-//============================================================================
-//! @description
-//! Post an event to the "raw" thread-safe event queue using the
-//! Last-In-First-Out (LIFO) order.
-//!
-//! @param[in] e     pointer to the event to be posted to the queue
-//! @param[in] qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @attention
-//! The LIFO policy should be used only with great __caution__,
-//! because it alters the order of events in the queue.
-//!
-//! @note
-//! This function can be called from any task context or ISR context.
-//!
-//! @note
-//! This function is used for the "raw" thread-safe queues and __not__
-//! for the queues of active objects.
-//!
-//! @sa
-//! QP::QEQueue::post(), QP::QEQueue::get(), QP::QActive::defer()
-//!
+//............................................................................
 void QEQueue::postLIFO(QEvt const * const e,
                        std::uint_fast8_t const qs_id) noexcept
 {
@@ -260,24 +198,7 @@ void QEQueue::postLIFO(QEvt const * const e,
     QF_CRIT_X_();
 }
 
-//============================================================================
-//! @description
-//! Retrieves an event from the front of the "raw" thread-safe queue and
-//! returns a pointer to this event to the caller.
-//!
-//! @param[in] qs_id QS-id of this state machine (for QS local filter)
-//!
-//! @returns
-//! pointer to event at the front of the queue, if the queue is
-//! not empty and NULL if the queue is empty.
-//!
-//! @note
-//! this function is used for the "raw" thread-safe queues and __not__
-//! for the queues of active objects.
-//!
-//! @sa
-//! QP::QEQueue::post(), QP::QEQueue::postLIFO(), QP::QActive::recall()
-//!
+//............................................................................
 QEvt const *QEQueue::get(std::uint_fast8_t const qs_id) noexcept {
     static_cast<void>(qs_id); // unused parameter, if Q_SPY not defined
 

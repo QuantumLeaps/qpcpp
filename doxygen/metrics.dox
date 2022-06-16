@@ -5,205 +5,207 @@
 ================================================
   NLOC    CCN   token  PARAM  length  location
 ------------------------------------------------
-       3      1     14      1       4 QP::QEvt::QEvt@141-144@..\include\qep.hpp
-       5      1     26      2       5 QP::QEvt::QEvt@148-152@..\include\qep.hpp
-       1      1      6      0       1 QP::QEvt::~QEvt@156-156@..\include\qep.hpp
-       3      1     17      1       3 QP::QHsm::init@262-264@..\include\qep.hpp
-       3      1     13      1       3 QP::QHsm::state@276-278@..\include\qep.hpp
-       4      1     18      1       4 QP::QHsm::tran@334-337@..\include\qep.hpp
-       4      1     18      1       4 QP::QHsm::tran_hist@340-343@..\include\qep.hpp
-       4      1     18      1       4 QP::QHsm::super@346-349@..\include\qep.hpp
-       4      1     30      1       4 QP::QHsm::qm_tran@360-363@..\include\qep.hpp
-       7      1     42      2       7 QP::QHsm::qm_tran_hist@367-373@..\include\qep.hpp
-       4      1     30      1       4 QP::QHsm::qm_tran_init@377-380@..\include\qep.hpp
-       4      1     30      1       4 QP::QHsm::qm_tran_ep@384-387@..\include\qep.hpp
-       7      1     40      2       7 QP::QHsm::qm_tran_xp@391-397@..\include\qep.hpp
-       4      1     20      1       4 QP::QHsm::qm_entry@401-404@..\include\qep.hpp
-       4      1     20      1       4 QP::QHsm::qm_exit@407-410@..\include\qep.hpp
-       4      1     19      1       4 QP::QHsm::qm_entry@416-419@..\include\qep.hpp
-       4      1     19      1       4 QP::QHsm::qm_exit@422-425@..\include\qep.hpp
-       4      1     20      1       4 QP::QHsm::qm_sm_exit@429-432@..\include\qep.hpp
-       4      1     20      1       4 QP::QHsm::qm_super_sub@436-439@..\include\qep.hpp
-       3      1     13      1       3 QP::QMsm::stateObj@500-502@..\include\qep.hpp
-       3      1     10      1       3 QP::QEP::getVersion@584-586@..\include\qep.hpp
-       3      1     11      1       3 QP::QEQueue::getNFree@215-217@..\include\qequeue.hpp
-       3      1     11      1       3 QP::QEQueue::getNMin@230-232@..\include\qequeue.hpp
-       3      1     13      1       3 QP::QEQueue::isEmpty@244-246@..\include\qequeue.hpp
-       6      1     51      5       6 QP::QActive::start@192-197@..\include\qf.hpp
-       3      1     19      1       3 QP::QActive::getPrio@243-245@..\include\qf.hpp
-       3      1     22      1       3 QP::QActive::setPrio@248-250@..\include\qf.hpp
-       1      1     10      1       1 QP::QActive::getOsObject@258-258@..\include\qf.hpp
-       1      1     10      1       1 QP::QActive::getThread@264-264@..\include\qf.hpp
-       3      1     13      1       3 QP::QMActive::stateObj@340-342@..\include\qf.hpp
-       3      1     17      1       3 QP::QTimeEvt::toActive@455-457@..\include\qf.hpp
-       3      1     17      1       3 QP::QTimeEvt::toTimeEvt@460-462@..\include\qf.hpp
-       3      1     10      1       3 QP::QF::getVersion@491-493@..\include\qf.hpp
-       3      1     10      1       3 QP::QK::getVersion@146-148@..\include\qk.hpp
-       3      1     11      1       3 QP::QMPool::getBlockSize@142-144@..\include\qmpool.hpp
-       3      1     11      1       3 QP::QPSet::setEmpty@73-75@..\include\qpset.hpp
-       3      1     15      1       3 QP::QPSet::isEmpty@78-80@..\include\qpset.hpp
-       3      1     15      1       3 QP::QPSet::notEmpty@83-85@..\include\qpset.hpp
-       3      1     30      1       3 QP::QPSet::hasElement@88-90@..\include\qpset.hpp
-       3      1     28      1       3 QP::QPSet::insert@93-95@..\include\qpset.hpp
-       4      1     40      1       4 QP::QPSet::rmove@101-104@..\include\qpset.hpp
-       3      1     14      1       3 QP::QPSet::findMax@106-108@..\include\qpset.hpp
-       4      1     21      1       4 QP::QPSet::setEmpty@127-130@..\include\qpset.hpp
-       3      2     29      1       3 QP::QPSet::isEmpty@134-136@..\include\qpset.hpp
-       3      2     29      1       3 QP::QPSet::notEmpty@140-142@..\include\qpset.hpp
-       7      2     79      1       7 QP::QPSet::hasElement@145-151@..\include\qpset.hpp
-      10      2     84      1      10 QP::QPSet::insert@154-163@..\include\qpset.hpp
-      10      2     88      1      10 QP::QPSet::rmove@169-178@..\include\qpset.hpp
-       5      2     40      1       5 QP::QPSet::findMax@181-185@..\include\qpset.hpp
-       3      1     19      1       3 QP::QSpyId::getPrio@205-207@..\include\qs.hpp
-       7      1     28      1       7 QP::QS::force_cast@497-503@..\include\qs.hpp
-      14      3     72      1      14 QP::QS::rxPut@538-551@..\include\qs.hpp
-       6      1     49      5       6 QP::QActiveDummy::start@587-592@..\include\qs.hpp
+       3      1     14      1       4 QP::QEvt::QEvt@166-169@..\include\qep.hpp
+       5      1     26      2       5 QP::QEvt::QEvt@173-177@..\include\qep.hpp
+       1      1      6      0       1 QP::QEvt::~QEvt@181-181@..\include\qep.hpp
+       1      1      6      0       1 QP::QHsm::~QHsm@266-266@..\include\qep.hpp
+       3      1     17      1       3 QP::QHsm::init@286-288@..\include\qep.hpp
+       3      1     13      1       3 QP::QHsm::state@332-334@..\include\qep.hpp
+       4      1     18      1       4 QP::QHsm::tran@419-422@..\include\qep.hpp
+       4      1     18      1       4 QP::QHsm::tran_hist@425-428@..\include\qep.hpp
+       4      1     18      1       4 QP::QHsm::super@431-434@..\include\qep.hpp
+       4      1     30      1       4 QP::QHsm::qm_tran@445-448@..\include\qep.hpp
+       7      1     42      2       7 QP::QHsm::qm_tran_hist@452-458@..\include\qep.hpp
+       4      1     30      1       4 QP::QHsm::qm_tran_init@462-465@..\include\qep.hpp
+       4      1     30      1       4 QP::QHsm::qm_tran_ep@469-472@..\include\qep.hpp
+       7      1     40      2       7 QP::QHsm::qm_tran_xp@476-482@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_entry@486-489@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_exit@492-495@..\include\qep.hpp
+       4      1     19      1       4 QP::QHsm::qm_entry@501-504@..\include\qep.hpp
+       4      1     19      1       4 QP::QHsm::qm_exit@507-510@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_sm_exit@514-517@..\include\qep.hpp
+       4      1     20      1       4 QP::QHsm::qm_super_sub@521-524@..\include\qep.hpp
+       3      1     13      1       3 QP::QMsm::stateObj@644-646@..\include\qep.hpp
+       3      1     11      1       3 QP::QEQueue::getNFree@263-265@..\include\qequeue.hpp
+       3      1     11      1       3 QP::QEQueue::getNMin@278-280@..\include\qequeue.hpp
+       3      1     13      1       3 QP::QEQueue::isEmpty@292-294@..\include\qequeue.hpp
+       6      1     51      5       6 QP::QActive::start@215-220@..\include\qf.hpp
+       3      1     19      1       3 QP::QActive::getPrio@435-437@..\include\qf.hpp
+       3      1     22      1       3 QP::QActive::setPrio@440-442@..\include\qf.hpp
+       1      1     10      1       1 QP::QActive::getOsObject@450-450@..\include\qf.hpp
+       1      1     10      1       1 QP::QActive::getThread@456-456@..\include\qf.hpp
+       3      1     13      1       3 QP::QMActive::stateObj@553-555@..\include\qf.hpp
+       3      1     17      1       3 QP::QTimeEvt::toActive@758-760@..\include\qf.hpp
+       3      1     17      1       3 QP::QTimeEvt::toTimeEvt@763-765@..\include\qf.hpp
+       3      1     10      1       3 QP::QF::getVersion@793-795@..\include\qf.hpp
+       3      1     16      1       3 QP::QF_EVT_POOL_ID_@132-134@..\include\qf_pkg.hpp
+       3      1     16      1       3 QP::QF_EVT_REF_CTR_@137-139@..\include\qf_pkg.hpp
+       3      1     31      1       3 QP::QF_EVT_REF_CTR_INC_@142-144@..\include\qf_pkg.hpp
+       3      1     31      1       3 QP::QF_EVT_REF_CTR_DEC_@147-149@..\include\qf_pkg.hpp
+       3      1     10      1       3 QP::QK::getVersion@208-210@..\include\qk.hpp
+       3      1     11      1       3 QP::QMPool::getBlockSize@223-225@..\include\qmpool.hpp
+       3      1     11      1       3 QP::QPSet::setEmpty@83-85@..\include\qpset.hpp
+       3      1     15      1       3 QP::QPSet::isEmpty@88-90@..\include\qpset.hpp
+       3      1     15      1       3 QP::QPSet::notEmpty@93-95@..\include\qpset.hpp
+       3      1     30      1       3 QP::QPSet::hasElement@98-100@..\include\qpset.hpp
+       3      1     28      1       3 QP::QPSet::insert@103-105@..\include\qpset.hpp
+       4      1     40      1       4 QP::QPSet::rmove@112-115@..\include\qpset.hpp
+       3      1     14      1       3 QP::QPSet::findMax@117-119@..\include\qpset.hpp
+       4      1     21      1       4 QP::QPSet::setEmpty@139-142@..\include\qpset.hpp
+       3      2     29      1       3 QP::QPSet::isEmpty@146-148@..\include\qpset.hpp
+       3      2     29      1       3 QP::QPSet::notEmpty@152-154@..\include\qpset.hpp
+       7      2     79      1       7 QP::QPSet::hasElement@157-163@..\include\qpset.hpp
+      10      2     84      1      10 QP::QPSet::insert@166-175@..\include\qpset.hpp
+      10      2     88      1      10 QP::QPSet::rmove@182-191@..\include\qpset.hpp
+       5      2     40      1       5 QP::QPSet::findMax@194-198@..\include\qpset.hpp
+       7      1     28      1       7 QP::QS::force_cast@530-536@..\include\qs.hpp
+       3      1     19      1       3 QP::QSpyId::getPrio@722-724@..\include\qs.hpp
+      14      3     72      1      14 QP::QS::rxPut@763-776@..\include\qs.hpp
+       6      1     49      5       6 QP::QActiveDummy::start@814-819@..\include\qs.hpp
        3      1     19      1       3 QP::QSpyId::getPrio@106-108@..\include\qs_dummy.hpp
-       3      1     20      1       3 QP::QXThread::init@79-81@..\include\qxthread.hpp
-       6      1     51      5       6 QP::QXThread::start@95-100@..\include\qxthread.hpp
-       2      1     19      2       3 QP::QEvt@91-93@..\src\qf\qep_hsm.cpp
-       4      1     27      1       4 QP::QHsm::QHsm@116-119@..\src\qf\qep_hsm.cpp
-       2      1      7      0       2 QP::QHsm::~QHsm@125-126@..\src\qf\qep_hsm.cpp
-      47      7    318      2      68 QP::QHsm::init@140-207@..\src\qf\qep_hsm.cpp
-       5      1     37      2       5 QP::QHsm::top@228-232@..\src\qf\qep_hsm.cpp
-     102     15    608      2     154 QP::QHsm::dispatch@249-402@..\src\qf\qep_hsm.cpp
-      95     15    460      2     129 QP::QHsm::hsm_tran@419-547@..\src\qf\qep_hsm.cpp
-       3      1     13      0       3 QP::QHsm::getStateHandler@551-553@..\src\qf\qep_hsm.cpp
-      16      3     85      1      23 QP::QHsm::isIn@572-594@..\src\qf\qep_hsm.cpp
-      20      4    108      1      29 QP::QHsm::childState@618-646@..\src\qf\qep_hsm.cpp
-       6      1     29      1       6 QP::QMsm::QMsm@74-79@..\src\qf\qep_msm.cpp
-      22      3    168      2      36 QP::QMsm::init@92-127@..\src\qf\qep_msm.cpp
-       3      1     21      1       3 QP::QMsm::init@139-141@..\src\qf\qep_msm.cpp
-     113     21    661      2     166 QP::QMsm::dispatch@154-319@..\src\qf\qep_msm.cpp
-       3      1     15      0       3 QP::QMsm::getStateHandler@326-328@..\src\qf\qep_msm.cpp
-      51      9    298      2      64 QP::QMsm::execTatbl_@345-408@..\src\qf\qep_msm.cpp
-      21      4    116      3      28 QP::QMsm::exitToTranSource_@420-447@..\src\qf\qep_msm.cpp
-      43      6    236      2      54 QP::QMsm::enterHistory_@461-514@..\src\qf\qep_msm.cpp
-      13      3     59      1      14 QP::QMsm::isInState@529-542@..\src\qf\qep_msm.cpp
-      21      4     90      1      28 QP::QMsm::childStateObj@559-586@..\src\qf\qep_msm.cpp
-       9      3     72      1      10 QP::QF::add_@68-77@..\src\qf\qf_act.cpp
-      10      3     80      1      11 QP::QF::remove_@92-102@..\src\qf\qf_act.cpp
-       7      2     61      2       7 QP::QF::bzero@117-123@..\src\qf\qf_act.cpp
-      24      6    155      1      29 QF_LOG2@139-167@..\src\qf\qf_act.cpp
-      79     13    394      2     115 QP::QActive::post_@91-205@..\src\qf\qf_actq.cpp
-      42      7    237      1      63 QP::QActive::postLIFO@221-283@..\src\qf\qf_actq.cpp
-      34      3    206      1      46 QP::QActive::get_@304-349@..\src\qf\qf_actq.cpp
-      10      2     68      1      13 QP::QF::getQueueMin@369-381@..\src\qf\qf_actq.cpp
-       5      1     30      1       6 QP::QTicker::QTicker@384-389@..\src\qf\qf_actq.cpp
-       7      1     41      2       7 QP::QTicker::init@391-397@..\src\qf\qf_actq.cpp
-      14      2     88      2      16 QP::QTicker::dispatch@399-414@..\src\qf\qf_actq.cpp
-       3      1     22      1       3 QP::QTicker::init@416-418@..\src\qf\qf_actq.cpp
-      27      3    160      2      40 QP::QTicker::post_@428-467@..\src\qf\qf_actq.cpp
-       4      1     26      1       4 QP::QTicker::postLIFO@470-473@..\src\qf\qf_actq.cpp
-      12      1     79      2      14 QP::QActive::defer@74-87@..\src\qf\qf_defer.cpp
-      32      3    157      1      49 QP::QActive::recall@110-158@..\src\qf\qf_defer.cpp
-      11      2     62      1      11 QP::QActive::flushDeferred@175-185@..\src\qf\qf_defer.cpp
-      16      3    133      3      24 QP::QF::poolInit@82-105@..\src\qf\qf_dyn.cpp
-      39      7    268      3      55 QP::QF::newX_@133-187@..\src\qf\qf_dyn.cpp
-      35      5    244      1      57 QP::QF::gc@212-268@..\src\qf\qf_dyn.cpp
-      18      2    106      2      25 QP::QF::newRef_@284-308@..\src\qf\qf_dyn.cpp
-      11      1     70      1      13 QP::QF::deleteRef_@320-332@..\src\qf\qf_dyn.cpp
-       3      1     20      1       3 QP::QF::poolGetMaxBlockSize@338-340@..\src\qf\qf_dyn.cpp
-       9      1     43      1       9 QP::QMPool::QMPool@60-68@..\src\qf\qf_mem.cpp
-      31      5    234      3      53 QP::QMPool::init@100-152@..\src\qf\qf_mem.cpp
-      17      2    110      2      23 QP::QMPool::put@171-193@..\src\qf\qf_mem.cpp
-      42      4    211      2      65 QP::QMPool::get@224-288@..\src\qf\qf_mem.cpp
-      10      3     71      1      13 QP::QF::getPoolMin@303-315@..\src\qf\qf_mem.cpp
-       7      1     42      2      11 QP::QF::psInit@85-95@..\src\qf\qf_ps.cpp
-      90     17    587      1     202 QP::QF::publish_@115-316@..\src\qf\qf_ps.cpp
+       3      1     20      1       3 QP::QXThread::init@137-139@..\include\qxthread.hpp
+       6      1     51      5       6 QP::QXThread::start@174-179@..\include\qxthread.hpp
+       2      1     19      2       3 QP::QEvt@92-94@..\src\qf\qep_hsm.cpp
+       4      1     27      1       4 QP::QHsm::QHsm@109-112@..\src\qf\qep_hsm.cpp
+      47      7    318      2      68 QP::QHsm::init@115-182@..\src\qf\qep_hsm.cpp
+       5      1     37      2       5 QP::QHsm::top@185-189@..\src\qf\qep_hsm.cpp
+     102     15    608      2     154 QP::QHsm::dispatch@192-345@..\src\qf\qep_hsm.cpp
+      95     15    460      2     129 QP::QHsm::hsm_tran@348-476@..\src\qf\qep_hsm.cpp
+       3      1     13      0       3 QP::QHsm::getStateHandler@480-482@..\src\qf\qep_hsm.cpp
+      16      3     85      1      23 QP::QHsm::isIn@486-508@..\src\qf\qep_hsm.cpp
+      20      4    108      1      29 QP::QHsm::childState@511-539@..\src\qf\qep_hsm.cpp
+       6      1     29      1       6 QP::QMsm::QMsm@62-67@..\src\qf\qep_msm.cpp
+      22      3    168      2      36 QP::QMsm::init@70-105@..\src\qf\qep_msm.cpp
+       3      1     21      1       3 QP::QMsm::init@108-110@..\src\qf\qep_msm.cpp
+     113     21    661      2     166 QP::QMsm::dispatch@113-278@..\src\qf\qep_msm.cpp
+       3      1     15      0       3 QP::QMsm::getStateHandler@285-287@..\src\qf\qep_msm.cpp
+      51      9    298      2      64 QP::QMsm::execTatbl_@291-354@..\src\qf\qep_msm.cpp
+      21      4    116      3      28 QP::QMsm::exitToTranSource_@357-384@..\src\qf\qep_msm.cpp
+      43      6    236      2      54 QP::QMsm::enterHistory_@387-440@..\src\qf\qep_msm.cpp
+      13      3     59      1      14 QP::QMsm::isInState@443-456@..\src\qf\qep_msm.cpp
+      21      4     90      1      28 QP::QMsm::childStateObj@459-486@..\src\qf\qep_msm.cpp
+       9      3     72      1      10 QP::QF::add_@56-65@..\src\qf\qf_act.cpp
+      10      3     80      1      11 QP::QF::remove_@68-78@..\src\qf\qf_act.cpp
+       7      2     61      2       7 QP::QF::bzero@81-87@..\src\qf\qf_act.cpp
+      24      6    155      1      29 QF_LOG2@98-126@..\src\qf\qf_act.cpp
+      79     13    394      2     115 QP::QActive::post_@64-178@..\src\qf\qf_actq.cpp
+      42      7    237      1      62 QP::QActive::postLIFO@181-242@..\src\qf\qf_actq.cpp
+      34      3    206      1      46 QP::QActive::get_@245-290@..\src\qf\qf_actq.cpp
+      10      2     68      1      13 QP::QF::getQueueMin@293-305@..\src\qf\qf_actq.cpp
+       5      1     30      1       6 QP::QTicker::QTicker@308-313@..\src\qf\qf_actq.cpp
+       7      1     41      2       7 QP::QTicker::init@315-321@..\src\qf\qf_actq.cpp
+      14      2     88      2      16 QP::QTicker::dispatch@323-338@..\src\qf\qf_actq.cpp
+       3      1     22      1       3 QP::QTicker::init@340-342@..\src\qf\qf_actq.cpp
+      27      3    160      2      40 QP::QTicker::post_@351-390@..\src\qf\qf_actq.cpp
+       4      1     26      1       4 QP::QTicker::postLIFO@393-396@..\src\qf\qf_actq.cpp
+      12      1     79      2      14 QP::QActive::defer@53-66@..\src\qf\qf_defer.cpp
+      32      3    157      1      49 QP::QActive::recall@69-117@..\src\qf\qf_defer.cpp
+      11      2     62      1      11 QP::QActive::flushDeferred@120-130@..\src\qf\qf_defer.cpp
+      16      3    133      3      24 QP::QF::poolInit@57-80@..\src\qf\qf_dyn.cpp
+      39      7    268      3      55 QP::QF::newX_@83-137@..\src\qf\qf_dyn.cpp
+      35      5    244      1      57 QP::QF::gc@140-196@..\src\qf\qf_dyn.cpp
+      18      2    106      2      25 QP::QF::newRef_@199-223@..\src\qf\qf_dyn.cpp
+      11      1     70      1      13 QP::QF::deleteRef_@226-238@..\src\qf\qf_dyn.cpp
+       3      1     20      1       3 QP::QF::poolGetMaxBlockSize@244-246@..\src\qf\qf_dyn.cpp
+       9      1     43      1       9 QP::QMPool::QMPool@61-69@..\src\qf\qf_mem.cpp
+      31      5    234      3      53 QP::QMPool::init@72-124@..\src\qf\qf_mem.cpp
+      42      4    211      2      65 QP::QMPool::get@127-191@..\src\qf\qf_mem.cpp
+      17      2    110      2      23 QP::QMPool::put@194-216@..\src\qf\qf_mem.cpp
+      10      3     71      1      13 QP::QF::getPoolMin@219-231@..\src\qf\qf_mem.cpp
+       7      1     42      2      11 QP::QF::psInit@58-68@..\src\qf\qf_ps.cpp
+      90     17    587      1     142 QP::QF::publish_@72-213@..\src\qf\qf_ps.cpp
        7      3     47      1      12 QP::QActive::QActive@37-48@..\src\qf\qf_qact.cpp
-       9      1     44      1       9 QP::QEQueue::QEQueue@55-63@..\src\qf\qf_qeq.cpp
-      13      2     74      2      13 QP::QEQueue::init@81-93@..\src\qf\qf_qeq.cpp
-      56      8    280      3      75 QP::QEQueue::post@119-193@..\src\qf\qf_qeq.cpp
-      35      5    177      2      45 QP::QEQueue::postLIFO@217-261@..\src\qf\qf_qeq.cpp
-      36      4    193      1      46 QP::QEQueue::get@281-326@..\src\qf\qf_qeq.cpp
-       5      1     22      1       5 QP::QMActive::QMActive@59-63@..\src\qf\qf_qmact.cpp
-       4      1     41      2       4 QP::QMActive::init@66-69@..\src\qf\qf_qmact.cpp
-       4      1     33      1       4 QP::QMActive::init@71-74@..\src\qf\qf_qmact.cpp
-       5      1     32      2       5 QP::QMActive::dispatch@76-80@..\src\qf\qf_qmact.cpp
-       3      1     27      1       3 QP::QMActive::isInState@83-85@..\src\qf\qf_qmact.cpp
-       6      1     27      1       6 QP::QMActive::childStateObj@87-92@..\src\qf\qf_qmact.cpp
-       3      1     20      0       3 QP::QMActive::getStateHandler@97-99@..\src\qf\qf_qmact.cpp
-      69      7    390      1     101 QP::QF::tickX_@78-178@..\src\qf\qf_time.cpp
-      14      3     70      1      17 QP::QF::noTimeEvtsActiveX@193-209@..\src\qf\qf_time.cpp
-      16      2    104      3      32 QP::QTimeEvt::QTimeEvt@222-253@..\src\qf\qf_time.cpp
-      13      1     53      0      29 QP::QTimeEvt::QTimeEvt@259-287@..\src\qf\qf_time.cpp
-      33      8    221      2      60 QP::QTimeEvt::armX@316-375@..\src\qf\qf_time.cpp
-      32      3    170      1      41 QP::QTimeEvt::disarm@393-433@..\src\qf\qf_time.cpp
-      33      8    221      1      62 QP::QTimeEvt::rearm@455-516@..\src\qf\qf_time.cpp
-       5      1     38      1       6 QP::QTimeEvt::wasDisarmed@538-543@..\src\qf\qf_time.cpp
-       7      1     28      1       8 QP::QTimeEvt::currCtr@558-565@..\src\qf\qf_time.cpp
-      11      2     79      1      16 QP::QF::init@70-85@..\src\qk\qk.cpp
-       3      1     14      1       4 QP::QF::stop@103-106@..\src\qk\qk.cpp
-       6      2     26      1       8 QP::initial_events@111-118@..\src\qk\qk.cpp
-      12      3     49      1      19 QP::QF::run@129-147@..\src\qk\qk.cpp
-      21      5    144      6      30 QP::QActive::start@165-194@..\src\qk\qk.cpp
-      21      2    136      1      32 QP::QK::schedLock@219-250@..\src\qk\qk.cpp
-      22      4    147      1      33 QP::QK::schedUnlock@269-301@..\src\qk\qk.cpp
-      14      3     94      1      17 QK_sched_@321-337@..\src\qk\qk.cpp
-      59     15    397      1     103 QK_activate_@348-450@..\src\qk\qk.cpp
-       9      2     67      1      13 QP::QF::init@76-88@..\src\qv\qv.cpp
-       3      1     12      1       4 QP::QF::stop@106-109@..\src\qv\qv.cpp
-      38      9    200      1      75 QP::QF::run@127-201@..\src\qv\qv.cpp
-      15      3    114      6      22 QP::QActive::start@219-240@..\src\qv\qv.cpp
-       2      1     10      0       2 QP::QXKIdleThread::QXKIdleThread@63-64@..\src\qxk\qxk.cpp
-      14      2    105      1      22 QP::QF::init@79-100@..\src\qxk\qxk.cpp
-       3      1     12      1       4 QP::QF::stop@118-121@..\src\qxk\qxk.cpp
-       6      2     26      1       8 QP::initial_events@126-133@..\src\qxk\qxk.cpp
-      12      3     49      1      20 QP::QF::run@142-161@..\src\qxk\qxk.cpp
-      23      6    158      6      32 QP::QActive::start@178-209@..\src\qxk\qxk.cpp
-      23      3    148      1      33 QP::QXK::schedLock@232-264@..\src\qxk\qxk.cpp
-      22      4    147      1      34 QP::QXK::schedUnlock@287-320@..\src\qxk\qxk.cpp
-      48      7    279      1      67 QXK_sched_@340-406@..\src\qxk\qxk.cpp
-      74     16    510      1     130 QXK_activate_@417-546@..\src\qxk\qxk.cpp
-      12      2     70      1      18 QXK_current@549-566@..\src\qxk\qxk.cpp
-      16      4    108      1      24 QP::QXMutex::init@82-105@..\src\qxk\qxk_mutex.cpp
-      66     12    477      1     108 QP::QXMutex::lock@127-234@..\src\qxk\qxk_mutex.cpp
-      45     10    288      1      69 QP::QXMutex::tryLock@254-322@..\src\qxk\qxk_mutex.cpp
-      65     16    462      1     112 QP::QXMutex::unlock@341-452@..\src\qxk\qxk_mutex.cpp
-       8      1     58      2      10 QP::QXSemaphore::init@75-84@..\src\qxk\qxk_sema.cpp
-      44      7    292      1      70 QP::QXSemaphore::wait@108-177@..\src\qxk\qxk_sema.cpp
-      15      2     60      1      20 QP::QXSemaphore::tryWait@192-211@..\src\qxk\qxk_sema.cpp
-      27      6    180      1      45 QP::QXSemaphore::signal@231-275@..\src\qxk\qxk_sema.cpp
-       8      1     54      2       8 QP::QXThread::QXThread@83-90@..\src\qxk\qxk_xthr.cpp
-       7      1     40      2       7 QP::QXThread::init@94-100@..\src\qxk\qxk_xthr.cpp
-       7      1     40      2       7 QP::QXThread::dispatch@103-109@..\src\qxk\qxk_xthr.cpp
-      25      6    191      6      44 QP::QXThread::start@132-175@..\src\qxk\qxk_xthr.cpp
-      94     13    469      2     128 QP::QXThread::post_@214-341@..\src\qxk\qxk_xthr.cpp
-       4      1     26      1       4 QP::QXThread::postLIFO@352-355@..\src\qxk\qxk_xthr.cpp
-      58      7    427      1      85 QP::QXThread::queueGet@377-461@..\src\qxk\qxk_xthr.cpp
-       5      1     50      1       6 QP::QXThread::block_@470-475@..\src\qxk\qxk_xthr.cpp
-       8      3     59      1       9 QP::QXThread::unblock_@484-492@..\src\qxk\qxk_xthr.cpp
-      20      3    153      2      37 QP::QXThread::teArm_@502-538@..\src\qxk\qxk_xthr.cpp
-      11      2     42      1      14 QP::QXThread::teDisarm_@547-560@..\src\qxk\qxk_xthr.cpp
-      21      4    175      1      36 QP::QXThread::delay@576-611@..\src\qxk\qxk_xthr.cpp
-      14      2     58      1      16 QP::QXThread::delayCancel@623-638@..\src\qxk\qxk_xthr.cpp
-      14      2    110      1      23 QXK_threadRet_@655-677@..\src\qxk\qxk_xthr.cpp
-       3      1     16      1       3 QP::QF_EVT_POOL_ID_@132-134@..\src\qf_pkg.hpp
-       3      1     16      1       3 QP::QF_EVT_REF_CTR_@137-139@..\src\qf_pkg.hpp
-       3      1     31      1       3 QP::QF_EVT_REF_CTR_INC_@142-144@..\src\qf_pkg.hpp
-       3      1     31      1       3 QP::QF_EVT_REF_CTR_DEC_@147-149@..\src\qf_pkg.hpp
+       9      1     44      1       9 QP::QEQueue::QEQueue@52-60@..\src\qf\qf_qeq.cpp
+      13      2     74      2      13 QP::QEQueue::init@63-75@..\src\qf\qf_qeq.cpp
+      56      8    280      3      75 QP::QEQueue::post@78-152@..\src\qf\qf_qeq.cpp
+      35      5    177      2      45 QP::QEQueue::postLIFO@155-199@..\src\qf\qf_qeq.cpp
+      36      4    193      1      46 QP::QEQueue::get@202-247@..\src\qf\qf_qeq.cpp
+       5      1     22      1       5 QP::QMActive::QMActive@60-64@..\src\qf\qf_qmact.cpp
+       4      1     41      2       4 QP::QMActive::init@67-70@..\src\qf\qf_qmact.cpp
+       4      1     33      1       4 QP::QMActive::init@72-75@..\src\qf\qf_qmact.cpp
+       5      1     32      2       5 QP::QMActive::dispatch@77-81@..\src\qf\qf_qmact.cpp
+       3      1     27      1       3 QP::QMActive::isInState@84-86@..\src\qf\qf_qmact.cpp
+       6      1     27      1       6 QP::QMActive::childStateObj@88-93@..\src\qf\qf_qmact.cpp
+       3      1     20      0       3 QP::QMActive::getStateHandler@98-100@..\src\qf\qf_qmact.cpp
+      69      7    390      1     101 QP::QF::tickX_@61-161@..\src\qf\qf_time.cpp
+      14      3     70      1      17 QP::QF::noTimeEvtsActiveX@164-180@..\src\qf\qf_time.cpp
+      16      2    104      3      32 QP::QTimeEvt::QTimeEvt@193-224@..\src\qf\qf_time.cpp
+      13      1     53      0      29 QP::QTimeEvt::QTimeEvt@227-255@..\src\qf\qf_time.cpp
+      33      8    221      2      60 QP::QTimeEvt::armX@258-317@..\src\qf\qf_time.cpp
+      32      3    170      1      41 QP::QTimeEvt::disarm@320-360@..\src\qf\qf_time.cpp
+      33      8    221      1      62 QP::QTimeEvt::rearm@363-424@..\src\qf\qf_time.cpp
+       5      1     38      1       6 QP::QTimeEvt::wasDisarmed@427-432@..\src\qf\qf_time.cpp
+       7      1     28      1       8 QP::QTimeEvt::currCtr@447-454@..\src\qf\qf_time.cpp
+       6      2     26      1       8 initial_events@54-61@..\src\qk\qk.cpp
+      11      2     79      1      16 QP::QF::init@69-84@..\src\qk\qk.cpp
+       3      1     14      1       4 QP::QF::stop@87-90@..\src\qk\qk.cpp
+      12      3     49      1      19 QP::QF::run@93-111@..\src\qk\qk.cpp
+      21      5    144      6      30 QP::QActive::start@114-143@..\src\qk\qk.cpp
+      21      2    136      1      32 QP::QK::schedLock@146-177@..\src\qk\qk.cpp
+      22      4    147      1      33 QP::QK::schedUnlock@180-212@..\src\qk\qk.cpp
+      14      3     94      1      17 QK_sched_@222-238@..\src\qk\qk.cpp
+      59     15    397      1     103 QK_activate_@241-343@..\src\qk\qk.cpp
+       9      2     67      1      13 QP::QF::init@66-78@..\src\qv\qv.cpp
+       3      1     12      1       4 QP::QF::stop@81-84@..\src\qv\qv.cpp
+      38      9    200      1      75 QP::QF::run@87-161@..\src\qv\qv.cpp
+      15      3    114      6      22 QP::QActive::start@164-185@..\src\qv\qv.cpp
+       2      1     12      0       2 QXKIdleThread::QXKIdleThread@56-57@..\src\qxk\qxk.cpp
+      14      2    105      1      22 QP::QF::init@75-96@..\src\qxk\qxk.cpp
+       3      1     12      1       4 QP::QF::stop@99-102@..\src\qxk\qxk.cpp
+       6      2     26      1       8 QP::initial_events@107-114@..\src\qxk\qxk.cpp
+      12      3     49      1      20 QP::QF::run@117-136@..\src\qxk\qxk.cpp
+      23      6    158      6      32 QP::QActive::start@139-170@..\src\qxk\qxk.cpp
+      23      3    148      1      33 QP::QXK::schedLock@173-205@..\src\qxk\qxk.cpp
+      22      4    147      1      34 QP::QXK::schedUnlock@208-241@..\src\qxk\qxk.cpp
+      48      7    279      1      67 QXK_sched_@250-316@..\src\qxk\qxk.cpp
+      74     16    510      1     130 QXK_activate_@319-448@..\src\qxk\qxk.cpp
+      12      2     70      1      18 QXK_current@451-468@..\src\qxk\qxk.cpp
+      16      4    108      1      24 QP::QXMutex::init@59-82@..\src\qxk\qxk_mutex.cpp
+      66     12    477      1     108 QP::QXMutex::lock@85-192@..\src\qxk\qxk_mutex.cpp
+      45     10    288      1      69 QP::QXMutex::tryLock@195-263@..\src\qxk\qxk_mutex.cpp
+      65     16    462      1     112 QP::QXMutex::unlock@266-377@..\src\qxk\qxk_mutex.cpp
+       8      1     58      2      10 QP::QXSemaphore::init@58-67@..\src\qxk\qxk_sema.cpp
+      44      7    292      1      70 QP::QXSemaphore::wait@70-139@..\src\qxk\qxk_sema.cpp
+      15      2     60      1      20 QP::QXSemaphore::tryWait@142-161@..\src\qxk\qxk_sema.cpp
+      27      6    180      1      45 QP::QXSemaphore::signal@164-208@..\src\qxk\qxk_sema.cpp
+       8      1     54      2       8 QP::QXThread::QXThread@71-78@..\src\qxk\qxk_xthr.cpp
+       7      1     40      2       7 QP::QXThread::init@82-88@..\src\qxk\qxk_xthr.cpp
+       7      1     40      2       7 QP::QXThread::dispatch@91-97@..\src\qxk\qxk_xthr.cpp
+      25      6    191      6      44 QP::QXThread::start@100-143@..\src\qxk\qxk_xthr.cpp
+      94     13    469      2     128 QP::QXThread::post_@153-280@..\src\qxk\qxk_xthr.cpp
+       4      1     26      1       4 QP::QXThread::postLIFO@283-286@..\src\qxk\qxk_xthr.cpp
+      58      7    427      1      85 QP::QXThread::queueGet@289-373@..\src\qxk\qxk_xthr.cpp
+       5      1     50      1       6 QP::QXThread::block_@376-381@..\src\qxk\qxk_xthr.cpp
+       8      3     59      1       9 QP::QXThread::unblock_@384-392@..\src\qxk\qxk_xthr.cpp
+      20      3    153      2      37 QP::QXThread::teArm_@395-431@..\src\qxk\qxk_xthr.cpp
+      11      2     42      1      14 QP::QXThread::teDisarm_@434-447@..\src\qxk\qxk_xthr.cpp
+      21      4    175      1      36 QP::QXThread::delay@450-485@..\src\qxk\qxk_xthr.cpp
+      14      2     58      1      16 QP::QXThread::delayCancel@488-503@..\src\qxk\qxk_xthr.cpp
+      14      2    110      1      23 QXK_threadRet_@512-534@..\src\qxk\qxk_xthr.cpp
 37 file analyzed.
 ==============================================================
 NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 --------------------------------------------------------------
       4       0.0     0.0        0.0         0     ..\include\qassert.h
-    227       4.0     1.0       21.1        21     ..\include\qep.hpp
+    221       3.9     1.0       20.9        21     ..\include\qep.hpp
      40       3.0     1.0       11.7         3     ..\include\qequeue.hpp
     194       2.9     1.0       18.8         9     ..\include\qf.hpp
+     24       3.0     1.0       23.5         4     ..\include\qf_pkg.hpp
      32       3.0     1.0       10.0         1     ..\include\qk.hpp
      37       3.0     1.0       11.0         1     ..\include\qmpool.hpp
       5       0.0     0.0        0.0         0     ..\include\qpcpp.hpp
      76       4.6     1.4       37.4        14     ..\include\qpset.hpp
-    308       7.5     1.5       42.0         4     ..\include\qs.hpp
+    309       7.5     1.5       42.0         4     ..\include\qs.hpp
       5       0.0     0.0        0.0         0     ..\include\qstamp.cpp
       4       0.0     0.0        0.0         0     ..\include\qstamp.hpp
      21       3.0     1.0       19.0         1     ..\include\qs_dummy.hpp
+     26       0.0     0.0        0.0         0     ..\include\qs_pkg.hpp
       9       0.0     0.0        0.0         0     ..\include\quit.hpp
      12       0.0     0.0        0.0         0     ..\include\qv.hpp
      32       0.0     0.0        0.0         0     ..\include\qxk.hpp
+     13       0.0     0.0        0.0         0     ..\include\qxk_pkg.hpp
      66       4.5     1.0       35.5         2     ..\include\qxthread.hpp
-    317      29.6     4.9      168.2        10     ..\src\qf\qep_hsm.cpp
+    315      32.7     5.3      186.1         9     ..\src\qf\qep_hsm.cpp
     313      29.6     5.3      169.3        10     ..\src\qf\qep_msm.cpp
      64      12.5     3.5       92.0         4     ..\src\qf\qf_act.cpp
     241      22.5     3.4      127.2        10     ..\src\qf\qf_actq.cpp
@@ -217,23 +219,20 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
     236      24.7     3.8      143.9         9     ..\src\qf\qf_time.cpp
     184      18.8     4.1      120.7         9     ..\src\qk\qk.cpp
      79      16.2     3.8       98.2         4     ..\src\qv\qv.cpp
-    258      21.7     4.3      137.6        11     ..\src\qxk\qxk.cpp
+    260      21.7     4.3      137.8        11     ..\src\qxk\qxk.cpp
     203      48.0    10.5      333.8         4     ..\src\qxk\qxk_mutex.cpp
     105      23.5     4.0      147.5         4     ..\src\qxk\qxk_sema.cpp
     312      21.1     3.4      135.3        14     ..\src\qxk\qxk_xthr.cpp
-     24       3.0     1.0       23.5         4     ..\src\qf_pkg.hpp
-     26       0.0     0.0        0.0         0     ..\src\qs_pkg.hpp
-     13       0.0     0.0        0.0         0     ..\src\qxk_pkg.hpp
 
 =========================================================================================================
 !!!! Warnings (cyclomatic_complexity > 20 or length > 500 or nloc > 1000000 or parameter_count > 10) !!!!
 ================================================
   NLOC    CCN   token  PARAM  length  location
 ------------------------------------------------
-     113     21    661      2     166 QP::QMsm::dispatch@154-319@..\src\qf\qep_msm.cpp
+     113     21    661      2     166 QP::QMsm::dispatch@113-278@..\src\qf\qep_msm.cpp
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
-      4083      16.6     3.1      101.8      178            1      0.01    0.04
+      4078      16.7     3.1      102.3      177            1      0.01    0.04
 @endcode
 */
