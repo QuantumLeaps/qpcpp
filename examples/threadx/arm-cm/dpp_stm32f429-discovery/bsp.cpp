@@ -212,7 +212,7 @@ void BSP::terminate(int16_t result) {
 // namespace QP **************************************************************
 namespace QP {
 
-static TX_TIMER l_tick_timer; // ThreadX timer to call QF::tickX_()
+static TX_TIMER l_tick_timer; // ThreadX timer to call QTimeEvt::TICKX_()
 
 #ifdef Q_SPY
     // ThreadX "idle" thread for QS output, see NOTE1
@@ -224,7 +224,7 @@ static TX_TIMER l_tick_timer; // ThreadX timer to call QF::tickX_()
 // QF callbacks ==============================================================
 extern "C" {
 static VOID timer_expiration(ULONG id) {
-    QP::QF::TICK_X(id, &DPP::l_clock_tick); // QF clock tick processing
+    QP::QTimeEvt::TICK_X(id, &DPP::l_clock_tick); // QF clock tick processing
 }
 } // extern "C"
 //............................................................................

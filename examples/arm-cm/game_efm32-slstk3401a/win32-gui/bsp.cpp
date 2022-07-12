@@ -841,7 +841,7 @@ void QF::onCleanup(void) {
 //............................................................................
 void QF_onClockTick(void) {
     static QP::QEvt const tickEvt = QEVT_INITIALIZER(GAME::TIME_TICK_SIG);
-    QP::QF::TICK_X(0U, &GAME::l_clock_tick); // process time events at rate 0
+    QP::QTimeEvt::TICK_X(0U, &GAME::l_clock_tick); // process time events at rate 0
     QP::QF::PUBLISH(&tickEvt, &GAME::l_clock_tick); // publish the tick event
 
     QS_RX_INPUT(); // handle the QS-RX input

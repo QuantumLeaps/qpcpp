@@ -1,45 +1,23 @@
-//============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
-//
-// This software is dual-licensed under the terms of the open source GNU
-// General Public License version 3 (or any later version), or alternatively,
-// under the terms of one of the closed source Quantum Leaps commercial
-// licenses.
-//
-// The terms of the open source GNU General Public License version 3
-// can be found at: <www.gnu.org/licenses/gpl-3.0>
-//
-// The terms of the closed source Quantum Leaps commercial licenses
-// can be found at: <www.state-machine.com/licensing>
-//
-// Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
-//
-// Contact information:
-// <www.state-machine.com>
-// <info@state-machine.com>
-//============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
-//!
 //! @file
-//! @brief QF/C++ port example, Generic C++11 compiler
-//! @description
-//! This is an example QP/C++ port with the documentation for the main
-//! items, such as configuration macros, functions, and includes.
+//! @brief Various macros for configuring and porting QP/C++
 
-#ifndef QF_PORT_HPP
-#define QF_PORT_HPP
-
-//lint -save -e1960    MISRA-C++:2008 Rule 7-3-1, Global declaration
+//! The preprocessor switch to disable checking assertions
+//!
+//! When defined, Q_NASSERT disables the following macros #Q_ASSERT,
+//! #Q_REQUIRE, #Q_ENSURE, #Q_INVARIANT, #Q_ERROR as well as
+//! #Q_ASSERT_ID, #Q_REQUIRE_ID, #Q_ENSURE_ID, #Q_INVARIANT_ID, and
+//! #Q_ERROR_ID do NOT evaluate the test condition passed as the
+//! argument to these macros.
+//!
+//! @note One notable exception is the macro #Q_ALLEGE, that still
+//! evaluates the test condition, but does not report assertion
+//! failures when the switch Q_NASSERT is defined.
+#define Q_NASSERT
 
 //! The maximum number of active objects in the application.
 //!
 //! This macro *must* be defined in the QF port and should be in range
-//! of 1U..63U, inclusive. The value of this macro determines the maximum
+//! of 1U..64U, inclusive. The value of this macro determines the maximum
 //! priority level of an active object in the system. Not all priority
 //! levels must be used, but the maximum priority cannot exceed
 //! #QF_MAX_ACTIVE.
@@ -125,7 +103,7 @@
 //! The size (in bytes) of the block-size representation in the
 //! native QF event pool. Valid values: 1U, 2U, or 4U; default 2U.
 //! #QF_EVENT_SIZ_SIZE.
-//!@description
+//! @description
 //! This macro can be defined in the QF ports to configure the QP::QMPoolSize
 //! type. If the macro is not defined, the default of #QF_EVENT_SIZ_SIZE
 //! will be chosen in qmpool.hpp, because the memory pool is primarily used for
@@ -247,21 +225,133 @@
 //!
 #define QF_ACTIVE_STOP
 
-//lint -restore
+//! The preprocessor switch to activate the event-constructors
+//! and destructors
+//
+//! When Q_EVT_CTOR is defined (typically in the qep_port.hpp header file),
+//! QP::QEvt becomes a class with constructor and virtual destructor.
+//! More importantly, the subclasses of QEvt (your custom events) can have
+//! non-default constructors and destructors. These constructors are then
+//! called when events are created (e.g., with Q_NEW()) and the destructor
+//! is invoked before recycling the event with QP::QF::gc().
+#define Q_EVT_CTOR
 
-#include "qep_port.hpp"   // QEP port
-#include "qxk_port.hpp"   // QXK port
-#include "qf.hpp"         // QF platform-independent public interface
-#include "qxthread.hpp"   // QXK naked thread
+//! The preprocessor switch to activate the QS software tracing
+//! instrumentation in the code
+//!
+//! When defined, Q_SPY activates the QS software tracing instrumentation.
+//! When Q_SPY is not defined, the QS instrumentation in the code does
+//! not generate any code.
+#define Q_SPY
 
-extern "C" {
+//! The preprocessor switch to activate the QUTest unit testing
+//! instrumentation in the code
+//!
+//! @note
+//! This macro requires that #Q_SPY be defined as well.
+#define Q_UTEST
 
-void intDisable(void);
-void intEnable(void);
+//! This macro defines the type of the thread handle used for AOs
+#define QF_THREAD_TYPE         void*
 
-QF_CRIT_STAT_TYPE critEntry(void);
-void critExit(QF_CRIT_STAT_TYPE stat);
+//! This macro defines the type of the event-queue used for AOs
+#define QF_EQUEUE_TYPE         QEQueue
 
-} // extern "C"
+//! This macro defines the type of the OS-Object used for blocking
+//! the native ::QEQueue when the queue is empty
+//!
+//! @description
+//! This macro is used when ::QEQueue is used as the event-queue for AOs
+//! but also the AO queue must *block* when the queue is empty.
+//! In that case, #QF_OS_OBJECT_TYPE specifies the blocking mechanism.
+//! For examle, in the POSIX port, the blocking mechanism is a condition
+//! variable.
+//!
+#define QF_OS_OBJECT_TYPE      pthread_cond_t
 
-#endif // QF_PORT_HPP
+//! Platform-dependent macro defining how QF should block the calling
+//! task when the QF native queue is empty
+//!
+//! @note This is just an example of #QACTIVE_EQUEUE_WAIT_ for the QK-port
+//! of QF. QK never activates a task that has no events to process, so in this
+//! case the macro asserts that the queue is not empty. In other QF ports you
+//! need to define the macro appropriately for the underlying kernel/OS you're
+//! using.
+#define QACTIVE_EQUEUE_WAIT_(me_) \
+    Q_ASSERT((me_)->m_eQueue.m_frontEvt != nullptr)
+
+//! Platform-dependent macro defining how QF should signal the
+//! active object task that an event has just arrived.
+//
+//! The macro is necessary only when the native QF event queue is used.
+//! The signaling of task involves unblocking the task if it is blocked.
+//!
+//! @note #QACTIVE_EQUEUE_SIGNAL_ is called from a critical section.
+//! It might leave the critical section internally, but must restore
+//! the critical section before exiting to the caller.
+//!
+//! @note This is just an example of #QACTIVE_EQUEUE_SIGNAL_ for the QK-port
+//! of QF. In other QF ports you need to define the macro appropriately for
+//! the underlying kernel/OS you're using.
+#define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
+    QF_readySet_.insert((me_)->m_prio);  \
+    if (QF_intNest_ == 0U) {             \
+        uint8_t p = QK_schedPrio_();     \
+        if (p != 0U) {                   \
+            QK_sched_(p);                \
+        }                                \
+    }                                    \
+} while (false)
+
+//! This macro defines the type of the event pool used in this QF port.
+//!
+//! @note This is a specific implementation for the QK-port of QF.
+//! In other QF ports you need to define the macro appropriately for
+//! the underlying kernel/OS you're using.
+#define QF_EPOOL_TYPE_              QMPool
+
+//! This macro enables calling the QK context-switch callback
+//! QK_onContextSw()
+#define QK_ON_CONTEXT_SW
+
+//! This macro enables calling the QXK context-switch callback
+//! QXK_onContextSw()
+#define QXK_ON_CONTEXT_SW
+
+//! Platform-dependent macro defining the event pool initialization
+//!
+//! @note This is a specific implementation for the QK-port of QF.
+//! In other QF ports you need to define the macro appropriately for
+//! the underlying kernel/OS you're using.
+#define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+    (p_).init((poolSto_), (poolSize_), static_cast<QMPoolSize>(evtSize_))
+
+//! Platform-dependent macro defining how QF should obtain the
+//! event pool block-size
+//!
+//! @note This is a specific implementation for the QK-port of QF.
+//! In other QF ports you need to define the macro appropriately for
+//! the underlying kernel/OS you're using.
+#define QF_EPOOL_EVENT_SIZE_(p_) static_cast<uint32_t>((p_).getBlockSize())
+
+//! Platform-dependent macro defining how QF should obtain an event
+//! @a e_ from the event pool @a p_
+//!
+//! @note This is a specific implementation for the QK-port of QF.
+//! In other QF ports you need to define the macro appropriately for
+//! the underlying kernel/OS you're using.
+#define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+    ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+
+//! Platform-dependent macro defining how QF should return an event
+//! @a e_ to the event pool @a p_
+//!
+//! @note This is a specific implementation for the QK-port of QF.
+//! In other QF ports you need to define the macro appropriately for
+//! the underlying kernel/OS you're using.
+#define QF_EPOOL_PUT_(p_, e_, qs_id_)   ((p_).put((e_), (qs_id_)))
+
+//! Macro that should be defined (typically on the compiler's command line)
+//! in the Win32-GUI applications that use the @ref win32 or @ref win32-qv
+//! ports.
+#define WIN32_GUI

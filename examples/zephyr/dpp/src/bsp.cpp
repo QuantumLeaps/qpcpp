@@ -74,7 +74,7 @@ static struct k_timer QF_tick_timer;
 
 static void QF_tick_function(struct k_timer *tid) {
     static_cast<void>(tid); // unused parameter
-    QP::QF::TICK_X(0U, &timerID);
+    QP::QTimeEvt::TICK_X(0U, &timerID);
 }
 
 }

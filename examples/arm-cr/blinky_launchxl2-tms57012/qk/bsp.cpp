@@ -74,7 +74,7 @@ extern "C" {
 //............................................................................
 QK_IRQ_BEGIN(rtiCompare0)
     rtiREG1->INTFLAG = 1U;    // clear the interrutp source
-    QP::QF::TICK_X(0U, nullptr); // process time events for rate 0
+    QP::QTimeEvt::TICK_X(0U, nullptr); // process time events for rate 0
 QK_IRQ_END()
 
 } // extern "C"

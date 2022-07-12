@@ -27,7 +27,7 @@
 //!
 //! @file
 //! @brief QEP/C++ port, ARM-CLANG C++11 compiler
-//!
+
 #ifndef QEP_PORT_HPP
 #define QEP_PORT_HPP
 

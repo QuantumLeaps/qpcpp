@@ -26,8 +26,7 @@
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
-//! @brief QUTEST port for Win32
-//!
+//! @brief QUTEST port for Windows, GNU or Visual C++
 
 #ifndef Q_SPY
     #error "Q_SPY must be defined for QUTest application"
@@ -36,7 +35,7 @@
 #define QP_IMPL         // this is QP implementation
 #include "qf_port.hpp"  // QF port
 #include "qassert.h"    // QP embedded systems-friendly assertions
-#include "qs_port.hpp"  // include QS port
+#include "qs_port.hpp"  // QS port
 
 #include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>

@@ -17,6 +17,10 @@ source ~/zephyrproject/zephyr/zephyr-env.sh
 type:
 west build -b <board>
 
+example <board>:
+nucleo_l152re
+nucleo_h743zi
+
 type:
 west flush
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.0" links="1">
+<model version="5.2.0" links="1">
  <documentation>PEdestrian LIghto CONtrolled (PELICA) crossing for Qt with GUI</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>

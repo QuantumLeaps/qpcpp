@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QXK/C++ port example, Generic C++ compiler
@@ -58,7 +58,7 @@
 //! QK ports will not define this macro, but instead will provide ISR
 //! skeleton code in assembly.
 #define QXK_ISR_ENTRY() do { \
-    ++QXK_attr_.intNest;     \
+    ++QF_intNest_;           \
 } while (false)
 
 
@@ -68,16 +68,16 @@
 //! the macro appropriately for the CPU/compiler you're using. Also, some
 //! QK ports will not define this macro, but instead will provide ISR
 //! skeleton code in assembly.
-#define QXK_ISR_EXIT() do {        \
-    --QXK_attr_.intNest;           \
-    if (QXK_attr_.intNest == 0U) { \
-        if (QXK_sched_() != 0U) {  \
-            QXK_activate_();       \
-        }                          \
-    }                              \
-    else {                         \
-        Q_ERROR();                 \
-    }                              \
+#define QXK_ISR_EXIT() do {       \
+    --QF_intNest_;                \
+    if (QF_intNest_ == 0U) {      \
+        if (QXK_sched_() != 0U) { \
+            QXK_activate_();      \
+        }                         \
+    }                             \
+    else {                        \
+        Q_ERROR();                \
+    }                             \
 } while (false)
 
 extern "C" {

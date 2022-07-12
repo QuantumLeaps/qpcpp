@@ -43,7 +43,7 @@ using namespace QP;
 Q_DEFINE_THIS_FILE
 
 #ifdef Q_SPY
-static uint8_t const l_QF_onClockTick = 0;
+static uint8_t const l_QF::onClockTick = 0;
 #endif
 
 //............................................................................
@@ -52,7 +52,7 @@ void BSP_init(int argc, char * argv[]) {
     (void)argv;
     Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
 
-    QS_OBJ_DICTIONARY(&l_QF_onClockTick);
+    QS_OBJ_DICTIONARY(&l_QF::onClockTick);
 
     // setup the QS filters...
     QS_GLB_FILTER(QP::QS_ALL_RECORDS);
@@ -60,21 +60,21 @@ void BSP_init(int argc, char * argv[]) {
 }
 //............................................................................
 void QF::onStartup(void) {
-    QF_setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
-    QF_consoleSetup();
+    QF::setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
+    QF::consoleSetup();
 }
 //............................................................................
 void QF::onCleanup(void) {
-    QF_consoleCleanup();
+    QF::consoleCleanup();
 }
 //............................................................................
-void QP::QF_onClockTick(void) {
-    QF::TICK_X(0U, &l_QF_onClockTick); // perform the QF clock tick processing
+void QP::QF::onClockTick(void) {
+    QTimeEvt::TICK_X(0U, &l_QF::onClockTick); // perform the QF clock tick processing
 
     QS_RX_INPUT(); // handle the QS-RX input
     QS_OUTPUT();   // handle the QS output
 
-    int key = QF_consoleGetKey();
+    int key = QF::consoleGetKey();
     if (key != 0) { /* any key pressed? */
         BSP_onKeyboardInput((uint8_t)key);
     }

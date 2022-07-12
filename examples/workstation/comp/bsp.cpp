@@ -109,17 +109,17 @@ void BSP_showTime12H(char const *str, uint32_t time, uint32_t base) {
 }
 //............................................................................
 void QF::onStartup(void) {
-    QF_setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
-    QF_consoleSetup();
+    QF::setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
+    QF::consoleSetup();
 }
 //............................................................................
 void QF::onCleanup(void) {
-    QF_consoleCleanup();
+    QF::consoleCleanup();
 }
 //............................................................................
-void QP::QF_onClockTick(void) {
-    QF::TICK_X(0U, &l_clock_tick); // perform the QF clock tick processing
-    int key = QF_consoleGetKey();
+void QP::QF::onClockTick(void) {
+    QTimeEvt::TICK_X(0U, &l_clock_tick); // perform the QF clock tick processing
+    int key = QF::consoleGetKey();
     if (key != 0) { /* any key pressed? */
         BSP_onKeyboardInput((uint8_t)key);
     }

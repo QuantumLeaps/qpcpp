@@ -2,8 +2,8 @@
 //! @brief QF/C++ port to embOS RTOS kernel, all supported compilers
 //! @cond
 //!/**************************************************************************
-//! Last updated for version 6.9.3
-//! Last updated on  2021-04-09
+//! Last updated for version 7.0.1
+//! Last updated on  2022-06-30
 //!
 //!                    Q u a n t u m  L e a P s
 //!                    ------------------------
@@ -89,13 +89,15 @@ void QF::stop(void) {
 }
 
 // thread for active objects -------------------------------------------------
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
     // event-loop
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
+    act->unregister_(); // remove this object from QF
+    OS_TerminateTask(&act->m_thread);
 }
 
 //............................................................................
@@ -109,9 +111,7 @@ static void thread_function(void *pVoid) { // embOS signature
     }
 #endif  // __TARGET_FPU_VFP
 
-    QF::thread_(act);
-    QF::remove_(act); // remove this object from QF
-    OS_TerminateTask(&act->getThread());
+    QActive::thread_(act);
 }
 //............................................................................
 void QActive::start(std::uint_fast8_t const prio,
@@ -126,7 +126,7 @@ void QActive::start(std::uint_fast8_t const prio,
                 static_cast<void *>(&qSto[0]));
 
     m_prio = prio;  // save the QF priority
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
@@ -162,13 +162,8 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
     }
 }
 //............................................................................
-#ifndef Q_SPY
-bool QActive::post_(QEvt const * const e,
-                    std::uint_fast16_t const margin) noexcept
-#else
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                      void const * const sender) noexcept
-#endif
 {
     std::uint_fast16_t nFree;
     bool status;

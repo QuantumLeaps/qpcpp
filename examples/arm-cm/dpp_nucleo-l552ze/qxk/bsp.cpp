@@ -90,7 +90,7 @@ void SysTick_Handler(void) {
 
     QXK_ISR_ENTRY();   /* inform QXK about entering an ISR */
 
-    QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle

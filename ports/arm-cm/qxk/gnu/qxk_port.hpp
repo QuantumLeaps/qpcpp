@@ -26,8 +26,7 @@
 //!
 //! @file
 //! @brief QXK/C++ port to ARM Cortex-M, GNU-ARM toolset
-//!
-//!
+
 #ifndef QXK_PORT_HPP
 #define QXK_PORT_HPP
 

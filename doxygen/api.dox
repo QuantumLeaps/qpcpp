@@ -43,7 +43,7 @@ QF is a portable, event-driven, real-time framework for execution of active obje
 
 @subsection api_qf_ps Publish-Subscribe
 - ::QSubscrList (Subscriber List struct)
-- QF::psInit()
+- QActive::psInit()
 - %QF:: PUBLISH()
 - QActive::subscribe()
 - QActive::unsubscribe()

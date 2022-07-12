@@ -26,23 +26,20 @@
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
-//! @brief QS/C++ port to QUTEST, Win32 API
+//! @brief QS/C++ port to Win32
 
 #ifndef QS_PORT_HPP
 #define QS_PORT_HPP
 
 #define QS_TIME_SIZE        4U
 
-#ifdef _WIN64 // 64-bit architecture?
+#if defined(_WIN64) || defined(__LP64__) || defined(_LP64)  // 64-bit OS?
     #define QS_OBJ_PTR_SIZE 8U
     #define QS_FUN_PTR_SIZE 8U
-#else         // 32-bit architecture
+#else  // 32-bit OS
     #define QS_OBJ_PTR_SIZE 4U
     #define QS_FUN_PTR_SIZE 4U
 #endif
-
-// flush the QS output buffer after each QS record
-#define QS_REC_DONE()  QP::QS::onFlush()
 
 //============================================================================
 // NOTE: QS might be used with or without other QP components, in which case

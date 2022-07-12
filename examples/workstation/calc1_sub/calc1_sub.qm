@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.0" links="1">
- <documentation>The improved Calculator model with QMsm state machine implementation strategy, no &quot;me-&gt;&quot; pointer, and Sub-Machines.</documentation>
+<model version="5.2.0" links="1">
+ <documentation>The improved Calculator model with QMsm state machine implementation strategy and Sub-Machines.</documentation>
  <!--${qpcpp}-->
- <framework name="qpcpp" license="../../../QPCPP-EVAL.qlc"/>
+ <framework name="qpcpp" license="../../../LICENSES/QM-EVAL-QPCPP.qlc"/>
  <!--${Events}-->
  <package name="Events" stereotype="0x01">
   <!--${Events::CalcEvt}-->

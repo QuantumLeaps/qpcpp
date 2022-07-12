@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-13
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -53,7 +53,7 @@ Q_DEFINE_THIS_MODULE("qf_port")
 
 // Local objects -------------------------------------------------------------
 static void task_function(void *pvParameters) { // FreeRTOS task signature
-    QP::QF::thread_(reinterpret_cast<QP::QActive *>(pvParameters));
+    QP::QActive::thread_(reinterpret_cast<QP::QActive *>(pvParameters));
 }
 
 } // unnamed local namespace
@@ -126,7 +126,7 @@ void QActive::start(std::uint_fast8_t const prio,
     Q_ASSERT_ID(210, m_eQueue != static_cast<QueueHandle_t>(0));
 
     m_prio = prio;  // save the QF priority
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
@@ -167,7 +167,7 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
     }
 }
 // thread for active objects -------------------------------------------------
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
 #ifdef QF_ACTIVE_STOP
     while (act->m_eQueue != nullptr)
 #else
@@ -176,24 +176,20 @@ void QF::thread_(QActive *act) {
     {
         QEvt const *e = act->get_();   // wait for event
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
 #ifdef QF_ACTIVE_STOP
-    remove_(act); // remove this object from QF
+    act->unregister_(); // remove this object from QF
     vTaskDelete(static_cast<TaskHandle_t>(0)); // delete this FreeRTOS task
 #endif
 }
 
 /*==========================================================================*/
-//............................................................................
-#ifndef Q_SPY
-bool QActive::post_(QEvt const * const e,
-                    std::uint_fast16_t const margin) noexcept
-#else
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
-#endif
 {
+    static_cast<void>(sender); // unused parameter when Q_SPY is undefined
+
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
@@ -303,15 +299,9 @@ QEvt const *QActive::get_(void) noexcept {
 }
 
 // The "FromISR" QP APIs for the FreeRTOS port...
-#ifdef Q_SPY
 bool QActive::postFromISR_(QEvt const * const e,
                            std::uint_fast16_t const margin, void *par,
                            void const * const sender) noexcept
-#else
-bool QActive::postFromISR_(QEvt const * const e,
-                           std::uint_fast16_t const margin,
-                           void *par) noexcept
-#endif
 {
     UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
 
@@ -378,15 +368,11 @@ bool QActive::postFromISR_(QEvt const * const e,
     return status;
 }
 /*..........................................................................*/
-#ifdef Q_SPY
-void QF::publishFromISR_(QEvt const *e, void *par,
-                         void const * const sender) noexcept
-#else
-void QF::publishFromISR_(QEvt const *e, void *par) noexcept
-#endif
+void QActive::publishFromISR_(QEvt const *e, void *par,
+                              void const * const sender) noexcept
 {
     //! @pre the published signal must be within the configured range
-    Q_REQUIRE_ID(500, static_cast<enum_t>(e->sig) < QF_maxPubSignal_);
+    Q_REQUIRE_ID(500, static_cast<enum_t>(e->sig) < QActive::maxPubSignal_);
 
     UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
 
@@ -410,7 +396,7 @@ void QF::publishFromISR_(QEvt const *e, void *par) noexcept
     }
 
     // make a local, modifiable copy of the subscriber list
-    QPSet subscrList = QF_subscrList_[e->sig];
+    QPSet subscrList = QActive::subscrList_[e->sig];
     portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
 
     if (subscrList.notEmpty()) {
@@ -439,15 +425,11 @@ void QF::publishFromISR_(QEvt const *e, void *par) noexcept
     // The following garbage collection step decrements the reference counter
     // and recycles the event if the counter drops to zero. This covers both
     // cases when the event was published with or without any subscribers.
-    gcFromISR(e);
+    QF::gcFromISR(e);
 }
 //............................................................................
-#ifdef Q_SPY
-void QF::tickXfromISR_(std::uint_fast8_t const tickRate, void *par,
-                       void const * const sender) noexcept
-#else
-void QF::tickXfromISR_(std::uint_fast8_t const tickRate, void *par) noexcept
-#endif
+void QTimeEvt::tickXfromISR_(std::uint_fast8_t const tickRate, void *par,
+                             void const * const sender) noexcept
 {
     QTimeEvt *prev = &timeEvtHead_[tickRate];
     UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
@@ -465,12 +447,12 @@ void QF::tickXfromISR_(std::uint_fast8_t const tickRate, void *par) noexcept
         // end of the list?
         if (t == nullptr) {
 
-            // any new time events armed since the last run of QF::tickX_()?
+            // any new time events armed since the last run?
             if (timeEvtHead_[tickRate].m_act != nullptr) {
 
                 // sanity check
                 Q_ASSERT_ID(610, prev != nullptr);
-                prev->m_next = QF::timeEvtHead_[tickRate].toTimeEvt();
+                prev->m_next = QTimeEvt::timeEvtHead_[tickRate].toTimeEvt();
                 timeEvtHead_[tickRate].m_act = nullptr;
                 t = prev->m_next; // switch to the new list
             }

@@ -116,7 +116,7 @@ namespace QP {
 
 //............................................................................
 void QF_onClockTick(void) {
-    QF::TICK_X(0U, &l_time_tick);
+    QTimeEvt::TICK_X(0U, &l_time_tick);
 }
 //............................................................................
 void QF::onStartup(void) {

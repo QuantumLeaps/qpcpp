@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.0" links="1">
+<model version="5.2.0" links="1">
  <documentation>Simple Blinky example for QP/C++, which demonstrates:
 - Active object (Blinky) with state machine
 - Board Support Package abstraction for portability

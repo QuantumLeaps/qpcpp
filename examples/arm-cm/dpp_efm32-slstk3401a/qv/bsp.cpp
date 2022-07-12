@@ -96,7 +96,7 @@ void SysTick_Handler(void) {
     }
 #endif
 
-    //QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time evts for rate 0
+    //QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time evts for rate 0
     the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
 
     // Perform the debouncing of buttons. The algorithm for debouncing
@@ -191,6 +191,8 @@ void BSP::init(void) {
     }
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_GPIO_EVEN_IRQHandler);
+    QS_OBJ_DICTIONARY(the_Ticker0);
+
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
 

@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
@@ -19,15 +18,15 @@
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // Contact information:
-// <www.state-machine.com>
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-07
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ port to Win32 API (multi-threaded)
-//!
+
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
 #include "qf_pkg.hpp"       // QF package-scope interface
@@ -56,7 +55,7 @@ static bool  l_isRunning;      // flag indicating when QF is running
 //............................................................................
 // helper function to match the signature expeced by CreateThread() Win32 API
 static DWORD WINAPI ao_thread(LPVOID me) {
-    QP::QF::thread_(static_cast<QP::QActive *>(me));
+    QP::QActive::thread_(static_cast<QP::QActive *>(me));
     return static_cast<DWORD>(0); // return success
 }
 
@@ -75,11 +74,11 @@ void QF::init(void) {
     EnterCriticalSection(&l_startupCritSect);
 }
 //............................................................................
-void QF_enterCriticalSection_(void) {
+void QF::enterCriticalSection_(void) {
     EnterCriticalSection(&l_win32CritSect);
 }
 //............................................................................
-void QF_leaveCriticalSection_(void) {
+void QF::leaveCriticalSection_(void) {
     LeaveCriticalSection(&l_win32CritSect);
 }
 //............................................................................
@@ -87,7 +86,7 @@ void QF::stop(void) {
     l_isRunning = false; // terminate the main (ticker) thread
 }
 //............................................................................
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
     // block this thread until the startup critical section is exited
     // from QF::run()
     EnterCriticalSection(&l_startupCritSect);
@@ -101,12 +100,13 @@ void QF::thread_(QActive *act) {
     {
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
 #ifdef QF_ACTIVE_STOP
-    remove_(act); // remove this object from QF
+    act->unregister_(); // remove this object from QF
 #endif
 }
+
 //............................................................................
 int_t QF::run(void) {
 
@@ -123,7 +123,7 @@ int_t QF::run(void) {
     l_isRunning = true; // QF is running
 
     // set the ticker (this thread) priority according to selection made in
-    // QF_setTickRate()
+    // QF::setTickRate()
     //
     int threadPrio = THREAD_PRIORITY_NORMAL;
     if (l_tickPrio < 33) {
@@ -135,24 +135,24 @@ int_t QF::run(void) {
     SetThreadPriority(GetCurrentThread(), threadPrio);
 
     while (l_isRunning) {
-        Sleep(l_tickMsec);  // wait for the tick interval
-        QF_onClockTick();   // clock tick callback (must call QF_TICK_X())
+        Sleep(l_tickMsec); // wait for the tick interval
+        onClockTick();     // clock tick callback (must call QF::TICK_X())
     }
 
-    onCleanup();            // cleanup callback
-    QS_EXIT();              // cleanup the QSPY connection
+    onCleanup(); // cleanup callback
+    QS_EXIT();   // cleanup the QSPY connection
     //DeleteCriticalSection(&l_startupCritSect);
     //DeleteCriticalSection(&l_win32CritSect);
     return 0; // return success
 }
 //............................................................................
-void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
+void QF::setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
     Q_REQUIRE_ID(600, ticksPerSec != 0U);
     l_tickMsec = 1000UL / ticksPerSec;
     l_tickPrio = tickPrio;
 }
 //............................................................................
-void QF_setWin32Prio(QActive *act, int_t win32Prio) {
+void QF::setWin32Prio(QActive *act, int_t win32Prio) {
     HANDLE win32thread = static_cast<HANDLE>(act->getThread());
 
     // thread must be already created, see QActive::start()
@@ -161,20 +161,20 @@ void QF_setWin32Prio(QActive *act, int_t win32Prio) {
 }
 
 //............................................................................
-void QF_consoleSetup(void) {
+void QF::consoleSetup(void) {
 }
 //............................................................................
-void QF_consoleCleanup(void) {
+void QF::consoleCleanup(void) {
 }
 //............................................................................
-int QF_consoleGetKey(void) {
+int QF::consoleGetKey(void) {
     if (_kbhit()) { // any key pressed?
         return static_cast<int>(_getwch());
     }
     return 0;
 }
 //............................................................................
-int QF_consoleWaitForKey(void) {
+int QF::consoleWaitForKey(void) {
     return static_cast<int>(_getwch());
 }
 
@@ -192,7 +192,7 @@ void QActive::start(std::uint_fast8_t const prio,
                                    // ... be provided
     m_eQueue.init(qSto, qLen);
     m_prio = prio;  // set the QF priority of this AO
-    QF::add_(this); // make QF aware of this AO
+    register_(); // make QF aware of this AO
 
     // save osObject as integer, in case it contains the Win32 priority
     //int win32Prio = (m_osObject != nullptr)

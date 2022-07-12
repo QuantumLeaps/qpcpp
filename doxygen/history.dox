@@ -2,10 +2,27 @@ namespace QP {
 
 /** @page history Revision History
 
-@section qpcpp_7_0_1 Version 7.0.1, 2022-06-30 (planned)
-__Source Code Changes:__
+@section qpcpp_7_0_1 Version 7.0.1, 2022-07-15 (planned)
+This release is the first one that contains the complete [QM model](https://www.state-machine.com/products/qm) of the QP/C++ framework (in the file `qpcpp/qpcpp.qm`). This model is then used to **generate all QP/C++ source code**:
+- `qpcpp/`
+  + @ref C:/qp-dev/qpcpp/include "include"
+  + @ref C:/qp-dev/qpcpp/src "src"
 
-Moved package-scope header files qf_pkg.hpp, qs_pkg.hpp, and qxk_pkg.hpp from the `qpcpp/src` directory to `qpcpp/include`. This allows the build process to specify only the `qpcpp/include` directory to build applications and QP/C++ source code. Previously, the build process had to specify additionally `qpcpp/src`, but this is no longer needed.
+The QM model of QP/C++ explicitly captures the *logical design* of the framework, which is then mapped to the preexisting [physical design](https://www.state-machine.com/qm/ce.html#ce_phys). The *logical design*, which consists of packages (often associated with namespaces), classes, types, and macros traces explicitly to the @ref sas "Software Architecture Specification (SAS)" and is easier to manipulate and refactor.
+
+
+__Source Code Changes:__
+- The whole QP/C++ source code is now generated from the `qpcpp.qm` model.
+- Refactored classes with only static members (QF, QV, QK, QXK, QS) into [namespaces](namespaces.html). This allows the namespaces to be extended in the QP ports.
+- Refactored:
+  + QF::publish_() -> QActive::publish_()
+  + QF::psInit() -> QActive::psInit()
+  + QF::tickX_() -> QTimeEvt::tickX_()
+
+@note
+The old APIs (QF::PUBLISH(), QF::TICK_X(), QF::psInit()) are still provided, but are tagged as [deprecated](deprecated.html).
+
+- Moved package-scope header files qf_pkg.hpp and qs_pkg.hpp from the `qpcpp/src` directory to `qpcpp/include`. This allows the build process to specify only the `qpcpp/include` directory to build applications and QP/C++ source code. Previously, the build process had to specify additionally `qpcpp/src`, but this is no longer needed.
 
 @note
 This change allowed all provided examples to be simplified by removing the `qpcpp/src` include directory from the various project files.
@@ -20,12 +37,13 @@ __Added Ports/Examples:__
 - redesigned QP/C++ @ref freertos "port to FreeRTOS", see `qpc/ports/freertos`
 - slightly improved QP/C++ @ref threadx "port to ThreadX", see `qpc/ports/threadx`
 
+
 @section qpcpp_7_0_0 Version 7.0.0, 2022-04-30
 This major focus of this release is the adaptation of the code and documentation to better support safety certification (see [QP Certification Pack](modules.html))
 
 __Modified QP/C++ source code:__
 - updated QP/C++ source code for AUTOSAR:C++14
-- made the compliant with the updated [Quantum Leaps Embedded C/C++ Coding Style (QL-C/C++:2022)](https://github.com/QuantumLeaps/embedded-coding-style)
+- made the compliant with the updated "Quantum Leaps Embedded C/C++ Coding Style (QL-C/C++:2022)"
 - added traceability links between QP/C++ source code and requirements, architecture, design, and MISRA deviation permits.
 - modified the top-level file comments now have standard-compliant license specification (SPDX-License-Identifiers). This allows QP/C++ to be included in automatic generation of Software Bill Of Materials (SBOM).
 
@@ -2412,7 +2430,7 @@ latest Sourcery G++ 2011.02-2.
 
 @section qpcpp_4_1_06 Version 4.1.06, 2011-01-07
 1. Fixed a bug in the software tracing instrumentation in the function
-QF::remove_(), file qf_act.cpp.
+QF::unregister_(), file qf_act.cpp.
 
 2. Made cosmetic improvements to the example QM models of the
 "Fly 'n' Shoot" game.

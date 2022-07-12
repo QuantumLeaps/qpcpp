@@ -22,11 +22,11 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-12
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
-//! @brief QS/C++ port to a 32-bit CPU, generic C++ compiler
+//! @brief QS/C++ port on Windows/Linux/macOS, GNU or Visual C++
 
 
 #ifndef QS_PORT_HPP
@@ -34,18 +34,13 @@
 
 #define QS_TIME_SIZE        4U
 
-#if defined(__LP64__) || defined(_LP64) // 64-bit architecture?
+#if defined(_WIN64) || defined(__LP64__) || defined(_LP64)  // 64-bit OS?
     #define QS_OBJ_PTR_SIZE 8U
     #define QS_FUN_PTR_SIZE 8U
-#else                                   // 32-bit architecture
+#else  // 32-bit OS
     #define QS_OBJ_PTR_SIZE 4U
     #define QS_FUN_PTR_SIZE 4U
 #endif
-
-namespace QP {
-void QS_output(void);    // handle the QS output
-void QS_rx_input(void);  // handle the QS-RX input
-}
 
 //============================================================================
 // NOTE: QS might be used with or without other QP components, in which case

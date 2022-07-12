@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.0" links="1">
- <documentation>Dining Philosopher Problem example
-
-NOTE: Requries QP5</documentation>
+<model version="5.2.0" links="1">
+ <documentation>Dining Philosopher Problem example</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
  <!--${Events}-->

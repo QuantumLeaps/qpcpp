@@ -46,7 +46,7 @@ int main() {
     QP::QF::init();  // initialize the framework and the underlying RT kernel
     DPP::BSP::init(); // initialize the BSP
 
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
 
     // initialize event pools...
     QP::QF::poolInit(smlPoolSto,

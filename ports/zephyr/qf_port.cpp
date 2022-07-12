@@ -64,13 +64,14 @@ void QF::stop(void) {
 }
 
 // thread for active objects -------------------------------------------------
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
     // event-loop
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
+    act->unregister_(); // remove this active object from QF
 }
 
 //............................................................................
@@ -79,10 +80,7 @@ static void thread_entry(void *p1, void *p2, void *p3) { // Zephyr signature
     static_cast<void>(p2); // unused parameter
     static_cast<void>(p3); // unused parameter
 
-    QF::thread_(act); // run the thread routine (typically endless loop)
-
-    // in case the thread ever returns...
-    QF::remove_(act); // remove this active object from QF
+    QActive::thread_(act); // run the thread routine (typically endless loop)
 }
 //............................................................................
 //
@@ -106,7 +104,7 @@ void QActive::start(std::uint_fast8_t const prio,
                 sizeof(QEvt *), static_cast<uint32_t>(qLen));
 
     m_prio = prio;  // save the QF priority
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
 
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
@@ -135,13 +133,8 @@ void QActive::start(std::uint_fast8_t const prio,
                     K_NO_WAIT); // start immediately */
 }
 //............................................................................
-#ifndef Q_SPY
-bool QActive::post_(QEvt const * const e,
-                    std::uint_fast16_t const margin) noexcept
-#else
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
-                     void const * const sender) noexcept
-#endif
+                    void const * const sender) noexcept
 {
     std::uint_fast16_t nFree;
     bool status;
@@ -186,7 +179,8 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
         // posting to the Zephyr mailbox must succeed, see NOTE3
         Q_ALLEGE_ID(520,
-            k_msgq_put(&m_eQueue, static_cast<void const *>(&e), K_NO_WAIT) == 0);
+            k_msgq_put(&m_eQueue, static_cast<void const *>(&e), K_NO_WAIT)
+             == 0);
     }
     else {
 

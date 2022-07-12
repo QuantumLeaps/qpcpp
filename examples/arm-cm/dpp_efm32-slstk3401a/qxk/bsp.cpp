@@ -99,7 +99,7 @@ void SysTick_Handler(void) {
     }
 #endif
 
-    //QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    //QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
     the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
 
     // Perform the debouncing of buttons. The algorithm for debouncing
@@ -172,7 +172,8 @@ void BSP::init(void) {
     SystemCoreClockUpdate();
 
     /* NOTE: The VFP (hardware Floating Point) unit is configured by QXK */
-    //FPU->FPCCR |= (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
+    //FPU->FPCCR = FPU->FPCCR
+    //              | (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
 
     // enable clock for to the peripherals used by this application...
     CMU_ClockEnable(cmuClock_HFPER, true);
@@ -210,10 +211,10 @@ void BSP::init(void) {
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'e') {
-        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED0_PIN);
     }
     else {
-        GPIO->P[LED_PORT].DOUT &=  ~(1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED0_PIN);
     }
 
     QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
@@ -224,7 +225,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
     if (paused != 0U) {
-        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED0_PIN);
 
         // for testing the extended threads...
         static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
@@ -232,7 +233,7 @@ void BSP::displayPaused(uint8_t paused) {
         XT_Test2->POST_X(&pauseEvt, 1U, nullptr); // post to Test2's queue
     }
     else {
-        GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED0_PIN);
     }
 
     QS_BEGIN_ID(PAUSED_STAT, AO_Table->m_prio) // app-specific record begin
@@ -261,11 +262,11 @@ void BSP::randomSeed(uint32_t seed) {
 }
 //............................................................................
 void BSP::ledOn(void) {
-    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
+    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED1_PIN);
 }
 //............................................................................
 void BSP::ledOff(void) {
-    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
+    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED1_PIN);
 }
 //............................................................................
 void BSP::terminate(int16_t result) {
@@ -310,8 +311,8 @@ void QF::onCleanup(void) {
 void QXK::onIdle(void) {
     // toggle the User LED on and then off, see NOTE01
 //    QF_INT_DISABLE();
-//    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
-//    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
+//    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED1_PIN);
+//    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED1_PIN);
 //    QF_INT_ENABLE();
 
     // Some flating point code is to exercise the VFP...
@@ -352,7 +353,8 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 
 #ifndef NDEBUG
     // light up both LEDs
-    GPIO->P[LED_PORT].DOUT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
+    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT
+                             | ((1U << LED0_PIN) | (1U << LED1_PIN));
     // for debugging, hang on in an endless loop until PB1 is pressed...
     while ((GPIO->P[PB_PORT].DIN & (1U << PB1_PIN)) != 0) {
     }

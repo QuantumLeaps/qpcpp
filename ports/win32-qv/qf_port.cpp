@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
@@ -19,10 +18,10 @@
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // Contact information:
-// <www.state-machine.com>
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-07
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -69,7 +68,7 @@ static DWORD WINAPI ticker_thread(LPVOID /*arg*/) { // for CreateThread()
 
     while (l_isRunning) {
         Sleep(l_tickMsec); // wait for the tick interval
-        QP::QF_onClockTick();  // clock tick callback (must call QF_TICK_X())
+        QP::QF::onClockTick();  // clock tick callback (must call TICK_X())
     }
     return 0; // return success
 }
@@ -79,7 +78,6 @@ static DWORD WINAPI ticker_thread(LPVOID /*arg*/) { // for CreateThread()
 namespace QP {
 
 // Global objects ............................................................
-QPSet  QV_readySet_;   // QV-ready set of active objects
 HANDLE QV_win32Event_; // Win32 event to signal events
 
 //............................................................................
@@ -88,11 +86,11 @@ void QF::init(void) {
     QV_win32Event_ = CreateEvent(NULL, FALSE, FALSE, NULL);
 }
 //............................................................................
-void QF_enterCriticalSection_(void) {
+void QF::enterCriticalSection_(void) {
     EnterCriticalSection(&l_win32CritSect);
 }
 //............................................................................
-void QF_leaveCriticalSection_(void) {
+void QF::leaveCriticalSection_(void) {
     LeaveCriticalSection(&l_win32CritSect);
 }
 //............................................................................
@@ -126,9 +124,9 @@ int_t QF::run(void) {
 
     while (l_isRunning) {
         // find the maximum priority AO ready to run
-        if (QV_readySet_.notEmpty()) {
-            std::uint_fast8_t p = QV_readySet_.findMax();
-            QActive *a = active_[p];
+        if (QF::readySet_.notEmpty()) {
+            std::uint_fast8_t p = QF::readySet_.findMax();
+            QActive *a = QActive::active_[p];
             QF_CRIT_X_();
 
             // the active object 'a' must still be registered in QF
@@ -137,18 +135,18 @@ int_t QF::run(void) {
 
             // perform the run-to-completion (RTS) step...
             // 1. retrieve the event from the AO's event queue, which by this
-            //    time must be non-empty and The "Vanialla" kernel asserts it.
+            //    time must be non-empty and The QV kernel asserts it.
             // 2. dispatch the event to the AO's state machine.
             // 3. determine if event is garbage and collect it if so
             //
             QEvt const *e = a->get_();
             a->dispatch(e, a->m_prio);
-            gc(e);
+            QF::gc(e);
 
             QF_CRIT_E_();
 
-            if (a->m_eQueue.isEmpty()) { // empty queue? */
-                QV_readySet_.rmove(p);
+            if (a->m_eQueue.isEmpty()) { // empty queue?
+                QF::readySet_.rmove(p);
             }
         }
         else {
@@ -164,8 +162,8 @@ int_t QF::run(void) {
         }
     }
     QF_CRIT_X_();
-    onCleanup();  // cleanup callback
-    QS_EXIT();    // cleanup the QSPY connection
+    QF::onCleanup(); // cleanup callback
+    QS_EXIT();       // cleanup the QSPY connection
 
     //CloseHandle(QV_win32Event_);
     //DeleteCriticalSection(&l_win32CritSect);
@@ -173,7 +171,7 @@ int_t QF::run(void) {
     return 0; // return success
 }
 //............................................................................
-void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
+void QF::setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
     if (ticksPerSec != 0U) {
         l_tickMsec = 1000UL / ticksPerSec;
     }
@@ -184,20 +182,20 @@ void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
 }
 
 //............................................................................
-void QF_consoleSetup(void) {
+void QF::consoleSetup(void) {
 }
 //............................................................................
-void QF_consoleCleanup(void) {
+void QF::consoleCleanup(void) {
 }
 //............................................................................
-int QF_consoleGetKey(void) {
+int QF::consoleGetKey(void) {
     if (_kbhit()) { // any key pressed?
         return static_cast<int>(_getwch());
     }
     return 0;
 }
 //............................................................................
-int QF_consoleWaitForKey(void) {
+int QF::consoleWaitForKey(void) {
     return static_cast<int>(_getwch());
 }
 
@@ -207,16 +205,15 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    (void)stkSize; // unused paramteter in the Win32-QV port
+    Q_UNUSED_PAR(stkSize);
 
     Q_REQUIRE_ID(600, (0U < prio)  /* priority...*/
         && (prio <= QF_MAX_ACTIVE) /*... in range */
-        && (stkSto == nullptr));  // statck storage must NOT...
-                                   // ... be provided
+        && (stkSto == nullptr));   // stack storage must NOT be provided
 
     m_eQueue.init(qSto, qLen);
-    m_prio = prio;  // set the QF priority of this AO before adding it to QF
-    QF::add_(this); // make QF aware of this AO
+    m_prio = prio; // set the QF priority of this AO before registering it
+    register_();   // register this AO with QF
 
     this->init(par, m_prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
@@ -230,10 +227,10 @@ void QActive::stop(void) {
     // make sure the AO is no longer in "ready set"
     QF_CRIT_STAT_
     QF_CRIT_E_();
-    QV_readySet_.rmove(m_prio);
+    QF::readySet_.rmove(m_prio);
     QF_CRIT_X_();
 
-    QF::remove_(this); // remove this AO from QF
+    unregister_(); // remove this AO from QF
 }
 #endif
 

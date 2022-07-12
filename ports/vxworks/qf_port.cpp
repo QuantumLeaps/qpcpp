@@ -92,12 +92,12 @@ void QF::stop(void) {
     onCleanup(); // the cleanup callback
 }
 //............................................................................
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
     // event loop of the active object thread
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
 }
 //............................................................................
@@ -106,7 +106,7 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par) // see NOTE1
 {
-    (void)stkSize; // unused paramteter in the VxWorks port
+    static_cast<void>(stkSize); // unused parameter in the VxWorks port
 
     Q_REQUIRE_ID(200, (prio <= QF_MAX_ACTIVE) /* not exceeding max */
         && (qSto != nullptr) /* queue storage */
@@ -118,7 +118,7 @@ void QActive::start(std::uint_fast8_t const prio,
     m_eQueue.init(qSto, qLen);
 
     m_prio = prio;  // save the QF priority
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
 
     init(par);      // thake the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
@@ -135,7 +135,7 @@ void QActive::start(std::uint_fast8_t const prio,
     // spawn a VxWorks thread for the active object
     m_thread = taskSpawn(tname,      // task name
         vx_prio,                     // VxWorks priority
-        reinterpret_cast<int>(ie),   // VxWorks taks options, see NOTE1
+        reinterpret_cast<int>(ie),   // VxWorks task options, see NOTE1
         static_cast<size_t>(stkSize),
         reinterpret_cast<FUNCPTR>(&task_function),
         reinterpret_cast<int>(this), 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -162,13 +162,14 @@ static int task_function(
     int /*a9*/,
     int /*a10*/)
 {
-    QP::QF::thread_(reinterpret_cast<QP::QActive *>(a1));
+    QP::QActive::thread_(reinterpret_cast<QP::QActive *>(a1));
+
     return 0;
 }
 
 //............................................................................
 static void usrClockHook(TASK_ID /*tid*/) {
-    QP::QF::TICK_X(0U, &QP::l_clock_tick);
+    QP::QTimeEvt::TICK_X(0U, &QP::l_clock_tick);
 }
 
 } // extern "C"

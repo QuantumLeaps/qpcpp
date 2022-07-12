@@ -71,7 +71,7 @@ extern "C" {
 {
     QK_ISR_ENTRY();    // inform QK about entering the ISR
 
-    QF::TICK_X(0U, nullptr); // process all time events at rate 0
+    QTimeEvt::TICK_X(0U, nullptr); // process all time events at rate 0
 
     QK_ISR_EXIT();     // inform QK about exiting the ISR
 

@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
@@ -19,10 +18,10 @@
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // Contact information:
-// <www.state-machine.com>
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-07
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -58,27 +57,26 @@ namespace { // unnamed local namespace
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
-// Local objects *************************************************************
 static pthread_mutex_t l_pThreadMutex; // POSIX mutex for the QF crit. section
-static bool l_isRunning;    // flag indicating when QF is running
+static bool l_isRunning;      // flag indicating when QF is running
 static struct termios l_tsav; // structure with saved terminal attributes
 static struct timespec l_tick;
 static int_t l_tickPrio;
 enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 
 //............................................................................
-static void *ticker_thread(void *arg); // prototype
-static void *ticker_thread(void * /*arg*/) { // for pthread_create()
+static void *ticker_thread(void *); // prototype
+static void *ticker_thread(void *) { // for pthread_create()
     while (l_isRunning) { // the clock tick loop...
         nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
-        QF_onClockTick(); // clock tick callback (must call QF_TICK_X())
+        QP::QF::onClockTick(); // clock tick callback (must call TICK_X())
     }
     return nullptr; // return success
 }
 //............................................................................
 static void sigIntHandler(int /* dummy */); // prototype
 static void sigIntHandler(int /* dummy */) {
-    QF::onCleanup();
+    QP::QF::onCleanup();
     exit(-1);
 }
 
@@ -87,9 +85,7 @@ static void sigIntHandler(int /* dummy */) {
 //============================================================================
 namespace QP {
 
-// Global objects ............................................................
-QPSet  QV_readySet_;        // QV-ready set of active objects
-pthread_cond_t QV_condVar_; // Cond.var. to signal events
+pthread_cond_t QV_condVar_; // cond.var. to signal events
 
 //............................................................................
 void QF::init(void) {
@@ -112,18 +108,18 @@ void QF::init(void) {
     sig_act.sa_handler = &sigIntHandler;
     sigaction(SIGINT, &sig_act, NULL);
 }
-
 //............................................................................
-void QF_enterCriticalSection_(void) {
+void QF::enterCriticalSection_(void) {
     pthread_mutex_lock(&l_pThreadMutex);
 }
 //............................................................................
-void QF_leaveCriticalSection_(void) {
+void QF::leaveCriticalSection_(void) {
     pthread_mutex_unlock(&l_pThreadMutex);
 }
 
 //............................................................................
 int_t QF::run(void) {
+
     onStartup(); // application-specific startup callback
 
     l_isRunning = true; // QF is running
@@ -168,7 +164,7 @@ int_t QF::run(void) {
         pthread_attr_destroy(&attr);
     }
 
-    // the combined event-loop and background-loop of the QV kernel */
+    // the combined event-loop and background-loop of the QV kernel
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
@@ -177,10 +173,10 @@ int_t QF::run(void) {
     QS_END_NOCRIT_PRE_()
 
     while (l_isRunning) {
-
-        if (QV_readySet_.notEmpty()) {
-            std::uint_fast8_t p = QV_readySet_.findMax();
-            QActive *a = active_[p];
+        // find the maximum priority AO ready to run
+        if (QF::readySet_.notEmpty()) {
+            std::uint_fast8_t p = QF::readySet_.findMax();
+            QActive *a = QActive::active_[p];
             QF_CRIT_X_();
 
             // the active object 'a' must still be registered in QF
@@ -189,18 +185,18 @@ int_t QF::run(void) {
 
             // perform the run-to-completion (RTS) step...
             // 1. retrieve the event from the AO's event queue, which by this
-            //    time must be non-empty and The "QV" kernel asserts it.
+            //    time must be non-empty and The QV kernel asserts it.
             // 2. dispatch the event to the AO's state machine.
             // 3. determine if event is garbage and collect it if so
             //
             QEvt const *e = a->get_();
             a->dispatch(e, a->m_prio);
-            gc(e);
+            QF::gc(e);
 
             QF_CRIT_E_();
 
-            if (a->m_eQueue.isEmpty()) { /* empty queue? */
-                QV_readySet_.rmove(p);
+            if (a->m_eQueue.isEmpty()) { // empty queue?
+                QF::readySet_.rmove(p);
             }
         }
         else {
@@ -209,14 +205,14 @@ int_t QF::run(void) {
             // for events. Instead, the POSIX-QV port efficiently waits until
             // QP events become available.
             //
-            while (QV_readySet_.isEmpty()) {
+            while (QF::readySet_.isEmpty()) {
                 pthread_cond_wait(&QV_condVar_, &l_pThreadMutex);
             }
         }
     }
     QF_CRIT_X_();
-    onCleanup();  // cleanup callback
-    QS_EXIT();    // cleanup the QSPY connection
+    QF::onCleanup(); // cleanup callback
+    QS_EXIT();       // cleanup the QSPY connection
 
     pthread_cond_destroy(&QV_condVar_); // cleanup the condition variable
     pthread_mutex_destroy(&l_pThreadMutex); // cleanup the global mutex
@@ -224,25 +220,26 @@ int_t QF::run(void) {
     return 0; // return success
 }
 //............................................................................
-void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
-    if (ticksPerSec != 0U) {
-        l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
-    }
-    else {
-        l_tick.tv_nsec = 0; /* means NO system clock tick */
-    }
-    l_tickPrio = tickPrio;
-}
-//............................................................................
 void QF::stop(void) {
     l_isRunning = false; // terminate the main event-loop thread
 
     // unblock the event-loop so it can terminate
-    QV_readySet_.insert(1);
+    QF::readySet_.insert(1);
     pthread_cond_signal(&QV_condVar_);
 }
 //............................................................................
-void QF_consoleSetup(void) {
+void QF::setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
+    if (ticksPerSec != 0U) {
+        l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
+    }
+    else {
+        l_tick.tv_nsec = 0; // means NO system clock tick
+    }
+    l_tickPrio = tickPrio;
+}
+
+//............................................................................
+void QF::consoleSetup(void) {
     struct termios tio;   // modified terminal attributes
 
     tcgetattr(0, &l_tsav); // save the current terminal attributes
@@ -251,11 +248,11 @@ void QF_consoleSetup(void) {
     tcsetattr(0, TCSANOW, &tio);     // set the new attributes
 }
 //............................................................................
-void QF_consoleCleanup(void) {
+void QF::consoleCleanup(void) {
     tcsetattr(0, TCSANOW, &l_tsav); // restore the saved attributes
 }
 //............................................................................
-int QF_consoleGetKey(void) {
+int QF::consoleGetKey(void) {
     int byteswaiting;
     ioctl(0, FIONREAD, &byteswaiting);
     if (byteswaiting > 0) {
@@ -266,30 +263,30 @@ int QF_consoleGetKey(void) {
     return 0; // no input at this time
 }
 //............................................................................
-int QF_consoleWaitForKey(void) {
+int QF::consoleWaitForKey(void) {
     return getchar();
 }
 
-//............................................................................
+//============================================================================
 void QActive::start(std::uint_fast8_t const prio,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    (void)stkSize; // unused paramteter in the POSIX port
+    Q_UNUSED_PAR(stkSize);
 
     Q_REQUIRE_ID(600, (0U < prio)  /* priority...*/
-        && (prio <= QF_MAX_ACTIVE) /*.. in range */
-        && (stkSto == nullptr));   // stack storage must NOT...
-                                   // ... be provided
+        && (prio <= QF_MAX_ACTIVE) /*... in range */
+        && (stkSto == nullptr));   // stack storage must NOT be provided
 
     m_eQueue.init(qSto, qLen);
-    m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
-    QF::add_(this); // make QF aware of this AO
+    m_prio = prio; // set the QF priority of this AO before registering it
+    register_();   // register this AO with QF
 
     this->init(par, m_prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
 }
+
 //............................................................................
 #ifdef QF_ACTIVE_STOP
 void QActive::stop(void) {
@@ -298,10 +295,10 @@ void QActive::stop(void) {
     // make sure the AO is no longer in "ready set"
     QF_CRIT_STAT_
     QF_CRIT_E_();
-    QV_readySet_.rmove(m_prio);
+    QF::readySet_.rmove(m_prio);
     QF_CRIT_X_();
 
-    QF::remove_(this); // remove this AO from QF
+    unregister_(); // remove this AO from QF
 }
 #endif
 
@@ -312,7 +309,7 @@ void QActive::stop(void) {
 // In Linux, the scheduler policy closest to real-time is the SCHED_FIFO
 // policy, available only with superuser privileges. QF::run() attempts
 // to set this policy as well as to maximize its priority, so that the
-// ticking occurs in the most timely manner (as close to an interrupt as
+// ticking occurrs in the most timely manner (as close to an interrupt as
 // possible). However, setting the SCHED_FIFO policy might fail, most
 // probably due to insufficient privileges.
 //

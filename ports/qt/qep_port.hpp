@@ -31,17 +31,16 @@
 #ifndef QEP_PORT_HPP
 #define QEP_PORT_HPP
 
-// provide QEvt constructors
-#define Q_EVT_CTOR    1
+// provide QP::QEvt constructors
+#define Q_EVT_CTOR 1
 
-// provide QEvt virtual destructor
+// provide QP::QEvt virtual destructor
 #define Q_EVT_XTOR 1
 
-// provide QHsm virtual destructor
+// provide QP::QHsm virtual destructor
 #define Q_HSM_XTOR 1
 
 #include <cstdint>    // Exact-width types. C++11 standard
 #include "qep.hpp"    // QEP platform-independent public interface
 
 #endif // QEP_PORT_HPP
-

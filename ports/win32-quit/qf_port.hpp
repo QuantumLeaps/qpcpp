@@ -19,10 +19,10 @@
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // Contact information:
-// <www.state-machine.com>
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-13
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -46,8 +46,8 @@
 #define QF_ACTIVE_STOP       1
 
 // QF interrupt disable/enable
-#define QF_INT_DISABLE()     (++QP::QF_intNest)
-#define QF_INT_ENABLE()      (--QP::QF_intNest)
+#define QF_INT_DISABLE()     (++QF_intNest_)
+#define QF_INT_ENABLE()      (--QF_intNest_)
 
 // QUIT critical section
 // QF_CRIT_STAT_TYPE not defined
@@ -56,25 +56,17 @@
 
 // QF_LOG2 not defined -- use the internal LOG2() implementation
 
-#include "qep_port.hpp"  // QEP port
-#include "qequeue.hpp"   // Win32-QV needs event-queue
-#include "qmpool.hpp"    // Win32-QV needs memory-pool
-#include "qpset.hpp"     // Win32-QV needs priority-set
-#include "qf.hpp"        // QF platform-independent public interface
-
-namespace QP {
-
-// interrupt nesting up-down counter
-extern std::uint8_t volatile QF_intNest;
-
-} // namespace QP
-
 // special adaptations for QWIN GUI applications
 #ifdef QWIN_GUI
     // replace main() with main_gui() as the entry point to a GUI app.
     #define main() main_gui()
     int_t main_gui(); // prototype of the GUI application entry point
 #endif
+
+#include "qep_port.hpp"  // QEP port
+#include "qequeue.hpp"   // QUIT needs event-queue
+#include "qmpool.hpp"    // QUIT needs memory-pool
+#include "qf.hpp"        // QF platform-independent public interface
 
 //============================================================================
 // interface used only inside QF, but not in applications
@@ -83,14 +75,14 @@ extern std::uint8_t volatile QF_intNest;
 
     // Win32-QV specific scheduler locking, see NOTE2
     #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) ((void)0)
-    #define QF_SCHED_UNLOCK_()    ((void)0)
+    #define QF_SCHED_LOCK_(dummy) (static_cast<void>(0))
+    #define QF_SCHED_UNLOCK_()    (static_cast<void>(0))
 
     // native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT((me_)->m_eQueue.m_frontEvt != nullptr)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QV_readySet_.insert((me_)->m_prio)); \
+        (QF::readySet_.insert((me_)->m_prio)); \
         (void)SetEvent(QV_win32Event_)
 
     // Win32-QV specific event pool operations

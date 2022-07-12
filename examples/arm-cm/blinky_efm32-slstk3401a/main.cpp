@@ -41,7 +41,7 @@ int main() {
     BSP_init(); // initialize the Board Support Package
     QF::init(); // initialize the framework and the underlying RT kernel
 
-    // publish-subscribe not used, no call to QF::psInit()
+    // publish-subscribe not used, no call to QActive::psInit()
     // dynamic event allocation not used, no call to QF::poolInit()
 
     // instantiate and start the active objects...

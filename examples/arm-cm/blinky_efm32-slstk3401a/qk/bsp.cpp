@@ -63,7 +63,7 @@ extern "C" {
 void SysTick_Handler(void); // prototype
 void SysTick_Handler(void) {
     QK_ISR_ENTRY();   // inform QK about entering an ISR
-    QF::TICK_X(0U, nullptr); // process time events for rate 0
+    QTimeEvt::TICK_X(0U, nullptr); // process time events for rate 0
     QK_ISR_EXIT();  // inform QK about exiting an ISR
 }
 

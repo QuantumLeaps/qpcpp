@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-01-20
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ port to uC-OS2, generic C++11 compiler
@@ -83,7 +83,7 @@ void QActive::start(std::uint_fast8_t const prio,
     Q_ASSERT_ID(210, m_eQueue != nullptr);
 
     m_prio = prio;  // save the QF priority
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
 
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
@@ -140,30 +140,23 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
 }
 
 // thread for active objects -------------------------------------------------
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
     // event-loop
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
-}
-//............................................................................
-static void task_function(void *pdata) { // uC-OS2 task signature
-    QActive *act = reinterpret_cast<QActive *>(pdata);
-
-    QF::thread_(act);
-    QF::remove_(act); // remove this object from QF
+    act->unregister_(); // remove this object from QF
     OSTaskDel(OS_PRIO_SELF); // make uC-OS2 forget about this task
 }
 //............................................................................
-#ifndef Q_SPY
-bool QActive::post_(QEvt const * const e,
-                    std::uint_fast16_t const margin) noexcept
-#else
+static void task_function(void *pdata) { // uC-OS2 task signature
+    QActive::thread_(reinterpret_cast<QActive *>(pdata));
+}
+//............................................................................
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
-#endif
 {
     QF_CRIT_STAT_
 

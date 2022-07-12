@@ -27,7 +27,7 @@
 //!
 //! @file
 //! @brief QEP/C++ port, GNU-ARM C++11 compiler
-//!
+
 #ifndef QEP_PORT_HPP
 #define QEP_PORT_HPP
 

@@ -66,18 +66,18 @@ void QF::stop(void) {
     onCleanup(); // the cleanup callback
 }
 //............................................................................
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
     // event loop of the active object thread
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
 }
 //............................................................................
 static void thread_function(ULONG thread_input) { // ThreadX signature
     // run the active-object thread
-    QF::thread_(reinterpret_cast<QActive *>(thread_input));
+    QActive::thread_(reinterpret_cast<QActive *>(thread_input));
 }
 //............................................................................
 void QActive::start(std::uint_fast8_t const prio,
@@ -95,7 +95,7 @@ void QActive::start(std::uint_fast8_t const prio,
         == TX_SUCCESS);
 
     m_prio = prio;  // save the QF priority
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
 
     init(par, m_prio); // execute initial transition
     QS_FLUSH();     // flush the trace buffer to the host
@@ -132,13 +132,8 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
     }
 }
 //............................................................................
-#ifndef Q_SPY
-bool QActive::post_(QEvt const * const e,
-                    std::uint_fast16_t const margin) noexcept
-#else
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
-#endif
 {
     bool status;
     QF_CRIT_STAT_
@@ -184,7 +179,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
         // posting to the ThreadX queue must succeed
         Q_ALLEGE_ID(520,
-            tx_queue_send(&m_eQueue, const_cast<VOID *>(&e), TX_NO_WAIT)
+            tx_queue_send(&m_eQueue, const_cast<QEvt **>(&e), TX_NO_WAIT)
             == TX_SUCCESS);
     }
     else {
@@ -228,7 +223,7 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
 
     // LIFO posting the ThreadX queue must succeed
     Q_ALLEGE_ID(610,
-        tx_queue_front_send(&m_eQueue, const_cast<VOID *>(&e), TX_NO_WAIT)
+        tx_queue_front_send(&m_eQueue, const_cast<QEvt **>(&e), TX_NO_WAIT)
         == TX_SUCCESS);
 }
 //............................................................................

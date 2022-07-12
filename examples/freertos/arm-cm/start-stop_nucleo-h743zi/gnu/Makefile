@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on NUCLEO-H743ZI, FreeRTOS, GNU-ARM
 # Last Updated for Version: 7.0.1
-# Date of the Last Update:  2022-05-23
+# Date of the Last Update:  2022-07-09
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -121,7 +121,7 @@ CPP_SRCS := \
 	bsp.cpp \
 	main.cpp \
 	launcher.cpp \
-	worker.cpp
+	worker.cpp \
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := $(PROJECT).ld
@@ -130,7 +130,6 @@ QP_SRCS := \
 	qep_hsm.cpp \
 	qep_msm.cpp \
 	qf_act.cpp \
-	qf_actq.cpp \
 	qf_defer.cpp \
 	qf_dyn.cpp \
 	qf_mem.cpp \
@@ -142,8 +141,9 @@ QP_SRCS := \
 	qf_port.cpp
 
 RTOS_SRCS := \
-	list.c \
 	tasks.c \
+	queue.c \
+	list.c \
 	port.c
 
 QS_SRCS := \

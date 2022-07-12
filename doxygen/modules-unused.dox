@@ -290,3 +290,20 @@ void lib_fun(uint32_t x) {
 - QXK_TLS()
 
 */
+/*##########################################################################*/
+/*! @dir include
+* @brief QP/C++ include directory (needs to be added to the compiler
+* include path to build QP/C++ applications)
+*
+* @note
+* All files in this directory have been generated from the QM model
+* located in the `qpcpp.qm` model file.
+*/
+/*##########################################################################*/
+/*! @dir src
+* @brief QP/C++ source directory (platform-independent code).
+*
+* @note
+* All files in this directory have been generated from the QM model
+* located in the `qpcpp.qm` model file.
+*/

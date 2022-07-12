@@ -2,8 +2,8 @@
 //! @brief QUIT (QP Unit Internal Test) port to Win32 with GNU or VisualC++
 //! @cond
 //============================================================================
-//! Last updated for version 6.9.2
-//! Last updated on  2021-02-12
+//! Last updated for version 7.0.1
+//! Last updated on  2022-06-30
 //!
 //!                    Q u a n t u m  L e a P s
 //!                    ------------------------
@@ -53,9 +53,6 @@ static int l_test_count;
 
 //============================================================================
 namespace QP {
-
-// Global objects ............................................................
-std::uint8_t volatile QF_intNest;
 
 //............................................................................
 void QUIT_fail_(char const *cond, char const *file, int line) {

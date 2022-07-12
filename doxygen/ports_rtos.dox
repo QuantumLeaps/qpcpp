@@ -132,7 +132,7 @@ void vApplicationTickHook(void) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     // process time events for rate 0
-    QP::QF::TICK_X_FROM_ISR(0U, &xHigherPriorityTaskWoken, &l_TickHook);
+    QP::QTimeEvt::TICK_X_FROM_ISR(0U, &xHigherPriorityTaskWoken, &l_TickHook);
     . . .
     // notify FreeRTOS to perform context switch from ISR, if needed
     portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
@@ -276,7 +276,7 @@ The Zephyr message queue currently supports only the FIFO policy and does NOT su
 
 - The QP port uses the native QF memory pool (::QMPool) to implement event pools.
 
-- The QP port does not mandate any specific method to manage the QP time events, but the provided examples use the Zephyr timer (`struct k_timer`) to tick periodically and invoke QP::QF::TICK_X().
+- The QP port does not mandate any specific method to manage the QP time events, but the provided examples use the Zephyr timer (`struct k_timer`) to tick periodically and invoke QP::QTimeEvt::TICK_X().
 
 
 @subsection zephyr_build QP Source Files Needed in this QP Port

@@ -89,7 +89,7 @@ static void tick_handler(void) {  /* signature of embOS tick hook routine */
     /* scale down the 1000Hz embOS tick to the desired BSP_TICKS_PER_SEC */
     if (--ctr == 0U) {
         ctr = 1000U/DPP::BSP::TICKS_PER_SEC;
-        QP::QF::TICK_X(0U, &l_embos_ticker);
+        QP::QTimeEvt::TICK_X(0U, &l_embos_ticker);
 
         /* Perform the debouncing of buttons. The algorithm for debouncing
         * adapted from the book "Embedded Systems Dictionary" by Jack Ganssle

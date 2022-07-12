@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: QK port to ARM7-9, GNU-ARM assembler
-* Last Updated for Version: 6.3.6
-* Date of the Last Update:  2018-10-29
+* Last Updated for Version: 7.0.1
+* Date of the Last Update:  2022-07-09
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -37,9 +37,6 @@
     .equ    FIQ_MODE,    0x11
     .equ    IRQ_MODE,    0x12
     .equ    SYS_MODE,    0x1F
-
-    /* NOTE: keep in synch with the QK_Attr struct in "qk.h" !!! */
-    .equ    QK_INT_NEST, 4
 
     .text
     .arm
@@ -113,10 +110,10 @@ QK_irq:
     MSR     cpsr_c,#(SYS_MODE | NO_IRQ) /* SYSTEM mode, IRQ disabled */
 /* IRQ entry }}} */
 
-    LDR     r0,=QK_attr_        /* load address in already saved r0 */
-    LDRB    r12,[r0,#QK_INT_NEST] /* load QK_attr_.intNest into saved r12 */
+    LDR     r0,=QF_intNest_     /* load address in already saved r0 */
+    LDRB    r12,[r0,#0]         /* load QF_intNest_ into saved r12 */
     ADD     r12,r12,#1          /* increment the nesting level */
-    STRB    r12,[r0,#QK_INT_NEST] /* store the value in QK_attr_.intNest */
+    STRB    r12,[r0,#0]         /* store the value in QF_intNest_ */
 
     /*     MSR     cpsr_c,#(SYS_MODE | NO_IRQ) ; enable FIQ
     * NOTE: BSP_irq might re-enable IRQ interrupts (the FIQ is enabled
@@ -127,10 +124,10 @@ QK_irq:
     BX      r12                 /* call the C IRQ-handler (ARM/THUMB) */
 
     MSR     cpsr_c,#(SYS_MODE | NO_IRQ) /* make sure IRQs are disabled */
-    LDR     r0,=QK_attr_        /* load address */
-    LDRB    r12,[r0,#QK_INT_NEST] /* load QK_attr_.intNest into saved r12 */
+    LDR     r0,=QF_intNest_     /* load address */
+    LDRB    r12,[r0,#0]         /* load QF_intNest_ into saved r12 */
     SUBS    r12,r12,#1          /* decrement the nesting level */
-    STRB    r12,[r0,#QK_INT_NEST] /* store the value in QK_attr_.intNest */
+    STRB    r12,[r0,#0]         /* store the value in QF_intNest_ */
     BNE     QK_irq_exit         /* branch if interrupt nesting not zero */
 
     LDR     r12,=QK_sched_

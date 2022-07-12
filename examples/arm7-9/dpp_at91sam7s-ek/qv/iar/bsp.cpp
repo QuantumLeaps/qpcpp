@@ -103,7 +103,7 @@ static void ISR_tick(void) {
     // clear the interrupt source
     tmp = AT91C_BASE_PITC->PITC_PIVR;
 
-    QP::QF::TICK_X(0U, &l_ISR_tick); // process all time events at tick rate 0
+    QP::QTimeEvt::TICK_X(0U, &l_ISR_tick); // process all time events at tick rate 0
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle

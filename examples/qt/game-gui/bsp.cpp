@@ -57,7 +57,7 @@ static uint8_t l_ship_pos = GAME_SHIP_Y;
 
 //............................................................................
 void QP::QF_onClockTick(void) {
-    QP::QF::TICK_X(0U, &l_time_tick); // perform the QF clock tick processing
+    QP::QTimeEvt::TICK_X(0U, &l_time_tick); // perform the QF clock tick processing
 
     static QP::QEvt const tickEvt(GAME::TIME_TICK_SIG);
     QP::QF::PUBLISH(&tickEvt, &l_time_tick); // publish the tick event

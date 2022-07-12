@@ -22,11 +22,11 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-13
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
-//! @brief QF/C++ port to FreeRTOS 10.x, ARM Cortex-M, IAR-ARM toolset
+//! @brief QF/C++ port to FreeRTOS 10.x
 
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
@@ -60,7 +60,7 @@
 
 #include "qep_port.hpp" // QEP port
 #include "qequeue.hpp"  // QF event queue (for deferring events)
-#include "qmpool.hpp"   // QF memory pool (for event pools)
+#include "qmpool.hpp"   // this QP port uses memory pool (for event pools)
 #include "qf.hpp"       // QF platform-independent public interface
 
 // the "FromISR" versions of the QF APIs, see NOTE3
@@ -79,16 +79,17 @@
         tickXfromISR_((tickRate_), (pxHigherPrioTaskWoken_), (sender_))
 #else
     #define PUBLISH_FROM_ISR(e_, pxHigherPrioTaskWoken_, dummy) \
-        publishFromISR_((e_), (pxHigherPrioTaskWoken_))
+        publishFromISR_((e_), (pxHigherPrioTaskWoken_), nullptr)
 
     #define POST_FROM_ISR(e_, pxHigherPrioTaskWoken_, dummy) \
-        postFromISR_((e_), QP::QF_NO_MARGIN, (pxHigherPrioTaskWoken_))
+        postFromISR_((e_), QP::QF_NO_MARGIN, (pxHigherPrioTaskWoken_), \
+                     nullptr)
 
     #define POST_X_FROM_ISR(e_, margin_, pxHigherPrioTaskWoken_, dummy) \
-        postFromISR_((e_), (margin_), (pxHigherPrioTaskWoken_))
+        postFromISR_((e_), (margin_), (pxHigherPrioTaskWoken_), nullptr)
 
     #define TICK_X_FROM_ISR(tickRate_, pxHigherPrioTaskWoken_, dummy) \
-        tickXfromISR_((tickRate_), (pxHigherPrioTaskWoken_))
+        tickXfromISR_((tickRate_), (pxHigherPrioTaskWoken_), nullptr)
 #endif
 
 #define TICK_FROM_ISR(pxHigherPrioTaskWoken_, sender_) \

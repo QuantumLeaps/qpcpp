@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ port example, Generic C++11 compiler
@@ -249,10 +249,8 @@
 
 //lint -restore
 
-#include "qep_port.hpp"   // QEP port
-#include "qxk_port.hpp"   // QXK port
-#include "qf.hpp"         // QF platform-independent public interface
-#include "qxthread.hpp"   // QXK naked thread
+#include "qep_port.hpp" // QEP port
+#include "qxk_port.hpp" // QXK dual-mode kernel port
 
 extern "C" {
 

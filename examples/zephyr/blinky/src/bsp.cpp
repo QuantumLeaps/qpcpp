@@ -64,7 +64,7 @@ static struct device const *dev_LED0;
 static struct k_timer QF_tick_timer;
 static void QF_tick_function(struct k_timer *tid) {
     (void)tid; /* unused parameter */
-    QF::TICK_X(0U, nullptr);
+    QTimeEvt::TICK_X(0U, nullptr);
     //printk("tick\n");
 }
 

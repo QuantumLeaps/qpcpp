@@ -1,40 +1,31 @@
+//============================================================================
+// Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
 //! @brief QF/C++ port to POSIX/P-threads
-//! @cond
-//============================================================================
-//! Last updated for: @ref qpcpp_7_0_0
-//! Last updated on  2021-06-17
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
-//!
 
 // expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
 #define _POSIX_C_SOURCE 200809L
@@ -61,14 +52,10 @@
 #include <unistd.h>
 #include <signal.h>
 
-namespace QP {
+namespace { // unnamed local namespace
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
-/* Global objects ==========================================================*/
-pthread_mutex_t QF_pThreadMutex_; // mutex for QF critical section
-
-// Local objects *************************************************************
 static pthread_mutex_t l_startupMutex;
 static bool l_isRunning;      // flag indicating when QF is running
 static struct termios l_tsav; // structure with saved terminal attributes
@@ -76,16 +63,29 @@ static struct timespec l_tick;
 static int_t l_tickPrio;
 enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 
-static void sigIntHandler(int /* dummy */);
-static void *ao_thread(void *arg); // thread routine for all AOs
+static void sigIntHandler(int /* dummy */) {
+    QP::QF::onCleanup();
+    exit(-1);
+}
+static void *ao_thread(void *arg) { // thread routine for all AOs
+    QP::QActive::thread_(static_cast<QP::QActive *>(arg));
+    return nullptr; // return success
+}
 
-// QF functions ==============================================================
+} // unnamed local namespace
+
+//============================================================================
+namespace QP {
+
+pthread_mutex_t QF::pThreadMutex_; // mutex for QF critical section
+
+//............................................................................
 void QF::init(void) {
     // lock memory so we're never swapped out to disk
     //mlockall(MCL_CURRENT | MCL_FUTURE); // uncomment when supported
 
     // init the global mutex with the default non-recursive initializer
-    pthread_mutex_init(&QF_pThreadMutex_, NULL);
+    pthread_mutex_init(&QF::pThreadMutex_, NULL);
 
     // init the startup mutex with the default non-recursive initializer
     pthread_mutex_init(&l_startupMutex, NULL);
@@ -105,17 +105,18 @@ void QF::init(void) {
     sigaction(SIGINT, &sig_act, NULL);
 }
 
-//============================================================================
-void QF_enterCriticalSection_(void) {
-    pthread_mutex_lock(&QF_pThreadMutex_);
+//............................................................................
+void QF::enterCriticalSection_(void) {
+    pthread_mutex_lock(&QF::pThreadMutex_);
 }
-//============================================================================
-void QF_leaveCriticalSection_(void) {
-    pthread_mutex_unlock(&QF_pThreadMutex_);
+//............................................................................
+void QF::leaveCriticalSection_(void) {
+    pthread_mutex_unlock(&QF::pThreadMutex_);
 }
 
-//============================================================================
+//............................................................................
 int_t QF::run(void) {
+
     onStartup(); // application-specific startup callback
 
     // produce the QS_QF_RUN trace record
@@ -129,7 +130,7 @@ int_t QF::run(void) {
         // success, this application has sufficient privileges
     }
     else {
-        // setting priority failed, probably due to insufficient privieges
+        // setting priority failed, probably due to insufficient privileges
     }
 
     // unlock the startup mutex to unblock any active objects started before
@@ -138,28 +139,56 @@ int_t QF::run(void) {
 
     l_isRunning = true;
     while (l_isRunning) { // the clock tick loop...
-        QF_onClockTick(); // clock tick callback (must call QF_TICK_X())
+        QF::onClockTick(); // clock tick callback (must call TICK_X())
 
         nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
     }
     onCleanup(); // cleanup callback
     pthread_mutex_destroy(&l_startupMutex);
-    pthread_mutex_destroy(&QF_pThreadMutex_);
+    pthread_mutex_destroy(&QF::pThreadMutex_);
 
     return 0; // return success
-}
-//============================================================================
-void QF_setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
-    Q_REQUIRE_ID(300, ticksPerSec != 0U);
-    l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
-    l_tickPrio = tickPrio;
 }
 //............................................................................
 void QF::stop(void) {
     l_isRunning = false; // stop the loop in QF::run()
 }
 //............................................................................
-void QF::thread_(QActive *act) {
+void QF::setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
+    Q_REQUIRE_ID(300, ticksPerSec != 0U);
+    l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
+    l_tickPrio = tickPrio;
+}
+//............................................................................
+void QF::consoleSetup(void) {
+    struct termios tio;   // modified terminal attributes
+
+    tcgetattr(0, &l_tsav); // save the current terminal attributes
+    tcgetattr(0, &tio);    // obtain the current terminal attributes
+    tio.c_lflag &= ~(ICANON | ECHO); // disable the canonical mode & echo
+    tcsetattr(0, TCSANOW, &tio);     // set the new attributes
+}
+//............................................................................
+void QF::consoleCleanup(void) {
+    tcsetattr(0, TCSANOW, &l_tsav); // restore the saved attributes
+}
+//............................................................................
+int QF::consoleGetKey(void) {
+    int byteswaiting;
+    ioctl(0, FIONREAD, &byteswaiting);
+    if (byteswaiting > 0) {
+        char ch;
+        (void)read(0, &ch, 1);
+        return (int)ch;
+    }
+    return 0; // no input at this time
+}
+/*..........................................................................*/
+int QF::consoleWaitForKey(void) {
+    return getchar();
+}
+//............................................................................
+void QActive::thread_(QActive *act) {
     // block this thread until the startup mutex is unlocked from QF::run()
     pthread_mutex_lock(&l_startupMutex);
     pthread_mutex_unlock(&l_startupMutex);
@@ -173,40 +202,11 @@ void QF::thread_(QActive *act) {
     {
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
 #ifdef QF_ACTIVE_STOP
-    remove_(act); // remove this object from QF
+    act->unregister_(); // remove this object from QF
 #endif
-}
-
-//............................................................................
-void QF_consoleSetup(void) {
-    struct termios tio;   // modified terminal attributes
-
-    tcgetattr(0, &l_tsav); // save the current terminal attributes
-    tcgetattr(0, &tio);    // obtain the current terminal attributes
-    tio.c_lflag &= ~(ICANON | ECHO); // disable the canonical mode & echo
-    tcsetattr(0, TCSANOW, &tio);     // set the new attributes
-}
-//............................................................................
-void QF_consoleCleanup(void) {
-    tcsetattr(0, TCSANOW, &l_tsav); // restore the saved attributes
-}
-//............................................................................
-int QF_consoleGetKey(void) {
-    int byteswaiting;
-    ioctl(0, FIONREAD, &byteswaiting);
-    if (byteswaiting > 0) {
-        char ch;
-        read(0, &ch, 1);
-        return (int)ch;
-    }
-    return 0; // no input at this time
-}
-/*..........................................................................*/
-int QF_consoleWaitForKey(void) {
-    return getchar();
 }
 
 //============================================================================
@@ -222,7 +222,7 @@ void QActive::start(std::uint_fast8_t const prio,
 
     m_eQueue.init(qSto, qLen);
     m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
-    QF::add_(this); // make QF aware of this AO
+    register_(); // make QF aware of this AO
 
     this->init(par, m_prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
@@ -272,18 +272,6 @@ void QActive::stop(void) {
     m_thread = false; // stop the thread loop (see QF::thread_)
 }
 #endif
-
-//............................................................................
-static void *ao_thread(void *arg) { // the expected POSIX signature
-    QF::thread_(static_cast<QActive *>(arg));
-    return nullptr; // return success
-}
-
-//============================================================================
-static void sigIntHandler(int /* dummy */) {
-    QF::onCleanup();
-    exit(-1);
-}
 
 } // namespace QP
 

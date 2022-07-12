@@ -99,7 +99,7 @@ QK_IRQ_BEGIN(rtiCompare0)
     uint32_t tmp;
 
     rtiREG1->INTFLAG = 1U;    // clear the interrutp source
-    QP::QF::TICK_X(0U, &DPP::l_rtiCompare0); // process time events for rate 0
+    QP::QTimeEvt::TICK_X(0U, &DPP::l_rtiCompare0); // process time events for rate 0
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle

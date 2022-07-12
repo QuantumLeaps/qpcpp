@@ -2,14 +2,14 @@
 //! @brief QF/C++ port to embOS kernel, all supported compilers
 //! @cond
 //============================================================================
-//! Last updated for version 6.9.3 / embOS v4.34.1
-//! Last updated on  2021-04-09
+//! Last updated for version 7.0.1 / embOS v4.34.1
+//! Last updated on  2022-06-30
 //!
 //!                    Q u a n t u m  L e a P s
 //!                    ------------------------
 //!                    Modern Embedded Software
 //!
-//! Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+//! Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //!
 //! This program is open source software: you can redistribute it and/or
 //! modify it under the terms of the GNU General Public License as published
@@ -68,7 +68,6 @@ enum EmbOS_TaskAttrs {
 #include "RTOS.h"      // embOS API
 #include "qep_port.hpp"  // QEP port
 #include "qequeue.hpp"   // used for event deferral
-#include "qpset.hpp"     // this QP port uses the native QP priority set
 #include "qmpool.hpp"    // this QP port uses the native QF memory pool
 #include "qf.hpp"        // QF platform-independent public interface
 

@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-07
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -252,7 +252,7 @@ QSTimeCtr QS::onGetTime(void) {
 }
 
 //............................................................................
-void QS_output(void) {
+void QS::doOutput(void) {
     uint16_t nBytes;
     uint8_t const *data;
     QS_CRIT_STAT_
@@ -299,7 +299,7 @@ void QS_output(void) {
     }
 }
 //............................................................................
-void QS_rx_input(void) {
+void QS::doInput(void) {
     int status = recv(l_sock,
                       (char *)QS::rxPriv_.buf, (int)QS::rxPriv_.end, 0);
     if (status > 0) { // any data received?
@@ -310,4 +310,3 @@ void QS_rx_input(void) {
 }
 
 } // namespace QP
-

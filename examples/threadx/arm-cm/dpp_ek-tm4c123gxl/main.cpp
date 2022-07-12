@@ -62,7 +62,7 @@ void tx_application_define(void * /*first_unused_memory*/) {
     QP::QF::init();
 
     // init publish-subscribe
-    QP::QF::psInit(l_subscrSto, Q_DIM(l_subscrSto));
+    QP::QActive::psInit(l_subscrSto, Q_DIM(l_subscrSto));
 
     // initialize event pools...
     QP::QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto),

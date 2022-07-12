@@ -79,7 +79,7 @@ extern "C" {
 //
 void rtiNotification(uint32 notification) {
     if (notification == rtiNOTIFICATION_COMPARE0) {
-        QP::QF::TICK_X(0U, nullptr); // process time events for rate 0
+        QP::QTimeEvt::TICK_X(0U, nullptr); // process time events for rate 0
     }
 }
 

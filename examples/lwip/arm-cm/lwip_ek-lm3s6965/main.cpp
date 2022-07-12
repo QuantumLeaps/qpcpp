@@ -49,7 +49,7 @@ int main(void) {
     BSP_init();  // initialize the BSP
 
     // initialize publish-subscribe...
-    QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // initialize event pools...
     QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));

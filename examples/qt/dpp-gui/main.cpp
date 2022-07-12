@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     // object dictionaries...
     QS_OBJ_DICTIONARY(l_smlPoolSto);
 
-    QP::QF::psInit(l_subscrSto, Q_DIM(l_subscrSto)); // init publish-subscribe
+    QP::QActive::psInit(l_subscrSto, Q_DIM(l_subscrSto)); // init publish-subscribe
 
     // initialize event pools...
     QP::QF::poolInit(l_smlPoolSto,

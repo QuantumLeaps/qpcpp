@@ -2,8 +2,8 @@
 //! @brief QF/C++ port to VxWorks API
 //! @cond
 //============================================================================
-//! Last updated for version 6.6.0
-//! Last updated on  2019-07-30
+//! Last updated for version 7.0.1
+//! Last updated on  2022-06-30
 //!
 //!                    Q u a n t u m  L e a P s
 //!                    ------------------------
@@ -75,7 +75,6 @@
 #include "qep_port.hpp"  // QEP port
 #include "qequeue.hpp"   // VxWorks port needs event-queue
 #include "qmpool.hpp"    // VxWorks port needs memory-pool
-#include "qpset.hpp"     // VxWorks port needs priority-set
 #include "qf.hpp"        // QF platform-independent public interface
 
 
@@ -106,7 +105,7 @@
         }
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        Q_ASSERT_ID(410, QF::active_[(me_)->m_prio] != nullptr); \
+        Q_ASSERT_ID(410, QActive::active_[(me_)->m_prio] != nullptr); \
         Q_ALLEGE_ID(415, eventSend((me_)->m_thread, QF_EQUEUE_EVT) == OK)
 
     // event pool operations

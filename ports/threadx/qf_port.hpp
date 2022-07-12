@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-12
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -55,12 +55,11 @@ enum ThreadX_ThreadAttrs {
 
 } // namespace QP
 
-#include "tx_api.h"    // ThreadX API
+#include "tx_api.h"      // ThreadX API
 
 #include "qep_port.hpp"  // QEP port
 #include "qequeue.hpp"   // used for event deferral
 #include "qmpool.hpp"    // native QF event pool
-#include "qpset.hpp"     // used for publish/subscribe
 #include "qf.hpp"        // QF platform-independent public interface
 
 

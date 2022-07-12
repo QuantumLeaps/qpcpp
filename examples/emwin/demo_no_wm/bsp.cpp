@@ -136,7 +136,7 @@ void QF::onCleanup(void) {
 }
 //............................................................................
 void QP::QF_onClockTick(void) {
-    QF::TICK(&l_clock_tick); // perform the QF clock tick processing
+    QTimeEvt::TICK(&l_clock_tick); // perform the QF clock tick processing
 }
 
 //............................................................................

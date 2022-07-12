@@ -53,7 +53,7 @@ int main() {
            "Press 'b' to start BAKING\n"
            "Press 'f' to turn the oven OFF\n"
            "Press ESC to quit...\n",
-           QP::QEP::getVersion());
+           QP_VERSION_STR);
 
     // instantiate the ToastOven HSM and trigger the initial transition
     the_oven->init(0U);
@@ -62,7 +62,7 @@ int main() {
 
         PRINTF_S("\n", "");
 
-        uint8_t c = (uint8_t)QF_consoleWaitForKey();
+        uint8_t c = (uint8_t)QF::consoleWaitForKey();
         PRINTF_S("%c: ", c);
 
         QP::QEvt e;
@@ -86,14 +86,14 @@ int main() {
 namespace QP {
 /*..........................................................................*/
 void QF::onStartup(void) {
-    QF_consoleSetup();
+    QF::consoleSetup();
 }
 /*..........................................................................*/
 void QF::onCleanup(void) {
-    QF_consoleCleanup();
+    QF::consoleCleanup();
 }
 /*..........................................................................*/
-void QF_onClockTick(void) {
+void QF::onClockTick(void) {
 }
 
 } // namespace QP
