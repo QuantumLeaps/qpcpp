@@ -86,10 +86,10 @@ namespace QP {
 
 } // namespace QP
 
-//$declare${QF::QEQueue} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$declare${QF::QP-queue::QEQueue} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QEQueue} .............................................................
+//${QF::QP-queue::QEQueue} ...................................................
 //! Native QF Event Queue class
 //!
 //! @description
@@ -335,6 +335,6 @@ private:
 }; // class QEQueue
 
 } // namespace QP
-//$enddecl${QF::QEQueue} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddecl${QF::QP-queue::QEQueue} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #endif // QEQUEUE_HPP

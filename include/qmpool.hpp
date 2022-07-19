@@ -93,10 +93,10 @@ namespace QP {
 
 } // namespace QP
 
-//$declare${QF::QMPool} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$declare${QF::QP-pool::QMPool} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QMPool} ..............................................................
+//${QF::QP-pool::QMPool} .....................................................
 //! Native QF memory pool class
 //!
 //! @description
@@ -118,7 +118,6 @@ namespace QP {
 //! @note
 //! The native QF event pool is configured by defining the macro
 //! #QF_EPOOL_TYPE_ as QP::QMPool in the specific QF port header file.
-//!
 class QMPool {
 private:
 
@@ -305,7 +304,7 @@ public:
 }; // class QMPool
 
 } // namespace QP
-//$enddecl${QF::QMPool} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddecl${QF::QP-pool::QMPool} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //! Memory pool element to allocate correctly aligned storage for QP::QMPool
 #define QF_MPOOL_EL(type_) \

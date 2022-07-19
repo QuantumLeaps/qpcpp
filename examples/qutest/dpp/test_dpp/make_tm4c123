@@ -300,6 +300,7 @@ clean :
 
 show :
 	@echo PROJECT      = $(PROJECT)
+	@echo MAKECMDGOALS = $(MAKECMDGOALS)
 	@echo TESTS        = $(TESTS)
 	@echo TARGET_ELF   = $(TARGET_ELF)
 	@echo CONF         = $(CONF)

@@ -54,7 +54,6 @@
 
 // QXK OS-object used to store the private stack pointer for extended threads.
 // (The private stack pointer is NULL for basic-threads).
-//
 #define QF_OS_OBJECT_TYPE   void*
 
 // QXK thread type used to store the private Thread-Local Storage pointer.
@@ -68,29 +67,11 @@
 #include "qf.hpp"       // QF framework integrates directly with QXK
 
 //============================================================================
-//$declare${QXK::QSchedStatus} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-
-//${QXK::QSchedStatus} .......................................................
-//! The QXK scheduler lock status
-using QSchedStatus  = std::uint_fast16_t;
-
-} // namespace QP
-//$enddecl${QXK::QSchedStatus} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$declare${QXK::QXTHREAD_NO_TIMEOUT} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-
-//${QXK::QXTHREAD_NO_TIMEOUT} ................................................
-//! no-timeout specification when blocking on queues or semaphores
-static constexpr std::uint_fast16_t QXTHREAD_NO_TIMEOUT  = 0U;
-
-} // namespace QP
-//$enddecl${QXK::QXTHREAD_NO_TIMEOUT} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$declare${QXK::QXK} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$declare${QXK::QP} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QXK {
 
-//${QXK::QXK::onIdle} ........................................................
+//${QXK::QP::QXK::onIdle} ....................................................
 //! QXK idle callback (customized in BSPs for QXK)
 //!
 //! @description
@@ -106,7 +87,7 @@ namespace QXK {
 //! QK::onIdle(), QXK::onIdle()
 void onIdle() ;
 
-//${QXK::QXK::schedLock} .....................................................
+//${QXK::QP::QXK::schedLock} .................................................
 //! QXK selective scheduler lock
 //!
 //! @description
@@ -132,7 +113,7 @@ void onIdle() ;
 //!
 QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept;
 
-//${QXK::QXK::schedUnlock} ...................................................
+//${QXK::QP::QXK::schedUnlock} ...............................................
 //! QXK selective scheduler unlock
 //!
 //! @description
@@ -157,12 +138,20 @@ QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept;
 void schedUnlock(QSchedStatus const stat) noexcept;
 
 } // namespace QXK
-} // namespace QP
-//$enddecl${QXK::QXK} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$declare${QXK::QXThread} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
 
-//${QXK::QXThread} ...........................................................
+//${QXK::QP::QXK_Timeouts} ...................................................
+//! timeout signals for extended threads
+enum QXK_Timeouts : std::uint8_t {
+    QXK_DELAY_SIG = Q_USER_SIG,
+    QXK_QUEUE_SIG,
+    QXK_SEMA_SIG
+};
+
+//${QXK::QP::QXTHREAD_NO_TIMEOUT} ............................................
+//! No-timeout specification when blocking on queues or semaphores
+static constexpr std::uint_fast16_t QXTHREAD_NO_TIMEOUT = 0U;
+
+//${QXK::QP::QXThread} .......................................................
 //! Extended (blocking) thread of the QXK preemptive kernel
 //!
 //! @description
@@ -181,7 +170,6 @@ namespace QP {
 //! The following example illustrates how to instantiate and use an extended
 //! thread in your application.
 //! @include qxk_thread.cpp
-//!
 class QXThread : public QP::QActive {
 private:
 
@@ -304,7 +292,6 @@ public:
     //! @usage
     //! The following example shows starting an extended thread:
     //! @include qxk_start.cpp
-    //!
     void start(
         std::uint_fast8_t const prio,
         QEvt const * * const qSto,
@@ -418,166 +405,7 @@ private:
     bool teDisarm_() noexcept;
 }; // class QXThread
 
-} // namespace QP
-//$enddecl${QXK::QXThread} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$declare${QXK::QXMutex} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-
-//${QXK::QXMutex} ............................................................
-//! Priority Ceiling Mutex the QXK preemptive kernel
-//!
-//! @description
-//! QP::QXMutex is a blocking mutual exclusion mechanism that can also apply
-//! the **priority ceiling protocol** to avoid unbounded priority inversion
-//! (if initialized with a non-zero ceiling priority, see QP::QXMutex::init()).
-//! In that case, QP::QXMutex requires its own uinque QP priority level, which
-//! cannot be used by any thread or any other QP::QXMutex.
-//! If initialzied with zero ceiling priority, QP::QXMutex does **not** use
-//! the priority ceiling protocol and does not require a unique QP priority
-//! (see QP::QXMutex::init()).
-//! QP::QXMutex is **recursive** (reentrant), which means that it can be
-//! locked mutiliple times (up to 255 levels) by the *same* thread without
-//! causing deadlock.
-//! QP::QXMutex is primarily intended for the @ref QP::QXThread
-//! "extened (blocking) threads", but can also be used by the @ref QP::QActive
-//! "basic threads" through the non-blocking QP::QXMutex::tryLock() API.
-//!
-//! @note
-//! QP::QXMutex should be used in situations when at least one of the extended
-//! threads contending for the mutex blocks while holding the mutex (between
-//! the QP::QXMutex::lock() and QP::QXMutex::unlock() operations). If no
-//! blocking is needed while holding the mutex, the more efficient
-//! non-blocking mechanism of @ref QP::QXK::schedLock() "selective QXK
-//! scheduler locking" should be used instead. @ref QP::QXK::schedLock()
-//! "Selective scheduler locking" is available for both @ref QP::QActive
-//! "basic threads" and @ref QP::QXThread "extended threads", so it is
-//! applicable to situations where resources are shared among all
-//! these threads.
-//!
-//! @usage
-//! The following example illustrates how to instantiate and use the mutex
-//! in your application.
-//! @include qxk_mutex.cpp
-//!
-class QXMutex {
-private:
-
-    //! set of extended-threads waiting on this mutex
-    QPSet m_waitSet;
-
-    //! lock-nesting up-down counter
-    std::uint8_t volatile m_lockNest;
-
-    //! prio of the lock holder thread
-    std::uint8_t volatile m_holderPrio;
-
-    //! prioirty ceiling of this mutex
-    std::uint8_t m_ceiling;
-
-public:
-
-    //! initialize the QXK priority-ceiling mutex QP::QXMutex
-    //!
-    //! @description
-    //! Initialize the QXK priority ceiling mutex.
-    //!
-    //! @param[in]  ceiling    the ceiling-priotity of this mutex or zero.
-    //!
-    //! @note
-    //! `ceiling == 0` means that the priority-ceiling protocol shall **not**
-    //! be used by this mutex. Such mutex will **not** change (boost) the
-    //! priority of the holding thread.
-    //!
-    //! @note
-    //! `ceiling > 0` means that the priority-ceiling protocol shall be used
-    //! by this mutex. Such mutex __will__ boost the priority of the holding
-    //! thread to the `ceiling` level for as long as the thread holds this
-    //! mutex.
-    //!
-    //! @attention
-    //! When the priority-ceiling protocol is used (`ceiling > 0`), the
-    //! `ceiling` priority must be unused by any other thread or mutex.
-    //! Also, the `ceiling` priority must be higher than priority of any
-    //! thread that uses this mutex.
-    //!
-    //! @usage
-    //! @include qxk_mutex.cpp
-    //!
-    void init(std::uint_fast8_t const ceiling) noexcept;
-
-    //! lock the QXK priority-ceiling mutex QP::QXMutex
-    //!
-    //! @description
-    //! Lock the QXK priority ceiling mutex QP::QXMutex.
-    //!
-    //! @param[in]  nTicks    number of clock ticks (at the associated rate)
-    //!                       to wait for the semaphore. The value of
-    //!                       #QXTHREAD_NO_TIMEOUT indicates that no timeout
-    //!                       will occur and the semaphore will wait
-    //!                       indefinitely.
-    //! @returns
-    //! 'true' if the mutex has been acquired and 'false' if a timeout
-    //! occurred.
-    //!
-    //! @note
-    //! The mutex locks are allowed to nest, meaning that the same extended
-    //! thread can lock the same mutex multiple times (< 255). However,
-    //! each call to QXMutex::lock() must be balanced by the matching call to
-    //! QXMutex::unlock().
-    //!
-    //! @usage
-    //! @include qxk_mutex.cpp
-    //!
-    bool lock(std::uint_fast16_t const nTicks = QXTHREAD_NO_TIMEOUT) noexcept;
-
-    //! try to lock the QXK priority-ceiling mutex QP::QXMutex
-    //!
-    //! @description
-    //! Try to lock the QXK priority ceiling mutex QP::QXMutex.
-    //!
-    //! @returns
-    //! 'true' if the mutex was successfully locked and 'false' if the mutex
-    //! was unavailable and was NOT locked.
-    //!
-    //! @note
-    //! This function **can** be called from both basic threads (active
-    //! objects) and extended threads.
-    //!
-    //! @note
-    //! The mutex locks are allowed to nest, meaning that the same extended
-    //! thread can lock the same mutex multiple times (< 255). However, each
-    //! successful call to QXMutex::tryLock() must be balanced by the
-    //! matching call to QXMutex::unlock().
-    //!
-    bool tryLock() noexcept;
-
-    //! unlock the QXK priority-ceiling mutex QP::QXMutex
-    //!
-    //! @description
-    //! Unlock the QXK priority ceiling mutex.
-    //!
-    //! @note
-    //! This function **can** be called from both basic threads (active
-    //! objects) and extended threads.
-    //!
-    //! @note
-    //! The mutex locks are allowed to nest, meaning that the same extended
-    //! thread can lock the same mutex multiple times (< 255). However, each
-    //! call to QXMutex::lock() or a *successful* call to QXMutex::tryLock()
-    //! must be balanced by the matching call to QXMutex::unlock().
-    //!
-    //! @usage
-    //! @include qxk_mutex.cpp
-    //!
-    void unlock() noexcept;
-}; // class QXMutex
-
-} // namespace QP
-//$enddecl${QXK::QXMutex} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$declare${QXK::QXSemaphore} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-
-//${QXK::QXSemaphore} ........................................................
+//${QXK::QP::QXSemaphore} ....................................................
 //! Counting Semaphore of the QXK preemptive kernel
 //!
 //! @description
@@ -693,55 +521,175 @@ public:
     bool signal() noexcept;
 }; // class QXSemaphore
 
-} // namespace QP
-//$enddecl${QXK::QXSemaphore} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$declare${QXK::QXK_Timeouts} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
+//${QXK::QP::QXMutex} ........................................................
+//! Priority Ceiling Mutex the QXK preemptive kernel
+//!
+//! @description
+//! QP::QXMutex is a blocking mutual exclusion mechanism that can also apply
+//! the **priority ceiling protocol** to avoid unbounded priority inversion
+//! (if initialized with a non-zero ceiling priority, see QP::QXMutex::init()).
+//! In that case, QP::QXMutex requires its own uinque QP priority level, which
+//! cannot be used by any thread or any other QP::QXMutex.
+//! If initialzied with zero ceiling priority, QP::QXMutex does **not** use
+//! the priority ceiling protocol and does not require a unique QP priority
+//! (see QP::QXMutex::init()).
+//! QP::QXMutex is **recursive** (reentrant), which means that it can be
+//! locked mutiliple times (up to 255 levels) by the *same* thread without
+//! causing deadlock.
+//! QP::QXMutex is primarily intended for the @ref QP::QXThread
+//! "extened (blocking) threads", but can also be used by the @ref QP::QActive
+//! "basic threads" through the non-blocking QP::QXMutex::tryLock() API.
+//!
+//! @note
+//! QP::QXMutex should be used in situations when at least one of the extended
+//! threads contending for the mutex blocks while holding the mutex (between
+//! the QP::QXMutex::lock() and QP::QXMutex::unlock() operations). If no
+//! blocking is needed while holding the mutex, the more efficient
+//! non-blocking mechanism of @ref QP::QXK::schedLock() "selective QXK
+//! scheduler locking" should be used instead. @ref QP::QXK::schedLock()
+//! "Selective scheduler locking" is available for both @ref QP::QActive
+//! "basic threads" and @ref QP::QXThread "extended threads", so it is
+//! applicable to situations where resources are shared among all
+//! these threads.
+//!
+//! @usage
+//! The following example illustrates how to instantiate and use the mutex
+//! in your application.
+//! @include qxk_mutex.cpp
+//!
+class QXMutex {
+private:
 
-//${QXK::QXK_Timeouts} .......................................................
-//! timeout signals for extended threads
-enum QXK_Timeouts : std::uint8_t {
-    QXK_DELAY_SIG = Q_USER_SIG,
-    QXK_QUEUE_SIG,
-    QXK_SEMA_SIG
-};
+    //! set of extended-threads waiting on this mutex
+    QPSet m_waitSet;
 
-} // namespace QP
-//$enddecl${QXK::QXK_Timeouts} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    //! lock-nesting up-down counter
+    std::uint8_t volatile m_lockNest;
 
-//============================================================================
-extern "C" {
-//$declare${QXK-extern-C} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    //! prio of the lock holder thread
+    std::uint8_t volatile m_holderPrio;
 
-//${QXK-extern-C::QXK_Attr} ..................................................
-//! attributes of the QXK kernel (extern "C" for easy access in assembly)
-class QXK_Attr {
+    //! prioirty ceiling of this mutex
+    std::uint8_t m_ceiling;
+
 public:
 
-    //! currently executing thread
-    QP::QActive * volatile curr;
+    //! initialize the QXK priority-ceiling mutex QP::QXMutex
+    //!
+    //! @description
+    //! Initialize the QXK priority ceiling mutex.
+    //!
+    //! @param[in]  ceiling    the ceiling-priotity of this mutex or zero.
+    //!
+    //! @note
+    //! `ceiling == 0` means that the priority-ceiling protocol shall **not**
+    //! be used by this mutex. Such mutex will **not** change (boost) the
+    //! priority of the holding thread.
+    //!
+    //! @note
+    //! `ceiling > 0` means that the priority-ceiling protocol shall be used
+    //! by this mutex. Such mutex __will__ boost the priority of the holding
+    //! thread to the `ceiling` level for as long as the thread holds this
+    //! mutex.
+    //!
+    //! @attention
+    //! When the priority-ceiling protocol is used (`ceiling > 0`), the
+    //! `ceiling` priority must be unused by any other thread or mutex.
+    //! Also, the `ceiling` priority must be higher than priority of any
+    //! thread that uses this mutex.
+    //!
+    //! @usage
+    //! @include qxk_mutex.cpp
+    void init(std::uint_fast8_t const ceiling) noexcept;
 
-    //! next thread to execute
-    QP::QActive * volatile next;
+    //! lock the QXK priority-ceiling mutex QP::QXMutex
+    //!
+    //! @description
+    //! Lock the QXK priority ceiling mutex QP::QXMutex.
+    //!
+    //! @param[in]  nTicks    number of clock ticks (at the associated rate)
+    //!                       to wait for the semaphore. The value of
+    //!                       #QXTHREAD_NO_TIMEOUT indicates that no timeout
+    //!                       will occur and the semaphore will wait
+    //!                       indefinitely.
+    //! @returns
+    //! 'true' if the mutex has been acquired and 'false' if a timeout
+    //! occurred.
+    //!
+    //! @note
+    //! The mutex locks are allowed to nest, meaning that the same extended
+    //! thread can lock the same mutex multiple times (< 255). However,
+    //! each call to QXMutex::lock() must be balanced by the matching call to
+    //! QXMutex::unlock().
+    //!
+    //! @usage
+    //! @include qxk_mutex.cpp
+    bool lock(std::uint_fast16_t const nTicks = QXTHREAD_NO_TIMEOUT) noexcept;
 
-    //! prio of the active AO (basic thread)
-    std::uint8_t volatile actPrio;
+    //! try to lock the QXK priority-ceiling mutex QP::QXMutex
+    //!
+    //! @description
+    //! Try to lock the QXK priority ceiling mutex QP::QXMutex.
+    //!
+    //! @returns
+    //! 'true' if the mutex was successfully locked and 'false' if the mutex
+    //! was unavailable and was NOT locked.
+    //!
+    //! @note
+    //! This function **can** be called from both basic threads (active
+    //! objects) and extended threads.
+    //!
+    //! @note
+    //! The mutex locks are allowed to nest, meaning that the same extended
+    //! thread can lock the same mutex multiple times (< 255). However, each
+    //! successful call to QXMutex::tryLock() must be balanced by the
+    //! matching call to QXMutex::unlock().
+    bool tryLock() noexcept;
 
-    //! lock prio (0 == no-lock)
-    std::uint8_t volatile lockPrio;
+    //! unlock the QXK priority-ceiling mutex QP::QXMutex
+    //!
+    //! @description
+    //! Unlock the QXK priority ceiling mutex.
+    //!
+    //! @note
+    //! This function **can** be called from both basic threads (active
+    //! objects) and extended threads.
+    //!
+    //! @note
+    //! The mutex locks are allowed to nest, meaning that the same extended
+    //! thread can lock the same mutex multiple times (< 255). However, each
+    //! call to QXMutex::lock() or a *successful* call to QXMutex::tryLock()
+    //! must be balanced by the matching call to QXMutex::unlock().
+    //!
+    //! @usage
+    //! @include qxk_mutex.cpp
+    void unlock() noexcept;
+}; // class QXMutex
 
-    //! prio of the lock holder
-    std::uint8_t volatile lockHolder;
+} // namespace QP
+//$enddecl${QXK::QP} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    //! pointer to the QXK idle thread (basic thread)
-    QP::QActive * idleThread;
-}; // class QXK_Attr
+//============================================================================
+// Global namespace
+extern "C" {
+//$declare${QXK::glob} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-//${QXK-extern-C::QXK_attr_} .................................................
+//${QXK::glob::QXK_Attr} .....................................................
+//! attributes of the QXK kernel (extern "C" for easy access in assembly)
+struct QXK_Attr {
+    QP::QActive * volatile curr;      //!< currently executing thread
+    QP::QActive * volatile next;      //!< next thread to execute
+    std::uint8_t volatile actPrio;    //!< prio of the active AO (basic)
+    std::uint8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
+    std::uint8_t volatile lockHolder; //!< prio of the lock holder
+    QP::QActive * idleThread;  //!< pointer to the idle thread (basic)
+};
+
+//${QXK::glob::QXK_attr_} ....................................................
 //! attributes of the QXK kernel (extern "C" to be accessible from C)
 extern QXK_Attr QXK_attr_;
 
-//${QXK-extern-C::QXK_sched_} ................................................
+//${QXK::glob::QXK_sched_} ...................................................
 //! QXK scheduler finds the highest-priority thread ready to run
 //!
 //! @description
@@ -757,7 +705,7 @@ extern QXK_Attr QXK_attr_;
 //!
 std::uint_fast8_t QXK_sched_() noexcept;
 
-//${QXK-extern-C::QXK_activate_} .............................................
+//${QXK::glob::QXK_activate_} ................................................
 //! QXK activator activates the next active object. The activated AO preempts
 //! the currently executing AOs
 //!
@@ -771,7 +719,7 @@ std::uint_fast8_t QXK_sched_() noexcept;
 //!
 void QXK_activate_() noexcept;
 
-//${QXK-extern-C::QXK_onContextSw} ...........................................
+//${QXK::glob::QXK_onContextSw} ..............................................
 #ifdef QXK_ON_CONTEXT_SW
 //! QXK context switch callback (customized in BSPs for QXK)
 //!
@@ -798,11 +746,11 @@ void QXK_onContextSw(
     QP::QActive * next) ;
 #endif // def QXK_ON_CONTEXT_SW
 
-//${QXK-extern-C::QXK_current} ...............................................
+//${QXK::glob::QXK_current} ..................................................
 //! return the currently executing active-object/thread
 QP::QActive * QXK_current() noexcept;
 
-//${QXK-extern-C::QXK_stackInit_} ............................................
+//${QXK::glob::QXK_stackInit_} ...............................................
 //! initialize the private stack of a given AO
 void QXK_stackInit_(
     void * thr,
@@ -810,7 +758,7 @@ void QXK_stackInit_(
     void * const stkSto,
     std::uint_fast16_t const stkSize) noexcept;
 
-//${QXK-extern-C::QXK_threadExit_} ...........................................
+//${QXK::glob::QXK_threadExit_} ..............................................
 //! called when a thread function exits
 //!
 //! @description
@@ -824,7 +772,7 @@ void QXK_stackInit_(
 //!
 void QXK_threadExit_() ;
 
-//${QXK-extern-C::QXTHREAD_CAST_} ............................................
+//${QXK::glob::QXTHREAD_CAST_} ...............................................
 //! internal macro to encapsulate casting of pointers for MISRA deviations
 //!
 //! @description
@@ -839,7 +787,7 @@ void QXK_threadExit_() ;
 //!
 #define QXTHREAD_CAST_(ptr_) (static_cast<QP::QXThread *>(ptr_))
 
-//${QXK-extern-C::QXK_PTR_CAST_} .............................................
+//${QXK::glob::QXK_PTR_CAST_} ................................................
 //! internal macro to encapsulate casting of pointers for MISRA deviations
 //!
 //! @description
@@ -852,67 +800,86 @@ void QXK_threadExit_() ;
 //! disable the warnings for this particular case.
 //!
 #define QXK_PTR_CAST_(type_, ptr_) (reinterpret_cast<type_>(ptr_))
-//$enddecl${QXK-extern-C} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddecl${QXK::glob} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 } // extern "C"
 
 //============================================================================
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
+// QK implementation...
+//$declare${QXK::impl} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-    #ifndef QXK_ISR_CONTEXT_
-        //! Internal port-specific macro that reports the execution context
-        // (ISR vs. thread).
-        //! @returns true if the code executes in the ISR context and false
-        //! otherwise
-        #define QXK_ISR_CONTEXT_()  (QF_intNest_ != 0U)
-    #endif // QXK_ISR_CONTEXT_
+//${QXK::impl::QXK_ISR_CONTEXT_} .............................................
+#ifndef QXK_ISR_CONTEXT_
+//! Internal port-specific macro that checks the execution context
+//! (ISR vs. thread). Might be overridden in qxk_port.hpp.
+//!
+//! @returns
+//! 'true' if the code executes in the ISR context and 'false' otherwise.
+#define QXK_ISR_CONTEXT_() (QF_intNest_ != 0U)
+#endif // ndef QXK_ISR_CONTEXT_
 
-    // QXK-specific scheduler locking
-    //! Internal macro to represent the scheduler lock status
-    // that needs to be preserved to allow nesting of locks.
-    //
-    #define QF_SCHED_STAT_ QSchedStatus lockStat_;
+//${QXK::impl::QF_SCHED_STAT_} ...............................................
+//! QXK scheduler lock status
+#define QF_SCHED_STAT_ QSchedStatus lockStat_;
 
-    //! Internal macro for selective scheduler locking.
-    #define QF_SCHED_LOCK_(prio_) do {           \
-        if (QXK_ISR_CONTEXT_()) {                \
-            lockStat_ = 0xFFU;                   \
-        } else {                                 \
-            lockStat_ = QXK::schedLock((prio_)); \
-        }                                        \
-    } while (false)
+//${QXK::impl::QF_SCHED_LOCK_} ...............................................
+//! QXK selective scheduler locking
+#define QF_SCHED_LOCK_(prio_) do { \
+    if (QXK_ISR_CONTEXT_()) { \
+        lockStat_ = 0xFFU; \
+    } else { \
+        lockStat_ = QXK::schedLock((prio_)); \
+    } \
+} while (false)
 
-    //! Internal macro for selective scheduler unlocking.
-    #define QF_SCHED_UNLOCK_() do {      \
-        if (lockStat_ != 0xFFU) {        \
-            QXK::schedUnlock(lockStat_); \
-        }                                \
-    } while (false)
+//${QXK::impl::QF_SCHED_UNLOCK_} .............................................
+//! QXK selective scheduler unlocking
+#define QF_SCHED_UNLOCK_() do { \
+    if (lockStat_ != 0xFFU) { \
+        QXK::schedUnlock(lockStat_); \
+    } \
+} while (false)
 
-    // QXK-specific native event queue operations...
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
+//${QXK::impl::QACTIVE_EQUEUE_WAIT_} .........................................
+// QXK native event queue waiting
+#define QACTIVE_EQUEUE_WAIT_(me_) \
+   Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
 
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) do {                   \
-        QF::readySet_.insert(                                  \
-            static_cast<std::uint_fast8_t>((me_)->m_dynPrio)); \
-        if (!QXK_ISR_CONTEXT_()) {                             \
-            if (QXK_sched_() != 0U) {                          \
-                QXK_activate_();                               \
-            }                                                  \
-        }                                                      \
-    } while (false)
+//${QXK::impl::QACTIVE_EQUEUE_SIGNAL_} .......................................
+// QXK native event queue signalling
+#define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
+    QF::readySet_.insert( \
+        static_cast<std::uint_fast8_t>((me_)->m_dynPrio)); \
+    if (!QXK_ISR_CONTEXT_()) { \
+        if (QXK_sched_() != 0U) { \
+            QXK_activate_(); \
+        } \
+    } \
+} while (false)
+//$enddecl${QXK::impl} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    // QXK-specific native QF event pool operations...
-    #define QF_EPOOL_TYPE_  QMPool
-    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-        (p_).init((poolSto_), (poolSize_), (evtSize_))
-    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
-    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
+// Native QF event pool operations...
+//$declare${QF::QF-epool} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
+//${QF::QF-epool::QF_EPOOL_TYPE_} ............................................
+#define QF_EPOOL_TYPE_ QMPool
+
+//${QF::QF-epool::QF_EPOOL_INIT_} ............................................
+#define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+    (p_).init((poolSto_), (poolSize_), (evtSize_))
+
+//${QF::QF-epool::QF_EPOOL_EVENT_SIZE_} ......................................
+#define QF_EPOOL_EVENT_SIZE_(p_) ((p_).getBlockSize())
+
+//${QF::QF-epool::QF_EPOOL_GET_} .............................................
+#define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+    ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+
+//${QF::QF-epool::QF_EPOOL_PUT_} .............................................
+#define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
+//$enddecl${QF::QF-epool} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #endif // QP_IMPL
 
-#endif // QK_HPP
+#endif // QXK_HPP

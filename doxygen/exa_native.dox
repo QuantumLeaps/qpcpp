@@ -277,9 +277,9 @@ The DPP example is located in the directory <span class="img folder">qpcpp/examp
   +-examples/              // QP/C++ examples directory (applications)
   | +-arm-cm/              // QP/C++ examples for ARM Cortex-M
   | | +-dpp_ek-tm4c123gxl/ // DPP example on the EK-TM4C123GLX board
-  | | | +-lint/            // PC-Lint version (static analysis of the application code)
+  | | | +-lint-plus/       // PC-Lint-Plus version (static analysis of the application code)
   | | | | +-lin.bat        // batch file for running the PC-Lint
-  | | | | +-options.lnt    // PC-Lint options file for the DPP application code
+  | | | | +-options.lnt    // PC-Lint options file for the application code
   | | | +-qk/              // QK version
   | | | | +-armclang/      // ARM-KEIL with arm-clang (compiler 6)
   | | | | | +-dpp-qk.uvprojx // uVision project
@@ -372,7 +372,7 @@ The DPP example is located in the directory <span class="img folder">qpcpp/examp
   +-examples/              // QP/C++ examples directory (application)
   | +-arm-cm/              // QP/C++ examples for ARM Cortex-M
   | | +-dpp_efm32-slstk3401a/ // DPP example on the EK-TM4C123GLX board
-  | | | +-lint/            // PC-Lint version (static analysis of the application code)
+  | | | +-lint-plus/       // PC-Lint-Plus version (static analysis of the application code)
   | | | | +-lin.bat        // batch file for running the PC-Lint
   | | | | +-options.lnt    // PC-Lint options file for the DPP application code
   | | | +-qk/              // QK version

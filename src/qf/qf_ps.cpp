@@ -66,23 +66,23 @@ Q_DEFINE_THIS_MODULE("qf_ps")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QActive::subscrList_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QActive::subscrList_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 QSubscrList * QActive::subscrList_;
 
 } // namespace QP
-//$enddef${QF::QActive::subscrList_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::maxPubSignal_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::subscrList_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::maxPubSignal_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 enum_t QActive::maxPubSignal_;
 
 } // namespace QP
-//$enddef${QF::QActive::maxPubSignal_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QActive::maxPubSignal_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QActive::psInit} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QActive::psInit} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::psInit} .....................................................
+//${QF::QP::QActive::psInit} .................................................
 void QActive::psInit(
     QSubscrList * const subscrSto,
     enum_t const maxSignal) noexcept
@@ -97,11 +97,11 @@ void QActive::psInit(
 }
 
 } // namespace QP
-//$enddef${QF::QActive::psInit} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::publish_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::psInit} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::publish_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::publish_} ...................................................
+//${QF::QP::QActive::publish_} ...............................................
 void QActive::publish_(
     QEvt const * const e,
     void const * const sender,
@@ -171,11 +171,11 @@ void QActive::publish_(
 }
 
 } // namespace QP
-//$enddef${QF::QActive::publish_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::subscribe} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::publish_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::subscribe} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::subscribe} ..................................................
+//${QF::QP::QActive::subscribe} ..............................................
 void QActive::subscribe(enum_t const sig) const noexcept {
     std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
 
@@ -198,11 +198,11 @@ void QActive::subscribe(enum_t const sig) const noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QActive::subscribe} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::unsubscribe} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::subscribe} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::unsubscribe} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::unsubscribe} ................................................
+//${QF::QP::QActive::unsubscribe} ............................................
 void QActive::unsubscribe(enum_t const sig) const noexcept {
     std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
 
@@ -228,11 +228,11 @@ void QActive::unsubscribe(enum_t const sig) const noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QActive::unsubscribe} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::unsubscribeAll} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::unsubscribe} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::unsubscribeAll} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::unsubscribeAll} .............................................
+//${QF::QP::QActive::unsubscribeAll} .........................................
 void QActive::unsubscribeAll() const noexcept {
     std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
 
@@ -260,4 +260,4 @@ void QActive::unsubscribeAll() const noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QActive::unsubscribeAll} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QActive::unsubscribeAll} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

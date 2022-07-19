@@ -65,10 +65,10 @@ Q_DEFINE_THIS_MODULE("qep_msm")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QEP::QMsm} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QEP::QP::QMsm} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QEP::QMsm} ...............................................................
+//${QEP::QP::QMsm} ...........................................................
 QMState const QMsm::msm_top_s  = {
     nullptr,
     nullptr,
@@ -78,7 +78,7 @@ QMState const QMsm::msm_top_s  = {
 };
 
 
-//${QEP::QMsm::init} .........................................................
+//${QEP::QP::QMsm::init} .....................................................
 void QMsm::init(
     void const * const e,
     std::uint_fast8_t const qs_id)
@@ -118,7 +118,7 @@ void QMsm::init(
     Q_UNUSED_PAR(qs_id); // when Q_SPY not defined
 }
 
-//${QEP::QMsm::dispatch} .....................................................
+//${QEP::QP::QMsm::dispatch} .................................................
 void QMsm::dispatch(
     QEvt const * const e,
     std::uint_fast8_t const qs_id)
@@ -288,7 +288,7 @@ void QMsm::dispatch(
     Q_UNUSED_PAR(qs_id); // when Q_SPY not defined
 }
 
-//${QEP::QMsm::isInState} ....................................................
+//${QEP::QP::QMsm::isInState} ................................................
 bool QMsm::isInState(QMState const * const st) const noexcept {
     bool inState = false; // assume that this MSM is not in 'state'
 
@@ -304,7 +304,7 @@ bool QMsm::isInState(QMState const * const st) const noexcept {
     return inState;
 }
 
-//${QEP::QMsm::childStateObj} ................................................
+//${QEP::QP::QMsm::childStateObj} ............................................
 QMState const * QMsm::childStateObj(QMState const * const parent) const noexcept {
     QMState const *child = m_state.obj;
     bool isFound = false; // start with the child not found
@@ -332,7 +332,7 @@ QMState const * QMsm::childStateObj(QMState const * const parent) const noexcept
     return child; // return the child
 }
 
-//${QEP::QMsm::execTatbl_} ...................................................
+//${QEP::QP::QMsm::execTatbl_} ...............................................
 QState QMsm::execTatbl_(
     QMTranActTable const * const tatbl,
     std::uint_fast8_t const qs_id)
@@ -397,7 +397,7 @@ QState QMsm::execTatbl_(
 
 }
 
-//${QEP::QMsm::exitToTranSource_} ............................................
+//${QEP::QP::QMsm::exitToTranSource_} ........................................
 void QMsm::exitToTranSource_(
     QMState const * s,
     QMState const * const ts,
@@ -428,7 +428,7 @@ void QMsm::exitToTranSource_(
     Q_UNUSED_PAR(qs_id); // when Q_SPY not defined
 }
 
-//${QEP::QMsm::enterHistory_} ................................................
+//${QEP::QP::QMsm::enterHistory_} ............................................
 QState QMsm::enterHistory_(
     QMState const * const hist,
     std::uint_fast8_t const qs_id)
@@ -486,4 +486,4 @@ QState QMsm::enterHistory_(
 }
 
 } // namespace QP
-//$enddef${QEP::QMsm} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QEP::QP::QMsm} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

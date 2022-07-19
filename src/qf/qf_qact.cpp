@@ -36,7 +36,7 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qf::qf_qact.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-15
+//! @date Last updated on: 2022-06-30
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -66,28 +66,28 @@ Q_DEFINE_THIS_MODULE("qf_act")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QActive::active_[QF_MAX_ACTIVE + 1U]} vvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QActive::active_[QF_MAX_ACTIVE + 1U]} vvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 QActive * QActive::active_[QF_MAX_ACTIVE + 1U];
 
 } // namespace QP
-//$enddef${QF::QActive::active_[QF_MAX_ACTIVE + 1U]} ^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QF::readySet_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::active_[QF_MAX_ACTIVE + 1U]} ^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QF::readySet_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::readySet_} .......................................................
+//${QF::QP::QF::readySet_} ...................................................
 QPSet readySet_;
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::readySet_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QF::readySet_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //============================================================================
-//$define${QF::QActive::QActive} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QActive::QActive} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::QActive} ....................................................
+//${QF::QP::QActive::QActive} ................................................
 QActive::QActive(QStateHandler const initial) noexcept
   : QHsm(initial),
     m_prio(0U)
@@ -106,11 +106,11 @@ QActive::QActive(QStateHandler const initial) noexcept
 }
 
 } // namespace QP
-//$enddef${QF::QActive::QActive} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::register_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::QActive} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::register_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::register_} ..................................................
+//${QF::QP::QActive::register_} ..............................................
 void QActive::register_() noexcept {
     std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
 
@@ -123,11 +123,11 @@ void QActive::register_() noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QActive::register_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::unregister_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::register_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::unregister_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::unregister_} ................................................
+//${QF::QP::QActive::unregister_} ............................................
 void QActive::unregister_() noexcept {
     std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
 
@@ -141,13 +141,13 @@ void QActive::unregister_() noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QActive::unregister_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QActive::unregister_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QF::bzero} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QF::bzero} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::bzero} ...........................................................
+//${QF::QP::QF::bzero} .......................................................
 void bzero(
     void * const start,
     std::uint_fast16_t const len) noexcept
@@ -161,18 +161,13 @@ void bzero(
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::bzero} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QF::bzero} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QPSet::QF_LOG2} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
 
-//============================================================================
-extern "C" {
-//$define${QF-extern-C} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
-//${QF-extern-C::QF_intNest_} ................................................
-std::uint8_t volatile QF_intNest_;
-
-//${QF-extern-C::QF_LOG2} ....................................................
+//${QF::QP::QPSet::QF_LOG2} ..................................................
 #ifndef QF_LOG2
-std::uint_fast8_t QF_LOG2(QP::QPSetBits x) noexcept {
+std::uint_fast8_t QPSet::QF_LOG2(QP::QPSetBits x) const noexcept {
     static std::uint8_t const log2LUT[16] = {
         0U, 1U, 2U, 2U, 3U, 3U, 3U, 3U,
         4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U
@@ -200,8 +195,18 @@ std::uint_fast8_t QF_LOG2(QP::QPSetBits x) noexcept {
         x = t;
     }
     return n + log2LUT[x];
-
 }
+
 #endif // ndef QF_LOG2
-//$enddef${QF-extern-C} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+} // namespace QP
+//$enddef${QF::QP::QPSet::QF_LOG2} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+//============================================================================
+extern "C" {
+//$define${QF::QF_intNest_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+//${QF::QF_intNest_} .........................................................
+std::uint_fast8_t QF_intNest_;
+//$enddef${QF::QF_intNest_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 } // extern "C"

@@ -56,7 +56,7 @@
 
 // protection against including this source file in a wrong project
 #ifndef QXK_HPP
-    #error "Source file included in a project NOT based on the QXK kernel"
+#error "Source file included in a project NOT based on the QXK kernel"
 #endif // QXK_HPP
 
 //============================================================================
@@ -75,6 +75,7 @@ static QXKIdleThread l_idleThread;
 } // unnamed namespace
 
 //============================================================================
+extern "C" {
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 // Check for the minimum required QP version
 #if (QP_VERSION < 690U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
@@ -82,207 +83,12 @@ static QXKIdleThread l_idleThread;
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QXK::QXK} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-namespace QXK {
+//$define${QXK::glob} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-//${QXK::QXK::schedLock} .....................................................
-QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept {
-    QF_CRIT_STAT_
-    QF_CRIT_E_();
-
-    //! @pre The QXK scheduler lock:
-    //! - cannot be called from an ISR;
-    Q_REQUIRE_ID(400, !QXK_ISR_CONTEXT_());
-
-    // first store the previous lock prio if below the ceiling
-    QSchedStatus stat;
-    if (static_cast<std::uint_fast8_t>(QXK_attr_.lockPrio) < ceiling) {
-        stat = (static_cast<QSchedStatus>(QXK_attr_.lockPrio) << 8U);
-        QXK_attr_.lockPrio = static_cast<std::uint8_t>(ceiling);
-
-        QS_BEGIN_NOCRIT_PRE_(QS_SCHED_LOCK, 0U)
-            QS_TIME_PRE_(); // timestamp
-            // the previous lock prio & new lock prio
-            QS_2U8_PRE_(stat, QXK_attr_.lockPrio);
-        QS_END_NOCRIT_PRE_()
-
-        // add the previous lock holder priority
-        stat |= static_cast<QSchedStatus>(QXK_attr_.lockHolder);
-        QXK_attr_.lockHolder = (QXK_attr_.curr != nullptr)
-                               ? QXK_attr_.curr->m_prio
-                               : 0U;
-    }
-    else {
-       stat = 0xFFU;
-    }
-    QF_CRIT_X_();
-
-    return stat; // return the status to be saved in a stack variable
-}
-
-//${QXK::QXK::schedUnlock} ...................................................
-void schedUnlock(QSchedStatus const stat) noexcept {
-    // has the scheduler been actually locked by the last QXK_schedLock()?
-    if (stat != 0xFFU) {
-        std::uint_fast8_t const prevPrio
-            = static_cast<std::uint_fast8_t>(stat >> 8U);
-        std::uint_fast8_t const lockPrio
-            = static_cast<std::uint_fast8_t>(QXK_attr_.lockPrio);
-        Q_UNUSED_PAR(lockPrio); // unused if Q_NASSERT is defined
-
-        QF_CRIT_STAT_
-        QF_CRIT_E_();
-
-        //! @pre The scheduler cannot be unlocked:
-        //! - from the ISR context; and
-        //! - the current lock priority must be greater than the previous
-        Q_REQUIRE_ID(500, (!QXK_ISR_CONTEXT_())
-                          && (lockPrio > prevPrio));
-
-        QS_BEGIN_NOCRIT_PRE_(QS_SCHED_UNLOCK, 0U)
-            QS_TIME_PRE_(); // timestamp
-            // prio before unlocking & prio after unlocking
-            QS_2U8_PRE_(lockPrio, prevPrio);
-        QS_END_NOCRIT_PRE_()
-
-        // restore the previous lock priority and lock holder
-        QXK_attr_.lockPrio   = static_cast<std::uint8_t>(prevPrio);
-        QXK_attr_.lockHolder = static_cast<std::uint8_t>(stat & 0xFFU);
-
-        // find the highest-prio thread ready to run
-        if (QXK_sched_() != 0U) { // priority found?
-            QXK_activate_(); // activate any unlocked basic threads
-        }
-
-        QF_CRIT_X_();
-    }
-}
-
-} // namespace QXK
-} // namespace QP
-//$enddef${QXK::QXK} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QXK::QF} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-namespace QF {
-
-//${QXK::QF::init} ...........................................................
-void init() {
-    QF_maxPool_ = 0U;
-    QActive::subscrList_   = nullptr;
-    QActive::maxPubSignal_ = 0;
-
-    bzero(&QTimeEvt::timeEvtHead_[0], sizeof(QTimeEvt::timeEvtHead_));
-    bzero(&QActive::active_[0], sizeof(QActive::active_));
-    bzero(&QF::readySet_, sizeof(QF::readySet_));
-    bzero(&QXK_attr_, sizeof(QXK_attr_));
-    bzero(&l_idleThread, sizeof(l_idleThread));
-
-    // setup the QXK scheduler as initially locked and not running
-    QXK_attr_.lockPrio = QF_MAX_ACTIVE + 1U;
-
-    // setup the QXK idle loop...
-    QActive::active_[0] = &l_idleThread; // register the idle thread
-    QXK_attr_.idleThread = &l_idleThread; // save the idle thread ptr
-    QXK_attr_.actPrio = l_idleThread.m_prio; // set the base priority
-
-    #ifdef QXK_INIT
-    QXK_INIT(); // port-specific initialization of the QXK kernel
-    #endif
-}
-
-//${QXK::QF::stop} ...........................................................
-void stop() {
-    onCleanup();  // cleanup callback
-    // nothing else to do for the QXK preemptive kernel
-}
-
-//${QXK::QF::run} ............................................................
-int_t run() {
-    QF_INT_DISABLE();
-    QXK_attr_.lockPrio = 0U; // unlock the scheduler
-
-    // any active objects need to be scheduled before starting event loop?
-    if (QXK_sched_() != 0U) {
-        QXK_activate_(); // process all events produced so far
-    }
-
-    onStartup(); // application-specific startup callback
-
-    // produce the QS_QF_RUN trace record
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, 0U)
-    QS_END_NOCRIT_PRE_()
-
-    QF_INT_ENABLE();
-
-    // the QXK idle loop...
-    for (;;) {
-        QXK::onIdle(); // application-specific QXK idle callback
-    }
-
-    #ifdef __GNUC__  // GNU compiler?
-    return 0;
-    #endif
-}
-
-} // namespace QF
-} // namespace QP
-//$enddef${QXK::QF} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QXK::QActive} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-
-//${QXK::QActive} ............................................................
-
-//${QXK::QActive::start} .....................................................
-void QActive::start(
-    std::uint_fast8_t const prio,
-    QEvt const * * const qSto,
-    std::uint_fast16_t const qLen,
-    void * const stkSto,
-    std::uint_fast16_t const stkSize,
-    void const * const par)
-{
-    //! @pre AO cannot be started:
-    //! - from an ISR;
-    //! - the priority must be in range;
-    //! - the stack storage must NOT be provided (because the QXK kernel does
-    //! not need per-AO stacks).
-    Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
-        && (0U < prio) && (prio <= QF_MAX_ACTIVE)
-        && (stkSto == nullptr)
-        && (stkSize == 0U));
-
-    m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
-    m_osObject  = nullptr; // no private stack for AO
-    m_prio      = static_cast<std::uint8_t>(prio); // prio of the AO
-    m_dynPrio   = static_cast<std::uint8_t>(prio); // dynamic prio of the AO
-    register_();  // make QF aware of this AO
-
-    this->init(par, m_prio); // take the top-most initial tran. (virtual)
-    QS_FLUSH(); // flush the trace buffer to the host
-
-    // see if this AO needs to be scheduled in case QXK is running
-    QF_CRIT_STAT_
-    QF_CRIT_E_();
-    if (QXK_sched_() != 0U) { // activation needed?
-        QXK_activate_();
-    }
-    QF_CRIT_X_();
-}
-
-} // namespace QP
-//$enddef${QXK::QActive} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-//============================================================================
-extern "C" {
-//$define${QXK-extern-C} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
-//${QXK-extern-C::QXK_Attr} ..................................................
-
-//${QXK-extern-C::QXK_attr_} .................................................
+//${QXK::glob::QXK_attr_} ....................................................
 QXK_Attr QXK_attr_;
 
-//${QXK-extern-C::QXK_sched_} ................................................
+//${QXK::glob::QXK_sched_} ...................................................
 std::uint_fast8_t QXK_sched_() noexcept {
     // find the highest-prio thread ready to run
     std::uint_fast8_t p = QP::QF::readySet_.findMax();
@@ -351,7 +157,7 @@ std::uint_fast8_t QXK_sched_() noexcept {
     return p;
 }
 
-//${QXK-extern-C::QXK_activate_} .............................................
+//${QXK::glob::QXK_activate_} ................................................
 void QXK_activate_() noexcept {
     std::uint_fast8_t const pin =
         static_cast<std::uint_fast8_t>(QXK_attr_.actPrio);
@@ -485,7 +291,7 @@ void QXK_activate_() noexcept {
     #endif // QXK_ON_CONTEXT_SW || Q_SPY
 }
 
-//${QXK-extern-C::QXK_current} ...............................................
+//${QXK::glob::QXK_current} ..................................................
 QP::QActive * QXK_current() noexcept {
     //! @pre the QXK kernel must be running
     Q_REQUIRE_ID(800, QXK_attr_.lockPrio <= QF_MAX_ACTIVE);
@@ -505,7 +311,7 @@ QP::QActive * QXK_current() noexcept {
     return curr;
 }
 
-//${QXK-extern-C::QXK_threadExit_} ...........................................
+//${QXK::glob::QXK_threadExit_} ..............................................
 void QXK_threadExit_() {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -529,5 +335,193 @@ void QXK_threadExit_() {
     static_cast<void>(QXK_sched_());
     QF_CRIT_X_();
 }
-//$enddef${QXK-extern-C} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QXK::glob} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 } // extern "C"
+
+//============================================================================
+//$define${QXK::QP::QXK} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+namespace QXK {
+
+//${QXK::QP::QXK::schedLock} .................................................
+QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept {
+    QF_CRIT_STAT_
+    QF_CRIT_E_();
+
+    //! @pre The QXK scheduler lock:
+    //! - cannot be called from an ISR;
+    Q_REQUIRE_ID(400, !QXK_ISR_CONTEXT_());
+
+    // first store the previous lock prio if below the ceiling
+    QSchedStatus stat;
+    if (static_cast<std::uint_fast8_t>(QXK_attr_.lockPrio) < ceiling) {
+        stat = (static_cast<QSchedStatus>(QXK_attr_.lockPrio) << 8U);
+        QXK_attr_.lockPrio = static_cast<std::uint8_t>(ceiling);
+
+        QS_BEGIN_NOCRIT_PRE_(QS_SCHED_LOCK, 0U)
+            QS_TIME_PRE_(); // timestamp
+            // the previous lock prio & new lock prio
+            QS_2U8_PRE_(stat, QXK_attr_.lockPrio);
+        QS_END_NOCRIT_PRE_()
+
+        // add the previous lock holder priority
+        stat |= static_cast<QSchedStatus>(QXK_attr_.lockHolder);
+        QXK_attr_.lockHolder = (QXK_attr_.curr != nullptr)
+                               ? QXK_attr_.curr->m_prio
+                               : 0U;
+    }
+    else {
+       stat = 0xFFU;
+    }
+    QF_CRIT_X_();
+
+    return stat; // return the status to be saved in a stack variable
+}
+
+//${QXK::QP::QXK::schedUnlock} ...............................................
+void schedUnlock(QSchedStatus const stat) noexcept {
+    // has the scheduler been actually locked by the last QXK_schedLock()?
+    if (stat != 0xFFU) {
+        std::uint_fast8_t const prevPrio
+            = static_cast<std::uint_fast8_t>(stat >> 8U);
+        std::uint_fast8_t const lockPrio
+            = static_cast<std::uint_fast8_t>(QXK_attr_.lockPrio);
+        Q_UNUSED_PAR(lockPrio); // unused if Q_NASSERT is defined
+
+        QF_CRIT_STAT_
+        QF_CRIT_E_();
+
+        //! @pre The scheduler cannot be unlocked:
+        //! - from the ISR context; and
+        //! - the current lock priority must be greater than the previous
+        Q_REQUIRE_ID(500, (!QXK_ISR_CONTEXT_())
+                          && (lockPrio > prevPrio));
+
+        QS_BEGIN_NOCRIT_PRE_(QS_SCHED_UNLOCK, 0U)
+            QS_TIME_PRE_(); // timestamp
+            // prio before unlocking & prio after unlocking
+            QS_2U8_PRE_(lockPrio, prevPrio);
+        QS_END_NOCRIT_PRE_()
+
+        // restore the previous lock priority and lock holder
+        QXK_attr_.lockPrio   = static_cast<std::uint8_t>(prevPrio);
+        QXK_attr_.lockHolder = static_cast<std::uint8_t>(stat & 0xFFU);
+
+        // find the highest-prio thread ready to run
+        if (QXK_sched_() != 0U) { // priority found?
+            QXK_activate_(); // activate any unlocked basic threads
+        }
+
+        QF_CRIT_X_();
+    }
+}
+
+} // namespace QXK
+} // namespace QP
+//$enddef${QXK::QP::QXK} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QXK::QP-port} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+
+//${QXK::QP-port::QActive} ...................................................
+
+//${QXK::QP-port::QActive::start} ............................................
+void QActive::start(
+    std::uint_fast8_t const prio,
+    QEvt const * * const qSto,
+    std::uint_fast16_t const qLen,
+    void * const stkSto,
+    std::uint_fast16_t const stkSize,
+    void const * const par)
+{
+    //! @pre AO cannot be started:
+    //! - from an ISR;
+    //! - the priority must be in range;
+    //! - the stack storage must NOT be provided (because the QXK kernel does
+    //! not need per-AO stacks).
+    Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
+        && (0U < prio) && (prio <= QF_MAX_ACTIVE)
+        && (stkSto == nullptr)
+        && (stkSize == 0U));
+
+    m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
+    m_osObject  = nullptr; // no private stack for AO
+    m_prio      = static_cast<std::uint8_t>(prio); // prio of the AO
+    m_dynPrio   = static_cast<std::uint8_t>(prio); // dynamic prio of the AO
+    register_();  // make QF aware of this AO
+
+    this->init(par, m_prio); // take the top-most initial tran. (virtual)
+    QS_FLUSH(); // flush the trace buffer to the host
+
+    // see if this AO needs to be scheduled in case QXK is running
+    QF_CRIT_STAT_
+    QF_CRIT_E_();
+    if (QXK_sched_() != 0U) { // activation needed?
+        QXK_activate_();
+    }
+    QF_CRIT_X_();
+}
+namespace QF {
+
+//${QXK::QP-port::QF::init} ..................................................
+void init() {
+    QF_maxPool_ = 0U;
+    QActive::subscrList_   = nullptr;
+    QActive::maxPubSignal_ = 0;
+
+    bzero(&QTimeEvt::timeEvtHead_[0], sizeof(QTimeEvt::timeEvtHead_));
+    bzero(&QActive::active_[0], sizeof(QActive::active_));
+    bzero(&QF::readySet_, sizeof(QF::readySet_));
+    bzero(&QXK_attr_, sizeof(QXK_attr_));
+    bzero(&l_idleThread, sizeof(l_idleThread));
+
+    // setup the QXK scheduler as initially locked and not running
+    QXK_attr_.lockPrio = QF_MAX_ACTIVE + 1U;
+
+    // setup the QXK idle loop...
+    QActive::active_[0] = &l_idleThread; // register the idle thread
+    QXK_attr_.idleThread = &l_idleThread; // save the idle thread ptr
+    QXK_attr_.actPrio = l_idleThread.m_prio; // set the base priority
+
+    #ifdef QXK_INIT
+    QXK_INIT(); // port-specific initialization of the QXK kernel
+    #endif
+}
+
+//${QXK::QP-port::QF::stop} ..................................................
+void stop() {
+    onCleanup();  // cleanup callback
+    // nothing else to do for the QXK preemptive kernel
+}
+
+//${QXK::QP-port::QF::run} ...................................................
+int_t run() {
+    QF_INT_DISABLE();
+    QXK_attr_.lockPrio = 0U; // unlock the scheduler
+
+    // any active objects need to be scheduled before starting event loop?
+    if (QXK_sched_() != 0U) {
+        QXK_activate_(); // process all events produced so far
+    }
+
+    onStartup(); // application-specific startup callback
+
+    // produce the QS_QF_RUN trace record
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, 0U)
+    QS_END_NOCRIT_PRE_()
+
+    QF_INT_ENABLE();
+
+    // the QXK idle loop...
+    for (;;) {
+        QXK::onIdle(); // application-specific QXK idle callback
+    }
+
+    #ifdef __GNUC__  // GNU compiler?
+    return 0;
+    #endif
+}
+
+} // namespace QF
+
+} // namespace QP
+//$enddef${QXK::QP-port} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

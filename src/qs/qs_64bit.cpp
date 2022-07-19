@@ -53,11 +53,11 @@
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QS::QStx-64bit} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QS::QP::QS-tx-64bit} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QS {
 
-//${QS::QStx-64bit::u64_raw_} ................................................
+//${QS::QP::QS-tx-64bit::u64_raw_} ...........................................
 void u64_raw_(std::uint64_t d) noexcept {
     std::uint8_t chksum_ = priv_.chksum;
     std::uint8_t * const buf_ = priv_.buf;
@@ -75,7 +75,7 @@ void u64_raw_(std::uint64_t d) noexcept {
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//${QS::QStx-64bit::u64_fmt_} ................................................
+//${QS::QP::QS-tx-64bit::u64_fmt_} ...........................................
 void u64_fmt_(
     std::uint8_t format,
     std::uint64_t d) noexcept
@@ -100,4 +100,4 @@ void u64_fmt_(
 
 } // namespace QS
 } // namespace QP
-//$enddef${QS::QStx-64bit} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QS::QP::QS-tx-64bit} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

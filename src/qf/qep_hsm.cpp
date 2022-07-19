@@ -119,18 +119,18 @@ static QP::QEvt const QEP_reservedEvt_[4] {
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QEP::QHsm} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QEP::QP::QHsm} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QEP::QHsm} ...............................................................
+//${QEP::QP::QHsm} ...........................................................
 
-//${QEP::QHsm::QHsm} .........................................................
+//${QEP::QP::QHsm::QHsm} .....................................................
 QHsm::QHsm(QStateHandler const initial) noexcept{
     m_state.fun = Q_STATE_CAST(&top);
     m_temp.fun  = initial;
 }
 
-//${QEP::QHsm::init} .........................................................
+//${QEP::QP::QHsm::init} .....................................................
 void QHsm::init(
     void const * const e,
     std::uint_fast8_t const qs_id)
@@ -203,7 +203,7 @@ void QHsm::init(
     m_temp.fun  = t; // mark the configuration as stable
 }
 
-//${QEP::QHsm::dispatch} .....................................................
+//${QEP::QP::QHsm::dispatch} .................................................
 void QHsm::dispatch(
     QEvt const * const e,
     std::uint_fast8_t const qs_id)
@@ -363,7 +363,7 @@ void QHsm::dispatch(
     m_temp.fun  = t; // mark the configuration as stable
 }
 
-//${QEP::QHsm::top} ..........................................................
+//${QEP::QP::QHsm::top} ......................................................
 QState QHsm::top(
     void * const me,
     QEvt const * const e) noexcept
@@ -373,7 +373,7 @@ QState QHsm::top(
     return Q_RET_IGNORED; // the top state ignores all events
 }
 
-//${QEP::QHsm::isIn} .........................................................
+//${QEP::QP::QHsm::isIn} .....................................................
 bool QHsm::isIn(QStateHandler const s) noexcept {
     //! @pre state configuration must be stable
     Q_REQUIRE_ID(600, m_temp.fun == m_state.fun);
@@ -397,7 +397,7 @@ bool QHsm::isIn(QStateHandler const s) noexcept {
     return inState; // return the status
 }
 
-//${QEP::QHsm::childState} ...................................................
+//${QEP::QP::QHsm::childState} ...............................................
 QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
     QStateHandler child = m_state.fun; // start with the current state
     bool isFound = false; // start with the child not found
@@ -428,7 +428,7 @@ QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
     return child; // return the child
 }
 
-//${QEP::QHsm::hsm_tran} .....................................................
+//${QEP::QP::QHsm::hsm_tran} .................................................
 std::int_fast8_t QHsm::hsm_tran(
     QStateHandler (&path)[MAX_NEST_DEPTH_],
     std::uint_fast8_t const qs_id)
@@ -561,4 +561,4 @@ std::int_fast8_t QHsm::hsm_tran(
 }
 
 } // namespace QP
-//$enddef${QEP::QHsm} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QEP::QP::QHsm} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

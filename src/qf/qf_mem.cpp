@@ -65,12 +65,12 @@ Q_DEFINE_THIS_MODULE("qf_mem")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QMPool} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP-pool::QMPool} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QMPool} ..............................................................
+//${QF::QP-pool::QMPool} .....................................................
 
-//${QF::QMPool::QMPool} ......................................................
+//${QF::QP-pool::QMPool::QMPool} .............................................
 QMPool::QMPool()
   : m_start(nullptr),
     m_end(nullptr),
@@ -81,7 +81,7 @@ QMPool::QMPool()
     m_nMin(0U)
 {}
 
-//${QF::QMPool::init} ........................................................
+//${QF::QP-pool::QMPool::init} ...............................................
 void QMPool::init(
     void * const poolSto,
     std::uint_fast32_t poolSize,
@@ -138,7 +138,7 @@ void QMPool::init(
     m_end      = fb;      // the last block in this pool
 }
 
-//${QF::QMPool::get} .........................................................
+//${QF::QP-pool::QMPool::get} ................................................
 void * QMPool::get(
     std::uint_fast16_t const margin,
     std::uint_fast8_t const qs_id) noexcept
@@ -207,7 +207,7 @@ void * QMPool::get(
 
 }
 
-//${QF::QMPool::put} .........................................................
+//${QF::QP-pool::QMPool::put} ................................................
 void QMPool::put(
     void * const b,
     std::uint_fast8_t const qs_id) noexcept
@@ -235,18 +235,18 @@ void QMPool::put(
     QF_CRIT_X_();
 }
 
-//${QF::QMPool::getBlockSize} ................................................
+//${QF::QP-pool::QMPool::getBlockSize} .......................................
 QMPoolSize QMPool::getBlockSize() const noexcept {
     return m_blockSize;
 }
 
 } // namespace QP
-//$enddef${QF::QMPool} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QF::getPoolMin} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP-pool::QMPool} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QF::getPoolMin} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::getPoolMin} ......................................................
+//${QF::QP::QF::getPoolMin} ..................................................
 std::uint_fast16_t getPoolMin(std::uint_fast8_t const poolId) noexcept {
     //! @pre the poolId must be in range
     Q_REQUIRE_ID(400, (QF_maxPool_ <= QF_MAX_EPOOL)
@@ -262,4 +262,4 @@ std::uint_fast16_t getPoolMin(std::uint_fast8_t const poolId) noexcept {
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::getPoolMin} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QF::getPoolMin} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -40,7 +40,7 @@
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
-//! @brief QF/C++ stub for QUTEST unit testing
+//! @brief QUTest unit testing harness + QF/++ stub for QUTest
 
 // only build when Q_UTEST is defined
 #ifdef Q_UTEST
@@ -54,11 +54,11 @@
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-
 Q_DEFINE_THIS_MODULE("qutest")
-
 } // unnamed namespace
 
+//===========================================================================
+// QUTest unit testing harness
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 // Check for the minimum required QP version
 #if (QP_VERSION < 690U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
@@ -70,14 +70,10 @@ Q_DEFINE_THIS_MODULE("qutest")
 namespace QP {
 namespace QS {
 
-//${QS::QUTest::TProbe} ......................................................
-
-//${QS::QUTest::TestData} ....................................................
-
-//${QS::QUTest::testData} ....................................................
+//${QS::QUTest::QS::testData} ................................................
 TestData testData;
 
-//${QS::QUTest::processTestEvts_} ............................................
+//${QS::QUTest::QS::processTestEvts_} ........................................
 void processTestEvts_() {
     QS_TEST_PROBE_DEF(&QS::processTestEvts_)
 
@@ -104,14 +100,14 @@ void processTestEvts_() {
     }
 }
 
-//${QS::QUTest::test_pause_} .................................................
+//${QS::QUTest::QS::test_pause_} .............................................
 void test_pause_() {
     beginRec_(static_cast<std::uint_fast8_t>(QP::QS_TEST_PAUSED));
     endRec_();
     onTestLoop();
 }
 
-//${QS::QUTest::getTestProbe_} ...............................................
+//${QS::QUTest::QS::getTestProbe_} ...........................................
 std::uint32_t getTestProbe_(QP::QSpyFunPtr const api) noexcept {
     std::uint32_t data = 0U;
     for (std::uint8_t i = 0U; i < testData.tpNum; ++i) {
@@ -141,8 +137,221 @@ std::uint32_t getTestProbe_(QP::QSpyFunPtr const api) noexcept {
 }
 
 } // namespace QS
+
+//${QS::QUTest::QHsmDummy} ...................................................
+
+//${QS::QUTest::QHsmDummy::QHsmDummy} ........................................
+QHsmDummy::QHsmDummy()
+: QHsm(nullptr)
+{}
+
+//${QS::QUTest::QHsmDummy::init} .............................................
+void QHsmDummy::init(
+    void const * const e,
+    std::uint_fast8_t const qs_id)
+{
+    Q_UNUSED_PAR(e);
+
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QEP_STATE_INIT, qs_id)
+        QS_OBJ_PRE_(this);        // this state machine object
+        QS_FUN_PRE_(m_state.fun); // the source state
+        QS_FUN_PRE_(m_temp.fun);  // the target of the initial transition
+    QS_END_PRE_()
+}
+
+//${QS::QUTest::QHsmDummy::init} .............................................
+void QHsmDummy::init(std::uint_fast8_t const qs_id) {
+    QHsmDummy::init(nullptr, qs_id);
+}
+
+//${QS::QUTest::QHsmDummy::dispatch} .........................................
+void QHsmDummy::dispatch(
+    QEvt const * const e,
+    std::uint_fast8_t const qs_id)
+{
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QEP_DISPATCH, qs_id)
+        QS_TIME_PRE_();           // time stamp
+        QS_SIG_PRE_(e->sig);      // the signal of the event
+        QS_OBJ_PRE_(this);        // this state machine object
+        QS_FUN_PRE_(m_state.fun); // the current state
+    QS_END_PRE_()
+}
+
+//${QS::QUTest::QActiveDummy} ................................................
+
+//${QS::QUTest::QActiveDummy::QActiveDummy} ..................................
+QActiveDummy::QActiveDummy()
+: QActive(nullptr)
+{}
+
+//${QS::QUTest::QActiveDummy::start} .........................................
+void QActiveDummy::start(
+    std::uint_fast8_t const prio,
+    QEvt const * * const qSto,
+    std::uint_fast16_t const qLen,
+    void * const stkSto,
+    std::uint_fast16_t const stkSize,
+    void const * const par)
+{
+    // No special preconditions for checking parameters to allow starting
+    // dummy AOs the exact same way as the real counterparts.
+    static_cast<void>(qSto);    // unusuded parameter
+    static_cast<void>(qLen);    // unusuded parameter
+    static_cast<void>(stkSto);  // unusuded parameter
+    static_cast<void>(stkSize); // unusuded parameter
+
+    m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
+
+    register_(); // make QF aware of this AO
+
+    QActiveDummy::init(par, m_prio); // take the top-most initial tran.
+    //QS_FLUSH();
+}
+
+//${QS::QUTest::QActiveDummy::init} ..........................................
+void QActiveDummy::init(
+    void const * const e,
+    std::uint_fast8_t const qs_id)
+{
+    Q_UNUSED_PAR(e);
+    Q_UNUSED_PAR(qs_id);
+
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QEP_STATE_INIT, m_prio)
+        QS_OBJ_PRE_(this);        // this state machine object
+        QS_FUN_PRE_(m_state.fun); // the source state
+        QS_FUN_PRE_(m_temp.fun);  // the target of the initial transition
+    QS_END_PRE_()
+}
+
+//${QS::QUTest::QActiveDummy::init} ..........................................
+void QActiveDummy::init(std::uint_fast8_t const qs_id) {
+    QActiveDummy::init(nullptr, qs_id);
+}
+
+//${QS::QUTest::QActiveDummy::dispatch} ......................................
+void QActiveDummy::dispatch(
+    QEvt const * const e,
+    std::uint_fast8_t const qs_id)
+{
+    Q_UNUSED_PAR(qs_id);
+
+    QS_CRIT_STAT_
+    QS_BEGIN_PRE_(QS_QEP_DISPATCH, m_prio)
+        QS_TIME_PRE_();           // time stamp
+        QS_SIG_PRE_(e->sig);      // the signal of the event
+        QS_OBJ_PRE_(this);        // this state machine object
+        QS_FUN_PRE_(m_state.fun); // the current state
+    QS_END_PRE_()
+}
+
+//${QS::QUTest::QActiveDummy::post_} .........................................
+bool QActiveDummy::post_(
+    QEvt const * const e,
+    std::uint_fast16_t const margin,
+    void const * const sender) noexcept
+{
+    QS_TEST_PROBE_DEF(&QActive::post_)
+
+    // test-probe#1 for faking queue overflow
+    bool status = true;
+    QS_TEST_PROBE_ID(1,
+        status = false;
+        if (margin == QF_NO_MARGIN) {
+            // fake assertion Mod=qf_actq,Loc=110
+            Q_onAssert("qf_actq", 110);
+        }
+    )
+
+    QF_CRIT_STAT_
+    QF_CRIT_E_();
+
+    // is it a dynamic event?
+    if (e->poolId_ != 0U) {
+        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    }
+
+    std::uint_fast8_t const rec =
+        (status ? static_cast<std::uint8_t>(QS_QF_ACTIVE_POST)
+                : static_cast<std::uint8_t>(QS_QF_ACTIVE_POST_ATTEMPT));
+    QS_BEGIN_NOCRIT_PRE_(rec, m_prio)
+        QS_TIME_PRE_();      // timestamp
+        QS_OBJ_PRE_(sender); // the sender object
+        QS_SIG_PRE_(e->sig); // the signal of the event
+        QS_OBJ_PRE_(this);   // this active object
+        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
+        QS_EQC_PRE_(0U);     // number of free entries
+        QS_EQC_PRE_(margin); // margin requested
+    QS_END_NOCRIT_PRE_()
+
+    // callback to examine the posted event under the same conditions
+    // as producing the #QS_QF_ACTIVE_POST trace record, which are:
+    // the local filter for this AO ('me->prio') is set
+    //
+    if ((QS::priv_.locFilter[m_prio >> 3U]
+         & (1U << (m_prio & 7U))) != 0U)
+    {
+        QS::onTestPost(sender, this, e, status);
+    }
+
+    QF_CRIT_X_();
+
+    // recycle the event immediately, because it was not really posted
+    QF::gc(e);
+
+    return status;
+}
+
+//${QS::QUTest::QActiveDummy::postLIFO} ......................................
+void QActiveDummy::postLIFO(QEvt const * const e) noexcept {
+    QS_TEST_PROBE_DEF(&QActive::postLIFO)
+
+    // test-probe#1 for faking queue overflow
+    QS_TEST_PROBE_ID(1,
+        // fake assertion Mod=qf_actq,Loc=210
+        Q_onAssert("qf_actq", 210);
+    )
+
+    QF_CRIT_STAT_
+    QF_CRIT_E_();
+
+    // is it a dynamic event?
+    if (e->poolId_ != 0U) {
+        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    }
+
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
+        QS_TIME_PRE_();      // timestamp
+        QS_SIG_PRE_(e->sig); // the signal of this event
+        QS_OBJ_PRE_(this);   // this active object
+        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
+        QS_EQC_PRE_(0U); // number of free entries
+        QS_EQC_PRE_(0U); // min number of free entries
+    QS_END_NOCRIT_PRE_()
+
+    // callback to examine the posted event under the same conditions
+    // as producing the #QS_QF_ACTIVE_POST trace record, which are:
+    // the local filter for this AO ('me->prio') is set
+    //
+    if ((QS::priv_.locFilter[m_prio >> 3U]
+         & (1U << (m_prio & 7U))) != 0U)
+    {
+        QS::onTestPost(nullptr, this, e, true);
+    }
+
+    QF_CRIT_X_();
+
+    // recycle the event immediately, because it was not really posted
+    QF::gc(e);
+}
+
 } // namespace QP
 //$enddef${QS::QUTest} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+//===========================================================================
+// QF/++ stub for QUTest
 //$define${QS::QUTest-stub} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
@@ -344,215 +553,6 @@ void QTimeEvt::tick1_(
     QF_CRIT_X_();
 }
 
-//${QS::QUTest-stub::QHsmDummy} ..............................................
-
-//${QS::QUTest-stub::QHsmDummy::QHsmDummy} ...................................
-QHsmDummy::QHsmDummy()
-: QHsm(nullptr)
-{}
-
-//${QS::QUTest-stub::QHsmDummy::init} ........................................
-void QHsmDummy::init(
-    void const * const e,
-    std::uint_fast8_t const qs_id)
-{
-    Q_UNUSED_PAR(e);
-
-    QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QEP_STATE_INIT, qs_id)
-        QS_OBJ_PRE_(this);        // this state machine object
-        QS_FUN_PRE_(m_state.fun); // the source state
-        QS_FUN_PRE_(m_temp.fun);  // the target of the initial transition
-    QS_END_PRE_()
-}
-
-//${QS::QUTest-stub::QHsmDummy::init} ........................................
-void QHsmDummy::init(std::uint_fast8_t const qs_id) {
-    QHsmDummy::init(nullptr, qs_id);
-}
-
-//${QS::QUTest-stub::QHsmDummy::dispatch} ....................................
-void QHsmDummy::dispatch(
-    QEvt const * const e,
-    std::uint_fast8_t const qs_id)
-{
-    QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QEP_DISPATCH, qs_id)
-        QS_TIME_PRE_();           // time stamp
-        QS_SIG_PRE_(e->sig);      // the signal of the event
-        QS_OBJ_PRE_(this);        // this state machine object
-        QS_FUN_PRE_(m_state.fun); // the current state
-    QS_END_PRE_()
-}
-
-//${QS::QUTest-stub::QActiveDummy} ...........................................
-
-//${QS::QUTest-stub::QActiveDummy::QActiveDummy} .............................
-QActiveDummy::QActiveDummy()
-: QActive(nullptr)
-{}
-
-//${QS::QUTest-stub::QActiveDummy::start} ....................................
-void QActiveDummy::start(
-    std::uint_fast8_t const prio,
-    QEvt const * * const qSto,
-    std::uint_fast16_t const qLen,
-    void * const stkSto,
-    std::uint_fast16_t const stkSize,
-    void const * const par)
-{
-    // No special preconditions for checking parameters to allow starting
-    // dummy AOs the exact same way as the real counterparts.
-    static_cast<void>(qSto);    // unusuded parameter
-    static_cast<void>(qLen);    // unusuded parameter
-    static_cast<void>(stkSto);  // unusuded parameter
-    static_cast<void>(stkSize); // unusuded parameter
-
-    m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
-
-    register_(); // make QF aware of this AO
-
-    QActiveDummy::init(par, m_prio); // take the top-most initial tran.
-    //QS_FLUSH();
-}
-
-//${QS::QUTest-stub::QActiveDummy::init} .....................................
-void QActiveDummy::init(
-    void const * const e,
-    std::uint_fast8_t const qs_id)
-{
-    Q_UNUSED_PAR(e);
-    Q_UNUSED_PAR(qs_id);
-
-    QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QEP_STATE_INIT, m_prio)
-        QS_OBJ_PRE_(this);        // this state machine object
-        QS_FUN_PRE_(m_state.fun); // the source state
-        QS_FUN_PRE_(m_temp.fun);  // the target of the initial transition
-    QS_END_PRE_()
-}
-
-//${QS::QUTest-stub::QActiveDummy::init} .....................................
-void QActiveDummy::init(std::uint_fast8_t const qs_id) {
-    QActiveDummy::init(nullptr, qs_id);
-}
-
-//${QS::QUTest-stub::QActiveDummy::dispatch} .................................
-void QActiveDummy::dispatch(
-    QEvt const * const e,
-    std::uint_fast8_t const qs_id)
-{
-    Q_UNUSED_PAR(qs_id);
-
-    QS_CRIT_STAT_
-    QS_BEGIN_PRE_(QS_QEP_DISPATCH, m_prio)
-        QS_TIME_PRE_();           // time stamp
-        QS_SIG_PRE_(e->sig);      // the signal of the event
-        QS_OBJ_PRE_(this);        // this state machine object
-        QS_FUN_PRE_(m_state.fun); // the current state
-    QS_END_PRE_()
-}
-
-//${QS::QUTest-stub::QActiveDummy::post_} ....................................
-bool QActiveDummy::post_(
-    QEvt const * const e,
-    std::uint_fast16_t const margin,
-    void const * const sender) noexcept
-{
-    QS_TEST_PROBE_DEF(&QActive::post_)
-
-    // test-probe#1 for faking queue overflow
-    bool status = true;
-    QS_TEST_PROBE_ID(1,
-        status = false;
-        if (margin == QF_NO_MARGIN) {
-            // fake assertion Mod=qf_actq,Loc=110
-            Q_onAssert("qf_actq", 110);
-        }
-    )
-
-    QF_CRIT_STAT_
-    QF_CRIT_E_();
-
-    // is it a dynamic event?
-    if (e->poolId_ != 0U) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-    }
-
-    std::uint_fast8_t const rec =
-        (status ? static_cast<std::uint8_t>(QS_QF_ACTIVE_POST)
-                : static_cast<std::uint8_t>(QS_QF_ACTIVE_POST_ATTEMPT));
-    QS_BEGIN_NOCRIT_PRE_(rec, m_prio)
-        QS_TIME_PRE_();      // timestamp
-        QS_OBJ_PRE_(sender); // the sender object
-        QS_SIG_PRE_(e->sig); // the signal of the event
-        QS_OBJ_PRE_(this);   // this active object
-        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-        QS_EQC_PRE_(0U);     // number of free entries
-        QS_EQC_PRE_(margin); // margin requested
-    QS_END_NOCRIT_PRE_()
-
-    // callback to examine the posted event under the same conditions
-    // as producing the #QS_QF_ACTIVE_POST trace record, which are:
-    // the local filter for this AO ('me->prio') is set
-    //
-    if ((QS::priv_.locFilter[m_prio >> 3U]
-         & (1U << (m_prio & 7U))) != 0U)
-    {
-        QS::onTestPost(sender, this, e, status);
-    }
-
-    QF_CRIT_X_();
-
-    // recycle the event immediately, because it was not really posted
-    QF::gc(e);
-
-    return status;
-}
-
-//${QS::QUTest-stub::QActiveDummy::postLIFO} .................................
-void QActiveDummy::postLIFO(QEvt const * const e) noexcept {
-    QS_TEST_PROBE_DEF(&QActive::postLIFO)
-
-    // test-probe#1 for faking queue overflow
-    QS_TEST_PROBE_ID(1,
-        // fake assertion Mod=qf_actq,Loc=210
-        Q_onAssert("qf_actq", 210);
-    )
-
-    QF_CRIT_STAT_
-    QF_CRIT_E_();
-
-    // is it a dynamic event?
-    if (e->poolId_ != 0U) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
-    }
-
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
-        QS_TIME_PRE_();      // timestamp
-        QS_SIG_PRE_(e->sig); // the signal of this event
-        QS_OBJ_PRE_(this);   // this active object
-        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-        QS_EQC_PRE_(0U); // number of free entries
-        QS_EQC_PRE_(0U); // min number of free entries
-    QS_END_NOCRIT_PRE_()
-
-    // callback to examine the posted event under the same conditions
-    // as producing the #QS_QF_ACTIVE_POST trace record, which are:
-    // the local filter for this AO ('me->prio') is set
-    //
-    if ((QS::priv_.locFilter[m_prio >> 3U]
-         & (1U << (m_prio & 7U))) != 0U)
-    {
-        QS::onTestPost(nullptr, this, e, true);
-    }
-
-    QF_CRIT_X_();
-
-    // recycle the event immediately, because it was not really posted
-    QF::gc(e);
-}
-
 } // namespace QP
 //$enddef${QS::QUTest-stub} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -566,9 +566,9 @@ Q_NORETURN Q_onAssert(char const * const module, int_t const location) {
         QS_STR_PRE_((module != nullptr) ? module : "?");
     QS_END_NOCRIT_PRE_()
 
-    QP::QS::onFlush(); // flush the assertion record to the host
+    QP::QS::onFlush();    // flush the assertion record to the host
     QP::QS::onTestLoop(); // loop to wait for commands (typically reset)
-    QP::QS::onReset(); // in case the QUTEST loop ever returns, reset manually
+    QP::QS::onReset();    // in case the QUTest loop ever returns: reset
     for (;;) { // onReset() should not return, but to ensure no-return...
     }
 }

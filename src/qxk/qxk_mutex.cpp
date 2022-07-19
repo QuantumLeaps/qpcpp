@@ -55,14 +55,12 @@
 
 // protection against including this source file in a wrong project
 #ifndef QXK_HPP
-    #error "Source file included in a project NOT based on the QXK kernel"
+#error "Source file included in a project NOT based on the QXK kernel"
 #endif // QXK_HPP
 
 //============================================================================
 namespace { // unnamed local namespace
-
 Q_DEFINE_THIS_MODULE("qxk_mutex")
-
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -72,12 +70,12 @@ Q_DEFINE_THIS_MODULE("qxk_mutex")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QXK::QXMutex} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QXK::QP::QXMutex} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QXK::QXMutex} ............................................................
+//${QXK::QP::QXMutex} ........................................................
 
-//${QXK::QXMutex::init} ......................................................
+//${QXK::QP::QXMutex::init} ..................................................
 void QXMutex::init(std::uint_fast8_t const ceiling) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -103,7 +101,7 @@ void QXMutex::init(std::uint_fast8_t const ceiling) noexcept {
     QF_CRIT_X_();
 }
 
-//${QXK::QXMutex::lock} ......................................................
+//${QXK::QP::QXMutex::lock} ..................................................
 bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -214,7 +212,7 @@ bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
 
 }
 
-//${QXK::QXMutex::tryLock} ...................................................
+//${QXK::QP::QXMutex::tryLock} ...............................................
 bool QXMutex::tryLock() noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -285,7 +283,7 @@ bool QXMutex::tryLock() noexcept {
     return curr != nullptr;
 }
 
-//${QXK::QXMutex::unlock} ....................................................
+//${QXK::QP::QXMutex::unlock} ................................................
 void QXMutex::unlock() noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -401,4 +399,4 @@ void QXMutex::unlock() noexcept {
 }
 
 } // namespace QP
-//$enddef${QXK::QXMutex} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QXK::QP::QXMutex} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

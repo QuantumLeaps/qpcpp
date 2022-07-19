@@ -45,63 +45,85 @@
 #ifndef QV_HPP
 #define QV_HPP
 
-#include "qequeue.hpp" // QV kernel uses the native QF event queue
-#include "qmpool.hpp"  // QV kernel uses the native QF memory pool
-
 //============================================================================
 // QF configuration for QK
 
 // QV event-queue used for AOs
 #define QF_EQUEUE_TYPE  QEQueue
 
-//$declare${QV::QV} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+#include "qequeue.hpp" // QV kernel uses the native QF event queue
+#include "qmpool.hpp"  // QV kernel uses the native QF memory pool
+#include "qf.hpp"      // QF framework integrates directly with QV
+
+//$declare${QV::QP::QV} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QV {
 
-//${QV::QV::onIdle} ..........................................................
+//${QV::QP::QV::onIdle} ......................................................
 //! QV idle callback (customized in BSPs for QV)
 //!
-//! @description
-//! QV::onIdle() must be called with interrupts DISABLED because
-//! the determination of the idle condition (no events in the
-//! queues) can change at any time by an interrupt posting events
-//! to a queue. QV::onIdle() MUST enable interrupts internally,
-//! perhaps at the same time as putting the CPU into a power-saving
-//! mode.
-//!
-//! @sa
-//! QK::onIdle(), QXK::onIdle()
+//! @attention
+//! QV::onIdle() must be called with interrupts DISABLED because the
+//! determination of the idle condition (no events in the queues) can
+//! change at any time by an interrupt posting events to a queue.
+//! QV::onIdle() MUST enable interrupts internally, ideally **atomically**
+//! with putting the CPU into a power-saving mode.
 void onIdle() ;
 
 } // namespace QV
 } // namespace QP
-//$enddecl${QV::QV} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddecl${QV::QP::QV} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //============================================================================
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
+// QV-specific scheduler locking and event queue...
+//$declare${QV::impl} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-    // QV-specific scheduler locking (not needed in QV)
-    #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) (static_cast<void>(0))
-    #define QF_SCHED_UNLOCK_()    (static_cast<void>(0))
+//${QV::impl::QF_SCHED_STAT_} ................................................
+//! QV scheduler lock status (not needed in QV)
+#define QF_SCHED_STAT_
 
-    // QV-specific native event queue operations...
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QF::readySet_.insert(static_cast<std::uint_fast8_t>((me_)->m_prio)))
+//${QV::impl::QF_SCHED_LOCK_} ................................................
+//! QV scheduler locking (not needed in QV)
+#define QF_SCHED_LOCK_(dummy) (static_cast<void>(0))
 
-    // QV-specific native QF event pool operations...
-    #define QF_EPOOL_TYPE_  QMPool
-    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-        (p_).init((poolSto_), (poolSize_), (evtSize_))
-    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
-    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
+//${QV::impl::QF_SCHED_UNLOCK_} ..............................................
+//! QV scheduler unlocking (not needed in QV)
+#define QF_SCHED_UNLOCK_() (static_cast<void>(0))
 
+//${QV::impl::QACTIVE_EQUEUE_WAIT_} ..........................................
+//! QV native event queue waiting
+#define QACTIVE_EQUEUE_WAIT_(me_) \
+    Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
+
+//${QV::impl::QACTIVE_EQUEUE_SIGNAL_} ........................................
+//! QV native event queue signaling
+#define QACTIVE_EQUEUE_SIGNAL_(me_) \
+    (QF::readySet_.insert(static_cast<std::uint_fast8_t>((me_)->m_prio)))
+//$enddecl${QV::impl} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+// Native QF event pool operations...
+//$declare${QF::QF-epool} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+//${QF::QF-epool::QF_EPOOL_TYPE_} ............................................
+#define QF_EPOOL_TYPE_ QMPool
+
+//${QF::QF-epool::QF_EPOOL_INIT_} ............................................
+#define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+    (p_).init((poolSto_), (poolSize_), (evtSize_))
+
+//${QF::QF-epool::QF_EPOOL_EVENT_SIZE_} ......................................
+#define QF_EPOOL_EVENT_SIZE_(p_) ((p_).getBlockSize())
+
+//${QF::QF-epool::QF_EPOOL_GET_} .............................................
+#define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+    ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+
+//${QF::QF-epool::QF_EPOOL_PUT_} .............................................
+#define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
+//$enddecl${QF::QF-epool} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #endif // QP_IMPL
 
 #endif // QV_HPP

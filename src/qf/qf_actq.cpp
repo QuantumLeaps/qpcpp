@@ -42,10 +42,11 @@
 //! @file
 //! @brief QP::QActive native queue operations (based on QP::QEQueue)
 //!
-//! @note
-//! this source file is only included in the QF library when the native
-//! QF active object queue is used (instead of a message queue of an RTOS).
-//!
+//! @attention
+//! This qf_actq.cpp source file is only included in the build when the
+//! macro #QF_EQUEUE_TYPE is defined as QEQueue. This means that the QP
+//! port uses the QP::QEQueue for active objects and so this implementation
+//! applies to the QP port.
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -57,19 +58,6 @@
 #else
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
-
-//============================================================================
-// The following preprocessor "magic" is intended to check that this file
-// is included in the build only when the macro QF_EQUEUE_TYPE is defined
-// as QEQueue in qf_port.hpp.
-//
-#define CONCAT(x_,y_) x_ ## y_
-#define IS_USING(x_,y_) CONCAT(x_,y_)
-#define QEQueueQEQueue 1
-
-#if IS_USING(QF_EQUEUE_TYPE, QEQueue) != 1
-#error "The file qf_actq.cpp must be EXCLUDED from this QP port"
-#else
 
 //============================================================================
 // unnamed namespace for local definitions with internal linkage
@@ -84,10 +72,10 @@ Q_DEFINE_THIS_MODULE("qf_actq")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QActive::post_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QActive::post_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::post_} ......................................................
+//${QF::QP::QActive::post_} ..................................................
 bool QActive::post_(
     QEvt const * const e,
     std::uint_fast16_t const margin,
@@ -208,11 +196,11 @@ bool QActive::post_(
 }
 
 } // namespace QP
-//$enddef${QF::QActive::post_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::postLIFO} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::post_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::postLIFO} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::postLIFO} ...................................................
+//${QF::QP::QActive::postLIFO} ...............................................
 void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -278,11 +266,11 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QActive::postLIFO} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::get_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::postLIFO} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::get_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::get_} .......................................................
+//${QF::QP::QActive::get_} ...................................................
 QEvt const * QActive::get_() noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -330,13 +318,13 @@ QEvt const * QActive::get_() noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QActive::get_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QActive::get_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QF::getQueueMin} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QF::getQueueMin} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::getQueueMin} .....................................................
+//${QF::QP::QF::getQueueMin} .................................................
 std::uint_fast16_t getQueueMin(std::uint_fast8_t const prio) noexcept {
     Q_REQUIRE_ID(400, (prio <= QF_MAX_ACTIVE)
                       && (QActive::active_[prio] != nullptr));
@@ -351,15 +339,15 @@ std::uint_fast16_t getQueueMin(std::uint_fast8_t const prio) noexcept {
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::getQueueMin} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QF::getQueueMin} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //============================================================================
-//$define${QF::QTicker} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QTicker} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QTicker} .............................................................
+//${QF::QP::QTicker} .........................................................
 
-//${QF::QTicker::QTicker} ....................................................
+//${QF::QP::QTicker::QTicker} ................................................
 QTicker::QTicker(std::uint_fast8_t const tickRate) noexcept
 : QActive(nullptr)
 {
@@ -367,7 +355,7 @@ QTicker::QTicker(std::uint_fast8_t const tickRate) noexcept
     m_eQueue.m_head = static_cast<QEQueueCtr>(tickRate);
 }
 
-//${QF::QTicker::init} .......................................................
+//${QF::QP::QTicker::init} ...................................................
 void QTicker::init(
     void const * const e,
     std::uint_fast8_t const qs_id)
@@ -377,12 +365,12 @@ void QTicker::init(
     m_eQueue.m_tail = 0U;
 }
 
-//${QF::QTicker::init} .......................................................
+//${QF::QP::QTicker::init} ...................................................
 void QTicker::init(std::uint_fast8_t const qs_id) {
     QTicker::init(nullptr, qs_id);
 }
 
-//${QF::QTicker::dispatch} ...................................................
+//${QF::QP::QTicker::dispatch} ...............................................
 void QTicker::dispatch(
     QEvt const * const e,
     std::uint_fast8_t const qs_id)
@@ -402,7 +390,7 @@ void QTicker::dispatch(
     }
 }
 
-//${QF::QTicker::post_} ......................................................
+//${QF::QP::QTicker::post_} ..................................................
 bool QTicker::post_(
     QEvt const * const e,
     std::uint_fast16_t const margin,
@@ -447,6 +435,4 @@ bool QTicker::post_(
 }
 
 } // namespace QP
-//$enddef${QF::QTicker} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-#endif // IS_USING(QF_EQUEUE_TYPE, QEQueue)
+//$enddef${QF::QP::QTicker} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -34,7 +34,7 @@
 #define QF_MAX_TICK_RATE        2U
 
 // QF interrupt disable/enable and log2()...
-#if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1(v6-M, v6S-M)?
+#if (__ARM_ARCH == 6) // if ARMv6-M...
 
     // The maximum number of active objects in the application, see NOTE1
     #define QF_MAX_ACTIVE       16U
@@ -53,10 +53,10 @@
     // CMSIS threshold for "QF-aware" interrupts, see NOTE2 and NOTE4
     #define QF_AWARE_ISR_CMSIS_PRI 0
 
-    // hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
+    // hand-optimized LOG2 in assembly for ARMv6-M...
     #define QF_LOG2(n_) QF_qlog2(static_cast<std::uint32_t>(n_))
 
-#else // Cortex-M3/M4/M7
+#else // ARMv7-M or higher
 
     // The maximum number of active objects in the application, see NOTE1
     #define QF_MAX_ACTIVE       32U
@@ -91,16 +91,16 @@
     #define QF_LOG2(n_) (static_cast<std::uint_fast8_t>( \
         32 - __builtin_clz(static_cast<unsigned>(n_))))
 
-#endif
+#endif // ARMv7-M or higher
 
 #define QF_CRIT_EXIT_NOP()      __asm volatile ("isb")
 
 #include "qep_port.hpp" // QEP port
 
-#if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1(v6-M, v6S-M)?
+#if (__ARM_ARCH == 6) // if ARMv6-M...
     // hand-optimized quick LOG2 in assembly
     extern "C" uint_fast8_t QF_qlog2(uint32_t x);
-#endif // Cortex-M0/M0+/M1(v6-M, v6S-M)
+#endif // ARMv6-M
 
 #include "qxk_port.hpp" // QXK dual-mode kernel port
 

@@ -144,7 +144,6 @@ INPUT                  = main.dox \
                          ../../cert-pack/autosar.dox \
                          ../../cert-pack/tr.dox \
                          metrics.dox \
-                         dir.dox \
                          config.hpp \
                          ../include \
                          ../src
@@ -291,15 +290,15 @@ PREDEFINED             = Q_SPY \
                          Q_UTEST \
                          QK_ON_CONTEXT_SW \
                          QXK_ON_CONTEXT_SW \
-                         QF_MAX_ACTIVE=64U \
-                         QF_MAX_TICK_RATE=2U \
-                         QF_MAX_EPOOL=3U \
-                         QF_EVENT_SIZ_SIZE=2U \
-                         QF_EQUEUE_CTR_SIZE=2U \
-                         QF_MPOOL_SIZ_SIZE=2U \
-                         QF_MPOOL_CTR_SIZE=2U \
-                         QF_TIMEEVT_CTR_SIZE=4U \
+                         QF_MAX_ACTIVE=32 \
+                         QF_MAX_TICK_RATE=2 \
+                         QF_MAX_EPOOL=3 \
+                         QF_EVENT_SIZ_SIZE=2 \
+                         QF_EQUEUE_CTR_SIZE=2 \
+                         QF_MPOOL_SIZ_SIZE=2 \
+                         QF_MPOOL_CTR_SIZE=2 \
+                         QF_TIMEEVT_CTR_SIZE=4 \
                          QF_ACTIVE_STOP=0 \
-                         QS_TIME_SIZE=4U
+                         QS_TIME_SIZE=4
 EXPAND_AS_DEFINED      =
 SKIP_FUNCTION_MACROS   = YES

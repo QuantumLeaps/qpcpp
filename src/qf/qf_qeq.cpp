@@ -65,12 +65,12 @@ Q_DEFINE_THIS_MODULE("qf_qeq")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QEQueue} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP-queue::QEQueue} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QEQueue} .............................................................
+//${QF::QP-queue::QEQueue} ...................................................
 
-//${QF::QEQueue::QEQueue} ....................................................
+//${QF::QP-queue::QEQueue::QEQueue} ..........................................
 QEQueue::QEQueue() noexcept
   : m_frontEvt(nullptr),
     m_ring(nullptr),
@@ -81,7 +81,7 @@ QEQueue::QEQueue() noexcept
     m_nMin(0U)
 {}
 
-//${QF::QEQueue::init} .......................................................
+//${QF::QP-queue::QEQueue::init} .............................................
 void QEQueue::init(
     QEvt const * qSto[],
     std::uint_fast16_t const qLen) noexcept
@@ -97,7 +97,7 @@ void QEQueue::init(
     m_nMin     = m_nFree;
 }
 
-//${QF::QEQueue::post} .......................................................
+//${QF::QP-queue::QEQueue::post} .............................................
 bool QEQueue::post(
     QEvt const * const e,
     std::uint_fast16_t const margin,
@@ -175,7 +175,7 @@ bool QEQueue::post(
     return status;
 }
 
-//${QF::QEQueue::postLIFO} ...................................................
+//${QF::QP-queue::QEQueue::postLIFO} .........................................
 void QEQueue::postLIFO(
     QEvt const * const e,
     std::uint_fast8_t const qs_id) noexcept
@@ -223,7 +223,7 @@ void QEQueue::postLIFO(
     QF_CRIT_X_();
 }
 
-//${QF::QEQueue::get} ........................................................
+//${QF::QP-queue::QEQueue::get} ..............................................
 QEvt const * QEQueue::get(std::uint_fast8_t const qs_id) noexcept {
     Q_UNUSED_PAR(qs_id); // when Q_SPY not defined
 
@@ -272,4 +272,4 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qs_id) noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QEQueue} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP-queue::QEQueue} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

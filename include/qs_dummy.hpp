@@ -36,8 +36,8 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qs_dummy.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-02-20
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-07-15
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief Dummy definitions of the QS macros that avoid code generation from
@@ -47,7 +47,7 @@
 #define QS_DUMMY_HPP
 
 #ifdef Q_SPY
-    #error "Q_SPY must NOT be defined to include qs_dummy.hpp"
+#error "Q_SPY must NOT be defined to include qs_dummy.hpp"
 #endif
 
 #define QS_INIT(arg_)                   (true)
@@ -95,10 +95,11 @@
 #define QS_OUTPUT()                     static_cast<void>(0)
 #define QS_RX_INPUT()                   static_cast<void>(0)
 
-//$declare${QS::QSpyIdOffsets} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//============================================================================
+//$declare${QS::QP::QSpyIdOffsets} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QS::QSpyIdOffsets} .......................................................
+//${QS::QP::QSpyIdOffsets} ...................................................
 //! QS ID offsets for QS_LOC_FILTER()
 enum QSpyIdOffsets : std::int16_t {
     QS_AO_ID = 0,  //!< offset for AO priorities
@@ -108,11 +109,11 @@ enum QSpyIdOffsets : std::int16_t {
 };
 
 } // namespace QP
-//$enddecl${QS::QSpyIdOffsets} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$declare${QS::QSpyIdGroups} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddecl${QS::QP::QSpyIdOffsets} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$declare${QS::QP::QSpyIdGroups} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QS::QSpyIdGroups} ........................................................
+//${QS::QP::QSpyIdGroups} ....................................................
 //! QS ID groups for QS_LOC_FILTER()
 enum QSpyIdGroups : std::int16_t {
     QS_ALL_IDS = 0xF0,            //!< all QS IDs
@@ -123,28 +124,23 @@ enum QSpyIdGroups : std::int16_t {
 };
 
 } // namespace QP
-//$enddecl${QS::QSpyIdGroups} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$declare${QS::QSpyId} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddecl${QS::QP::QSpyIdGroups} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$declare${QS::QP::QSpyId} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QS::QSpyId} ..............................................................
+//${QS::QP::QSpyId} ..........................................................
 //! QS ID type for applying local filtering
-class QSpyId {
-public:
-
-    //! "priority" (qs_id) for the QS "local filter"
-    std::uint8_t m_prio;
-
-public:
+struct QSpyId {
+    std::uint8_t m_prio; //!< "priority" (qs_id) for the QS "local filter"
 
     //! get the "priority" (qs_id) from the QSpyId opbject
     std::uint_fast8_t getPrio() const noexcept {
         return static_cast<std::uint_fast8_t>(m_prio);
     }
-}; // class QSpyId
+};
 
 } // namespace QP
-//$enddecl${QS::QSpyId} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddecl${QS::QP::QSpyId} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //============================================================================
 // internal QS macros used only in the QP components

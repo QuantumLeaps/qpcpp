@@ -3,6 +3,7 @@
 
 //! The preprocessor switch to disable checking assertions
 //!
+//! @description
 //! When defined, Q_NASSERT disables the following macros #Q_ASSERT,
 //! #Q_REQUIRE, #Q_ENSURE, #Q_INVARIANT, #Q_ERROR as well as
 //! #Q_ASSERT_ID, #Q_REQUIRE_ID, #Q_ENSURE_ID, #Q_INVARIANT_ID, and
@@ -16,6 +17,7 @@
 
 //! The maximum number of active objects in the application.
 //!
+//! @description
 //! This macro *must* be defined in the QF port and should be in range
 //! of 1U..64U, inclusive. The value of this macro determines the maximum
 //! priority level of an active object in the system. Not all priority
@@ -30,6 +32,7 @@
 #define QF_MAX_ACTIVE              32U
 
 //! The maximum number of clock tick rates in the application.
+//!
 //! @description
 //! This macro can be defined in the QF ports and should be in range
 //! of 1U..15U, inclusive. The value of this macro determines the maximum
@@ -82,6 +85,7 @@
 
 //! The size (in bytes) of the ring-buffer counters used in the native
 //! QF event queue implementation. Valid values: 1U, 2U, or 4U; default 1U
+//!
 //! @description
 //! This macro can be defined in the QF ports to configure the QP::QEQueueCtr
 //! type. If the macro is not defined, the default of 1 byte will be chosen
@@ -103,6 +107,7 @@
 //! The size (in bytes) of the block-size representation in the
 //! native QF event pool. Valid values: 1U, 2U, or 4U; default 2U.
 //! #QF_EVENT_SIZ_SIZE.
+//!
 //! @description
 //! This macro can be defined in the QF ports to configure the QP::QMPoolSize
 //! type. If the macro is not defined, the default of #QF_EVENT_SIZ_SIZE
@@ -124,6 +129,7 @@
 
 //! The size (in bytes) of the block-counter representation in the
 //! native QF event pool. Valid values: 1U, 2U, or 4U; default 2U.
+//!
 //! @description
 //! This macro can be defined in the QF ports to configure the QP::QMPoolCtr
 //! type. If the macro is not defined, the default of 2 bytes will be chosen
@@ -143,6 +149,7 @@
 
 //! The size (in bytes) of the time event -counter representation
 //! in the QP::QTimeEvt class. Valid values: 1U, 2U, or 4U; default 2U.
+//!
 //! @description
 //! This macro can be defined in the QF ports to configure the internal tick
 //! counters of Time Events. If the macro is not defined, the default of 2
@@ -159,7 +166,15 @@
 //! this header file in all builds.
 #define QF_TIMEEVT_CTR_SIZE         2U
 
+//! Size (in bytes) of the QS time stamp
+//!
+//! @description
+//! This macro can be defined in the QS port file (qs_port.hpp) to configure
+//! the QP::QSTimeCtr type. Valid values 1U, 2U, 4U. Default 4U.
+#define QS_TIME_SIZE                4U
+
 //! Define the interrupt disabling policy.
+//!
 //! @description
 //! This macro encapsulates platform-specific way of disabling interrupts
 //! from C++ for a given CPU and compiler.
@@ -170,6 +185,7 @@
 #define QF_INT_DISABLE()            intDisable()
 
 //! Define the interrupt enabling policy.
+//!
 //! @description
 //! This macro encapsulates platform-specific way of enabling interrupts
 //! from "C" for a given CPU and compiler.
@@ -180,6 +196,7 @@
 #define QF_INT_ENABLE()             intEnable()
 
 //! Define the type of the critical section status.
+//!
 //! @description
 //! Defining this macro configures the "saving and restoring critical section
 //! status" policy. Conversely, if this macro is not defined, the simple
@@ -202,6 +219,7 @@
 #define QF_CRIT_ENTRY(stat_)        ((stat_) = critEntry())
 
 //! Define the critical section exit policy.
+//!
 //! @description
 //! This macro enters a critical section (often by means of disabling
 //! interrupts). When the "saving and restoring critical section status"
@@ -225,20 +243,33 @@
 //!
 #define QF_ACTIVE_STOP
 
-//! The preprocessor switch to activate the event-constructors
-//! and destructors
-//
-//! When Q_EVT_CTOR is defined (typically in the qep_port.hpp header file),
-//! QP::QEvt becomes a class with constructor and virtual destructor.
-//! More importantly, the subclasses of QEvt (your custom events) can have
-//! non-default constructors and destructors. These constructors are then
-//! called when events are created (e.g., with Q_NEW()) and the destructor
-//! is invoked before recycling the event with QP::QF::gc().
+//! The preprocessor switch to activate the constructor in QP::QEvt.
+//!
+//! @description
+//! When #Q_EVT_CTOR is defined (typically in the qep_port.hpp header file),
+//! QP::QEvt becomes a class with constructor. More importantly, the
+//! subclasses of QP::QEvt (custom events) can have non-default constructors.
+//! These constructors are then called when events are created (e.g.,
+//! with Q_NEW())
+//!
+//! @sa #Q_EVT_VIRTUAL
 #define Q_EVT_CTOR
+
+//! The preprocessor switch to activate the virtual destructor in QP::QEvt.
+//!
+//! @description
+//! This macro only works when #Q_EVT_CTOR is also defined. When also
+//! #Q_EVT_VIRTUAL is defined (typically in the qep_port.hpp header
+//! file), QP::QEvt becomes a class with a constructor and a virtual
+//! destructor. More importantly, the subclasses of QP::QEvt (custom events)
+//! can have (virtual) destructors. These destructors are then invoked
+//! before recycling the event with QP::QF::gc().
+#define Q_EVT_VIRTUAL
 
 //! The preprocessor switch to activate the QS software tracing
 //! instrumentation in the code
 //!
+//! @description
 //! When defined, Q_SPY activates the QS software tracing instrumentation.
 //! When Q_SPY is not defined, the QS instrumentation in the code does
 //! not generate any code.
@@ -272,7 +303,8 @@
 //! Platform-dependent macro defining how QF should block the calling
 //! task when the QF native queue is empty
 //!
-//! @note This is just an example of #QACTIVE_EQUEUE_WAIT_ for the QK-port
+//! @note
+//! This is just an example of #QACTIVE_EQUEUE_WAIT_ for the QK-port
 //! of QF. QK never activates a task that has no events to process, so in this
 //! case the macro asserts that the queue is not empty. In other QF ports you
 //! need to define the macro appropriately for the underlying kernel/OS you're
@@ -282,7 +314,8 @@
 
 //! Platform-dependent macro defining how QF should signal the
 //! active object task that an event has just arrived.
-//
+//!
+//! @description
 //! The macro is necessary only when the native QF event queue is used.
 //! The signaling of task involves unblocking the task if it is blocked.
 //!
@@ -305,7 +338,8 @@
 
 //! This macro defines the type of the event pool used in this QF port.
 //!
-//! @note This is a specific implementation for the QK-port of QF.
+//! @note
+//! This is a specific implementation for the QK-port of QF.
 //! In other QF ports you need to define the macro appropriately for
 //! the underlying kernel/OS you're using.
 #define QF_EPOOL_TYPE_              QMPool
@@ -320,7 +354,8 @@
 
 //! Platform-dependent macro defining the event pool initialization
 //!
-//! @note This is a specific implementation for the QK-port of QF.
+//! @note
+//! This is a specific implementation for the QK-port of QF.
 //! In other QF ports you need to define the macro appropriately for
 //! the underlying kernel/OS you're using.
 #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
@@ -329,7 +364,8 @@
 //! Platform-dependent macro defining how QF should obtain the
 //! event pool block-size
 //!
-//! @note This is a specific implementation for the QK-port of QF.
+//! @note
+//! This is a specific implementation for the QK-port of QF.
 //! In other QF ports you need to define the macro appropriately for
 //! the underlying kernel/OS you're using.
 #define QF_EPOOL_EVENT_SIZE_(p_) static_cast<uint32_t>((p_).getBlockSize())
@@ -337,7 +373,8 @@
 //! Platform-dependent macro defining how QF should obtain an event
 //! @a e_ from the event pool @a p_
 //!
-//! @note This is a specific implementation for the QK-port of QF.
+//! @note
+//! This is a specific implementation for the QK-port of QF.
 //! In other QF ports you need to define the macro appropriately for
 //! the underlying kernel/OS you're using.
 #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
@@ -346,7 +383,8 @@
 //! Platform-dependent macro defining how QF should return an event
 //! @a e_ to the event pool @a p_
 //!
-//! @note This is a specific implementation for the QK-port of QF.
+//! @note
+//! This is a specific implementation for the QK-port of QF.
 //! In other QF ports you need to define the macro appropriately for
 //! the underlying kernel/OS you're using.
 #define QF_EPOOL_PUT_(p_, e_, qs_id_)   ((p_).put((e_), (qs_id_)))

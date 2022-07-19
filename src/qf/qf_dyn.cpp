@@ -72,11 +72,11 @@ std::uint_fast8_t QF_maxPool_; // number of initialized event pools
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QF::poolInit} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QF::poolInit} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::poolInit} ........................................................
+//${QF::QP::QF::poolInit} ....................................................
 void poolInit(
     void * const poolSto,
     std::uint_fast32_t const poolSize,
@@ -106,12 +106,12 @@ void poolInit(
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::poolInit} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QF::newX_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QF::poolInit} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QF::newX_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::newX_} ...........................................................
+//${QF::QP::QF::newX_} .......................................................
 QEvt * newX_(
     std::uint_fast16_t const evtSize,
     std::uint_fast16_t const margin,
@@ -172,12 +172,12 @@ QEvt * newX_(
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::newX_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QF::gc} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QF::newX_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QF::gc} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::gc} ..............................................................
+//${QF::QP::QF::gc} ..........................................................
 void gc(QEvt const * const e) noexcept {
     // is it a dynamic event?
     if (e->poolId_ != 0U) {
@@ -238,12 +238,12 @@ void gc(QEvt const * const e) noexcept {
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::gc} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QF::newRef_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QF::gc} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QF::newRef_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::newRef_} .........................................................
+//${QF::QP::QF::newRef_} .....................................................
 QEvt const * newRef_(
     QEvt const * const e,
     QEvt const * const evtRef) noexcept
@@ -273,12 +273,12 @@ QEvt const * newRef_(
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::newRef_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QF::deleteRef_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QF::newRef_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QF::deleteRef_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::deleteRef_} ......................................................
+//${QF::QP::QF::deleteRef_} ..................................................
 void deleteRef_(QEvt const * const evtRef) noexcept {
     QS_CRIT_STAT_
     QS_BEGIN_PRE_(QS_QF_DELETE_REF,
@@ -294,16 +294,16 @@ void deleteRef_(QEvt const * const evtRef) noexcept {
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::deleteRef_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QF::poolGetMaxBlockSize} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QF::deleteRef_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QF::poolGetMaxBlockSize} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
-//${QF::QF::poolGetMaxBlockSize} .............................................
+//${QF::QP::QF::poolGetMaxBlockSize} .........................................
 std::uint_fast16_t poolGetMaxBlockSize() noexcept {
     return QF_EPOOL_EVENT_SIZE_(QF_pool_[QF_maxPool_ - 1U]);
 }
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF::poolGetMaxBlockSize} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QF::poolGetMaxBlockSize} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

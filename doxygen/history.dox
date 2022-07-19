@@ -1,5 +1,3 @@
-namespace QP {
-
 /** @page history Revision History
 
 @section qpcpp_7_0_1 Version 7.0.1, 2022-07-15 (planned)
@@ -2781,5 +2779,3 @@ updated to the latest QP API changes.
 - all examples that use QF now contain the QS software tracing support.
 
 */
-
-} // namespace QP

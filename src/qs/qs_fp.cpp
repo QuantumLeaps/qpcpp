@@ -53,11 +53,11 @@
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QS::QStx-fp} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QS::QP::QS-tx-fp} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QS {
 
-//${QS::QStx-fp::f32_fmt_} ...................................................
+//${QS::QP::QS-tx-fp::f32_fmt_} ..............................................
 void f32_fmt_(
     std::uint8_t format,
     float32_t d) noexcept
@@ -86,7 +86,7 @@ void f32_fmt_(
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//${QS::QStx-fp::f64_fmt_} ...................................................
+//${QS::QP::QS-tx-fp::f64_fmt_} ..............................................
 void f64_fmt_(
     std::uint8_t format,
     float32_t d) noexcept
@@ -137,4 +137,4 @@ void f64_fmt_(
 
 } // namespace QS
 } // namespace QP
-//$enddef${QS::QStx-fp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QS::QP::QS-tx-fp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

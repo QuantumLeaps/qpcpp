@@ -45,9 +45,6 @@
 #ifndef QK_HPP
 #define QK_HPP
 
-#include "qequeue.hpp" // QK kernel uses the native QF event queue
-#include "qmpool.hpp"  // QK kernel uses the native QF memory pool
-
 //============================================================================
 // QF configuration for QK -- data members of the QActive class...
 
@@ -56,8 +53,11 @@
 
 // QK thread type used for AOs
 // QK uses this member to store the private Thread-Local Storage pointer.
-//
 #define QF_THREAD_TYPE  void*
+
+#include "qequeue.hpp" // QK kernel uses the native QF event queue
+#include "qmpool.hpp"  // QK kernel uses the native QF memory pool
+#include "qf.hpp"      // QF framework integrates directly with QK
 
 //============================================================================
 namespace QP {
@@ -65,31 +65,22 @@ namespace QP {
 } // namespace QP
 
 extern "C" {
-//$declare${QK-extern-C} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$declare${QK::glob} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-//${QK-extern-C::QK_Attr} ....................................................
+//${QK::glob::QK_Attr} .......................................................
 //! attributes of the QK kernel (extern "C" for easy access in assembly)
-class QK_Attr {
-public:
+struct QK_Attr {
+    std::uint8_t volatile actPrio;    //!< prio of the active AO
+    std::uint8_t volatile nextPrio;   //!< prio of the next AO to execute
+    std::uint8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
+    std::uint8_t volatile lockHolder; //!< prio of the lock holder
+};
 
-    //! prio of the active AO
-    std::uint8_t volatile actPrio;
-
-    //! prio of the next AO to execute
-    std::uint8_t volatile nextPrio;
-
-    //! lock prio (0 == no-lock)
-    std::uint8_t volatile lockPrio;
-
-    //! prio of the lock holder
-    std::uint8_t volatile lockHolder;
-}; // class QK_Attr
-
-//${QK-extern-C::QK_attr_} ...................................................
+//${QK::glob::QK_attr_} ......................................................
 //! attributes of the QK kernel (extern "C" to be accessible from C)
 extern QK_Attr QK_attr_;
 
-//${QK-extern-C::QK_sched_} ..................................................
+//${QK::glob::QK_sched_} .....................................................
 //! QK scheduler finds the highest-priority thread ready to run
 //!
 //! @description
@@ -106,7 +97,7 @@ extern QK_Attr QK_attr_;
 //!
 std::uint_fast8_t QK_sched_() noexcept;
 
-//${QK-extern-C::QK_activate_} ...............................................
+//${QK::glob::QK_activate_} ..................................................
 //! QK activator activates the next active object. The activated AO preempts
 //! the currently executing AOs
 //!
@@ -120,7 +111,7 @@ std::uint_fast8_t QK_sched_() noexcept;
 //!
 void QK_activate_() noexcept;
 
-//${QK-extern-C::QK_onContextSw} .............................................
+//${QK::glob::QK_onContextSw} ................................................
 #ifdef QK_ON_CONTEXT_SW
 //! QK context switch callback (customized in BSPs for QK)
 //!
@@ -146,25 +137,15 @@ void QK_onContextSw(
     QP::QActive * prev,
     QP::QActive * next) ;
 #endif // def QK_ON_CONTEXT_SW
-//$enddecl${QK-extern-C} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddecl${QK::glob} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 } // extern "C"
 
 //============================================================================
-//$declare${QK::QSchedStatus} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-
-//${QK::QSchedStatus} ........................................................
-//! The QK scheduler lock status
-using QSchedStatus  = std::uint_fast16_t;
-
-} // namespace QP
-//$enddecl${QK::QSchedStatus} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-//$declare${QK::QK} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$declare${QK::QP} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QK {
 
-//${QK::QK::onIdle} ..........................................................
+//${QK::QP::QK::onIdle} ......................................................
 //! QK idle callback (customized in BSPs for QK)
 //!
 //! @description
@@ -179,7 +160,7 @@ namespace QK {
 //! @sa QV::onIdle(), QXK::onIdle()
 void onIdle() ;
 
-//${QK::QK::schedLock} .......................................................
+//${QK::QP::QK::schedLock} ...................................................
 //! QK selective scheduler lock
 //!
 //! @description
@@ -205,7 +186,7 @@ void onIdle() ;
 //!
 QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept;
 
-//${QK::QK::schedUnlock} .....................................................
+//${QK::QP::QK::schedUnlock} .................................................
 //! QK selective scheduler unlock
 //!
 //! @description
@@ -226,67 +207,87 @@ QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept;
 void schedUnlock(QSchedStatus const stat) noexcept;
 
 } // namespace QK
+
 } // namespace QP
-//$enddecl${QK::QK} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddecl${QK::QP} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //============================================================================
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
+// QK implementation...
+//$declare${QK::impl} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-    #ifndef QK_ISR_CONTEXT_
-        //! Internal port-specific macro that reports the execution context
-        // (ISR vs. thread).
-        //! @returns true if the code executes in the ISR context and false
-        //! otherwise
-        #define QK_ISR_CONTEXT_()  (QF_intNest_ != 0U)
-    #endif // QK_ISR_CONTEXT_
+//${QK::impl::QK_ISR_CONTEXT_} ...............................................
+#ifndef QK_ISR_CONTEXT_
+//! Internal port-specific macro that checks the execution context
+//! (ISR vs. thread). Might be overridden in qk_port.hpp.
+//!
+//! @returns
+//! 'true' if the code executes in the ISR context and 'false' otherwise.
+#define QK_ISR_CONTEXT_() (QF_intNest_ != 0U)
+#endif // ndef QK_ISR_CONTEXT_
 
-    // QK-specific scheduler locking
-    //! Internal macro to represent the scheduler lock status
-    //! that needs to be preserved to allow nesting of locks.
-    //!
-    #define QF_SCHED_STAT_ QSchedStatus lockStat_;
+//${QK::impl::QF_SCHED_STAT_} ................................................
+//! QK scheduler lock status
+#define QF_SCHED_STAT_ QSchedStatus lockStat_;
 
-    //! Internal macro for selective scheduler locking.
-    #define QF_SCHED_LOCK_(prio_) do {          \
-        if (QK_ISR_CONTEXT_()) {                \
-            lockStat_ = 0xFFU;                  \
-        } else {                                \
-            lockStat_ = QK::schedLock((prio_)); \
-        }                                       \
-    } while (false)
+//${QK::impl::QF_SCHED_LOCK_} ................................................
+//! QK selective scheduler locking
+#define QF_SCHED_LOCK_(prio_) do { \
+    if (QK_ISR_CONTEXT_()) { \
+        lockStat_ = 0xFFU; \
+    } else { \
+        lockStat_ = QK::schedLock((prio_)); \
+    } \
+} while (false)
 
-    //! Internal macro for selective scheduler unlocking.
-    #define QF_SCHED_UNLOCK_() do {     \
-        if (lockStat_ != 0xFFU) {       \
-            QK::schedUnlock(lockStat_); \
-        }                               \
-    } while (false)
+//${QK::impl::QF_SCHED_UNLOCK_} ..............................................
+//! QK selective scheduler unlocking
+#define QF_SCHED_UNLOCK_() do { \
+    if (lockStat_ != 0xFFU) { \
+        QK::schedUnlock(lockStat_); \
+    } \
+} while (false)
 
-    // QK-specific native event queue operations...
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
+//${QK::impl::QACTIVE_EQUEUE_WAIT_} ..........................................
+// QK native event queue waiting
+#define QACTIVE_EQUEUE_WAIT_(me_) \
+    Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
 
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) do {                \
-        QF::readySet_.insert(                               \
-            static_cast<std::uint_fast8_t>((me_)->m_prio)); \
-        if (!QK_ISR_CONTEXT_()) {                           \
-            if (QK_sched_() != 0U) {                        \
-                QK_activate_();                             \
-            }                                               \
-        }                                                   \
-    } while (false)
+//${QK::impl::QACTIVE_EQUEUE_SIGNAL_} ........................................
+// QK native event queue signaling
+#define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
+    QF::readySet_.insert( \
+        static_cast<std::uint_fast8_t>((me_)->m_prio)); \
+    if (!QK_ISR_CONTEXT_()) { \
+        if (QK_sched_() != 0U) { \
+            QK_activate_(); \
+        } \
+    } \
+} while (false)
+//$enddecl${QK::impl} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    // QK-specific native QF event pool operations...
-    #define QF_EPOOL_TYPE_  QMPool
-    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-        (p_).init((poolSto_), (poolSize_), (evtSize_))
-    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
-    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
+// Native QF event pool operations...
+//$declare${QF::QF-epool} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
+//${QF::QF-epool::QF_EPOOL_TYPE_} ............................................
+#define QF_EPOOL_TYPE_ QMPool
+
+//${QF::QF-epool::QF_EPOOL_INIT_} ............................................
+#define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+    (p_).init((poolSto_), (poolSize_), (evtSize_))
+
+//${QF::QF-epool::QF_EPOOL_EVENT_SIZE_} ......................................
+#define QF_EPOOL_EVENT_SIZE_(p_) ((p_).getBlockSize())
+
+//${QF::QF-epool::QF_EPOOL_GET_} .............................................
+#define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
+    ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
+
+//${QF::QF-epool::QF_EPOOL_PUT_} .............................................
+#define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
+//$enddecl${QF::QF-epool} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #endif // QP_IMPL
 
 #endif // QK_HPP

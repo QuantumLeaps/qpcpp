@@ -73,14 +73,19 @@ Q_DEFINE_THIS_MODULE("qv")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QV} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QV::QP} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QV {
 
 } // namespace QV
+
+} // namespace QP
+//$enddef${QV::QP} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QV::QP-port} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
 namespace QF {
 
-//${QV::QF::init} ............................................................
+//${QV::QP-port::QF::init} ...................................................
 void init() {
     QF_maxPool_ = 0U;
     QActive::subscrList_   = nullptr;
@@ -95,13 +100,13 @@ void init() {
     #endif
 }
 
-//${QV::QF::stop} ............................................................
+//${QV::QP-port::QF::stop} ...................................................
 void stop() {
     onCleanup(); // cleanup callback
     // nothing else to do for the QV kernel
 }
 
-//${QV::QF::run} .............................................................
+//${QV::QP-port::QF::run} ....................................................
 int_t run() {
     #ifdef Q_SPY
     std::uint_fast8_t pprev = 0U; // previous priority
@@ -179,9 +184,9 @@ int_t run() {
 
 } // namespace QF
 
-//${QV::QActive} .............................................................
+//${QV::QP-port::QActive} ....................................................
 
-//${QV::QActive::start} ......................................................
+//${QV::QP-port::QActive::start} .............................................
 void QActive::start(
     std::uint_fast8_t const prio,
     QEvt const * * const qSto,
@@ -209,4 +214,4 @@ void QActive::start(
 }
 
 } // namespace QP
-//$enddef${QV} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QV::QP-port} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

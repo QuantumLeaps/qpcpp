@@ -73,11 +73,11 @@ Q_DEFINE_THIS_MODULE("qk")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QK} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QK::QP} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QK {
 
-//${QK::QK::schedLock} .......................................................
+//${QK::QP::QK::schedLock} ...................................................
 QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -111,7 +111,7 @@ QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept {
     return stat; // return the status to be saved in a stack variable
 }
 
-//${QK::QK::schedUnlock} .....................................................
+//${QK::QP::QK::schedUnlock} .................................................
 void schedUnlock(QSchedStatus const stat) noexcept {
     // has the scheduler been actually locked by the last QK_schedLock()?
     if (stat != 0xFFU) {
@@ -147,9 +147,14 @@ void schedUnlock(QSchedStatus const stat) noexcept {
 }
 
 } // namespace QK
+
+} // namespace QP
+//$enddef${QK::QP} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QK::QP-port} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
 namespace QF {
 
-//${QK::QF::init} ............................................................
+//${QK::QP-port::QF::init} ...................................................
 void init() {
     QF_maxPool_ = 0U;
     QActive::subscrList_   = nullptr;
@@ -168,13 +173,13 @@ void init() {
     #endif
 }
 
-//${QK::QF::stop} ............................................................
+//${QK::QP-port::QF::stop} ...................................................
 void stop() {
     onCleanup();  // cleanup callback
     // nothing else to do for the QK preemptive kernel
 }
 
-//${QK::QF::run} .............................................................
+//${QK::QP-port::QF::run} ....................................................
 int_t run() {
     QF_INT_DISABLE();
     QK_attr_.lockPrio = 0U; // scheduler unlocked
@@ -203,9 +208,9 @@ int_t run() {
 
 } // namespace QF
 
-//${QK::QActive} .............................................................
+//${QK::QP-port::QActive} ....................................................
 
-//${QK::QActive::start} ......................................................
+//${QK::QP-port::QActive::start} .............................................
 void QActive::start(
     std::uint_fast8_t const prio,
     QEvt const * * const qSto,
@@ -242,18 +247,16 @@ void QActive::start(
 }
 
 } // namespace QP
-//$enddef${QK} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QK::QP-port} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //============================================================================
 extern "C" {
-//$define${QK-extern-C} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QK::glob} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-//${QK-extern-C::QK_Attr} ....................................................
-
-//${QK-extern-C::QK_attr_} ...................................................
+//${QK::glob::QK_attr_} ......................................................
 QK_Attr QK_attr_;
 
-//${QK-extern-C::QK_sched_} ..................................................
+//${QK::glob::QK_sched_} .....................................................
 std::uint_fast8_t QK_sched_() noexcept {
     // find the highest-prio AO with non-empty event queue
     std::uint_fast8_t p = QP::QF::readySet_.findMax();
@@ -272,7 +275,7 @@ std::uint_fast8_t QK_sched_() noexcept {
     return p;
 }
 
-//${QK-extern-C::QK_activate_} ...............................................
+//${QK::glob::QK_activate_} ..................................................
 void QK_activate_() noexcept {
     std::uint_fast8_t const pin =
         static_cast<std::uint_fast8_t>(QK_attr_.actPrio);
@@ -376,5 +379,5 @@ void QK_activate_() noexcept {
 
     #endif // QK_ON_CONTEXT_SW || Q_SPY
 }
-//$enddef${QK-extern-C} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QK::glob} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 } // extern "C"

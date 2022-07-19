@@ -61,7 +61,6 @@
     ++QF_intNest_;           \
 } while (false)
 
-
 //! Define the ISR exit sequence, if the compiler supports writing
 //! interrupts in C++.
 //! @note This is just an example of #QK_ISR_EXIT. You need to define
@@ -89,6 +88,6 @@ void trigSWI(void);
 
 //lint -restore
 
-#include "qxk.hpp" // QXK platform-independent public interface
+#include "qxk.hpp" // QXK dual-mode kernel
 
 #endif // QXK_PORT_HPP

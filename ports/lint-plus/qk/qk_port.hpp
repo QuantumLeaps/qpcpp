@@ -54,9 +54,8 @@
 //! QK ports will not define this macro, but instead will provide ISR
 //! skeleton code in assembly.
 #define QK_ISR_ENTRY() do { \
-    ++QF_intNest_;         \
+    ++QF_intNest_;          \
 } while (false)
-
 
 //! Define the ISR exit sequence, if the compiler supports writing
 //! interrupts in C++.

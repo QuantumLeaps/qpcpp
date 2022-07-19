@@ -5,7 +5,7 @@ The QP/C++ framework can be easily adapted to various operating systems, process
 
 The QP/C++ distribution contains many QP/C++ ports, which are organized into the three categories:
 
-- @subpage ports_lint (generic C compiler) QP/C++ "port" to the PC-Lint Plus static analysis tool (a "compiler")
+- @subpage ports_lint (generic C compiler) QP/C++ "port" to the PC-Lint-Plus static analysis tool (a "compiler")
 
 - @subpage ports_native "Native Ports" adapt QP/C++ to run on bare-metal processors "natively", using one of the built-in kernels (@ref qv "QV", @ref qk "QK", or @ref qxk "QXK")
 
@@ -50,7 +50,7 @@ All ports are located in sub-directories of the <span class="img folder">ports</
         <li><span class="img folder">ti</span> &mdash; Port to TI/CCS toolset
         </li>
       </ul>
-      <li><span class="img folder">qxk/</span> &mdash; Port to the @ref qxk "blocing QXK kernel"
+      <li><span class="img folder">qxk/</span> &mdash; Port to the @ref qxk "blocking QXK kernel"
       </li>
       <ul class="tag">
         <li><span class="img folder">arm</span> &mdash; Port to ARM-KEIL toolset

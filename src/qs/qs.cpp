@@ -50,9 +50,7 @@
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-
 Q_DEFINE_THIS_MODULE("qs")
-
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -62,16 +60,14 @@ Q_DEFINE_THIS_MODULE("qs")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QS::QStx} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QS::QP::QS-tx} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QS {
 
-//${QS::QStx::QStx} ..........................................................
-
-//${QS::QStx::priv_} .........................................................
+//${QS::QP::QS-tx::priv_} ....................................................
 QStx priv_;
 
-//${QS::QStx::initBuf} .......................................................
+//${QS::QP::QS-tx::initBuf} ..................................................
 void initBuf(
     std::uint8_t * const sto,
     std::uint_fast16_t const stoSize) noexcept
@@ -106,7 +102,7 @@ void initBuf(
     // wait with flushing after successful initialization (see QS_INIT())
 }
 
-//${QS::QStx::getByte} .......................................................
+//${QS::QP::QS-tx::getByte} ..................................................
 std::uint16_t getByte() noexcept {
     std::uint16_t ret;
     if (priv_.used == 0U) {
@@ -129,7 +125,7 @@ std::uint16_t getByte() noexcept {
     return ret;  // return the byte or EOD
 }
 
-//${QS::QStx::getBlock} ......................................................
+//${QS::QP::QS-tx::getBlock} .................................................
 std::uint8_t const * getBlock(std::uint16_t * const pNbytes) noexcept {
     QSCtr const used_ = priv_.used; // put in a temporary (register)
     std::uint8_t *buf_;
@@ -163,7 +159,7 @@ std::uint8_t const * getBlock(std::uint16_t * const pNbytes) noexcept {
     return buf_;
 }
 
-//${QS::QStx::glbFilter_} ....................................................
+//${QS::QP::QS-tx::glbFilter_} ...............................................
 void glbFilter_(std::int_fast16_t const filter) noexcept {
     bool const isRemove = (filter < 0);
     std::uint16_t const rec = isRemove
@@ -371,7 +367,7 @@ void glbFilter_(std::int_fast16_t const filter) noexcept {
     }
 }
 
-//${QS::QStx::locFilter_} ....................................................
+//${QS::QP::QS-tx::locFilter_} ...............................................
 void locFilter_(std::int_fast16_t const filter) noexcept {
     bool const isRemove = (filter < 0);
     std::uint16_t const qs_id = isRemove
@@ -430,7 +426,7 @@ void locFilter_(std::int_fast16_t const filter) noexcept {
 
 }
 
-//${QS::QStx::beginRec_} .....................................................
+//${QS::QP::QS-tx::beginRec_} ................................................
 void beginRec_(std::uint_fast8_t const rec) noexcept {
     std::uint8_t const b = priv_.seq + 1U;
     std::uint8_t chksum_ = 0U; // reset the checksum
@@ -450,7 +446,7 @@ void beginRec_(std::uint_fast8_t const rec) noexcept {
     priv_.chksum = chksum_; // save the checksum
 }
 
-//${QS::QStx::endRec_} .......................................................
+//${QS::QP::QS-tx::endRec_} ..................................................
 void endRec_() noexcept {
     std::uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
     QSCtr head_ = priv_.head;
@@ -478,7 +474,7 @@ void endRec_() noexcept {
     }
 }
 
-//${QS::QStx::u8_raw_} .......................................................
+//${QS::QP::QS-tx::u8_raw_} ..................................................
 void u8_raw_(std::uint8_t const d) noexcept {
     std::uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
     std::uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
@@ -492,7 +488,7 @@ void u8_raw_(std::uint8_t const d) noexcept {
     priv_.chksum = chksum_; // save the checksum
 }
 
-//${QS::QStx::u8u8_raw_} .....................................................
+//${QS::QP::QS-tx::u8u8_raw_} ................................................
 void u8u8_raw_(
     std::uint8_t const d1,
     std::uint8_t const d2) noexcept
@@ -510,7 +506,7 @@ void u8u8_raw_(
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//${QS::QStx::u16_raw_} ......................................................
+//${QS::QP::QS-tx::u16_raw_} .................................................
 void u16_raw_(std::uint16_t d) noexcept {
     std::uint8_t b = static_cast<std::uint8_t>(d);
     std::uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
@@ -530,7 +526,7 @@ void u16_raw_(std::uint16_t d) noexcept {
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//${QS::QStx::u32_raw_} ......................................................
+//${QS::QP::QS-tx::u32_raw_} .................................................
 void u32_raw_(std::uint32_t d) noexcept {
     std::uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
     std::uint8_t * const buf_ = priv_.buf; // put in a temporary (register)
@@ -548,7 +544,7 @@ void u32_raw_(std::uint32_t d) noexcept {
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//${QS::QStx::obj_raw_} ......................................................
+//${QS::QP::QS-tx::obj_raw_} .................................................
 void obj_raw_(void const * const obj) noexcept {
     #if (QS_OBJ_PTR_SIZE == 1U)
         u8_raw_(reinterpret_cast<std::uint8_t>(obj));
@@ -563,7 +559,7 @@ void obj_raw_(void const * const obj) noexcept {
     #endif
 }
 
-//${QS::QStx::str_raw_} ......................................................
+//${QS::QP::QS-tx::str_raw_} .................................................
 void str_raw_(char const * s) noexcept {
     std::uint8_t b = static_cast<std::uint8_t>(*s);
     std::uint8_t chksum_ = priv_.chksum;   // put in a temporary (register)
@@ -587,7 +583,7 @@ void str_raw_(char const * s) noexcept {
     priv_.used   = used_;    // save # of used buffer space
 }
 
-//${QS::QStx::u8_fmt_} .......................................................
+//${QS::QP::QS-tx::u8_fmt_} ..................................................
 void u8_fmt_(
     std::uint8_t const format,
     std::uint8_t const d) noexcept
@@ -606,7 +602,7 @@ void u8_fmt_(
     priv_.chksum = chksum_; // save the checksum
 }
 
-//${QS::QStx::u16_fmt_} ......................................................
+//${QS::QP::QS-tx::u16_fmt_} .................................................
 void u16_fmt_(
     std::uint8_t format,
     std::uint16_t d) noexcept
@@ -631,7 +627,7 @@ void u16_fmt_(
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//${QS::QStx::u32_fmt_} ......................................................
+//${QS::QP::QS-tx::u32_fmt_} .................................................
 void u32_fmt_(
     std::uint8_t format,
     std::uint32_t d) noexcept
@@ -654,7 +650,7 @@ void u32_fmt_(
     priv_.chksum = chksum_; // save the checksum
 }
 
-//${QS::QStx::str_fmt_} ......................................................
+//${QS::QP::QS-tx::str_fmt_} .................................................
 void str_fmt_(char const * s) noexcept {
     std::uint8_t b       = static_cast<std::uint8_t>(*s);
     std::uint8_t chksum_ = static_cast<std::uint8_t>(
@@ -682,7 +678,7 @@ void str_fmt_(char const * s) noexcept {
     priv_.used   = used_;   // save # of used buffer space
 }
 
-//${QS::QStx::mem_fmt_} ......................................................
+//${QS::QP::QS-tx::mem_fmt_} .................................................
 void mem_fmt_(
     std::uint8_t const * blk,
     std::uint8_t size) noexcept
@@ -709,7 +705,7 @@ void mem_fmt_(
     priv_.chksum = chksum_;  // save the checksum
 }
 
-//${QS::QStx::sig_dict_pre_} .................................................
+//${QS::QP::QS-tx::sig_dict_pre_} ............................................
 void sig_dict_pre_(
     enum_t const sig,
     void const * const obj,
@@ -727,7 +723,7 @@ void sig_dict_pre_(
     onFlush();
 }
 
-//${QS::QStx::obj_dict_pre_} .................................................
+//${QS::QP::QS-tx::obj_dict_pre_} ............................................
 void obj_dict_pre_(
     void const * const obj,
     char const * const name) noexcept
@@ -743,7 +739,7 @@ void obj_dict_pre_(
     onFlush();
 }
 
-//${QS::QStx::obj_arr_dict_pre_} .............................................
+//${QS::QP::QS-tx::obj_arr_dict_pre_} ........................................
 void obj_arr_dict_pre_(
     void const * const obj,
     std::uint_fast16_t const idx,
@@ -807,7 +803,7 @@ void obj_arr_dict_pre_(
     onFlush();
 }
 
-//${QS::QStx::fun_dict_pre_} .................................................
+//${QS::QP::QS-tx::fun_dict_pre_} ............................................
 void fun_dict_pre_(
     QSpyFunPtr fun,
     char const * const name) noexcept
@@ -823,7 +819,7 @@ void fun_dict_pre_(
     onFlush();
 }
 
-//${QS::QStx::usr_dict_pre_} .................................................
+//${QS::QP::QS-tx::usr_dict_pre_} ............................................
 void usr_dict_pre_(
     enum_t const rec,
     char const * const name) noexcept
@@ -839,7 +835,7 @@ void usr_dict_pre_(
     onFlush();
 }
 
-//${QS::QStx::assertion_pre_} ................................................
+//${QS::QP::QS-tx::assertion_pre_} ...........................................
 void assertion_pre_(
     char const * const module,
     int_t const loc,
@@ -857,7 +853,7 @@ void assertion_pre_(
     QP::QS::onCleanup();
 }
 
-//${QS::QStx::crit_entry_pre_} ...............................................
+//${QS::QP::QS-tx::crit_entry_pre_} ..........................................
 void crit_entry_pre_() noexcept {
     QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_CRIT_ENTRY, 0U)
         QS_TIME_PRE_();
@@ -866,7 +862,7 @@ void crit_entry_pre_() noexcept {
     QS_END_NOCRIT_PRE_()
 }
 
-//${QS::QStx::crit_exit_pre_} ................................................
+//${QS::QP::QS-tx::crit_exit_pre_} ...........................................
 void crit_exit_pre_() noexcept {
     QS_BEGIN_NOCRIT_PRE_(QP::QS_QF_CRIT_EXIT, 0U)
         QS_TIME_PRE_();
@@ -875,7 +871,7 @@ void crit_exit_pre_() noexcept {
     QS_END_NOCRIT_PRE_()
 }
 
-//${QS::QStx::isr_entry_pre_} ................................................
+//${QS::QP::QS-tx::isr_entry_pre_} ...........................................
 void isr_entry_pre_(
     std::uint8_t const isrnest,
     std::uint8_t const prio) noexcept
@@ -887,7 +883,7 @@ void isr_entry_pre_(
     QS_END_NOCRIT_PRE_()
 }
 
-//${QS::QStx::isr_exit_pre_} .................................................
+//${QS::QP::QS-tx::isr_exit_pre_} ............................................
 void isr_exit_pre_(
     std::uint8_t const isrnest,
     std::uint8_t const prio) noexcept
@@ -899,7 +895,7 @@ void isr_exit_pre_(
     QS_END_NOCRIT_PRE_()
 }
 
-//${QS::QStx::target_info_} ..................................................
+//${QS::QP::QS-tx::target_info_} .............................................
 void target_info_(std::uint8_t const isReset) {
     static constexpr std::uint8_t ZERO = static_cast<std::uint8_t>('0');
     static std::uint8_t const * const TIME =
@@ -1013,4 +1009,4 @@ void target_info_(std::uint8_t const isReset) {
 
 } // namespace QS
 } // namespace QP
-//$enddef${QS::QStx} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QS::QP::QS-tx} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

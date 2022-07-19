@@ -21,8 +21,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-05-02
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QXK/C++ port to ARM Cortex-M, ARM-CLANG toolset

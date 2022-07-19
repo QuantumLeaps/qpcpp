@@ -79,7 +79,7 @@
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QS::rxPriv_.readySet.insert(   \
+        (QF::readySet_.insert(   \
             static_cast<std::uint_fast8_t>((me_)->m_prio)))
 
     // native QF event pool operations

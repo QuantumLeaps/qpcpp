@@ -72,12 +72,12 @@ namespace {
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QMActive} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QMActive} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QMActive} ............................................................
+//${QF::QP::QMActive} ........................................................
 
-//${QF::QMActive::init} ......................................................
+//${QF::QP::QMActive::init} ..................................................
 void QMActive::init(
     void const * const e,
     std::uint_fast8_t const qs_id)
@@ -86,13 +86,13 @@ void QMActive::init(
     QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(e, qs_id);
 }
 
-//${QF::QMActive::init} ......................................................
+//${QF::QP::QMActive::init} ..................................................
 void QMActive::init(std::uint_fast8_t const qs_id) {
     m_state.obj = &QMsm::msm_top_s;
     QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::init(qs_id);
 }
 
-//${QF::QMActive::dispatch} ..................................................
+//${QF::QP::QMActive::dispatch} ..............................................
 void QMActive::dispatch(
     QEvt const * const e,
     std::uint_fast8_t const qs_id)
@@ -100,18 +100,18 @@ void QMActive::dispatch(
     QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::dispatch(e, qs_id);
 }
 
-//${QF::QMActive::isInState} .................................................
+//${QF::QP::QMActive::isInState} .............................................
 bool QMActive::isInState(QMState const * const st) const noexcept {
     return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)->QMsm::isInState(st);
 }
 
-//${QF::QMActive::childStateObj} .............................................
+//${QF::QP::QMActive::childStateObj} .........................................
 QMState const * QMActive::childStateObj(QMState const * const parent) const noexcept {
     return QF_QMACTIVE_TO_QMSM_CONST_CAST_(this)
                ->QMsm::childStateObj(parent);
 }
 
-//${QF::QMActive::getStateHandler} ...........................................
+//${QF::QP::QMActive::getStateHandler} .......................................
 #ifdef Q_SPY
 QStateHandler QMActive::getStateHandler() noexcept {
     return QF_QMACTIVE_TO_QMSM_CAST_(this)->QMsm::getStateHandler();
@@ -120,4 +120,4 @@ QStateHandler QMActive::getStateHandler() noexcept {
 #endif // def Q_SPY
 
 } // namespace QP
-//$enddef${QF::QMActive} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QMActive} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

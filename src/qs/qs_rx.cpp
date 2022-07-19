@@ -211,16 +211,14 @@ static inline void tran_(RxStateEnum const target) noexcept {
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QS::QSrx} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QS::QP::QS-rx} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QS {
 
-//${QS::QSrx::QSrx} ..........................................................
-
-//${QS::QSrx::rxPriv_} .......................................................
+//${QS::QP::QS-rx::rxPriv_} ..................................................
 QSrx rxPriv_;
 
-//${QS::QSrx::rxInitBuf} .....................................................
+//${QS::QP::QS-rx::rxInitBuf} ................................................
 void rxInitBuf(
     std::uint8_t * const sto,
     std::uint16_t const stoSize) noexcept
@@ -254,7 +252,7 @@ void rxInitBuf(
     #endif // Q_UTEST
 }
 
-//${QS::QSrx::rxGetNfree} ....................................................
+//${QS::QP::QS-rx::rxGetNfree} ...............................................
 std::uint16_t rxGetNfree() noexcept {
     QSCtr const head = rxPriv_.head;
     if (head == rxPriv_.tail) { // buffer empty?
@@ -269,7 +267,7 @@ std::uint16_t rxGetNfree() noexcept {
     }
 }
 
-//${QS::QSrx::setCurrObj} ....................................................
+//${QS::QP::QS-rx::setCurrObj} ...............................................
 void setCurrObj(
     std::uint8_t obj_kind,
     void * obj_ptr) noexcept
@@ -278,7 +276,7 @@ void setCurrObj(
     rxPriv_.currObj[obj_kind] = obj_ptr;
 }
 
-//${QS::QSrx::queryCurrObj} ..................................................
+//${QS::QP::QS-rx::queryCurrObj} .............................................
 void queryCurrObj(std::uint8_t obj_kind) noexcept {
     Q_REQUIRE_ID(200, obj_kind < Q_DIM(rxPriv_.currObj));
 
@@ -333,7 +331,7 @@ void queryCurrObj(std::uint8_t obj_kind) noexcept {
     }
 }
 
-//${QS::QSrx::rxParse} .......................................................
+//${QS::QP::QS-rx::rxParse} ..................................................
 void rxParse() {
     QSCtr tail = rxPriv_.tail;
     while (rxPriv_.head != tail) { // QS-RX buffer NOT empty?
@@ -378,7 +376,7 @@ void rxParse() {
     }
 }
 
-//${QS::QSrx::rxHandleGoodFrame_} ............................................
+//${QS::QP::QS-rx::rxHandleGoodFrame_} .......................................
 void rxHandleGoodFrame_(std::uint8_t const state) {
     std::uint8_t i;
     std::uint8_t *ptr;
@@ -728,7 +726,7 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
 
 } // namespace QS
 } // namespace QP
-//$enddef${QS::QSrx} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QS::QP::QS-rx} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //============================================================================
 namespace { // unnamed local namespace

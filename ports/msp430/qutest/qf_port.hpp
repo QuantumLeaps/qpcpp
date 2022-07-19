@@ -40,11 +40,11 @@
 
 // QUTEST event queue and thread types
 #define QF_EQUEUE_TYPE QEQueue
-/*#define QF_OS_OBJECT_TYPE */
-/*#define QF_THREAD_TYPE */
+//#define QF_OS_OBJECT_TYPE
+//#define QF_THREAD_TYPE
 
 // The maximum number of active objects in the application, see NOTE01
-#define QF_MAX_ACTIVE        8U
+#define QF_MAX_ACTIVE        16U
 
 #define QF_EVENT_SIZ_SIZE    1U
 #define QF_EQUEUE_CTR_SIZE   1U
@@ -82,7 +82,7 @@
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QS::rxPriv_.readySet.insert(   \
+        (QF::readySet_.insert(   \
             static_cast<std::uint_fast8_t>((me_)->m_prio)))
 
     // native QF event pool operations

@@ -55,14 +55,12 @@
 
 // protection against including this source file in a wrong project
 #ifndef QXK_HPP
-    #error "Source file included in a project NOT based on the QXK kernel"
+#error "Source file included in a project NOT based on the QXK kernel"
 #endif // QXK_HPP
 
 //============================================================================
 namespace { // unnamed local namespace
-
 Q_DEFINE_THIS_MODULE("qxk_xthr")
-
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -72,12 +70,12 @@ Q_DEFINE_THIS_MODULE("qxk_xthr")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QXK::QXThread} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QXK::QP::QXThread} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QXK::QXThread} ...........................................................
+//${QXK::QP::QXThread} .......................................................
 
-//${QXK::QXThread::QXThread} .................................................
+//${QXK::QP::QXThread::QXThread} .............................................
 QXThread::QXThread(
     QXThreadHandler const handler,
     std::uint_fast8_t const tickRate) noexcept
@@ -88,7 +86,7 @@ QXThread::QXThread(
     m_state.act = nullptr; // mark as extended thread
 }
 
-//${QXK::QXThread::delay} ....................................................
+//${QXK::QP::QXThread::delay} ................................................
 bool QXThread::delay(std::uint_fast16_t const nTicks) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -126,7 +124,7 @@ bool QXThread::delay(std::uint_fast16_t const nTicks) noexcept {
     return (thr->m_timeEvt.sig == 0U);
 }
 
-//${QXK::QXThread::delayCancel} ..............................................
+//${QXK::QP::QXThread::delayCancel} ..........................................
 bool QXThread::delayCancel() noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -144,7 +142,7 @@ bool QXThread::delayCancel() noexcept {
     return wasArmed;
 }
 
-//${QXK::QXThread::queueGet} .................................................
+//${QXK::QP::QXThread::queueGet} .............................................
 QEvt const * QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -232,7 +230,7 @@ QEvt const * QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
 
 }
 
-//${QXK::QXThread::init} .....................................................
+//${QXK::QP::QXThread::init} .................................................
 void QXThread::init(
     void const * const e,
     std::uint_fast8_t const qs_id)
@@ -242,13 +240,13 @@ void QXThread::init(
     Q_ERROR_ID(110);
 }
 
-//${QXK::QXThread::init} .....................................................
+//${QXK::QP::QXThread::init} .................................................
 void QXThread::init(std::uint_fast8_t const qs_id) {
     Q_UNUSED_PAR(qs_id);
     Q_ERROR_ID(111);
 }
 
-//${QXK::QXThread::dispatch} .................................................
+//${QXK::QP::QXThread::dispatch} .............................................
 void QXThread::dispatch(
     QEvt const * const e,
     std::uint_fast8_t const qs_id)
@@ -258,7 +256,7 @@ void QXThread::dispatch(
     Q_ERROR_ID(120);
 }
 
-//${QXK::QXThread::start} ....................................................
+//${QXK::QP::QXThread::start} ................................................
 void QXThread::start(
     std::uint_fast8_t const prio,
     QEvt const * * const qSto,
@@ -307,7 +305,7 @@ void QXThread::start(
     QF_CRIT_X_();
 }
 
-//${QXK::QXThread::post_} ....................................................
+//${QXK::QP::QXThread::post_} ................................................
 bool QXThread::post_(
     QEvt const * const e,
     std::uint_fast16_t const margin,
@@ -438,13 +436,13 @@ bool QXThread::post_(
     return status;
 }
 
-//${QXK::QXThread::postLIFO} .................................................
+//${QXK::QP::QXThread::postLIFO} .............................................
 void QXThread::postLIFO(QEvt const * const e) noexcept {
     Q_UNUSED_PAR(e);
     Q_ERROR_ID(410);
 }
 
-//${QXK::QXThread::block_} ...................................................
+//${QXK::QP::QXThread::block_} ...............................................
 void QXThread::block_() const noexcept {
     //! @pre the thread holding the lock cannot block!
     Q_REQUIRE_ID(600, (QXK_attr_.lockHolder != m_prio));
@@ -452,7 +450,7 @@ void QXThread::block_() const noexcept {
     static_cast<void>(QXK_sched_());
 }
 
-//${QXK::QXThread::unblock_} .................................................
+//${QXK::QP::QXThread::unblock_} .............................................
 void QXThread::unblock_() const noexcept {
     QF::readySet_.insert(static_cast<std::uint_fast8_t>(m_dynPrio));
 
@@ -463,7 +461,7 @@ void QXThread::unblock_() const noexcept {
     }
 }
 
-//${QXK::QXThread::teArm_} ...................................................
+//${QXK::QP::QXThread::teArm_} ...............................................
 void QXThread::teArm_(
     enum_t const sig,
     std::uint_fast16_t const nTicks) noexcept
@@ -505,7 +503,7 @@ void QXThread::teArm_(
     }
 }
 
-//${QXK::QXThread::teDisarm_} ................................................
+//${QXK::QP::QXThread::teDisarm_} ............................................
 bool QXThread::teDisarm_() noexcept {
     bool wasArmed;
     // is the time evt running?
@@ -522,4 +520,4 @@ bool QXThread::teDisarm_() noexcept {
 }
 
 } // namespace QP
-//$enddef${QXK::QXThread} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QXK::QP::QXThread} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

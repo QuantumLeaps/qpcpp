@@ -55,14 +55,12 @@
 
 // protection against including this source file in a wrong project
 #ifndef QXK_HPP
-    #error "Source file included in a project NOT based on the QXK kernel"
+#error "Source file included in a project NOT based on the QXK kernel"
 #endif // QXK_HPP
 
 //============================================================================
 namespace { // unnamed local namespace
-
 Q_DEFINE_THIS_MODULE("qxk_sema")
-
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -72,12 +70,12 @@ Q_DEFINE_THIS_MODULE("qxk_sema")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QXK::QXSemaphore} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QXK::QP::QXSemaphore} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QXK::QXSemaphore} ........................................................
+//${QXK::QP::QXSemaphore} ....................................................
 
-//${QXK::QXSemaphore::init} ..................................................
+//${QXK::QP::QXSemaphore::init} ..............................................
 void QXSemaphore::init(
     std::uint_fast16_t const count,
     std::uint_fast16_t const max_count) noexcept
@@ -90,7 +88,7 @@ void QXSemaphore::init(
     m_waitSet.setEmpty();
 }
 
-//${QXK::QXSemaphore::wait} ..................................................
+//${QXK::QP::QXSemaphore::wait} ..............................................
 bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -162,7 +160,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
     return signaled;
 }
 
-//${QXK::QXSemaphore::tryWait} ...............................................
+//${QXK::QP::QXSemaphore::tryWait} ...........................................
 bool QXSemaphore::tryWait() noexcept {
     //! @pre the semaphore must be initialized
     Q_REQUIRE_ID(300, m_max_count > 0U);
@@ -184,7 +182,7 @@ bool QXSemaphore::tryWait() noexcept {
     return isAvailable;
 }
 
-//${QXK::QXSemaphore::signal} ................................................
+//${QXK::QP::QXSemaphore::signal} ............................................
 bool QXSemaphore::signal() noexcept {
     //! @pre the semaphore must be initialized
     Q_REQUIRE_ID(400, m_max_count > 0U);
@@ -233,4 +231,4 @@ bool QXSemaphore::signal() noexcept {
 }
 
 } // namespace QP
-//$enddef${QXK::QXSemaphore} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QXK::QP::QXSemaphore} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

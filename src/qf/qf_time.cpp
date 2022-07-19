@@ -65,13 +65,13 @@ Q_DEFINE_THIS_MODULE("qf_time")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QTimeEvt} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QTimeEvt} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QTimeEvt} ............................................................
+//${QF::QP::QTimeEvt} ........................................................
 QTimeEvt QTimeEvt::timeEvtHead_[QF_MAX_TICK_RATE];
 
-//${QF::QTimeEvt::QTimeEvt} ..................................................
+//${QF::QP::QTimeEvt::QTimeEvt} ..............................................
 QTimeEvt::QTimeEvt(
     QActive * const act,
     enum_t const sgnl,
@@ -107,7 +107,7 @@ QTimeEvt::QTimeEvt(
     refCtr_ = static_cast<std::uint8_t>(tickRate);
 }
 
-//${QF::QTimeEvt::armX} ......................................................
+//${QF::QP::QTimeEvt::armX} ..................................................
 void QTimeEvt::armX(
     QTimeEvtCtr const nTicks,
     QTimeEvtCtr const interval) noexcept
@@ -169,7 +169,7 @@ void QTimeEvt::armX(
     QF_CRIT_X_();
 }
 
-//${QF::QTimeEvt::disarm} ....................................................
+//${QF::QP::QTimeEvt::disarm} ................................................
 bool QTimeEvt::disarm() noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
@@ -212,7 +212,7 @@ bool QTimeEvt::disarm() noexcept {
     return wasArmed;
 }
 
-//${QF::QTimeEvt::rearm} .....................................................
+//${QF::QP::QTimeEvt::rearm} .................................................
 bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) noexcept {
     std::uint8_t const tickRate = refCtr_ & TE_TICK_RATE;
 
@@ -275,7 +275,7 @@ bool QTimeEvt::rearm(QTimeEvtCtr const nTicks) noexcept {
     return wasArmed;
 }
 
-//${QF::QTimeEvt::wasDisarmed} ...............................................
+//${QF::QP::QTimeEvt::wasDisarmed} ...........................................
 bool QTimeEvt::wasDisarmed() noexcept {
     std::uint8_t const isDisarmed = refCtr_ & TE_WAS_DISARMED;
     // mark as disarmed
@@ -283,7 +283,7 @@ bool QTimeEvt::wasDisarmed() noexcept {
     return isDisarmed != 0U;
 }
 
-//${QF::QTimeEvt::tickX_} ....................................................
+//${QF::QP::QTimeEvt::tickX_} ................................................
 void QTimeEvt::tickX_(
     std::uint_fast8_t const tickRate,
     void const * const sender)
@@ -389,7 +389,7 @@ void QTimeEvt::tickX_(
     QF_CRIT_X_();
 }
 
-//${QF::QTimeEvt::noActive} ..................................................
+//${QF::QP::QTimeEvt::noActive} ..............................................
 bool QTimeEvt::noActive(std::uint_fast8_t const tickRate) noexcept {
     //! @pre the tick rate must be in range
     Q_REQUIRE_ID(200, tickRate < QF_MAX_TICK_RATE);
@@ -407,7 +407,7 @@ bool QTimeEvt::noActive(std::uint_fast8_t const tickRate) noexcept {
     return inactive;
 }
 
-//${QF::QTimeEvt::QTimeEvt} ..................................................
+//${QF::QP::QTimeEvt::QTimeEvt} ..............................................
 QTimeEvt::QTimeEvt()
  :
 #ifdef Q_EVT_CTOR
@@ -437,4 +437,4 @@ QTimeEvt::QTimeEvt()
 }
 
 } // namespace QP
-//$enddef${QF::QTimeEvt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QTimeEvt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

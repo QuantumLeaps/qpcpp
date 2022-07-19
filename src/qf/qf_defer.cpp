@@ -65,10 +65,10 @@ Q_DEFINE_THIS_MODULE("qf_defer")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QF::QActive::defer} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QP::QActive::defer} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::defer} ......................................................
+//${QF::QP::QActive::defer} ..................................................
 bool QActive::defer(
     QEQueue * const eq,
     QEvt const * const e) const noexcept
@@ -88,11 +88,11 @@ bool QActive::defer(
 }
 
 } // namespace QP
-//$enddef${QF::QActive::defer} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::recall} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::defer} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::recall} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::recall} .....................................................
+//${QF::QP::QActive::recall} .................................................
 bool QActive::recall(QEQueue * const eq) noexcept {
     QEvt const * const e = eq->get(m_prio); // get evt from deferred queue
     bool recalled;
@@ -145,11 +145,11 @@ bool QActive::recall(QEQueue * const eq) noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QActive::recall} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QActive::flushDeferred} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$enddef${QF::QP::QActive::recall} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QP::QActive::flushDeferred} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::flushDeferred} ..............................................
+//${QF::QP::QActive::flushDeferred} ..........................................
 std::uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const noexcept {
     std::uint_fast16_t n = 0U;
     for (QEvt const *e = eq->get(m_prio);
@@ -163,4 +163,4 @@ std::uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const noexcept {
 }
 
 } // namespace QP
-//$enddef${QF::QActive::flushDeferred} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QP::QActive::flushDeferred} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
