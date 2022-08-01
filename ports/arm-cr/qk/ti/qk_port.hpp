@@ -73,12 +73,12 @@
     " POP {R0-R3, R12}\n" \
     " RFEIA SP!\n"); \
     extern "C" void name_ ## _isr(void) { \
-    ++QF_intNest_; {
+    ++QP::QF::intNest_; {
 
 // QK-specific Interrupt Request handler END
 #define QK_IRQ_END() \
-    } --QF_intNest_; \
-    if (QF_intNest_ == 0U) { \
+    } --QP::QF::intNest_; \
+    if (QP::QF::intNest_ == 0U) { \
         if (QK_sched_() != 0U) { \
             QK_activate_(); \
         } \

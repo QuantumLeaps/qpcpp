@@ -406,10 +406,10 @@ void QActive::publishFromISR_(QEvt const *e, void *par,
         // no need to lock the scheduler in the ISR context
         do { // loop over all subscribers
             // the prio of the AO must be registered with the framework
-            Q_ASSERT_ID(510, active_[p] != nullptr);
+            Q_ASSERT_ID(510, registry_[p] != nullptr);
 
             // POST_FROM_ISR() asserts internally if the queue overflows
-            (void)active_[p]->POST_FROM_ISR(e, par, sender);
+            (void)registry_[p]->POST_FROM_ISR(e, par, sender);
 
             subscrList.rmove(p); // remove the handled subscriber
             if (subscrList.notEmpty()) {  // still more subscribers?
@@ -428,8 +428,8 @@ void QActive::publishFromISR_(QEvt const *e, void *par,
     QF::gcFromISR(e);
 }
 //............................................................................
-void QTimeEvt::tickXfromISR_(std::uint_fast8_t const tickRate, void *par,
-                             void const * const sender) noexcept
+void QTimeEvt::tickFromISR_(std::uint_fast8_t const tickRate, void *par,
+                            void const * const sender) noexcept
 {
     QTimeEvt *prev = &timeEvtHead_[tickRate];
     UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
@@ -530,24 +530,24 @@ QEvt *QF::newXfromISR_(std::uint_fast16_t const evtSize,
 {
     // find the pool id that fits the requested event size ...
     std::uint_fast8_t idx;
-    for (idx = 0U; idx < QF_maxPool_; ++idx) {
-        if (evtSize <= QF_EPOOL_EVENT_SIZE_(QF_pool_[idx])) {
+    for (idx = 0U; idx < QF::maxPool_; ++idx) {
+        if (evtSize <= QF_EPOOL_EVENT_SIZE_(QF::ePool_[idx])) {
             break;
         }
     }
     // cannot run out of registered pools
-    Q_ASSERT_ID(710, idx < QF_maxPool_);
+    Q_ASSERT_ID(710, idx < QF::maxPool_);
 
     // get e -- platform-dependent
 #ifdef Q_SPY
     QEvt *e = static_cast<QEvt *>(
-              QF_pool_[idx].getFromISR(((margin != QF_NO_MARGIN)
+              QF::ePool_[idx].getFromISR(((margin != QF_NO_MARGIN)
                   ? margin : 0U),
                   static_cast<std::uint_fast8_t>(QS_EP_ID) + idx + 1U));
     UBaseType_t uxSavedInterruptStatus;
 #else
     QEvt *e = static_cast<QEvt *>(
-              QF_pool_[idx].getFromISR(((margin != QF_NO_MARGIN)
+              QF::ePool_[idx].getFromISR(((margin != QF_NO_MARGIN)
                   ? margin : 0U), 0U));
 #endif
 
@@ -622,7 +622,7 @@ void QF::gcFromISR(QEvt const * const e) noexcept {
             portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
 
             // pool ID must be in range
-            Q_ASSERT_ID(810, idx < QF_maxPool_);
+            Q_ASSERT_ID(810, idx < QF::maxPool_);
 
 #ifdef Q_EVT_XTOR
             // explicitly exectute the destructor'
@@ -633,10 +633,10 @@ void QF::gcFromISR(QEvt const * const e) noexcept {
 
 #ifdef Q_SPY
             // cast 'const' away, which is OK, because it's a pool event
-            QF_pool_[idx].putFromISR(QF_EVT_CONST_CAST_(e),
+            QF::ePool_[idx].putFromISR(QF_EVT_CONST_CAST_(e),
                 static_cast<uint_fast8_t>(QS_EP_ID) + e->poolId_);
 #else
-            QF_pool_[idx].putFromISR(QF_EVT_CONST_CAST_(e), 0U);
+            QF::ePool_[idx].putFromISR(QF_EVT_CONST_CAST_(e), 0U);
 #endif
         }
     }

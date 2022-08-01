@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.2.0" links="1">
+<model version="5.2.1" links="1">
  <documentation>Blinky example</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -84,7 +84,7 @@ extern &quot;C&quot; void Q_onAssert(char const * const module, int loc) {
 void QF::onStartup(void) {}
 void QF::onCleanup(void) {}
 void QF::onClockTick(void) {
-    QF::TICK_X(0U, nullptr);  // perform the QF clock tick processing
+    QTimeEvt::TICK_X(0U, nullptr);  // perform the QF clock tick processing
 }
 
 enum BlinkySignals {
@@ -110,9 +110,7 @@ int main() {
 }
 
 //================ ask QM to define the Blinky class ==================
-$define${AOs::Blinky}
-
-</text>
+$define${AOs::Blinky}</text>
   </file>
  </directory>
 </model>

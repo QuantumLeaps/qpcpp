@@ -116,7 +116,7 @@ int consoleWaitForKey(void);
         }
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        Q_ASSERT_ID(410, QActive::active_[(me_)->m_prio] != nullptr); \
+        Q_ASSERT_ID(410, QActive::registry_[(me_)->m_prio] != nullptr); \
         (void)SetEvent((me_)->m_osObject)
 
     // native QF event pool operations

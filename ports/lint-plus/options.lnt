@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
+//! @date Last updated on: 2022-07-21
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -85,10 +85,13 @@ qpcpp.lnt           // QP/C++ options
  QEP_EXIT_,
  QEP_ACT_PTR_INC_)
 
+// implicit conversion of enum 'QP::QHsm::QStateRet' to integral type
+-esym(641,
+ QP::QHsm::QStateRet)
+
 // MC++R7-1-2 parameter of function could be pointer to const
 -esym(818,
  QP::QHsm::top)
-
 
 // QF ------------------------------------------------------------------------
 
@@ -192,7 +195,7 @@ qpcpp.lnt           // QP/C++ options
 
 // variable has 'static' storage duration and non-POD type
 -esym(1756,
- QP::QF_pool_,
+ QP::QF::ePool_,
  QP::QF::timeEvtHead_)
 
 // call to unqualified virtual function 'QP::QHsm::init'

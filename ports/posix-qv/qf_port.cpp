@@ -176,7 +176,7 @@ int_t QF::run(void) {
         // find the maximum priority AO ready to run
         if (QF::readySet_.notEmpty()) {
             std::uint_fast8_t p = QF::readySet_.findMax();
-            QActive *a = QActive::active_[p];
+            QActive *a = QActive::registry_[p];
             QF_CRIT_X_();
 
             // the active object 'a' must still be registered in QF

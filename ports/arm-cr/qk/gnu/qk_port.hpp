@@ -56,7 +56,7 @@
     __asm(" AND R3, SP, #4\n" \
     " SUB SP, SP, R3\n" \
     " PUSH {R3, LR}\n"); \
-    ++QF_intNest_; {
+    ++QP::QF::intNest_; {
 #else
 #define QK_IRQ_BEGIN(name_) \
     void name_(void) \
@@ -69,14 +69,14 @@
     __asm(" AND R3, SP, #4\n" \
     " SUB SP, SP, R3\n" \
     " PUSH {R3, LR}\n"); \
-    ++QF_intNest_; {
+    ++QP::QF::intNest_; {
 #endif
 
 /* QK-specific Interrupt Request handler END */
 #ifdef __FPU_PRESENT
 #define QK_IRQ_END() \
-    } --QF_intNest_; \
-    if (QF_intNest_ == 0U) { \
+    } --QP::QF::intNest_; \
+    if (QP::QF::intNest_ == 0U) { \
         if (QK_sched_() != 0U) { \
             QK_activate_(); \
         } \
@@ -93,8 +93,8 @@
 }
 #else
 #define QK_IRQ_END() \
-    } --QF_intNest_; \
-    if (QF_intNest_ == 0U) { \
+    } --QP::QF::intNest_; \
+    if (QP::QF::intNest_ == 0U) { \
         if (QK_sched_() != 0U) { \
             QK_activate_(); \
         } \

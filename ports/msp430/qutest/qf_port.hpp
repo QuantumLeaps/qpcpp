@@ -53,8 +53,8 @@
 #define QF_TIMEEVT_CTR_SIZE  2U
 
 // QF interrupt disable/enable
-#define QF_INT_DISABLE()     (++QF_intNest_)
-#define QF_INT_ENABLE()      (--QF_intNest_)
+#define QF_INT_DISABLE()     (++QP::QF::intNest_)
+#define QF_INT_ENABLE()      (--QP::QF::intNest_)
 
 // QF critical section
 // QF_CRIT_STAT_TYPE not defined

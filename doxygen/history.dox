@@ -1,6 +1,6 @@
 /** @page history Revision History
 
-@section qpcpp_7_0_1 Version 7.0.1, 2022-07-15 (planned)
+@section qpcpp_7_0_1 Version 7.0.1, 2022-07-31
 This release is the first one that contains the complete [QM model](https://www.state-machine.com/products/qm) of the QP/C++ framework (in the file `qpcpp/qpcpp.qm`). This model is then used to **generate all QP/C++ source code**:
 - `qpcpp/`
   + @ref C:/qp-dev/qpcpp/include "include"
@@ -8,14 +8,13 @@ This release is the first one that contains the complete [QM model](https://www.
 
 The QM model of QP/C++ explicitly captures the *logical design* of the framework, which is then mapped to the preexisting [physical design](https://www.state-machine.com/qm/ce.html#ce_phys). The *logical design*, which consists of packages (often associated with namespaces), classes, types, and macros traces explicitly to the @ref sas "Software Architecture Specification (SAS)" and is easier to manipulate and refactor.
 
-
 __Source Code Changes:__
 - The whole QP/C++ source code is now generated from the `qpcpp.qm` model.
 - Refactored classes with only static members (QF, QV, QK, QXK, QS) into [namespaces](namespaces.html). This allows the namespaces to be extended in the QP ports.
 - Refactored:
   + QF::publish_() -> QActive::publish_()
   + QF::psInit() -> QActive::psInit()
-  + QF::tickX_() -> QTimeEvt::tickX_()
+  + QF::tickX_() -> QTimeEvt::tick_()
 
 @note
 The old APIs (QF::PUBLISH(), QF::TICK_X(), QF::psInit()) are still provided, but are tagged as [deprecated](deprecated.html).
@@ -25,15 +24,17 @@ The old APIs (QF::PUBLISH(), QF::TICK_X(), QF::psInit()) are still provided, but
 @note
 This change allowed all provided examples to be simplified by removing the `qpcpp/src` include directory from the various project files.
 
-
 Adapted QP/C++ source code to avoid warnings from the new C++20 standard about: "compound assignment with 'volatile'-qualified left operand is deprecated".
 
-
-__Added Ports/Examples:__
+__Ports/Examples:__
+- Removed port and examples for the older ARM7/ARM9
 - Added port to the @ref zephyr "Zephyr RTOS"
 - Added examples for the @ref exa_zephyr "Zephyr RTOS"
-- redesigned QP/C++ @ref freertos "port to FreeRTOS", see `qpc/ports/freertos`
-- slightly improved QP/C++ @ref threadx "port to ThreadX", see `qpc/ports/threadx`
+- redesigned QP/C++ @ref freertos "port to FreeRTOS", see `qpcpp/ports/freertos`
+- slightly improved QP/C++ @ref threadx "port to ThreadX", see `qpcpp/ports/threadx`
+
+__Improved Documentation:__
+The Doxygen documentation has been re-structured and improved. Also the more attractive styling of the HTML has been applied.
 
 
 @section qpcpp_7_0_0 Version 7.0.0, 2022-04-30

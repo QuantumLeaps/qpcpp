@@ -39,11 +39,11 @@
 #define QK_PORT_HPP
 
 // QK interrupt entry and exit...
-#define QK_ISR_ENTRY()    (++QF_intNest_)
+#define QK_ISR_ENTRY()    (++QP::QF::intNest_)
 
 #define QK_ISR_EXIT()     do {   \
-    --QF_intNest_;               \
-    if (QF_intNest_ == 0U) {     \
+    --QP::QF::intNest_;          \
+    if (QP::QF::intNest_ == 0U) {\
         if (QK_sched_() != 0U) { \
             QK_activate_();      \
         }                        \

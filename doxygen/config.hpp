@@ -68,13 +68,8 @@
 //! Valid values: 1U, 2U, or 4U; default 2U
 //!
 //! @description
-//! This macro can be defined in the QF ports to configure the QP::QEvtSize
-//! type. If the macro is not defined, the default of 2 byte will be chosen in
-//! qf.hpp. The valid #QF_EVENT_SIZ_SIZE values of 1, 2, or 4, correspond
-//! to QP::QEvtSize of uint8_t, uint16_t, and uint32_t, respectively. The
-//! QP::QEvtSize data type determines the dynamic range of event-sizes in
-//! your application.
-//! @sa QP::QF::poolInit(), QP::QF::new_()
+//! This macro can be defined in the QF ports to configure the size
+//! of the event-size.
 //!
 //! @note Once you choose a certain value of #QF_EVENT_SIZ_SIZE, you must
 //! consistently use the same value in building all the QP component libraries
@@ -327,8 +322,8 @@
 //! of QF. In other QF ports you need to define the macro appropriately for
 //! the underlying kernel/OS you're using.
 #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
-    QF_readySet_.insert((me_)->m_prio);  \
-    if (QF_intNest_ == 0U) {             \
+    QF::readySet_.insert((me_)->m_prio); \
+    if (QF::intNest_ == 0U) {            \
         uint8_t p = QK_schedPrio_();     \
         if (p != 0U) {                   \
             QK_sched_(p);                \

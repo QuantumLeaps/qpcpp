@@ -101,7 +101,7 @@ extern pthread_mutex_t pThreadMutex_; // mutex for QF critical section
             pthread_cond_wait(&(me_)->m_osObject, &QF::pThreadMutex_)
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        Q_ASSERT_ID(410, QActive::active_[(me_)->m_prio] != nullptr); \
+        Q_ASSERT_ID(410, QActive::registry_[(me_)->m_prio] != nullptr); \
         pthread_cond_signal(&(me_)->m_osObject)
 
     // native QF event pool operations

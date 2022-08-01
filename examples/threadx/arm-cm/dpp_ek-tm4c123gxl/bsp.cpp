@@ -368,7 +368,6 @@ void QS::onReset(void) {
 //............................................................................
 //! callback function to execute a user command
 extern "C" void assert_failed(char const *module, int loc); // prototype
-extern void QS_target_info_(uint8_t isReset) noexcept; // prototype
 
 void QS::onCommand(uint8_t cmdId, uint32_t param1,
                    uint32_t param2, uint32_t param3)
@@ -386,10 +385,6 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     QS_END()
 
     switch (cmdId) {
-        case 1: {
-            QS_target_info_(static_cast<uint8_t>(0xFF)); // test a reset
-            break;
-        }
         case 10: {
             assert_failed("QS_onCommand", 10); // for testing assertions
             break;

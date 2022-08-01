@@ -41,13 +41,13 @@
 // QK interrupt entry and exit
 #define QK_ISR_ENTRY() do { \
     QF_INT_DISABLE();       \
-    ++QF_intNest_;          \
+    ++QP::QF::intNest_;     \
     QF_INT_ENABLE();        \
 } while (false)
 
 #define QK_ISR_EXIT() do {   \
     QF_INT_DISABLE();        \
-    --QF_intNest_;           \
+    --QP::QF::intNest_;      \
     if (QK_sched_() != 0U) { \
         IFS0SET = _IFS0_CS0IF_MASK; \
     }                        \
