@@ -259,7 +259,7 @@ qpcpp.lnt           // QP/C++ options
 
 // variable has 'static' storage duration and non-POD type
 -esym(1756,
- *::l_idleThread)
+ QP::QXThread::idle)
 
 
 // QS ------------------------------------------------------------------------

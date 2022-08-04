@@ -142,7 +142,7 @@ void vApplicationTickHook(void) {
     if (tmp != 0U) {  // debounced user button state changed?
         if (buttons.depressed != 0U) { // user button depressed?
             // demonstrate the ISR APIs: PUBLISH_FROM_ISR and Q_NEW_FROM_ISR
-            QP::QF::PUBLISH_FROM_ISR(Q_NEW_FROM_ISR(QP::QEvt, DPP::PAUSE_SIG),
+            QP::QActive::PUBLISH_FROM_ISR(Q_NEW_FROM_ISR(QP::QEvt, DPP::PAUSE_SIG),
                                      &xHigherPriorityTaskWoken, &l_TickHook);
         }
         else { // the button is released
