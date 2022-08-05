@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-07
+//! @date Last updated on: 2022-08-05
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -209,7 +209,7 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
         QS_SIG_PRE_(e->sig);        // the signal of this event
         QS_OBJ_PRE_(this);          // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
-        QS_EQC_PRE_(m_eQueue.maxMsg - m_eQueue.nofMsg); // # free entries
+        QS_EQC_PRE_(k_msgq_num_free_get(&m_eQueue)); // # free entries
         QS_EQC_PRE_(0U); // min # free entries (unknown)
     QS_END_NOCRIT_PRE_()
 
@@ -239,7 +239,7 @@ QEvt const *QActive::get_(void) noexcept {
         QS_SIG_PRE_(e->sig);        // the signal of this event
         QS_OBJ_PRE_(this);          // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
-        QS_EQC_PRE_(m_eQueue.maxMsg - m_eQueue.nofMsg); // # free entries
+        QS_EQC_PRE_(k_msgq_num_free_get(&m_eQueue)); // # free entries
     QS_END_PRE_()
 
     return e;

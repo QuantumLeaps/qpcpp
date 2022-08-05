@@ -10,6 +10,8 @@ zephyr_include_directories(
  ../../../ports/zephyr
 )
 
+# add_compile_definitions(Q_SPY)
+
 target_sources(app PRIVATE
  src/main.cpp
  src/bsp.cpp

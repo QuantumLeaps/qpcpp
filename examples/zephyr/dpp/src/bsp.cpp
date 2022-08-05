@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-07
+//! @date Last updated on: 2022-08-05
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -215,7 +215,7 @@ void QS::onFlush(void) {
 //............................................................................
 //! callback function to reset the target (to be implemented in the BSP)
 void QS::onReset(void) {
-    syst_reboot();
+    //???sys_reboot();
 }
 //............................................................................
 //! callback function to execute a user command (to be implemented in BSP)
@@ -247,7 +247,7 @@ Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 #ifndef NDEBUG
     k_panic(); // debug build: halt the system for error search...
 #else
-    syst_reboot(); // release build: reboot the system
+    //???sys_reboot(); // release build: reboot the system
 #endif
 }
 
