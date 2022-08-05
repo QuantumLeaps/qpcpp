@@ -32,8 +32,6 @@
 *.Debug
 *.Release
 *.bak
-*.qlc
-.qpcpp
 JLink*.*
 version-*
 
