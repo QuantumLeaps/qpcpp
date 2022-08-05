@@ -114,6 +114,13 @@ open the file [html/index.html](html/index.html) in your web browser.
 - [Quantum Leaps licensing](https://www.state-machine.com/licensing)
 - [info@state-machine.com](mailto:info@state-machine.com)
 
+
+# How to Help this Project?
+If you like this project, please give it a star (in the upper-right corner of your browser window):
+
+![GitHub star](doxygen/images/github-star.jpg)
+
+
    [RTEF]: <https://www.state-machine.com/rtef>
    [QP]: <https://www.state-machine.com/products/qp>
    [QP/C]: <https://www.state-machine.com/qpc>
