@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-05
+//! @date Last updated on: 2022-08-06
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -40,18 +40,29 @@
 #endif // Q_SPY
 
 namespace { // unnamed namespace
-    Q_DEFINE_THIS_MODULE("qf_port")
+
+Q_DEFINE_THIS_MODULE("qf_port")
+
+//............................................................................
+static void thread_entry(void *p1, void *p2, void *p3) { // Zephyr signature
+    Q_UNUSED_PAR(p2);
+    Q_UNUSED_PAR(p3);
+
+    // run the thread routine (typically endless loop)
+    QP::QActive::thread_(reinterpret_cast<QP::QActive *>(p1));
 }
+
+} // unnamed namespace
 
 // namespace QP ==============================================================
 namespace QP {
 
 // Zephyr spinlock for QF critical section
-struct k_spinlock QF_spinlock;
+struct k_spinlock QF::spinlock;
 
 //............................................................................
 void QF::init(void) {
-    QF_spinlock = (struct k_spinlock){};
+    spinlock = (struct k_spinlock){};
 }
 //............................................................................
 int_t QF::run(void) {
@@ -75,18 +86,10 @@ void QActive::thread_(QActive *act) {
 }
 
 //............................................................................
-static void thread_entry(void *p1, void *p2, void *p3) { // Zephyr signature
-    QActive *act = reinterpret_cast<QActive *>(p1);
-    static_cast<void>(p2); // unused parameter
-    static_cast<void>(p3); // unused parameter
-
-    QActive::thread_(act); // run the thread routine (typically endless loop)
-}
-//............................................................................
 //
-// In the Zephyr port the generic function QActive_setAttr() is used to
+// In the Zephyr port the generic function QActive::setAttr() is used to
 // set the options for the Zephyr thread (attr1) and thread name (attr2).
-// QActive_setAttr() needs to be called *before* QActive::start() for the
+// QActive::setAttr() needs to be called *before* QActive::start() for the
 // given active object.
 //
 void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
@@ -119,7 +122,7 @@ void QActive::start(std::uint_fast8_t const prio,
 #endif
     m_thread = (struct k_thread){}; // clear the thread control block
 #ifdef CONFIG_THREAD_NAME
-    k_thread_name_set(&me->thread, name);
+    k_thread_name_set(&m_thread, name);
 #endif
     k_thread_create(&m_thread,
                     static_cast<k_thread_stack_t *>(stkSto),
@@ -136,13 +139,13 @@ void QActive::start(std::uint_fast8_t const prio,
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
 {
-    std::uint_fast16_t nFree;
-    bool status;
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
-    nFree = static_cast<std::uint_fast16_t>(k_msgq_num_free_get(&m_eQueue));
 
+    std::uint_fast16_t nFree =
+         static_cast<std::uint_fast16_t>(k_msgq_num_free_get(&m_eQueue));
+
+    bool status;
     if (margin == QF_NO_MARGIN) {
         if (nFree > 0U) {
             status = true; // can post
@@ -162,16 +165,16 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     if (status) { // can post the event?
 
         QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
-            QS_TIME_PRE_();        // timestamp
-            QS_OBJ_PRE_(sender);   // the sender object
-            QS_SIG_PRE_(e->sig);   // the signal of the event
-            QS_OBJ_PRE_(this);     // this active object (recipient)
+            QS_TIME_PRE_();         // timestamp
+            QS_OBJ_PRE_(sender);    // the sender object
+            QS_SIG_PRE_(e->sig);    // the signal of the event
+            QS_OBJ_PRE_(this);      // this active object (recipient)
             QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
-            QS_EQC_PRE_(nFree);    // # free entries
-            QS_EQC_PRE_(0U);       // min # free (unknown)
+            QS_EQC_PRE_(nFree);     // # free entries
+            QS_EQC_PRE_(0U);        // min # free (unknown)
         QS_END_NOCRIT_PRE_()
 
-        if (e->poolId_ != 0U) {     // is it a pool event?
+        if (e->poolId_ != 0U) { // is it a pool event?
             QF_EVT_REF_CTR_INC_(e); // increment the reference counter
         }
 
@@ -185,13 +188,13 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     else {
 
         QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
-            QS_TIME_PRE_();             // timestamp
-            QS_OBJ_PRE_(sender);        // the sender object
-            QS_SIG_PRE_(e->sig);        // the signal of the event
-            QS_OBJ_PRE_(this);          // this active object (recipient)
+            QS_TIME_PRE_();         // timestamp
+            QS_OBJ_PRE_(sender);    // the sender object
+            QS_SIG_PRE_(e->sig);    // the signal of the event
+            QS_OBJ_PRE_(this);      // this active object (recipient)
             QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
-            QS_EQC_PRE_(nFree);         // # free entries
-            QS_EQC_PRE_(0U);            // min # free (unknown)
+            QS_EQC_PRE_(nFree);     // # free entries
+            QS_EQC_PRE_(0U);        // min # free (unknown)
         QS_END_NOCRIT_PRE_()
 
         QF_CRIT_X_();
@@ -205,15 +208,15 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_E_();
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
-        QS_TIME_PRE_();             // timestamp
-        QS_SIG_PRE_(e->sig);        // the signal of this event
-        QS_OBJ_PRE_(this);          // this active object
+        QS_TIME_PRE_();              // timestamp
+        QS_SIG_PRE_(e->sig);         // the signal of this event
+        QS_OBJ_PRE_(this);           // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
         QS_EQC_PRE_(k_msgq_num_free_get(&m_eQueue)); // # free entries
-        QS_EQC_PRE_(0U); // min # free entries (unknown)
+        QS_EQC_PRE_(0U);             // min # free entries (unknown)
     QS_END_NOCRIT_PRE_()
 
-    if (e->poolId_ != 0U) {     // is it a pool event?
+    if (e->poolId_ != 0U) {  // is it a pool event?
         QF_EVT_REF_CTR_INC_(e); // increment the reference counter
     }
 
@@ -223,7 +226,8 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     // so normal FIFO posting is used instead.
     //
     Q_ALLEGE_ID(810,
-        k_msgq_put(&m_eQueue, static_cast<void const *>(&e), K_NO_WAIT) == 0);
+        k_msgq_put(&m_eQueue, static_cast<void const *>(&e), K_NO_WAIT)
+        == 0);
 }
 //............................................................................
 QEvt const *QActive::get_(void) noexcept {
@@ -235,9 +239,9 @@ QEvt const *QActive::get_(void) noexcept {
         k_msgq_get(&m_eQueue, static_cast<void *>(&e), K_FOREVER) == 0);
 
     QS_BEGIN_PRE_(QS_QF_ACTIVE_GET, m_prio)
-        QS_TIME_PRE_();             // timestamp
-        QS_SIG_PRE_(e->sig);        // the signal of this event
-        QS_OBJ_PRE_(this);          // this active object
+        QS_TIME_PRE_();               // timestamp
+        QS_SIG_PRE_(e->sig);          // the signal of this event
+        QS_OBJ_PRE_(this);            // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
         QS_EQC_PRE_(k_msgq_num_free_get(&m_eQueue)); // # free entries
     QS_END_PRE_()
@@ -247,6 +251,3 @@ QEvt const *QActive::get_(void) noexcept {
 
 } // namespace QP
 
-//============================================================================
-// NOTE
-//

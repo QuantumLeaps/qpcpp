@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-05
+//! @date Last updated on: 2022-08-06
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -33,6 +33,7 @@
 #include "bsp.hpp"
 
 #include <drivers/gpio.h>
+#include <sys/reboot.h>
 // add other drivers if necessary...
 
 #ifdef Q_SPY
@@ -106,7 +107,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 #ifndef NDEBUG
     k_panic(); /* debug build: halt the system for error search... */
 #else
-    //???sys_reboot(); /* release build: reboot the system */
+    sys_reboot(SYS_REBOOT_COLD); /* release build: reboot the system */
 #endif
 }
 

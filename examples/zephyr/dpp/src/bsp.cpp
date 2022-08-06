@@ -33,6 +33,7 @@
 #include "bsp.hpp"
 
 #include <drivers/gpio.h>
+#include <sys/reboot.h>
 // add other drivers if necessary...
 
 // The devicetree node identifier for the "led0" alias.
@@ -79,7 +80,7 @@ static void QF_tick_function(struct k_timer *tid) {
 
 }
 
-// namespace DPP *************************************************************
+// namespace DPP ============================================================
 namespace DPP {
 
 // BSP functions .............................................................
@@ -135,7 +136,6 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
     else {
         ledOff();
     }
-    printk("Philo[%d]->%s\n", n, stat);
 
     QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
@@ -179,25 +179,62 @@ namespace QP {
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
     k_timer_start(&QF_tick_timer, K_MSEC(1), K_MSEC(1));
-    printk("QF::onStartup\n");
 }
 //............................................................................
 void QF::onCleanup(void) {
-    printk("QF::onCleanup\n");
 }
 
 // QS callbacks ==============================================================
 #ifdef Q_SPY
+
+#include <drivers/uart.h>
+
+static const struct device *uart_console_dev;
+
 //............................................................................
+static K_THREAD_STACK_DEFINE(qspy_stack, 1024); // stack storage
+static k_thread qspy_thread_handler;
+static void qspy_thread(void *p1, void *p2, void *p3){
+    while (true) {
+        // transmit bytes...
+        std::uint16_t len = 0xFFFFU; // get as many bytes as available
+        
+        QS_CRIT_STAT_
+        QS_CRIT_E_();
+        std::uint8_t const *buf = QS::getBlock(&len);
+        QS_CRIT_X_();
+        for (; len != 0U; --len, ++buf) {
+            uart_poll_out(uart_console_dev, *buf); 
+        }
+
+        // receive bytes...
+        std::uint8_t b;
+        while (uart_poll_in(uart_console_dev, &b) == 0) {
+            QS::rxPut(b);
+        }
+        QS::rxParse();
+    }
+}
+
 bool QS::onStartup(void const *arg) {
     static uint8_t qsTxBuf[2*1024]; // buffer for QS transmit channel
-    static uint8_t qsRxBuf[100];    // buffer for QS receive channel
+    static uint8_t qsRxBuf[256];    // buffer for QS receive channel
 
     initBuf  (qsTxBuf, sizeof(qsTxBuf));
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
-
-    //TBD...
-
+    uart_console_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+    Q_ASSERT(uart_console_dev != NULL);
+    k_thread_create(&qspy_thread_handler,
+                    qspy_stack,
+                    K_THREAD_STACK_SIZEOF(qspy_stack),
+                    &qspy_thread,
+                    nullptr, // p1
+                    nullptr, // p2
+                    nullptr, // p3
+                    QF_MAX_ACTIVE, // lowest priority
+                    K_ESSENTIAL,   // thread options
+                    K_NO_WAIT);    // start immediately
+    //TODO assert if could not create thread
     return true; // return success
 }
 //............................................................................
@@ -205,17 +242,25 @@ void QS::onCleanup(void) {
 }
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
-    //TBD...
-    return 0U;
+    return k_uptime_get_32();
 }
 //............................................................................
 void QS::onFlush(void) {
-    //TBD...
+    uint16_t len = 0xFFFFU; // big number to get as many bytes as available
+    uint8_t const *buf = QS::getBlock(&len); // get continguous block of data
+    while (buf != nullptr) { // data available?
+        for(auto i = 0;i!=len;i++)
+        {
+            uart_poll_out(uart_console_dev,buf[i]); 
+        }        
+        len = 0xFFFFU; // big number to get as many bytes as available
+        buf = QS::getBlock(&len); // try to get more data
+    }
 }
 //............................................................................
 //! callback function to reset the target (to be implemented in the BSP)
 void QS::onReset(void) {
-    //???sys_reboot();
+    sys_reboot(SYS_REBOOT_COLD);
 }
 //............................................................................
 //! callback function to execute a user command (to be implemented in BSP)
@@ -247,7 +292,7 @@ Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 #ifndef NDEBUG
     k_panic(); // debug build: halt the system for error search...
 #else
-    //???sys_reboot(); // release build: reboot the system
+    sys_reboot(SYS_REBOOT_COLD); // release build: reboot the system
 #endif
 }
 

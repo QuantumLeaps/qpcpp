@@ -29,6 +29,9 @@ target_sources(app PRIVATE
  ../../../src/qf/qf_qeq.cpp
  ../../../src/qf/qf_qmact.cpp
  ../../../src/qf/qf_time.cpp
+# ../../../src/qs/qs.cpp
+# ../../../src/qs/qs_rx.cpp
+# ../../../include/qstamp.cpp
  ../../../ports/zephyr/qf_port.cpp
 )
 

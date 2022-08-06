@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-07
+//! @date Last updated on: 2022-08-06
 //! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
@@ -43,8 +43,8 @@
 
 // QF critical section entry/exit for Zephyr, see NOTE1/
 #define QF_CRIT_STAT_TYPE    k_spinlock_key_t
-#define QF_CRIT_ENTRY(key_)  ((key_) = k_spin_lock(&QP::QF_spinlock))
-#define QF_CRIT_EXIT(key_)   (k_spin_unlock(&QP::QF_spinlock, (key_)))
+#define QF_CRIT_ENTRY(key_)  ((key_) = k_spin_lock(&QP::QF::spinlock))
+#define QF_CRIT_EXIT(key_)   (k_spin_unlock(&QP::QF::spinlock, (key_)))
 
 #include <zephyr.h>      // Zephyr API
 #include "qep_port.hpp"  // QEP port
@@ -53,10 +53,12 @@
 #include "qf.hpp"        // QF platform-independent public interface
 
 namespace QP {
+namespace QF {
 
 // Zephyr spinlock for QF critical section
-extern struct k_spinlock QF_spinlock;
+extern struct k_spinlock spinlock;
 
+} // namespace QF
 } // namespace QP
 
 //============================================================================
@@ -77,7 +79,6 @@ extern struct k_spinlock QF_spinlock;
     #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
     #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
-
 
 #endif // ifdef QP_IMPL
 
