@@ -3,5 +3,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 build:
-  cmake: ./zephyr/CMakeLists.txt
+  cmake: ./zephyr/
   kconfig: ./zephyr/Kconfig
