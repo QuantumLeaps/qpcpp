@@ -1,0 +1,7 @@
+# QPCPP Zephyr Module
+# Copyright (c) 2022 Victor Chavez
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+build:
+  cmake: zephyr/CMakeLists.txt
+  kconfig: zephyr/Kconfig
