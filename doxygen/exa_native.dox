@@ -5,20 +5,14 @@ namespace QP {
 
 <p>The QP/C++ framework contains real-time kernels (@ref comp_qv and @ref comp_qk), so it can run natively ("bare-metal") on single-chip microcontrollers, completely replacing a traditional RTOS. Click on the following links to see examples for the specified built-in kernels:
 </p>
-
 - @subpage exa_qv
 - @subpage exa_qk
 - @subpage exa_qxk
 
-
-
 Click on the following links to see examples for the specified CPU architectures:
-
 - @subpage exa_arm-cm
 - @subpage exa_arm-cr
-- @subpage exa_arm7-9
 - @subpage exa_msp430
-
 */
 /*##########################################################################*/
 /*! @page exa_qv QV Kernel (Non-Preemptive, Priority-Based, Non-Blocking)
@@ -37,10 +31,9 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 - @ref arm-cm_dpp_nucleo-h743zi <a class="preview board" href="bd_NUCLEO-H743ZI.jpg" title="STM32 NUCLEO-H743ZI"></a>
 - @ref arm-cm_dpp_nucleo-l552ze <a class="preview board" href="bd_NUCLEO-L552ZE.jpg" title="STM32 NUCLEO-L552ZE Q"></a>
 - @ref arm-cm_game_efm32-slstk3401a <a class="preview board" href="bd_EFM32-SLSTK3401A.jpg" title="EFM32-SLSTK3401A"></a>
-- @ref arm-cm_low-power <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a>
+- @ref tut_low <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a>
 - @ref arm-cr_blinky_launchxl2-tms57012 <a class="preview board" href="bd_LAUNCHXL2-TMS57012.jpg" title="LAUNCHXL2-TMS57012"></a>
 - @ref arm-cr_dpp_launchxl2-tms57012 <a class="preview board" href="bd_LAUNCHXL2-TMS57012.jpg" title="LAUNCHXL2-TMS57012"></a>
-- @ref arm7-9_dpp_at91sam7s-ek <a class="preview board" href="bd_AT91SAM7S-EK.jpg" title="AT91SAM7S-EK"></a>
 - @ref msp430_blinky_msp-exp430f5529lp <a class="preview board" href="bd_MSP-EXP430F5529LP.jpg" title="MSP-EXP430F5529LP"></a>
 - @ref msp430_dpp_msp-exp430f5529lp <a class="preview board" href="bd_MSP-EXP430F5529LP.jpg" title="MSP-EXP430F5529LP"></a>
 */
@@ -61,10 +54,9 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 - @ref arm-cm_dpp_stm32f4-discovery <a class="preview board" href="bd_STM32F4-Disco.jpg" title="STM32F4-Discovery"></a>
 - @ref arm-cm_dpp_nucleo-h743zi <a class="preview board" href="bd_NUCLEO-H743ZI.jpg" title="STM32 NUCLEO-H743ZI"></a>
 - @ref arm-cm_dpp_nucleo-l552ze <a class="preview board" href="bd_NUCLEO-L552ZE.jpg" title="STM32 STM32 NUCLEO-L552ZE Q"></a>
-- @ref arm-cm_low-power <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a>
+- @ref tut_low <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a>
 - @ref arm-cr_blinky_launchxl2-tms57012 <a class="preview board" href="bd_LAUNCHXL2-TMS57012.jpg" title="LAUNCHXL2-TMS57012"></a>
 - @ref arm-cr_dpp_launchxl2-tms57012 <a class="preview board" href="bd_LAUNCHXL2-TMS57012.jpg" title="LAUNCHXL2-TMS57012"></a>
-- @ref arm7-9_dpp_at91sam7s-ek <a class="preview board" href="bd_AT91SAM7S-EK.jpg" title="AT91SAM7S-EK"></a>
 - @ref msp430_blinky_msp-exp430f5529lp <a class="preview board" href="bd_MSP-EXP430F5529LP.jpg" title="MSP-EXP430F5529LP"></a>
 - @ref msp430_dpp_msp-exp430f5529lp <a class="preview board" href="bd_MSP-EXP430F5529LP.jpg" title="MSP-EXP430F5529LP"></a>
 
@@ -80,7 +72,7 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 - @ref arm-cm_dpp_stm32f4-discovery <a class="preview board" href="bd_STM32F4-Disco.jpg" title="STM32F4-Discovery"></a>
 - @ref arm-cm_dpp_nucleo-l552ze <a class="preview board" href="bd_NUCLEO-L552ZE.jpg" title="STM32 NUCLEO-L552ZE Q"></a>
 - @ref arm-cm_dpp_nucleo-h743zi <a class="preview board" href="bd_NUCLEO-H743ZI.jpg" title="STM32 NUCLEO-H743ZI"></a>
-- @ref arm-cm_low-power <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a>
+- @ref tut_low <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a>
 
 */
 /*##########################################################################*/
@@ -100,7 +92,7 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 - @subpage arm-cm_dpp_nucleo-h743zi <a class="preview board" href="bd_NUCLEO-H743ZI.jpg" title="STM32 NUCLEO-H743ZI"></a>
 - @subpage arm-cm_dpp_nucleo-l552ze <a class="preview board" href="bd_NUCLEO-L552ZE.jpg" title="STM32 NUCLEO-L552ZE"></a>
 - @subpage arm-cm_game_efm32-slstk3401a <a class="preview board" href="bd_EFM32-SLSTK3401A.jpg" title="EFM32-SLSTK3401A"></a>
-- @subpage arm-cm_low-power <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a>
+- @ref tut_lowr <a class="preview board" href="bd_EK-TM4C123GXL.jpg" title="EK-TM4C123GXL"></a>
 */
 /*##########################################################################*/
 /*! @page exa_arm-cr ARM Cortex-R
@@ -110,14 +102,6 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 
 - @subpage arm-cr_blinky_launchxl2-tms57012 <a class="preview board" href="bd_LAUNCHXL2-TMS57012.jpg" title="LAUNCHXL2-TMS57012"></a>
 - @subpage arm-cr_dpp_launchxl2-tms57012 <a class="preview board" href="bd_LAUNCHXL2-TMS57012.jpg" title="LAUNCHXL2-TMS57012"></a>
-*/
-/*##########################################################################*/
-/*! @page exa_arm7-9 ARM7/ARM9 ("classic" ARM)
-
-@note
-You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; icon in the list below to see the picture of the board.
-
-- @subpage arm7-9_dpp_at91sam7s-ek <a class="preview board" href="bd_AT91SAM7S-EK.jpg" title="AT91SAM7S-EK"></a>
 */
 /*##########################################################################*/
 /*! @page exa_msp430 MSP430 ("classic" MSP430 and "extended" MSP430x)
@@ -132,8 +116,6 @@ You can hover the mouse cursor over the <span class="board"></span>&nbsp;&nbsp; 
 
 /*##########################################################################*/
 /*! @page arm-cm_blinky_ek-tm4c123gxl Blinky on EK-TM4C123GXL
-
-@tableofcontents
 
 <p>This example implements the @ref blinky "Blinky sample application" on the EK-TM4C123GLX board (ARM Cortex-M4F).
 </p>
@@ -202,8 +184,6 @@ The Windows emulation is a simple console application that produces the followin
 /*##########################################################################*/
 /*! @page arm-cm_blinky_efm32-slstk3401a Blinky on EFM32-SLSTK3401A
 
-@tableofcontents
-
 <p>This example implements the @ref blinky "Blinky sample application" on the EFM32-SLSTK3401A board (ARM Cortex-M4F).
 </p>
 
@@ -269,8 +249,6 @@ The Windows emulation is a simple console application that produces the followin
 /*##########################################################################*/
 /*! @page arm-cm_dpp_ek-tm4c123gxl DPP on EK-TM4C123GXL
 
-@tableofcontents
-
 <p>This example implements the @ref dpp "Dining Philosophers Problem" sample application on the EK-TM4C123GLX board (ARM Cortex-M4F).
 </p>
 
@@ -283,9 +261,9 @@ The DPP example is located in the directory <span class="img folder">qpcpp/examp
   +-examples/              // QP/C++ examples directory (applications)
   | +-arm-cm/              // QP/C++ examples for ARM Cortex-M
   | | +-dpp_ek-tm4c123gxl/ // DPP example on the EK-TM4C123GLX board
-  | | | +-lint/            // PC-Lint version (static analysis of the application code)
+  | | | +-lint-plus/       // PC-Lint-Plus version (static analysis of the application code)
   | | | | +-lin.bat        // batch file for running the PC-Lint
-  | | | | +-options.lnt    // PC-Lint options file for the DPP application code
+  | | | | +-options.lnt    // PC-Lint options file for the application code
   | | | +-qk/              // QK version
   | | | | +-armclang/      // ARM-KEIL with arm-clang (compiler 6)
   | | | | | +-dpp-qk.uvprojx // uVision project
@@ -361,12 +339,9 @@ The examples demonstrates the QUTest unit tests for the application.
 
 @section arm-cm_dpp_ek-tm4c123gxl_spy QP/Spy Software Tracing
 The application also demonstrates <a href="https://www.state-machine.com/qtools/qpspy.html" target="_blank" class="extern">QP/Spy</a> software tracing output and input. To exercise this feature, you need to build and upload the Spy build configuration into the board.
-
 */
 /*##########################################################################*/
 /*! @page arm-cm_dpp_efm32-slstk3401a DPP on EFM32-SLSTK3401A
-
-@tableofcontents
 
 <p>This example implements the @ref dpp "Dining Philosophers Problem" sample application on the EFM32-SLSTK3401A board (ARM Cortex-M4F).
 </p>
@@ -380,7 +355,7 @@ The DPP example is located in the directory <span class="img folder">qpcpp/examp
   +-examples/              // QP/C++ examples directory (application)
   | +-arm-cm/              // QP/C++ examples for ARM Cortex-M
   | | +-dpp_efm32-slstk3401a/ // DPP example on the EK-TM4C123GLX board
-  | | | +-lint/            // PC-Lint version (static analysis of the application code)
+  | | | +-lint-plus/       // PC-Lint-Plus version (static analysis of the application code)
   | | | | +-lin.bat        // batch file for running the PC-Lint
   | | | | +-options.lnt    // PC-Lint options file for the DPP application code
   | | | +-qk/              // QK version
@@ -441,7 +416,6 @@ The DPP example is located in the directory <span class="img folder">qpcpp/examp
 Once programmed into the board, the example rapidly toggles the LED1 from the idle loop (LED1 glows) and toggles LED0 as the Philosophers change their state. Additionally, you can depress and hold the BTN0 button (left) to PAUSE the application (Table transitions into the "paused" state). Releasing the BTN0 button causes transition back to the "serving" state.
 
 
-
 @section arm-cm_dpp_efm32-slstk3401a_spy QP/Spy Software Tracing
 The application also demonstrates <a href="https://www.state-machine.com/qtools/qpspy.html" target="_blank" class="extern">QP/Spy</a> software tracing output and input. To exercise this feature, you need to build and upload the Spy build configuration into the board.
 
@@ -454,11 +428,10 @@ The application also demonstrates <a href="https://www.state-machine.com/qtools/
 Dining Philosophers Problem (DPP) example for  NXP LPC1768 MCU (Cortex-M3) with GNU-ARM toolchain.
 
 @image html mbed-LPC1768_button.jpg Adding External Button to mbed-LPC1768
-@n
-@n
+
+<br>
 @image html under_construction.jpg
 */
-
 /*##########################################################################*/
 /*! @page arm-cm_dpp_nucleo-l053r8 DPP on STM32 NUCLEO-L053R8
 
@@ -470,7 +443,6 @@ Demonstrated built-in kernels:
 - cooperative @ref qv with ARM-Clang, ARM-Keil, GNU-ARM (Makefile and Atollic TRUEstudio), and IAR-ARM toolchains
 - preemptive, run-to-completion @ref qk with ARM-Clang, ARM-Keil, GNU-ARM, and IAR-ARM toolchains
 - dual-mode (run-to-completion/blocking) @ref qxk with ARM-Clang, ARM-Keil, GNU-ARM, and IAR-ARM toolchains
-
 
 Features:
 - multiple active objects, including 5 instances of the same AO class (Philo)
@@ -489,13 +461,11 @@ Demonstrated built-in kernels:
 - cooperative @ref qv with ARM-Clang, ARM-Keil, GNU-ARM, and IAR-ARM toolchains
 - preemptive, run-to-completion @ref qk with ARM-Clang, ARM-Keil, GNU-ARM, and IAR-ARM toolchains
 
-
 Features:
 - multiple active objects, including 5 instances of the same AO class (Philo)
 - [QP/Spy software tracing](https://www.state-machine.com/qtools/qpspy.html) using the virtual COM-port
 
 */
-
 /*##########################################################################*/
 /*! @page arm-cm_dpp_stm32f4-discovery DPP on STM32F4-Discovery
 
@@ -514,7 +484,6 @@ Features:
 - extended threads (the QXK version)
 - [QP/Spy software tracing](https://www.state-machine.com/qtools/qpspy.html) using the virtual COM-port
 - bi-directional [QP/Spy](https://www.state-machine.com/qtools/qs.html#qs_rx) (sending commands to the target)
-
 
 After you load the DPP example into the STM32F4-Discovery board, the application should start blinking the 4 on-board LEDs. You can press the User button (blue) to PAUSE the philosophers for as long as the button is depressed. The philosophers resume dining when you release the User button. (In the PAUSED state the Table active object stops granting permissions to eat, so eventually all philosophers end in the "hungry" state.)
 
@@ -545,7 +514,6 @@ The actual COM port number might be different on your Windows machine. Please ch
 
 @next{arm-cm_dpp_nucleo-l552ze}
 */
-
 /*##########################################################################*/
 /*! @page arm-cm_dpp_nucleo-h743zi DPP on STM32 NUCLEO-H743ZI
 
@@ -565,7 +533,6 @@ Features:
 - bi-directional [QP/Spy](https://www.state-machine.com/qtools/qs.html#qs_rx) (sending commands to the target)
 
 */
-
 /*##########################################################################*/
 /*! @page arm-cm_dpp_nucleo-l552ze DPP on STM32 STM32 NUCLEO-L552ZE Q
 
@@ -585,7 +552,6 @@ Features:
 - bi-directional [QP/Spy](https://www.state-machine.com/qtools/qs.html#qs_rx) (sending commands to the target)
 
 */
-
 /*##########################################################################*/
 /*! @page arm-cm_game_efm32-slstk3401a "Fly 'n' Shoot" Game on EFM32-SLSTK3401A
 
@@ -598,7 +564,6 @@ Features:
 @n
 @image html under_construction.jpg
 */
-
 /*##########################################################################*/
 /*! @page arm-cr_blinky_launchxl2-tms57012 Blinky on LAUNCHXL2-TMS57012
 
@@ -617,16 +582,6 @@ Dining Philosophers Problem (DPP) example for LAUNCHXL2-TMS57012 MCU (Cortex-R, 
 
 @image html under_construction.jpg
 */
-
-/*##########################################################################*/
-/*! @page arm7-9_dpp_at91sam7s-ek DPP on AT91SAM7S-EK
-
-@image html bd_AT91SAM7S-EK.jpg AT91SAM7S-EK board
-
-Dining Philosophers Problem (DPP) example for Atmel AT91SAM7S MCU (ARM7) with GNU-ARM toolchain.
-
-@image html under_construction.jpg
-*/
 /*##########################################################################*/
 /*! @page msp430_blinky_msp-exp430f5529lp Blinky on MSP-EXP430F5529LP
 
@@ -636,7 +591,6 @@ Simple Blinky example for MSP-EXP430F5529LP with CCS-430 and IAR-430 toolchains.
 
 @note
 The simple Blinky application does NOT support the Spy build configuration. Please see the @ref  msp430_dpp_msp-exp430f5529lp "DPP example" for QS output.
-
 
 */
 /*##########################################################################*/

@@ -56,7 +56,7 @@ extern "C" void MainTask(void) {
 
     QF::init(); // initialize the framework and the underlying RT kernel
 
-    QF::psInit(l_subscrSto, Q_DIM(l_subscrSto)); // init publish-subscribe
+    QActive::psInit(l_subscrSto, Q_DIM(l_subscrSto)); // init publish-subscribe
 
     // initialize event pools...
     QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));

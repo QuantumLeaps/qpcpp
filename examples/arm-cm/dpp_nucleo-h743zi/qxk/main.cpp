@@ -54,7 +54,7 @@ int main() {
     DPP::BSP::init(); // initialize the Board Support Package
 
     // init publish-subscribe
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // initialize event pools...
     QP::QF::poolInit(smlPoolSto,

@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
 
     QF::init(); // initialize the framework and the underlying RT kernel
 
-    // publish-subscribe not used, no call to QF::psInit()
+    // publish-subscribe not used, no call to QActive::psInit()
 
     // initialize event pools...
     QF::poolInit(l_regPoolSto, sizeof(l_regPoolSto), sizeof(QEvt));

@@ -1,11 +1,11 @@
 void QActive::run(void) { // <---
     m_running = true;
     while (m_running) {
-        QP::QEvt const *e = get_(e); // wait for an event
+        QEvt const *e = get_(e); // wait for an event
         dispatch(e, m_prio); // dispatch e to the AO's state machine
-        QP::QF::gc(e);  // check if the event is garbage, and collect it if so
+        QF::gc(e);  // check if the event is garbage, and collect it if so
     }
 
     unsubscribeAll();   // unsubscribe from all signals
-    QF::remove_(this);  // remove this object from any subscriptions
+    unregister_();  // remove this object from any subscriptions
 }

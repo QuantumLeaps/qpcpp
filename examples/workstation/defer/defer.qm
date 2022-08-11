@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.0" links="1">
- <documentation>Dining Philosopher Problem example
-
-NOTE: Requries QP6.</documentation>
+<model version="5.2.0" links="1">
+ <documentation>Deferred Event state pattern</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
  <!--${Events}-->
@@ -230,12 +228,11 @@ int main(int argc, char *argv[]) {
 
     BSP_init(argc, argv); // initialize the BSP
 
-
-    // publish-subscribe not used, no call to QF_psInit()
-
     // initialize event pools...
     QP::QF::poolInit(l_smlPoolSto,
                      sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
+
+    // publish-subscribe not used, no call to QActive::psInit()
 
     QS_SIG_DICTIONARY(NEW_REQUEST_SIG, nullptr); // global signals
     QS_SIG_DICTIONARY(RECEIVED_SIG,    nullptr);

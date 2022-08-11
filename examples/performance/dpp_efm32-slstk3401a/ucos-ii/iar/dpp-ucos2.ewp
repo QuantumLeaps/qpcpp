@@ -353,7 +353,6 @@
                     <state>$PROJ_DIR$\..</state>
                     <state>$PROJ_DIR$\..\..</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\ucos-ii</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Source</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\ucos-ii\Ports\ARM-Cortex-M\ARMv7-M\IAR</state>
@@ -1422,7 +1421,6 @@
                     <state>$PROJ_DIR$\..</state>
                     <state>$PROJ_DIR$\..\..</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\ucos-ii</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Ports\ARM-Cortex-M4\Generic\ARM</state>
@@ -2491,7 +2489,6 @@
                     <state>$PROJ_DIR$\..</state>
                     <state>$PROJ_DIR$\..\..</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\ucos-ii</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Source</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\uCOS-II\Ports\ARM-Cortex-M4\Generic\ARM</state>

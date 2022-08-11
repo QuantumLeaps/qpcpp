@@ -316,7 +316,7 @@ void QF::onCleanup(void) {
 }
 //............................................................................
 void QF_onClockTick(void) {
-    QF::TICK_X(0U, &DPP::l_clock_tick); // perform the QF clock tick processing
+    QTimeEvt::TICK_X(0U, &DPP::l_clock_tick); // perform the QF clock tick processing
 
     QS_RX_INPUT(); // handle the QS-RX input
     QS_OUTPUT();   // handle the QS output

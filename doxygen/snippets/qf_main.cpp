@@ -19,7 +19,7 @@ int_t main(void) {
     QS_OBJ_DICTIONARY(AO_Philo[4]);
 
     static QP::QSubscrList subscrSto[MAX_PUB_SIG];
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
 
     // initialize event pools...
     static QF_MPOOL_EL(TableEvt) smlPoolSto[2*N_PHILO];

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.3" links="1">
+<model version="5.2.0" links="1">
  <documentation>QMsmTst is a test for the QMsm state machine implementation strategy based on the state machine design from Chapter 2 of the PSiCC2 book.</documentation>
  <!--${qpcpp}-->
- <framework name="qpcpp" license="../../../QPCPP-EVAL.qlc"/>
+ <framework name="qpcpp" license="../../../LICENSES/QM-EVAL-QPCPP.qlc"/>
  <!--${SMs}-->
  <package name="SMs" stereotype="0x02">
   <!--${SMs::QMsmTst}-->
@@ -308,7 +308,7 @@ enum QMsmTstSignals {
 extern QP::QHsm * const the_sm; // opaque pointer to the test state machine
 
 // BSP functions to dispaly a message and exit
-void BSP_display(char_t const *msg);
+void BSP_display(char const *msg);
 void BSP_terminate(int16_t const result);
 
 #endif // QMSMTST_HPP

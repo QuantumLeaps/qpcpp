@@ -77,7 +77,7 @@ extern "C" void SysTick_Handler(void) {
     QS_tickTime_ += QS_tickPeriod_; // account for the clock rollover
 #endif
 
-    QF::TICK_X(0U, &l_SysTick_Handler); // process time events at rate 0
+    QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events at rate 0
 
 
     // Perform the debouncing of buttons. The algorithm for debouncing

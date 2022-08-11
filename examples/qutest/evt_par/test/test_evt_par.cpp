@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     QS_TEST_PAUSE();
 
     // initialize publish-subscribe..
-    QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // initialize event pools...
     QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));

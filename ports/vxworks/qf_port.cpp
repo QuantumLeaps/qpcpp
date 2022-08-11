@@ -1,40 +1,33 @@
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
 //! @brief QF/C++ port to VxWorks API
-//! @cond
-//============================================================================
-//! Last updated for version 6.8.0
-//! Last updated on  2020-01-23
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
-//!
+
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
 #include "qf_pkg.hpp"
@@ -92,12 +85,12 @@ void QF::stop(void) {
     onCleanup(); // the cleanup callback
 }
 //............................................................................
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
     // event loop of the active object thread
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e); // dispatch to the active object's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
 }
 //............................................................................
@@ -106,7 +99,7 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par) // see NOTE1
 {
-    (void)stkSize; // unused paramteter in the VxWorks port
+    static_cast<void>(stkSize); // unused parameter in the VxWorks port
 
     Q_REQUIRE_ID(200, (prio <= QF_MAX_ACTIVE) /* not exceeding max */
         && (qSto != nullptr) /* queue storage */
@@ -118,7 +111,7 @@ void QActive::start(std::uint_fast8_t const prio,
     m_eQueue.init(qSto, qLen);
 
     m_prio = prio;  // save the QF priority
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
 
     init(par);      // thake the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
@@ -135,7 +128,7 @@ void QActive::start(std::uint_fast8_t const prio,
     // spawn a VxWorks thread for the active object
     m_thread = taskSpawn(tname,      // task name
         vx_prio,                     // VxWorks priority
-        reinterpret_cast<int>(ie),   // VxWorks taks options, see NOTE1
+        reinterpret_cast<int>(ie),   // VxWorks task options, see NOTE1
         static_cast<size_t>(stkSize),
         reinterpret_cast<FUNCPTR>(&task_function),
         reinterpret_cast<int>(this), 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -162,13 +155,14 @@ static int task_function(
     int /*a9*/,
     int /*a10*/)
 {
-    QP::QF::thread_(reinterpret_cast<QP::QActive *>(a1));
+    QP::QActive::thread_(reinterpret_cast<QP::QActive *>(a1));
+
     return 0;
 }
 
 //............................................................................
 static void usrClockHook(TASK_ID /*tid*/) {
-    QP::QF::TICK_X(0U, &QP::l_clock_tick);
+    QP::QTimeEvt::TICK_X(0U, &QP::l_clock_tick);
 }
 
 } // extern "C"

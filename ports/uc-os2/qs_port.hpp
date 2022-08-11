@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-01-20
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-12
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QS/C++ port to uC-OS2, generic C++11 compiler
@@ -41,9 +41,11 @@
 // and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
 // the QF framework, by simply including "qf_port.hpp" *before* "qs.hpp".
 //
+#ifndef QF_PORT_HPP
 #include "qf_port.hpp" // use QS with QF
+#endif
 
-#if (OS_CRITICAL_METHOD == 3u)
+#if (OS_CRITICAL_METHOD == 3U)
     #define QS_CRIT_STAT_    OS_CPU_SR cpu_sr;
     #define QS_CRIT_E_()     OS_ENTER_CRITICAL()
     #define QS_CRIT_X_()     OS_EXIT_CRITICAL(); QS_REC_DONE()

@@ -23,16 +23,16 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-05-13
-* @version Last updated for: @ref qpcpp_7_0_0
+* @date Last updated on: 2022-06-30
+* @version Last updated for: @ref qpcpp_7_0_1
 *
 * @file
 * @brief QXK/C++ port to ARM Cortex-M, IAR-ARM toolset
 */
-/* This QXK port is part of the interanl QP implementation */
+/* This QXK port is part of the internal QP implementation */
 #define QP_IMPL 1U
 #include "qf_port.hpp"
-#include "qxk_pkg.hpp"
+#include "qf_pkg.hpp"
 
 extern "C" {
 
@@ -63,7 +63,7 @@ void NMI_Handler(void);
 * BASEPRI register. However, this method cannot disable interrupt
 * priority zero, which is the default for all interrupts out of reset.
 * The following code changes the SysTick priority and all IRQ priorities
-* to the safe value QF_BASEPRI, wich the QF critical section can disable.
+* to the safe value QF_BASEPRI, which the QF critical section can disable.
 * This avoids breaching of the QF critical sections in case the
 * application programmer forgets to explicitly set priorities of all
 * "kernel aware" interrupts.
@@ -131,8 +131,8 @@ void QXK_stackInit_(void *thr, QP::QXThreadHandler const handler,
 
     /* synthesize the ARM Cortex-M exception stack frame...*/
     *(--sp) = (1U << 24);    /* xPSR  (just the THUMB bit) */
-    *(--sp) = (std::uint32_t)handler;         /* PC (the thread handler) */
-    *(--sp) = (std::uint32_t)&QXK_threadRet_; /* LR (return from thread) */
+    *(--sp) = (std::uint32_t)handler;          /* PC (the thread handler) */
+    *(--sp) = (std::uint32_t)&QXK_threadExit_; /* LR (return from thread) */
     *(--sp) = 0x0000000CU;   /* R12 */
     *(--sp) = 0x00000003U;   /* R3  */
     *(--sp) = 0x00000002U;   /* R2  */

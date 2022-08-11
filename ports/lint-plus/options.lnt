@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for version: 7.0.0
+//! @date Last updated on: 2022-07-21
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief PC-Lint-Plus option file for linting QP/C++ source code
@@ -37,7 +37,6 @@
 // include directories
 -i.                 // QP/C++ port includes (see also qk/ and qv/)
 -i%QPCPP%/include   // QP/C++ public includes
--i%QPCPP%/src       // QP/C++ package-scope includes
 
 // standards
 au-autosar.lnt      // AUTOSAR:C++14
@@ -86,10 +85,13 @@ qpcpp.lnt           // QP/C++ options
  QEP_EXIT_,
  QEP_ACT_PTR_INC_)
 
+// implicit conversion of enum 'QP::QHsm::QStateRet' to integral type
+-esym(641,
+ QP::QHsm::QStateRet)
+
 // MC++R7-1-2 parameter of function could be pointer to const
 -esym(818,
  QP::QHsm::top)
-
 
 // QF ------------------------------------------------------------------------
 
@@ -193,13 +195,14 @@ qpcpp.lnt           // QP/C++ options
 
 // variable has 'static' storage duration and non-POD type
 -esym(1756,
- QP::QF_pool_,
+ QP::QF::ePool_,
  QP::QF::timeEvtHead_)
 
 // call to unqualified virtual function 'QP::QHsm::init'
 // from non-static member function
 -esym(1933,
  QP::QHsm::init)
+
 
 // QV ------------------------------------------------------------------------
 // MC++R16-0-4 function-like macro
@@ -254,15 +257,10 @@ qpcpp.lnt           // QP/C++ options
  QXK_PTR_CAST_,
  QXTHREAD_CAST_)
 
-// M3-R8.13(a) parameter 'me' of function could be pointer to const
-//-efunc(818,
-// QXThread_init_,
-// QXThread_dispatch_,
-// QXThread_postLIFO_)
-
-// ariable 'QP::l_idleThread' has 'static' storage duration and non-POD type
+// variable has 'static' storage duration and non-POD type
 -esym(1756,
- QP::l_idleThread)
+ QP::QXThread::idle)
+
 
 // QS ------------------------------------------------------------------------
 // the following options are needed only when Q_SPY is defined

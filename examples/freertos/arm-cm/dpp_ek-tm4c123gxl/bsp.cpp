@@ -133,7 +133,7 @@ void vApplicationTickHook(void) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     // process time events for rate 0
-    QP::QF::TICK_X_FROM_ISR(0U, &xHigherPriorityTaskWoken, &l_TickHook);
+    QP::QTimeEvt::TICK_X_FROM_ISR(0U, &xHigherPriorityTaskWoken, &l_TickHook);
 
 #ifdef Q_SPY
     {
@@ -155,7 +155,7 @@ void vApplicationTickHook(void) {
     if ((tmp & BTN_SW1) != 0U) {  // debounced SW1 state changed?
         if ((buttons.depressed & BTN_SW1) != 0U) { // is SW1 depressed?
             // demonstrate the ISR APIs: PUBLISH_FROM_ISR and Q_NEW_FROM_ISR
-            QP::QF::PUBLISH_FROM_ISR(Q_NEW_FROM_ISR(QP::QEvt, DPP::PAUSE_SIG),
+            QP::QActive::PUBLISH_FROM_ISR(Q_NEW_FROM_ISR(QP::QEvt, DPP::PAUSE_SIG),
                                      &xHigherPriorityTaskWoken, &l_TickHook);
         }
         else { // the button is released
@@ -371,7 +371,8 @@ void QF::onCleanup(void) {
 }
 
 //............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
+extern "C"
+Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     //
     // NOTE: add here your application-specific error handling
     //

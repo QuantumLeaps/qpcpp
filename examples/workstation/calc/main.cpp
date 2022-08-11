@@ -47,7 +47,7 @@ int main() {
     QF::onStartup();
 
     cout << "Calculator example, QEP version: "
-         << QP::QEP::getVersion() << endl
+         << QP_VERSION_STR << endl
          << "Press '0' .. '9'     to enter a digit\n"
             "Press '.'            to enter the decimal point\n"
             "Press '+' or '#'     to add\n"
@@ -68,7 +68,7 @@ int main() {
 
         cout << ": ";
 
-        e.key_code = static_cast<std::uint8_t>(QF_consoleWaitForKey());
+        e.key_code = static_cast<std::uint8_t>(QF::consoleWaitForKey());
         cout << static_cast<char>(e.key_code) << ' ';
 
         switch (e.key_code) {

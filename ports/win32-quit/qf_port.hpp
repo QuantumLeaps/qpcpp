@@ -1,40 +1,33 @@
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
 //! @brief QF/C++ port for QUIT unit internal test, Win32 with GNU/VisualC++
-//! @cond
-//============================================================================
-//! Last updated for version 6.9.2
-//! Last updated on  2021-01-12
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
-//!
+
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
 
@@ -53,8 +46,8 @@
 #define QF_ACTIVE_STOP       1
 
 // QF interrupt disable/enable
-#define QF_INT_DISABLE()     (++QF_intNest)
-#define QF_INT_ENABLE()      (--QF_intNest)
+#define QF_INT_DISABLE()     (++QP::QF::intNest_)
+#define QF_INT_ENABLE()      (--QP::QF::intNest_)
 
 // QUIT critical section
 // QF_CRIT_STAT_TYPE not defined
@@ -63,25 +56,17 @@
 
 // QF_LOG2 not defined -- use the internal LOG2() implementation
 
-#include "qep_port.hpp"  // QEP port
-#include "qequeue.hpp"   // Win32-QV needs event-queue
-#include "qmpool.hpp"    // Win32-QV needs memory-pool
-#include "qpset.hpp"     // Win32-QV needs priority-set
-#include "qf.hpp"        // QF platform-independent public interface
-
-namespace QP {
-
-// interrupt nesting up-down counter
-extern std::uint8_t volatile QF_intNest;
-
-} // namespace QP
-
 // special adaptations for QWIN GUI applications
 #ifdef QWIN_GUI
     // replace main() with main_gui() as the entry point to a GUI app.
     #define main() main_gui()
     int_t main_gui(); // prototype of the GUI application entry point
 #endif
+
+#include "qep_port.hpp"  // QEP port
+#include "qequeue.hpp"   // QUIT needs event-queue
+#include "qmpool.hpp"    // QUIT needs memory-pool
+#include "qf.hpp"        // QF platform-independent public interface
 
 //============================================================================
 // interface used only inside QF, but not in applications
@@ -90,14 +75,14 @@ extern std::uint8_t volatile QF_intNest;
 
     // Win32-QV specific scheduler locking, see NOTE2
     #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) ((void)0)
-    #define QF_SCHED_UNLOCK_()    ((void)0)
+    #define QF_SCHED_LOCK_(dummy) (static_cast<void>(0))
+    #define QF_SCHED_UNLOCK_()    (static_cast<void>(0))
 
     // native event queue operations...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT((me_)->m_eQueue.m_frontEvt != nullptr)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QV_readySet_.insert((me_)->m_prio)); \
+        (QF::readySet_.insert((me_)->m_prio)); \
         (void)SetEvent(QV_win32Event_)
 
     // Win32-QV specific event pool operations

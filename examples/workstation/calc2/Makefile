@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ for Windows and POSIX *HOSTS*
-# Last updated for version 6.9.3
-# Last updated on  2021-03-18
+# Last Updated for Version: 7.0.1
+# Date of the Last Update:  2022-05-23
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -145,7 +145,7 @@ endif
 # Typically you should not need to change anything below this line
 
 VPATH    += $(QPCPP)/src/qf $(QP_PORT_DIR)
-INCLUDES += -I$(QPCPP)/include -I$(QPCPP)/src -I$(QP_PORT_DIR)
+INCLUDES += -I$(QPCPP)/include -I$(QP_PORT_DIR)
 
 #-----------------------------------------------------------------------------
 # GNU toolset:

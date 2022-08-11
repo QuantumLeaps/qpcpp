@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.0" links="1">
- <documentation>Dining Philosopher Problem example
-
-NOTE: Requries QP6.</documentation>
+<model version="5.2.0" links="1">
+ <documentation>Reminder state pattern</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
  <!--${Events}-->
@@ -154,14 +152,15 @@ int main(int argc, char *argv[]) {
     BSP_init(argc, argv); // initialize the BSP
     QF::init(); // initialize the framework and the underlying RT kernel
 
-    // publish-subscribe not used, no call to QF_psInit()
-
+    // pools for dynamic (mutable) events
     QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
+
+    // publish-subscribe not used, no call to QActive::psInit()
 
     // instantiate and start the active objects...
     l_cruncher.start(1U,
                      l_cruncherQSto, Q_DIM(l_cruncherQSto),
-                     nullptr, 0U, (QEvt *)0);
+                     nullptr, 0U, nullptr);
 
     return QF::run(); // run the QF application
 }

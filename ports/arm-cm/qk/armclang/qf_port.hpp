@@ -21,12 +21,12 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-04-10
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ port to ARM Cortex-M, preemptive QK kernel, ARM-CLANG
-//!
+
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
 
@@ -51,7 +51,7 @@
     // CMSIS threshold for "QF-aware" interrupts, see NOTE2 and NOTE4
     #define QF_AWARE_ISR_CMSIS_PRI 0
 
-    // hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
+    // hand-optimized LOG2 in assembly for ARMv6-M...
     #define QF_LOG2(n_) QF_qlog2(static_cast<std::uint32_t>(n_))
 
 #else // ARMv7-M or higher
@@ -96,7 +96,6 @@
 #endif // ARMv6-M
 
 #include "qk_port.hpp"  // QK preemptive kernel port
-#include "qf.hpp"       // QF platform-independent public interface
 
 //============================================================================
 // NOTE1:
@@ -117,8 +116,8 @@
 // with numerical priority values lower than QF_BASEPRI) are NOT disabled in
 // this method. These free-running interrupts have very low ("zero") latency,
 // but they are not allowed to call any QF services, because QF is unaware
-// of them ("QF-unaware" interrutps). Consequently, only interrupts with
-// numerical values of priorities eqal to or higher than QF_BASEPRI
+// of them ("QF-unaware" interrupts). Consequently, only interrupts with
+// numerical values of priorities equal to or higher than QF_BASEPRI
 // ("QF-aware" interrupts ), can call QF services.
 //
 // NOTE4:

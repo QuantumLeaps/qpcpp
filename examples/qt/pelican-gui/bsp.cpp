@@ -45,7 +45,7 @@ static uint8_t const l_time_tick = 0U; // for QS
 
 //............................................................................
 void QP::QF_onClockTick(void) {
-    QP::QF::TICK_X(0U, &l_time_tick);
+    QP::QTimeEvt::TICK_X(0U, &l_time_tick);
 }
 //............................................................................
 void QP::QF::onStartup(void) {

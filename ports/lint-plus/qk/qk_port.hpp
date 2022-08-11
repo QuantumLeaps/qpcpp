@@ -2,14 +2,14 @@
 //! @brief QK/C++ port to Lint, Generic C++ compiler
 //! @cond
 //============================================================================
-//! Last updated for version 6.8.0
-//! Last updated on  2020-01-20
+//! Last updated for version 7.0.1
+//! Last updated on  2022-06-30
 //!
 //!                    Q u a n t u m  L e a P s
 //!                    ------------------------
 //!                    Modern Embedded Software
 //!
-//! Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+//! Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //!
 //! This program is open source software: you can redistribute it and/or
 //! modify it under the terms of the GNU General Public License as published
@@ -54,9 +54,8 @@
 //! QK ports will not define this macro, but instead will provide ISR
 //! skeleton code in assembly.
 #define QK_ISR_ENTRY() do { \
-    ++QK_attr_.intNest;     \
+    ++QP::QF::intNest_;     \
 } while (false)
-
 
 //! Define the ISR exit sequence, if the compiler supports writing
 //! interrupts in C++.
@@ -64,16 +63,16 @@
 //! the macro appropriately for the CPU/compiler you're using. Also, some
 //! QK ports will not define this macro, but instead will provide ISR
 //! skeleton code in assembly.
-#define QK_ISR_EXIT()     do {    \
-    --QK_attr_.intNest;           \
-    if (QK_attr_.intNest == 0U) { \
-        if (QK_sched_() != 0U) {  \
-            QK_activate_();       \
-        }                         \
-    }                             \
-    else {                        \
-        Q_ERROR();                \
-    }                             \
+#define QK_ISR_EXIT()     do {   \
+    --QP::QF::intNest_;          \
+    if (QP::QF::intNest_ == 0U) {\
+        if (QK_sched_() != 0U) { \
+            QK_activate_();      \
+        }                        \
+    }                            \
+    else {                       \
+        Q_ERROR();               \
+    }                            \
 } while (false)
 
 extern "C" {

@@ -21,12 +21,12 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-04-10
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ port to ARM Cortex-M, cooperative QV kernel, IAR-ARM
-//!
+
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
 
@@ -37,7 +37,7 @@
 #if (__ARM_ARCH == 6) // if ARMv6-M...
 
     // The maximum number of active objects in the application, see NOTE1
-    #define QF_MAX_ACTIVE       8U
+    #define QF_MAX_ACTIVE       16U
 
     // Cortex-M0/M0+/M1(v6-M, v6S-M) interrupt disabling policy, see NOTE2
     #define QF_INT_DISABLE()    __disable_interrupt()
@@ -51,13 +51,13 @@
     // CMSIS threshold for "QF-aware" interrupts, see NOTE2 and NOTE4
     #define QF_AWARE_ISR_CMSIS_PRI 0
 
-    // hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
+    // hand-optimized LOG2 in assembly for ARMv6-M...
     #define QF_LOG2(n_) QF_qlog2(static_cast<std::uint32_t>(n_))
 
 #else // ARMv7-M or higher
 
     // The maximum number of active objects in the application, see NOTE1
-    #define QF_MAX_ACTIVE       16U
+    #define QF_MAX_ACTIVE       32U
 
     // Cortex-M3/M4/M7 alternative interrupt disabling with PRIMASK
     #define QF_PRIMASK_DISABLE() __disable_interrupt()
@@ -90,8 +90,8 @@
 
 #define QF_CRIT_EXIT_NOP()      __ISB()
 
-#include <intrinsics.h>   // IAR intrinsic functions
-#include "qep_port.hpp"   // QEP port
+#include <intrinsics.h> // IAR intrinsic functions
+#include "qep_port.hpp" // QEP port
 
 #if (__ARM_ARCH == 6) // if ARMv6-M...
     // hand-optimized quick LOG2 in assembly
@@ -99,7 +99,6 @@
 #endif // ARMv6-M
 
 #include "qv_port.hpp"  // QV cooperative kernel port
-#include "qf.hpp"       // QF platform-independent public interface
 
 //============================================================================
 // NOTE1:
@@ -120,8 +119,8 @@
 // with numerical priority values lower than QF_BASEPRI) are NOT disabled in
 // this method. These free-running interrupts have very low ("zero") latency,
 // but they are not allowed to call any QF services, because QF is unaware
-// of them ("QF-unaware" interrutps). Consequently, only interrupts with
-// numerical values of priorities eqal to or higher than QF_BASEPRI
+// of them ("QF-unaware" interrupts). Consequently, only interrupts with
+// numerical values of priorities equal to or higher than QF_BASEPRI
 // ("QF-aware" interrupts ), can call QF services.
 //
 // NOTE4:

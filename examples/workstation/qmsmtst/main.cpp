@@ -83,7 +83,7 @@ int main(int argc, char *argv[ ]) {
             QS_OUTPUT(); // handle the QS output
 
             int c;
-            c = (uint8_t)QP::QF_consoleWaitForKey();
+            c = (uint8_t)QP::QF::consoleWaitForKey();
             PRINTF_S("%c: ", (c >= ' ') ? c : 'X');
 
             QP::QEvt e = QEVT_INITIALIZER(0);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[ ]) {
     else { // batch version
         PRINTF_S("QMsmTst, output saved to %s\n", argv[1]);
         FPRINTF_S(l_outFile,
-                "QMsmTst example, QEP %s\n", QP::QEP::getVersion());
+                "QMsmTst example, QEP %s\n", QP_VERSION_STR);
 
         the_sm->init(0U); // trigger the initial tran. in the test HSM
 
@@ -169,14 +169,14 @@ namespace QP {
 
 //----------------------------------------------------------------------------
 void QF::onStartup(void) {
-    QF_consoleSetup();
+    QF::consoleSetup();
 }
 //............................................................................
 void QF::onCleanup(void) {
-    QF_consoleCleanup();
+    QF::consoleCleanup();
 }
 //............................................................................
-void QF_onClockTick(void) {
+void QF::onClockTick(void) {
 }
 
 //----------------------------------------------------------------------------

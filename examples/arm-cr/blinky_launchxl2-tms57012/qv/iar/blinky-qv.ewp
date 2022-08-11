@@ -352,7 +352,6 @@
                     <state>$PROJ_DIR$\..</state>
                     <state>$PROJ_DIR$\..\..</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\arm-cr\qv\iar</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\launchxl2-tms57012\iar\include</state>
                 </option>
@@ -1414,7 +1413,6 @@
                     <state>$PROJ_DIR$\..</state>
                     <state>$PROJ_DIR$\..\..</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\arm-cr\qv\iar</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\launchxl2-tms57012\iar\include</state>
                 </option>
@@ -2476,7 +2474,6 @@
                     <state>$PROJ_DIR$\..</state>
                     <state>$PROJ_DIR$\..\..</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\ports\arm-cr\qv\iar</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\3rd_party\launchxl2-tms57012\iar\include</state>
                 </option>

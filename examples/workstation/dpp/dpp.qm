@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.3" links="1">
- <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
+<model version="5.2.0" links="1">
+ <documentation>Dining Philosopher Problem example</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
  <!--${Shared}-->
@@ -138,7 +138,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
      <entry>m_timeEvt.armX(eat_time(), 0U);</entry>
      <exit>TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
 pe-&gt;philoNum = PHILO_ID(this);
-QP::QF::PUBLISH(pe, this);
+QP::QActive::PUBLISH(pe, this);
 (void)m_timeEvt.disarm();</exit>
      <!--${AOs::Philo::SM::eating::TIMEOUT}-->
      <tran trig="TIMEOUT" target="../../1">
@@ -230,7 +230,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
         m_fork[n] = USED;
         TableEvt *te = Q_NEW(TableEvt, EAT_SIG);
         te-&gt;philoNum = n;
-        QP::QF::PUBLISH(te, this);
+        QP::QActive::PUBLISH(te, this);
         m_isHungry[n] = false;
         BSP::displayPhilStat(n, EATING);
     }
@@ -250,7 +250,7 @@ uint8_t m = LEFT(n);</action>
 m_fork[n] = USED;
 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
 pe-&gt;philoNum = n;
-QP::QF::PUBLISH(pe, this);
+QP::QActive::PUBLISH(pe, this);
 BSP::displayPhilStat(n, EATING);</action>
         <choice_glyph conn="19,26,5,-1,10">
          <action box="1,0,10,2"/>
@@ -289,7 +289,7 @@ if (m_isHungry[m] &amp;&amp; (m_fork[m] == FREE)) {
     m_isHungry[m] = false;
     TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
     pe-&gt;philoNum = m;
-    QP::QF::PUBLISH(pe, this);
+    QP::QActive::PUBLISH(pe, this);
     BSP::displayPhilStat(m, EATING);
 }
 m = LEFT(n); // check the left neighbor
@@ -300,7 +300,7 @@ if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
     m_isHungry[m] = false;
     TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
     pe-&gt;philoNum = m;
-    QP::QF::PUBLISH(pe, this);
+    QP::QActive::PUBLISH(pe, this);
     BSP::displayPhilStat(m, EATING);
 }</action>
        <tran_glyph conn="4,34,3,-1,15">

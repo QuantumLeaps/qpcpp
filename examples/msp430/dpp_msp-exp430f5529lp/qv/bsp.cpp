@@ -97,7 +97,7 @@ extern "C" {
        / DPP::BSP::TICKS_PER_SEC) + 1;
 #endif
 
-    QP::QF::TICK_X(0U, &l_timer0_ISR); // process all time events at rate 0
+    QP::QTimeEvt::TICK_X(0U, &l_timer0_ISR); // process all time events at rate 0
 
 }
 

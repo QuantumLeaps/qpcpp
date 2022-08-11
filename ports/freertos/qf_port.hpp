@@ -1,56 +1,40 @@
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
-//! @brief QF/C++ port to FreeRTOS 10.x, ARM Cortex-M, IAR-ARM toolset
-//! @cond
-//============================================================================
-//! Last updated for version 6.9.1
-//! Last updated on  2020-09-21
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
+//! @brief QF/C++ port to FreeRTOS 10.x
 
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
 
-// Activate the QF ISR API required for FreeRTOS
-#define QF_ISR_API            1
-
-// Activate the QF QActive::stop() API
-#define QF_ACTIVE_STOP        1
-
 // FreeRTOS event queue and thread types
-#define QF_EQUEUE_TYPE        QEQueue
+#define QF_EQUEUE_TYPE        QueueHandle_t
+#define QF_OS_OBJECT_TYPE     StaticQueue_t
 #define QF_THREAD_TYPE        StaticTask_t
-
-#ifdef QF_ACTIVE_STOP
-    #define QF_OS_OBJECT_TYPE bool
-#endif
 
 // The maximum number of active objects in the application, see NOTE1
 #define QF_MAX_ACTIVE         32U
@@ -64,12 +48,19 @@
 #define QF_CRIT_ENTRY(stat_)  taskENTER_CRITICAL()
 #define QF_CRIT_EXIT(stat_)   taskEXIT_CRITICAL()
 
+// FreeRTOS requires the "FromISR" API in QP/C++
+#define QF_ISR_API      1
+
+// enable the QActive::stop()
+#define QF_ACTIVE_STOP  1
+
 #include "FreeRTOS.h"   // FreeRTOS master include file, see NOTE4/
-#include "task.h"       // FreeRTOS task  management
+#include "task.h"       // FreeRTOS task management
+#include "queue.h"      // FreeRTOS queue management
 
 #include "qep_port.hpp" // QEP port
-#include "qequeue.hpp"  // this QP port uses the native QF event queue
-#include "qmpool.hpp"   // this QP port uses the native QF memory pool
+#include "qequeue.hpp"  // QF event queue (for deferring events)
+#include "qmpool.hpp"   // this QP port uses memory pool (for event pools)
 #include "qf.hpp"       // QF platform-independent public interface
 
 // the "FromISR" versions of the QF APIs, see NOTE3
@@ -78,26 +69,27 @@
         publishFromISR_((e_), (pxHigherPrioTaskWoken_), (sender_))
 
     #define POST_FROM_ISR(e_, pxHigherPrioTaskWoken_, sender_) \
-        postFromISR_((e_), QP::QF_NO_MARGIN, \
+        postFromISR_((e_), QF_NO_MARGIN, \
                      (pxHigherPrioTaskWoken_), (sender_))
 
     #define POST_X_FROM_ISR(e_, margin_, pxHigherPrioTaskWoken_, sender_) \
         postFromISR_((e_), (margin_), (pxHigherPrioTaskWoken_), (sender_))
 
     #define TICK_X_FROM_ISR(tickRate_, pxHigherPrioTaskWoken_, sender_) \
-        tickXfromISR_((tickRate_), (pxHigherPrioTaskWoken_), (sender_))
+        tickFromISR_((tickRate_), (pxHigherPrioTaskWoken_), (sender_))
 #else
     #define PUBLISH_FROM_ISR(e_, pxHigherPrioTaskWoken_, dummy) \
-        publishFromISR_((e_), (pxHigherPrioTaskWoken_))
+        publishFromISR_((e_), (pxHigherPrioTaskWoken_), nullptr)
 
     #define POST_FROM_ISR(e_, pxHigherPrioTaskWoken_, dummy) \
-        postFromISR_((e_), QP::QF_NO_MARGIN, (pxHigherPrioTaskWoken_))
+        postFromISR_((e_), QF_NO_MARGIN, (pxHigherPrioTaskWoken_), \
+                     nullptr)
 
     #define POST_X_FROM_ISR(e_, margin_, pxHigherPrioTaskWoken_, dummy) \
-        postFromISR_((e_), (margin_), (pxHigherPrioTaskWoken_))
+        postFromISR_((e_), (margin_), (pxHigherPrioTaskWoken_), nullptr)
 
     #define TICK_X_FROM_ISR(tickRate_, pxHigherPrioTaskWoken_, dummy) \
-        tickXfromISR_((tickRate_), (pxHigherPrioTaskWoken_))
+        tickFromISR_((tickRate_), (pxHigherPrioTaskWoken_), nullptr)
 #endif
 
 #define TICK_FROM_ISR(pxHigherPrioTaskWoken_, sender_) \
@@ -105,7 +97,7 @@
 
 #ifdef Q_EVT_CTOR
     #define Q_NEW_FROM_ISR(evtT_, sig_, ...) \
-        (new(QP::QF::newXfromISR_(sizeof(evtT_), QP::QF_NO_MARGIN, 0)) \
+        (new(QP::QF::newXfromISR_(sizeof(evtT_), QF_NO_MARGIN, 0)) \
             evtT_((sig_),  ##__VA_ARGS__))
 
     #define Q_NEW_X_FROM_ISR(e_, evtT_, margin_, sig_, ...) do {        \
@@ -121,7 +113,7 @@
     #define Q_NEW_FROM_ISR(evtT_, sig_)                         \
         (static_cast<evtT_ *>(QP::QF::newXfromISR_(             \
                 static_cast<std::uint_fast16_t>(sizeof(evtT_)), \
-                QP::QF_NO_MARGIN, (sig_))))
+                QF_NO_MARGIN, (sig_))))
 
     #define Q_NEW_X_FROM_ISR(e_, evtT_, margin_, sig_)          \
         ((e_) = static_cast<evtT_ *>(                           \
@@ -158,24 +150,28 @@ extern "C" {
 // interface used only inside QF, but not in applications
 //
 #ifdef QP_IMPL
-    // FreeRTOS blocking for event queue implementation (task level)
-    #define QACTIVE_EQUEUE_WAIT_(me_)                   \
-        while ((me_)->m_eQueue.m_frontEvt == nullptr) { \
-            QF_CRIT_X_();                            \
-            ulTaskNotifyTake(pdTRUE, portMAX_DELAY);    \
-            QF_CRIT_E_();                           \
-        }
+    #define FREERTOS_TASK_PRIO(qp_prio_) \
+        ((UBaseType_t)((qp_prio_) + tskIDLE_PRIORITY))
 
-    // FreeRTOS signaling (unblocking) for event queue (task level)
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) do {             \
-        QF_CRIT_X_();                                 \
-        xTaskNotifyGive((TaskHandle_t)&(me_)->m_thread); \
-        QF_CRIT_E_(); \
-    } while (false)
+    /* FreeRTOS scheduler locking for QF_publish_() (task context only) */
+    #define QF_SCHED_STAT_      \
+        UBaseType_t curr_prio;  \
+        TaskHandle_t curr_task;
+    #define QF_SCHED_LOCK_(prio_) do {                              \
+         curr_task = xTaskGetCurrentTaskHandle();                   \
+         curr_prio = uxTaskPriorityGet(curr_task);                  \
+         if (FREERTOS_TASK_PRIO(prio_) > curr_prio) {               \
+             vTaskPrioritySet(curr_task, FREERTOS_TASK_PRIO(prio_));\
+         }                                                          \
+         else {                                                     \
+             curr_prio = tskIDLE_PRIORITY;                          \
+         }                                                          \
+    } while (0)
 
-    #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) vTaskSuspendAll()
-    #define QF_SCHED_UNLOCK_()    xTaskResumeAll()
+    #define QF_SCHED_UNLOCK_()                                      \
+         if (curr_prio != tskIDLE_PRIORITY) {                       \
+             vTaskPrioritySet(curr_task, curr_prio);                \
+         } else ((void)0)
 
     // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool

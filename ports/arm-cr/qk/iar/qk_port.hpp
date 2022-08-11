@@ -2,14 +2,14 @@
 //! @brief QK/C++ port to ARM Cortex-R, preemptive QK kernel, IAR-ARM toolset
 //! @cond
 //============================================================================
-//! Last updated for version 6.6.0
-//! Last updated on  2019-07-30
+//! Last updated for version 7.0.1
+//! Last updated on  2022-06-30
 //!
 //!                    Q u a n t u m  L e a P s
 //!                    ------------------------
 //!                    Modern Embedded Software
 //!
-//! Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+//! Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //!
 //! This program is open source software: you can redistribute it and/or
 //! modify it under the terms of the GNU General Public License as published
@@ -54,7 +54,7 @@
     __asm(" AND R3, SP, #4\n" \
     " SUB SP, SP, R3\n" \
     " PUSH {R3, LR}\n"); \
-    ++QK_attr_.intNest; {
+    ++QP::QF::intNest_; {
 #else
 #define QK_IRQ_BEGIN(name_) \
     __stackless __arm void name_(void) { \
@@ -65,15 +65,15 @@
     __asm(" AND R3, SP, #4\n" \
     " SUB SP, SP, R3\n" \
     " PUSH {R3, LR}\n"); \
-    ++QK_attr_.intNest; {
+    ++QP::QF::intNest_; {
 #endif
 
 // QK-specific Interrupt Request handler END
 #ifdef __ARMVFP__
 #define QK_IRQ_END() \
-    } --QK_attr_.intNest; \
-    if (QK_attr_.intNest == (uint_fast8_t)0) { \
-        if (QK_sched_() != (uint_fast8_t)0) { \
+    } --QP::QF::intNest_; \
+    if (QP::QF::intNest_ == 0U) { \
+        if (QK_sched_() != 0U) { \
             QK_activate_(); \
         } \
     } \
@@ -89,9 +89,9 @@
 }
 #else
 #define QK_IRQ_END() \
-    } --QK_attr_.intNest; \
-    if (QK_attr_.intNest == (uint_fast8_t)0) { \
-        if (QK_sched_() != (uint_fast8_t)0) { \
+    } --QP::QF::intNest_; \
+    if (QP::QF::intNest_ == 0U) { \
+        if (QK_sched_() != 0U) { \
             QK_activate_(); \
         } \
     } \

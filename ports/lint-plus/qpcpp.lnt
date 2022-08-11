@@ -22,11 +22,12 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-31
-//! @version Last updated for version: 7.0.0
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for version: 7.0.1
 //!
 //! @file
 //! @brief PC-Lint-Plus option file for linting QP/C++ __Applications__
+
 
 // Assertions ----------------------------------------------------------------
 
@@ -91,6 +92,7 @@
 
 // MC++R16-0-4 function-like macro
 -esym(9026,
+ Q_UNUSED_PAR,
  Q_DIM,
  Q_UINT2PTR_CAST)
 
@@ -100,7 +102,6 @@
  Q_ASSERT_ID,
  Q_ERROR,
  Q_ERROR_ID)
-
 
 // QEP -----------------------------------------------------------------------
 
@@ -289,6 +290,11 @@
 -esym(1790,
  QP::QEvt)
 
+// variable has 'static' storage duration and non-POD type
+// [AUTOSAR Rule A3-3-2]
+-esym(1756,
+ QP::QTimeEvt::timeEvtHead_)
+
 
 // QK ------------------------------------------------------------------------
 
@@ -326,11 +332,11 @@
 -emacro(9079,
  QXK_PTR_CAST_)
 
-// MC++R5-2-2 casting from base class 'QP::QActive' to derived class 'QP::QXThread'
+// MC++R5-2-2 casting from base class to derived class
 -emacro(1939,
  QXTHREAD_CAST_)
 
-// MC++R5-2-3 downcast of polymorphic type 'QP::QActive' to type 'QP::QXThread'
+// MC++R5-2-3 downcast of polymorphic type
 -emacro(9171,
  QXTHREAD_CAST_)
 

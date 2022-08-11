@@ -1,39 +1,32 @@
+//============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
 //! @brief QF/C++ port to embOS RTOS kernel, all supported compilers
-//! @cond
-//!/**************************************************************************
-//! Last updated for version 6.9.3
-//! Last updated on  2021-04-09
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//!/**************************************************************************
-//! @endcond
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -89,13 +82,15 @@ void QF::stop(void) {
 }
 
 // thread for active objects -------------------------------------------------
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
     // event-loop
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
+    act->unregister_(); // remove this object from QF
+    OS_TerminateTask(&act->m_thread);
 }
 
 //............................................................................
@@ -109,9 +104,7 @@ static void thread_function(void *pVoid) { // embOS signature
     }
 #endif  // __TARGET_FPU_VFP
 
-    QF::thread_(act);
-    QF::remove_(act); // remove this object from QF
-    OS_TerminateTask(&act->getThread());
+    QActive::thread_(act);
 }
 //............................................................................
 void QActive::start(std::uint_fast8_t const prio,
@@ -126,7 +119,7 @@ void QActive::start(std::uint_fast8_t const prio,
                 static_cast<void *>(&qSto[0]));
 
     m_prio = prio;  // save the QF priority
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
@@ -162,13 +155,8 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
     }
 }
 //............................................................................
-#ifndef Q_SPY
-bool QActive::post_(QEvt const * const e,
-                    std::uint_fast16_t const margin) noexcept
-#else
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                      void const * const sender) noexcept
-#endif
 {
     std::uint_fast16_t nFree;
     bool status;

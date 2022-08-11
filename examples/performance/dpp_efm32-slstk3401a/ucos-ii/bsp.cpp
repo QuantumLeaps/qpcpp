@@ -178,7 +178,7 @@ void App_TimeTickHook(void) {
     }
 #endif
 
-    QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle

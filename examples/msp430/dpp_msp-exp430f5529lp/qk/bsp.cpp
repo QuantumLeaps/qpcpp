@@ -94,7 +94,7 @@ extern "C" {
 #endif
     QK_ISR_ENTRY();    // inform QK about entering the ISR
 
-    QP::QF::TICK_X(0U, &l_timer0_ISR); // process all time events at rate 0
+    QP::QTimeEvt::TICK_X(0U, &l_timer0_ISR); // process all time events at rate 0
 
     QK_ISR_EXIT();     // inform QK about exiting the ISR
 

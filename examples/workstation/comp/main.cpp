@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     BSP_init(argc, argv); // initialize the BSP
     QF::init(); // initialize the framework and the underlying RT kernel
 
-    // publish-subscribe not used, no call to QF::psInit()
+    // publish-subscribe not used, no call to QActive::psInit()
 
     // initialize event pools...
     QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));

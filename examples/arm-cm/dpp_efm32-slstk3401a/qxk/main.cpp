@@ -59,7 +59,7 @@ int main() {
     QS_OBJ_DICTIONARY(&l_ticker0);
 
     // init publish-subscribe
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // initialize event pools...
     QP::QF::poolInit(smlPoolSto,

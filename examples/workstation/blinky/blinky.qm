@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.0" links="1">
+<model version="5.2.1" links="1">
+ <documentation>Blinky example</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
  <!--${AOs}-->
@@ -64,6 +65,10 @@
 using namespace std;
 using namespace QP;
 
+#ifdef Q_SPY
+    #error Simple Blinky Application does not provide Spy build configuration
+#endif
+
 enum { BSP_TICKS_PER_SEC = 100 };
 
 void BSP_ledOff(void) {
@@ -78,8 +83,8 @@ extern &quot;C&quot; void Q_onAssert(char const * const module, int loc) {
 }
 void QF::onStartup(void) {}
 void QF::onCleanup(void) {}
-void QP::QF_onClockTick(void) {
-    QF::TICK_X(0U, nullptr);  // perform the QF clock tick processing
+void QF::onClockTick(void) {
+    QTimeEvt::TICK_X(0U, nullptr);  // perform the QF clock tick processing
 }
 
 enum BlinkySignals {
@@ -105,9 +110,7 @@ int main() {
 }
 
 //================ ask QM to define the Blinky class ==================
-$define${AOs::Blinky}
-
-</text>
+$define${AOs::Blinky}</text>
   </file>
  </directory>
 </model>

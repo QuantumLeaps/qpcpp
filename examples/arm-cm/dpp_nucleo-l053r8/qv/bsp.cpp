@@ -88,7 +88,7 @@ void SysTick_Handler(void) {
     }
 #endif
 
-    QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
     //the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
 
     // Perform the debouncing of buttons. The algorithm for debouncing

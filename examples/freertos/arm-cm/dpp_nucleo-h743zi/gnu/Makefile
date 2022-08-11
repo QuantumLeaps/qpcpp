@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on NUCLEO-H743ZI, FreeRTOS, GNU-ARM
-# Last Updated for Version: 7.0.0
-# Date of the Last Update:  2021-07-01
+# Last Updated for Version: 7.0.1
+# Date of the Last Update:  2022-06-13
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -87,7 +87,6 @@ VPATH = \
 INCLUDES  = \
 	-I.. \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(FREERTOS)/Source/include \
 	-I$(FREERTOS)/Source/portable/GCC/ARM_CM4F \
@@ -131,7 +130,6 @@ QP_SRCS := \
 	qep_hsm.cpp \
 	qep_msm.cpp \
 	qf_act.cpp \
-	qf_actq.cpp \
 	qf_defer.cpp \
 	qf_dyn.cpp \
 	qf_mem.cpp \
@@ -143,8 +141,9 @@ QP_SRCS := \
 	qf_port.cpp
 
 RTOS_SRCS := \
-	list.c \
 	tasks.c \
+	queue.c \
+	list.c \
 	port.c
 
 QS_SRCS := \

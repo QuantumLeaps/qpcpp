@@ -1,39 +1,31 @@
+//============================================================================
+// Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
 //! @brief QP/C++ port to Qt
-//! @cond
-//============================================================================
-//! Last updated for version 6.9.1 / Qt 5.x
-//! Last updated on  2020-10-05
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
 
 #define QP_IMPL             // this is QP implementation
 #include "qf_port.hpp"      // QF port
@@ -46,7 +38,9 @@
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-Q_DEFINE_THIS_MODULE("guiapp")
+namespace {
+    Q_DEFINE_THIS_MODULE("guiapp")
+}
 
 //============================================================================
 namespace QP {
@@ -105,22 +99,19 @@ void GuiQActive::start(std::uint_fast8_t const prio,
     (void)qLen;
 
     setPrio(prio);  // set the QF priority of this AO
-    QF::add_(this); // make QF aware of this AO
+    register_(); // make QF aware of this AO
     static_cast<GuiApp *>(QApplication::instance())->registerAct(this);
 
     this->init(par, prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 }
 //............................................................................
-#ifndef Q_SPY
-bool GuiQActive::post_(QEvt const * const e,
-                       std::uint_fast16_t const /*margin*/) noexcept
-#else
 bool GuiQActive::post_(QEvt const * const e,
                        std::uint_fast16_t const /*margin*/,
                        void const * const sender) noexcept
-#endif
 {
+    Q_UNUSED(sender); // when Q_SPY is not defined
+
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
@@ -187,22 +178,19 @@ void GuiQMActive::start(std::uint_fast8_t const prio,
     (void)qLen;
 
     setPrio(prio);  // set the QF priority of this active object
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
     static_cast<GuiApp *>(QApplication::instance())->registerAct(this);
 
     this->init(par, prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 }
 //............................................................................
-#ifndef Q_SPY
-bool GuiQMActive::post_(QEvt const * const e,
-                        std::uint_fast16_t const /*margin*/) noexcept
-#else
 bool GuiQMActive::post_(QEvt const * const e,
                         std::uint_fast16_t const /*margin*/,
                         void const * const sender) noexcept
-#endif
 {
+    Q_UNUSED(sender); // when Q_SPY is not defined
+
     QF_CRIT_STAT_
     QF_CRIT_E_();
 

@@ -61,7 +61,7 @@ int main() {
     QP::QF::poolInit(medPoolSto, sizeof(medPoolSto), sizeof(medPoolSto[0]));
 
     // init publish-subscribe
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // object dictionaries for AOs...
     QS_OBJ_DICTIONARY(GAME::AO_Missile);

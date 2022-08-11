@@ -104,7 +104,7 @@ void vApplicationTickHook(void) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     // process time events for rate 0
-    QP::QF::TICK_X_FROM_ISR(0U, &xHigherPriorityTaskWoken, &l_TickHook);
+    QP::QTimeEvt::TICK_X_FROM_ISR(0U, &xHigherPriorityTaskWoken, &l_TickHook);
 
 #ifdef Q_SPY
     {

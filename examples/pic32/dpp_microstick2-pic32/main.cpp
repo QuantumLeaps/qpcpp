@@ -57,7 +57,7 @@ int main() {
     QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
     QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
 
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
 
     // initialize event pools...
     QP::QF::poolInit(smlPoolSto,

@@ -108,7 +108,7 @@ void SysTick_Handler(void) {
     }
 #endif
 
-    //QP::QF::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    //QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
     the_Ticker0->POST(0, 0); // post a don't-care event to Ticker0
 
     static QP::QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };

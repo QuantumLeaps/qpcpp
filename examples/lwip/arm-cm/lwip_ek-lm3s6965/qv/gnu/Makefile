@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++, lwIP on EK-LM3S6965, QV kernel, GNU-ARM
-# Last Updated for Version: 6.5.0
-# Date of the Last Update:  2019-04-15
+# Last Updated for Version: 7.0.1
+# Date of the Last Update:  2022-05-23
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -82,7 +82,6 @@ VPATH = \
 INCLUDES  = \
 	-I../.. \
 	-I$(QPCPP)/include \
-	-I$(QPCPP)/src \
 	-I$(QP_PORT_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
 	-I$(QPCPP)/3rd_party/ek-lm3s6965 \

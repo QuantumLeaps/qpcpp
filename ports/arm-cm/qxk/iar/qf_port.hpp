@@ -1,39 +1,31 @@
+// QP/C++ Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
 //! @brief QF/C++ port to ARM Cortex-M, dual-mode QXK kernel, IAR-ARM toolset
-//! @cond
-//============================================================================
-//! Last updated for version 6.6.0
-//! Last updated on  2019-07-30
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
 
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
@@ -42,7 +34,7 @@
 #define QF_MAX_TICK_RATE        2U
 
 // QF interrupt disable/enable and log2()...
-#if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1(v6-M, v6S-M)?
+#if (__ARM_ARCH == 6) // if ARMv6-M...
 
     // The maximum number of active objects in the application, see NOTE1
     #define QF_MAX_ACTIVE       16U
@@ -62,10 +54,10 @@
     // CMSIS threshold for "QF-aware" interrupts, see NOTE2 and NOTE4
     #define QF_AWARE_ISR_CMSIS_PRI 0
 
-    // hand-optimized LOG2 in assembly for Cortex-M0/M0+/M1(v6-M, v6S-M)
+    // hand-optimized LOG2 in assembly for ARMv6-M...
     #define QF_LOG2(n_) QF_qlog2(static_cast<std::uint32_t>(n_))
 
-#else // Cortex-M3/M4/M7
+#else // ARMv7-M or higher
 
     // The maximum number of active objects in the application, see NOTE1
     #define QF_MAX_ACTIVE       32U
@@ -100,21 +92,19 @@
     #define QF_LOG2(n_) (static_cast<std::uint_fast8_t>( \
         32U - __CLZ(static_cast<unsigned long>(n_))))
 
-#endif
+#endif // ARMv7-M or higher
 
 #define QF_CRIT_EXIT_NOP()      __ISB()
 
 #include <intrinsics.h> // IAR intrinsic functions
-#include "qep_port.hpp"   // QEP port
+#include "qep_port.hpp" // QEP port
 
-#if (__ARM_ARCH == 6)   // Cortex-M0/M0+/M1(v6-M, v6S-M)?
+#if (__ARM_ARCH == 6) // if ARMv6-M...
     // hand-optimized quick LOG2 in assembly
     extern "C" uint_fast8_t QF_qlog2(uint32_t x);
-#endif // Cortex-M0/M0+/M1(v6-M, v6S-M)
+#endif // ARMv6-M
 
 #include "qxk_port.hpp" // QXK dual-mode kernel port
-#include "qf.hpp"       // QF platform-independent public interface
-#include "qxthread.hpp" // QXK extended thread interface
 
 //============================================================================
 // NOTE1:
@@ -135,8 +125,8 @@
 // with numerical priority values lower than QF_BASEPRI) are NOT disabled in
 // this method. These free-running interrupts have very low ("zero") latency,
 // but they are not allowed to call any QF services, because QF is unaware
-// of them ("QF-unaware" interrutps). Consequently, only interrupts with
-// numerical values of priorities eqal to or higher than QF_BASEPRI
+// of them ("QF-unaware" interrupts). Consequently, only interrupts with
+// numerical values of priorities equal to or higher than QF_BASEPRI
 // ("QF-aware" interrupts ), can call QF services.
 //
 // NOTE4:

@@ -80,7 +80,7 @@ extern "C" {
 void __ISR(_TIMER_2_VECTOR, IPL4SOFT) tickISR(void) {
     IFS0CLR = _IFS0_T2IF_MASK; // clear the interrupt source
 
-    QP::QF::TICK_X(0U, &l_tickISR); // handle armed time events at tick rate 0
+    QP::QTimeEvt::TICK_X(0U, &l_tickISR); // handle armed time events at tick rate 0
 }
 //............................................................................
 // for testing interrupt nesting and active object preemption

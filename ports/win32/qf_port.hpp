@@ -1,40 +1,32 @@
+//============================================================================
+// Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
 //! @brief QF/C++ port to Win32 API (multi-threaded)
-//! @cond
-//============================================================================
-//! Last updated for version 6.8.2
-//! Last updated on  2020-06-23
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
-//!
+
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
 
@@ -61,42 +53,42 @@
 
 // Win32 critical section, see NOTE1
 // QF_CRIT_STAT_TYPE not defined
-#define QF_CRIT_ENTRY(dummy) QP::QF_enterCriticalSection_()
-#define QF_CRIT_EXIT(dummy)  QP::QF_leaveCriticalSection_()
+#define QF_CRIT_ENTRY(dummy) QP::QF::enterCriticalSection_()
+#define QF_CRIT_EXIT(dummy)  QP::QF::leaveCriticalSection_()
 
 // QF_LOG2 not defined -- use the internal LOG2() implementation
 
 #include "qep_port.hpp"  // QEP port
 #include "qequeue.hpp"   // Win32 needs event-queue
 #include "qmpool.hpp"    // Win32 needs memory-pool
-#include "qpset.hpp"     // Win32 needs priority-set
 #include "qf.hpp"        // QF platform-independent public interface
 
 namespace QP {
+namespace QF {
 
-void QF_enterCriticalSection_(void);
-void QF_leaveCriticalSection_(void);
+void enterCriticalSection_(void);
+void leaveCriticalSection_(void);
 
 // set Win32 thread priority for an active object;
 // see: Microsoft documentation for SetThreadPriority()
 // NOTE: must be called *after* QActive::START()
 //
-void QF_setWin32Prio(QActive *act, int_t win32Prio);
+void setWin32Prio(QActive *act, int_t win32Prio);
 
 // set clock tick rate and priority
-void QF_setTickRate(uint32_t ticksPerSec, int_t tickPrio);
+void setTickRate(uint32_t ticksPerSec, int_t tickPrio);
 
 // clock tick callback (provided in the app)
-void QF_onClockTick(void);
+void onClockTick(void);
 
 // abstractions for console access...
-void QF_consoleSetup(void);
-void QF_consoleCleanup(void);
-int QF_consoleGetKey(void);
-int QF_consoleWaitForKey(void);
+void consoleSetup(void);
+void consoleCleanup(void);
+int consoleGetKey(void);
+int consoleWaitForKey(void);
 
+} // namespace QF
 } // namespace QP
-
 
 // special adaptations for QWIN GUI applications
 #ifdef QWIN_GUI
@@ -112,8 +104,8 @@ int QF_consoleWaitForKey(void);
 
     // Win32-specific scheduler locking, see NOTE2
     #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) QF_enterCriticalSection_()
-    #define QF_SCHED_UNLOCK_()    QF_leaveCriticalSection_()
+    #define QF_SCHED_LOCK_(dummy) QF::enterCriticalSection_()
+    #define QF_SCHED_UNLOCK_()    QF::leaveCriticalSection_()
 
     // Win32-specific event queue customization
     #define QACTIVE_EQUEUE_WAIT_(me_) \
@@ -124,10 +116,10 @@ int QF_consoleWaitForKey(void);
         }
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        Q_ASSERT_ID(410, QF::active_[(me_)->m_prio] != nullptr); \
+        Q_ASSERT_ID(410, QActive::registry_[(me_)->m_prio] != nullptr); \
         (void)SetEvent((me_)->m_osObject)
 
-    // Win32-specific event pool operations
+    // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
@@ -159,11 +151,11 @@ int QF_consoleWaitForKey(void);
 // code exclusively, meaning that only one thread can execute the code at
 // the time. Such sections of code are called "critical sections"
 //
-// This port uses a pair of functions QF_enterCriticalSection_() /
-// QF_leaveCriticalSection_() to enter/leave the cirtical section,
+// This port uses a pair of functions QF::enterCriticalSection_() /
+// QF::leaveCriticalSection_() to enter/leave the cirtical section,
 // respectively.
 //
-// These functions are implemented in the qf_port.c module, where they
+// These functions are implemented in the qf_port.cpp module, where they
 // manipulate the file-scope Win32 critical section object l_win32CritSect
 // to protect all critical sections. Using the single critical section
 // object for all crtical section guarantees that only one thread at a time
@@ -186,10 +178,11 @@ int QF_consoleWaitForKey(void);
 // information.
 //
 // NOTE2:
-// Scheduler locking (used inside QF_publish_()) is implemented in this
+// Scheduler locking (used inside QActive::publish_()) is implemented in this
 // port with the main critical section. This means that event multicasting
 // will appear atomic, in the sense that no thread will be able to post
 // events during multicasting.
 //
 
 #endif // QF_PORT_HPP
+

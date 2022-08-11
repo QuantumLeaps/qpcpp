@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
     QP::QF::poolInit(medPoolSto, sizeof(medPoolSto), sizeof(medPoolSto[0]));
 
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
 
     // send signal dictionaries for globally published events...
     QS_SIG_DICTIONARY(GAME::TIME_TICK_SIG,      nullptr);

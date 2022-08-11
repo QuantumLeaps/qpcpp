@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-01-20
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
 //!
 //! @file
 //! @brief QF/C++ port to uC-OS2, generic C++11 compiler
@@ -64,7 +64,6 @@ enum UCOS2_TaskAttrs {
 #include "qep_port.hpp"  // QEP port, includes the master uC-OS2 include
 #include "qequeue.hpp"   // used for event deferral
 #include "qmpool.hpp"    // native QF event pool
-#include "qpset.hpp"     // this QP port uses the native QP priority set
 #include "qf.hpp"        // QF platform-independent public interface
 
 //============================================================================

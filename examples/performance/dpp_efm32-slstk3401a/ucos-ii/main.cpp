@@ -56,7 +56,7 @@ int main() {
     DPP::BSP::init(); // initialize the BSP
 
     // initialize publish-subscribe...
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // initialize event pools...
     QP::QF::poolInit(smlPoolSto,

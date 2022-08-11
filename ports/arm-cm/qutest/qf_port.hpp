@@ -2,14 +2,14 @@
 //! @brief QF/C++ port for QUTEST Unit Test, ARM Cortex-M with GNU or Visual C++
 //! @cond
 //============================================================================
-//! Last updated for version 6.9.1
-//! Last updated on  2019-09-21
+//! Last updated for version 7.0.1
+//! Last updated on  2022-06-30
 //!
 //!                    Q u a n t u m  L e a P s
 //!                    ------------------------
 //!                    Modern Embedded Software
 //!
-//! Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+//! Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //!
 //! This program is open source software: you can redistribute it and/or
 //! modify it under the terms of the GNU General Public License as published
@@ -50,8 +50,8 @@
 #define QF_MAX_TICK_RATE     2U
 
 // QF interrupt disable/enable
-#define QF_INT_DISABLE()     (++QP::QF_intNest)
-#define QF_INT_ENABLE()      (--QP::QF_intNest)
+#define QF_INT_DISABLE()     (++QP::QF::intNest_)
+#define QF_INT_ENABLE()      (--QP::QF::intNest_)
 
 // QF critical section
 // QF_CRIT_STAT_TYPE not defined
@@ -64,11 +64,6 @@
 #include "qequeue.hpp"   // QUTEST port uses QEQueue event-queue
 #include "qmpool.hpp"    // QUTEST port uses QMPool memory-pool
 #include "qf.hpp"        // QF platform-independent public interface
-
-namespace QP {
-// interrupt nesting up-down counter
-extern uint8_t volatile QF_intNest;
-}
 
 //============================================================================
 // interface used only inside QF, but not in applications
@@ -84,7 +79,7 @@ extern uint8_t volatile QF_intNest;
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QS::rxPriv_.readySet.insert(   \
+        (QF::readySet_.insert(   \
             static_cast<std::uint_fast8_t>((me_)->m_prio)))
 
     // native QF event pool operations

@@ -88,7 +88,7 @@ products ranging from implantable medical devices to complex weapon systems.
 
 
 # QP/C++ Licensing
-QP/C++ is licensed under the increasingly popular [dual licensing model][Lic],
+QP/C++ is licensed under the sustainable [dual licensing model][Lic],
 in which both the open source software distribution mechanism and
 traditional closed source software distribution models are combined.
 
@@ -113,6 +113,13 @@ open the file [html/index.html](html/index.html) in your web browser.
 - [Quantum Leaps website](https://www.state-machine.com)
 - [Quantum Leaps licensing](https://www.state-machine.com/licensing)
 - [info@state-machine.com](mailto:info@state-machine.com)
+
+
+# How to Help this Project?
+If you like this project, please give it a star (in the upper-right corner of your browser window):
+
+![GitHub star](doxygen/images/github-star.jpg)
+
 
    [RTEF]: <https://www.state-machine.com/rtef>
    [QP]: <https://www.state-machine.com/products/qp>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.3" links="1">
+<model version="5.2.0" links="1">
  <documentation>Start-stop application that demonstrates staring and stopping active objects multiple times during the runtime, as opposed to starting AOs only at the beginning.</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -178,7 +178,7 @@ m_te.armX(BSP::TICKS_PER_SEC / 5U,
     <state name="final">
      <entry>BSP::led2On();
 static QEvt const doneEvt = { DONE_SIG, 0 };
-QF::PUBLISH(&amp;doneEvt, this);
+QActive::PUBLISH(&amp;doneEvt, this);
 stop(); // stop this active object</entry>
      <state_glyph node="2,54,34,16">
       <entry box="1,2,33,12"/>

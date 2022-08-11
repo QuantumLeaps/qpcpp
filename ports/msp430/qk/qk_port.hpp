@@ -2,14 +2,14 @@
 //! @brief QK/C++ port to MSP430
 //! @cond
 //============================================================================
-//! Last updated for version 6.6.0
-//! Last updated on  2019-07-30
+//! Last updated for version 7.0.1
+//! Last updated on  2022-06-30
 //!
 //!                    Q u a n t u m  L e a P s
 //!                    ------------------------
 //!                    Modern Embedded Software
 //!
-//! Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
+//! Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //!
 //! This program is open source software: you can redistribute it and/or
 //! modify it under the terms of the GNU General Public License as published
@@ -39,18 +39,18 @@
 #define QK_PORT_HPP
 
 // QK interrupt entry and exit...
-#define QK_ISR_ENTRY()    (++QK_attr_.intNest)
+#define QK_ISR_ENTRY()    (++QP::QF::intNest_)
 
-#define QK_ISR_EXIT()     do {    \
-    --QK_attr_.intNest;           \
-    if (QK_attr_.intNest == 0U) { \
-        if (QK_sched_() != 0U) {  \
-            QK_activate_();       \
-        }                         \
-    }                             \
-    else {                        \
-        Q_ERROR();                \
-    }                             \
+#define QK_ISR_EXIT()     do {   \
+    --QP::QF::intNest_;          \
+    if (QP::QF::intNest_ == 0U) {\
+        if (QK_sched_() != 0U) { \
+            QK_activate_();      \
+        }                        \
+    }                            \
+    else {                       \
+        Q_ERROR();               \
+    }                            \
 } while (false)
 
 #include "qk.hpp"  // QK platform-independent public interface

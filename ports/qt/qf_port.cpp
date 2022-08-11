@@ -50,7 +50,9 @@
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-Q_DEFINE_THIS_MODULE("qf_port")
+namespace {
+    Q_DEFINE_THIS_MODULE("qf_port")
+}
 
 //============================================================================
 namespace QP {
@@ -72,7 +74,7 @@ AOThread::~AOThread() {
 //............................................................................
 void AOThread::run() {
     Q_REQUIRE(m_act != nullptr);
-    QP::QF::thread_(static_cast<QP::QActive *>(m_act));
+    QP::QActive::thread_(static_cast<QP::QActive *>(m_act));
 }
 
 //============================================================================
@@ -110,7 +112,7 @@ int_t QF::run(void) {
     return static_cast<int_t>(QCoreApplication::instance()->exec());
 }
 //............................................................................
-void QF::thread_(QActive *act) {
+void QActive::thread_(QActive *act) {
     AOThread *thread = static_cast<AOThread *>(act->m_thread);
     thread->m_isRunning = true;
 
@@ -118,7 +120,7 @@ void QF::thread_(QActive *act) {
     for (;;) { // for-ever
         QEvt const *e = act->get_(); // wait for event
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
-        gc(e); // check if the event is garbage, and collect it if so
+        QF::gc(e); // check if the event is garbage, and collect it if so
     }
 }
 //............................................................................
@@ -153,7 +155,7 @@ void QActive::start(std::uint_fast8_t const prio,
     m_eQueue.init(qSto, qLen);
     m_prio = prio;
 
-    QF::add_(this); // make QF aware of this active object
+    register_(); // make QF aware of this active object
 
     init(par, m_prio); // execute the initial transition
     QS_FLUSH();     // flush the trace buffer to the host

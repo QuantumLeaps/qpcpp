@@ -43,7 +43,7 @@
 @echo.
 
 :: NOTE: adjust to for your installation directory of PC-Lint-Plus
-@set PCLP=C:\tools\lint-plus\pclp32.exe
+@set PCLP=C:\tools\lint-plus\windows\pclp32.exe
 
 if NOT exist "%PCLP%" (
     @echo The PC-Lint-Plus toolset not found. Please adjust lin.bat

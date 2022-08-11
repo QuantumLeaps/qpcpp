@@ -140,14 +140,14 @@ void BSP_message(char const *msg) {
 namespace QP {
 /*..........................................................................*/
 void QF::onStartup(void) {
-    QF_consoleSetup();
+    QF::consoleSetup();
 }
 /*..........................................................................*/
 void QF::onCleanup(void) {
-    QF_consoleCleanup();
+    QF::consoleCleanup();
 }
 /*..........................................................................*/
-void QF_onClockTick(void) {
+void QF::onClockTick(void) {
 }
 
 } // namespace QP

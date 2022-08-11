@@ -74,14 +74,14 @@ enum {
 // ISRs used in this project =================================================
 void SysTick_Handler(void) {
     QK_ISR_ENTRY();   // inform QK about entering an ISR
-    QP::QF::TICK_X(0U, nullptr); // process time events for rate 0
+    QP::QTimeEvt::TICK_X(0U, nullptr); // process time events for rate 0
     QK_ISR_EXIT();  // inform QK about exiting an ISR
 }
 //............................................................................
 void Timer0A_IRQHandler(void) {
     QK_ISR_ENTRY();   // inform QK about entering an ISR
     TIMER0->ICR |= (1U << 0); // clear the Timer0 interrupt source
-    QP::QF::TICK_X(1U, nullptr); // process time events for rate 1
+    QP::QTimeEvt::TICK_X(1U, nullptr); // process time events for rate 1
     QK_ISR_EXIT();  // inform QK about exiting an ISR
 }
 //............................................................................

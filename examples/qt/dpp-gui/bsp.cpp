@@ -52,7 +52,7 @@ static uint32_t l_rnd; // random seed
 
 //............................................................................
 void QP::QF_onClockTick(void) {
-    QP::QF::TICK_X(0U, &l_time_tick);
+    QP::QTimeEvt::TICK_X(0U, &l_time_tick);
 }
 //............................................................................
 void QP::QF::onStartup(void) {

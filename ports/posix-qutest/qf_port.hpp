@@ -1,47 +1,39 @@
+//============================================================================
+// Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com/licensing>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2022-06-30
+//! @version Last updated for: @ref qpcpp_7_0_1
+//!
 //! @file
-//! @brief QF/C++ port for QUTEST Unit Test, POSIX
-//! @cond
-//============================================================================
-//! Last updated for version 6.9.1
-//! Last updated on  2020-09-21
-//!
-//!                    Q u a n t u m  L e a P s
-//!                    ------------------------
-//!                    Modern Embedded Software
-//!
-//! Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
-//!
-//! This program is open source software: you can redistribute it and/or
-//! modify it under the terms of the GNU General Public License as published
-//! by the Free Software Foundation, either version 3 of the License, or
-//! (at your option) any later version.
-//!
-//! Alternatively, this program may be distributed and modified under the
-//! terms of Quantum Leaps commercial licenses, which expressly supersede
-//! the GNU General Public License and are specifically designed for
-//! licensees interested in retaining the proprietary status of their code.
-//!
-//! This program is distributed in the hope that it will be useful,
-//! but WITHOUT ANY WARRANTY; without even the implied warranty of
-//! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//! GNU General Public License for more details.
-//!
-//! You should have received a copy of the GNU General Public License
-//! along with this program. If not, see <www.gnu.org/licenses>.
-//!
-//! Contact information:
-//! <www.state-machine.com/licensing>
-//! <info@state-machine.com>
-//============================================================================
-//! @endcond
+//! @brief QF/C++ port for QUTEST Windows/Linux/macOS, GNU or Visual C++
 
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
 
 // QUTEST event queue and thread types
-#define QF_EQUEUE_TYPE       QEQueue
-//#define QF_OS_OBJECT_TYPE
-//#define QF_THREAD_TYPE
+#define QF_EQUEUE_TYPE QEQueue
+// QF_OS_OBJECT_TYPE  not used
+// QF_THREAD_TYPE     not used
 
 // The maximum number of active objects in the application
 #define QF_MAX_ACTIVE        64U
@@ -53,8 +45,8 @@
 #define QF_ACTIVE_STOP       1
 
 // QF interrupt disable/enable
-#define QF_INT_DISABLE()     (++QP::QF_intNest)
-#define QF_INT_ENABLE()      (--QP::QF_intNest)
+#define QF_INT_DISABLE()     (++QP::QF::intNest_)
+#define QF_INT_ENABLE()      (--QP::QF::intNest_)
 
 // QF critical section
 // QF_CRIT_STAT_TYPE not defined
@@ -68,17 +60,12 @@
 #include "qmpool.hpp"    // QUTEST port uses QMPool memory-pool
 #include "qf.hpp"        // QF platform-independent public interface
 
-namespace QP {
-// interrupt nesting up-down counter
-extern uint8_t volatile QF_intNest;
-}
-
-//***************************************************************************
+//============================================================================
 // interface used only inside QF, but not in applications
 
 #ifdef QP_IMPL
 
-    // QUTEST scheduler locking (not used)
+    // QUTest scheduler locking (not used)
     #define QF_SCHED_STAT_
     #define QF_SCHED_LOCK_(dummy) ((void)0)
     #define QF_SCHED_UNLOCK_()    ((void)0)
@@ -87,7 +74,7 @@ extern uint8_t volatile QF_intNest;
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT_ID(110, (me_)->m_eQueue.m_frontEvt != nullptr)
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        (QS::rxPriv_.readySet.insert(   \
+        (QF::readySet_.insert(   \
             static_cast<std::uint_fast8_t>((me_)->m_prio)))
 
     // native QF event pool operations
@@ -97,7 +84,7 @@ extern uint8_t volatile QF_intNest;
     #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
     #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
-    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
+    #define QF_EPOOL_PUT_(p_, e_, qs_id_)  ((p_).put((e_), (qs_id_)))
 
 #endif // QP_IMPL
 
