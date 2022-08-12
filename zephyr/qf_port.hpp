@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-06
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-12
+//! @version Last updated for: @ref qpcpp_7_0_2
 //!
 //! @file
 //! @brief QF/C++ port to Zephyr RTOS kernel, all supported compilers
@@ -60,6 +60,14 @@ extern struct k_spinlock spinlock;
 
 } // namespace QF
 } // namespace QP
+
+// Q_PRINTK() macro to avoid conflicts with Zephyr's printk()
+// when Q_SPY configuation is used
+#ifndef Q_SPY
+#define Q_PRINTK(fmt_, ...) printk(fmt_, ##__VA_ARGS__)
+#else
+#define Q_PRINTK(dummy, ...) (static_cast<void>(0))
+#endif
 
 //============================================================================
 // interface used only inside QF, but not in applications

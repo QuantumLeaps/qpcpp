@@ -32,7 +32,8 @@ zephyr_library_sources(
  ${QPCPP_DIR}/zephyr/qf_port.cpp
 )
 
-if(CONFIG_QSPY)
+# QSPY option...
+if(QSPY)
 
 target_compile_definitions(app PUBLIC Q_SPY)
 zephyr_library_compile_definitions(Q_SPY)
@@ -46,6 +47,6 @@ zephyr_library_sources(
  ${QPCPP_DIR}/include/qstamp.cpp
 )
 
-endif() # CONFIG_QSPY
+endif() # QSPY
 
 endif() # CONFIG_QPCPP
