@@ -138,8 +138,8 @@ LIBS      :=
 
 # defines
 DEFINES   := -DEFM32PG1B200F256GM48=1 \
-	-DQK_USE_IRQ_NUM=25 \
-	-DQK_USE_IRQ_HANDLER=CRYPTO_IRQHandler
+	-DQK_USE_IRQ_HANDLER=CRYPTO_IRQHandler \
+	-DQK_USE_IRQ_NUM=25
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]

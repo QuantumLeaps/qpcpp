@@ -32,10 +32,27 @@ C++ programs seem not to tolerate heap size of 0. Therefore it is
 recommended to set the Heap_Size symbol to a minimal value of 16.
 ***
 
+Selecting QXK Exception
+=======================
+The QXK kernel needs a dedicated exception to return to the thread
+context after preemption. The default is to use the NMI exception
+for that purpose. However, in case NMI is needed for some other
+purpose, the QXK port allows you to select a any, otherwise unused
+IRQ for that purpose. To choose a given IRQ, you need to define
+the macros QXK_USE_IRQ_NUM and QXK_USE_IRQ_HANDLER. These macros can
+be provided on the command-line to the compiler.
+
+For example, for the STM32L053 MCU, you might dedicate the IRQ
+"CRYPTO_IRQHandler" (see the vector table), with IRQ number 25,
+as follows:
+
+QXK_USE_IRQ_HANDLER=LCD_IRQHandler
+QXK_USE_IRQ_NUM=30
+
 
 Startup Code
 ============
-The startup code for the STM32L1xx MCU used in this project is
+The startup code for the STM32L0xx MCU used in this project is
 located in the "3rd_party" folder in the following location:
 
 3rd_party\nucleo-l053r8\arm\startup_stm32l053xx.s
@@ -74,4 +91,3 @@ on the solder bridge configuration. Please see Chapter 5.7 "OSC clock" in
 the STM32 NUCLEO Boards User Manual (ST document UM1724) for more information.
 ***
 
-  

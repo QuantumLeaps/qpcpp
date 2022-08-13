@@ -134,8 +134,8 @@ LIBS      :=
 
 # defines
 DEFINES   := \
-	-DQK_USE_IRQ_NUM=30 \
-	-DQK_USE_IRQ_HANDLER=LCD_IRQHandler
+	-DQK_USE_IRQ_HANDLER=LCD_IRQHandler \
+	-DQK_USE_IRQ_NUM=30
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
