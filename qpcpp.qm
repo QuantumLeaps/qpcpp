@@ -36,7 +36,7 @@ Contact information:
 //! The #QP_VERSION is a decimal constant, where XX is a 2-digit
 //! major version number, Y is a 1-digit minor version number, and Z is
 //! a 1-digit release number.</documentation>
-   <code>701U</code>
+   <code>702U</code>
   </attribute>
   <!--${version::QP_VERSION_STR}-->
   <attribute name="QP_VERSION_STR" type="char const *" visibility="0x03" properties="0x00">
@@ -46,12 +46,12 @@ Contact information:
 //! #QP_VERSION_STR is of the form &quot;XX.Y.Z&quot;, where XX is a 1-or 2-digit
 //! major version number, Y is a 1-digit minor version number, and Z is
 //! a 1-digit release number.</documentation>
-   <code>&quot;7.0.1&quot;</code>
+   <code>&quot;7.0.2&quot;</code>
   </attribute>
   <!--${version::QP_RELEASE}-->
   <attribute name="QP_RELEASE" type="unint32_t" visibility="0x03" properties="0x00">
-   <documentation>//! Encrypted  current QP release (7.0.1) and date (2022-06-30)</documentation>
-   <code>0x7C7E85E2U</code>
+   <documentation>//! Encrypted  current QP release (7.0.2) and date (2022-08-12)</documentation>
+   <code>0x7C62C081U</code>
   </attribute>
  </package>
  <!--${glob-types}-->
@@ -11977,8 +11977,8 @@ QF_CRIT_X_();</code>
  <directory name="include">
   <!--${include::qep.hpp}-->
   <file name="qep.hpp">
-   <text>//! @date Last updated on: 2022-07-14
-//! @version Last updated for: @ref qpcpp_7_0_1
+   <text>//! @date Last updated on: 2022-08-12
+//! @version Last updated for: @ref qpcpp_7_0_2
 //!
 //! @file
 //! @brief QEP/C++ platform-independent public interface.

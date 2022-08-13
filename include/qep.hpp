@@ -36,8 +36,8 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qep.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-07-14
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-12
+//! @version Last updated for: @ref qpcpp_7_0_2
 //!
 //! @file
 //! @brief QEP/C++ platform-independent public interface.
@@ -58,7 +58,7 @@
 //! The #QP_VERSION is a decimal constant, where XX is a 2-digit
 //! major version number, Y is a 1-digit minor version number, and Z is
 //! a 1-digit release number.
-#define QP_VERSION 701U
+#define QP_VERSION 702U
 
 //${version::QP_VERSION_STR} .................................................
 //! The current QP version as a zero terminated string literal.
@@ -67,11 +67,11 @@
 //! #QP_VERSION_STR is of the form "XX.Y.Z", where XX is a 1-or 2-digit
 //! major version number, Y is a 1-digit minor version number, and Z is
 //! a 1-digit release number.
-#define QP_VERSION_STR "7.0.1"
+#define QP_VERSION_STR "7.0.2"
 
 //${version::QP_RELEASE} .....................................................
-//! Encrypted  current QP release (7.0.1) and date (2022-06-30)
-#define QP_RELEASE 0x7C7E85E2U
+//! Encrypted  current QP release (7.0.2) and date (2022-08-12)
+#define QP_RELEASE 0x7C62C081U
 //$enddecl${version} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //$declare${glob-types} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
