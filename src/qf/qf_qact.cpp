@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qf::qf_qact.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QP::QActive services and QF support code
 
@@ -55,7 +52,7 @@
 
 //============================================================================
 namespace { // unnamed local namespace
-Q_DEFINE_THIS_MODULE("qf_act")
+Q_DEFINE_THIS_MODULE("qf_qact")
 } // unnamed namespace
 
 //============================================================================
@@ -118,7 +115,8 @@ namespace QP {
 //${QF::QActive::QActive} ....................................................
 QActive::QActive(QStateHandler const initial) noexcept
   : QHsm(initial),
-    m_prio(0U)
+    m_prio(0U),
+    m_pthre(0U)
 {
     #ifdef QF_EQUEUE_TYPE
         QF::bzero(&m_eQueue, sizeof(m_eQueue));
@@ -140,13 +138,47 @@ namespace QP {
 
 //${QF::QActive::register_} ..................................................
 void QActive::register_() noexcept {
-    std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
+    std::uint_fast8_t const prio = static_cast<std::uint_fast8_t>(m_prio);
 
-    Q_REQUIRE_ID(100, (0U < p) && (p <= QF_MAX_ACTIVE)
-                      && (registry_[p] == nullptr));
+    //! @pre the priority of the AO must be in range. Also, the priority
+    //! must not be already in use. QF requires each active object to
+    //! have a **unique** priority.
+    Q_REQUIRE_ID(100, (0U < prio) && (prio <= QF_MAX_ACTIVE)
+                       && (registry_[prio] == nullptr));
+
+    #ifndef Q_NASSERT
+
+    if (m_pthre == 0U) { // preemption-threshold not defined?
+        m_pthre = m_prio; // apply the default
+    }
+    std::uint8_t prev_thre = m_pthre;
+    std::uint8_t next_thre = m_pthre;
+
+    std::uint_fast8_t p;
+    for (p = static_cast<std::uint_fast8_t>(prio) - 1U; p > 0U; --p) {
+        if (registry_[p] != nullptr) {
+            prev_thre = registry_[p]->m_pthre;
+            break;
+        }
+    }
+    for (p = static_cast<std::uint_fast8_t>(prio) + 1U;
+         p <= QF_MAX_ACTIVE; ++p)
+    {
+        if (registry_[p] != nullptr) {
+            next_thre = registry_[p]->m_pthre;
+            break;
+        }
+    }
+
+    //! @post The preemption threshold of the AO (me->pthre) must be
+    //! between the threshold of the previous AO and the next AO
+    Q_ENSURE_ID(101, (prev_thre <= m_pthre)
+                      && (m_pthre <= next_thre));
+    #endif // Q_NASSERT
+
     QF_CRIT_STAT_
     QF_CRIT_E_();
-    registry_[p] = this;  // registger the active object at this priority
+    registry_[prio] = this;  // registger the active object at this priority
     QF_CRIT_X_();
 }
 

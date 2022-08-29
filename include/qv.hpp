@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qv.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QV/C++ platform-independent public interface.
 

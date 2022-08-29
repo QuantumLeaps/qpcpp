@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qxk.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QXK/C++ preemptive extended (blocking) kernel, platform-independent
 //! public interface.
@@ -150,7 +147,8 @@ void schedUnlock(QSchedStatus const stat) noexcept;
 enum Timeouts : enum_t {
     DELAY_SIG = Q_USER_SIG,
     QUEUE_SIG,
-    SEMA_SIG
+    SEMA_SIG,
+    MUTEX_SIG
 };
 
 } // namespace QXK
@@ -178,6 +176,7 @@ namespace QP {
 //! The following example illustrates how to instantiate and use an extended
 //! thread in your application.
 //! @include qxk_thread.cpp
+//!
 class QXThread : public QP::QActive {
 private:
 
@@ -187,11 +186,6 @@ private:
     // friends...
     friend class QXSemaphore;
     friend class QXMutex;
-
-public:
-
-    //! the idle thread of the QXK kernel
-    static QXThread idle;
 
 public:
 
@@ -206,12 +200,16 @@ public:
     //! @param[in]     tickRate the ticking rate associated with this thread
     //!                for timeouts in this thread (see QXThread::delay() and
     //!                TICK_X())
-    //!
     //! @note
     //! Must be called only ONCE before QXThread::start().
     QXThread(
         QXThreadHandler const handler,
         std::uint_fast8_t const tickRate = 0U) noexcept;
+
+    //! obtain the time event
+    QTimeEvt const * getTimeEvt() const noexcept {
+        return &m_timeEvt;
+    }
 
     //! delay (block) the current extended thread for a specified # ticks
     //!
@@ -287,22 +285,23 @@ public:
     //! framework. The extended thread becomes ready-to-run immediately and
     //! is scheduled if the QXK is already running.
     //!
-    //! @param[in]     prio    priority at which to start the extended thread
-    //! @param[in]     qSto    pointer to the storage for the ring buffer of
-    //!                        the event queue. This cold be NULL, if this
-    //!                        extended thread does not use the built-in
-    //!                        event queue.
-    //! @param[in]     qLen    length of the event queue [in events],
-    //!                        or zero if queue not used
-    //! @param[in]     stkSto  pointer to the stack storage (must be provided)
-    //! @param[in]     stkSize stack size [in bytes] (must not be zero)
-    //! @param[in]     par     pointer to an extra parameter (might be NULL)
+    //! @param[in] prioSpec priority specification at which to start the
+    //!                     extended thread
+    //! @param[in] qSto     pointer to the storage for the ring buffer of
+    //!                     the event queue. This cold be NULL, if this
+    //!                     extended thread does not use the built-in
+    //!                     event queue.
+    //! @param[in] qLen     length of the event queue [in events],
+    //!                     or zero if queue not used
+    //! @param[in] stkSto   pointer to the stack storage (must be provided)
+    //! @param[in] stkSize  stack size [in bytes] (must not be zero)
+    //! @param[in] par      pointer to an extra parameter (might be NULL)
     //!
     //! @usage
     //! The following example shows starting an extended thread:
     //! @include qxk_start.cpp
     void start(
-        std::uint_fast8_t const prio,
+        QPrioSpec const prioSpec,
         QEvt const * * const qSto,
         std::uint_fast16_t const qLen,
         void * const stkSto,
@@ -311,13 +310,13 @@ public:
 
     //! Overloaded start function (no initialization event)
     void start(
-        std::uint_fast8_t const prio,
+        QPrioSpec const prioSpec,
         QEvt const * * const qSto,
         std::uint_fast16_t const qLen,
         void * const stkSto,
         std::uint_fast16_t const stkSize) override
     {
-        this->start(prio, qSto, qLen, stkSto, stkSize, nullptr);
+        this->start(prioSpec, qSto, qLen, stkSto, stkSize, nullptr);
     }
 
     //! Posts an event `e` directly to the event queue of the extended
@@ -358,7 +357,7 @@ public:
     //! using the Last-In-First-Out (LIFO) policy
     //!
     //! @details
-    //! Last-In-First-Out (LIFO) policy is not supported for extened threads.
+    //! Last-In-First-Out (LIFO) policy is not supported for extended threads.
     //!
     //! @param[in]  e  pointer to the event to post to the queue
     //!
@@ -427,6 +426,7 @@ namespace QP {
 //! The following example illustrates how to instantiate and use the semaphore
 //! in your application.
 //! @include qxk_sema.cpp
+//!
 class QXSemaphore {
 private:
 
@@ -519,8 +519,8 @@ public:
     //! semaphore count exceeded the maximum.
     //!
     //! @note
-    //! A semaphore can be signaled from many places, including from ISRs, basic
-    //! threads (AOs), and extended threads.
+    //! A semaphore can be signaled from many places, including from ISRs,
+    //! basic threads (AOs), and extended threads.
     bool signal() noexcept;
 }; // class QXSemaphore
 
@@ -530,108 +530,85 @@ public:
 namespace QP {
 
 //${QXK::QXMutex} ............................................................
-//! Priority Ceiling Mutex the QXK preemptive kernel
+//! Blocking, Priority-Ceiling Mutex the QXK preemptive kernel
 //!
 //! @details
 //! QP::QXMutex is a blocking mutual exclusion mechanism that can also apply
-//! the **priority ceiling protocol** to avoid unbounded priority inversion
-//! (if initialized with a non-zero ceiling priority, see QP::QXMutex::init()).
-//! In that case, QP::QXMutex requires its own uinque QP priority level, which
-//! cannot be used by any thread or any other QP::QXMutex.
-//! If initialzied with zero ceiling priority, QP::QXMutex does **not** use
-//! the priority ceiling protocol and does not require a unique QP priority
-//! (see QP::QXMutex::init()).
-//! QP::QXMutex is **recursive** (reentrant), which means that it can be
-//! locked mutiliple times (up to 255 levels) by the *same* thread without
-//! causing deadlock.
+//! the **priority-ceiling protocol** to avoid unbounded priority inversion
+//! (if initialized with a non-zero ceiling priority, see QXMutex::init()).
+//! In that case, QP::QXMutex requires its own uinque QP priority level,
+//! which cannot be used by any thread or any other QP::QXMutex.
+//! If initialized with preemption-ceiling of zero, QXMutex does **not**
+//! use the priority-ceiling protocol and does not require a unique QP
+//! priority (see QXMutex::init()).
+//! QP::QXMutex is **recursive** (re-entrant), which means that it can be
+//! locked multiple times (up to 255 levels) by the *same* thread without
+//! causing deadlock.<br>
+//!
 //! QP::QXMutex is primarily intended for the @ref QP::QXThread
-//! "extened (blocking) threads", but can also be used by the @ref QP::QActive
-//! "basic threads" through the non-blocking QP::QXMutex::tryLock() API.
+//! "extended (blocking) threads", but can also be used by the
+//! @ref QPP::QActive "basic threads" through the non-blocking
+//! QXMutex::tryLock() API.
 //!
 //! @note
 //! QP::QXMutex should be used in situations when at least one of the extended
 //! threads contending for the mutex blocks while holding the mutex (between
-//! the QP::QXMutex::lock() and QP::QXMutex::unlock() operations). If no
-//! blocking is needed while holding the mutex, the more efficient
-//! non-blocking mechanism of @ref QP::QXK::schedLock() "selective QXK
-//! scheduler locking" should be used instead. @ref QP::QXK::schedLock()
-//! "Selective scheduler locking" is available for both @ref QP::QActive
-//! "basic threads" and @ref QP::QXThread "extended threads", so it is
-//! applicable to situations where resources are shared among all
-//! these threads.
+//! the QXMutex::lock() and QXMutex_unlock() operations). If no blocking is
+//! needed while holding the mutex, the more efficient non-blocking mechanism
+//! of @ref srs_qxk_schedLock() "selective QXK scheduler locking" should be
+//! used instead. @ref srs_qxk_schedLock() "Selective scheduler locking" is
+//! available for both @ref QP::QActive "basic threads" and @ref QP::QXThread
+//! "extended threads", so it is applicable to situations where resources
+//! are shared among all these threads.
 //!
 //! @usage
 //! The following example illustrates how to instantiate and use the mutex
 //! in your application.
 //! @include qxk_mutex.cpp
-class QXMutex {
+//!
+class QXMutex : public QP::QActive {
 private:
 
     //! set of extended-threads waiting on this mutex
     QPSet m_waitSet;
 
-    //! lock-nesting up-down counter
-    std::uint8_t volatile m_lockNest;
-
-    //! prio of the lock holder thread
-    std::uint8_t volatile m_holderPrio;
-
-    //! prioirty ceiling of this mutex
-    std::uint8_t m_ceiling;
-
 public:
+
+    //! default constructor
+    QXMutex();
 
     //! initialize the QXK priority-ceiling mutex QP::QXMutex
     //!
     //! @details
     //! Initialize the QXK priority ceiling mutex.
     //!
-    //! @param[in]  ceiling    the ceiling-priotity of this mutex or zero.
-    //!
+    //! @param[in] prioSpec  the priority specification for the mutex
+    //!                      (See also QP::QPrioSpec). This value might
+    //!                      also be zero.
     //! @note
-    //! `ceiling == 0` means that the priority-ceiling protocol shall **not**
+    //! `prioSpec == 0` means that the priority-ceiling protocol shall **not**
     //! be used by this mutex. Such mutex will **not** change (boost) the
     //! priority of the holding thread.
     //!
     //! @note
-    //! `ceiling > 0` means that the priority-ceiling protocol shall be used
-    //! by this mutex. Such mutex __will__ boost the priority of the holding
-    //! thread to the `ceiling` level for as long as the thread holds this
-    //! mutex.
+    //! `prioSpec == 0` means that the priority-ceiling protocol shall **not**
+    //! be used by this mutex. Such mutex will **not** change (boost) the
+    //! priority of the holding threads.<br>
+    //!
+    //! Conversely, `prioSpec != 0` means that the priority-ceiling protocol
+    //! shall be used by this mutex. Such mutex **will** temporarily boost
+    //! the priority and priority-threshold of the holding thread to the
+    //! priority specification in `prioSpec` (see QP::QPrioSpec).
     //!
     //! @attention
-    //! When the priority-ceiling protocol is used (`ceiling > 0`), the
-    //! `ceiling` priority must be unused by any other thread or mutex.
-    //! Also, the `ceiling` priority must be higher than priority of any
-    //! thread that uses this mutex.
+    //! When the priority-ceiling protocol is used (`prioSpec != 0`), the
+    //! QF-priority specified in `prioSpec` must be unused by any other thread
+    //! or mutex. Also, the priority-threshold must be higher or equal to the
+    //! threshold of any thread that uses this mutex (see QP::QPrioSpec).
     //!
     //! @usage
     //! @include qxk_mutex.cpp
-    void init(std::uint_fast8_t const ceiling) noexcept;
-
-    //! lock the QXK priority-ceiling mutex QP::QXMutex
-    //!
-    //! @details
-    //! Lock the QXK priority ceiling mutex QP::QXMutex.
-    //!
-    //! @param[in]  nTicks    number of clock ticks (at the associated rate)
-    //!                       to wait for the semaphore. The value of
-    //!                       QP::QXTHREAD_NO_TIMEOUT indicates that no
-    //!                       timeout will occur and the mutex will wait
-    //!                       indefinitely.
-    //! @returns
-    //! 'true' if the mutex has been acquired and 'false' if a timeout
-    //! occurred.
-    //!
-    //! @note
-    //! The mutex locks are allowed to nest, meaning that the same extended
-    //! thread can lock the same mutex multiple times (< 255). However,
-    //! each call to QXMutex::lock() must be balanced by the matching call to
-    //! QXMutex::unlock().
-    //!
-    //! @usage
-    //! @include qxk_mutex.cpp
-    bool lock(std::uint_fast16_t const nTicks = QXTHREAD_NO_TIMEOUT) noexcept;
+    void init(QPrioSpec const prioSpec) noexcept override;
 
     //! try to lock the QXK priority-ceiling mutex QP::QXMutex
     //!
@@ -652,6 +629,29 @@ public:
     //! successful call to QXMutex::tryLock() must be balanced by the
     //! matching call to QXMutex::unlock().
     bool tryLock() noexcept;
+
+    //! lock the QXK priority-ceiling mutex QP::QXMutex
+    //!
+    //! @details
+    //! Lock the QXK priority ceiling mutex QP::QXMutex.
+    //!
+    //! @param[in]  nTicks  number of clock ticks (at the associated rate)
+    //!                     to wait for the mutex. The value of
+    //!                     QXTHREAD_NO_TIMEOUT indicates that no timeout will
+    //!                     occur and the mutex could block indefinitely.
+    //! @returns
+    //! 'true' if the mutex has been acquired and 'false' if a timeout
+    //! occurred.
+    //!
+    //! @note
+    //! The mutex locks are allowed to nest, meaning that the same extended
+    //! thread can lock the same mutex multiple times (< 255). However,
+    //! each call to QXMutex::lock() must be balanced by the matching call to
+    //! QXMutex::unlock().
+    //!
+    //! @usage
+    //! @include qxk_mutex.cpp
+    bool lock(std::uint_fast16_t const nTicks = QXTHREAD_NO_TIMEOUT) noexcept;
 
     //! unlock the QXK priority-ceiling mutex QP::QXMutex
     //!
@@ -684,14 +684,28 @@ extern "C" {
 struct QXK_Attr {
     QP::QActive * volatile curr;      //!< currently executing thread
     QP::QActive * volatile next;      //!< next thread to execute
-    std::uint8_t volatile actPrio;    //!< prio of the active AO (basic)
-    std::uint8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
+    std::uint8_t volatile actPrio;    //!< prio of the active AO
+    std::uint8_t volatile actThre;    //!< active preemption-threshold
+    std::uint8_t volatile lockCeil;   //!< lock preemption-ceiling (0==no-lock)
     std::uint8_t volatile lockHolder; //!< prio of the lock holder
 };
 
 //${QXK-extern-C::QXK_attr_} .................................................
 //! attributes of the QXK kernel (extern "C" to be accessible from C)
 extern QXK_Attr QXK_attr_;
+
+//${QXK-extern-C::QXK_activate_} .............................................
+//! QXK activator activates the next active object. The activated AO preempts
+//! the currently executing AOs
+//!
+//! @attention
+//! QXK_activate_() must be always called with interrupts **disabled** and
+//! returns with interrupts **disabled**.
+//!
+//! @note
+//! The activate function might enable interrupts internally, but it always
+//! returns with interrupts **disabled**.
+void QXK_activate_() noexcept;
 
 //${QXK-extern-C::QXK_sched_} ................................................
 //! QXK scheduler finds the highest-priority thread ready to run
@@ -708,18 +722,17 @@ extern QXK_Attr QXK_attr_;
 //! returns with interrupts **disabled**.
 std::uint_fast8_t QXK_sched_() noexcept;
 
-//${QXK-extern-C::QXK_activate_} .............................................
-//! QXK activator activates the next active object. The activated AO preempts
-//! the currently executing AOs
-//!
-//! @attention
-//! QXK_activate_() must be always called with interrupts **disabled** and
-//! returns with interrupts **disabled**.
-//!
-//! @note
-//! The activate function might enable interrupts internally, but it always
-//! returns with interrupts **disabled**.
-void QXK_activate_() noexcept;
+//${QXK-extern-C::QXK_current} ...............................................
+//! return the currently executing active-object/thread
+QP::QActive * QXK_current() noexcept;
+
+//${QXK-extern-C::QXK_stackInit_} ............................................
+//! initialize the private stack of a given AO
+void QXK_stackInit_(
+    void * thr,
+     QP::QXThreadHandler const handler,
+    void * const stkSto,
+    std::uint_fast16_t const stkSize) noexcept;
 
 //${QXK-extern-C::QXK_onContextSw} ...........................................
 #ifdef QXK_ON_CONTEXT_SW
@@ -746,18 +759,6 @@ void QXK_onContextSw(
     QP::QActive * prev,
     QP::QActive * next) ;
 #endif // def QXK_ON_CONTEXT_SW
-
-//${QXK-extern-C::QXK_current} ...............................................
-//! return the currently executing active-object/thread
-QP::QActive * QXK_current() noexcept;
-
-//${QXK-extern-C::QXK_stackInit_} ............................................
-//! initialize the private stack of a given AO
-void QXK_stackInit_(
-    void * thr,
-     QP::QXThreadHandler const handler,
-    void * const stkSto,
-    std::uint_fast16_t const stkSize) noexcept;
 
 //${QXK-extern-C::QXK_threadExit_} ...........................................
 //! called when a thread function exits
@@ -822,11 +823,11 @@ void QXK_threadExit_() ;
 
 //${QXK-impl::QF_SCHED_LOCK_} ................................................
 //! QXK selective scheduler locking
-#define QF_SCHED_LOCK_(prio_) do { \
+#define QF_SCHED_LOCK_(ceil_) do { \
     if (QXK_ISR_CONTEXT_()) { \
         lockStat_ = 0xFFU; \
     } else { \
-        lockStat_ = QXK::schedLock((prio_)); \
+        lockStat_ = QXK::schedLock((ceil_)); \
     } \
 } while (false)
 
@@ -847,7 +848,7 @@ void QXK_threadExit_() ;
 // QXK native event queue signalling
 #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
     QF::readySet_.insert( \
-        static_cast<std::uint_fast8_t>((me_)->m_dynPrio)); \
+        static_cast<std::uint_fast8_t>((me_)->m_prio)); \
     if (!QXK_ISR_CONTEXT_()) { \
         if (QXK_sched_() != 0U) { \
             QXK_activate_(); \

@@ -80,11 +80,15 @@ static void thread_function(ULONG thread_input) { // ThreadX signature
     QActive::thread_(reinterpret_cast<QActive *>(thread_input));
 }
 //............................................................................
-void QActive::start(std::uint_fast8_t const prio,
+void QActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
+    register_(); // make QF aware of this active object
+
     // allege that the ThreadX queue is created successfully
     Q_ALLEGE_ID(210,
         tx_queue_create(&m_eQueue,
@@ -94,14 +98,8 @@ void QActive::start(std::uint_fast8_t const prio,
             static_cast<ULONG>(qLen * sizeof(ULONG)))
         == TX_SUCCESS);
 
-    m_prio = prio;  // save the QF priority
-    register_(); // make QF aware of this active object
-
     init(par, m_prio); // execute initial transition
     QS_FLUSH();     // flush the trace buffer to the host
-
-    // convert QF priority to the ThreadX priority
-    UINT tx_prio = QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - prio;
 
     Q_ALLEGE_ID(220,
         tx_thread_create(
@@ -111,8 +109,8 @@ void QActive::start(std::uint_fast8_t const prio,
             reinterpret_cast<ULONG>(this), // thread parameter
             stkSto,    // stack start
             stkSize,   // stack size in bytes
-            tx_prio,   // ThreadX priority
-            tx_prio,   // preemption threshold disabled (same as priority)
+            QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - m_prio,  // ThreadX priority
+            QF_TX_PRIO_OFFSET + QF_MAX_ACTIVE - m_pthre, // premption-thre
             TX_NO_TIME_SLICE,
             TX_AUTO_START)
         == TX_SUCCESS);

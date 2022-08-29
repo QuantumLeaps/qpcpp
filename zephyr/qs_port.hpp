@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-12
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-25
+//! @version Last updated for: Zephyr 3.1.99 and @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QS/C++ port to a 32-bit CPU, generic C++ compiler
@@ -56,3 +56,4 @@
 #include "qs.hpp"      // QS platform-independent public interface
 
 #endif // QS_PORT_HPP
+

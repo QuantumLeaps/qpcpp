@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-12
-//! @version Last updated for: @ref qpcpp_7_0_2
+//! @date Last updated on: 2022-08-25
+//! @version Last updated for: Zephyr 3.1.99 and @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QF/C++ port to Zephyr RTOS kernel, all supported compilers
@@ -68,10 +68,14 @@ void QF::init(void) {
 int_t QF::run(void) {
     onStartup();
 #ifdef Q_SPY
+
+#if CONFIG_NUM_PREEMPT_PRIORITIES > 0
     // lower the priority of the main thread to the level of idle
     k_thread_priority_set(k_current_get(),
                           CONFIG_NUM_PREEMPT_PRIORITIES - 1);
-    // perform QS work
+#endif
+
+    // perform QS work...
     while (true) {
         QS::rxParse();   // parse any QS-RX bytes
         QS::doOutput();  // perform the QS-TX output
@@ -103,22 +107,26 @@ void QActive::thread_(QActive *act) {
 // QActive::setAttr() needs to be called *before* QActive::start() for the
 // given active object.
 //
+// In this Zephyr port the attributes will be used as follows:
+// - attr1 - will be used for thread options in k_thread_create()
+// - attr2 - will be used for thread name in k_thread_name_set()
+//
 void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
     m_thread.base.order_key = attr1;
     m_thread.init_data      = const_cast<void *>(attr2);
 }
 //............................................................................
-void QActive::start(std::uint_fast8_t const prio,
+void QActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
+    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    register_(); // make QF aware of this active object
+
     // initialize the Zephyr message queue
     k_msgq_init(&m_eQueue, reinterpret_cast<char *>(qSto),
                 sizeof(QEvt *), static_cast<uint32_t>(qLen));
-
-    m_prio = prio;  // save the QF priority
-    register_(); // make QF aware of this active object
 
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
@@ -126,15 +134,16 @@ void QActive::start(std::uint_fast8_t const prio,
     // Zephyr uses the reverse priority numbering than QP
     int zprio = (int)QF_MAX_ACTIVE - static_cast<int>(prio);
 
-    // create an Zephyr thread for the AO...
+    // extract data temporarily saved in m_thread by QActive::setAttr()
     std::uint32_t opt = m_thread.base.order_key;
 #ifdef CONFIG_THREAD_NAME
     char const *name = static_cast<char const *>(m_thread.init_data);
 #endif
-    m_thread = (struct k_thread){}; // clear the thread control block
-#ifdef CONFIG_THREAD_NAME
-    k_thread_name_set(&m_thread, name);
-#endif
+
+    // clear the Zephyr thread structure before creating the thread
+    m_thread = (struct k_thread){};
+
+    // create a Zephyr thread for the AO...
     k_thread_create(&m_thread,
                     static_cast<k_thread_stack_t *>(stkSto),
                     static_cast<size_t>(stkSize),
@@ -145,6 +154,10 @@ void QActive::start(std::uint_fast8_t const prio,
                     zprio,      // Zephyr priority */
                     opt,        // thread options */
                     K_NO_WAIT); // start immediately */
+
+#ifdef CONFIG_THREAD_NAME
+    k_thread_name_set(&m_thread, (name != nullptr) ? name : "AO");
+#endif
 }
 //............................................................................
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
@@ -152,7 +165,6 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 {
     QF_CRIT_STAT_
     QF_CRIT_E_();
-
     std::uint_fast16_t nFree =
          static_cast<std::uint_fast16_t>(k_msgq_num_free_get(&m_eQueue));
 
@@ -261,4 +273,3 @@ QEvt const *QActive::get_(void) noexcept {
 }
 
 } // namespace QP
-

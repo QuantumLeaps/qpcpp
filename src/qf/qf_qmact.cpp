@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qf::qf_qmact.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-07
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QMActive::QMActive() and virtual functions
 

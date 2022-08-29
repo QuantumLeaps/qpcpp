@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-28
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QF/C++ port to embOS RTOS kernel, all supported compilers
@@ -89,8 +89,8 @@ void QActive::thread_(QActive *act) {
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
         QF::gc(e); // check if the event is garbage, and collect it if so
     }
-    act->unregister_(); // remove this object from QF
-    OS_TerminateTask(&act->m_thread);
+    //act->unregister_(); // remove this object from QF
+    //OS_TerminateTask(&act->m_thread);
 }
 
 //............................................................................
@@ -107,19 +107,20 @@ static void thread_function(void *pVoid) { // embOS signature
     QActive::thread_(act);
 }
 //............................................................................
-void QActive::start(std::uint_fast8_t const prio,
+void QActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
+    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    register_(); // make QF aware of this AO
+
     // create the embOS message box for the AO
     OS_CreateMB(&m_eQueue,
                 static_cast<OS_U16>(sizeof(QEvt *)),
                 static_cast<OS_UINT>(qLen),
                 static_cast<void *>(&qSto[0]));
 
-    m_prio = prio;  // save the QF priority
-    register_(); // make QF aware of this active object
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
@@ -130,7 +131,7 @@ void QActive::start(std::uint_fast8_t const prio,
 #elif
                     "AO",          // a generic AO task name
 #endif
-        static_cast<OS_PRIO>(prio), // embOS uses same numbering as QP
+        static_cast<OS_PRIO>(m_prio), // embOS uses same numbering as QP
         &thread_function,
         static_cast<void OS_STACKPTR *>(stkSto),
         static_cast<OS_UINT>(stkSize),

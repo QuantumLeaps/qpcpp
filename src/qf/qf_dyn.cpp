@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qf::qf_dyn.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-29
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QF/C++ dynamic event management
 
@@ -201,16 +198,16 @@ void gc(QEvt const * const e) noexcept {
             // explicitly exectute the destructor'
             // NOTE: casting 'const' away is legitimate,
             // because it's a pool event
-            QF_EVT_CONST_CAST_(e)->~QEvt(); // xtor,
+            QF_CONST_CAST_(QEvt*, e)->~QEvt(); // xtor,
     #endif
 
     #ifdef Q_SPY
             // cast 'const' away, which is OK, because it's a pool event
-            QF_EPOOL_PUT_(QF::ePool_[idx], QF_EVT_CONST_CAST_(e),
+            QF_EPOOL_PUT_(QF::ePool_[idx], QF_CONST_CAST_(QEvt*, e),
                      static_cast<std::uint_fast8_t>(QS_EP_ID)
                          + static_cast<std::uint_fast8_t>(e->poolId_));
     #else
-            QF_EPOOL_PUT_(QF::ePool_[idx], QF_EVT_CONST_CAST_(e), 0U);
+            QF_EPOOL_PUT_(QF::ePool_[idx], QF_CONST_CAST_(QEvt*, e), 0U);
     #endif
         }
     }

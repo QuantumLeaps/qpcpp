@@ -1,7 +1,7 @@
 //============================================================================
 // DPP example for QXK
-// Last updated for version 6.3.3
-// Last updated on  2018-06-23
+// Last updated for version 7.1.0
+// Last updated on  2022-08-28
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -53,7 +53,7 @@ int main() {
     static uint64_t test2StackSto[64];
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-    DPP::BSP::init(); // initialize the BSP
+    BSP::init(); // initialize the BSP
 
     // object dictionaries...
     QS_OBJ_DICTIONARY(&l_ticker0);
@@ -67,7 +67,7 @@ int main() {
 
     // start the extended Test1 thread
     DPP::XT_Test1->start(
-            1U,                      // QP prio of the thread
+            Q_PRIO(1U, 1U),          // QF-prio/preempt-thre.
             test1QueueSto,           // event queue storage
             Q_DIM(test1QueueSto),    // queue length [events]
             test1StackSto,           // stack storage
@@ -78,21 +78,21 @@ int main() {
     // start the Philo active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start(
-            (n + 3U),                // QP priority of the AO
+            Q_PRIO(n + 3U, 3U),      // QF-prio/preempt-thre.
             philoQueueSto[n],        // event queue storage
             Q_DIM(philoQueueSto[n]), // queue length [events]
             nullptr, 0U);            // no stack storage
     }
 
     // example of prioritizing the Ticker0 active object
-    DPP::the_Ticker0->start(N_PHILO + 3U, // priority
+    DPP::the_Ticker0->start(Q_PRIO(N_PHILO + 3U, 4U), // priority
                             0, 0, 0, 0);
 
     // NOTE: leave priority (N_PHILO + 4) free for mutex
 
     // start the extended Test2 thread
     DPP::XT_Test2->start(
-            N_PHILO + 5U,            // QP prio of the thread
+            Q_PRIO(N_PHILO + 5U, 5U),// QF-prio/preempt-thre.
             test2QueueSto,           // event queue storage
             Q_DIM(test2QueueSto),    // queue length [events]
             test2StackSto,           // stack storage
@@ -101,7 +101,7 @@ int main() {
     // NOTE: leave priority (N_PHILO + 6) free for mutex
 
     DPP::AO_Table->start(
-            N_PHILO + 7U,            // QP priority of the AO
+            Q_PRIO(N_PHILO + 7U, 7U),// QF-prio/preempt-thre.
             tableQueueSto,           // event queue storage
             Q_DIM(tableQueueSto),    // queue length [events]
             nullptr, 0U);            // no stack storage

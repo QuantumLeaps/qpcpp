@@ -148,7 +148,7 @@ extern "C" {
 
 //============================================================================
 // interface used only inside QF, but not in applications
-//
+
 #ifdef QP_IMPL
     #define FREERTOS_TASK_PRIO(qp_prio_) \
         ((UBaseType_t)((qp_prio_) + tskIDLE_PRIORITY))
@@ -204,3 +204,4 @@ extern "C" {
 //
 
 #endif // QF_PORT_HPP
+

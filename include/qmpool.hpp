@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qmpool.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-15
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief platform-independent memory pool QP::QMPool interface.
 

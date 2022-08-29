@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qf::qf_act.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @deprecated
 //! Empty file kept only for backwards compatibility.

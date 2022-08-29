@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qf.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-07-25
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QF/C++ platform-independent public interface.
 
@@ -155,6 +152,56 @@ using QTimeEvtCtr = std::uint8_t;
 using QTimeEvtCtr = std::uint32_t;
 #endif //  (QF_TIMEEVT_CTR_SIZE== 4U)
 
+//${QF-types::QPrioSpec} .....................................................
+//! Priority specification for Active Objects in QP
+//!
+//! @details
+//! Active Object priorities in QP are integer numbers in the range
+//! [1..#QF_MAX_ACTIVE], whereas the special priority number 0 is reserved
+//! for the lowest-priority idle thread. The QP framework uses the *direct*
+//! priority numbering, in which higher numerical values denote higher
+//! urgency. For example, an AO with priority 32 has higher urgency than
+//! an AO with priority 23.
+//!
+//! QP::QPrioSpec allows an application developer to assign **two**
+//! priorities to a given AO (see also Q_PRIO()):
+//!
+//! 1. The "QF-priority", which resides in the least-significant byte
+//!    of the QP::QPrioSpec data type. The "QF-priority" must be **unique**
+//!    for each thread in the system and higher numerical values represent
+//!    higher urgency (direct pirority numbering).
+//!
+//! 2. The second priority, which resides in the most-significant byte
+//!    of the QP::QPrioSpec data type. The second priority is specific to the
+//!    underlying real-time kernel or operating system with the semantics
+//!    determined by that kernel.
+//!
+//! @note
+//! In the QP native preemptive kernels, like QK and QXK, the second component
+//! of the QP::QPrioSpec is used as the "preemption-threshold". It determines
+//! the conditions under which a given thread can be *preempted* by other
+//! threads. Specifically, a given thread can be preempted only by another
+//! thread with a *higher* "preemption-threshold".
+//!
+//! ![QF-priority and preemption-threshold relations](qp-prio.png)
+//!
+//! For backwards-compatibility, ::QPrioSpec data type might contain only the
+//! "QF-priority" component (and the "preemption-threshold" component left at
+//! zero). In that case, the "preemption-threshold" will be assumed to be the
+//! same as the "QF-priority". This corresponds exactly to the previous
+//! semantics of AO priority.
+//!
+//! @note
+//! When QP runs on top of 3rd-party kernels/RTOSes or general-purpose
+//! operating systems, sthe second priority can have different meaning,
+//! depending on the specific RTOS/GPOS used.
+//
+using QPrioSpec = std::uint_fast16_t;
+
+//${QF-types::QSchedStatus} ..................................................
+//! The scheduler lock status used in some real-time kernels
+using QSchedStatus = std::uint_fast16_t;
+
 //${QF-types::QPSet} .........................................................
 //! Priority Set of up to #QF_MAX_ACTIVE elements
 //!
@@ -234,14 +281,10 @@ public:
     }
 
     //! Remove element `n` from the set (n = 1U..64U)
-    //!
-    //! @note
-    //! intentionally misspelled ("rmove") to avoid collision with
-    //! the C++ standard library facility "remove"
-    void rmove(std::uint_fast8_t const n) noexcept {
+    void remove(std::uint_fast8_t const n) noexcept {
         #if (QF_MAX_ACTIVE <= 32U)
-            m_bits = (m_bits &
-                static_cast<QPSetBits>(~(static_cast<QPSetBits>(1) << (n - 1U))));
+            m_bits = (m_bits & static_cast<QPSetBits>(
+                               ~(static_cast<QPSetBits>(1) << (n - 1U))));
         #else
             if (n <= 32U) {
                 (m_bits[0] = (m_bits[0]
@@ -277,14 +320,10 @@ public:
 //! Subscriber List (for publish-subscribe)
 //!
 //! @details
-//! This data type represents a set of active objects that subscribe to
-//! a given signal. The set is represented as priority-set, where each
-//! bit corresponds to the unique priority of an active object.
-using QSubscrList  = QPSet;
-
-//${QF-types::QSchedStatus} ..................................................
-//! The scheduler lock status
-using QSchedStatus = std::uint_fast8_t;
+//! This data type represents a set of Active Objects that subscribe to
+//! a given signal. The set is represented as priority-set, where each bit
+//! corresponds to the unique QF-priority of an AO (see QP::QPrioSpec).
+using QSubscrList = QPSet;
 
 } // namespace QP
 //$enddecl${QF-types} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -357,14 +396,14 @@ public:
     //! m_thread can be a pointer to the Thread-Local-Storage (TLS).
     QF_THREAD_TYPE m_thread;
 #endif // def QF_THREAD_TYPE
-#ifdef QXK_HPP
 
-    //! QXK dynamic priority (1..#QF_MAX_ACTIVE) of AO/thread.
-    std::uint8_t m_dynPrio;
-#endif // def QXK_HPP
-
-    //! QF priority (1..#QF_MAX_ACTIVE) of this active object.
+    //! QF-priority [1..#QF_MAX_ACTIVE] of this AO.
+    //! @sa QP::QPrioSpec
     std::uint8_t m_prio;
+
+    //! preemption-threshold [1..#QF_MAX_ACTIVE] of this AO.
+    //! @sa QP::QPrioSpec
+    std::uint8_t m_pthre;
 
 private:
     friend class QTimeEvt;
@@ -411,7 +450,9 @@ public:
     //! @details
     //! Starts execution of the AO and registers the AO with the framework.
     //!
-    //! @param[in] prio    priority at which to start the active object
+    //! @param[in] prioSpec priority specification of the AO containing the
+    //!    QF-priority and (optionally) preemption-threshold of this AO
+    //!    (for preemptive kernels that support it). See also QP::QPrioSpec.
     //! @param[in] qSto    pointer to the storage for the ring buffer of the
     //!                    event queue
     //! @param[in] qLen    length of the event queue [# QP::QEvt* pointers]
@@ -424,7 +465,7 @@ public:
     //! is needed:
     //! @include qf_start.cpp
     virtual void start(
-        std::uint_fast8_t const prio,
+        QPrioSpec const prioSpec,
         QEvt const * * const qSto,
         std::uint_fast16_t const qLen,
         void * const stkSto,
@@ -433,13 +474,13 @@ public:
 
     //! Overloaded start function (no initialization parameter)
     virtual void start(
-        std::uint_fast8_t const prio,
+        QPrioSpec const prioSpec,
         QEvt const * * const qSto,
         std::uint_fast16_t const qLen,
         void * const stkSto,
         std::uint_fast16_t const stkSize)
     {
-        this->start(prio, qSto, qLen, stkSto, stkSize, nullptr);
+        this->start(prioSpec, qSto, qLen, stkSto, stkSize, nullptr);
     }
 
 #ifdef QF_ACTIVE_STOP
@@ -665,14 +706,19 @@ public:
     std::uint_fast16_t flushDeferred(QEQueue * const eq) const noexcept;
 
     //! Get the priority of the active object.
-    std::uint_fast8_t getPrio() const noexcept {
-        return static_cast<std::uint_fast8_t>(m_prio);
+    std::uint8_t getPrio() const noexcept {
+        return m_prio;
     }
 
+protected:
+
     //! Set the priority of the active object.
-    void setPrio(std::uint_fast8_t const prio) noexcept {
-        m_prio = static_cast<std::uint8_t>(prio);
+    void setPrio(QPrioSpec const prio) noexcept {
+        m_prio  = static_cast<std::uint8_t>(prio & 0xFFU);
+        m_pthre = static_cast<std::uint8_t>(prio >> 8U);
     }
+
+public:
 
     //! Generic setting of additional attributes (useful in QP ports)
     void setAttr(
@@ -1502,20 +1548,14 @@ void gcFromISR(QEvt const * e) noexcept;
 // Global namespace...
 //$declare${QF-macros} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-//${QF-macros::QF_CRIT_EXIT_NOP} .............................................
-#ifndef QF_CRIT_EXIT_NOP
-//! No-operation for exiting a critical section
-//!
-//! @details
-//! In some QF ports the critical section exit takes effect only on the
-//! next machine instruction. If this next instruction is another entry
-//! to a critical section, the critical section won't be really exited,
-//! but rather the two adjecent critical sections would be merged.
-//! The QF_CRIT_EXIT_NOP() macro contains minimal code required to
-//! prevent such merging of critical sections in such merging of
-//! critical sections in QF ports, in which it can occur.
-#define QF_CRIT_EXIT_NOP() (static_cast<void>(0))
-#endif // ndef QF_CRIT_EXIT_NOP
+//${QF-macros::QF_NO_MARGIN} .................................................
+//! Special value of margin that causes asserting failure in case
+//! event allocation or event posting fails
+#define QF_NO_MARGIN (static_cast<std::uint16_t>(0xFFFFU))
+
+//${QF-macros::Q_PRIO} .......................................................
+//! Create a QP::QPrioSpec object to specify priorty of an AO or a thread
+#define Q_PRIO(prio_, pthre_) (static_cast<QP::QPrioSpec>((prio_) | (pthre_) << 8U))
 
 //${QF-macros::Q_NEW} ........................................................
 #ifndef Q_EVT_CTOR
@@ -1651,18 +1691,15 @@ void gcFromISR(QEvt const * e) noexcept;
 //! overhead when the tracing is disabled.
 //!
 //! @param[in] e_      pointer to the posted event
-//! @param[in] sender_ pointer to the sender object. This parameter is
-//!          actually only used when QS software tracing is enabled
-//!          (macro #Q_SPY is defined). When QS software tracing is
-//!          disabled, the macro calls QActive::publish_() without the
-//!          `sender_` parameter, so the overhead of passing this
-//!          extra parameter is entirely avoided.
+//! @param[in] e_      pointer to the posted event
+//! @param[in] sender_ pointer to the sender object (actually used
+//!                    only when #Q_SPY is defined)
 //!
 //! @note
-//! The pointer to the sender object is not necessarily a pointer
-//! to an active object. In fact, if QActive::publish_() is called from
-//! an interrupt or other context, you can create a unique object just
-//! to unambiguously identify the publisher of the event.
+//! The pointer to the `sender_` object is not necessarily a pointer
+//! to an active object. In fact, if QACTIVE_PUBLISH() is called from an
+//! interrupt or other context, you can create a unique object just to
+//! unambiguously identify the sender of the event.
 //!
 //! @sa QActive::publish_()
 #define PUBLISH(e_, sender_) \
@@ -1787,9 +1824,19 @@ void gcFromISR(QEvt const * e) noexcept;
 //! @sa TICK_X()
 #define TICK(sender_) TICK_X(0U, (sender_))
 
-//${QF-macros::QF_NO_MARGIN} .................................................
-//! Special value of margin that causes asserting failure in case
-//! event allocation or event posting fails
-#define QF_NO_MARGIN (static_cast<std::uint16_t>(0xFFFFU))
+//${QF-macros::QF_CRIT_EXIT_NOP} .............................................
+#ifndef QF_CRIT_EXIT_NOP
+//! No-operation for exiting a critical section
+//!
+//! @details
+//! In some QF ports the critical section exit takes effect only on the
+//! next machine instruction. If this next instruction is another entry
+//! to a critical section, the critical section won't be really exited,
+//! but rather the two adjecent critical sections would be merged.
+//! The QF_CRIT_EXIT_NOP() macro contains minimal code required to
+//! prevent such merging of critical sections in such merging of
+//! critical sections in QF ports, in which it can occur.
+#define QF_CRIT_EXIT_NOP() (static_cast<void>(0))
+#endif // ndef QF_CRIT_EXIT_NOP
 //$enddecl${QF-macros} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #endif // QF_HPP

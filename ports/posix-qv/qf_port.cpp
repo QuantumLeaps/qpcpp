@@ -21,8 +21,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-28
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QF/C++ port to POSIX API (single-threaded, like QV kernel)
@@ -196,7 +196,7 @@ int_t QF::run(void) {
             QF_CRIT_E_();
 
             if (a->m_eQueue.isEmpty()) { // empty queue?
-                QF::readySet_.rmove(p);
+                QF::readySet_.remove(p);
             }
         }
         else {
@@ -268,20 +268,21 @@ int QF::consoleWaitForKey(void) {
 }
 
 //============================================================================
-void QActive::start(std::uint_fast8_t const prio,
+void QActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
+    Q_UNUSED_PAR(stkSto);
     Q_UNUSED_PAR(stkSize);
 
-    Q_REQUIRE_ID(600, (0U < prio)  /* priority...*/
-        && (prio <= QF_MAX_ACTIVE) /*... in range */
-        && (stkSto == nullptr));   // stack storage must NOT be provided
+    // no need for stack storage in this port
+    Q_REQUIRE_ID(600, stkSto == nullptr);
+
+    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    register_(); // make QF aware of this AO
 
     m_eQueue.init(qSto, qLen);
-    m_prio = prio; // set the QF priority of this AO before registering it
-    register_();   // register this AO with QF
 
     this->init(par, m_prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
@@ -295,7 +296,7 @@ void QActive::stop(void) {
     // make sure the AO is no longer in "ready set"
     QF_CRIT_STAT_
     QF_CRIT_E_();
-    QF::readySet_.rmove(m_prio);
+    QF::readySet_.remove(m_prio);
     QF_CRIT_X_();
 
     unregister_(); // remove this AO from QF

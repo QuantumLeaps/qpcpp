@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on STM32 NUCLEO-L053R8, QK kernel, GNU-ARM
-# Last Updated for Version: 7.0.1
-# Date of the Last Update:  2022-05-23
+# Last Updated for Version: 7.1.0
+# Date of the Last Update:  2022-08-26
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -45,8 +45,7 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    https://sourceforge.net/projects/qpc/files/QTools/
-#
+#    https://github.com/QuantumLeaps/qtools
 
 #-----------------------------------------------------------------------------
 # project name
@@ -134,6 +133,7 @@ LIBS      :=
 
 # defines
 DEFINES   := \
+	-DQK_ON_CONTEXT_SW \
 	-DQK_USE_IRQ_HANDLER=LCD_IRQHandler \
 	-DQK_USE_IRQ_NUM=30
 

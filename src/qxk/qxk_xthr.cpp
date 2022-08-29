@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qxk::qxk_xthr.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QXK/C++ preemptive kernel extended (blocking) thread implementation
 
@@ -75,8 +72,6 @@ Q_DEFINE_THIS_MODULE("qxk_xthr")
 namespace QP {
 
 //${QXK::QXThread} ...........................................................
-QXThread QXThread::idle (nullptr);
-
 
 //${QXK::QXThread::QXThread} .................................................
 QXThread::QXThread(
@@ -109,7 +104,7 @@ bool QXThread::delay(std::uint_fast16_t const nTicks) noexcept {
     Q_REQUIRE_ID(801, QXK_attr_.lockHolder != thr->m_prio);
 
     // remember the blocking object
-    thr->m_temp.obj = QXK_PTR_CAST_(QMState*, &thr->m_timeEvt);
+    thr->m_temp.obj = QXK_PTR_CAST_(QMState const*, &thr->m_timeEvt);
     thr->teArm_(static_cast<enum_t>(QXK::DELAY_SIG), nTicks);
     thr->block_();
     QF_CRIT_X_();
@@ -169,8 +164,8 @@ QEvt const * QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
         thr->m_temp.obj = QXK_PTR_CAST_(QMState*, &thr->m_eQueue);
 
         thr->teArm_(static_cast<enum_t>(QXK::QUEUE_SIG), nTicks);
-        QF::readySet_.rmove(
-                           static_cast<std::uint_fast8_t>(thr->m_dynPrio));
+        QF::readySet_.remove(
+                           static_cast<std::uint_fast8_t>(thr->m_prio));
         static_cast<void>(QXK_sched_());
         QF_CRIT_X_();
         QF_CRIT_EXIT_NOP(); // BLOCK here
@@ -261,7 +256,7 @@ void QXThread::dispatch(
 
 //${QXK::QXThread::start} ....................................................
 void QXThread::start(
-    std::uint_fast8_t const prio,
+    QPrioSpec const prioSpec,
     QEvt const * * const qSto,
     std::uint_fast16_t const qLen,
     void * const stkSto,
@@ -272,11 +267,9 @@ void QXThread::start(
 
     //! @pre this function must:
     //! - NOT be called from an ISR;
-    //! - the thread priority cannot exceed #QF_MAX_ACTIVE;
     //! - the stack storage must be provided;
     //! - the thread must be instantiated (see #QXThread).
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
-        && (prio <= QF_MAX_ACTIVE)
         && (stkSto != nullptr)
         && (stkSize != 0U)
         && (m_state.act == nullptr));
@@ -290,18 +283,17 @@ void QXThread::start(
     // the top-most initial transition 'm_temp.act'
     QXK_stackInit_(this, m_temp.thr, stkSto, stkSize);
 
-    m_prio    = static_cast<std::uint8_t>(prio);
-    m_dynPrio = static_cast<std::uint8_t>(prio);
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); //  QF-prio.
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
+    register_(); // make QF aware of this AO
 
     // the new thread is not blocked on any object
     m_temp.obj = nullptr;
 
-    register_(); // make QF aware of this extended thread
-
     QF_CRIT_STAT_
     QF_CRIT_E_();
     // extended-thread becomes ready immediately
-    QF::readySet_.insert(static_cast<std::uint_fast8_t>(m_dynPrio));
+    QF::readySet_.insert(static_cast<std::uint_fast8_t>(m_prio));
 
     // see if this thread needs to be scheduled in case QXK is running
     static_cast<void>(QXK_sched_());
@@ -392,7 +384,7 @@ bool QXThread::post_(
                 if (m_temp.obj == QXK_PTR_CAST_(QMState*, &m_eQueue)) {
                     static_cast<void>(teDisarm_());
                     QF::readySet_.insert(
-                        static_cast<std::uint_fast8_t>(m_dynPrio));
+                        static_cast<std::uint_fast8_t>(m_prio));
                     if (!QXK_ISR_CONTEXT_()) {
                         static_cast<void>(QXK_sched_());
                     }
@@ -449,13 +441,13 @@ void QXThread::postLIFO(QEvt const * const e) noexcept {
 void QXThread::block_() const noexcept {
     //! @pre the thread holding the lock cannot block!
     Q_REQUIRE_ID(600, (QXK_attr_.lockHolder != m_prio));
-    QF::readySet_.rmove(static_cast<std::uint_fast8_t>(m_dynPrio));
+    QF::readySet_.remove(static_cast<std::uint_fast8_t>(m_prio));
     static_cast<void>(QXK_sched_());
 }
 
 //${QXK::QXThread::unblock_} .................................................
 void QXThread::unblock_() const noexcept {
-    QF::readySet_.insert(static_cast<std::uint_fast8_t>(m_dynPrio));
+    QF::readySet_.insert(static_cast<std::uint_fast8_t>(m_prio));
 
     if ((!QXK_ISR_CONTEXT_()) // not inside ISR?
         && (QActive::registry_[0] != nullptr)) // kernel started?

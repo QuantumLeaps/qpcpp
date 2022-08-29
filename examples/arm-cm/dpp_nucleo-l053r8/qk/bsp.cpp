@@ -1,13 +1,13 @@
 //============================================================================
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QK kernel
-// Last updated for version 6.9.3
-// Last updated on  2021-03-03
+// Last updated for version 7.1.0
+// Last updated on  2022-08-26
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -62,7 +62,8 @@ static unsigned  l_rnd; // random seed
     static QP::QSpyId const l_EXTI0_1_IRQHandler = { 0U };
 
     enum AppRecords { // application-specific trace records
-        PHILO_STAT = QP::QS_USER
+        PHILO_STAT = QP::QS_USER,
+        CONTEXT_SW
     };
 
 #endif
@@ -177,11 +178,11 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_EXTI0_1_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
+    QS_USR_DICTIONARY(CONTEXT_SW);
 
     // setup the QS filters...
-    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
-    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
-    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS); // all records
+    QS_GLB_FILTER(-QP::QS_QF_TICK);    // exclude the clock tick
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -299,8 +300,23 @@ void QK::onIdle(void) {
 #endif
 }
 
+} // namespace QP
+
+//============================================================================
+extern "C" {
+
+#ifdef QK_ON_CONTEXT_SW
+// NOTE: the context-switch callback is called with interrupts DISABLED
+void QK_onContextSw(QP::QActive *prev, QP::QActive *next) {
+    QS_BEGIN_NOCRIT(DPP::CONTEXT_SW, 0U) // no critical section!
+        QS_OBJ(prev);
+        QS_OBJ(next);
+    QS_END_NOCRIT()
+}
+#endif // QK_ON_CONTEXT_SW
+
 //............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
+Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     //
     // NOTE: add here your application-specific error handling
     //
@@ -310,8 +326,11 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     NVIC_SystemReset();
 }
 
+} // extern "C"
+
 // QS callbacks ==============================================================
 #ifdef Q_SPY
+namespace QP {
 
 /*..........................................................................*/
 #define __DIV(__PCLK, __BAUD)       (((__PCLK / 4U) * 25U)/(__BAUD))
@@ -399,10 +418,11 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
     //TBD
 }
-#endif // Q_SPY
-//--------------------------------------------------------------------------*/
 
 } // namespace QP
+
+#endif // Q_SPY
+//--------------------------------------------------------------------------*/
 
 //============================================================================
 // NOTE00:

@@ -36,11 +36,9 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qpcpp.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-07-09
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QP/C++ public interface including backwards-compatibility layer
+//!
 //! @details
 //! This header file must be included directly or indirectly
 //! in all application modules (*.cpp files) that use QP/C++.

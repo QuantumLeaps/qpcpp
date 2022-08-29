@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last updated for version 6.9.3
-// Last updated on  2021-03-03
+// Last updated for version 7.1.0
+// Last updated on  2022-08-28
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -43,9 +43,6 @@
 
 Q_DEFINE_THIS_FILE
 
-// namespace DPP *************************************************************
-namespace DPP {
-
 // Local-scope objects -------------------------------------------------------
 #define LED_PORT    gpioPortF
 #define LED0_PIN    4
@@ -54,6 +51,8 @@ namespace DPP {
 #define PB_PORT     gpioPortF
 #define PB0_PIN     6
 #define PB1_PIN     7
+
+namespace { // empty namespace
 
 static uint32_t l_rnd; // random seed
 
@@ -71,10 +70,13 @@ static uint32_t l_rnd; // random seed
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,
         PAUSED_STAT,
+        CONTEXT_SW,
         COMMAND_STAT
     };
 
 #endif
+
+} // empty namespace
 
 // ISRs used in this project =================================================
 extern "C" {
@@ -99,8 +101,8 @@ void SysTick_Handler(void) {
     }
 #endif
 
-    //QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
-    the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
+    QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
+    //the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
@@ -136,7 +138,7 @@ void GPIO_EVEN_IRQHandler(void) {
     // for testing...
     //DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),
     //                    &l_GPIO_EVEN_IRQHandler);
-    QP::QF::PUBLISH(Q_NEW(QP::QEvt, TEST_SIG), // for testing...
+    QP::QF::PUBLISH(Q_NEW(QP::QEvt, DPP::TEST_SIG), // for testing...
                          &l_GPIO_EVEN_IRQHandler);
 
     QXK_ISR_EXIT();  // inform QXK about exiting an ISR
@@ -152,8 +154,8 @@ void USART0_RX_IRQHandler(void); // prototype
 //
 void USART0_RX_IRQHandler(void) {
     // while RX FIFO NOT empty
-    while ((DPP::l_USART0->STATUS & USART_STATUS_RXDATAV) != 0) {
-        uint32_t b = DPP::l_USART0->RXDATA;
+    while ((l_USART0->STATUS & USART_STATUS_RXDATAV) != 0) {
+        uint32_t b = l_USART0->RXDATA;
         QP::QS::rxPut(b);
     }
     QXK_ARM_ERRATUM_838869();
@@ -201,12 +203,12 @@ void BSP::init(void) {
     QS_OBJ_DICTIONARY(&l_GPIO_EVEN_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(PAUSED_STAT);
+    QS_USR_DICTIONARY(CONTEXT_SW);
     QS_USR_DICTIONARY(COMMAND_STAT);
 
     // setup the QS filters...
-    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
-    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
-    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS); // all records
+    QS_GLB_FILTER(-QP::QS_QF_TICK);    // exclude the clock tick
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -217,7 +219,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
         GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED0_PIN);
     }
 
-    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, DPP::AO_Philo[n]->m_prio) // app-specific record
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()
@@ -228,15 +230,15 @@ void BSP::displayPaused(uint8_t paused) {
         GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED0_PIN);
 
         // for testing the extended threads...
-        static QP::QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
-        XT_Test2->delayCancel(); // make sure Test2 is not delayed
-        XT_Test2->POST_X(&pauseEvt, 1U, nullptr); // post to Test2's queue
+        static QP::QEvt const pauseEvt = { DPP::PAUSE_SIG, 0U, 0U};
+        DPP::XT_Test2->delayCancel(); // make sure Test2 is not delayed
+        DPP::XT_Test2->POST_X(&pauseEvt, 1U, nullptr); // post to Test2
     }
     else {
         GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED0_PIN);
     }
 
-    QS_BEGIN_ID(PAUSED_STAT, AO_Table->m_prio) // app-specific record begin
+    QS_BEGIN_ID(PAUSED_STAT, DPP::AO_Table->m_prio) // app-specific record
         QS_U8(1, paused);  // Paused status
     QS_END()
 }
@@ -273,18 +275,15 @@ void BSP::terminate(int16_t result) {
     (void)result;
 }
 
-} // namespace DPP
-
-
 // namespace QP **************************************************************
 namespace QP {
 
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
     // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
+    SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
 
-    // assingn all priority bits for preemption-prio. and none to sub-prio.
+    // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE00
@@ -315,14 +314,14 @@ void QXK::onIdle(void) {
 //    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED1_PIN);
 //    QF_INT_ENABLE();
 
-    // Some flating point code is to exercise the VFP...
+    // Some floating point code to exercise the VFP...
     float volatile x = 1.73205F;
     x = x * 1.73205F;
 
 #ifdef Q_SPY
     QS::rxParse();  // parse all the received bytes
 
-    if ((DPP::l_USART0->STATUS & USART_STATUS_TXBL) != 0) { // is TXE empty?
+    if ((l_USART0->STATUS & USART_STATUS_TXBL) != 0) { // is TXE empty?
         uint16_t b;
 
         QF_INT_DISABLE();
@@ -330,7 +329,7 @@ void QXK::onIdle(void) {
         QF_INT_ENABLE();
 
         if (b != QS_EOD) {  // not End-Of-Data?
-            DPP::l_USART0->TXDATA = (b & 0xFFU); // put into the DR register
+            l_USART0->TXDATA = (b & 0xFFU); // put into the DR register
         }
     }
 #elif defined NDEBUG
@@ -343,7 +342,24 @@ void QXK::onIdle(void) {
 }
 
 //............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
+extern "C" {
+
+//............................................................................
+#ifdef QXK_ON_CONTEXT_SW
+// NOTE: the context-switch callback is called with interrupts DISABLED
+void QXK_onContextSw(QActive *prev, QActive *next) {
+    if (next != nullptr) {
+        //_impure_ptr = next->thread; // switch to next TLS
+    }
+    QS_BEGIN_NOCRIT(CONTEXT_SW, 0U) // no critical section!
+        QS_OBJ(prev);
+        QS_OBJ(next);
+    QS_END_NOCRIT()
+}
+#endif // QXK_ON_CONTEXT_SW
+
+//............................................................................
+Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     //
     // NOTE: add here your application-specific error handling
     //
@@ -362,6 +378,8 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 
     NVIC_SystemReset();
 }
+
+} // extern "C"
 
 // QS callbacks ==============================================================
 #ifdef Q_SPY
@@ -402,29 +420,29 @@ bool QS::onStartup(void const *arg) {
 
     // configure the UART for the desired baud rate, 8-N-1 operation
     init.enable = usartDisable;
-    USART_InitAsync(DPP::l_USART0, &init);
+    USART_InitAsync(l_USART0, &init);
 
     // enable pins at correct UART/USART location.
-    DPP::l_USART0->ROUTEPEN = USART_ROUTEPEN_RXPEN | USART_ROUTEPEN_TXPEN;
-    DPP::l_USART0->ROUTELOC0 = (DPP::l_USART0->ROUTELOC0 &
+    l_USART0->ROUTEPEN = USART_ROUTEPEN_RXPEN | USART_ROUTEPEN_TXPEN;
+    l_USART0->ROUTELOC0 = (l_USART0->ROUTELOC0 &
                            ~(_USART_ROUTELOC0_TXLOC_MASK
                            | _USART_ROUTELOC0_RXLOC_MASK));
 
     // Clear previous RX interrupts
-    USART_IntClear(DPP::l_USART0, USART_IF_RXDATAV);
+    USART_IntClear(l_USART0, USART_IF_RXDATAV);
     NVIC_ClearPendingIRQ(USART0_RX_IRQn);
 
     // Enable RX interrupts
-    USART_IntEnable(DPP::l_USART0, USART_IF_RXDATAV);
+    USART_IntEnable(l_USART0, USART_IF_RXDATAV);
     // NOTE: do not enable the UART0 interrupt in the NVIC yet.
     // Wait till QF::onStartup()
 
 
     // Finally enable the UART
-    USART_Enable(DPP::l_USART0, usartEnable);
+    USART_Enable(l_USART0, usartEnable);
 
-    DPP::QS_tickPeriod_ = SystemCoreClock / DPP::BSP::TICKS_PER_SEC;
-    DPP::QS_tickTime_ = DPP::QS_tickPeriod_; // to start the timestamp at zero
+    QS_tickPeriod_ = SystemCoreClock / BSP::TICKS_PER_SEC;
+    QS_tickTime_   = QS_tickPeriod_; // to start the timestamp at zero
 
     return true; // return success
 }
@@ -434,10 +452,10 @@ void QS::onCleanup(void) {
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
     if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0) { // not set?
-        return DPP::QS_tickTime_ - static_cast<QSTimeCtr>(SysTick->VAL);
+        return QS_tickTime_ - static_cast<QSTimeCtr>(SysTick->VAL);
     }
     else { // the rollover occured, but the SysTick_ISR did not run yet
-        return DPP::QS_tickTime_ + DPP::QS_tickPeriod_
+        return QS_tickTime_ + QS_tickPeriod_
                - static_cast<QSTimeCtr>(SysTick->VAL);
     }
 }
@@ -449,9 +467,9 @@ void QS::onFlush(void) {
     while ((b = getByte()) != QS_EOD) { // while not End-Of-Data...
         QF_INT_ENABLE();
         // while TXE not empty
-        while ((DPP::l_USART0->STATUS & USART_STATUS_TXBL) == 0U) {
+        while ((l_USART0->STATUS & USART_STATUS_TXBL) == 0U) {
         }
-        DPP::l_USART0->TXDATA  = (b & 0xFFU); // put into the DR register
+        l_USART0->TXDATA  = (b & 0xFFU); // put into the DR register
         QF_INT_DISABLE();
     }
     QF_INT_ENABLE();
@@ -473,7 +491,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN_ID(DPP::COMMAND_STAT, 0U)
+    QS_BEGIN_ID(COMMAND_STAT, 0U)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()
@@ -509,7 +527,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 //
 // NOTE01:
 // The User LED is used to visualize the idle loop activity. The brightness
-// of the LED is proportional to the frequency of invcations of the idle loop.
+// of the LED is proportional to the frequency of invocations of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt
 // execution time contributes to the brightness of the User LED.
 //

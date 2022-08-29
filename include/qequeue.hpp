@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qequeue.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-28
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief platform-independent fast "raw" thread-safe event queue interface
 //!
@@ -171,6 +168,7 @@ private:
     QEQueueCtr m_nMin;
     friend class QActive;
     friend class QTicker;
+    friend class QXMutex;
     friend class QXThread;
 
 public:

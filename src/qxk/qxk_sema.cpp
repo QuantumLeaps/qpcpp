@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qxk::qxk_sema.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QXK/C++ preemptive kernel counting semaphore implementation
 
@@ -101,30 +98,40 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
     //! - the semaphore must be initialized
     //! - be called from an extended thread;
     //! - the thread must NOT be already blocked on any object.
-    //!
-    Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
+    Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) // can't wait inside an ISR
         && (m_max_count > 0U)
         && (curr != nullptr)
-        && (curr->m_temp.obj == nullptr)); // NOT blocked
+        && (curr->m_temp.obj == nullptr));
     //! @pre also: the thread must NOT be holding a scheduler lock.
     Q_REQUIRE_ID(201, QXK_attr_.lockHolder != curr->m_prio);
 
     bool signaled = true; // assume that the semaphore will be signaled
     if (m_count > 0U) {
-        m_count = (m_count - 1U); // take semaphore: decrement
+        m_count = m_count - 1U; // semaphore taken: decrement
+
+        QS_BEGIN_NOCRIT_PRE_(QS_SEM_TAKE, curr->m_prio)
+            QS_TIME_PRE_();  // timestamp
+            QS_OBJ_PRE_(this); // this semaphore
+            QS_2U8_PRE_(curr->m_prio, m_count);
+        QS_END_NOCRIT_PRE_()
     }
     else {
         std::uint_fast8_t const p =
-            static_cast<std::uint_fast8_t>(curr->m_dynPrio);
+            static_cast<std::uint_fast8_t>(curr->m_prio);
+        // remove the curr prio from the ready set (will block)
+        // and insert to the waiting set on this semaphore
+        QF::readySet_.remove(p);
+        m_waitSet.insert(p);
 
         // remember the blocking object (this semaphore)
         curr->m_temp.obj = QXK_PTR_CAST_(QMState*, this);
         curr->teArm_(static_cast<enum_t>(QXK::SEMA_SIG), nTicks);
 
-        // remove this curr prio from the ready set (will block)
-        // and insert to the waiting set on this semaphore
-        m_waitSet.insert(p);    // add to waiting-set
-        QF::readySet_.rmove(p); // remove from ready-set
+        QS_BEGIN_NOCRIT_PRE_(QS_SEM_BLOCK, curr->m_prio)
+            QS_TIME_PRE_();  // timestamp
+            QS_OBJ_PRE_(this); // this semaphore
+            QS_2U8_PRE_(curr->m_prio, m_count);
+        QS_END_NOCRIT_PRE_()
 
         // schedule the next thread if multitasking started
         static_cast<void>(QXK_sched_());
@@ -134,26 +141,25 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
         QF_CRIT_E_();   // AFTER unblocking...
         // the blocking object must be this semaphore
         Q_ASSERT_ID(240, curr->m_temp.obj
-                          == QXK_PTR_CAST_(QMState*, this));
+                         == QXK_PTR_CAST_(QMState*, this));
 
         // did the blocking time-out? (signal of zero means that it did)
         if (curr->m_timeEvt.sig == 0U) {
             if (m_waitSet.hasElement(p)) { // still waiting?
-                m_waitSet.rmove(p); // remove the unblocked thread
+                m_waitSet.remove(p); // remove unblocked thread
                 signaled = false; // the semaphore was NOT signaled
                 // semaphore NOT taken: do NOT decrement the count
             }
             else { // semaphore was both signaled and timed out
-                m_count = (m_count - 1U); // take semaphore: decrement
+                m_count = m_count - 1U; // semaphore taken: decrement
             }
         }
         else { // blocking did NOT time out
             // the thread must NOT be waiting on this semaphore
             Q_ASSERT_ID(250, !m_waitSet.hasElement(p));
-
-            m_count = (m_count - 1U); // semaphore taken: decrement
+            m_count = m_count - 1U; // semaphore taken: decrement
         }
-        curr->m_temp.obj = nullptr; // clear blocked obj.
+        curr->m_temp.obj = nullptr; // clear blocking obj.
     }
     QF_CRIT_X_();
 
@@ -162,20 +168,38 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
 
 //${QXK::QXSemaphore::tryWait} ...............................................
 bool QXSemaphore::tryWait() noexcept {
+    QF_CRIT_STAT_
+    QF_CRIT_E_();
+
     //! @pre the semaphore must be initialized
     Q_REQUIRE_ID(300, m_max_count > 0U);
 
-    QF_CRIT_STAT_
-    QF_CRIT_E_();
+    #ifdef Q_SPY
+    // volatile into temp.
+    QActive const * const curr = QXK_PTR_CAST_(QActive*, QXK_attr_.curr);
+    #endif // Q_SPY
 
     bool isAvailable;
     // is the semaphore available?
     if (m_count > 0U) {
-        m_count = (m_count - 1U); // take semaphore: decrement
+        m_count = m_count - 1U; // semaphore signaled: decrement
         isAvailable = true;
+
+        QS_BEGIN_NOCRIT_PRE_(QS_SEM_TAKE, curr->m_prio)
+            QS_TIME_PRE_();  // timestamp
+            QS_OBJ_PRE_(this); // this semaphore
+            QS_2U8_PRE_(curr->m_prio, m_count);
+        QS_END_NOCRIT_PRE_()
     }
     else { // the semaphore is NOT available (would block)
         isAvailable = false;
+
+        QS_BEGIN_NOCRIT_PRE_(QS_SEM_BLOCK_ATTEMPT, curr->m_prio)
+            QS_TIME_PRE_();  // timestamp
+            QS_OBJ_PRE_(this); // this semaphore
+            QS_2U8_PRE_(curr->m_prio,
+                        m_count);
+        QS_END_NOCRIT_PRE_()
     }
     QF_CRIT_X_();
 
@@ -192,30 +216,48 @@ bool QXSemaphore::signal() noexcept {
 
     bool signaled = true; // assume that the semaphore will be signaled
     if (m_count < m_max_count) {
-        m_count = (m_count + 1U); // signal semaphore: increment
+
+        m_count = m_count + 1U; // semaphore signaled: increment
+
+        #ifdef Q_SPY
+        // volatile into temp.
+        QActive const * const curr = QXK_PTR_CAST_(QActive*, QXK_attr_.curr);
+        #endif // Q_SPY
+
+        QS_BEGIN_NOCRIT_PRE_(QS_SEM_SIGNAL, curr->m_prio)
+            QS_TIME_PRE_();  // timestamp
+            QS_OBJ_PRE_(this); // this semaphore
+            QS_2U8_PRE_(curr->m_prio,
+                        m_count);
+        QS_END_NOCRIT_PRE_()
 
         if (m_waitSet.notEmpty()) {
-
             // find the highest-priority thread waiting on this semaphore
             std::uint_fast8_t const p = m_waitSet.findMax();
-            QXThread * const thr = QXK_PTR_CAST_(QXThread*,
-                                                 QActive::registry_[p]);
+            QXThread * const thr =
+                QXK_PTR_CAST_(QXThread*, QActive::registry_[p]);
 
-            // assert that:
-            // - the thread must be registered in QF;
-            // - the thread must be extended; and
+            // assert that the tread:
+            // - must be registered in QF;
+            // - must be extended; and
             // - must be blocked on this semaphore;
-            //
             Q_ASSERT_ID(410, (thr != nullptr)
                 && (thr->m_osObject != nullptr)
-                && (thr->m_temp.obj == QXK_PTR_CAST_(QMState*, this)));
+                && (thr->m_temp.obj
+                    == QXK_PTR_CAST_(QMState*, this)));
 
             // disarm the internal time event
             static_cast<void>(thr->teDisarm_());
 
             // make the thread ready to run and remove from the wait-list
             QF::readySet_.insert(p);
-            m_waitSet.rmove(p);
+            m_waitSet.remove(p);
+
+            QS_BEGIN_NOCRIT_PRE_(QS_SEM_TAKE, thr->m_prio)
+                QS_TIME_PRE_();  // timestamp
+                QS_OBJ_PRE_(this); // this semaphore
+                QS_2U8_PRE_(thr->m_prio, m_count);
+            QS_END_NOCRIT_PRE_()
 
             if (!QXK_ISR_CONTEXT_()) { // not inside ISR?
                 static_cast<void>(QXK_sched_()); // schedule the next thread

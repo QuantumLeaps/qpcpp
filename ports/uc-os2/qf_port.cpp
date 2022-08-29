@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-28
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QF/C++ port to uC-OS2, generic C++11 compiler
@@ -70,20 +70,20 @@ void QF::stop(void) {
 }
 
 //............................................................................
-void QActive::start(std::uint_fast8_t const prio,
+void QActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
+    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    register_(); // make QF aware of this AO
+
     // task name to be passed to OSTaskCreateExt()
     void * const task_name = static_cast<void *>(m_eQueue);
 
     // create uC-OS2 queue and make sure it was created correctly
     m_eQueue = OSQCreate((void **)qSto, qLen);
     Q_ASSERT_ID(210, m_eQueue != nullptr);
-
-    m_prio = prio;  // save the QF priority
-    register_(); // make QF aware of this active object
 
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
@@ -107,7 +107,7 @@ void QActive::start(std::uint_fast8_t const prio,
         static_cast<OS_STK *>(stkSto), // ptos
 #endif
         p_ucos,                    // uC-OS2 task priority
-        static_cast<INT16U>(prio), // the unique QP priority is the task id
+        static_cast<INT16U>(m_prio), // the unique QP priority is the task id
 #if OS_STK_GROWTH
         static_cast<OS_STK *>(stkSto), // pbos
 #else

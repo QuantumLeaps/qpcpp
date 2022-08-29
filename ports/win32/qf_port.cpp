@@ -21,8 +21,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-28
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QF/C++ port to Win32 API (multi-threaded)
@@ -179,20 +179,21 @@ int QF::consoleWaitForKey(void) {
 }
 
 //============================================================================
-void QActive::start(std::uint_fast8_t const prio,
+void QActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    (void)stkSize; // unused parameter in the Win32 port
+    Q_UNUSED_PAR(stkSto);
+    Q_UNUSED_PAR(stkSize);
 
-    Q_REQUIRE_ID(800, (0U < prio)  /* priority...*/
-        && (prio <= QF_MAX_ACTIVE) /*...in range */
-        && (stkSto == nullptr));  // statck storage must NOT...
-                                   // ... be provided
-    m_eQueue.init(qSto, qLen);
-    m_prio = prio;  // set the QF priority of this AO
+    // no need for external stack storage in this port
+    Q_REQUIRE_ID(800, stkSto == nullptr);
+
+    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
     register_(); // make QF aware of this AO
+
+    m_eQueue.init(qSto, qLen);
 
     // save osObject as integer, in case it contains the Win32 priority
     //int win32Prio = (m_osObject != nullptr)

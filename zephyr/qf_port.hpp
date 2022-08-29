@@ -22,11 +22,11 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-12
-//! @version Last updated for: @ref qpcpp_7_0_2
+//! @date Last updated on: 2022-08-25
+//! @version Last updated for: Zephyr 3.1.99 and @ref qpcpp_7_1_0
 //!
 //! @file
-//! @brief QF/C++ port to Zephyr RTOS kernel, all supported compilers
+//! @brief QF/C++ port to Zephyr RTOS (v 3.1.99)
 
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
@@ -46,11 +46,11 @@
 #define QF_CRIT_ENTRY(key_)  ((key_) = k_spin_lock(&QP::QF::spinlock))
 #define QF_CRIT_EXIT(key_)   (k_spin_unlock(&QP::QF::spinlock, (key_)))
 
-#include <zephyr.h>      // Zephyr API
-#include "qep_port.hpp"  // QEP port
-#include "qequeue.hpp"   // used for event deferral
-#include "qmpool.hpp"    // this QP port uses the native QF memory pool
-#include "qf.hpp"        // QF platform-independent public interface
+#include <zephyr/zephyr.h> // Zephyr API
+#include "qep_port.hpp"    // QEP port
+#include "qequeue.hpp"     // used for event deferral
+#include "qmpool.hpp"      // this QP port uses the native QF memory pool
+#include "qf.hpp"          // QF platform-independent public interface
 
 namespace QP {
 namespace QF {
@@ -104,3 +104,4 @@ extern struct k_spinlock spinlock;
 //
 
 #endif // QF_PORT_HPP
+

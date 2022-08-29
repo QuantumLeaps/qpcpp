@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qs::qs_64bit.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-05-15
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QS long-long (64-bit) output
 

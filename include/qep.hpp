@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qep.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-08-12
-//! @version Last updated for: @ref qpcpp_7_0_2
-//!
 //! @file
 //! @brief QEP/C++ platform-independent public interface.
 //!
@@ -48,31 +45,29 @@
 #define QEP_HPP
 
 //============================================================================
-// Global namespace...
-//$declare${version} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//! The current QP version as an unsigned number
+//
+// @details
+// ::QP_VERSION is a decimal constant, where XX is a 1-digit or 2-digit
+// major version number, Y is a 1-digit minor version number, and Z is
+// a 1-digit release number.
+//
+#define QP_VERSION 710U
 
-//${version::QP_VERSION} .....................................................
-//! The current QP version as an unsigned literal
-//!
-//! @details
-//! The #QP_VERSION is a decimal constant, where XX is a 2-digit
-//! major version number, Y is a 1-digit minor version number, and Z is
-//! a 1-digit release number.
-#define QP_VERSION 702U
-
-//${version::QP_VERSION_STR} .................................................
 //! The current QP version as a zero terminated string literal.
-//!
-//! @details
-//! #QP_VERSION_STR is of the form "XX.Y.Z", where XX is a 1-or 2-digit
-//! major version number, Y is a 1-digit minor version number, and Z is
-//! a 1-digit release number.
-#define QP_VERSION_STR "7.0.2"
+//
+// @details
+// ::QP_VERSION_STR is of the form "XX.Y.Z", where XX is a 1-or 2-digit
+// major version number, Y is a 1-digit minor version number, and Z is
+// a 1-digit release number.
+//
+#define QP_VERSION_STR "7.1.0"
 
-//${version::QP_RELEASE} .....................................................
-//! Encrypted  current QP release (7.0.2) and date (2022-08-12)
-#define QP_RELEASE 0x7C62C081U
-//$enddecl${version} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//! Encrypted  current QP release (7.1.0) and date (2022-08-30)
+#define QP_RELEASE 0x7C600159U
+
+//============================================================================
+// Global namespace...
 //$declare${glob-types} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 //${glob-types::int_t} .......................................................
@@ -357,7 +352,7 @@ public:
         Q_RET_NULL,      //!< return value without any effect
 
         // transitions need to execute transition-action table in QP::QMsm
-        Q_RET_TRAN,      //!< regular transition */
+        Q_RET_TRAN,      //!< regular transition
         Q_RET_TRAN_INIT, //!< initial transition in a state or submachine
         Q_RET_TRAN_EP,   //!< entry-point transition into a submachine
 

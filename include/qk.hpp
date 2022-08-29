@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qk.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QK/C++ platform-independent public interface.
 
@@ -69,7 +66,7 @@ namespace QK {
 //! QK idle callback (customized in BSPs for QK)
 //!
 //! @details
-//! QK::onIdle() is called continously by the QK idle loop. This callback
+//! QK::onIdle() is called continuously by the QK idle loop. This callback
 //! gives the application an opportunity to enter a power-saving CPU mode,
 //! or perform some other idle processing.
 //!
@@ -136,7 +133,8 @@ extern "C" {
 struct QK_Attr {
     std::uint8_t volatile actPrio;    //!< prio of the active AO
     std::uint8_t volatile nextPrio;   //!< prio of the next AO to execute
-    std::uint8_t volatile lockPrio;   //!< lock prio (0 == no-lock)
+    std::uint8_t volatile actThre;    //!< active preemption-threshold
+    std::uint8_t volatile lockCeil;   //!< lock preemption-ceiling (0==no-lock)
     std::uint8_t volatile lockHolder; //!< prio of the lock holder
 };
 
@@ -222,11 +220,11 @@ void QK_onContextSw(
 
 //${QK-impl::QF_SCHED_LOCK_} .................................................
 //! QK selective scheduler locking
-#define QF_SCHED_LOCK_(prio_) do { \
+#define QF_SCHED_LOCK_(ceil_) do { \
     if (QK_ISR_CONTEXT_()) { \
         lockStat_ = 0xFFU; \
     } else { \
-        lockStat_ = QK::schedLock((prio_)); \
+        lockStat_ = QK::schedLock((ceil_)); \
     } \
 } while (false)
 

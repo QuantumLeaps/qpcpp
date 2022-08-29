@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qs.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QS/C++ platform-independent public interface.
 
@@ -75,40 +72,40 @@ namespace QP {
 
 //${QS::QSTimeCtr} ...........................................................
 //! QS time stamp type, which determines the dynamic range of QS time stamps
-#if (QS_TIME_SIZE == 4U) 
+#if (QS_TIME_SIZE == 4U)
 using QSTimeCtr = std::uint32_t;
-#endif //  (QS_TIME_SIZE == 4U) 
+#endif //  (QS_TIME_SIZE == 4U)
 
 //${QS::QSTimeCtr} ...........................................................
-#if (QS_TIME_SIZE == 2U) 
+#if (QS_TIME_SIZE == 2U)
 using QSTimeCtr = std::uint16_t;
-#endif //  (QS_TIME_SIZE == 2U) 
+#endif //  (QS_TIME_SIZE == 2U)
 
 //${QS::QSTimeCtr} ...........................................................
-#if (QS_TIME_SIZE == 1U) 
+#if (QS_TIME_SIZE == 1U)
 using QSTimeCtr = std::uint8_t;
-#endif //  (QS_TIME_SIZE == 1U) 
+#endif //  (QS_TIME_SIZE == 1U)
 
 //${QS::QSFun} ...............................................................
 //! QS function pointer type (for serializing function pointers)
-#if (QS_FUN_PTR_SIZE == 4U) 
+#if (QS_FUN_PTR_SIZE == 4U)
 using QSFun = std::uint32_t;
-#endif //  (QS_FUN_PTR_SIZE == 4U) 
+#endif //  (QS_FUN_PTR_SIZE == 4U)
 
 //${QS::QSFun} ...............................................................
-#if (QS_FUN_PTR_SIZE == 8U) 
+#if (QS_FUN_PTR_SIZE == 8U)
 using QSFun = std::uint64_t;
-#endif //  (QS_FUN_PTR_SIZE == 8U) 
+#endif //  (QS_FUN_PTR_SIZE == 8U)
 
 //${QS::QSFun} ...............................................................
-#if (QS_FUN_PTR_SIZE == 2U) 
+#if (QS_FUN_PTR_SIZE == 2U)
 using QSFun = std::uint16_t;
-#endif //  (QS_FUN_PTR_SIZE == 2U) 
+#endif //  (QS_FUN_PTR_SIZE == 2U)
 
 //${QS::QSFun} ...............................................................
-#if (QS_FUN_PTR_SIZE == 1U) 
+#if (QS_FUN_PTR_SIZE == 1U)
 using QSFun = std::uint8_t;
-#endif //  (QS_FUN_PTR_SIZE == 1U) 
+#endif //  (QS_FUN_PTR_SIZE == 1U)
 
 //${QS::QSCtr} ...............................................................
 //! QS ring buffer counter and offset type
@@ -160,7 +157,7 @@ enum QSpyPre : std::int8_t {
     QS_QF_EQUEUE_GET,     //!< get an event and queue still not empty
     QS_QF_EQUEUE_GET_LAST,//!< get the last event from the queue
 
-    // [23] Framework (QF) records */
+    // [23] Framework (QF) records
     QS_QF_NEW_ATTEMPT,    //!< an attempt to allocate an event failed
 
     // [24] Memory Pool (MP) records
@@ -201,9 +198,11 @@ enum QSpyPre : std::int8_t {
     // [47] Additional Memory Pool (MP) records
     QS_QF_MPOOL_GET_ATTEMPT,   //!< attempt to get a memory block failed
 
-    // [48] Scheduler (SC) records
-    QS_MUTEX_LOCK,        //!< a mutex was locked
-    QS_MUTEX_UNLOCK,      //!< a mutex was unlocked
+    // [48] old Mutex records, deprecated in QP 7.1.0
+    QS_MUTEX_LOCK,        //!< @deprecated
+    QS_MUTEX_UNLOCK,      //!< @deprecated
+
+    // [50] Scheduler (SC) records
     QS_SCHED_LOCK,        //!< scheduler was locked
     QS_SCHED_UNLOCK,      //!< scheduler was unlocked
     QS_SCHED_NEXT,        //!< scheduler found next task to execute
@@ -229,6 +228,23 @@ enum QSpyPre : std::int8_t {
     QS_PEEK_DATA,         //!< reports the data from the PEEK query
     QS_ASSERT_FAIL,       //!< assertion failed in the code
     QS_QF_RUN,            //!< QF_run() was entered
+
+    // [71] Semaphore (SEM) records
+    QS_SEM_TAKE,          //!< a semaphore was taken by a thread
+    QS_SEM_BLOCK,         //!< a semaphore blocked a thread
+    QS_SEM_SIGNAL,        //!< a semaphore was signaled
+    QS_SEM_BLOCK_ATTEMPT, //!< a semaphore blocked was attempted
+
+    // [75] Mutex (MTX) records
+    QS_MTX_LOCK,          //!< a mutex was locked
+    QS_MTX_BLOCK,         //!< a mutex blocked a thread
+    QS_MTX_UNLOCK,        //!< a mutex was unlocked
+    QS_MTX_LOCK_ATTEMPT,  //!< a mutex lock was attempted
+    QS_MTX_BLOCK_ATTEMPT, //!< a mutex blocking was attempted
+    QS_MTX_UNLOCK_ATTEMPT,//!< a mutex unlock was attempted
+
+    // [81]
+    QS_PRE_MAX,           //!< the number of predefined signals
 };
 
 //${QS::QSpyGroups} ..........................................................
@@ -242,12 +258,14 @@ enum QSpyGroups : std::int16_t {
     QS_TE_RECORDS,  //!< Time Events QS records
     QS_QF_RECORDS,  //!< QF QS records
     QS_SC_RECORDS,  //!< Scheduler QS records
+    QS_SEM_RECORDS, //!< Semaphore QS records
+    QS_MTX_RECORDS, //!< Mutex QS records
     QS_U0_RECORDS,  //!< User Group 100-104 records
     QS_U1_RECORDS,  //!< User Group 105-109 records
     QS_U2_RECORDS,  //!< User Group 110-114 records
     QS_U3_RECORDS,  //!< User Group 115-119 records
     QS_U4_RECORDS,  //!< User Group 120-124 records
-    QS_UA_RECORDS   //!< All User records
+    QS_UA_RECORDS,  //!< All User records
 };
 
 //${QS::QSpyUserOffsets} .....................................................
@@ -1392,10 +1410,6 @@ struct TestData {
 //! QUTest data
 extern TestData testData;
 
-//${QUTest::QS::processTestEvts_} ............................................
-//! internal function to process posted events during test
-void processTestEvts_() ;
-
 //${QUTest::QS::test_pause_} .................................................
 //! internal function to pause test and enter the test event loop
 void test_pause_() ;
@@ -1430,7 +1444,30 @@ void onTestLoop() ;
 
 } // namespace QS
 
-//${QUTest::QHsmDummy} .......................................................
+} // namespace QP
+//$enddecl${QUTest} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+//----------------------------------------------------------------------------
+// QP-stub for QUTest
+// NOTE: The QP-stub is needed for unit testing QP applications,
+// but might NOT be needed for testing QP itself.
+//
+#if Q_UTEST != 0
+//$declare${QUTest-stub::QS} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+namespace QS {
+
+//${QUTest-stub::QS::processTestEvts_} .......................................
+//! internal function to process posted events during test
+void processTestEvts_() ;
+
+} // namespace QS
+} // namespace QP
+//$enddecl${QUTest-stub::QS} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$declare${QUTest-stub::QHsmDummy} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+
+//${QUTest-stub::QHsmDummy} ..................................................
 //! Dummy HSM class for testing (inherits QP::QHsm)
 //!
 //! @details
@@ -1450,7 +1487,12 @@ public:
         std::uint_fast8_t const qs_id) override;
 }; // class QHsmDummy
 
-//${QUTest::QActiveDummy} ....................................................
+} // namespace QP
+//$enddecl${QUTest-stub::QHsmDummy} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$declare${QUTest-stub::QActiveDummy} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+
+//${QUTest-stub::QActiveDummy} ...............................................
 //! Dummy Active Object class for testing (inherits QP::QActive)
 //!
 //! @details
@@ -1462,20 +1504,20 @@ public:
     //! ctor
     QActiveDummy();
     void start(
-        std::uint_fast8_t const prio,
+        QPrioSpec const prioSpec,
         QEvt const * * const qSto,
         std::uint_fast16_t const qLen,
         void * const stkSto,
         std::uint_fast16_t const stkSize,
         void const * const par) override;
     void start(
-        std::uint_fast8_t const prio,
+        QPrioSpec const prioSpec,
         QEvt const * * const qSto,
         std::uint_fast16_t const qLen,
         void * const stkSto,
         std::uint_fast16_t const stkSize) override
     {
-        this->start(prio, qSto, qLen, stkSto, stkSize, nullptr);
+        this->start(prioSpec, qSto, qLen, stkSto, stkSize, nullptr);
     }
     void init(
         void const * const e,
@@ -1492,7 +1534,8 @@ public:
 }; // class QActiveDummy
 
 } // namespace QP
-//$enddecl${QUTest} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddecl${QUTest-stub::QActiveDummy} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#endif // Q_UTEST != 0
 
 //! QS macro to define the Test-Probe for a given `fun_`
 #define QS_TEST_PROBE_DEF(fun_)                                       \

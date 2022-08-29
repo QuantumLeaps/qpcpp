@@ -1,7 +1,7 @@
 //============================================================================
 // DPP example
-// Last updated for version 6.3.3
-// Last updated on  2018-06-23
+// Last updated for version 7.1.0
+// Last updated on  2022-08-28
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,7 +28,7 @@
 // along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
 #include "qpcpp.hpp"
@@ -42,12 +42,12 @@ QP::QActive *DPP::the_Ticker0 = &l_ticker0;
 int main() {
     static QP::QEvt const *tableQueueSto[N_PHILO];
     static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
+
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
     static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO];
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-
-    DPP::BSP::init(); // initialize the BSP
+    BSP::init(); // initialize the BSP
 
     QP::QActive::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
 
@@ -55,21 +55,26 @@ int main() {
     QP::QF::poolInit(smlPoolSto,
                      sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
-    // start the active objects...
+    // start the Philo active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
-                           philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-                           nullptr, 0U);
+        DPP::AO_Philo[n]->start(
+            n + 1U,                  // QP-priority
+            philoQueueSto[n],        // event queue storage
+            Q_DIM(philoQueueSto[n]), // queue length [events]
+            nullptr, 0U);            // no stack storage
     }
 
     // example of prioritizing the Ticker0 active object
-    DPP::the_Ticker0->start((uint_fast8_t)(N_PHILO + 1U), // priority
-                            0, 0,
-                            0, 0);
+    DPP::the_Ticker0->start(
+        N_PHILO + 1U,                 // QP-priority
+        0, 0,
+        0, 0);
 
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 2U), // priority
-                    tableQueueSto, Q_DIM(tableQueueSto),
-                    nullptr, 0U);
+    DPP::AO_Table->start(
+            N_PHILO + 2U,            // QP-priority
+            tableQueueSto,           // event queue storage
+            Q_DIM(tableQueueSto),    // queue length [events]
+            nullptr, 0U);            // no stack storage
 
     return QP::QF::run(); // run the QF application
 }

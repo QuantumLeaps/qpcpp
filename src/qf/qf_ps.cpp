@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qf::qf_ps.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QF/C++ Publish-Subscribe services
 //! definitions.
@@ -139,19 +136,21 @@ void QActive::publish_(
     if (subscrList.notEmpty()) { // any subscribers?
         // the highest-prio subscriber
         std::uint_fast8_t p = subscrList.findMax();
+        QActive *a = registry_[p];
         QF_SCHED_STAT_
 
-        QF_SCHED_LOCK_(p); // lock the scheduler up to prio 'p'
-        do { // loop over all subscribers */
+        QF_SCHED_LOCK_(a->m_pthre); // lock the scheduler up to threshold
+        do { // loop over all subscribers
             // the prio of the AO must be registered with the framework
-            Q_ASSERT_ID(210, registry_[p] != nullptr);
+            Q_ASSERT_ID(210, a != nullptr);
 
             // POST() asserts internally if the queue overflows
-            registry_[p]->POST(e, sender);
+            a->POST(e, sender);
 
-            subscrList.rmove(p); // remove the handled subscriber
+            subscrList.remove(p); // remove the handled subscriber
             if (subscrList.notEmpty()) {  // still more subscribers?
                 p = subscrList.findMax(); // the highest-prio subscriber
+                a = registry_[p];
             }
             else {
                 p = 0U; // no more subscribers
@@ -219,7 +218,7 @@ void QActive::unsubscribe(enum_t const sig) const noexcept {
         QS_OBJ_PRE_(this);      // this active object
     QS_END_NOCRIT_PRE_()
 
-    subscrList_[sig].rmove(p); // remove from subscriber-list
+    subscrList_[sig].remove(p); // remove from subscriber-list
 
     QF_CRIT_X_();
 }
@@ -240,7 +239,7 @@ void QActive::unsubscribeAll() const noexcept {
         QF_CRIT_STAT_
         QF_CRIT_E_();
         if (subscrList_[sig].hasElement(p)) {
-            subscrList_[sig].rmove(p);
+            subscrList_[sig].remove(p);
 
             QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_UNSUBSCRIBE, m_prio)
                 QS_TIME_PRE_();     // timestamp

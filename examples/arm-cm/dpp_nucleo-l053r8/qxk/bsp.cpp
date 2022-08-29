@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QXK kernel
-// Last updated for: @qpcpp_7_0_0
-// Last updated on  2021-08-04
+// Last updated for: @qpcpp_7_1_0
+// Last updated on  2021-08-26
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -65,7 +65,7 @@ static unsigned  l_rnd; // random seed
         PHILO_STAT = QP::QS_USER,
         PAUSED_STAT,
         COMMAND_STAT,
-        ON_CONTEXT_SW
+        CONTEXT_SW
     };
 
 #endif
@@ -183,12 +183,11 @@ void BSP::init(void) {
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(PAUSED_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
-    QS_USR_DICTIONARY(ON_CONTEXT_SW);
+    QS_USR_DICTIONARY(CONTEXT_SW);
 
     // setup the QS filters...
-    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
-    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
-    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS); // all records
+    QS_GLB_FILTER(-QP::QS_QF_TICK);    // exclude the clock tick
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
@@ -291,7 +290,7 @@ void QXK_onContextSw(QActive *prev, QActive *next) {
     if (next != (QActive *)0) {
         //_impure_ptr = next->thread; // switch to next TLS
     }
-    QS_BEGIN_NOCRIT(DPP::ON_CONTEXT_SW, 0U) // no critical section!
+    QS_BEGIN_NOCRIT(DPP::CONTEXT_SW, 0U) // no critical section!
         QS_OBJ(prev);
         QS_OBJ(next);
     QS_END_NOCRIT()

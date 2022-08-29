@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qs::qs_fp.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-05-13
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QS floating point output implementation
 

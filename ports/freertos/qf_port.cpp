@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-28
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
@@ -40,11 +40,11 @@
 #endif // Q_SPY
 
 #if ( configSUPPORT_STATIC_ALLOCATION == 0 )
-    #error "This QP/C++ port to FreeRTOS requires configSUPPORT_STATIC_ALLOCATION"
+#error "This QP/C++ port to FreeRTOS requires configSUPPORT_STATIC_ALLOCATION"
 #endif
 
 #if ( configMAX_PRIORITIES < QF_MAX_ACTIVE )
-    #error "FreeRTOS configMAX_PRIORITIES must not be less than QF_MAX_ACTIVE"
+#error "FreeRTOS configMAX_PRIORITIES must not be less than QF_MAX_ACTIVE"
 #endif
 
 namespace { // unnamed local namespace
@@ -105,17 +105,19 @@ void QF::stop(void) {
 }
 
 //............................................................................
-void QActive::start(std::uint_fast8_t const prio,
+void QActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    Q_REQUIRE_ID(200, (0U < prio)
-        && (prio <= QF_MAX_ACTIVE) /* in range */
-        && (qSto != nullptr)       /* queue storage */
+    Q_REQUIRE_ID(200,
+        (qSto != nullptr)          /* queue storage */
         && (qLen > 0U)             /* queue size */
         && (stkSto != nullptr)     /* stack storage */
         && (stkSize > 0U));        // stack size
+
+    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    register_(); // make QF aware of this AO
 
     // create FreeRTOS message queue
     m_eQueue = xQueueCreateStatic(
@@ -125,8 +127,6 @@ void QActive::start(std::uint_fast8_t const prio,
             &m_osObject);                   // static queue buffer
     Q_ASSERT_ID(210, m_eQueue != static_cast<QueueHandle_t>(0));
 
-    m_prio = prio;  // save the QF priority
-    register_(); // make QF aware of this active object
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
@@ -142,7 +142,7 @@ void QActive::start(std::uint_fast8_t const prio,
               taskName ,      // the name of the task
               stkSize/sizeof(portSTACK_TYPE), // stack length
               this,           // the 'pvParameters' parameter
-              FREERTOS_TASK_PRIO(prio),  // FreeRTOS priority
+              FREERTOS_TASK_PRIO(m_prio), // also FreeRTOS priority
               static_cast<StackType_t *>(stkSto), // stack storage
               &m_thread));    // task buffer
 }
@@ -184,7 +184,7 @@ void QActive::thread_(QActive *act) {
 #endif
 }
 
-/*==========================================================================*/
+//============================================================================
 bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
 {
@@ -298,6 +298,7 @@ QEvt const *QActive::get_(void) noexcept {
     return e;
 }
 
+//============================================================================
 // The "FromISR" QP APIs for the FreeRTOS port...
 bool QActive::postFromISR_(QEvt const * const e,
                            std::uint_fast16_t const margin, void *par,
@@ -363,11 +364,13 @@ bool QActive::postFromISR_(QEvt const * const e,
         QS_END_NOCRIT_PRE_()
 
         portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
-   }
+
+        QF::gcFromISR(e); // recycle the event to avoid a leak
+    }
 
     return status;
 }
-/*..........................................................................*/
+//............................................................................
 void QActive::publishFromISR_(QEvt const *e, void *par,
                               void const * const sender) noexcept
 {
@@ -411,7 +414,7 @@ void QActive::publishFromISR_(QEvt const *e, void *par,
             // POST_FROM_ISR() asserts internally if the queue overflows
             (void)registry_[p]->POST_FROM_ISR(e, par, sender);
 
-            subscrList.rmove(p); // remove the handled subscriber
+            subscrList.remove(p); // remove the handled subscriber
             if (subscrList.notEmpty()) {  // still more subscribers?
                 p = subscrList.findMax(); // the highest-prio subscriber
             }
@@ -628,15 +631,15 @@ void QF::gcFromISR(QEvt const * const e) noexcept {
             // explicitly exectute the destructor'
             // NOTE: casting 'const' away is legitimate,
             // because it's a pool event
-            QF_EVT_CONST_CAST_(e)->~QEvt(); // xtor,
+            QF_CONST_CAST_(QEvt*, e)->~QEvt(); // xtor,
 #endif
 
 #ifdef Q_SPY
             // cast 'const' away, which is OK, because it's a pool event
-            QF::ePool_[idx].putFromISR(QF_EVT_CONST_CAST_(e),
+            QF::ePool_[idx].putFromISR(QF_CONST_CAST_(QEvt*, e),
                 static_cast<uint_fast8_t>(QS_EP_ID) + e->poolId_);
 #else
-            QF::ePool_[idx].putFromISR(QF_EVT_CONST_CAST_(e), 0U);
+            QF::ePool_[idx].putFromISR(QF_CONST_CAST_(QEvt*, e), 0U);
 #endif
         }
     }

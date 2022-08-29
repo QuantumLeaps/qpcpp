@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qf::qf_time.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-27
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QF/C++ time events and time management services
 

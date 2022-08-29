@@ -19,6 +19,11 @@ target_sources(app PRIVATE
 #
 set(QPCPP_DIR ../../..)
 
+# option to turn QSPY software tracing ON or OFF
+# NOTE: change of the option might require re-building the project
+#
+option(QSPY "QSPY software tracing" OFF)
+
 # QPCPP framework includes and sources...
 zephyr_include_directories(
  ${QPCPP_DIR}/include
@@ -39,4 +44,20 @@ target_sources(app PRIVATE
  ${QPCPP_DIR}/src/qf/qf_time.cpp
  ${QPCPP_DIR}/zephyr/qf_port.cpp
 )
+
+# QPCPP configuration with QSPY...
+if(QSPY)
+
+add_compile_definitions(Q_SPY)
+
+target_sources(app PRIVATE
+ ${QPCPP_DIR}/src/qs/qs.cpp
+ ${QPCPP_DIR}/src/qs/qs_rx.cpp
+ ${QPCPP_DIR}/src/qs/qs_fp.cpp
+ ${QPCPP_DIR}/src/qs/qutest.cpp
+ ${QPCPP_DIR}/src/qs/qs_64bit.cpp
+ ${QPCPP_DIR}/include/qstamp.cpp
+)
+
+endif()
 

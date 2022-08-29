@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qs::qs_rx.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-15
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QS receive channel services
 
@@ -403,8 +400,10 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
             QS::onCommand(l_rx.var.cmd.cmdId, l_rx.var.cmd.param1,
                           l_rx.var.cmd.param2, l_rx.var.cmd.param3);
     #ifdef Q_UTEST
+    #if Q_UTEST != 0
             QS::processTestEvts_(); // process all events produced
-    #endif
+    #endif  // Q_UTEST != 0
+    #endif  // Q_UTEST
             rxReportDone_(QS_RX_COMMAND);
             break;
         }
@@ -414,12 +413,14 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
             QTimeEvt::tick1_(
                 static_cast<std::uint_fast8_t>(l_rx.var.tick.rate),
                 &QS::rxPriv_);
+    #if Q_UTEST != 0
             QS::processTestEvts_(); // process all events produced
+    #endif  // Q_UTEST != 0
     #else
             QTimeEvt::tick_(
                 static_cast<std::uint_fast8_t>(l_rx.var.tick.rate),
                 &QS::rxPriv_);
-    #endif
+    #endif  // Q_UTEST
             rxReportDone_(QS_RX_TICK);
             break;
         }
@@ -588,7 +589,7 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
             // NOTE: Ack was already reported in the WAIT4_EVT_LEN state
     #ifdef Q_UTEST
             QS::onTestEvt(l_rx.var.evt.e); // "massage" the event, if needed
-    #endif // Q_UTEST
+    #endif  // Q_UTEST
             // use 'i' as status, 0 == success,no-recycle
             i = 0U;
 
@@ -670,8 +671,10 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
             }
             else {
     #ifdef Q_UTEST
+    #if Q_UTEST != 0
                 QS::processTestEvts_(); // process all events produced
-    #endif
+    #endif  // Q_UTEST != 0
+    #endif  // Q_UTEST
                 rxReportDone_(QS_RX_EVENT);
             }
             break;
@@ -721,7 +724,6 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
             break;
         }
     }
-
 }
 
 } // namespace QS

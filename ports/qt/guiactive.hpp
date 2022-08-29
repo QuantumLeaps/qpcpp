@@ -21,8 +21,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-25
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QP/C++ port to Qt
@@ -36,7 +36,7 @@ namespace QP {
 class GuiQActive : public QActive {
 public:
     GuiQActive(QStateHandler const initial) : QActive(initial) {}
-    void start(std::uint_fast8_t const prio,
+    void start(QPrioSpec const prioSpec,
                QEvt const * * const qSto, std::uint_fast16_t const qLen,
                void * const stkSto, std::uint_fast16_t const stkSize,
                void const * const par) override;
@@ -49,7 +49,7 @@ public:
 class GuiQMActive : public QMActive {
 public:
     GuiQMActive(QStateHandler const initial) : QMActive(initial) {}
-    void start(std::uint_fast8_t const prio,
+    void start(QPrioSpec const prioSpec,
                QEvt const * * const qSto, std::uint_fast16_t const qLen,
                void * const stkSto, std::uint_fast16_t const stkSize,
                void const * const par) override;

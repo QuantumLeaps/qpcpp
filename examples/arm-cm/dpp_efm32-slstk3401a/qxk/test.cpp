@@ -1,7 +1,7 @@
 //============================================================================
 // DPP example for QXK
-// Last updated for version 6.8.0
-// Last updated on  2020-01-15
+// Last updated for version 7.1.0
+// Last updated on  2022-08-28
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -66,6 +66,8 @@ static void lib_fun(uint32_t x) {
 static void Thread1_run(QP::QXThread * const me) {
 
     QS_OBJ_DICTIONARY(&l_test1);
+    QS_OBJ_DICTIONARY(l_test1.getTimeEvt());
+    QS_OBJ_DICTIONARY(&l_mutex);
 
     // initialize the TLS for Thread1
     me->m_thread = &l_tls1;
@@ -104,6 +106,8 @@ static void Thread1_run(QP::QXThread * const me) {
 static void Thread2_run(QP::QXThread * const me) {
 
     QS_OBJ_DICTIONARY(&l_test2);
+    QS_OBJ_DICTIONARY(l_test2.getTimeEvt());
+    QS_OBJ_DICTIONARY(&l_sema);
 
     // initialize the semaphore before using it
     // NOTE: Here the semaphore is initialized in the highest-priority thread
@@ -116,7 +120,7 @@ static void Thread2_run(QP::QXThread * const me) {
     // NOTE: Here the mutex is initialized in the highest-priority thread
     // that uses it. Alternatively, the mutex can be initialized
     // before any thread runs.
-    l_mutex.init(N_PHILO + 6U); // priority-ceiling protocol used
+    l_mutex.init(Q_PRIO(N_PHILO + 6U, 6U)); // QF-prio/preempt-thre.
     //l_mutex.init(0U); // alternatively: priority-ceiling NOT used
 
     // initialize the TLS for Thread2

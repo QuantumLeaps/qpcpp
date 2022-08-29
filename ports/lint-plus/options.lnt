@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-07-21
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-24
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief PC-Lint-Plus option file for linting QP/C++ source code
@@ -101,7 +101,7 @@ qpcpp.lnt           // QP/C++ options
  QF_CRIT_X_,
  QF_EVT_REF_CTR_INC_,
  QF_EVT_REF_CTR_DEC_,
- QF_EVT_CONST_CAST_,
+ QF_CONST_CAST_,
  QF_CRIT_ENTRY_,
  QF_CRIT_EXIT_,
  Q_ASSERT_CRIT_,
@@ -124,6 +124,14 @@ qpcpp.lnt           // QP/C++ options
  QF_EPOOL_PUT_,
  QF_QMACTIVE_TO_QMSM_CAST_,
  QF_QMACTIVE_TO_QMSM_CONST_CAST_)
+
+// MC++R10-0-6 unparenthesized macro parameter in definition of macro
+-esym(9022,
+ QF_CONST_CAST_)
+
+// [AUTOSAR Rule A5-2-3] cast drops const qualifier
+-emacro(9005,
+ QF_CONST_CAST_)
 
 // M3-R11.3(r) cast from pointer to object type
 -emacro(9087,

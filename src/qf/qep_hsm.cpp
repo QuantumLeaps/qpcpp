@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qf::qep_hsm.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-05-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QP::QHsm implementation
 //!
@@ -80,11 +77,11 @@
     } \
 } while (false)
 
+//============================================================================
 // unnamed namespace for local definitions with internal linkage
 namespace {
 Q_DEFINE_THIS_MODULE("qep_hsm")
 
-//============================================================================
 enum : QP::QSignal {
     //! empty signal for internal use only
     QEP_EMPTY_SIG_ = 0U
@@ -119,6 +116,11 @@ static QP::QEvt const QEP_reservedEvt_[4] {
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+//$define${QEP::versionStr[]} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+
+} // namespace QP
+//$enddef${QEP::versionStr[]} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //$define${QEP::QHsm} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 

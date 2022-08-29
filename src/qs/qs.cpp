@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qs::qs.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-15
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief QS software tracing services
 
@@ -277,10 +274,34 @@ void glbFilter_(std::int_fast16_t const filter) noexcept {
         case QS_SC_RECORDS:
             if (isRemove) {
                 priv_.glbFilter[6] &=
-                    static_cast<std::uint8_t>(~0x7FU & 0xFFU);
+                    static_cast<std::uint8_t>(~0x7CU & 0xFFU);
             }
             else {
-               priv_.glbFilter[6] |= 0x7FU;
+               priv_.glbFilter[6] |= 0x7CU;
+            }
+            break;
+        case QS_SEM_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[8] &=
+                    static_cast<std::uint8_t>(~0x80U & 0xFFU);
+                priv_.glbFilter[9] &=
+                    static_cast<std::uint8_t>(~0x07U & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[8] |= 0x80U;
+                priv_.glbFilter[9] |= 0x07U;
+            }
+            break;
+        case QS_MTX_RECORDS:
+            if (isRemove) {
+                priv_.glbFilter[9]  &=
+                    static_cast<std::uint8_t>(~0xF8U & 0xFFU);
+                priv_.glbFilter[10] &=
+                    static_cast<std::uint8_t>(~0x01U & 0xFFU);
+            }
+            else {
+                priv_.glbFilter[9]  |= 0xF8U;
+                priv_.glbFilter[10] |= 0x01U;
             }
             break;
         case QS_U0_RECORDS:

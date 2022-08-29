@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qf_pkg.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief Internal (package scope) QF/C++ interface.
 
@@ -46,8 +43,8 @@
 #define QF_PKG_HPP
 
 //============================================================================
-//! helper macro to cast const away from an event pointer `e_`
-#define QF_EVT_CONST_CAST_(e_) const_cast<QEvt *>(e_)
+//! helper macro to cast const away from an event pointer
+#define QF_CONST_CAST_(type_, ptr_) const_cast<type_>(ptr_)
 
 //$declare${QF::QF-pkg} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
@@ -121,12 +118,12 @@ inline std::uint8_t QF_EVT_REF_CTR_ (QEvt const * const e) noexcept {
 
 //! increment the refCtr_ of an event `e`
 inline void QF_EVT_REF_CTR_INC_(QEvt const * const e) noexcept {
-    (QF_EVT_CONST_CAST_(e))->refCtr_ = e->refCtr_ + 1U;
+    (QF_CONST_CAST_(QEvt*, e))->refCtr_ = e->refCtr_ + 1U;
 }
 
 //! decrement the refCtr_ of an event `e`
 inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) noexcept {
-    (QF_EVT_CONST_CAST_(e))->refCtr_ = e->refCtr_ - 1U;
+    (QF_CONST_CAST_(QEvt*, e))->refCtr_ = e->refCtr_ - 1U;
 }
 
 } // namespace QP

@@ -21,8 +21,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-25
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QP/C++ port to Qt
@@ -85,24 +85,23 @@ bool GuiApp::event(QEvent *e) {
 }
 
 //............................................................................
-void GuiQActive::start(std::uint_fast8_t const prio,
+void GuiQActive::start(QPrioSpec const prioSpec,
                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
                    void * const stkSto, std::uint_fast16_t const stkSize,
                    void const * const par)
 {
-    Q_REQUIRE((0U < prio)
-              && (prio <= QF_MAX_ACTIVE)
-              && (qSto == nullptr) /* does not need per-actor queue */
-              && (stkSto == nullptr)); // AOs don't need stack
+    Q_REQUIRE((qSto == nullptr) /* no need for per-AO queue */
+              && (stkSto == nullptr)); // no need for per-AO stack
 
-    (void)stkSize;
-    (void)qLen;
+    Q_UNUSED_PAR(stkSize);
+    Q_UNUSED_PAR(qLen);
 
-    setPrio(prio);  // set the QF priority of this AO
-    register_(); // make QF aware of this AO
+    setPrio(prioSpec); // set the priority specification of this AO
+    register_(); // make QF aware of this active object
+
     static_cast<GuiApp *>(QApplication::instance())->registerAct(this);
 
-    this->init(par, prio); // execute initial transition (virtual call)
+    this->init(par, getPrio()); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 }
 //............................................................................
@@ -121,14 +120,14 @@ bool GuiQActive::post_(QEvt const * const e,
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
-        QS_TIME_PRE_();              // timestamp
-        QS_OBJ_PRE_(sender);         // the sender object
-        QS_SIG_PRE_(e->sig);         // the signal of the event
-        QS_OBJ_PRE_(this);           // this active object
+        QS_TIME_PRE_();      // timestamp
+        QS_OBJ_PRE_(sender); // the sender object
+        QS_SIG_PRE_(e->sig); // the signal of the event
+        QS_OBJ_PRE_(this);   // this active object
         QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
                 QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
-        QS_EQC_PRE_(0U);             // number of free entries (not used)
-        QS_EQC_PRE_(0U);             // min number of free entries (not used)
+        QS_EQC_PRE_(0U);     // number of free entries (not used)
+        QS_EQC_PRE_(0U);     // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
 
     QF_CRIT_X_();
@@ -148,13 +147,13 @@ void GuiQActive::postLIFO(QEvt const * const e) noexcept {
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
-        QS_TIME_PRE_();                  // timestamp
-        QS_SIG_PRE_(e->sig);             // the signal of this event
-        QS_OBJ_PRE_(this);               // this active object
+        QS_TIME_PRE_();      // timestamp
+        QS_SIG_PRE_(e->sig); // the signal of this event
+        QS_OBJ_PRE_(this);   // this active object
         QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
                 QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
-        QS_EQC_PRE_(0U);                 // number of free entries (not used)
-        QS_EQC_PRE_(0U);                 // min number of free entries (not used)
+        QS_EQC_PRE_(0U);     // number of free entries (not used)
+        QS_EQC_PRE_(0U);     // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
 
     QF_CRIT_X_();
@@ -165,23 +164,23 @@ void GuiQActive::postLIFO(QEvt const * const e) noexcept {
 }
 
 //============================================================================
-void GuiQMActive::start(std::uint_fast8_t const prio,
+void GuiQMActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    Q_REQUIRE((0U < prio) && (prio <= QF_MAX_ACTIVE)
-              && (qSto == nullptr) /* does not need per-actor queue */
-              && (stkSto == nullptr)); // AOs don't need stack
+    Q_REQUIRE((qSto == nullptr) /* no need for per-AO queue */
+              && (stkSto == nullptr)); // no need for per-AO stack
 
-    (void)stkSize;
-    (void)qLen;
+    Q_UNUSED_PAR(stkSize);
+    Q_UNUSED_PAR(qLen);
 
-    setPrio(prio);  // set the QF priority of this active object
+    setPrio(prioSpec); // set the priority specification  of this AO
     register_(); // make QF aware of this active object
+
     static_cast<GuiApp *>(QApplication::instance())->registerAct(this);
 
-    this->init(par, prio); // execute initial transition (virtual call)
+    this->init(par, getPrio()); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 }
 //............................................................................
@@ -200,14 +199,14 @@ bool GuiQMActive::post_(QEvt const * const e,
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
-        QS_TIME_PRE_();              // timestamp
-        QS_OBJ_PRE_(sender);         // the sender object
-        QS_SIG_PRE_(e->sig);         // the signal of the event
-        QS_OBJ_PRE_(this);           // this active object
+        QS_TIME_PRE_();      // timestamp
+        QS_OBJ_PRE_(sender); // the sender object
+        QS_SIG_PRE_(e->sig); // the signal of the event
+        QS_OBJ_PRE_(this);   // this active object
         QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
                 QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
-        QS_EQC_PRE_(0U);             // number of free entries (not used)
-        QS_EQC_PRE_(0U);             // min number of free entries (not used)
+        QS_EQC_PRE_(0U);     // number of free entries (not used)
+        QS_EQC_PRE_(0U);     // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
 
     QF_CRIT_X_();
@@ -227,13 +226,13 @@ void GuiQMActive::postLIFO(QEvt const * const e) noexcept {
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
-        QS_TIME_PRE_();              // timestamp
-        QS_SIG_PRE_(e->sig);         // the signal of this event
-        QS_OBJ_PRE_(this);           // this active object
+        QS_TIME_PRE_();      // timestamp
+        QS_SIG_PRE_(e->sig); // the signal of this event
+        QS_OBJ_PRE_(this);   // this active object
         QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
                 QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
-        QS_EQC_PRE_(0U);             // number of free entries (not used)
-        QS_EQC_PRE_(0U);             // min number of free entries (not used)
+        QS_EQC_PRE_(0U);     // number of free entries (not used)
+        QS_EQC_PRE_(0U);     // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
 
     QF_CRIT_X_();
@@ -244,4 +243,3 @@ void GuiQMActive::postLIFO(QEvt const * const e) noexcept {
 }
 
 } // namespace QP
-

@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${src::qv::qv.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-07-26
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief Cooperative QV kernel implementation.
 
@@ -148,7 +145,7 @@ int_t run() {
 
             QF_INT_DISABLE();
             if (a->m_eQueue.isEmpty()) { // empty queue?
-                readySet_.rmove(p);
+                readySet_.remove(p);
             }
         }
         else { // no AO ready to run --> idle
@@ -189,26 +186,26 @@ namespace QP {
 
 //${QV::QActive::start} ......................................................
 void QActive::start(
-    std::uint_fast8_t const prio,
+    QPrioSpec const prioSpec,
     QEvt const * * const qSto,
     std::uint_fast16_t const qLen,
     void * const stkSto,
     std::uint_fast16_t const stkSize,
     void const * const par)
 {
+    Q_UNUSED_PAR(stkSto);  // not needed in QV
     Q_UNUSED_PAR(stkSize); // not needed in QV
 
-    //! @pre the priority must be in range and the stack storage must not
-    //! be provided, because the QV kernel does not need per-AO stacks.
+    //! @pre stack storage must not be provided because the QV kernel
+    //! does not need per-AO stacks.
     //!
-    Q_REQUIRE_ID(500,
-        (0U < prio) && (prio <= QF_MAX_ACTIVE)
-        && (stkSto == nullptr));
+    Q_REQUIRE_ID(500, stkSto == nullptr);
+
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); //  QF-prio.
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
+    register_(); // make QF aware of this AO
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
-    m_prio = static_cast<std::uint8_t>(prio);  // set the QF prio of this AO
-
-    register_(); // make QF aware of this AO
 
     this->init(par, m_prio); // take the top-most initial tran. (virtual)
     QS_FLUSH(); // flush the trace buffer to the host

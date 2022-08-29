@@ -36,9 +36,6 @@
 // <info@state-machine.com>
 //
 //$endhead${include::qs_dummy.hpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//! @date Last updated on: 2022-07-15
-//! @version Last updated for: @ref qpcpp_7_0_1
-//!
 //! @file
 //! @brief Dummy definitions of the QS macros that avoid code generation from
 //! the QS instrumentation.

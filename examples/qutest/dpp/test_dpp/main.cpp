@@ -77,12 +77,12 @@ int main(int argc, char *argv[]) {
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
+        AO_Philo[n]->start(n + 1U, // priority
                            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
                            nullptr, 0U);
     }
 
-    AO_Table->start((uint_fast8_t)(N_PHILO + 1U), // priority
+    AO_Table->start(N_PHILO + 1U, // priority
                     tableQueueSto, Q_DIM(tableQueueSto),
                     nullptr, 0U);
 

@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-28
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QF/C++ port to VxWorks API
@@ -94,24 +94,25 @@ void QActive::thread_(QActive *act) {
     }
 }
 //............................................................................
-void QActive::start(std::uint_fast8_t const prio,
+void QActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par) // see NOTE1
 {
-    static_cast<void>(stkSize); // unused parameter in the VxWorks port
+    Q_UNUSED_PAR(stkSto);  // unused in the VxWorks port
+    Q_UNUSED_PAR(stkSize); // unused in the VxWorks port
 
-    Q_REQUIRE_ID(200, (prio <= QF_MAX_ACTIVE) /* not exceeding max */
+    Q_REQUIRE_ID(200,
         && (qSto != nullptr) /* queue storage */
         && (qLen > 0U)  /* queue size */
         && (stkSto == nullptr) /* NO stack storage */
         && (stkSize > 0U)); // stack size
 
+    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    register_(); // make QF aware of this AO
+
     // create the event queue for the AO
     m_eQueue.init(qSto, qLen);
-
-    m_prio = prio;  // save the QF priority
-    register_(); // make QF aware of this active object
 
     init(par);      // thake the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host

@@ -21,8 +21,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-28
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QF/C++ port to POSIX/P-threads
@@ -104,7 +104,6 @@ void QF::init(void) {
     sig_act.sa_handler = &sigIntHandler;
     sigaction(SIGINT, &sig_act, NULL);
 }
-
 //............................................................................
 void QF::enterCriticalSection_(void) {
     pthread_mutex_lock(&QF::pThreadMutex_);
@@ -159,6 +158,7 @@ void QF::setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
     l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
     l_tickPrio = tickPrio;
 }
+
 //............................................................................
 void QF::consoleSetup(void) {
     struct termios tio;   // modified terminal attributes
@@ -183,7 +183,7 @@ int QF::consoleGetKey(void) {
     }
     return 0; // no input at this time
 }
-/*..........................................................................*/
+//............................................................................
 int QF::consoleWaitForKey(void) {
     return getchar();
 }
@@ -210,19 +210,22 @@ void QActive::thread_(QActive *act) {
 }
 
 //============================================================================
-void QActive::start(std::uint_fast8_t const prio,
+void QActive::start(QPrioSpec const prioSpec,
                     QEvt const * * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
+    Q_UNUSED_PAR(stkSto);
+    Q_UNUSED_PAR(stkSize);
+
     // p-threads allocate stack internally
     Q_REQUIRE_ID(600, stkSto == nullptr);
 
-    pthread_cond_init(&m_osObject, 0);
-
-    m_eQueue.init(qSto, qLen);
-    m_prio = static_cast<std::uint8_t>(prio); // set the QF prio of this AO
+    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
     register_(); // make QF aware of this AO
+
+    pthread_cond_init(&m_osObject, 0);
+    m_eQueue.init(qSto, qLen);
 
     this->init(par, m_prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
