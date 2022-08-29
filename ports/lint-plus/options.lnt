@@ -211,6 +211,10 @@ qpcpp.lnt           // QP/C++ options
 -esym(1933,
  QP::QHsm::init)
 
+// [AUTOSAR Rule M7-3-1] lobal declaration of symbol 'dummy' in the file
+-esym(9141,
+ dummy)
+
 
 // QV ------------------------------------------------------------------------
 // MC++R16-0-4 function-like macro

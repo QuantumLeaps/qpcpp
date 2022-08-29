@@ -21,7 +21,7 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-28
+//! @date Last updated on: 2022-08-29
 //! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
@@ -152,15 +152,6 @@ void QF::setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
     l_tickPrio = tickPrio;
 }
 //............................................................................
-void QF::setWin32Prio(QActive *act, int_t win32Prio) {
-    HANDLE win32thread = static_cast<HANDLE>(act->getThread());
-
-    // thread must be already created, see QActive::start()
-    Q_REQUIRE_ID(700, win32thread != static_cast<HANDLE>(0));
-    SetThreadPriority(win32thread, win32Prio);
-}
-
-//............................................................................
 void QF::consoleSetup(void) {
 }
 //............................................................................
@@ -190,18 +181,13 @@ void QActive::start(QPrioSpec const prioSpec,
     // no need for external stack storage in this port
     Q_REQUIRE_ID(800, stkSto == nullptr);
 
-    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
     register_(); // make QF aware of this AO
-
-    m_eQueue.init(qSto, qLen);
-
-    // save osObject as integer, in case it contains the Win32 priority
-    //int win32Prio = (m_osObject != nullptr)
-    //    ? reinterpret_cast<intptr_t>(m_osObject)
-    //    : THREAD_PRIORITY_NORMAL;
 
     // create the Win32 "event" to throttle the AO's event queue
     m_osObject = CreateEvent(NULL, FALSE, FALSE, NULL);
+    m_eQueue.init(qSto, qLen);
 
     this->init(par, m_prio); // execute initial transition (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
@@ -216,6 +202,24 @@ void QActive::start(QPrioSpec const prioSpec,
         0,
         NULL);
     Q_ENSURE_ID(830, m_thread != nullptr); // must succeed
+
+    // set the priority of the Win32 thread based on the m_pthre
+    int win32Prio;
+    switch (m_pthre) {
+        case 1U:
+            win32Prio = THREAD_PRIORITY_LOWEST;
+            break;
+        case 2U:
+            win32Prio = THREAD_PRIORITY_NORMAL;
+            break;
+        case 3U:
+            win32Prio = THREAD_PRIORITY_TIME_CRITICAL;
+            break;
+        default:
+            win32Prio = THREAD_PRIORITY_NORMAL;
+            break;
+    }
+    SetThreadPriority(m_thread, win32Prio);
 }
 //............................................................................
 #ifdef QF_ACTIVE_STOP

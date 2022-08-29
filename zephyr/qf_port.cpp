@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-25
+//! @date Last updated on: 2022-08-29
 //! @version Last updated for: Zephyr 3.1.99 and @ref qpcpp_7_1_0
 //!
 //! @file
@@ -121,7 +121,8 @@ void QActive::start(QPrioSpec const prioSpec,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
     register_(); // make QF aware of this active object
 
     // initialize the Zephyr message queue
@@ -132,7 +133,7 @@ void QActive::start(QPrioSpec const prioSpec,
     QS_FLUSH();     // flush the trace buffer to the host
 
     // Zephyr uses the reverse priority numbering than QP
-    int zprio = (int)QF_MAX_ACTIVE - static_cast<int>(prio);
+    int zprio = (int)QF_MAX_ACTIVE - static_cast<int>(m_prio);
 
     // extract data temporarily saved in m_thread by QActive::setAttr()
     std::uint32_t opt = m_thread.base.order_key;

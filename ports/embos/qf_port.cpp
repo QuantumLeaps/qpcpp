@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-28
+//! @date Last updated on: 2022-08-29
 //! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
@@ -112,7 +112,8 @@ void QActive::start(QPrioSpec const prioSpec,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
     register_(); // make QF aware of this AO
 
     // create the embOS message box for the AO
@@ -150,7 +151,7 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
         case TASK_USES_FPU:
             m_osObject = attr1;
             break;
-        /* ... */
+        //...
         default:
             break;
     }

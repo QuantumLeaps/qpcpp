@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-28
+//! @date Last updated on: 2022-08-29
 //! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
@@ -108,7 +108,8 @@ void QActive::start(QPrioSpec const prioSpec,
         && (stkSto == nullptr) /* NO stack storage */
         && (stkSize > 0U)); // stack size
 
-    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
     register_(); // make QF aware of this AO
 
     // create the event queue for the AO
@@ -124,7 +125,7 @@ void QActive::start(QPrioSpec const prioSpec,
     tname[4] = '0' + (m_prio % 10U);
 
     // convert the QP-priority to VxWorks priority
-    int vx_prio = QF_VX_PRIO_OFFSET + QF_MAX_ACTIVE - prio;
+    int vx_prio = QF_VX_PRIO_OFFSET + QF_MAX_ACTIVE - m_prio;
 
     // spawn a VxWorks thread for the active object
     m_thread = taskSpawn(tname,      // task name

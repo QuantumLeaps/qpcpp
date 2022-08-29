@@ -75,7 +75,8 @@ void QActive::start(QPrioSpec const prioSpec,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
     register_(); // make QF aware of this AO
 
     // task name to be passed to OSTaskCreateExt()

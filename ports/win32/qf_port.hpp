@@ -21,8 +21,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-08-29
+//! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
 //! @brief QF/C++ port to Win32 API (multi-threaded)
@@ -68,12 +68,6 @@ namespace QF {
 
 void enterCriticalSection_(void);
 void leaveCriticalSection_(void);
-
-// set Win32 thread priority for an active object;
-// see: Microsoft documentation for SetThreadPriority()
-// NOTE: must be called *after* QActive::START()
-//
-void setWin32Prio(QActive *act, int_t win32Prio);
 
 // set clock tick rate and priority
 void setTickRate(uint32_t ticksPerSec, int_t tickPrio);

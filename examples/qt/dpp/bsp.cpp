@@ -57,7 +57,7 @@ static QTextStream l_stdOutStream(stdout, QIODevice::WriteOnly);
 //............................................................................
 void BSP_init(void) {
     l_stdOutStream << "DPP-Qt console example\n"
-                   << "QP " << QP::QF::getVersion() << '\n';
+                   << "QP " << QP::versionStr << '\n';
 
     BSP_randomSeed(1234U);
 
@@ -153,12 +153,7 @@ bool QS::onStartup(void const *) {
         QF_TIMEEVT_CTR_SIZE, // tevtCtrSize
         { 0U, 0U, 0U, 0U, 0U, 0U} // tstamp
     };
-
-    QSPY_config(&config,
-                nullptr,     // no matFile,
-                nullptr,     // no seqFile
-                nullptr,     // no seqList
-                nullptr);    // no custom parser function
+    QSPY_config(&config, nullptr); // no custom parser function
 
     l_time.start();          // start the time stamp
 
@@ -166,7 +161,7 @@ bool QS::onStartup(void const *) {
 }
 //............................................................................
 void QS::onCleanup(void) {
-    QSPY_stop();
+    QSPY_cleanup();
 }
 //............................................................................
 void QS::onFlush(void) {

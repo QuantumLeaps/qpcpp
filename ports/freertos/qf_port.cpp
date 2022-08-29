@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-28
+//! @date Last updated on: 2022-08-29
 //! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
@@ -116,7 +116,8 @@ void QActive::start(QPrioSpec const prioSpec,
         && (stkSto != nullptr)     /* stack storage */
         && (stkSize > 0U));        // stack size
 
-    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
     register_(); // make QF aware of this AO
 
     // create FreeRTOS message queue
@@ -142,7 +143,7 @@ void QActive::start(QPrioSpec const prioSpec,
               taskName ,      // the name of the task
               stkSize/sizeof(portSTACK_TYPE), // stack length
               this,           // the 'pvParameters' parameter
-              FREERTOS_TASK_PRIO(m_prio), // also FreeRTOS priority
+              FREERTOS_TASK_PRIO(m_prio), // FreeRTOS priority
               static_cast<StackType_t *>(stkSto), // stack storage
               &m_thread));    // task buffer
 }

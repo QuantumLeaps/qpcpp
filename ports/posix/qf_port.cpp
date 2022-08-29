@@ -21,7 +21,7 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-28
+//! @date Last updated on: 2022-08-29
 //! @version Last updated for: @ref qpcpp_7_1_0
 //!
 //! @file
@@ -221,7 +221,8 @@ void QActive::start(QPrioSpec const prioSpec,
     // p-threads allocate stack internally
     Q_REQUIRE_ID(600, stkSto == nullptr);
 
-    m_prio = static_cast<std::uint8_t>(prioSpec & 0xFF); // QF-priority
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
     register_(); // make QF aware of this AO
 
     pthread_cond_init(&m_osObject, 0);
@@ -241,7 +242,7 @@ void QActive::start(QPrioSpec const prioSpec,
 
     // priority of the p-thread, see NOTE04
     struct sched_param param;
-    param.sched_priority = prio
+    param.sched_priority = m_prio
                            + (sched_get_priority_max(SCHED_FIFO)
                               - QF_MAX_ACTIVE - 3U);
     pthread_attr_setschedparam(&attr, &param);
