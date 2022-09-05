@@ -134,7 +134,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
         QS_END_NOCRIT_PRE_()
 
         // schedule the next thread if multitasking started
-        static_cast<void>(QXK_sched_());
+        static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
         QF_CRIT_X_();
         QF_CRIT_EXIT_NOP(); // BLOCK here !!!
 
@@ -260,7 +260,7 @@ bool QXSemaphore::signal() noexcept {
             QS_END_NOCRIT_PRE_()
 
             if (!QXK_ISR_CONTEXT_()) { // not inside ISR?
-                static_cast<void>(QXK_sched_()); // schedule the next thread
+                static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
             }
         }
     }

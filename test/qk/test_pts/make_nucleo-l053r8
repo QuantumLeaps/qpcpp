@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for SYSTEM-Level tests of QP/C++ on NUCLEO-L053R8, GNU-ARM
-# Last Updated for Version: 7.1.0
-# Date of the Last Update:  2022-08-20
+# Last Updated for Version: 7.1.1
+# Date of the Last Update:  2022-09-05
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -45,24 +45,24 @@
 #    https://github.com/QuantumLeaps/qtools
 #
 
+# location of the QP/C++ framework (if not provided in an env. variable)
+ifeq ($(QPCPP),)
+QPCPP := ../../..
+endif
+
 #-----------------------------------------------------------------------------
 # project name, target name, target directory:
 #
-PROJECT := test_thr
+PROJECT := test_pts
 TARGET  := nucleo-l053r8
-TARGET_DIR := ..\..\..\..\3rd_party\nucleo-l053r8\qutest
+TARGET_DIR := $(QPCPP)/3rd_party/nucleo-l053r8/qutest
 
 #-----------------------------------------------------------------------------
 # project directories:
 #
 
-# location of the QP/C++ framework (if not provided in an env. variable)
-ifeq ($(QPCPP),)
-QPCPP := ../../../..
-endif
-
 # QP port used in this project
-QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qxk/gnu
+QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qk/gnu
 
 # make sure that QTOOLS env. variable is defined...
 ifeq ("$(wildcard $(QTOOLS))","")
@@ -73,20 +73,20 @@ endif
 # list of all source directories used by this project
 VPATH := . \
 	../src \
-	$(TARGET_DIR) \
 	$(QPCPP)/src/qf \
-	$(QPCPP)/src/qxk \
+	$(QPCPP)/src/qk \
 	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
+	$(TARGET_DIR) \
 	$(QPCPP)/3rd_party/nucleo-l053r8 \
 	$(QPCPP)/3rd_party/nucleo-l053r8/gnu
 
 # list of all include directories needed by this project
 INCLUDES  = -I. \
 	-I../src \
-	-I$(TARGET_DIR) \
 	-I$(QPCPP)/include \
 	-I$(QP_PORT_DIR) \
+	-I$(TARGET_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
 	-I$(QPCPP)/3rd_party/nucleo-l053r8
 
@@ -104,11 +104,11 @@ C_SRCS := \
 
 # C++ source files
 CPP_SRCS := \
-	test_thr.cpp \
+	test_pts.cpp \
 	bsp_l053r8.cpp
 
 OUTPUT    := $(PROJECT)
-LD_SCRIPT := $(TARGET_DIR)\qutest.ld
+LD_SCRIPT := $(TARGET_DIR)/qutest.ld
 
 QP_SRCS := \
 	qep_hsm.cpp \
@@ -123,11 +123,8 @@ QP_SRCS := \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
 	qf_time.cpp \
-	qxk.cpp \
-	qxk_xthr.cpp \
-	qxk_sema.cpp \
-	qxk_mutex.cpp \
-	qxk_port.cpp \
+	qk.cpp \
+	qk_port.cpp \
 	qs.cpp \
 	qs_64bit.cpp \
 	qs_rx.cpp \
@@ -307,6 +304,7 @@ clean :
 
 show :
 	@echo PROJECT      = $(PROJECT)
+	@echo MAKECMDGOALS = $(MAKECMDGOALS)
 	@echo TESTS        = $(TESTS)
 	@echo TARGET_ELF   = $(TARGET_ELF)
 	@echo CONF         = $(CONF)
@@ -325,5 +323,6 @@ show :
 	@echo QTOOLS       = $(QTOOLS)
 	@echo HOST         = $(HOST)
 	@echo QUTEST       = $(QUTEST)
+	@echo FLASH        = $(FLASH)
 	@echo TESTS        = $(TESTS)
 

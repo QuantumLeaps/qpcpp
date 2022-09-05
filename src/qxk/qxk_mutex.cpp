@@ -291,7 +291,7 @@ bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
         QS_END_NOCRIT_PRE_()
 
         // schedule the next thread if multitasking started
-        static_cast<void>(QXK_sched_());
+        static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
         QF_CRIT_X_();
         QF_CRIT_EXIT_NOP(); // BLOCK here !!!
 
@@ -432,8 +432,8 @@ void QXMutex::unlock() noexcept {
         }
 
         // schedule the next thread if multitasking started
-        if (QXK_sched_() != 0U) {
-            QXK_activate_(); // activate a basic thread
+        if (QXK_sched_(0U) != 0U) { // synchronous preemption needed?
+            QXK_activate_(0U); // synchronously activate basic threads
         }
     }
     else { // releasing one level of nested mutex lock

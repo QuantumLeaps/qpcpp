@@ -1,11 +1,11 @@
 //============================================================================
 // Product: BSP for system-testing QXK
-// Last updated for version 7.1.0
-// Last updated on  2022-08-27
+// Last updated for version 7.1.1
+// Last updated on  2022-09-04
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -28,7 +28,7 @@
 // along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
 #ifndef BSP_HPP
@@ -45,6 +45,7 @@ void terminate(int16_t const result);
 void wait4PB1(void);
 void ledOn(void);
 void ledOff(void);
+void trigISR(void);
 
 } // namespace BSP
 
@@ -53,7 +54,9 @@ enum TestSignals {
     MAX_PUB_SIG,    // the last published signal
 
     TIMEOUT_SIG,
+    TRIG_SIG,
     MAX_SIG         // the last signal
 };
 
 #endif // BSP_HPP
+

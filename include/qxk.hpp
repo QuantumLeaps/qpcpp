@@ -694,22 +694,12 @@ struct QXK_Attr {
 //! attributes of the QXK kernel (extern "C" to be accessible from C)
 extern QXK_Attr QXK_attr_;
 
-//${QXK-extern-C::QXK_activate_} .............................................
-//! QXK activator activates the next active object. The activated AO preempts
-//! the currently executing AOs
-//!
-//! @attention
-//! QXK_activate_() must be always called with interrupts **disabled** and
-//! returns with interrupts **disabled**.
-//!
-//! @note
-//! The activate function might enable interrupts internally, but it always
-//! returns with interrupts **disabled**.
-void QXK_activate_() noexcept;
-
 //${QXK-extern-C::QXK_sched_} ................................................
 //! QXK scheduler finds the highest-priority thread ready to run
 //!
+//! @param[in]   asynch     flag conveying the type of scheduling:
+//!                         != 0 for asynchronous scheduling and
+//!                         == 0 for synchronous scheduling
 //! @details
 //! The QXK scheduler finds the priority of the highest-priority thread
 //! that is ready to run.
@@ -720,7 +710,23 @@ void QXK_activate_() noexcept;
 //! @attention
 //! QXK_sched_() must be always called with interrupts **disabled** and
 //! returns with interrupts **disabled**.
-std::uint_fast8_t QXK_sched_() noexcept;
+std::uint_fast8_t QXK_sched_(std::uint_fast8_t const asynch) noexcept;
+
+//${QXK-extern-C::QXK_activate_} .............................................
+//! QXK activator activates the next active object. The activated AO preempts
+//! the currently executing AOs
+//!
+//! @param[in]   asynch     flag conveying the type of activation:
+//!                         != 0 for asynchronous activation and
+//!                         == 0 for synchronous activation
+//! @attention
+//! QXK_activate_() must be always called with interrupts **disabled** and
+//! returns with interrupts **disabled**.
+//!
+//! @note
+//! The activate function might enable interrupts internally, but it always
+//! returns with interrupts **disabled**.
+void QXK_activate_(std::uint_fast8_t const asynch) noexcept;
 
 //${QXK-extern-C::QXK_current} ...............................................
 //! return the currently executing active-object/thread
@@ -850,8 +856,8 @@ void QXK_threadExit_() ;
     QF::readySet_.insert( \
         static_cast<std::uint_fast8_t>((me_)->m_prio)); \
     if (!QXK_ISR_CONTEXT_()) { \
-        if (QXK_sched_() != 0U) { \
-            QXK_activate_(); \
+        if (QXK_sched_(0U) != 0U) { \
+            QXK_activate_(0U); \
         } \
     } \
 } while (false)

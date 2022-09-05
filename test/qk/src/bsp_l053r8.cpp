@@ -1,7 +1,7 @@
 //============================================================================
-// Product: BSP for system-testing QXK, EFM32-SLSTK3401A board
-// Last updated for version 7.1.0
-// Last updated on  2022-08-21
+// Product: BSP for system-testing QK kernel, NUCLEO-L053R8 board
+// Last updated for version 7.1.1
+// Last updated on  2022-09-04
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -34,10 +34,7 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-#include "em_device.h"  // the device specific header (SiLabs)
-#include "em_cmu.h"     // Clock Management Unit (SiLabs)
-#include "em_gpio.h"    // GPIO (SiLabs)
-#include "em_usart.h"   // USART (SiLabs)
+#include "stm32l0xx.h"  // CMSIS-compliant header file for the MCU used
 // add other drivers if necessary...
 
 Q_DEFINE_THIS_FILE
@@ -46,21 +43,17 @@ Q_DEFINE_THIS_FILE
 namespace BSP {
 
 // Local-scope objects -------------------------------------------------------
-#define LED_PORT    gpioPortF
-#define LED0_PIN    4
-#define LED1_PIN    5
+// LED pins available on the board (just one user LED LD2--Green on PA.5)
+#define LED_LD2  (1U << 5)
 
-#define PB_PORT     gpioPortF
-#define PB0_PIN     6
-#define PB1_PIN     7
+// Button pins available on the board (just one user Button B1 on PC.13)
+#define BTN_B1   (1U << 13)
 
 #ifdef Q_SPY
 
     // QSpy source IDs
     static QP::QSpyId const l_SysTick_Handler = { 0U };
-    static QP::QSpyId const l_GPIO_EVEN_IRQHandler = { 0U };
-
-    static USART_TypeDef * const l_USART0 = ((USART_TypeDef *)(0x40010000UL));
+    static QP::QSpyId const l_test_ISR = { 0U };
 
     enum AppRecords { // application-specific trace records
         CONTEXT_SW = QP::QS_USER,
@@ -77,28 +70,23 @@ extern "C" {
 //............................................................................
 void SysTick_Handler(void); // prototype
 void SysTick_Handler(void) {
-    QXK_ISR_ENTRY();   // inform QXK about entering an ISR
+    QK_ISR_ENTRY();   // inform QK about entering an ISR
 
     QP::QTimeEvt::TICK_X(0U, &BSP::l_SysTick_Handler);
     //the_Ticker0->POST(0, &BSP::l_SysTick_Handler);
 
-    QXK_ISR_EXIT();  // inform QXK about exiting an ISR
+    QK_ISR_EXIT();  // inform QK about exiting an ISR
 }
 //............................................................................
-void GPIO_EVEN_IRQHandler(void);  // prototype
-
-// NOTE: to trigger this ISR from the debugger, write 0x200 to NVIC_ISPR0.
-//
-void GPIO_EVEN_IRQHandler(void) {
-    QXK_ISR_ENTRY(); // inform QXK about entering an ISR
+void EXTI0_1_IRQHandler(void);  // prototype
+void EXTI0_1_IRQHandler(void) {
+    QK_ISR_ENTRY(); // inform QK about entering an ISR
 
     // for testing...
-    //DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),
-    //                    &BSP::l_GPIO_EVEN_IRQHandler);
     QP::QF::PUBLISH(Q_NEW(QP::QEvt, TEST_SIG), // for testing...
-                         &BSP::l_GPIO_EVEN_IRQHandler);
+                         &BSP::l_test_ISR);
 
-    QXK_ISR_EXIT();  // inform QXK about exiting an ISR
+    QK_ISR_EXIT();  // inform QK about exiting an ISR
 }
 
 } // extern "C"
@@ -110,56 +98,56 @@ void BSP::init(void) {
     //
     SystemCoreClockUpdate();
 
-    /* NOTE: The VFP (hardware Floating Point) unit is configured by QXK */
-    //FPU->FPCCR = FPU->FPCCR
-    //              | (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
+    // enable GPIOA clock port for the LED LD2
+    RCC->IOPENR |= (1U << 0);
 
-    // enable clock for to the peripherals used by this application...
-    CMU_ClockEnable(cmuClock_HFPER, true);
-    CMU_ClockEnable(cmuClock_GPIO,  true);
-    CMU_ClockEnable(cmuClock_HFPER, true);
-    CMU_ClockEnable(cmuClock_GPIO,  true);
+    /* configure LED (PA.5) pin as push-pull output, no pull-up, pull-down */
+    GPIOA->MODER   &= ~((3U << 2*5));
+    GPIOA->MODER   |=  ((1U << 2*5));
+    GPIOA->OTYPER  &= ~((1U <<   5));
+    GPIOA->OSPEEDR &= ~((3U << 2*5));
+    GPIOA->OSPEEDR |=  ((1U << 2*5));
+    GPIOA->PUPDR   &= ~((3U << 2*5));
 
-    // configure the LEDs
-    GPIO_PinModeSet(LED_PORT, LED0_PIN, gpioModePushPull, 0);
-    GPIO_PinModeSet(LED_PORT, LED1_PIN, gpioModePushPull, 0);
-    GPIO_PinOutClear(LED_PORT, LED0_PIN);
-    GPIO_PinOutClear(LED_PORT, LED1_PIN);
+    // enable GPIOC clock port for the Button B1
+    RCC->IOPENR |=  (1U << 2);
 
-    // configure the Buttons
-    GPIO_PinModeSet(PB_PORT, PB0_PIN, gpioModeInputPull, 1);
-    GPIO_PinModeSet(PB_PORT, PB1_PIN, gpioModeInputPull, 1);
+    // configure Button (PC.13) pins as input, no pull-up, pull-down
+    GPIOC->MODER   &= ~(3U << 2*13);
+    GPIOC->OSPEEDR &= ~(3U << 2*13);
+    GPIOC->OSPEEDR |=  (1U << 2*13);
+    GPIOC->PUPDR   &= ~(3U << 2*13);
 
     if (!QS_INIT(nullptr)) { // initialize the QS software tracing
         Q_ERROR();
     }
-    // global signals
-    QS_SIG_DICTIONARY(TEST_SIG,      (void *)0);
-    QS_SIG_DICTIONARY(TIMEOUT_SIG,   (void *)0);
-
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
-    QS_OBJ_DICTIONARY(&l_GPIO_EVEN_IRQHandler);
+    QS_OBJ_DICTIONARY(&l_test_ISR);
 
     QS_USR_DICTIONARY(CONTEXT_SW);
     QS_USR_DICTIONARY(COMMAND_STAT);
 }
 //............................................................................
 void BSP::ledOn(void) {
-    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED1_PIN);
+    GPIOA->BSRR |= (LED_LD2); // turn LED2 on
 }
 //............................................................................
 void BSP::ledOff(void) {
-    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED1_PIN);
+    GPIOA->BSRR |= (LED_LD2 << 16); // turn LED2 off
+}
+//............................................................................
+void BSP::trigISR(void) {
+    NVIC_SetPendingIRQ(EXTI0_1_IRQn);
 }
 //............................................................................
 void BSP::terminate(int16_t result) {
     (void)result;
 }
 
-// namespace QP **************************************************************
+// namespace QP ==============================================================
 namespace QP {
 
-// QF callbacks ==============================================================
+// QF callbacks --------------------------------------------------------------
 void QF::onStartup(void) {
     // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
@@ -170,30 +158,29 @@ void QF::onStartup(void) {
     // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
     // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     //
-    NVIC_SetPriority(USART0_RX_IRQn, 0U); // kernel unaware interrupt
-    NVIC_SetPriority(GPIO_EVEN_IRQn, QF_AWARE_ISR_CMSIS_PRI);
-    NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 1U);
+    NVIC_SetPriority(USART2_IRQn,  0U); // kernel UNAWARE interrupt
+    NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 0U);
+    NVIC_SetPriority(EXTI0_1_IRQn, QF_AWARE_ISR_CMSIS_PRI + 1U);
     // ...
 
     // enable IRQs...
-    NVIC_EnableIRQ(GPIO_EVEN_IRQn);
+    NVIC_EnableIRQ(EXTI0_1_IRQn);
 }
 //............................................................................
 void QF::onCleanup(void) {
 }
 //............................................................................
-#ifdef QXK_ON_CONTEXT_SW
+#ifdef QK_ON_CONTEXT_SW
 // NOTE: the context-switch callback is called with interrupts DISABLED
-void QXK::onContextSw(QActive *prev, QActive *next) {
-    QS_BEGIN_NOCRIT(CONTEXT_SW, 0U) // no critical section!
+void QK::onContextSw(QActive *prev, QActive *next) {
+    QS_BEGIN_NOCRIT(BSP::CONTEXT_SW, 0U) // no critical section!
         QS_OBJ(prev);
         QS_OBJ(next);
     QS_END_NOCRIT()
 }
-#endif // QXK_ON_CONTEXT_SW
+#endif // QK_ON_CONTEXT_SW
 //............................................................................
-void QXK::onIdle(void) {
-    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
+void QK::onIdle(void) {
 #ifdef Q_SPY
     QS::rxParse();  // parse all the received bytes
     QS::doOutput();
@@ -204,7 +191,6 @@ void QXK::onIdle(void) {
     //
     __WFI(); // Wait-For-Interrupt
 #endif
-    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
 }
 
 // QS callbacks ==============================================================
@@ -219,9 +205,6 @@ void QTimeEvt::tick1_(
     *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (1U << 26U);
     QF_INT_ENABLE();
 }
-/*..........................................................................*/
-//void QS::processTestEvts_(void) {
-//}
 
 #endif // Q_SPY
 //----------------------------------------------------------------------------

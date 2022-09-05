@@ -1,7 +1,7 @@
 ##############################################################################
-# Product: Makefile for SYSTEM-Level tests of QP/C++ on EMF32, GNU-ARM
-# Last Updated for Version: 7.1.0
-# Date of the Last Update:  2022-08-20
+# Product: Makefile for SYSTEM-Level tests of QP/C++ on NUCLEO-L053R8, GNU-ARM
+# Last Updated for Version: 7.1.1
+# Date of the Last Update:  2022-09-05
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -33,11 +33,11 @@
 ##############################################################################
 #
 # examples of invoking this Makefile:
-# make -f make_efm32  # make and run the tests in the current directory
-# make -f make_efm32 TESTS=thr*.py  # make and run the selected tests
-# make -f make_efm32 HOST=localhost:7705 # connect to host:port
-# make -f make_efm32 norun   # only make but not run the tests
-# make -f make_efm32 clean   # cleanup the build
+# make -f make_nucleo-l053r8 USB=e: # make, uplaod to USB drive, run the tests
+# make -f make_nucleo-l053r8 USB=h: TESTS=philo*.py  # make and run the selected tests
+# make -f make_nucleo-l053r8 HOST=localhost:7705 # connect to host:port
+# make -f make_nucleo-l053r8 norun   # only make but not run the tests
+# make -f make_nucleo-l053r8 clean   # cleanup the build
 #
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
@@ -45,21 +45,21 @@
 #    https://github.com/QuantumLeaps/qtools
 #
 
+# location of the QP/C++ framework (if not provided in an env. variable)
+ifeq ($(QPCPP),)
+QPCPP := ../../..
+endif
+
 #-----------------------------------------------------------------------------
 # project name, target name, target directory:
 #
-PROJECT := test_thr
-TARGET  := efm32
-TARGET_DIR := ..\..\..\..\3rd_party\efm32pg1b\qutest
+PROJECT := test_xthr
+TARGET  := nucleo-l053r8
+TARGET_DIR := $(QPCPP)/3rd_party/nucleo-l053r8/qutest
 
 #-----------------------------------------------------------------------------
 # project directories:
 #
-
-# location of the QP/C++ framework (if not provided in an env. variable)
-ifeq ($(QPCPP),)
-QPCPP := ../../../..
-endif
 
 # QP port used in this project
 QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qxk/gnu
@@ -73,22 +73,22 @@ endif
 # list of all source directories used by this project
 VPATH := . \
 	../src \
-	$(TARGET_DIR) \
 	$(QPCPP)/src/qf \
 	$(QPCPP)/src/qxk \
 	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
-	$(QPCPP)/3rd_party/efm32pg1b \
-	$(QPCPP)/3rd_party/efm32pg1b/gnu
+	$(TARGET_DIR) \
+	$(QPCPP)/3rd_party/nucleo-l053r8 \
+	$(QPCPP)/3rd_party/nucleo-l053r8/gnu
 
 # list of all include directories needed by this project
 INCLUDES  = -I. \
 	-I../src \
-	-I$(TARGET_DIR) \
 	-I$(QPCPP)/include \
 	-I$(QP_PORT_DIR) \
+	-I$(TARGET_DIR) \
 	-I$(QPCPP)/3rd_party/CMSIS/Include \
-	-I$(QPCPP)/3rd_party/efm32pg1b
+	-I$(QPCPP)/3rd_party/nucleo-l053r8
 
 #-----------------------------------------------------------------------------
 # project files:
@@ -99,20 +99,16 @@ ASM_SRCS :=
 
 # C source files
 C_SRCS := \
-	startup_efm32pg1b.c \
-	system_efm32pg1b.c \
-	em_cmu.c \
-	em_emu.c \
-	em_gpio.c \
-	em_usart.c
+	system_stm32l0xx.c \
+	startup_stm32l053xx.c
 
 # C++ source files
 CPP_SRCS := \
-	test_thr.cpp \
-	bsp_efm32.cpp
+	test_xthr.cpp \
+	bsp_l053r8.cpp
 
 OUTPUT    := $(PROJECT)
-LD_SCRIPT := $(TARGET_DIR)\qutest.ld
+LD_SCRIPT := $(TARGET_DIR)/qutest.ld
 
 QP_SRCS := \
 	qep_hsm.cpp \
@@ -145,16 +141,16 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DEFM32PG1B200F256GM48=1
+DEFINES   :=
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
 # ARM_FPU:   [ | vfp]
 # FLOAT_ABI: [ | soft | softfp | hard]
 #
-ARM_CPU   := -mcpu=cortex-m4
-ARM_FPU   := -mfpu=vfp
-FLOAT_ABI := -mfloat-abi=softfp
+ARM_CPU   := -mcpu=cortex-m0plus
+ARM_FPU   :=
+FLOAT_ABI :=
 
 #-----------------------------------------------------------------------------
 # GNU-ARM toolset (NOTE: You need to adjust to your machine)
@@ -176,11 +172,12 @@ LINK  := $(GNU_ARM)/bin/arm-none-eabi-g++
 BIN   := $(GNU_ARM)/bin/arm-none-eabi-objcopy
 
 #-----------------------------------------------------------------------------
-# FLASH tool (NOTE: Requires the JLINK utility)
-# see $(TARGET_DIR)\flash.bat
+# NOTE: The following symbol USB assumes that the NUCLEO board
+# has enumerated as USB drive f:
 #
-
-FLASH := $(TARGET_DIR)\flash.bat
+ifeq ($(USB),)
+USB := f:
+endif
 
 ##############################################################################
 # Typically you should not need to change anything below this line
@@ -190,6 +187,8 @@ FLASH := $(TARGET_DIR)\flash.bat
 
 MKDIR := mkdir
 RM    := rm
+CP    := cp
+SLEEP := sleep
 
 #-----------------------------------------------------------------------------
 # QUTest test script utilities (requires QTOOLS):
@@ -262,14 +261,15 @@ endif
 
 $(TARGET_BIN) : $(TARGET_ELF)
 	$(BIN) -O binary $< $@
-	$(FLASH) $@
+	$(CP) $@ $(USB)
+	$(SLEEP) 2
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
 	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 flash :
-	$(FLASH) $(TARGET_BIN)
+	$(CP) $(TARGET_BIN) $(USB)
 
 run : $(TARGET_BIN)
 	$(QUTEST) $(TESTS) $(TARGET_EXE) $(HOST)
@@ -326,5 +326,6 @@ show :
 	@echo QTOOLS       = $(QTOOLS)
 	@echo HOST         = $(HOST)
 	@echo QUTEST       = $(QUTEST)
+	@echo FLASH        = $(FLASH)
 	@echo TESTS        = $(TESTS)
 
