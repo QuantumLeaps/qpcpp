@@ -131,7 +131,7 @@ void QActive::start(QPrioSpec const prioSpec,
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
 
-    // task name provided by the user in QF_setTaskName() or default name
+    // task name provided by the user in QActive::setAttr() or default name
     char const *taskName = (m_thread.pxDummy1 != nullptr)
                              ? static_cast<char const *>(m_thread.pxDummy1)
                              : static_cast<char const *>("AO");
