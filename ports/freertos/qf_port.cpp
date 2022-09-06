@@ -23,7 +23,7 @@
 // <info@state-machine.com>
 //============================================================================
 //! @date Last updated on: 2022-08-29
-//! @version Last updated for: @ref qpcpp_7_1_0
+//! @version Last updated for: @ref qpcpp_7_1_1
 //!
 //! @file
 //! @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
