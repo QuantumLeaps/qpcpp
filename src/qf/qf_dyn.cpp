@@ -50,6 +50,8 @@
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
+#if (QF_MAX_EPOOL > 0U)     // dynamic events configured?
+
 // unnamed namespace for local definitions with internal linkage
 namespace {
 Q_DEFINE_THIS_MODULE("qf_dyn")
@@ -63,6 +65,30 @@ Q_DEFINE_THIS_MODULE("qf_dyn")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+//$define${QF::QF-pkg::maxPool_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+namespace QF {
+
+//${QF::QF-pkg::maxPool_} ....................................................
+std::uint_fast8_t maxPool_;
+
+} // namespace QF
+} // namespace QP
+//$enddef${QF::QF-pkg::maxPool_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QF-pkg::ePool_[QF_MAX_EPOOL]} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+namespace QF {
+
+//${QF::QF-pkg::ePool_[QF_MAX_EPOOL]} ........................................
+#if (QF_MAX_EPOOL > 0U)
+QF_EPOOL_TYPE_ ePool_[QF_MAX_EPOOL];
+#endif //  (QF_MAX_EPOOL > 0U)
+
+} // namespace QF
+} // namespace QP
+//$enddef${QF::QF-pkg::ePool_[QF_MAX_EPOOL]} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+//============================================================================
 //$define${QF::QF-dyn} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
@@ -257,7 +283,9 @@ void deleteRef_(QEvt const * const evtRef) noexcept {
         QS_2U8_PRE_(evtRef->poolId_, evtRef->refCtr_); // pool Id & ref Count
     QS_END_PRE_()
 
+    #if (QF_MAX_EPOOL > 0U)
     gc(evtRef); // recycle the referenced event
+    #endif
 }
 
 //${QF::QF-dyn::getPoolMin} ..................................................
@@ -277,3 +305,5 @@ std::uint_fast16_t getPoolMin(std::uint_fast8_t const poolId) noexcept {
 } // namespace QF
 } // namespace QP
 //$enddef${QF::QF-dyn} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#endif // (QF_MAX_EPOOL > 0U) dynamic events configured

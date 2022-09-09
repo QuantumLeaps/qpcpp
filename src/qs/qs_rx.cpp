@@ -661,10 +661,12 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
                 i = 0x81U;  // failure, recycle
             }
 
+    #if (QF_MAX_EPOOL > 0U)
             // recycle needed?
             if ((i & 1U) != 0U) {
                 QF::gc(l_rx.var.evt.e);
             }
+    #endif
             // failure?
             if ((i & 0x80U) != 0U) {
                 rxReportError_(static_cast<std::uint8_t>(QS_RX_EVENT));
@@ -1213,7 +1215,9 @@ static void rxHandleBadFrame_(std::uint8_t const state) noexcept {
     switch (state) {
         case WAIT4_EVT_FRAME: {
             Q_ASSERT_ID(910, l_rx.var.evt.e != nullptr);
+#if (QF_MAX_EPOOL > 0U)
             QP::QF::gc(l_rx.var.evt.e); // don't leak an allocated event
+#endif
             break;
         }
         default: {

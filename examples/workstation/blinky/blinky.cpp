@@ -30,7 +30,7 @@
 //$endhead${.::blinky.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #include "qpcpp.hpp"
 #include <iostream>
-#include <stdlib.h> // for exit()
+#include <cstdlib> // for exit()
 
 using namespace std;
 using namespace QP;

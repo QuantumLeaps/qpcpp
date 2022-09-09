@@ -79,18 +79,19 @@ std::uint_fast8_t intNest_;
 } // namespace QF
 } // namespace QP
 //$enddef${QF::QF-base::intNest_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$define${QF::QF-pkg} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$define${QF::QF-pkg::readySet_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
 //${QF::QF-pkg::readySet_} ...................................................
 QPSet readySet_;
 
-//${QF::QF-pkg::ePool_[QF_MAX_EPOOL]} ........................................
-QF_EPOOL_TYPE_ ePool_[QF_MAX_EPOOL];
-
-//${QF::QF-pkg::maxPool_} ....................................................
-std::uint_fast8_t maxPool_;
+} // namespace QF
+} // namespace QP
+//$enddef${QF::QF-pkg::readySet_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QF-pkg::bzero} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+namespace QF {
 
 //${QF::QF-pkg::bzero} .......................................................
 void bzero(
@@ -106,7 +107,7 @@ void bzero(
 
 } // namespace QF
 } // namespace QP
-//$enddef${QF::QF-pkg} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$enddef${QF::QF-pkg::bzero} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //============================================================================
 //$define${QF::QActive::QActive} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

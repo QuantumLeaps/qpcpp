@@ -38,7 +38,7 @@
     #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
-#include <limits.h>         // limits of dynamic range for integers
+#include <climits>          // limits of dynamic range for integers
 #include <conio.h>          // console input/output
 
 namespace { // unnamed local namespace

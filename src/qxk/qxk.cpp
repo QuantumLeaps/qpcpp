@@ -153,18 +153,16 @@ namespace QF {
 
 //${QXK::QF-cust::init} ......................................................
 void init() {
+    #if (QF_MAX_EPOOL > 0U)
     QF::maxPool_ = 0U;
-    QActive::subscrList_   = nullptr;
-    QActive::maxPubSignal_ = 0;
+    #endif
 
     bzero(&QTimeEvt::timeEvtHead_[0], sizeof(QTimeEvt::timeEvtHead_));
     bzero(&QActive::registry_[0],     sizeof(QActive::registry_));
-    bzero(&QF::readySet_,  sizeof(QF::readySet_));
-    bzero(&QXK_attr_,      sizeof(QXK_attr_));
+    bzero(&QF::readySet_,             sizeof(QF::readySet_));
+    bzero(&QXK_attr_,                 sizeof(QXK_attr_));
 
     // setup the QXK scheduler as initially locked and not running
-    QXK_attr_.actPrio  = 0U; // priority of the QK idle loop
-    QXK_attr_.actThre  = 0U; // preemption-threshold of the QK idle loop
     QXK_attr_.lockCeil = (QF_MAX_ACTIVE + 1U); // scheduler locked
 
     // QXK idle AO object (const in ROM)
@@ -437,8 +435,9 @@ void QXK_activate_(std::uint_fast8_t const asynch) noexcept {
         //
         QP::QEvt const * const e = a->get_();
         a->dispatch(e, a->m_prio);
+    #if (QF_MAX_EPOOL > 0U)
         QP::QF::gc(e);
-
+    #endif
         QF_INT_DISABLE(); // unconditionally disable interrupts
 
         if (a->m_eQueue.isEmpty()) { // empty queue?

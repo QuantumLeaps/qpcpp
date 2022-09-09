@@ -154,8 +154,10 @@ std::uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const noexcept {
          e != nullptr;
          e = eq->get(m_prio))
     {
-        QF::gc(e); // garbage collect
         ++n; // count the flushed event
+    #if (QF_MAX_EPOOL > 0U)
+        QF::gc(e); // garbage collect
+    #endif
     }
     return n;
 }

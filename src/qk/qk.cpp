@@ -149,17 +149,16 @@ namespace QF {
 
 //${QK::QF-cust::init} .......................................................
 void init() {
+    #if (QF_MAX_EPOOL > 0U)
     QF::maxPool_ = 0U;
-    QActive::subscrList_   = nullptr;
-    QActive::maxPubSignal_ = 0;
+    #endif
 
     bzero(&QTimeEvt::timeEvtHead_[0], sizeof(QTimeEvt::timeEvtHead_));
-    bzero(&QActive::registry_[0], sizeof(QActive::registry_));
-    bzero(&QF::readySet_, sizeof(QF::readySet_));
-    bzero(&QK_attr_, sizeof(QK_attr_));
+    bzero(&QActive::registry_[0],     sizeof(QActive::registry_));
+    bzero(&QF::readySet_,             sizeof(QF::readySet_));
+    bzero(&QK_attr_,                  sizeof(QK_attr_));
 
-    QK_attr_.actPrio  = 0U; // priority of the QK idle loop
-    QK_attr_.actThre  = 0U; // preemption-threshold of the QK idle loop
+    // setup the QK scheduler as initially locked and not running
     QK_attr_.lockCeil = (QF_MAX_ACTIVE + 1U); // scheduler locked
 
     #ifdef QK_INIT
@@ -342,8 +341,9 @@ void QK_activate_(std::uint_fast8_t const asynch) noexcept {
         // 3. determine if event is garbage and collect it if so
         QP::QEvt const * const e = a->get_();
         a->dispatch(e, a->m_prio);
+    #if (QF_MAX_EPOOL > 0U)
         QP::QF::gc(e);
-
+    #endif
         // determine the next highest-priority AO ready to run...
         QF_INT_DISABLE(); // unconditionally disable interrupts
 

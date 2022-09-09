@@ -169,8 +169,9 @@ void processTestEvts_() {
         //
         QEvt const * const e = a->get_();
         a->dispatch(e, a->m_prio);
+    #if (QF_MAX_EPOOL > 0U)
         QF::gc(e);
-
+    #endif
         if (a->m_eQueue.isEmpty()) { // empty queue?
             QF::readySet_.remove(p);
         }
@@ -526,7 +527,9 @@ bool QActiveDummy::post_(
     QF_CRIT_X_();
 
     // recycle the event immediately, because it was not really posted
+    #if (QF_MAX_EPOOL > 0U)
     QF::gc(e);
+    #endif
 
     return status;
 }
@@ -571,7 +574,9 @@ void QActiveDummy::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_X_();
 
     // recycle the event immediately, because it was not really posted
+    #if (QF_MAX_EPOOL > 0U)
     QF::gc(e);
+    #endif
 }
 
 } // namespace QP

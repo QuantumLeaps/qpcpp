@@ -81,13 +81,13 @@ namespace QF {
 
 //${QV::QF-cust::init} .......................................................
 void init() {
+    #if (QF_MAX_EPOOL > 0U)
     QF::maxPool_ = 0U;
-    QActive::subscrList_   = nullptr;
-    QActive::maxPubSignal_ = 0;
+    #endif
 
     bzero(&QTimeEvt::timeEvtHead_[0], sizeof(QTimeEvt::timeEvtHead_));
-    bzero(&QActive::registry_[0], sizeof(QActive::registry_));
-    bzero(&QF::readySet_, sizeof(QF::readySet_));
+    bzero(&QActive::registry_[0],     sizeof(QActive::registry_));
+    bzero(&QF::readySet_,             sizeof(QF::readySet_));
 
     #ifdef QV_INIT
     QV_INIT(); // port-specific initialization of the QV kernel
@@ -141,8 +141,9 @@ int_t run() {
             //
             QEvt const * const e = a->get_();
             a->dispatch(e, a->m_prio);
+    #if (QF_MAX_EPOOL > 0U)
             gc(e);
-
+    #endif
             QF_INT_DISABLE();
             if (a->m_eQueue.isEmpty()) { // empty queue?
                 readySet_.remove(p);

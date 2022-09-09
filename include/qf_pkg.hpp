@@ -56,7 +56,9 @@ extern QPSet readySet_;
 
 //${QF::QF-pkg::ePool_[QF_MAX_EPOOL]} ........................................
 //! event pools managed by QF
+#if (QF_MAX_EPOOL > 0U)
 extern QF_EPOOL_TYPE_ ePool_[QF_MAX_EPOOL];
+#endif //  (QF_MAX_EPOOL > 0U)
 
 //${QF::QF-pkg::maxPool_} ....................................................
 //! number of initialized event pools

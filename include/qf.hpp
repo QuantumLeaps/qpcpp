@@ -76,7 +76,11 @@
 
 //${QF-config::QF_MAX_EPOOL} .................................................
 //! Maximum number of event pools (configurable value in qf_port.hpp)
-//! Valid values: [1U..15U]; default 3U
+//! Valid values: [0U..15U]; default 3U
+//!
+//! @note
+//! #QF_MAX_EPOOL set to zero means that dynamic events are NOT configured
+//! and should not be used in the application.
 #ifndef QF_MAX_EPOOL
 #define QF_MAX_EPOOL 3U
 #endif // ndef QF_MAX_EPOOL

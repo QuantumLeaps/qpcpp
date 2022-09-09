@@ -163,7 +163,9 @@ void QActive::publish_(
     // and recycles the event if the counter drops to zero. This covers both
     // cases when the event was published with or without any subscribers.
     //
+    #if (QF_MAX_EPOOL > 0U)
     QF::gc(e);
+    #endif
 }
 
 } // namespace QP

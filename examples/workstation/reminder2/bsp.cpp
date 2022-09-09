@@ -35,7 +35,7 @@
 #include "bsp.hpp"
 
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>  // for exit()
 
 using namespace std;
 using namespace QP;

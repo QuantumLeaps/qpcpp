@@ -419,11 +419,15 @@ bool QXThread::post_(
 
             QF_CRIT_X_();
 
+    #if (QF_MAX_EPOOL > 0U)
             QF::gc(e); // recycle the event to avoid a leak
+    #endif
         }
     }
     else { // the queue is not available
+    #if (QF_MAX_EPOOL > 0U)
          QF::gc(e); // make sure the event is not leaked
+    #endif
          status = false;
          Q_ERROR_ID(320); // this extended thread cannot accept events
     }

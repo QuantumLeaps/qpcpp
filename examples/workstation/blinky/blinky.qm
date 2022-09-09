@@ -60,7 +60,7 @@
   <file name="blinky.cpp">
    <text>#include &quot;qpcpp.hpp&quot;
 #include &lt;iostream&gt;
-#include &lt;stdlib.h&gt; // for exit()
+#include &lt;cstdlib&gt; // for exit()
 
 using namespace std;
 using namespace QP;

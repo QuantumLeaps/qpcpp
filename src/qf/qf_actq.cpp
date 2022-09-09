@@ -187,7 +187,9 @@ bool QActive::post_(
 
         QF_CRIT_X_();
 
+    #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // recycle the event to avoid a leak
+    #endif
     }
 
     return status;
