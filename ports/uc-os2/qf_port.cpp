@@ -167,7 +167,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
          - reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSNMsgs);
 
     bool status;
-    if (margin == QF_NO_MARGIN) {
+    if (margin == QF::NO_MARGIN) {
         if (nFree > 0U) {
             status = true; // can post
         }
