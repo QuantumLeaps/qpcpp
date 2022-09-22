@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-29
-//! @version Last updated for: @ref qpcpp_7_1_0
+//! @date Last updated on: 2022-09-17
+//! @version Last updated for: @ref qpcpp_7_1_1
 //!
 //! @file
 //! @brief QF/C++ port to embOS RTOS kernel, all supported compilers
@@ -167,7 +167,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     QF_CRIT_E_();
     nFree = static_cast<std::uint_fast16_t>(m_eQueue.maxMsg - m_eQueue.nofMsg);
 
-    if (margin == QF_NO_MARGIN) {
+    if (margin == QF::NO_MARGIN) {
         if (nFree > 0U) {
             status = true; // can post
         }

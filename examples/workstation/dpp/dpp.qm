@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.2.0" links="1">
+<model version="5.2.2" links="1">
  <documentation>Dining Philosopher Problem example</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -26,9 +26,9 @@
    <code>= &amp;Table::inst; // &quot;opaque&quot; pointer to Table AO</code>
   </attribute>
   <!--${Shared::XT_Test1}-->
-  <attribute name="XT_Test1? QXK_HPP" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
+  <attribute name="XT_Test1? QP_INC_QXK_HPP_" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
   <!--${Shared::XT_Test2}-->
-  <attribute name="XT_Test2? QXK_HPP" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
+  <attribute name="XT_Test2? QP_INC_QXK_HPP_" type="QP::QXThread * const" visibility="0x00" properties="0x00"/>
  </package>
  <!--${AOs}-->
  <package name="AOs" stereotype="0x02" namespace="DPP::">

@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-29
+//! @date Last updated on: 2022-09-17
 //! @version Last updated for: @ref qpcpp_7_1_1
 //!
 //! @file
@@ -199,7 +199,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
         static_cast<std::uint_fast16_t>(FREERTOS_QUEUE_GET_FREE());
 
     bool status;
-    if (margin == QF_NO_MARGIN) {
+    if (margin == QF::NO_MARGIN) {
         if (nFree > 0U) {
             status = true; // can post
         }
@@ -312,7 +312,7 @@ bool QActive::postFromISR_(QEvt const * const e,
         static_cast<std::uint_fast16_t>(FREERTOS_QUEUE_GET_FREE());
 
     bool status;
-    if (margin == QF_NO_MARGIN) {
+    if (margin == QF::NO_MARGIN) {
         if (nFree > 0U) {
             status = true; // can post
         }
@@ -545,13 +545,13 @@ QEvt *QF::newXfromISR_(std::uint_fast16_t const evtSize,
     // get e -- platform-dependent
 #ifdef Q_SPY
     QEvt *e = static_cast<QEvt *>(
-              QF::ePool_[idx].getFromISR(((margin != QF_NO_MARGIN)
+              QF::ePool_[idx].getFromISR(((margin != QF::NO_MARGIN)
                   ? margin : 0U),
                   static_cast<std::uint_fast8_t>(QS_EP_ID) + idx + 1U));
     UBaseType_t uxSavedInterruptStatus;
 #else
     QEvt *e = static_cast<QEvt *>(
-              QF::ePool_[idx].getFromISR(((margin != QF_NO_MARGIN)
+              QF::ePool_[idx].getFromISR(((margin != QF::NO_MARGIN)
                   ? margin : 0U), 0U));
 #endif
 
@@ -577,7 +577,7 @@ QEvt *QF::newXfromISR_(std::uint_fast16_t const evtSize,
     else {
         // event was not allocated, assert that the caller provided non-zero
         // margin, which means that they can tollerate bad allocation
-        Q_ASSERT_ID(720, margin != QF_NO_MARGIN);
+        Q_ASSERT_ID(720, margin != QF::NO_MARGIN);
 
     #ifdef Q_SPY
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();

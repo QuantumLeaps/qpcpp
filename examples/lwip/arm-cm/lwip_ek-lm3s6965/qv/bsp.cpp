@@ -87,7 +87,7 @@ extern "C" void SysTick_Handler(void) {
     static struct ButtonsDebouncing {
         uint32_t depressed;
         uint32_t previous;
-    } buttons = { ~0U, ~0U }; // state of the button debouncing
+    } buttons = { 0U, 0U }; // state of the button debouncing
     uint32_t current;
 
     current = ~GPIOF->DATA_Bits[USER_BTN]; // read USER_BTN

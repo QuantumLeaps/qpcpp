@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.2.0" links="1">
+<model version="5.2.2" links="1">
  <documentation>Dining Philosopher Problem example with MSM state machines</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -416,10 +416,10 @@ $declare${Events::TableEvt}
 $declare${AOs::AO_Philo[N_PHILO]}
 $declare${AOs::AO_Table}
 
-#ifdef QXK_HPP
+#ifdef QP_INC_QXK_HPP_
 $declare${AOs::XT_Test1}
 $declare${AOs::XT_Test2}
-#endif // QXK_HPP
+#endif // QP_INC_QXK_HPP_
 
 #endif // DPP_HPP</text>
   </file>

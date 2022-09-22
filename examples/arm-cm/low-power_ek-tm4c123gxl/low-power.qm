@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.2.0" links="1">
+<model version="5.2.2" links="1">
  <documentation>Low-Power example</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -226,7 +226,7 @@ enum BlinkySignals {
 
 $declare${AOs::AO_Blinky0}
 
-#ifdef QXK_HPP // QXK kernel?
+#ifdef QP_INC_QXK_HPP_ // QXK kernel?
 
 extern QP::QXThread XT_Blinky1;
 extern QP::QXSemaphore XSEM_sw1;

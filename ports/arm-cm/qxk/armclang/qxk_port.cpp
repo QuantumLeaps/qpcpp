@@ -131,7 +131,7 @@ void QXK_stackInit_(void *thr, QP::QXThreadHandler const handler,
     /* synthesize the ARM Cortex-M exception stack frame...*/
     *(--sp) = (1U << 24);    /* xPSR  (just the THUMB bit) */
     *(--sp) = (std::uint32_t)handler;          /* PC (the thread handler) */
-    *(--sp) = (std::uint32_t)&QXK_threadExit_; /* LR (return from thread) */
+    *(--sp) = (std::uint32_t)&QXK_threadExit_; /* LR (exit from thread) */
     *(--sp) = 0x0000000CU;   /* R12 */
     *(--sp) = 0x00000003U;   /* R3  */
     *(--sp) = 0x00000002U;   /* R2  */
@@ -207,7 +207,7 @@ __attribute__ ((naked))
 void PendSV_Handler(void) {
 __asm volatile (
 
-    /* Prepare some constants before entering a critical section... */
+    /* Prepare constants in registers before entering critical section */
     "  LDR     r3,=QXK_attr_    \n"
     "  LDR     r2,=" STRINGIFY(NVIC_ICSR) "\n" /* Interrupt Control and State */
     "  MOVS    r1,#1            \n"
@@ -534,13 +534,11 @@ __asm volatile (
     "  ISB                      \n" /* ISB after MSR CONTROL (ARM AN321,Sect.4.16) */
 #endif                  /*--------- VFP available */
 
-#ifndef QXK_USE_IRQ_NUM /*--------- IRQ NOT defined, used NMI by default */
+#ifndef QXK_USE_IRQ_NUM /*--------- IRQ NOT defined, use NMI by default */
     "  LDR     r0,=" STRINGIFY(NVIC_ICSR) "\n" /* Interrupt Control and State */
     "  MOVS    r1,#1            \n"
     "  LSLS    r1,r1,#31        \n" /* r1 := (1 << 31) (NMI bit) */
     "  STR     r1,[r0]          \n" /* ICSR[31] := 1 (pend NMI) */
-
-    /* NOTE! interrupts are still disabled when NMI is used */
 
 #else                   /*--------- use the selected IRQ */
     "  LDR     r0,=" STRINGIFY(NVIC_PEND + (QXK_USE_IRQ_NUM / 32)) "\n"
@@ -557,6 +555,7 @@ __asm volatile (
 #endif                  /*--------- ARMv7-M and higher */
 #endif                  /*--------- use IRQ */
 
+    /* NOTE! interrupts are still disabled when NMI is used */
     "  B       .                \n" /* wait for preemption by NMI/IRQ */
     );
 }
@@ -568,7 +567,9 @@ __asm volatile (
 * stack frame that must be at the top of the stack.
 */
 __attribute__ ((naked))
-#ifndef QXK_USE_IRQ_NUM /* IRQ NOT defined, used NMI by default */
+#ifndef QXK_USE_IRQ_NUM /*--------- IRQ NOT defined, use NMI by default */
+
+/* NOTE: The NMI_Handler() is entered with interrupts still disabled! */
 void NMI_Handler(void) {
 __asm volatile (
     /* enable interrupts */
@@ -581,12 +582,13 @@ __asm volatile (
 );
 
 #else                   /*--------- use the selected IRQ */
+
+/* NOTE: The IRQ Handler is entered with interrupts enabled */
 void QXK_USE_IRQ_HANDLER(void) {
 #endif                  /*--------- use IRQ */
 __asm volatile (
     "  ADD     sp,sp,#(8*4)     \n" /* remove one 8-register exception frame */
 
-#if (__ARM_ARCH != 6)   /*--------- if ARMv7-M or higher... */
 #if (__ARM_FP != 0)     /*--------- if VFP available... */
     "  POP     {r0,lr}          \n" /* restore alighner and EXC_RETURN into lr */
     "  DSB                      \n" /* ARM Erratum 838869 */
@@ -594,7 +596,6 @@ __asm volatile (
     "  IT      EQ               \n" /* if EXC_RETURN[4] is zero... */
     "  VLDMIAEQ sp!,{s16-s31}   \n" /* ... restore VFP registers s16..s31 */
 #endif                  /*--------- VFP available */
-#endif                  /*--------- ARMv7-M or higher */
     "  BX      lr               \n" /* return to the preempted task */
     );
 }

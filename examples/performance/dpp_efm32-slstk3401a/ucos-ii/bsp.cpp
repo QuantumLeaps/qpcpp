@@ -188,7 +188,7 @@ void App_TimeTickHook(void) {
     static struct ButtonsDebouncing {
         uint32_t depressed;
         uint32_t previous;
-    } buttons = { ~0U, ~0U };
+    } buttons = { 0U, 0U };
     uint32_t current;
     current = ~GPIO->P[PB_PORT].DIN; // read PB0 and BP1
     tmp = buttons.depressed; // save the debounced depressed buttons

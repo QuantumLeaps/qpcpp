@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.2.1" links="1">
+<model version="5.2.2" links="1">
  <documentation>QP/C++ Real-Time Embedded Framework (RTEF)
 The model is used to generate the whole QP/C++ source code.
 
@@ -1891,15 +1891,9 @@ return r;</code>
  </package>
  <!--${QF-macros}-->
  <package name="QF-macros" stereotype="0x02">
-  <!--${QF-macros::QF_NO_MARGIN}-->
-  <attribute name="QF_NO_MARGIN" type="std::uint_fast16_t" visibility="0x03" properties="0x00">
-   <documentation>//! Special value of margin that causes asserting failure in case
-//! event allocation or event posting fails</documentation>
-   <code>(static_cast&lt;std::uint16_t&gt;(0xFFFFU))</code>
-  </attribute>
   <!--${QF-macros::Q_PRIO}-->
   <operation name="Q_PRIO" type="QP::QPrioSpec" visibility="0x03" properties="0x02">
-   <documentation>//! Create a QP::QPrioSpec object to specify priorty of an AO or a thread</documentation>
+   <documentation>//! Create a QP::QPrioSpec object to specify priority of an AO or a thread</documentation>
    <!--${QF-macros::Q_PRIO::prio_}-->
    <parameter name="prio_" type="std::uint8_t"/>
    <!--${QF-macros::Q_PRIO::pthre_}-->
@@ -1912,7 +1906,7 @@ return r;</code>
 //!
 //! @details
 //! The macro calls the internal QF function QF::newX_() with
-//! margin == ::QF_NO_MARGIN, which causes an assertion when the event
+//! margin == QF::NO_MARGIN, which causes an assertion when the event
 //! cannot be successfully allocated.
 //!
 //! @param[in] evtT_ event type (class name) of the event to allocate
@@ -1934,7 +1928,7 @@ return r;</code>
    <!--${QF-macros::Q_NEW::sig_}-->
    <parameter name="sig_" type="QP::QSignal"/>
    <code>(static_cast&lt;evtT_ *&gt;( \
-    QP::QF::newX_(sizeof(evtT_), QF_NO_MARGIN, (sig_))))</code>
+    QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, (sig_))))</code>
   </operation>
   <!--${QF-macros::Q_NEW}-->
   <operation name="Q_NEW?def Q_EVT_CTOR" type="void" visibility="0x03" properties="0x00">
@@ -1946,7 +1940,7 @@ return r;</code>
    <!--${QF-macros::Q_NEW::...}-->
    <parameter name="..." type="__VA_ARGS__"/>
    <code>\
-    (new(QP::QF::newX_(sizeof(evtT_), QF_NO_MARGIN, 0)) \
+    (new(QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, 0)) \
         evtT_((sig_),  ##__VA_ARGS__))</code>
   </operation>
   <!--${QF-macros::Q_NEW_X}-->
@@ -1961,7 +1955,7 @@ return r;</code>
 //! @param[in] evtT_   event type (class name) of the event to allocate
 //! @param[in] margin_ number of events that must remain available
 //!                    in the given pool after this allocation. The
-//!                    special value ::QF_NO_MARGIN causes asserting
+//!                    special value QF::NO_MARGIN causes asserting
 //!                    failure in case event allocation fails.
 //! @param[in] sig_    signal to assign to the newly allocated event
 //!
@@ -2003,13 +1997,13 @@ return r;</code>
    <parameter name="sig_" type="QP::QSignal"/>
    <!--${QF-macros::Q_NEW_X::...}-->
    <parameter name="..." type="__VA_ARGS__"/>
-   <code>\
+   <code>do { \
     (e_) = static_cast&lt;evtT_ *&gt;( \
               QP::QF::newX_(sizeof(evtT_), (margin_), 0)); \
     if ((e_) != nullptr) { \
         new((e_)) evtT_((sig_),  ##__VA_ARGS__); \
     } \
- } while (false)</code>
+} while (false)</code>
   </operation>
   <!--${QF-macros::Q_NEW_REF}-->
   <operation name="Q_NEW_REF" type="void" visibility="0x03" properties="0x00">
@@ -2125,7 +2119,7 @@ return r;</code>
    <parameter name="e_" type="QP::QEvt const *"/>
    <!--${QF-macros::POST::sender_}-->
    <parameter name="sender_" type="&lt;sender *&gt;"/>
-   <code>post_((e_), QF_NO_MARGIN, (sender_))</code>
+   <code>post_((e_), QP::QF::NO_MARGIN, (sender_))</code>
   </operation>
   <!--${QF-macros::POST}-->
   <operation name="POST?ndef Q_SPY" type="void" visibility="0x03" properties="0x00">
@@ -2133,7 +2127,7 @@ return r;</code>
    <parameter name="e_" type="QP::QEvt const *"/>
    <!--${QF-macros::POST::dummy}-->
    <parameter name="dummy" type=""/>
-   <code>post_((e_), QF_NO_MARGIN, nullptr)</code>
+   <code>post_((e_), QP::QF::NO_MARGIN, nullptr)</code>
   </operation>
   <!--${QF-macros::POST_X}-->
   <operation name="POST_X?def Q_SPY" type="void" visibility="0x03" properties="0x00">
@@ -2147,7 +2141,7 @@ return r;</code>
 //! @param[in]  e_      pointer to the event to post
 //! @param[in]  margin_ the minimum free slots in the queue, which
 //!                     must still be available after posting the event.
-//!                     The special value ::QF_NO_MARGIN causes
+//!                     The special value QF::NO_MARGIN causes
 //!                     asserting failure in case event posting fails.
 //! @param[in]  sender_ pointer to the sender object.
 //!
@@ -2574,14 +2568,12 @@ return n + log2LUT[x];</code>
    <attribute name="QTimeEvt" type="friend class" visibility="0x02" properties="0x00"/>
    <!--${QF::QActive::QTicker}-->
    <attribute name="QTicker" type="friend class" visibility="0x02" properties="0x00"/>
-   <!--${QF::QActive::QMutex}-->
-   <attribute name="QMutex?def QK_HPP" type="friend class" visibility="0x02" properties="0x00"/>
    <!--${QF::QActive::QXThread}-->
-   <attribute name="QXThread?def QXK_HPP" type="friend class" visibility="0x02" properties="0x00"/>
+   <attribute name="QXThread?def QP_INC_QXK_HPP_" type="friend class" visibility="0x02" properties="0x00"/>
    <!--${QF::QActive::QXMutex}-->
-   <attribute name="QXMutex?def QXK_HPP" type="friend class" visibility="0x02" properties="0x00"/>
+   <attribute name="QXMutex?def QP_INC_QXK_HPP_" type="friend class" visibility="0x02" properties="0x00"/>
    <!--${QF::QActive::QXSemaphore}-->
-   <attribute name="QXSemaphore?def QXK_HPP" type="friend class" visibility="0x02" properties="0x00"/>
+   <attribute name="QXSemaphore?def QP_INC_QXK_HPP_" type="friend class" visibility="0x02" properties="0x00"/>
    <!--${QF::QActive::QActiveDummy}-->
    <attribute name="QActiveDummy?def Q_UTEST" type="friend class" visibility="0x02" properties="0x00"/>
    <!--${QF::QActive::GuiQActive}-->
@@ -2695,7 +2687,7 @@ return n + log2LUT[x];</code>
 //!
 //! @param[in] e      pointer to the event to be posted
 //! @param[in] margin number of required free slots in the queue
-//!     after posting the event or ::QF_NO_MARGIN.
+//!     after posting the event or QF::NO_MARGIN.
 //! @param[in] sender pointer to a sender object (used in QS only)
 //!
 //! @returns
@@ -2703,7 +2695,7 @@ return n + log2LUT[x];</code>
 //! and 'false' (failure) when the posting fails.
 //!
 //! @attention
-//! For `margin` == ::QF_NO_MARGIN, this function will assert internally
+//! For `margin` == QF::NO_MARGIN, this function will assert internally
 //! if the event posting fails. In that case, it is unnecessary to check
 //! the retrun value from this function.
 //!
@@ -2739,7 +2731,7 @@ QS_TEST_PROBE_ID(1,
 )
 
 bool status;
-if (margin == QF_NO_MARGIN) {
+if (margin == QF::NO_MARGIN) {
     if (nFree &gt; 0U) {
         status = true; // can post
     }
@@ -4454,12 +4446,12 @@ m_nMin     = m_nFree;</code>
 //! @param[in] e      pointer to the event to be posted to the queue
 //! @param[in] margin number of required free slots in the queue after
 //!                   posting the event. The special value
-//!                   ::QF_NO_MARGIN means that this function will
+//!                   QF::NO_MARGIN means that this function will
 //!                   assert if posting
 //! @param[in] qs_id  QS-id of this state machine (for QS local filter)
 //!
 //! @note
-//! The ::QF_NO_MARGIN value of the `margin` argument is special and
+//! The QF::NO_MARGIN value of the `margin` argument is special and
 //! denotes situation when the post() operation is assumed to succeed
 //! (event delivery guarantee). An assertion fires, when the event cannot
 //! be delivered in this case.
@@ -4486,7 +4478,7 @@ QEQueueCtr nFree = m_nFree; // temporary to avoid UB for volatile access
 
 // margin available?
 bool status;
-if (((margin == QF_NO_MARGIN) &amp;&amp; (nFree &gt; 0U))
+if (((margin == QF::NO_MARGIN) &amp;&amp; (nFree &gt; 0U))
     || (nFree &gt; static_cast&lt;QEQueueCtr&gt;(margin)))
 {
     // is it a dynamic event?
@@ -4529,7 +4521,7 @@ if (((margin == QF_NO_MARGIN) &amp;&amp; (nFree &gt; 0U))
 else {
     //! @note assert if event cannot be posted and dropping events is
     //! not acceptable
-    Q_ASSERT_CRIT_(210, margin != QF_NO_MARGIN);
+    Q_ASSERT_CRIT_(210, margin != QF::NO_MARGIN);
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_EQUEUE_POST_ATTEMPT, qs_id)
         QS_TIME_PRE_();        // timestamp
@@ -5371,6 +5363,12 @@ return min;</code>
     <parameter name="sender" type="void const * const"/>
     <code>QTimeEvt::tick_(tickRate, sender);</code>
    </operation>
+   <!--${QF::QF-base::NO_MARGIN}-->
+   <attribute name="NO_MARGIN" type="constexpr std::uint_fast16_t" visibility="0x04" properties="0x00">
+    <documentation>//! Special value of margin that causes asserting failure in case
+//! event allocation or event posting fails</documentation>
+    <code>{0xFFFFU};</code>
+   </attribute>
   </package>
   <!--${QF::QF-dyn}-->
   <package name="QF-dyn" stereotype="0x02" namespace="QF::">
@@ -5445,7 +5443,7 @@ QS::obj_dict_pre_(&amp;QF::ePool_[QF::maxPool_ - 1U], &amp;obj_name[0]);
 //! @param[in] evtSize the size (in bytes) of the event to allocate
 //! @param[in] margin  the number of un-allocated events still available
 //!                    in a given event pool after the allocation
-//!                    completes. The special value ::QF_NO_MARGIN
+//!                    completes. The special value QF::NO_MARGIN
 //!                    means that this function will assert if allocation
 //!                    fails.
 //! @param[in] sig     the signal to be assigned to the allocated event
@@ -5457,7 +5455,7 @@ QS::obj_dict_pre_(&amp;QF::ePool_[QF::maxPool_ - 1U], &amp;obj_name[0]);
 //!
 //! @note
 //! The internal QF function QF::newX_() raises an assertion when
-//! the margin argument is ::QF_NO_MARGIN and allocation of the event
+//! the margin argument is QF::NO_MARGIN and allocation of the event
 //! turns out to be impossible due to event pool depletion, or incorrect
 //! (too big) size of the requested event.
 //!
@@ -5485,10 +5483,10 @@ Q_ASSERT_ID(310, idx &lt; QF::maxPool_);
 QEvt *e;
 
 #ifdef Q_SPY
-QF_EPOOL_GET_(QF::ePool_[idx], e, ((margin != QF_NO_MARGIN) ? margin : 0U),
+QF_EPOOL_GET_(QF::ePool_[idx], e, ((margin != QF::NO_MARGIN) ? margin : 0U),
               static_cast&lt;std::uint_fast8_t&gt;(QS_EP_ID) + idx + 1U);
 #else
-QF_EPOOL_GET_(QF::ePool_[idx], e, ((margin != QF_NO_MARGIN) ? margin : 0U),
+QF_EPOOL_GET_(QF::ePool_[idx], e, ((margin != QF::NO_MARGIN) ? margin : 0U),
               0U);
 #endif
 
@@ -5511,7 +5509,7 @@ else {
     // This assertion means that the event allocation failed,
     // and this failure cannot be tolerated. The most frequent
     // reason is an event leak in the application.
-    Q_ASSERT_ID(320, margin != QF_NO_MARGIN);
+    Q_ASSERT_ID(320, margin != QF::NO_MARGIN);
 
     QS_BEGIN_PRE_(QS_QF_NEW_ATTEMPT,
                   static_cast&lt;std::uint_fast8_t&gt;(QS_EP_ID) + idx + 1U)
@@ -6760,18 +6758,23 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qs_id_)) { \
    <attribute name="priv_" type="QStx" visibility="0x00" properties="0x01">
     <documentation>//! the only instance of the QS-TX object (Singleton)</documentation>
    </attribute>
-   <!--${QS::QS-tx::force_cast(T_IN in)}-->
-   <attribute name="force_cast(T_IN in)" type="template&lt;typename T_OUT, typename T_IN&gt;  T_OUT" visibility="0x04" properties="0x01">
+   <!--${QS::QS-tx::force_cast}-->
+   <operation name="force_cast" type="template&lt;typename T_OUT, typename T_IN&gt; T_OUT" visibility="0x00" properties="0x02">
     <documentation>//! template for forcing cast of member functions for function
-//! dictionaries and test probes.</documentation>
-    <code>{
-    union TCast {
-        T_IN  in;
-        T_OUT out;
-    } u = { in };
-    return u.out;
-}</code>
-   </attribute>
+//! dictionaries and test probes.
+//!
+//! @tparam T_OUT  type of the returned representation
+//! @tparam T_IN   type of the provided representation
+//!
+//! @returns the binary representation of `T_IN` as `T_OUT`</documentation>
+    <!--${QS::QS-tx::force_cast::in}-->
+    <parameter name="in" type="T_IN"/>
+    <code>union TCast {
+    T_IN  in;
+    T_OUT out;
+} u = { in };
+return u.out;</code>
+   </operation>
    <!--${QS::QS-tx::initBuf}-->
    <operation name="initBuf" type="void" visibility="0x00" properties="0x01">
     <specifiers>noexcept</specifiers>
@@ -9232,7 +9235,7 @@ QS_END_PRE_()</code>
 bool status = true;
 QS_TEST_PROBE_ID(1,
     status = false;
-    if (margin == QF_NO_MARGIN) {
+    if (margin == QF::NO_MARGIN) {
         // fake assertion Mod=qf_actq,Loc=110
         Q_onAssert(&quot;qf_actq&quot;, 110);
     }
@@ -10587,7 +10590,7 @@ QF_CRIT_X_();</code>
 //! @param[in] e      pointer to the event to be posted
 //! @param[in] margin number of required free slots in the queue
 //!                   after posting the event. The special value
-//!                   ::QF_NO_MARGIN means that this function will
+//!                   QF::NO_MARGIN means that this function will
 //!                   assert if posting fails.
 //! @param[in] sender pointer to a sender object (used in QS only)
 //!
@@ -10599,7 +10602,7 @@ QF_CRIT_X_();</code>
 //! Should be called only via the macro POST() or POST_X().
 //!
 //! @note
-//! The ::QF_NO_MARGIN value of the `margin` parameter is special and
+//! The QF::NO_MARGIN value of the `margin` parameter is special and
 //! denotes situation when the post() operation is assumed to succeed
 //! (event delivery guarantee). An assertion fires, when the event cannot
 //! be delivered in this case.</documentation>
@@ -10640,7 +10643,7 @@ else if (m_eQueue.m_end != 0U) {
         nFree = 0U;
     )
 
-    if (margin == QF_NO_MARGIN) {
+    if (margin == QF::NO_MARGIN) {
         if (nFree &gt; 0U) {
             status = true; // can post
         }
@@ -12319,8 +12322,8 @@ QF_CRIT_X_();</code>
 //!
 //! @tr{RQP001} @tr{RQP101}
 
-#ifndef QEP_HPP
-#define QEP_HPP
+#ifndef QP_INC_QEP_HPP_
+#define QP_INC_QEP_HPP_
 
 //============================================================================
 //! The current QP version as an unsigned number
@@ -12352,18 +12355,19 @@ $declare ${QEP-config}
 $declare ${QEP}
 //============================================================================
 $declare ${QEP-macros}
-#endif // QEP_HPP</text>
+#endif // QP_INC_QEP_HPP_</text>
   </file>
   <!--${include::qf.hpp}-->
   <file name="qf.hpp">
    <text>//! @file
 //! @brief QF/C++ platform-independent public interface.
 
-#ifndef QF_HPP
-#define QF_HPP
+#ifndef QP_INC_QF_HPP_
+#define QP_INC_QF_HPP_
 
 #ifdef Q_EVT_CTOR
-#include &lt;new&gt;  // for placement new
+#include &lt;new&gt;      // for placement new
+#include &lt;cstdarg&gt;  // for va_list
 #endif // Q_EVT_CTOR
 
 //============================================================================
@@ -12383,15 +12387,15 @@ $declare ${QF::QF-dyn}
 //============================================================================
 // Global namespace...
 $declare ${QF-macros}
-#endif // QF_HPP</text>
+#endif // QP_INC_QF_HPP_</text>
   </file>
   <!--${include::qf_pkg.hpp}-->
   <file name="qf_pkg.hpp">
    <text>//! @file
 //! @brief Internal (package scope) QF/C++ interface.
 
-#ifndef QF_PKG_HPP
-#define QF_PKG_HPP
+#ifndef QP_INC_QF_PKG_HPP_
+#define QP_INC_QF_PKG_HPP_
 
 //============================================================================
 //! helper macro to cast const away from an event pointer
@@ -12523,7 +12527,7 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) noexcept {
 //! disable the warnings for this particular case.
 #define QF_PTR_RANGE_(x_, min_, max_)  (((min_) &lt;= (x_)) &amp;&amp; ((x_) &lt;= (max_)))
 
-#endif  // QF_PKG_HPP</text>
+#endif // QP_INC_QF_PKG_HPP_</text>
   </file>
   <!--${include::qequeue.hpp}-->
   <file name="qequeue.hpp">
@@ -12539,8 +12543,8 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) noexcept {
 //! and non-framework entities, such as ISRs, device drivers, or legacy
 //! code.
 
-#ifndef QEQUEUE_HPP
-#define QEQUEUE_HPP
+#ifndef QP_INC_QEQUEUE_HPP_
+#define QP_INC_QEQUEUE_HPP_
 
 #ifndef QF_EQUEUE_CTR_SIZE
 
@@ -12577,15 +12581,15 @@ namespace QP {
 //============================================================================
 $declare ${QF::QEQueue}
 
-#endif // QEQUEUE_HPP</text>
+#endif // QP_INC_QEQUEUE_HPP_</text>
   </file>
   <!--${include::qmpool.hpp}-->
   <file name="qmpool.hpp">
    <text>//! @file
 //! @brief platform-independent memory pool QP::QMPool interface.
 
-#ifndef QMPOOL_HPP
-#define QMPOOL_HPP
+#ifndef QP_INC_QMPOOL_HPP_
+#define QP_INC_QMPOOL_HPP_
 
 #ifndef QF_MPOOL_SIZ_SIZE
     //! macro to override the default QP::QMPoolSize size.
@@ -12643,15 +12647,15 @@ namespace QP {
 //============================================================================
 $declare ${QF::QMPool}
 
-#endif  // QMPOOL_HPP</text>
+#endif // QP_INC_QMPOOL_HPP_</text>
   </file>
   <!--${include::qv.hpp}-->
   <file name="qv.hpp">
    <text>//! @file
 //! @brief QV/C++ platform-independent public interface.
 
-#ifndef QV_HPP
-#define QV_HPP
+#ifndef QP_INC_QV_HPP_
+#define QP_INC_QV_HPP_
 
 //============================================================================
 // QF customization for QV -- data members of the QActive class...
@@ -12675,15 +12679,16 @@ $declare ${QV-impl}
 // Native QF event pool operations...
 $declare ${QF-QMPool-impl}
 #endif // QP_IMPL
-#endif // QV_HPP</text>
+
+#endif // QP_INC_QV_HPP_</text>
   </file>
   <!--${include::qk.hpp}-->
   <file name="qk.hpp">
    <text>//! @file
 //! @brief QK/C++ platform-independent public interface.
 
-#ifndef QK_HPP
-#define QK_HPP
+#ifndef QP_INC_QK_HPP_
+#define QP_INC_QK_HPP_
 
 //============================================================================
 // QF customization for QK -- data members of the QActive class...
@@ -12715,7 +12720,8 @@ $declare ${QK-impl}
 // Native QF event pool operations...
 $declare ${QF-QMPool-impl}
 #endif // QP_IMPL
-#endif // QK_HPP</text>
+
+#endif // QP_INC_QK_HPP_</text>
   </file>
   <!--${include::qxk.hpp}-->
   <file name="qxk.hpp">
@@ -12723,8 +12729,8 @@ $declare ${QF-QMPool-impl}
 //! @brief QXK/C++ preemptive extended (blocking) kernel, platform-independent
 //! public interface.
 
-#ifndef QXK_HPP
-#define QXK_HPP
+#ifndef QP_INC_QXK_HPP_
+#define QP_INC_QXK_HPP_
 
 //============================================================================
 // QF customization for QXK -- data members of the QActive class...
@@ -12766,15 +12772,16 @@ $declare ${QXK-impl}
 // Native QF event pool operations...
 $declare ${QF-QMPool-impl}
 #endif // QP_IMPL
-#endif // QXK_HPP</text>
+
+#endif // QP_INC_QXK_HPP_</text>
   </file>
   <!--${include::qs.hpp}-->
   <file name="qs.hpp">
    <text>//! @file
 //! @brief QS/C++ platform-independent public interface.
 
-#ifndef QS_HPP
-#define QS_HPP
+#ifndef QP_INC_QS_HPP_
+#define QP_INC_QS_HPP_
 
 #ifndef Q_SPY
     #error &quot;Q_SPY must be defined to include qs.hpp&quot;
@@ -12893,7 +12900,7 @@ $declare ${QUTest-stub::QActiveDummy}
     #define QS_TEST_PAUSE()  ((void)0)
 #endif // Q_UTEST
 
-#endif // QS_HPP</text>
+#endif // QP_INC_QS_HPP_</text>
   </file>
   <!--${include::qs_dummy.hpp}-->
   <file name="qs_dummy.hpp">
@@ -12901,8 +12908,8 @@ $declare ${QUTest-stub::QActiveDummy}
 //! @brief Dummy definitions of the QS macros that avoid code generation from
 //! the QS instrumentation.
 
-#ifndef QS_dummyHPP
-#define QS_dummyHPP
+#ifndef QP_INC_QS_DUMMY_HPP_
+#define QP_INC_QS_DUMMY_HPP_
 
 #ifdef Q_SPY
 #error &quot;Q_SPY must NOT be defined to include qs_dummy.hpp&quot;
@@ -12989,15 +12996,15 @@ $declare ${QS::QSpyId}
     #define QF_QS_ACTION(act_)          static_cast&lt;void&gt;(0)
 #endif // QP_IMPL
 
-#endif // QS_dummyHPP</text>
+#endif // QP_INC_QS_DUMMY_HPP_</text>
   </file>
   <!--${include::qs_pkg.hpp}-->
   <file name="qs_pkg.hpp">
    <text>//! @file
 //! @brief Internal (package scope) QS/C++ interface.
 
-#ifndef QS_PKG_HPP
-#define QS_PKG_HPP
+#ifndef QP_INC_QS_PKG_HPP_
+#define QP_INC_QS_PKG_HPP_
 
 //============================================================================
 namespace QP {
@@ -13258,7 +13265,7 @@ constexpr std::uint8_t QS_GOOD_CHKSUM = 0xFFU;
 //! selectively suppress this specific deviation.
 #define QS_REC_NUM_(enum_) (static_cast&lt;std::uint_fast8_t&gt;(enum_))
 
-#endif // QS_PKG_HPP</text>
+#endif // QP_INC_QS_PKG_HPP_</text>
   </file>
   <!--${include::qpcpp.hpp}-->
   <file name="qpcpp.hpp">
@@ -13269,8 +13276,8 @@ constexpr std::uint8_t QS_GOOD_CHKSUM = 0xFFU;
 //! This header file must be included directly or indirectly
 //! in all application modules (*.cpp files) that use QP/C++.
 
-#ifndef QPCPP_HPP
-#define QPCPP_HPP
+#ifndef QP_INC_QPCPP_HPP_
+#define QP_INC_QPCPP_HPP_
 
 //============================================================================
 #include &quot;qf_port.hpp&quot;      // QF/C++ port from the port directory
@@ -13304,6 +13311,9 @@ constexpr std::uint8_t QS_GOOD_CHKSUM = 0xFFU;
 // QP/C++ API compatibility layer...
 
 #if (QP_API_VERSION &lt; 700)
+
+//! @deprecated use QP::QF::NO_MARGIN instead
+#define QF_NO_MARGIN QP::QF::NO_MARGIN
 
 //! @deprecated plain 'char' is no longer forbidden in MISRA/AUTOSAR-C++
 using char_t = char;
@@ -13443,22 +13453,22 @@ using char_t = char;
 #endif // QP_API_VERSION &lt; 691
 #endif // QP_API_VERSION &lt; 700
 
-#endif // QPCPP_HPP</text>
+#endif // QP_INC_QPCPP_HPP_</text>
   </file>
   <!--${include::qstamp.hpp}-->
   <file name="qstamp.hpp">
    <text>//! @file
 //! @brief Application build time-stamp interface
 
-#ifndef QSTAMP_HPP
-#define QSTAMP_HPP
+#ifndef QP_INC_QSTAMP_HPP_
+#define QP_INC_QSTAMP_HPP_
 
 namespace QP {
 extern char const BUILD_DATE[12];
 extern char const BUILD_TIME[9];
 } // namespace QP
 
-#endif // QSTAMP</text>
+#endif // QP_INC_QSTAMP_HPP_</text>
   </file>
   <!--${include::qstamp.cpp}-->
   <file name="qstamp.cpp">
@@ -13878,9 +13888,9 @@ $define ${QF::QTimeEvt}</text>
 #endif // Q_SPY
 
 // protection against including this source file in a wrong project
-#ifndef QV_HPP
+#ifndef QP_INC_QV_HPP_
     #error &quot;Source file included in a project NOT based on the QV kernel&quot;
-#endif // QV_HPP
+#endif // QP_INC_QV_HPP_
 
 //============================================================================
 namespace { // unnamed local namespace
@@ -13912,9 +13922,9 @@ $define ${QV::QActive}</text>
 #endif // Q_SPY
 
 // protection against including this source file in a wrong project
-#ifndef QK_HPP
+#ifndef QP_INC_QK_HPP_
     #error &quot;Source file included in a project NOT based on the QK kernel&quot;
-#endif // QK_HPP
+#endif // QP_INC_QK_HPP_
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
@@ -13952,9 +13962,9 @@ $define ${QK-extern-C}
 #endif // Q_SPY
 
 // protection against including this source file in a wrong project
-#ifndef QXK_HPP
-#error &quot;Source file included in a project NOT based on the QXK kernel&quot;
-#endif // QXK_HPP
+#ifndef QP_INC_QXK_HPP_
+    #error &quot;Source file included in a project NOT based on the QXK kernel&quot;
+#endif // QP_INC_QXK_HPP_
 
 //============================================================================
 namespace { // unnamed local namespace
@@ -13988,9 +13998,9 @@ $define ${QXK-extern-C}
 #endif // Q_SPY
 
 // protection against including this source file in a wrong project
-#ifndef QXK_HPP
-#error &quot;Source file included in a project NOT based on the QXK kernel&quot;
-#endif // QXK_HPP
+#ifndef QP_INC_QXK_HPP_
+    #error &quot;Source file included in a project NOT based on the QXK kernel&quot;
+#endif // QP_INC_QXK_HPP_
 
 //============================================================================
 namespace { // unnamed local namespace
@@ -14016,9 +14026,9 @@ $define ${QXK::QXMutex}</text>
 #endif // Q_SPY
 
 // protection against including this source file in a wrong project
-#ifndef QXK_HPP
-#error &quot;Source file included in a project NOT based on the QXK kernel&quot;
-#endif // QXK_HPP
+#ifndef QP_INC_QXK_HPP_
+    #error &quot;Source file included in a project NOT based on the QXK kernel&quot;
+#endif // QP_INC_QXK_HPP_
 
 namespace { // unnamed local namespace
 Q_DEFINE_THIS_MODULE(&quot;qxk_sema&quot;)
@@ -14044,9 +14054,9 @@ $define ${QXK::QXSemaphore}</text>
 #endif // Q_SPY
 
 // protection against including this source file in a wrong project
-#ifndef QXK_HPP
-#error &quot;Source file included in a project NOT based on the QXK kernel&quot;
-#endif // QXK_HPP
+#ifndef QP_INC_QXK_HPP_
+    #error &quot;Source file included in a project NOT based on the QXK kernel&quot;
+#endif // QP_INC_QXK_HPP_
 
 //============================================================================
 namespace { // unnamed local namespace

@@ -255,9 +255,9 @@
 -emacro(534,
  POST)
 
-// [AUTOSAR Rule M17-0-2] the name 'remvoe' is reserved to the compiler
+// [AUTOSAR Rule M17-0-2] the name xxx is reserved to the compiler
 -esym(9093,
- remove)
+ remove) // QPrioSet::remvoe()
 
 // MC++R5-2-7 pointer type converted to unrelated pointer type
 -emacro(9176,
@@ -357,6 +357,10 @@
 // overridden function
 -esym(9272,
  QP::QXMutex::init*)
+
+// function xxx matches the name of a standard library function
+-esym(8502,
+ signal) // QXSemaphore::signal()
 
 
 // QS ------------------------------------------------------------------------

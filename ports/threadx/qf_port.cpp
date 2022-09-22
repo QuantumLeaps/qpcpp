@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-12
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-09-17
+//! @version Last updated for: @ref qpcpp_7_1_1
 //!
 //! @file
 //! @brief QF/C++ port to ThreadX, all supported compilers
@@ -140,7 +140,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     std::uint_fast16_t nFree =
         static_cast<std::uint_fast16_t>(m_eQueue.tx_queue_available_storage);
 
-    if (margin == QF_NO_MARGIN) {
+    if (margin == QF::NO_MARGIN) {
         if (nFree > 0U) {
             status = true; // can post
         }

@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-29
-//! @version Last updated for: Zephyr 3.1.99 and @ref qpcpp_7_1_0
+//! @date Last updated on: 2022-09-17
+//! @version Last updated for: Zephyr 3.1.99 and @ref qpcpp_7_1_1
 //!
 //! @file
 //! @brief QF/C++ port to Zephyr RTOS kernel, all supported compilers
@@ -170,7 +170,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
          static_cast<std::uint_fast16_t>(k_msgq_num_free_get(&m_eQueue));
 
     bool status;
-    if (margin == QF_NO_MARGIN) {
+    if (margin == QF::NO_MARGIN) {
         if (nFree > 0U) {
             status = true; // can post
         }

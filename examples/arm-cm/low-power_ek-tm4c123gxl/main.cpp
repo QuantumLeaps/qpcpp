@@ -1,7 +1,7 @@
 //============================================================================
 // DPP example
-// Last updated for version 6.4.0
-// Last updated on  2019-02-23
+// Last updated for version 7.1.1
+// Last updated on  2022-09-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -40,17 +40,18 @@ int main() {
     static QP::QSubscrList subscrSto[MAX_PUB_SIG];
 
     static QP::QEvt const *blinky0QueueSto[10]; // queue storage for Blinky0
-#ifdef QXK_HPP // QXK kernel?
+#ifdef QP_INC_QXK_HPP_ // QXK kernel?
     static uint32_t const *xblinky1Stack[64]; // stack for XBlinky1
 #else
     static QP::QEvt const *blinky1QueueSto[10]; // queue storage for Blinky1
-#endif
+#endif // QP_INC_QXK_HPP_
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
 
     BSP_init(); // initialize the BSP
 
-    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
+    // initialize publish-subscribe
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // initialize event pools...
     //QP::QF::poolInit(smlPoolSto,
@@ -61,7 +62,7 @@ int main() {
                       blinky0QueueSto, Q_DIM(blinky0QueueSto),
                       0, 0U, 0);
 
-#ifdef QXK_HPP // QXK kernel?
+#ifdef QP_INC_QXK_HPP_ // QXK kernel?
     XSEM_sw1.init(0U, 1U); /* binary signaling semaphore */
     XT_Blinky1.start(2U,     /* unique QP priority of the AO */
                   0, 0U, /* event queue (not used) */
@@ -72,7 +73,7 @@ int main() {
     AO_Blinky1->start(2U, // priority
                     blinky1QueueSto, Q_DIM(blinky1QueueSto),
                     0, 0U, 0);
-#endif
+#endif // QP_INC_QXK_HPP_
 
     return QP::QF::run(); // run the QF application
 }
