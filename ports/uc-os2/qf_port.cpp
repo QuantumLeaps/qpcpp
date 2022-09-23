@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-28
-//! @version Last updated for: @ref qpcpp_7_1_0
+//! @date Last updated on: 2022-09-22
+//! @version Last updated for: @ref qpcpp_7_1_1
 //!
 //! @file
 //! @brief QF/C++ port to uC-OS2, generic C++11 compiler

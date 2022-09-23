@@ -1,7 +1,7 @@
 //============================================================================
 // DPP example for QXK
-// Last updated for version 7.1.0
-// Last updated on  2022-08-28
+// Last updated for version 7.1.1
+// Last updated on  2022-09-23
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -120,7 +120,7 @@ static void Thread2_run(QP::QXThread * const me) {
     // NOTE: Here the mutex is initialized in the highest-priority thread
     // that uses it. Alternatively, the mutex can be initialized
     // before any thread runs.
-    l_mutex.init(Q_PRIO(N_PHILO + 6U, 6U)); // QF-prio/preempt-thre.
+    l_mutex.init(N_PHILO + 6U); // QF-prio/preempt-thre.
     //l_mutex.init(0U); // alternatively: priority-ceiling NOT used
 
     // initialize the TLS for Thread2

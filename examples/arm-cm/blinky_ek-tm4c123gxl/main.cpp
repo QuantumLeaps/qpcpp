@@ -1,7 +1,7 @@
 //============================================================================
 // Product: Simple Blinky example
-// Last Updated for Version: 7.1.0
-// Date of the Last Update:  2022-08-28
+// Last Updated for Version: 7.1.1
+// Date of the Last Update:  2022-09-23
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -45,7 +45,7 @@ int main() {
     // dynamic event allocation not used, no call to QF::poolInit()
 
     // instantiate and start the active objects...
-    AO_Blinky->start(Q_PRIO(1U, 1U), // QF-priority/preemption-threshold
+    AO_Blinky->start(1U,       // QF-priority/preemption-threshold
                      blinkyQSto, Q_DIM(blinkyQSto), // event queue
                      nullptr, 0U);                // stack (unused)
 

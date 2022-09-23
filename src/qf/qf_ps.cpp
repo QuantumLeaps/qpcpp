@@ -139,7 +139,7 @@ void QActive::publish_(
         QActive *a = registry_[p];
         QF_SCHED_STAT_
 
-        QF_SCHED_LOCK_(a->m_pthre); // lock the scheduler up to threshold
+        QF_SCHED_LOCK_(a->m_prio); // lock the scheduler up to AO's prio
         do { // loop over all subscribers
             // the prio of the AO must be registered with the framework
             Q_ASSERT_ID(210, a != nullptr);

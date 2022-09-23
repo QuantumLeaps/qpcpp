@@ -139,30 +139,31 @@ namespace QP {
 
 //${QF::QActive::register_} ..................................................
 void QActive::register_() noexcept {
-    std::uint_fast8_t const prio = static_cast<std::uint_fast8_t>(m_prio);
-
-    //! @pre the priority of the AO must be in range. Also, the priority
-    //! must not be already in use. QF requires each active object to
-    //! have a **unique** priority.
-    Q_REQUIRE_ID(100, (0U < prio) && (prio <= QF_MAX_ACTIVE)
-                       && (registry_[prio] == nullptr));
-
-    #ifndef Q_NASSERT
-
     if (m_pthre == 0U) { // preemption-threshold not defined?
         m_pthre = m_prio; // apply the default
     }
+
+    #ifndef Q_NASSERT
+
+    //! @pre
+    //! 1. the "QF-priority" of the AO must be in range
+    //! 2. the "QF-priority" must not be already in use (unique priority)
+    //! 3. the "QF-priority" must not exceed the "preemption-threshold"
+    Q_REQUIRE_ID(100, (0U < m_prio) && (m_prio <= QF_MAX_ACTIVE)
+                       && (registry_[m_prio] == nullptr)
+                       && (m_prio <= m_pthre));
+
     std::uint8_t prev_thre = m_pthre;
     std::uint8_t next_thre = m_pthre;
-
     std::uint_fast8_t p;
-    for (p = static_cast<std::uint_fast8_t>(prio) - 1U; p > 0U; --p) {
+
+    for (p = static_cast<std::uint_fast8_t>(m_prio) - 1U; p > 0U; --p) {
         if (registry_[p] != nullptr) {
             prev_thre = registry_[p]->m_pthre;
             break;
         }
     }
-    for (p = static_cast<std::uint_fast8_t>(prio) + 1U;
+    for (p = static_cast<std::uint_fast8_t>(m_prio) + 1U;
          p <= QF_MAX_ACTIVE; ++p)
     {
         if (registry_[p] != nullptr) {
@@ -171,15 +172,16 @@ void QActive::register_() noexcept {
         }
     }
 
-    //! @post The preemption threshold of the AO (me->pthre) must be
-    //! between the threshold of the previous AO and the next AO
-    Q_ENSURE_ID(101, (prev_thre <= m_pthre)
-                      && (m_pthre <= next_thre));
+    //! @post
+    //! 1. the preceding pre-thre must not exceed the preemption-threshold
+    //! 2. the preemption-threshold must not exceed the next pre-thre
+    Q_ENSURE_ID(110, (prev_thre <= m_pthre) && (m_pthre <= next_thre));
     #endif // Q_NASSERT
 
     QF_CRIT_STAT_
     QF_CRIT_E_();
-    registry_[prio] = this;  // registger the active object at this priority
+    // register the AO at the "QF-priority"
+    registry_[m_prio] = this;
     QF_CRIT_X_();
 }
 

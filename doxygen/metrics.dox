@@ -114,9 +114,9 @@
       19      5    127      0      25 QP::QActive::unsubscribeAll@234-258@..\src\qf\qf_ps.cpp
       10      2     59      2      10 QP::QF::bzero@97-106@..\src\qf\qf_qact.cpp
        9      4     65      1      17 QP::QActive::QActive@117-133@..\src\qf\qf_qact.cpp
-      31      9    208      0      44 QP::QActive::register_@141-184@..\src\qf\qf_qact.cpp
-      10      3     72      0      11 QP::QActive::unregister_@192-202@..\src\qf\qf_qact.cpp
-      24      6    158      1      29 QP::QPSet::QF_LOG2@213-241@..\src\qf\qf_qact.cpp
+      30     10    198      0      46 QP::QActive::register_@141-186@..\src\qf\qf_qact.cpp
+      10      3     72      0      11 QP::QActive::unregister_@194-204@..\src\qf\qf_qact.cpp
+      24      6    158      1      29 QP::QPSet::QF_LOG2@215-243@..\src\qf\qf_qact.cpp
        9      1     43      0       9 QP::QEQueue::QEQueue@71-79@..\src\qf\qf_qeq.cpp
       14      2     74      2      14 QP::QEQueue::init@82-95@..\src\qf\qf_qeq.cpp
       57      8    281      3      76 QP::QEQueue::post@98-173@..\src\qf\qf_qeq.cpp
@@ -142,8 +142,8 @@
        3      1      9      0       4 QP::QF::stop@170-173@..\src\qk\qk.cpp
       15      4     63      0      25 QP::QF::run@176-200@..\src\qk\qk.cpp
       25      3    147      6      34 QP::QActive::start@211-244@..\src\qk\qk.cpp
-      15      3     96      0      19 QK_sched_@257-275@..\src\qk\qk.cpp
-      82     21    515      1     132 QK_activate_@278-409@..\src\qk\qk.cpp
+      14      3     79      0      18 QK_sched_@257-274@..\src\qk\qk.cpp
+      80     21    495      1     130 QK_activate_@277-406@..\src\qk\qk.cpp
        7      3     66      0      13 QP::QF::init@83-95@..\src\qv\qv.cpp
        3      1      9      0       4 QP::QF::stop@98-101@..\src\qv\qv.cpp
       38     10    197      0      75 QP::QF::run@104-178@..\src\qv\qv.cpp
@@ -154,10 +154,10 @@
        3      1      9      0       4 QP::QF::stop@181-184@..\src\qxk\qxk.cpp
       15      4     64      0      25 QP::QF::run@187-211@..\src\qxk\qxk.cpp
       26      3    152      6      35 QP::QActive::start@222-256@..\src\qxk\qxk.cpp
-      75     12    422      1      99 QXK_sched_@269-367@..\src\qxk\qxk.cpp
-     104     24    677      1     168 QXK_activate_@370-537@..\src\qxk\qxk.cpp
-      12      2     69      0      18 QXK_current@540-557@..\src\qxk\qxk.cpp
-      14      2    111      0      23 QXK_threadExit_@560-582@..\src\qxk\qxk.cpp
+      74     12    405      1      99 QXK_sched_@269-367@..\src\qxk\qxk.cpp
+     102     24    664      1     164 QXK_activate_@370-533@..\src\qxk\qxk.cpp
+      12      2     69      0      18 QXK_current@536-553@..\src\qxk\qxk.cpp
+      14      2    111      0      23 QXK_threadExit_@556-578@..\src\qxk\qxk.cpp
        3      1     15      0       3 QP::QXMutex::QXMutex@76-78@..\src\qxk\qxk_mutex.cpp
        7      2     52      1       8 QP::QXMutex::init@81-88@..\src\qxk\qxk_mutex.cpp
       61      9    422      0      95 QP::QXMutex::tryLock@91-185@..\src\qxk\qxk_mutex.cpp
@@ -209,13 +209,13 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
     160      19.6     3.3      137.1         7     ..\src\qf\qf_dyn.cpp
     119      21.6     2.6      120.6         5     ..\src\qf\qf_mem.cpp
     127      20.4     4.4      125.0         5     ..\src\qf\qf_ps.cpp
-    118      16.8     4.8      112.4         5     ..\src\qf\qf_qact.cpp
+    117      16.6     5.0      110.4         5     ..\src\qf\qf_qact.cpp
     163      30.4     4.0      152.4         5     ..\src\qf\qf_qeq.cpp
      33       4.5     1.0       30.0         6     ..\src\qf\qf_qmact.cpp
     233      27.6     4.1      157.1         8     ..\src\qf\qf_time.cpp
-    214      24.0     5.1      147.9         8     ..\src\qk\qk.cpp
+    211      23.6     5.1      143.2         8     ..\src\qk\qk.cpp
      85      16.5     3.8       96.5         4     ..\src\qv\qv.cpp
-    328      30.6     5.8      192.6        10     ..\src\qxk\qxk.cpp
+    325      30.3     5.8      189.6        10     ..\src\qxk\qxk.cpp
     240      45.8     7.0      333.8         5     ..\src\qxk\qxk_mutex.cpp
     142      32.8     4.5      197.0         4     ..\src\qxk\qxk_sema.cpp
     306      21.1     3.4      128.5        14     ..\src\qxk\qxk_xthr.cpp
@@ -226,11 +226,11 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
   NLOC    CCN   token  PARAM  length  location
 ------------------------------------------------
      116     21    658      2     168 QP::QMsm::dispatch@119-286@..\src\qf\qep_msm.cpp
-      82     21    515      1     132 QK_activate_@278-409@..\src\qk\qk.cpp
-     104     24    677      1     168 QXK_activate_@370-537@..\src\qxk\qxk.cpp
+      80     21    495      1     130 QK_activate_@277-406@..\src\qk\qk.cpp
+     102     24    664      1     164 QXK_activate_@370-533@..\src\qxk\qxk.cpp
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
-      4530      18.3     3.2      108.5      176            3      0.02    0.09
+      4523      18.2     3.2      108.0      176            3      0.02    0.09
 @endcode
 */
