@@ -1,13 +1,13 @@
 //============================================================================
 // DPP example
-// Last updated for: @qpcpp_7_0_0
-// Last updated on  2022-02-28
+// Last updated for version 7.1.2
+// Last updated on  2022-10-05
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -54,14 +54,18 @@ int main() {
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
-            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-            nullptr, 0U);
+        DPP::AO_Philo[n]->start(
+            Q_PRIO(n + 1U, N_PHILO), // QF-prio/preempt-thre.
+            philoQueueSto[n],        // event queue storage
+            Q_DIM(philoQueueSto[n]), // queue length [events]
+            nullptr, 0U);            // no stack storage
     }
 
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 1U), // priority
-        tableQueueSto, Q_DIM(tableQueueSto),
-        nullptr, 0U);
+    DPP::AO_Table->start(
+            N_PHILO + 1U,            // QF-prio/preempt-thre.
+            tableQueueSto,           // event queue storage
+            Q_DIM(tableQueueSto),    // queue length [events]
+            nullptr, 0U);            // no stack storage
 
     return QP::QF::run(); // run the QF application
 }

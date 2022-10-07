@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-09-04
-//! @version Last updated for: @ref qpcpp_7_1_1
+//! @date Last updated on: 2022-10-04
+//! @version Last updated for: @ref qpcpp_7_1_2
 //!
 //! @file
 //! @brief QK/C++ port to PIC32, preemptive QK kernel, XC32 toolchain
@@ -49,7 +49,7 @@ void QK_isr_(void) { // see NOTE2
 
     QF_INT_DISABLE();
     _mtc0(_CP0_STATUS, _CP0_STATUS_SELECT, 0U); // drop IPL to 0
-    (void)QK_activate_(1U);  // asynchronously activate higher priority AO
+    (void)QK_activate_();  // asynchronously activate higher priority AO
     _mtc0(_CP0_STATUS, _CP0_STATUS_SELECT, 1U << 10); //restore IPL to 1
     QF_INT_ENABLE();
 }

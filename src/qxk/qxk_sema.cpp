@@ -125,7 +125,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
 
         // remember the blocking object (this semaphore)
         curr->m_temp.obj = QXK_PTR_CAST_(QMState*, this);
-        curr->teArm_(static_cast<enum_t>(QXK::SEMA_SIG), nTicks);
+        curr->teArm_(static_cast<enum_t>(QXK::TIMEOUT_SIG), nTicks);
 
         QS_BEGIN_NOCRIT_PRE_(QS_SEM_BLOCK, curr->m_prio)
             QS_TIME_PRE_();  // timestamp
@@ -134,7 +134,7 @@ bool QXSemaphore::wait(std::uint_fast16_t const nTicks) noexcept {
         QS_END_NOCRIT_PRE_()
 
         // schedule the next thread if multitasking started
-        static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
+        static_cast<void>(QXK_sched_()); // synchronous scheduling
         QF_CRIT_X_();
         QF_CRIT_EXIT_NOP(); // BLOCK here !!!
 
@@ -260,7 +260,7 @@ bool QXSemaphore::signal() noexcept {
             QS_END_NOCRIT_PRE_()
 
             if (!QXK_ISR_CONTEXT_()) { // not inside ISR?
-                static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
+                static_cast<void>(QXK_sched_()); // synchronous scheduling
             }
         }
     }

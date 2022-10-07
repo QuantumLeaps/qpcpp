@@ -1,11 +1,11 @@
 //============================================================================
 // DPP example
-// Last updated for version 6.0.4
-// Last updated on  2018-01-07
+// Last updated for version 7.1.2
+// Last updated on  2022-10-05
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
@@ -64,19 +64,24 @@ int main() {
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
-            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-            nullptr, 0U);
+        DPP::AO_Philo[n]->start(
+            Q_PRIO(n + 1U, N_PHILO), // QF-prio/preempt-thre.
+            philoQueueSto[n],        // event queue storage
+            Q_DIM(philoQueueSto[n]), // queue length [events]
+            nullptr, 0U);            // no stack storage
     }
 
     // example of prioritizing the Ticker0 active object
-    DPP::the_Ticker0->start((uint_fast8_t)(N_PHILO + 1U), // priority
+    DPP::the_Ticker0->start(
+        N_PHILO + 1U, // priority
         (QP::QEvt const **)0, 0U,
         nullptr, 0U);
 
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 2U), // priority
-        tableQueueSto, Q_DIM(tableQueueSto),
-        nullptr, 0U);
+    DPP::AO_Table->start(
+            N_PHILO + 2U,            // QF-prio/preempt-thre.
+            tableQueueSto,           // event queue storage
+            Q_DIM(tableQueueSto),    // queue length [events]
+            nullptr, 0U);            // no stack storage
 
     return QP::QF::run(); // run the QF application
 }

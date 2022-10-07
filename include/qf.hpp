@@ -201,7 +201,7 @@ using QTimeEvtCtr = std::uint32_t;
 //! When QP runs on top of 3rd-party kernels/RTOSes or general-purpose
 //! operating systems, sthe second priority can have different meaning,
 //! depending on the specific RTOS/GPOS used.
-using QPrioSpec = std::uint_fast16_t;
+using QPrioSpec = std::uint16_t;
 
 //${QF-types::QSchedStatus} ..................................................
 //! The scheduler lock status used in some real-time kernels

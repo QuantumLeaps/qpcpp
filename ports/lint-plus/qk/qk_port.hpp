@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-09-04
-//! @version Last updated for: @ref qpcpp_7_1_1
+//! @date Last updated on: 2022-10-04
+//! @version Last updated for: @ref qpcpp_7_1_2
 //!
 //! @file
 //! @brief QK/C++ port to Lint, Generic C++ compiler
@@ -60,7 +60,7 @@
     --QP::QF::intNest_;          \
     if (QP::QF::intNest_ == 0U) {\
         if (QK_sched_() != 0U) { \
-            QK_activate_(1U);    \
+            QK_activate_();      \
         }                        \
     }                            \
     else {                       \

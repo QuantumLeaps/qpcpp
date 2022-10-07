@@ -205,7 +205,7 @@ enum QSpyPre : std::int8_t {
     QS_SCHED_UNLOCK,      //!< scheduler was unlocked
     QS_SCHED_NEXT,        //!< scheduler found next task to execute
     QS_SCHED_IDLE,        //!< scheduler became idle
-    QS_SCHED_RESUME,      //!< scheduler resumed previous task (not idle)
+    QS_SCHED_RESUME,      //!< scheduler resumed a (blocked) task
 
     // [55] Additional QEP records
     QS_QEP_TRAN_HIST,     //!< a tran to history was taken

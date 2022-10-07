@@ -1,7 +1,7 @@
 //============================================================================
 // Product: BSP for system-testing QXK
-// Last updated for version 7.1.1
-// Last updated on  2022-09-04
+// Last updated for version 7.1.2
+// Last updated on  2022-10-06
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -36,12 +36,11 @@
 
 namespace BSP {
 
-enum { TICKS_PER_SEC = 100 };
-
 void init(void);
 void terminate(int16_t const result);
 
 // for testing...
+void trace(QP::QActive const *thr, char const *msg);
 void wait4PB1(void);
 void ledOn(void);
 void ledOff(void);
@@ -50,11 +49,12 @@ void trigISR(void);
 } // namespace BSP
 
 enum TestSignals {
-    TEST_SIG = QP::Q_USER_SIG,
+    TEST0_SIG = QP::Q_USER_SIG,
+    TEST1_SIG,
+    TEST2_SIG,
+    TEST3_SIG,
     MAX_PUB_SIG,    // the last published signal
 
-    TIMEOUT_SIG,
-    TRIG_SIG,
     MAX_SIG         // the last signal
 };
 

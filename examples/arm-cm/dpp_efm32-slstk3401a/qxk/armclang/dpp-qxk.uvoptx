@@ -152,9 +152,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>355</LineNumber>
+          <LineNumber>362</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>2142</Address>
+          <Address>2144</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -163,39 +163,23 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\bsp.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\dpp_qxk\../bsp.cpp\355</Expression>
+          <Expression>\\dpp_qxk\../bsp.cpp\362</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>292</LineNumber>
+          <LineNumber>355</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>7064</Address>
+          <Address>0</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\src\qf\qf_time.cpp</Filename>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\bsp.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\dpp_qxk\../../../../../src/qf/qf_time.cpp\292</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>112</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>6920</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\src\qf\qf_time.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\dpp_qxk\../../../../../src/qf/qf_time.cpp\112</Expression>
+          <Expression></Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -753,7 +737,7 @@
 
   <Group>
     <GroupName>QP</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

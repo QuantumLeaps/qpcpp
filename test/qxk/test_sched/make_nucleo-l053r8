@@ -1,7 +1,7 @@
 ##############################################################################
-# Product: Makefile for SYSTEM-Level tests of QP/C++ on NUCLEO-L053R8, GNU-ARM
-# Last Updated for Version: 7.1.1
-# Date of the Last Update:  2022-09-05
+# Product: Makefile for SYSTEM-Level tests of QP/C on NUCLEO-L053R8, GNU-ARM
+# Last Updated for Version: 7.1.2
+# Date of the Last Update:  2022-10-05
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -38,6 +38,7 @@
 # make -f make_nucleo-l053r8 HOST=localhost:7705 # connect to host:port
 # make -f make_nucleo-l053r8 norun   # only make but not run the tests
 # make -f make_nucleo-l053r8 clean   # cleanup the build
+# make -f make_nucleo-l053r8 debug   # only run tests in DEBUG mode
 #
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
@@ -53,7 +54,7 @@ endif
 #-----------------------------------------------------------------------------
 # project name, target name, target directory:
 #
-PROJECT := test_pts
+PROJECT := test_sched
 TARGET  := nucleo-l053r8
 TARGET_DIR := $(QPCPP)/3rd_party/nucleo-l053r8/qutest
 
@@ -62,7 +63,7 @@ TARGET_DIR := $(QPCPP)/3rd_party/nucleo-l053r8/qutest
 #
 
 # QP port used in this project
-QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qk/gnu
+QP_PORT_DIR := $(QPCPP)/ports/arm-cm/qxk/gnu
 
 # make sure that QTOOLS env. variable is defined...
 ifeq ("$(wildcard $(QTOOLS))","")
@@ -72,9 +73,8 @@ endif
 
 # list of all source directories used by this project
 VPATH := . \
-	../src \
 	$(QPCPP)/src/qf \
-	$(QPCPP)/src/qk \
+	$(QPCPP)/src/qxk \
 	$(QPCPP)/src/qs \
 	$(QP_PORT_DIR) \
 	$(TARGET_DIR) \
@@ -83,7 +83,6 @@ VPATH := . \
 
 # list of all include directories needed by this project
 INCLUDES  = -I. \
-	-I../src \
 	-I$(QPCPP)/include \
 	-I$(QP_PORT_DIR) \
 	-I$(TARGET_DIR) \
@@ -104,7 +103,7 @@ C_SRCS := \
 
 # C++ source files
 CPP_SRCS := \
-	test_pts.cpp \
+	test_sched.cpp \
 	bsp_l053r8.cpp
 
 OUTPUT    := $(PROJECT)
@@ -123,8 +122,11 @@ QP_SRCS := \
 	qf_qeq.cpp \
 	qf_qmact.cpp \
 	qf_time.cpp \
-	qk.cpp \
-	qk_port.cpp \
+	qxk.cpp \
+	qxk_xthr.cpp \
+	qxk_sema.cpp \
+	qxk_mutex.cpp \
+	qxk_port.cpp \
 	qs.cpp \
 	qs_64bit.cpp \
 	qs_rx.cpp \
@@ -138,7 +140,8 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   :=
+DEFINES   := \
+	-DQXK_ON_CONTEXT_SW
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -247,7 +250,7 @@ endif
 # rules
 #
 
-.PHONY : run norun flash
+.PHONY : run norun debug flash
 
 ifeq ($(MAKECMDGOALS),norun)
 all : $(TARGET_BIN)
@@ -286,14 +289,22 @@ $(BIN_DIR)/%.o : %.c
 $(BIN_DIR)/%.o : %.cpp
 	$(CPP) $(CPPFLAGS) $< -o $@
 
-.PHONY : clean show
-
-# include dependency files only if our goal depends on their existence
+# create BIN_DIR and include dependencies only if needed
 ifneq ($(MAKECMDGOALS),clean)
   ifneq ($(MAKECMDGOALS),show)
+     ifneq ($(MAKECMDGOALS),debug)
+ifeq ("$(wildcard $(BIN_DIR))","")
+$(shell $(MKDIR) $(BIN_DIR))
+endif
 -include $(C_DEPS_EXT) $(CPP_DEPS_EXT)
+     endif
   endif
 endif
+
+debug :
+	$(QUTEST) $(TESTS) DEBUG $(HOST)
+
+.PHONY : clean show
 
 clean :
 	-$(RM) $(BIN_DIR)/*.o \
@@ -323,6 +334,5 @@ show :
 	@echo QTOOLS       = $(QTOOLS)
 	@echo HOST         = $(HOST)
 	@echo QUTEST       = $(QUTEST)
-	@echo FLASH        = $(FLASH)
 	@echo TESTS        = $(TESTS)
 

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for SYSTEM-Level tests of QP/C++ on EMF32, GNU-ARM
-# Last Updated for Version: 7.1.1
-# Date of the Last Update:  2022-09-05
+# Last Updated for Version: 7.1.2
+# Date of the Last Update:  2022-10-05
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -38,6 +38,7 @@
 # make -f make_efm32 HOST=localhost:7705 # connect to host:port
 # make -f make_efm32 norun   # only make but not run the tests
 # make -f make_efm32 clean   # cleanup the build
+# make -f make_efm32 debug   # only run tests in DEBUG mode
 #
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
@@ -53,7 +54,7 @@ endif
 #-----------------------------------------------------------------------------
 # project name, target name, target directory:
 #
-PROJECT := test_xthr
+PROJECT := test_sched
 TARGET  := efm32
 TARGET_DIR := $(QPCPP)/3rd_party/efm32pg1b/qutest
 
@@ -72,7 +73,6 @@ endif
 
 # list of all source directories used by this project
 VPATH := . \
-	../src \
 	$(QPCPP)/src/qf \
 	$(QPCPP)/src/qxk \
 	$(QPCPP)/src/qs \
@@ -83,7 +83,6 @@ VPATH := . \
 
 # list of all include directories needed by this project
 INCLUDES  = -I. \
-	-I../src \
 	-I$(QPCPP)/include \
 	-I$(QP_PORT_DIR) \
 	-I$(TARGET_DIR) \
@@ -108,7 +107,7 @@ C_SRCS := \
 
 # C++ source files
 CPP_SRCS := \
-	test_xthr.cpp \
+	test_sched.cpp \
 	bsp_efm32.cpp
 
 OUTPUT    := $(PROJECT)
@@ -145,7 +144,8 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DEFM32PG1B200F256GM48=1
+DEFINES   := -DEFM32PG1B200F256GM48=1 \
+	-DQXK_ON_CONTEXT_SW
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -250,7 +250,7 @@ endif
 # rules
 #
 
-.PHONY : run norun flash
+.PHONY : run norun debug flash
 
 ifeq ($(MAKECMDGOALS),norun)
 all : $(TARGET_BIN)
@@ -288,14 +288,22 @@ $(BIN_DIR)/%.o : %.c
 $(BIN_DIR)/%.o : %.cpp
 	$(CPP) $(CPPFLAGS) $< -o $@
 
-.PHONY : clean show
-
-# include dependency files only if our goal depends on their existence
+# create BIN_DIR and include dependencies only if needed
 ifneq ($(MAKECMDGOALS),clean)
   ifneq ($(MAKECMDGOALS),show)
+     ifneq ($(MAKECMDGOALS),debug)
+ifeq ("$(wildcard $(BIN_DIR))","")
+$(shell $(MKDIR) $(BIN_DIR))
+endif
 -include $(C_DEPS_EXT) $(CPP_DEPS_EXT)
+     endif
   endif
 endif
+
+debug :
+	$(QUTEST) $(TESTS) DEBUG $(HOST)
+
+.PHONY : clean show
 
 clean :
 	-$(RM) $(BIN_DIR)/*.o \

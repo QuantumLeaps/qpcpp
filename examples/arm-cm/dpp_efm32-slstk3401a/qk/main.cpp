@@ -1,11 +1,11 @@
 //============================================================================
 // DPP example
-// Last updated for version 7.1.1
-// Last updated on  2022-09-23
+// Last updated for version 7.1.2
+// Last updated on  2022-10-05
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
@@ -65,11 +65,11 @@ int main() {
     }
 
     // example of prioritizing the Ticker0 active object
-    DPP::the_Ticker0->start(Q_PRIO(N_PHILO + 1U, 2U), // priority
+    DPP::the_Ticker0->start(N_PHILO + 1U, // priority
                             0, 0, 0, 0);
 
     DPP::AO_Table->start(
-            (N_PHILO + 2U,           // QF-prio/preempt-thre.
+            N_PHILO + 2U,            // QF-prio/preempt-thre.
             tableQueueSto,           // event queue storage
             Q_DIM(tableQueueSto),    // queue length [events]
             nullptr, 0U);            // no stack storage

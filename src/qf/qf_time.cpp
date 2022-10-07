@@ -85,7 +85,7 @@ QTimeEvt::QTimeEvt(
     m_interval(0U)
 {
     //! @pre The signal must be valid and the tick rate in range
-    Q_REQUIRE_ID(300, (sgnl >= Q_USER_SIG)
+    Q_REQUIRE_ID(300, (sgnl != 0)
                       && (tickRate < QF_MAX_TICK_RATE));
 
     #ifndef Q_EVT_CTOR

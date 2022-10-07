@@ -163,10 +163,10 @@ QEvt const * QXThread::queueGet(std::uint_fast16_t const nTicks) noexcept {
         // remember the blocking object (the thread's queue)
         thr->m_temp.obj = QXK_PTR_CAST_(QMState*, &thr->m_eQueue);
 
-        thr->teArm_(static_cast<enum_t>(QXK::QUEUE_SIG), nTicks);
+        thr->teArm_(static_cast<enum_t>(QXK::TIMEOUT_SIG), nTicks);
         QF::readySet_.remove(
                            static_cast<std::uint_fast8_t>(thr->m_prio));
-        static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
+        static_cast<void>(QXK_sched_()); // synchronous scheduling
         QF_CRIT_X_();
         QF_CRIT_EXIT_NOP(); // BLOCK here
 
@@ -269,10 +269,13 @@ void QXThread::start(
     //! - NOT be called from an ISR;
     //! - the stack storage must be provided;
     //! - the thread must be instantiated (see #QXThread).
+    //! - preemption-threshold is NOT provided (because QXK kernel
+    //!   does not support preemption-threshold scheduling)
     Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_())
         && (stkSto != nullptr)
         && (stkSize != 0U)
-        && (m_state.act == nullptr));
+        && (m_state.act == nullptr)
+        && ((prioSpec & 0xFF00U) == 0U));
 
     // is storage for the queue buffer provided?
     if (qSto != nullptr) {
@@ -284,7 +287,7 @@ void QXThread::start(
     QXK_stackInit_(this, m_temp.thr, stkSto, stkSize);
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); //  QF-prio.
-    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
+    m_pthre = 0U; // preemption-threshold NOT used
     register_(); // make QF aware of this AO
 
     // the new thread is not blocked on any object
@@ -296,7 +299,9 @@ void QXThread::start(
     QF::readySet_.insert(static_cast<std::uint_fast8_t>(m_prio));
 
     // see if this thread needs to be scheduled in case QXK is running
-    static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
+    if (QXK_attr_.lockCeil <= QF_MAX_ACTIVE) {
+        static_cast<void>(QXK_sched_()); // synchronous scheduling
+    }
     QF_CRIT_X_();
 }
 
@@ -386,7 +391,7 @@ bool QXThread::post_(
                     QF::readySet_.insert(
                         static_cast<std::uint_fast8_t>(m_prio));
                     if (!QXK_ISR_CONTEXT_()) {
-                        static_cast<void>(QXK_sched_(0U));
+                        static_cast<void>(QXK_sched_());
                     }
                 }
             }
@@ -446,7 +451,7 @@ void QXThread::block_() const noexcept {
     //! @pre the thread holding the lock cannot block!
     Q_REQUIRE_ID(600, (QXK_attr_.lockHolder != m_prio));
     QF::readySet_.remove(static_cast<std::uint_fast8_t>(m_prio));
-    static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
+    static_cast<void>(QXK_sched_()); // synchronous scheduling
 }
 
 //${QXK::QXThread::unblock_} .................................................
@@ -456,7 +461,7 @@ void QXThread::unblock_() const noexcept {
     if ((!QXK_ISR_CONTEXT_()) // not inside ISR?
         && (QActive::registry_[0] != nullptr)) // kernel started?
     {
-        static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
+        static_cast<void>(QXK_sched_()); // synchronous scheduling
     }
 }
 

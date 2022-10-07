@@ -145,10 +145,8 @@ void schedUnlock(QSchedStatus const stat) noexcept;
 //${QXK::QXK-base::Timeouts} .................................................
 //! timeout signals for extended threads
 enum Timeouts : enum_t {
-    DELAY_SIG = Q_USER_SIG,
-    QUEUE_SIG,
-    SEMA_SIG,
-    MUTEX_SIG
+    DELAY_SIG = 1,
+    TIMEOUT_SIG
 };
 
 } // namespace QXK
@@ -600,15 +598,9 @@ public:
     //! the priority and priority-threshold of the holding thread to the
     //! priority specification in `prioSpec` (see QP::QPrioSpec).
     //!
-    //! @attention
-    //! When the priority-ceiling protocol is used (`prioSpec != 0`), the
-    //! QF-priority specified in `prioSpec` must be unused by any other thread
-    //! or mutex. Also, the priority-threshold must be higher or equal to the
-    //! threshold of any thread that uses this mutex (see QP::QPrioSpec).
-    //!
     //! @usage
     //! @include qxk_mutex.cpp
-    void init(QPrioSpec const prioSpec) noexcept override;
+    void init(QPrioSpec const prioSpec) noexcept;
 
     //! try to lock the QXK priority-ceiling mutex QP::QXMutex
     //!
@@ -684,8 +676,8 @@ extern "C" {
 struct QXK_Attr {
     QP::QActive * volatile curr;      //!< currently executing thread
     QP::QActive * volatile next;      //!< next thread to execute
-    std::uint8_t volatile actPrio;    //!< prio of the active AO
-    std::uint8_t volatile actThre;    //!< active preemption-threshold
+    QP::QActive * volatile prev;      //!< previous thread
+    std::uint8_t volatile actPrio;    //!< QF-prio of the active AO
     std::uint8_t volatile lockCeil;   //!< lock preemption-ceiling (0==no-lock)
     std::uint8_t volatile lockHolder; //!< prio of the lock holder
 };
@@ -697,9 +689,6 @@ extern QXK_Attr QXK_attr_;
 //${QXK-extern-C::QXK_sched_} ................................................
 //! QXK scheduler finds the highest-priority thread ready to run
 //!
-//! @param[in]   asynch     flag conveying the type of scheduling:
-//!                         != 0 for asynchronous scheduling and
-//!                         == 0 for synchronous scheduling
 //! @details
 //! The QXK scheduler finds the priority of the highest-priority thread
 //! that is ready to run.
@@ -710,15 +699,12 @@ extern QXK_Attr QXK_attr_;
 //! @attention
 //! QXK_sched_() must be always called with interrupts **disabled** and
 //! returns with interrupts **disabled**.
-std::uint_fast8_t QXK_sched_(std::uint_fast8_t const asynch) noexcept;
+std::uint_fast8_t QXK_sched_() noexcept;
 
 //${QXK-extern-C::QXK_activate_} .............................................
 //! QXK activator activates the next active object. The activated AO preempts
 //! the currently executing AOs
 //!
-//! @param[in]   asynch     flag conveying the type of activation:
-//!                         != 0 for asynchronous activation and
-//!                         == 0 for synchronous activation
 //! @attention
 //! QXK_activate_() must be always called with interrupts **disabled** and
 //! returns with interrupts **disabled**.
@@ -726,10 +712,13 @@ std::uint_fast8_t QXK_sched_(std::uint_fast8_t const asynch) noexcept;
 //! @note
 //! The activate function might enable interrupts internally, but it always
 //! returns with interrupts **disabled**.
-void QXK_activate_(std::uint_fast8_t const asynch) noexcept;
+void QXK_activate_() noexcept;
 
 //${QXK-extern-C::QXK_current} ...............................................
-//! return the currently executing active-object/thread
+//! obtain the currently executing active-object/thread
+//!
+//! @returns
+//! pointer to the currently executing active-object/thread
 QP::QActive * QXK_current() noexcept;
 
 //${QXK-extern-C::QXK_stackInit_} ............................................
@@ -739,6 +728,22 @@ void QXK_stackInit_(
      QP::QXThreadHandler const handler,
     void * const stkSto,
     std::uint_fast16_t const stkSize) noexcept;
+
+//${QXK-extern-C::QXK_contextSw} .............................................
+#if defined(Q_SPY) || defined(QXK_ON_CONTEXT_SW)
+//! QXK context switch management
+//!
+//! @details
+//! This function performs software tracing (if #Q_SPY is defined)
+//! and calls QXK_onContextSw() (if #QXK_ON_CONTEXT_SW is defined)
+//!
+//! @param[in] next  pointer to the next thread (NULL for basic-thread)
+//!
+//! @attention
+//! QXK_contextSw() is invoked with interrupts **disabled** and must also
+//! return with interrupts **disabled**.
+void QXK_contextSw(QP::QActive * const next);
+#endif //  defined(Q_SPY) || defined(QXK_ON_CONTEXT_SW)
 
 //${QXK-extern-C::QXK_onContextSw} ...........................................
 #ifdef QXK_ON_CONTEXT_SW
@@ -856,8 +861,8 @@ void QXK_threadExit_();
     QF::readySet_.insert( \
         static_cast<std::uint_fast8_t>((me_)->m_prio)); \
     if (!QXK_ISR_CONTEXT_()) { \
-        if (QXK_sched_(0U) != 0U) { \
-            QXK_activate_(0U); \
+        if (QXK_sched_() != 0U) { \
+            QXK_activate_(); \
         } \
     } \
 } while (false)

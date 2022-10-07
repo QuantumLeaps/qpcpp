@@ -1,13 +1,13 @@
 //============================================================================
-// System test fixture for QK kernel on the EFM32 target
-// Last updated for version 7.1.1
-// Last updated on  2022-09-05
+// Product: System test fixture for QK on the EFM32 target
+// Last updated for version 7.1.2
+// Last updated on  2022-10-06
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -34,17 +34,18 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-namespace { // unnamed namespace
-
 Q_DEFINE_THIS_FILE
 
-enum { NumB = 3 };
+namespace {
+//============================================================================
+// AO ObjB
+enum { NUM_B = 3 };
 
 //............................................................................
 // AO ObjB
 class ObjB : public QP::QActive {
 public:
-    static ObjB inst[NumB];
+    static ObjB inst[NUM_B];
 
 public:
     ObjB() : QActive(&initial) {}
@@ -55,28 +56,37 @@ protected:
 }; // class ObjB
 
 Q_STATE_DEF(ObjB, initial) {
-    for (std::uint8_t n = 0U; n < NumB; ++n) {
-        QS_OBJ_ARR_DICTIONARY(&ObjB::inst[n], n);
+    static bool registered = false; // starts off with 0, per C-standard
+    if (!registered) {
+        registered = true;
+        QS_FUN_DICTIONARY(&ObjB::initial);
+        QS_FUN_DICTIONARY(&ObjB::active);
     }
-    QS_FUN_DICTIONARY(&ObjB::initial);
-    QS_FUN_DICTIONARY(&ObjB::active);
-
+    subscribe(TEST1_SIG);
+    subscribe(TEST2_SIG);
     return tran(&active);
 }
 
 Q_STATE_DEF(ObjB, active) {
     QP::QState status_;
     switch (e->sig) {
-        case Q_ENTRY_SIG: {
-            status_ = Q_RET_HANDLED;
-            break;
-        }
-        case TRIG_SIG: {
+        case TEST0_SIG: {
+            BSP::trace(this, "TEST0 1of2");
             BSP::trigISR();
+            BSP::trace(this, "TEST0 2of2");
             status_ = Q_RET_HANDLED;
             break;
         }
-        case TEST_SIG: {
+        case TEST1_SIG: {
+            static QP::QEvt const t2 = { TEST2_SIG, 0U, 0U };
+            BSP::trace(this, "TEST1 1of2");
+            QActive::PUBLISH(&t2, this);
+            BSP::trace(this, "TEST1 2of2");
+            status_ = Q_RET_HANDLED;
+            break;
+        }
+        case TEST2_SIG: {
+            BSP::trace(this, "TEST2 1of1");
             status_ = Q_RET_HANDLED;
             break;
         }
@@ -87,111 +97,57 @@ Q_STATE_DEF(ObjB, active) {
     }
     return status_;
 }
-//............................................................................
-// AO ObjA
-class ObjA : public QP::QActive {
-public:
-    static ObjA inst;
 
-public:
-    ObjA() : QActive(&initial) {}
-
-protected:
-    Q_STATE_DECL(initial);
-    Q_STATE_DECL(active);
-}; // class ObjA
-
-Q_STATE_DEF(ObjA, initial) {
-    subscribe(TEST_SIG);
-
-    QS_OBJ_DICTIONARY(&ObjA::inst);
-    QS_FUN_DICTIONARY(&ObjA::initial);
-    QS_FUN_DICTIONARY(&ObjA::active);
-
-    return tran(&active);
-}
-
-Q_STATE_DEF(ObjA, active) {
-    QP::QState status_;
-    switch (e->sig) {
-        case Q_ENTRY_SIG: {
-            status_ = Q_RET_HANDLED;
-            break;
-        }
-        case TRIG_SIG: {
-            BSP::trigISR();
-            status_ = Q_RET_HANDLED;
-            break;
-        }
-        case TEST_SIG: {
-            static QP::QEvt const tste = { TEST_SIG, 0U, 0U };
-            BSP::ledOn();
-            ObjB::inst[2].POST(&tste, this);
-            ObjB::inst[1].POST(&tste, this);
-            ObjB::inst[0].POST(&tste, this);
-            BSP::ledOff();
-            status_ = Q_RET_HANDLED;
-            break;
-        }
-        default: {
-            status_ = super(&top);
-            break;
-        }
-    }
-    return status_;
-}
+ObjB ObjB::inst[NUM_B];
 
 } // unnamed namespace
 
 //============================================================================
-ObjB ObjB::inst[NumB];
-ObjA ObjA::inst;
-
 int main() {
-    QP::QF::init(); // initialize the framework and the underlying QXK kernel
+
+    QP::QF::init();  // initialize the framework and the underlying QXK kernel
     BSP::init(); // initialize the Board Support Package
-
-    // dictionaries
-    QS_FUN_DICTIONARY(&QP::QHsm::top);
-    QS_SIG_DICTIONARY(TEST_SIG, nullptr);
-    QS_SIG_DICTIONARY(TRIG_SIG, nullptr);
-
-    static std::uint16_t pspec[NumB + 1] = {
-        Q_PRIO(1U, 0U),
-        Q_PRIO(2U, 0U),
-        Q_PRIO(3U, 0U),
-        Q_PRIO(4U, 0U)
-    };
-    QS_OBJ_DICTIONARY(pspec);
 
     // initialize publish-subscribe...
     static QP::QSubscrList subscrSto[MAX_PUB_SIG];
-    QP::QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // initialize event pools...
     static QF_MPOOL_EL(QP::QEvt) smlPoolSto[10]; // small pool
     QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
-    // pause execution of the test and wait for the test script to continue
-    QS_TEST_PAUSE();
+    // dictionaries
+    QS_SIG_DICTIONARY(TEST0_SIG,   nullptr);
+    QS_SIG_DICTIONARY(TEST1_SIG,   nullptr);
+    QS_SIG_DICTIONARY(TEST2_SIG,   nullptr);
+    QS_SIG_DICTIONARY(TEST3_SIG,   nullptr);
 
-    static QP::QEvt const *aoB_queueSto[NumB][5];
-    for (std::uint8_t n = 0U; n < NumB; ++n) {
-        ObjB::inst[n].start(
-            pspec[n],                 // QP priority spec
-            aoB_queueSto[n],          // event queue storage
-            Q_DIM(aoB_queueSto[n]),   // event length [events]
-            nullptr,                  // no stack storage
-            0U);                      // zero stack size [bytes]
+    // priority specifications for ObjBs...
+    static QP::QPrioSpec pspecB[NUM_B];
+    QS_OBJ_DICTIONARY(pspecB);
+
+    std::uint8_t n;
+
+    for (n = 0U; n < NUM_B; ++n) {
+        QS_OBJ_ARR_DICTIONARY(&ObjB::inst[n], n);
     }
 
-    static QP::QEvt const *aoA_queueSto[5];
-    ObjA::inst.start(
-        pspec[NumB],             // QP priority spec
-        aoA_queueSto,            // event queue storage
-        Q_DIM(aoA_queueSto),     // event length [events]
-        nullptr,                 // no stack storage
-        0U);                     // zero stack size [bytes]
+    // pause execution of the test and wait for the test script to continue
+    // NOTE:
+    // this pause gives the test-script a chance to poke pspecB and pspecX
+    // variables to start the threads with the desired prio-specifications.
+    QS_TEST_PAUSE();
+
+    static QP::QEvt const *aoB_queueSto[NUM_B][5];
+    for (n = 0U; n < NUM_B; ++n) {
+        if (pspecB[n] != 0U) {
+            ObjB::inst[n].start(pspecB[n],        // QF-prio/p-thre.
+                         aoB_queueSto[n],         // event queue storage
+                         Q_DIM(aoB_queueSto[n]),  // event length [events]
+                         nullptr,                 // no stack storage
+                         0U);                     // zero stack size [bytes]
+        }
+    }
 
     return QP::QF::run(); // run the QF application
 }
@@ -199,7 +155,6 @@ int main() {
 //============================================================================
 namespace QP {
 
-//............................................................................
 void QS::onTestSetup(void) {
 }
 //............................................................................
@@ -215,18 +170,16 @@ void QS::onCommand(uint8_t cmdId,
     Q_UNUSED_PAR(param2);
     Q_UNUSED_PAR(param3);
 }
-//............................................................................
+
+//============================================================================
 //! Host callback function to "massage" the event, if necessary
 void QS::onTestEvt(QEvt *e) {
-    Q_UNUSED_PAR(e);
+    (void)e;
 }
 //............................................................................
 //! callback function to output the posted QP events (not used here)
 void QS::onTestPost(void const *sender, QActive *recipient,
                    QEvt const *e, bool status)
-{
-    Q_UNUSED_PAR(sender);
-    Q_UNUSED_PAR(status);
-}
+{}
 
 } // namespace QP

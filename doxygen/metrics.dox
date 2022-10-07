@@ -66,8 +66,8 @@
       14      3     70      1      14 QP::QS::rxPut@805-818@..\include\qs.hpp
        9      1     49      5       9 QP::QActiveDummy::start@1517-1525@..\include\qs.hpp
        3      1     18      0       3 QP::QSpyId::getPrio@134-136@..\include\qs_dummy.hpp
-       3      1     11      0       3 QP::QXThread::getTimeEvt@210-212@..\include\qxk.hpp
-       9      1     49      5       9 QP::QXThread::start@312-320@..\include\qxk.hpp
+       3      1     11      0       3 QP::QXThread::getTimeEvt@208-210@..\include\qxk.hpp
+       9      1     49      5       9 QP::QXThread::start@310-318@..\include\qxk.hpp
        2      1     15      2       3 QP::QEvt@101-103@..\src\qf\qep_hsm.cpp
        4      1     27      1       4 QP::QHsm::QHsm@130-133@..\src\qf\qep_hsm.cpp
       50      7    303      2      71 QP::QHsm::init@136-206@..\src\qf\qep_hsm.cpp
@@ -200,7 +200,7 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
      25       0.0     0.0        0.0         0     ..\include\qs_pkg.hpp
       9       0.0     0.0        0.0         0     ..\include\quit.hpp
       8       0.0     0.0        0.0         0     ..\include\qv.hpp
-    122       6.0     1.0       30.0         2     ..\include\qxk.hpp
+    120       6.0     1.0       30.0         2     ..\include\qxk.hpp
     323      37.5     5.9      199.0         8     ..\src\qf\qep_hsm.cpp
     307      41.4     7.1      228.1         7     ..\src\qf\qep_msm.cpp
       2       0.0     0.0        0.0         0     ..\src\qf\qf_act.cpp
@@ -231,6 +231,6 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
-      4523      18.2     3.2      108.0      176            3      0.02    0.09
+      4521      18.2     3.2      108.0      176            3      0.02    0.09
 @endcode
 */

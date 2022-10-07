@@ -1,7 +1,7 @@
 //============================================================================
 // DPP example for QXK
-// Last updated for version 7.1.1
-// Last updated on  2022-09-23
+// Last updated for version 7.1.2
+// Last updated on  2022-10-05
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -78,7 +78,7 @@ int main() {
     // start the Philo active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
         DPP::AO_Philo[n]->start(
-            Q_PRIO(n + 3U, N_PHILO + 2U), // QF-prio/preempt-thre.
+            n + 3U,                  // QF-prio/preempt-thre.
             philoQueueSto[n],        // event queue storage
             Q_DIM(philoQueueSto[n]), // queue length [events]
             nullptr, 0U);            // no stack storage

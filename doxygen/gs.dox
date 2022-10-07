@@ -144,7 +144,7 @@ The DPP example is provided for most supported boards as well as in the command-
 
 The Dining Philosophers Problem (DPP) example is described in the @webref{doc/AN_DPP.pdf, Application Note: Dining Philosophers Problem (DPP) Example}.
 
-[![Application Note: Dining Philosophers Problem (DPP) Example](AN_DPP.jpg)](https://www.state-machine.com/doc/AN_Fly-n-Shoot.pdf)
+[![Application Note: Dining Philosophers Problem (DPP) Example](AN_DPP.jpg)](https://www.state-machine.com/doc/AN_DPP.pdf)
 
 
 @note

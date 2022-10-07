@@ -79,8 +79,11 @@ QXMutex::QXMutex()
 
 //${QXK::QXMutex::init} ......................................................
 void QXMutex::init(QPrioSpec const prioSpec) noexcept {
+    //! @pre preemption-threshold must not be used
+    Q_REQUIRE_ID(100, (prioSpec & 0xFF00U) == 0U);
+
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU);
-    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U);
+    m_pthre = 0U; // preemption-threshold not used
 
     if (prioSpec != 0U) {  // priority-ceiling protocol used?
         register_();  // register this mutex as AO
@@ -281,7 +284,7 @@ bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
 
         // set the blocking object (this mutex)
         curr->m_temp.obj = QXK_PTR_CAST_(QMState*, this);
-        curr->teArm_(static_cast<enum_t>(QXK::MUTEX_SIG), nTicks);
+        curr->teArm_(static_cast<enum_t>(QXK::TIMEOUT_SIG), nTicks);
 
         QS_BEGIN_NOCRIT_PRE_(QS_MTX_BLOCK, curr->m_prio)
             QS_TIME_PRE_();  // timestamp
@@ -291,7 +294,7 @@ bool QXMutex::lock(std::uint_fast16_t const nTicks) noexcept {
         QS_END_NOCRIT_PRE_()
 
         // schedule the next thread if multitasking started
-        static_cast<void>(QXK_sched_(0U)); // synchronous scheduling
+        static_cast<void>(QXK_sched_()); // synchronous scheduling
         QF_CRIT_X_();
         QF_CRIT_EXIT_NOP(); // BLOCK here !!!
 
@@ -432,8 +435,8 @@ void QXMutex::unlock() noexcept {
         }
 
         // schedule the next thread if multitasking started
-        if (QXK_sched_(0U) != 0U) { // synchronous preemption needed?
-            QXK_activate_(0U); // synchronously activate basic threads
+        if (QXK_sched_() != 0U) { // synchronous preemption needed?
+            QXK_activate_(); // synchronously activate basic threads
         }
     }
     else { // releasing one level of nested mutex lock
