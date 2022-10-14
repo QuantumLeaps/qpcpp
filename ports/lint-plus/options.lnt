@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-24
-//! @version Last updated for: @ref qpcpp_7_1_0
+//! @date Last updated on: 2022-10-07
+//! @version Last updated for: @ref qpcpp_7_1_3
 //!
 //! @file
 //! @brief PC-Lint-Plus option file for linting QP/C++ source code
@@ -42,7 +42,7 @@
 au-autosar.lnt      // AUTOSAR:C++14
 au-ds.lnt           // Dan Saks recommendations
 au-ql-cpp11.lnt     // Quantum Leaps coding standard for C++11
-//-strong(AXJ)        // Strong type checking
+
 
 // size/alignment options
 cpu.lnt             // for the chosen CPU

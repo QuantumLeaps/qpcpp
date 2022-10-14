@@ -147,7 +147,7 @@
 //!
 //! @description
 //! This macro can be defined in the QF ports to configure the internal tick
-//! counters of Time Events. If the macro is not defined, the default of 2
+//! counters of Time Events. If the macro is not defined, the default of 4
 //! bytes will be chosen in qf.hpp. The valid #QF_TIMEEVT_CTR_SIZE values of
 //! 1U, 2U, or 4U, correspond to tick counters of uint8_t, uint16_t, and
 //! uint32_t, respectively. The tick counter representation determines the
@@ -159,7 +159,7 @@
 //! and your own application code. The consistency is guaranteed if you define
 //! this macro only once in the qf_port.hpp header file and henceforth include
 //! this header file in all builds.
-#define QF_TIMEEVT_CTR_SIZE         2U
+#define QF_TIMEEVT_CTR_SIZE         4U
 
 //! Size (in bytes) of the QS time stamp
 //!
