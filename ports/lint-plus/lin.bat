@@ -55,7 +55,7 @@ if "%1"=="16bit" (
 @del *.log
 
 :: linting -------------------------------------------------------------------
-%PCLP% -os(lint_qf.log)  %LINTFLAGS% -iqv  ..\..\src\qf\*.cpp 
+%PCLP% -os(lint_qf.log)  %LINTFLAGS% -iqv  ..\..\src\qf\*.cpp
 
 %PCLP% -os(lint_qv.log)  %LINTFLAGS% -iqv  ..\..\src\qv\*.cpp
 
