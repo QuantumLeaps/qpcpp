@@ -1,7 +1,7 @@
 /** @defgroup metrics Code Metrics
 
 @code{.cpp}
-                Code Metrics
+                QP/C++ Code Metrics
 ================================================
   NLOC    CCN   token  PARAM  length  location
 ------------------------------------------------

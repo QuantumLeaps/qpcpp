@@ -1,7 +1,0 @@
-# Doxyfile 1.9.5
-
-@INCLUDE = Doxyfile
-
-GENERATE_HTML          = NO
-GENERATE_LATEX         = YES
-ENABLED_SECTIONS      += LATEX

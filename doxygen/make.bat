@@ -28,46 +28,42 @@
 @echo usage:
 @echo make
 @echo make -CHM
-@echo make -CERT
-@echo make -LATEX
+@echo make ...
 
-:: tools (adjust to your system)---------------------------------------------
-:: Doxygen tool
+:: Doxygen tool (adjust to your system) ......................................
 @set DOXYGEN=doxygen
 
-:: Simple complexity metrics tool  (adjust to your system)
-@set METRICS=lizard -m -L500 -a10 -C20 -V
-
-:: HTML Help tool (needed only with the -CHM option) .
+:: HTML Help tool (needed only with the -CHM option, (adjust to your system) .
 @set HHC="C:\tools\HTML Help Workshop\hhc.exe"
 
-:: QP directory .............................................................
-@set QP=..
+:: Simple complexity metrics tool  (adjust to your system) ...................
+@set LIZARD=lizard
 
-:: Outut directories ........................................................
-@set HTML_OUT=%QP%\html
-IF "%1"=="-CERT" (
-    @set HTML_OUT=%QP%\cert-pack
+:: QP/C++ directory ..........................................................
+@set QPCPP=..
+
+:: HTML outut directory ......................................................
+@set HTML_OUT=%QPCPP%\html
+if "%1"=="-CERT" (
+    @set HTML_OUT=%QPCPP%\cert-pack
 )
-@set LATEX_OUT=%QP%\latex
 
-:: Generate metrics.dox file-------------------------------------------------
-@set METRICS_INP=%QP%\include %QP%\src -x %QP%\src\qs\*
+:: Generate metrics.dox file...
+@set METRICS_INP=%QPCPP%\include %QPCPP%\src -x %QPCPP%\src\qs\*
 @set METRICS_OUT=metrics.dox
 
 @echo /** @defgroup metrics Code Metrics> %METRICS_OUT%
 @echo.>> %METRICS_OUT%
 @echo @code{.cpp}>> %METRICS_OUT%
-@echo                 Code Metrics >> %METRICS_OUT%
+@echo                 QP/C++ Code Metrics >> %METRICS_OUT%
 
-%METRICS% %METRICS_INP% >> %METRICS_OUT%
+%LIZARD% -m -L500 -a10 -C20 -V %METRICS_INP% >> %METRICS_OUT%
 
 @echo @endcode>> %METRICS_OUT%
-@echo */>> %METRICS_OUT%
+@echo */ >> %METRICS_OUT%
 
-:: Generate Doxygen Documentation -------------------------------------------
+:: Generate Doxygen Documentation...
 if "%1"=="-CHM" (
-
     @echo Generating HTML...
     %DOXYGEN% Doxyfile-CHM
 
@@ -83,24 +79,7 @@ if "%1"=="-CHM" (
     @rmdir /S /Q  tmp
     @echo CHM file generated
 
-) else if "%1"=="-LATEX" (
-
-    @echo.
-    @echo Cleanup...
-    rmdir /S /Q  %LATEX_OUT%
-
-    @echo Generating LATEX...
-    %DOXYGEN% Doxyfile-LATEX
-
-    @echo Adding custom files...
-    xcopy img %LATEX_OUT%\img\
-
-    @echo TODO...
-    @echo cd ..\latex
-    @echo make.bat
-
 ) else (
-
     @echo.
     @echo Cleanup...
     rmdir /S /Q  %HTML_OUT%
@@ -108,7 +87,7 @@ if "%1"=="-CHM" (
     @echo Generating HTML...
     %DOXYGEN% Doxyfile%1
 
-    @echo Adding custom files...
+    @echo Adding custom images...
     xcopy img %HTML_OUT%\img\
     xcopy /Y ..\..\ql-doxygen\jquery.js %HTML_OUT%
     rem @qclean %HTML_OUT%
