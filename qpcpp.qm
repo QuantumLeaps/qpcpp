@@ -13388,27 +13388,6 @@ extern char const BUILD_TIME[9];
 
 #endif // QP_INC_QSTAMP_HPP_</text>
   </file>
-  <!--${include::qstamp.cpp}-->
-  <file name="qstamp.cpp">
-   <text>//! @file
-//! @brief Application build time-stamp
-//! @note
-//! This module needs to be re-compiled in every new software build. To achive
-//! this, it is recommended to delete the object file (qstamp.o or qstamp.obj)
-//! in the build directory before each build. (Most development tools allow
-//! you to specify a pre-build action, which is the ideal place to delete
-//! the qstamp object file.)
-
-#include &quot;qstamp.hpp&quot;
-
-namespace QP {
-//! the calendar date of the last translation of the form: &quot;Mmm dd yyyy&quot;
-char const BUILD_DATE[12] = __DATE__;
-
-//! the time of the last translation of the form: &quot;hh:mm:ss&quot;
-char const BUILD_TIME[9] = __TIME__;
-} // namespace QP</text>
-  </file>
  </directory>
  <!--${src}-->
  <directory name="src">
@@ -14818,6 +14797,27 @@ $define ${QUTest-stub}
 #endif // Q_UTEST != 0
 
 #endif // def Q_UTEST</text>
+   </file>
+   <!--${src::qs::qstamp.cpp}-->
+   <file name="qstamp.cpp">
+    <text>//! @file
+//! @brief Application build time-stamp
+//! @note
+//! This module needs to be re-compiled in every new software build. To achive
+//! this, it is recommended to delete the object file (qstamp.o or qstamp.obj)
+//! in the build directory before each build. (Most development tools allow
+//! you to specify a pre-build action, which is the ideal place to delete
+//! the qstamp object file.)
+
+#include &quot;qstamp.hpp&quot;
+
+namespace QP {
+//! the calendar date of the last translation of the form: &quot;Mmm dd yyyy&quot;
+char const BUILD_DATE[12] = __DATE__;
+
+//! the time of the last translation of the form: &quot;hh:mm:ss&quot;
+char const BUILD_TIME[9] = __TIME__;
+} // namespace QP</text>
    </file>
   </directory>
  </directory>

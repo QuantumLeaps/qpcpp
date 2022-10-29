@@ -42,7 +42,7 @@
 
 @set DOXHOME="C:\tools\doxygen\bin"
 
-:: Generate Resource Standard Metrics for QP/C++ ............................. 
+:: Generate Resource Standard Metrics for QP/C++ .............................
 @set RCMHOME="C:\tools\MSquared\M2 RSM"
 
 @set RSM_OUTPUT=metrics.dox
@@ -58,11 +58,11 @@
 @echo @endcode >> %RSM_OUTPUT%
 @echo */ >> %RSM_OUTPUT%
 
-:: Generate Doxygen Documentation ........................................... 
+:: Generate Doxygen Documentation ...........................................
 if "%1"=="-CHM" (
     @echo Generating HTML...
     %DOXHOME%\doxygen.exe Doxyfile-CHM
-    
+
     @echo Adding custom images...
     xcopy preview.js tmp\
     xcopy img tmp\img\
@@ -70,7 +70,7 @@ if "%1"=="-CHM" (
 
     @echo Generating CHM...
     "C:\tools\HTML Help Workshop\hhc.exe" tmp\index.hhp
-    
+
     @echo.
     @echo Cleanup...
     @rmdir /S /Q  tmp
@@ -80,7 +80,7 @@ if "%1"=="-CHM" (
     @echo.
     @echo Cleanup...
     rmdir /S /Q  C:\qp_lab\qpcpp\html
-    
+
     echo Adding custom images...
     xcopy preview.js C:\qp_lab\qpcpp\html\
     xcopy img C:\qp_lab\qpcpp\html\img\
