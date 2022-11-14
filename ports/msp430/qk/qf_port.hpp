@@ -60,7 +60,7 @@
 #endif
 
 #include "qep_port.hpp" // QEP port
-#include "qk_port.hpp"    // QK preemptive kernel port
+#include "qk_port.hpp"  // QK preemptive kernel port
 
 //============================================================================
 // NOTE01:

@@ -188,6 +188,7 @@ void init() {
     //! data (as is required by the C++ Standard).
     QActive::subscrList_   = nullptr;
     QActive::maxPubSignal_ = 0;
+    QF::intLock_ = 0U;
     QF::intNest_ = 0U;
     QF::maxPool_ = 0U;
 

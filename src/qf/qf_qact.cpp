@@ -69,12 +69,22 @@ QActive * QActive::registry_[QF_MAX_ACTIVE + 1U];
 
 } // namespace QP
 //$enddef${QF::QActive::registry_[QF_MAX_ACTIVE + 1U]} ^^^^^^^^^^^^^^^^^^^^^^^
+//$define${QF::QF-base::intLock_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+namespace QF {
+
+//${QF::QF-base::intLock_} ...................................................
+std::uint_fast8_t volatile intLock_;
+
+} // namespace QF
+} // namespace QP
+//$enddef${QF::QF-base::intLock_} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //$define${QF::QF-base::intNest_} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {
 
 //${QF::QF-base::intNest_} ...................................................
-std::uint_fast8_t intNest_;
+std::uint_fast8_t volatile intNest_;
 
 } // namespace QF
 } // namespace QP

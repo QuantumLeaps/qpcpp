@@ -21,8 +21,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-11-11
+//! @version Last updated for: @ref qpcpp_7_1_3
 //!
 //! @file
 //! @brief QF/C++ port for QUTEST Windows/Linux/macOS, GNU or Visual C++
@@ -45,8 +45,8 @@
 #define QF_ACTIVE_STOP       1
 
 // QF interrupt disable/enable
-#define QF_INT_DISABLE()     (++QP::QF::intNest_)
-#define QF_INT_ENABLE()      (--QP::QF::intNest_)
+#define QF_INT_DISABLE()     (++QP::QF::intLock_)
+#define QF_INT_ENABLE()      (--QP::QF::intLock_)
 
 // QF critical section
 // QF_CRIT_STAT_TYPE not defined

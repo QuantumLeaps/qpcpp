@@ -31,11 +31,6 @@
 			<locationURI>PARENT-5-PROJECT_LOC/src/qf</locationURI>
 		</link>
 		<link>
-			<name>QP_include</name>
-			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/include</locationURI>
-		</link>
-		<link>
 			<name>QP_port</name>
 			<type>2</type>
 			<locationURI>PARENT-5-PROJECT_LOC/ports/msp430/qk</locationURI>

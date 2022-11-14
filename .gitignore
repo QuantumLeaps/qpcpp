@@ -38,7 +38,9 @@ version-*
 JLink*.*
 
 html/
+latex/
 cert-pack/
+cert-latex/
 test_priv/
 dbg/
 rel/

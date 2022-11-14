@@ -105,7 +105,7 @@ void BSP_ledOn(void) {
 // QF callbacks ==============================================================
 void QF::onStartup(void) {
     TA0CCTL0 = CCIE;  // CCR0 interrupt enabled
-    TA0CCR0 = BSP_MCK / BSP_TICKS_PER_SEC;
+    TA0CCR0 = BSP_SMCLK / BSP_TICKS_PER_SEC;
     TA0CTL = TASSEL_2 | MC_1 | TACLR; // SMCLK, upmode, clear TAR
 }
 //............................................................................

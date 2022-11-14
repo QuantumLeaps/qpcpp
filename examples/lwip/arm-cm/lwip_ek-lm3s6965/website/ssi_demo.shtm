@@ -11,10 +11,10 @@
 <A NAME="Top"></A>
 <TABLE cellSpacing=0 cellPadding=0 width="100%" border="0">
   <TR>
-    <TD id=masthead noWrap align=left><A href="http://www.state-machine.com"><IMG 
-      src="img/logo_ql.jpg" 
+    <TD id=masthead noWrap align=left><A href="http://www.state-machine.com"><IMG
+      src="img/logo_ql.jpg"
       title="Quantum Leaps - innovating embedded systems"
-      alt="Quantum Leaps - innovating embedded systems" 
+      alt="Quantum Leaps - innovating embedded systems"
       style="padding-bottom:5px;"></A>
     </TD>
     <TD width="100%"></TD>
@@ -33,7 +33,7 @@
     </TD>
   </TR>
 </TABLE>
-   
+
 <!--  BEGIN_CONTENT -->
 <A NAME="About"></A>
 <H1>About SSI Support</H1>
@@ -43,17 +43,17 @@
 <P>The HTTP server that comes with <strong>lwIP</strong> has been extended to support rudimentary <strong>Server Side Include (SSI)</strong> facility. To enable the SSI support in the lwIP-HTTP server, you need to define the macro <CODE>INCLUDE_HTTPD_SSI</CODE> in the <CODE>lwipopts.h</CODE> header file.
 
 <A HREF="http://www.state-machine.com/lwip/AN_QP_and_lwIP.pdf" TARGET="_blank"><IMG SRC="img/AN_QP_and_lwIP.jpg" ALT="Application Note (1.4MB PDF)" align="right" hspace="10" vspace="5"></A>
- 
+
 You must also provide your SSI callback function and register it by calling the <CODE>http_set_ssi_handler()</CODE> function. The HTTP server will then scan each file with extension <CODE>.shtml</CODE>, <CODE>.shtm</CODE> or <CODE>.ssi</CODE> for the SSI tags of the form <CODE>&lt;!--#tag--&gt;</CODE> and will replace on-the-fly every recognized SSI tag with the string composed by your SSI callback function. See the HTML source code for this web page (<CODE>ssi_demo.shtm</CODE>) and the SSI callback function definition in <CODE>lwipmgr.c</CODE>.
 </P>
-<P>While designing your own SSI tags, remember that the tag names are limited to 8 characters and the length of the replacement strings cannot exceed 192 characters. You can re-define these limits by changing the macros <CODE>MAX_TAG_NAME_LEN</CODE> and <CODE>MAX_TAG_INSERT_LEN</CODE>, respectively, in the <CODE>http.h</CODE> header file. 
+<P>While designing your own SSI tags, remember that the tag names are limited to 8 characters and the length of the replacement strings cannot exceed 192 characters. You can re-define these limits by changing the macros <CODE>MAX_TAG_NAME_LEN</CODE> and <CODE>MAX_TAG_INSERT_LEN</CODE>, respectively, in the <CODE>http.h</CODE> header file.
 </P>
 <P>Please refer to the Quantum Leaps Application Note: <A HREF="http://www.state-machine.com/lwip/AN_QP_and_lwIP.pdf" TARGET="_blank">"QP and lwIP TCP/IP Stack"</A> for more information. The Application Note is included in the QP-lwIP example code download.
 </P>
 
 <A NAME="Example"></A>
 <H1>SSI Example</H1>
-<P>The following table contains SSI tags embedded in the HTML of this web page. Client browsers never see these tags, as the lwIP-HTTP server replaces them on-the-fly while serving this page. These particular SSI tags cause the target to generate various <strong>lwIP</strong> link statistics. Please click the Refresh button on your browser to cause re-loading of this page and updating the statistics: 
+<P>The following table contains SSI tags embedded in the HTML of this web page. Client browsers never see these tags, as the lwIP-HTTP server replaces them on-the-fly while serving this page. These particular SSI tags cause the target to generate various <strong>lwIP</strong> link statistics. Please click the Refresh button on your browser to cause re-loading of this page and updating the statistics:
 </P>
 
 <TABLE summary="cgi example" cellspacing=4 cellpadding=1 align="center" valign="middle">
@@ -85,7 +85,7 @@ You must also provide your SSI callback function and register it by calling the 
     <TD align="right"><!--#s_err--></TD></TR>
 </TABLE>
 <br />
-<P><strong>NOTE:</strong> the webpage loads much slower than the others, because it contains 12 SSI tags, and each tag is sent is a separate TCP/IP packet.  
+<P><strong>NOTE:</strong> the webpage loads much slower than the others, because it contains 12 SSI tags, and each tag is sent is a separate TCP/IP packet.
 </P>
 <br />
 

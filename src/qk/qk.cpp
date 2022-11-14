@@ -161,6 +161,13 @@ void init() {
     // setup the QK scheduler as initially locked and not running
     QK_attr_.lockCeil = (QF_MAX_ACTIVE + 1U); // scheduler locked
 
+    // QK idle AO object (const in ROM)
+    static void * const idle_ao[(sizeof(QActive)/sizeof(void*)) + 1U]
+        = { nullptr };
+    // register the idle AO object (cast 'const' away)
+    QActive::registry_[0] = QF_CONST_CAST_(QActive*,
+       reinterpret_cast<QActive const*>(&idle_ao[0]));
+
     #ifdef QK_INIT
     QK_INIT(); // port-specific initialization of the QK kernel
     #endif

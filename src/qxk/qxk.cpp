@@ -166,11 +166,11 @@ void init() {
     QXK_attr_.lockCeil = (QF_MAX_ACTIVE + 1U); // scheduler locked
 
     // QXK idle AO object (const in ROM)
-    static QActive * const idle_ao[(sizeof(QActive)/sizeof(QActive*)) + 1U]
+    static void * const idle_ao[(sizeof(QActive)/sizeof(void*)) + 1U]
         = { nullptr };
     // register the idle AO object (cast 'const' away)
     QActive::registry_[0] = QF_CONST_CAST_(QActive*,
-        QXK_PTR_CAST_(QActive const*, &idle_ao[0]));
+        reinterpret_cast<QActive const*>(&idle_ao[0]));
 
     #ifdef QXK_INIT
     QXK_INIT(); // port-specific initialization of the QXK kernel

@@ -1252,9 +1252,13 @@ public:
 namespace QP {
 namespace QF {
 
+//${QF::QF-base::intLock_} ...................................................
+//! Interrupt lock up-down counter (used in some QF ports)
+extern std::uint_fast8_t volatile intLock_;
+
 //${QF::QF-base::intNest_} ...................................................
 //! Interrupt nesting up-down counter (used in some QF ports)
-extern std::uint_fast8_t intNest_;
+extern std::uint_fast8_t volatile intNest_;
 
 //${QF::QF-base::init} .......................................................
 //! QF initialization
