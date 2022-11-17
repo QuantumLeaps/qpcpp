@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-10-07
+//! @date Last updated on: 2022-11-17
 //! @version Last updated for: @ref qpcpp_7_1_3
 //!
 //! @file
@@ -78,13 +78,6 @@ qpcpp.lnt           // QP/C++ options
 
 // QEP -----------------------------------------------------------------------
 
-// MC++R16-0-4 function-like macro
--esym(9026,
- QEP_TRIG_,
- QEP_ENTER_,
- QEP_EXIT_,
- QEP_ACT_PTR_INC_)
-
 // implicit conversion of enum 'QP::QHsm::QStateRet' to integral type
 -esym(641,
  QP::QHsm::QStateRet)
@@ -99,8 +92,6 @@ qpcpp.lnt           // QP/C++ options
 -esym(9026,
  QF_CRIT_E_,
  QF_CRIT_X_,
- QF_EVT_REF_CTR_INC_,
- QF_EVT_REF_CTR_DEC_,
  QF_CONST_CAST_,
  QF_CRIT_ENTRY_,
  QF_CRIT_EXIT_,
@@ -147,8 +138,6 @@ qpcpp.lnt           // QP/C++ options
 
 // M3-R11.8(r) cast drops const qualifier
 -emacro(9005,
- QF_EVT_REF_CTR_INC_,
- QF_EVT_REF_CTR_DEC_,
  QF_EPOOL_PUT_)
 
 // M3-D11.5(a) conversion from pointer to void to other pointer type

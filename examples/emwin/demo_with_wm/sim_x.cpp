@@ -34,7 +34,7 @@
 extern "C" {
 
 #include "GUI.h"
-#include "GUI_SIM.h"
+#include "LCD_SIM.h"
 
 void SIM_X_Init() {
     if (((LCD_GetDevCap(LCD_DEVCAP_XSIZE) * LCD_GetXMag()) == 320)

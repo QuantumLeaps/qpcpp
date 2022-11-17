@@ -15,14 +15,39 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\include\qstamp.cpp" />
+    <ClCompile Include="..\..\..\..\ports\win32-qutest\qutest_port.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qep_hsm.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qep_msm.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_act.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_actq.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_defer.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_dyn.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_mem.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_ps.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_qact.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_qeq.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_qmact.cpp" />
+    <ClCompile Include="..\..\..\..\src\qf\qf_time.cpp" />
+    <ClCompile Include="..\..\..\..\src\qs\qs.cpp" />
+    <ClCompile Include="..\..\..\..\src\qs\qstamp.cpp" />
+    <ClCompile Include="..\..\..\..\src\qs\qs_64bit.cpp" />
+    <ClCompile Include="..\..\..\..\src\qs\qs_fp.cpp" />
+    <ClCompile Include="..\..\..\..\src\qs\qs_rx.cpp" />
+    <ClCompile Include="..\..\..\..\src\qs\qutest.cpp" />
     <ClCompile Include="..\src\blinky.cpp" />
     <ClCompile Include="..\src\bsp.cpp" />
     <ClCompile Include="test_blinky.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\ports\win32-qutest\qep_port.hpp" />
+    <ClInclude Include="..\..\..\..\ports\win32-qutest\qf_port.hpp" />
+    <ClInclude Include="..\..\..\..\ports\win32-qutest\qs_port.hpp" />
+    <ClInclude Include="..\..\..\..\ports\win32-qutest\safe_std.h" />
     <ClInclude Include="..\src\blinky.h" />
     <ClInclude Include="..\src\bsp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\ports\win32-qutest\README.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8CC465F7-872E-4D03-B93C-1B64858B4E11}</ProjectGuid>
@@ -89,8 +114,8 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>qp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../../../ports/win32-qutest/vc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>

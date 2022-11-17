@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.2.0" links="1">
+<model version="5.2.3" links="1">
  <documentation>&quot;Fly 'n' Shoot&quot; game model from Chapters 1 &amp; 9 of PSiCC2 for Qt with GUI
 NOTE: Adapted for QP-Qt integartion</documentation>
  <!--${qpcpp}-->
@@ -65,7 +65,7 @@ int main() {
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
-NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QMsm::dispatch() function.</documentation>
+NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() function.</documentation>
     <!--${Qt-port::GuiQActive::post::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
@@ -86,7 +86,7 @@ Direct event posting is the simplest asynchronous communication method available
 
 NOTE: You should be very careful with the LIFO (Last In First Out) policy, because it *reverses* the order of events in the queue. Typically, the QActive_postLIFO() operation shuould be only used for self-posting of events as reminders (see the &quot;Reminder&quot; state pattern) for continuing a processing. The postLIFO() operation is also used in the QActive::recall() operation.
 
-NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QMsm::dispatch() function.</documentation>
+NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() function.</documentation>
     <!--${Qt-port::GuiQActive::postLIFO::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
@@ -156,7 +156,7 @@ int main() {
 
 Direct event posting is the simplest asynchronous communication method available in QP.
 
-NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QMsm::dispatch() function.</documentation>
+NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() function.</documentation>
     <!--${Qt-port::GuiQMActive::post::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:
@@ -177,7 +177,7 @@ Direct event posting is the simplest asynchronous communication method available
 
 NOTE: You should be very careful with the LIFO (Last In First Out) policy, because it *reverses* the order of events in the queue. Typically, the QActive_postLIFO() operation shuould be only used for self-posting of events as reminders (see the &quot;Reminder&quot; state pattern) for continuing a processing. The postLIFO() operation is also used in the QActive::recall() operation.
 
-NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QMsm::dispatch() function.</documentation>
+NOTE: Direct event posting should not be confused with direct event dispatching. In contrast to asynchronous event posting through event queues, direct event dispatching is synchronous. Direct event dispatching occurs when you call QHsm::dispatch() function.</documentation>
     <!--${Qt-port::GuiQMActive::postLIFO::e}-->
     <parameter name="e" type="QEvt const *"/>
     <code>// Example:

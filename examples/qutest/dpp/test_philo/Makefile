@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QUTEST-QP/C++ for Windows and POSIX *HOSTS*
-# Last Updated for Version: 7.0.1
-# Date of the Last Update:  2022-05-23
+# Last updated for version 7.1.3
+# Last updated on  2022-11-13
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -95,13 +95,7 @@ DEFINES  :=
 #-----------------------------------------------------------------------------
 # add QP/C++ framework (depends on the OS this Makefile runs on):
 #
-ifeq ($(OS),Windows_NT)
-	QP_PORT_DIR := $(QPCPP)/ports/win32-qutest
-	LIB_DIRS += -L$(QP_PORT_DIR)/mingw
-	LIBS     += -lqp -lws2_32
-else
-	QP_PORT_DIR := $(QPCPP)/ports/posix-qutest
-	CPP_SRCS += \
+CPP_SRCS += \
 	qep_hsm.cpp \
 	qep_msm.cpp \
 	qf_act.cpp \
@@ -121,7 +115,16 @@ else
 	qutest.cpp \
 	qutest_port.cpp
 
-	LIBS += -lpthread
+ifeq ($(OS),Windows_NT)
+
+QP_PORT_DIR := $(QPCPP)/ports/win32-qutest
+LIBS += -lws2_32
+
+else
+
+QP_PORT_DIR := $(QPCPP)/ports/posix-qutest
+LIBS += -lpthread
+
 endif
 
 #============================================================================
@@ -174,7 +177,7 @@ endif
 
 BIN_DIR := build
 
-CFLAGS  := -c -g -O -fno-pie -std=c99 -pedantic -Wall -Wextra -W \
+CFLAGS  := -c -g -O -fno-pie -std=c11 -pedantic -Wall -Wextra -W \
 	$(INCLUDES) $(DEFINES) -DQ_SPY -DQ_UTEST -DQ_HOST
 
 CPPFLAGS := -c -g -O -fno-pie -std=c++11 -pedantic -Wall -Wextra \
@@ -200,7 +203,6 @@ C_OBJS_EXT   := $(addprefix $(BIN_DIR)/, $(C_OBJS))
 C_DEPS_EXT   := $(patsubst %.o,%.d, $(C_OBJS_EXT))
 CPP_OBJS_EXT := $(addprefix $(BIN_DIR)/, $(CPP_OBJS))
 CPP_DEPS_EXT := $(patsubst %.o,%.d, $(CPP_OBJS_EXT))
-
 
 #-----------------------------------------------------------------------------
 # rules

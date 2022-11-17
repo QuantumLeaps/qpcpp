@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ for Windows and POSIX *HOSTS*
-# Last Updated for Version: 7.0.1
-# Date of the Last Update:  2022-05-23
+# Last updated for version 7.1.3
+# Last updated on  2022-11-13
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -56,10 +56,10 @@ PROJECT := dpp
 #
 
 # list of all source directories used by this project
-VPATH = .
+VPATH := . \
 
 # list of all include directories needed by this project
-INCLUDES := -I.
+INCLUDES := -I. \
 
 # location of the QP/C framework (if not provided in an env. variable)
 ifeq ($(QPCPP),)
@@ -92,30 +92,8 @@ ifeq (,$(CONF))
 endif
 
 #-----------------------------------------------------------------------------
-# add QP/C++ framework (depends on the OS this Makefile runs on):
+# add QP/C++ framework:
 #
-ifeq ($(OS),Windows_NT)
-
-# NOTE:
-# For Windows hosts, you can choose:
-# - the single-threaded QP/C++ port (win32-qv) or
-# - the multithreaded QP/C++ port (win32).
-#
-QP_PORT_DIR := $(QPCPP)/ports/win32-qv
-#QP_PORT_DIR := $(QPCPP)/ports/win32
-LIB_DIRS += -L$(QP_PORT_DIR)/$(CONF)
-LIBS     += -lqp -lws2_32
-
-else
-
-# NOTE:
-# For POSIX hosts (Linux, MacOS), you can choose:
-# - the single-threaded QP/C++ port (win32-qv) or
-# - the multithreaded QP/C++ port (win32).
-#
-QP_PORT_DIR := $(QPCPP)/ports/posix-qv
-#QP_PORT_DIR := $(QPCPP)/ports/posix
-
 CPP_SRCS += \
 	qep_hsm.cpp \
 	qep_msm.cpp \
@@ -138,6 +116,27 @@ QS_SRCS := \
 	qs_fp.cpp \
 	qs_port.cpp
 
+ifeq ($(OS),Windows_NT)
+
+# NOTE:
+# For Windows hosts, you can choose:
+# - the single-threaded QP/C++ port (win32-qv) or
+# - the multithreaded QP/C++ port (win32).
+#
+QP_PORT_DIR := $(QPCPP)/ports/win32-qv
+#QP_PORT_DIR := $(QPCPP)/ports/win32
+LIBS += -lws2_32
+
+else
+
+# NOTE:
+# For POSIX hosts (Linux, MacOS), you can choose:
+# - the single-threaded QP/C++ port (win32-qv) or
+# - the multithreaded QP/C++ port (win32).
+#
+QP_PORT_DIR := $(QPCPP)/ports/posix-qv
+#QP_PORT_DIR := $(QPCPP)/ports/posix
+
 LIBS += -lpthread
 
 endif
@@ -153,7 +152,7 @@ INCLUDES += -I$(QPCPP)/include -I$(QP_PORT_DIR)
 #
 # NOTE:
 # GNU toolset (MinGW) is included in the QTools collection for Windows, see:
-#     http://sourceforge.net/projects/qpc/files/QTools/
+#     https://www.state-machine.com/qtools
 # It is assumed that %QTOOLS%\bin directory is added to the PATH
 #
 CC    := gcc
@@ -185,7 +184,7 @@ ifeq (rel, $(CONF)) # Release configuration ..................................
 
 BIN_DIR := build_rel
 # gcc options:
-CFLAGS  = -c -O3 -fno-pie -std=c99 -pedantic -Wall -Wextra -W \
+CFLAGS  = -c -O3 -fno-pie -std=c11 -pedantic -Wall -Wextra -W \
 	$(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -O3 -fno-pie -std=c++11 -pedantic -Wall -Wextra \
@@ -200,7 +199,7 @@ CPP_SRCS += $(QS_SRCS)
 VPATH    += $(QPCPP)/src/qs
 
 # gcc options:
-CFLAGS  = -c -g -O -fno-pie -std=c99 -pedantic -Wall -Wextra -W \
+CFLAGS  = -c -g -O -fno-pie -std=c11 -pedantic -Wall -Wextra -W \
 	$(INCLUDES) $(DEFINES) -DQ_SPY
 
 CPPFLAGS = -c -g -O -fno-pie -std=c++11 -pedantic -Wall -Wextra \
@@ -212,7 +211,7 @@ else # default Debug configuration .........................................
 BIN_DIR := build
 
 # gcc options:
-CFLAGS  = -c -g -O -fno-pie -std=c99 -pedantic -Wall -Wextra -W \
+CFLAGS  = -c -g -O -fno-pie -std=c11 -pedantic -Wall -Wextra -W \
 	$(INCLUDES) $(DEFINES)
 
 CPPFLAGS = -c -g -O -fno-pie -std=c++11 -pedantic -Wall -Wextra \
@@ -235,14 +234,11 @@ C_DEPS_EXT   := $(patsubst %.o,%.d, $(C_OBJS_EXT))
 CPP_OBJS_EXT := $(addprefix $(BIN_DIR)/, $(CPP_OBJS))
 CPP_DEPS_EXT := $(patsubst %.o,%.d, $(CPP_OBJS_EXT))
 
-# create $(BIN_DIR) if it does not exist
-ifeq ("$(wildcard $(BIN_DIR))","")
-$(shell $(MKDIR) $(BIN_DIR))
-endif
-
 #-----------------------------------------------------------------------------
 # rules
 #
+
+.PHONY: clean show
 
 all: $(TARGET_EXE)
 
@@ -262,16 +258,17 @@ $(BIN_DIR)/%.o : %.c
 $(BIN_DIR)/%.o : %.cpp
 	$(CPP) $(CPPFLAGS) $< -o $@
 
-.PHONY : clean show
-
-# include dependency files only if our goal depends on their existence
+# create BIN_DIR and include dependencies only if needed
 ifneq ($(MAKECMDGOALS),clean)
   ifneq ($(MAKECMDGOALS),show)
+     ifneq ($(MAKECMDGOALS),debug)
+ifeq ("$(wildcard $(BIN_DIR))","")
+$(shell $(MKDIR) $(BIN_DIR))
+endif
 -include $(C_DEPS_EXT) $(CPP_DEPS_EXT)
+     endif
   endif
 endif
-
-.PHONY : clean show
 
 clean :
 	-$(RM) $(BIN_DIR)/*.o \

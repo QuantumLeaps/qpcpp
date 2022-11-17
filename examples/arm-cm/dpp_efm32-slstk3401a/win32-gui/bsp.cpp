@@ -56,8 +56,6 @@ static DWORD WINAPI appThread(LPVOID par) {
 }
 
 //============================================================================
-namespace DPP {
-
 // local variables -----------------------------------------------------------
 static HINSTANCE l_hInst;   // this application instance
 static HWND      l_hWnd;    // main window handle
@@ -188,19 +186,19 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
 
         // drawing of owner-drawn buttons...
         case WM_DRAWITEM: {
-            static QP::QEvt const pe = QEVT_INITIALIZER(PAUSE_SIG);
+            static QP::QEvt const pe = QEVT_INITIALIZER(DPP::PAUSE_SIG);
             LPDRAWITEMSTRUCT pdis = (LPDRAWITEMSTRUCT)lParam;
             switch (pdis->CtlID) {
                 case IDC_PAUSE: {  // PAUSE owner-drawn button
                     switch (OwnerDrawnButton_draw(&l_pauseBtn,pdis)) {
                         case BTN_DEPRESSED: {
-                            AO_Table->POST(&pe, nullptr);
+                            DPP::AO_Table->POST(&pe, nullptr);
                             break;
                         }
                         case BTN_RELEASED: {
                             static QP::QEvt const se =
-                                QEVT_INITIALIZER(SERVE_SIG);
-                            AO_Table->POST(&se, nullptr);
+                                QEVT_INITIALIZER(DPP::SERVE_SIG);
+                            DPP::AO_Table->POST(&se, nullptr);
                             break;
                         }
                         default: {
@@ -276,7 +274,8 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
     // set the "segment" # n to the bitmap # 'bitmapNum'
     SegmentDisplay_setSegment(&l_philos, (UINT)n, bitmapNum);
 
-    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
+    // app-specific trace record
+    QS_BEGIN_ID(PHILO_STAT, DPP::AO_Philo[n]->m_prio)
         QS_U8(1, n);   // Philosopher number
         QS_STR(stat);  // Philosopher status
     QS_END()
@@ -301,22 +300,21 @@ void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 
-} // namespace DPP
-
 //============================================================================
 
 namespace QP {
 
 //............................................................................
 void QF::onStartup(void) {
-    QF_setTickRate(DPP::BSP::TICKS_PER_SEC, 30); // set the desired tick rate
+    QF::setTickRate(BSP::TICKS_PER_SEC, 30); // set the desired tick rate
 }
 //............................................................................
 void QF::onCleanup(void) {
 }
 //............................................................................
-void QF_onClockTick(void) {
-    QTimeEvt::TICK_X(0U, &DPP::l_clock_tick); // perform the QF clock tick processing
+void QF::onClockTick(void) {
+    // perform the QF clock tick processing
+    QTimeEvt::TICK_X(0U, &l_clock_tick);
 
     QS_RX_INPUT(); // handle the QS-RX input
     QS_OUTPUT();   // handle the QS output
@@ -330,7 +328,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
     char message[80];
     SNPRINTF_S(message, Q_DIM(message) - 1,
                "Assertion failed in module %s location %d", module, loc);
-    MessageBox(DPP::l_hWnd, message, "!!! ASSERTION !!!",
+    MessageBox(l_hWnd, message, "!!! ASSERTION !!!",
                MB_OK | MB_ICONEXCLAMATION | MB_APPLMODAL);
     PostQuitMessage(-1);
 }
@@ -349,7 +347,7 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3;
 
     // application-specific record
-    QS_BEGIN_ID(DPP::COMMAND_STAT, 0U)
+    QS_BEGIN_ID(COMMAND_STAT, 0U)
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()

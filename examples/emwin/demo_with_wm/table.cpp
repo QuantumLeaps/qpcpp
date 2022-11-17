@@ -37,7 +37,7 @@
 
 extern "C" {
     #include "GUI.h"
-    #include "GUI_SIM.h"
+    #include "LCD_SIM.h"
     #include "DIALOG.h"
     #include "WM.h" // emWin Windows Manager
 }

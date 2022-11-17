@@ -38,37 +38,35 @@
 // GUI includes
 Q_DEFINE_THIS_FILE
 
-// Local-scope objects -------------------------------------------------------
-static QEvt const *l_tableQueueSto[N_PHILO];
-static QEvt const *l_philoQueueSto[N_PHILO][N_PHILO];
-static QSubscrList   l_subscrSto[MAX_PUB_SIG];
-
-static union SmallEvents {
-    void *min_size;
-    TableEvt te;
-    MouseEvt me;
-    // other event types to go into this pool
-} l_smlPoolSto[2*N_PHILO]; // storage for the small event pool
-
 //............................................................................
 extern "C" void MainTask(void) {
     BSP_init(); // initialize the BSP
 
     QF::init(); // initialize the framework and the underlying RT kernel
 
-    QActive::psInit(l_subscrSto, Q_DIM(l_subscrSto)); // init publish-subscribe
-
     // initialize event pools...
+    static union SmallEvents {
+        void* min_size;
+        TableEvt te;
+        MouseEvt me;
+        // other event types to go into this pool
+    } l_smlPoolSto[2 * N_PHILO]; // storage for the small event pool
     QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
 
+    // initialize publish-subscribe
+    static QSubscrList l_subscrSto[MAX_PUB_SIG];
+    QActive::psInit(l_subscrSto, Q_DIM(l_subscrSto));
+
     // start the active objects...
-    uint8_t n;
-    for (n = 0; n < N_PHILO; ++n) {
-        AO_Philo[n]->start((uint8_t)(n + 1),
+    static QEvt const *l_philoQueueSto[N_PHILO][10];
+    for (uint8_t n = 0; n < N_PHILO; ++n) {
+        AO_Philo[n]->start(n + 1U,
                            l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
                            nullptr, 1024, nullptr);
     }
-    AO_Table->start((uint8_t)(N_PHILO + 1),
+
+    static QEvt const *l_tableQueueSto[N_PHILO];
+    AO_Table->start(N_PHILO + 1U,
                     l_tableQueueSto, Q_DIM(l_tableQueueSto),
                     nullptr, 1024, nullptr);
 

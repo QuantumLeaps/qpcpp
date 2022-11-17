@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.2.2" links="1">
+<model version="5.2.3" links="1">
  <documentation>QP/C++ Real-Time Embedded Framework (RTEF)
 The model is used to generate the whole QP/C++ source code.
 
@@ -497,14 +497,15 @@ Contact information:
    <attribute name="QHsmDummy?def Q_UTEST" type="friend class" visibility="0x02" properties="0x00"/>
    <!--${QEP::QHsm::QActiveDummy}-->
    <attribute name="QActiveDummy?def Q_UTEST" type="friend class" visibility="0x02" properties="0x00"/>
-   <!--${QEP::QHsm::ReservedHsmSignals}-->
-   <attribute name="ReservedHsmSignals" type="enum" visibility="0x04" properties="0x01">
+   <!--${QEP::QHsm::ReservedSig}-->
+   <attribute name="ReservedSig" type="enum" visibility="0x04" properties="0x01">
     <documentation>//! Reserved signals by the HSM-style state machine
 //! implementation strategy.</documentation>
     <code> : QSignal {
-        Q_ENTRY_SIG = 1U,  //!&lt; signal for entry actions
-        Q_EXIT_SIG,        //!&lt; signal for exit actions
-        Q_INIT_SIG         //!&lt; signal for nested initial transitions
+        Q_EMPTY_SIG,  //!&lt; signal to execute the default case
+        Q_ENTRY_SIG,  //!&lt; signal for entry actions
+        Q_EXIT_SIG,   //!&lt; signal for exit actions
+        Q_INIT_SIG    //!&lt; signal for nested initial transitions
     };</code>
    </attribute>
    <!--${QEP::QHsm::QStateRet}-->
@@ -570,7 +571,9 @@ m_temp.fun  = initial;</code>
     <parameter name="e" type="void const * const"/>
     <!--${QEP::QHsm::init::qs_id}-->
     <parameter name="qs_id" type="std::uint_fast8_t const"/>
-    <code>Q_UNUSED_PAR(qs_id); // when Q_SPY not defined
+    <code>#ifndef Q_SPY
+Q_UNUSED_PAR(qs_id);
+#endif
 
 QStateHandler t = m_state.fun;
 
@@ -597,24 +600,24 @@ do {
     std::int_fast8_t ip = 0; // entry path index
 
     path[0] = m_temp.fun;
-    QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+    static_cast&lt;void&gt;(hsm_reservedEvt_(this, m_temp.fun, Q_EMPTY_SIG));
     while (m_temp.fun != t) {
         ++ip;
         Q_ASSERT_ID(220, ip &lt; MAX_NEST_DEPTH_);
         path[ip] = m_temp.fun;
-        QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+        static_cast&lt;void&gt;(hsm_reservedEvt_(this, m_temp.fun, Q_EMPTY_SIG));
     }
     m_temp.fun = path[0];
 
     // retrace the entry path in reverse (desired) order...
     do {
-        QEP_ENTER_(path[ip]); // enter path[ip]
+        hsm_state_entry_(this, path[ip], qs_id); // enter path[ip]
         --ip;
     } while (ip &gt;= 0);
 
     t = path[0]; // current state becomes the new source
 
-    r = QEP_TRIG_(t, Q_INIT_SIG); // execute initial transition
+    r = hsm_reservedEvt_(this, t, Q_INIT_SIG); // execute initial tran.
 
 #ifdef Q_SPY
     if (r == Q_RET_TRAN) {
@@ -674,7 +677,11 @@ m_temp.fun  = t; // mark the configuration as stable</code>
     <parameter name="e" type="QEvt const * const"/>
     <!--${QEP::QHsm::dispatch::qs_id}-->
     <parameter name="qs_id" type="std::uint_fast8_t const"/>
-    <code>QStateHandler t = m_state.fun;
+    <code>#ifndef Q_SPY
+Q_UNUSED_PAR(qs_id);
+#endif
+
+QStateHandler t = m_state.fun;
 QS_CRIT_STAT_
 
 //! @pre the current state must be initialized and
@@ -705,7 +712,7 @@ do {
             QS_FUN_PRE_(s);      // the current state
         QS_END_PRE_()
 
-        r = QEP_TRIG_(s, QEP_EMPTY_SIG_); // find superstate of s
+        r = hsm_reservedEvt_(this, s, Q_EMPTY_SIG); // find superstate of s
     }
 } while (r == Q_RET_SUPER);
 
@@ -722,14 +729,9 @@ if (r &gt;= Q_RET_TRAN) {
     //! @tr{RQP120C}
     for (; t != s; t = m_temp.fun) {
         // exit handled?
-        if (QEP_TRIG_(t, Q_EXIT_SIG) == Q_RET_HANDLED) {
-            QS_BEGIN_PRE_(QS_QEP_STATE_EXIT, qs_id)
-                QS_OBJ_PRE_(this); // this state machine object
-                QS_FUN_PRE_(t);    // the exited state
-            QS_END_PRE_()
-
+        if (hsm_state_exit_(this, t, qs_id)) {
             // find superstate of t
-            QEP_TRIG_(t, QEP_EMPTY_SIG_);
+            static_cast&lt;void&gt;(hsm_reservedEvt_(this, t, Q_EMPTY_SIG));
         }
     }
 
@@ -750,14 +752,14 @@ if (r &gt;= Q_RET_TRAN) {
     // execute state entry actions in the desired order...
     //! @tr{RQP120B}
     for (; ip &gt;= 0; --ip) {
-        QEP_ENTER_(path[ip]); // enter path[ip]
+        hsm_state_entry_(this, path[ip], qs_id); // enter path[ip]
     }
     t = path[0];    // stick the target into register
     m_temp.fun = t; // update the next state
 
     // drill into the target hierarchy...
     //! @tr{RQP120I}
-    while (QEP_TRIG_(t, Q_INIT_SIG) == Q_RET_TRAN) {
+    while (hsm_reservedEvt_(this, t, Q_INIT_SIG) == Q_RET_TRAN) {
 
         QS_BEGIN_PRE_(QS_QEP_STATE_INIT, qs_id)
             QS_OBJ_PRE_(this);       // this state machine object
@@ -769,13 +771,14 @@ if (r &gt;= Q_RET_TRAN) {
         path[0] = m_temp.fun;
 
         // find superstate
-        QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+        static_cast&lt;void&gt;(hsm_reservedEvt_(this, m_temp.fun, Q_EMPTY_SIG));
 
         while (m_temp.fun != t) {
             ++ip;
             path[ip] = m_temp.fun;
             // find superstate
-            QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+            static_cast&lt;void&gt;(
+                hsm_reservedEvt_(this, m_temp.fun, Q_EMPTY_SIG));
         }
         m_temp.fun = path[0];
 
@@ -784,7 +787,7 @@ if (r &gt;= Q_RET_TRAN) {
 
         // retrace the entry path in reverse (correct) order...
         do {
-            QEP_ENTER_(path[ip]);  // enter path[ip]
+            hsm_state_entry_(this, path[ip], qs_id);  // enter path[ip]
             --ip;
         } while (ip &gt;= 0);
 
@@ -908,7 +911,7 @@ do {
         r = Q_RET_IGNORED; // cause breaking out of the loop
     }
     else {
-        r = QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+        r = hsm_reservedEvt_(this, m_temp.fun, Q_EMPTY_SIG);
     }
 } while (r != Q_RET_IGNORED); // QHsm::top() state not reached
 m_temp.fun = m_state.fun; // restore the stable state configuration
@@ -937,7 +940,7 @@ do {
     }
     else {
         child = m_temp.fun;
-        r = QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+        r = hsm_reservedEvt_(this, m_temp.fun, Q_EMPTY_SIG);
     }
 } while (r != Q_RET_IGNORED); // QHsm::top() state not reached
 m_temp.fun = m_state.fun; // establish stable state configuration
@@ -1092,12 +1095,12 @@ return Q_RET_SUPER_SUB;</code>
    <!--${QEP::QHsm::hsm_tran}-->
    <operation name="hsm_tran" type="std::int_fast8_t" visibility="0x02" properties="0x00">
     <documentation>//! @details
-//! helper function to execute transition sequence in a hierarchical state
-//! machine (HSM).
+//! helper function to execute transition sequence in a hierarchical
+//! state machine (HSM).
 //!
 //! @param[in,out] path array of pointers to state-handler functions
 //!                     to execute the entry actions
-//! @param[in]     qs_id QS-id of this state machine (for QS local filter)
+//! @param[in]  qs_id   QS-id of this state machine (for QS local filter)
 //!
 //! @returns
 //! the depth of the entry path stored in the `path` parameter.
@@ -1108,19 +1111,23 @@ return Q_RET_SUPER_SUB;</code>
     <parameter name="(&amp;path)[MAX_NEST_DEPTH_]" type="QStateHandler"/>
     <!--${QEP::QHsm::hsm_tran::qs_id}-->
     <parameter name="qs_id" type="std::uint_fast8_t const"/>
-    <code>std::int_fast8_t ip = -1; // transition entry path index
+    <code>#ifndef Q_SPY
+Q_UNUSED_PAR(qs_id);
+#endif
+
+std::int_fast8_t ip = -1; // transition entry path index
 QStateHandler t = path[0];
 QStateHandler const s = path[2];
-QS_CRIT_STAT_
 
 // (a) check source==target (transition to self)
 if (s == t) {
-    QEP_EXIT_(s);  // exit the source
+    // exit the source
+    static_cast&lt;void&gt;(hsm_state_exit_(this, s, qs_id));
     ip = 0; // enter the target
 }
 else {
     // superstate of target
-    QEP_TRIG_(t, QEP_EMPTY_SIG_);
+    static_cast&lt;void&gt;(hsm_reservedEvt_(this, t, Q_EMPTY_SIG));
     t = m_temp.fun;
 
     // (b) check source==target-&gt;super
@@ -1129,17 +1136,19 @@ else {
     }
     else {
         // superstate of src
-        QEP_TRIG_(s, QEP_EMPTY_SIG_);
+        static_cast&lt;void&gt;(hsm_reservedEvt_(this, s, Q_EMPTY_SIG));
 
         // (c) check source-&gt;super==target-&gt;super
         if (m_temp.fun == t) {
-            QEP_EXIT_(s);  // exit the source
+            // exit the source
+            static_cast&lt;void&gt;(hsm_state_exit_(this, s, qs_id));
             ip = 0; // enter the target
         }
         else {
             // (d) check source-&gt;super==target
             if (m_temp.fun == path[0]) {
-                QEP_EXIT_(s); // exit the source
+                // exit the source
+                static_cast&lt;void&gt;(hsm_state_exit_(this, s, qs_id));
             }
             else {
                 // (e) check rest of source==target-&gt;super-&gt;super..
@@ -1150,7 +1159,7 @@ else {
                 t = m_temp.fun; // save source-&gt;super
 
                 // find target-&gt;super-&gt;super
-                QState r = QEP_TRIG_(path[1], QEP_EMPTY_SIG_);
+                QState r = hsm_reservedEvt_(this, path[1], Q_EMPTY_SIG);
                 while (r == Q_RET_SUPER) {
                     ++ip;
                     path[ip] = m_temp.fun; // store the entry path
@@ -1165,7 +1174,7 @@ else {
                     }
                     // it is not the source, keep going up
                     else {
-                        r = QEP_TRIG_(m_temp.fun, QEP_EMPTY_SIG_);
+                        r = hsm_reservedEvt_(this, m_temp.fun, Q_EMPTY_SIG);
                     }
                 }
 
@@ -1174,7 +1183,8 @@ else {
                     // entry path must not overflow
                     Q_ASSERT_ID(520, ip &lt; MAX_NEST_DEPTH_);
 
-                    QEP_EXIT_(s); // exit the source
+                    // exit the source
+                    static_cast&lt;void&gt;(hsm_state_exit_(this, s, qs_id));
 
                     // (f) check the rest of source-&gt;super
                     //                  == target-&gt;super-&gt;super...
@@ -1200,15 +1210,11 @@ else {
                         //
                         r = Q_RET_IGNORED; // keep looping
                         do {
-                            // exit t unhandled?
-                            if (QEP_TRIG_(t, Q_EXIT_SIG) == Q_RET_HANDLED)
-                            {
-                                QS_BEGIN_PRE_(QS_QEP_STATE_EXIT, qs_id)
-                                    QS_OBJ_PRE_(this);
-                                    QS_FUN_PRE_(t);
-                                QS_END_PRE_()
-
-                                QEP_TRIG_(t, QEP_EMPTY_SIG_);
+                            // exit from t handled?
+                            if (hsm_state_exit_(this, t, qs_id)) {
+                                // find superstate of t
+                                static_cast&lt;void&gt;(
+                                    hsm_reservedEvt_(this, t, Q_EMPTY_SIG));
                             }
                             t = m_temp.fun; //  set to super of t
                             iq = ip;
@@ -1230,7 +1236,6 @@ else {
         }
     }
 }
-Q_UNUSED_PAR(qs_id); // when Q_SPY not defined
 return ip;
 </code>
    </operation>
@@ -2749,7 +2754,7 @@ else {
 
 // is it a dynamic event?
 if (e-&gt;poolId_ != 0U) {
-    QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    QEvt_refCtr_inc_(e); // increment the reference counter
 }
 
 if (status) { // can post the event?
@@ -2868,7 +2873,7 @@ Q_ASSERT_CRIT_(210, nFree != 0U);
 
 // is it a dynamic event?
 if (e-&gt;poolId_ != 0U) {
-    QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    QEvt_refCtr_inc_(e); // increment the reference counter
 }
 
 --nFree;  // one free entry just used up
@@ -3209,7 +3214,7 @@ if (e != nullptr) {
 
         // we need to decrement the reference counter once, to account
         // for removing the event from the deferred event queue.
-        QF_EVT_REF_CTR_DEC_(e); // decrement the reference counter
+        QEvt_refCtr_dec_(e); // decrement the reference counter
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_RECALL, m_prio)
@@ -3397,7 +3402,7 @@ if (e-&gt;poolId_ != 0U) {
     // recycles the event if the counter drops to zero. This covers the
     // case when the event was published without any subscribers.
     //
-    QF_EVT_REF_CTR_INC_(e);
+    QEvt_refCtr_inc_(e);
 }
 
 // make a local, modifiable copy of the subscriber list
@@ -4485,7 +4490,7 @@ if (((margin == QF::NO_MARGIN) &amp;&amp; (nFree &gt; 0U))
 {
     // is it a dynamic event?
     if (e-&gt;poolId_ != 0U) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+        QEvt_refCtr_inc_(e); // increment the reference counter
     }
 
     --nFree; // one free entry just used up
@@ -4582,7 +4587,7 @@ Q_REQUIRE_CRIT_(300, nFree != 0U);
 
 // is it a dynamic event?
 if (e-&gt;poolId_ != 0U) {
-    QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    QEvt_refCtr_inc_(e); // increment the reference counter
 }
 
 --nFree; // one free entry just used up
@@ -4962,9 +4967,13 @@ if (m_nFree &gt; static_cast&lt;QMPoolCtr&gt;(margin)) {
         m_nMin = 0U;// remember that pool got empty
     }
     else {
-        // pool is not empty, so the next free block must be in range
-        //
-        // NOTE: the next free block pointer can fall out of range
+        //! @invariant
+        //! The pool is not empty, so the next free-block pointer,
+        //! so the next free block must be in range.
+        //!
+        //! @tr{PQP18_3}
+
+        // NOTE: The next free block pointer can fall out of range
         // when the client code writes past the memory block, thus
         // corrupting the next block.
         Q_ASSERT_CRIT_(330, QF_PTR_RANGE_(fb_next, m_start, m_end));
@@ -5570,7 +5579,7 @@ if (e-&gt;poolId_ != 0U) {
             QS_2U8_PRE_(e-&gt;poolId_, e-&gt;refCtr_); // pool Id &amp; refCtr
         QS_END_NOCRIT_PRE_()
 
-        QF_EVT_REF_CTR_DEC_(e); // decrement the ref counter
+        QEvt_refCtr_dec_(e); // decrement the ref counter
 
         QF_CRIT_X_();
     }
@@ -5645,7 +5654,7 @@ Q_REQUIRE_ID(500, (e-&gt;poolId_ != 0U)
 QF_CRIT_STAT_
 QF_CRIT_E_();
 
-QF_EVT_REF_CTR_INC_(e); // increments the ref counter
+QEvt_refCtr_inc_(e); // increments the ref counter
 
 QS_BEGIN_NOCRIT_PRE_(QS_QF_NEW_REF,
                  static_cast&lt;std::uint_fast8_t&gt;(QS_EP_ID)
@@ -8614,7 +8623,7 @@ switch (state) {
                 // when the event is just retreived from a queue.
                 // This is expected for the following QF::gc() call.
                 //
-                QF_EVT_REF_CTR_INC_(l_rx.var.evt.e);
+                QEvt_refCtr_inc_(l_rx.var.evt.e);
 
                 static_cast&lt;QHsm *&gt;(QS::rxPriv_.currObj[QS::SM_OBJ])
                         -&gt;dispatch(l_rx.var.evt.e, 0U);
@@ -8631,7 +8640,7 @@ switch (state) {
                 // when the event is just retreived from a queue.
                 // This is expected for the following QF::gc() call.
                 //
-                QF_EVT_REF_CTR_INC_(l_rx.var.evt.e);
+                QEvt_refCtr_inc_(l_rx.var.evt.e);
 
                 static_cast&lt;QHsm *&gt;(QS::rxPriv_.currObj[QS::SM_OBJ])
                         -&gt;init(l_rx.var.evt.e, 0U);
@@ -9253,7 +9262,7 @@ QF_CRIT_E_();
 
 // is it a dynamic event?
 if (e-&gt;poolId_ != 0U) {
-    QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    QEvt_refCtr_inc_(e); // increment the reference counter
 }
 
 std::uint_fast8_t const rec =
@@ -9306,7 +9315,7 @@ QF_CRIT_E_();
 
 // is it a dynamic event?
 if (e-&gt;poolId_ != 0U) {
-    QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    QEvt_refCtr_inc_(e); // increment the reference counter
 }
 
 QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
@@ -9676,12 +9685,13 @@ bzero(&amp;QK_attr_,                  sizeof(QK_attr_));
 // setup the QK scheduler as initially locked and not running
 QK_attr_.lockCeil = (QF_MAX_ACTIVE + 1U); // scheduler locked
 
-// QK idle AO object (const in ROM)
-static void * const idle_ao[(sizeof(QActive)/sizeof(void*)) + 1U]
-    = { nullptr };
-// register the idle AO object (cast 'const' away)
+// storage capable for holding a blank QActive object (const in ROM)
+static void* const
+    idle_ao[((sizeof(QActive) + sizeof(void*)) - 1U) / sizeof(void*)]
+        = { nullptr };
+// register the blank QActive object as the idle-AO (cast 'const' away)
 QActive::registry_[0] = QF_CONST_CAST_(QActive*,
-   reinterpret_cast&lt;QActive const*&gt;(&amp;idle_ao[0]));
+    reinterpret_cast&lt;QActive const*&gt;(idle_ao));
 
 #ifdef QK_INIT
 QK_INIT(); // port-specific initialization of the QK kernel
@@ -10659,7 +10669,7 @@ else if (m_eQueue.m_end != 0U) {
 
     // is it a dynamic event?
     if (e-&gt;poolId_ != 0U) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+        QEvt_refCtr_inc_(e); // increment the reference counter
     }
 
     if (status) { // can post the event?
@@ -11694,12 +11704,13 @@ bzero(&amp;QXK_attr_,                 sizeof(QXK_attr_));
 // setup the QXK scheduler as initially locked and not running
 QXK_attr_.lockCeil = (QF_MAX_ACTIVE + 1U); // scheduler locked
 
-// QXK idle AO object (const in ROM)
-static void * const idle_ao[(sizeof(QActive)/sizeof(void*)) + 1U]
-    = { nullptr };
-// register the idle AO object (cast 'const' away)
+// storage capable for holding a blank QActive object (const in ROM)
+static void* const
+    idle_ao[((sizeof(QActive) + sizeof(void*)) - 1U) / sizeof(void*)]
+        = { nullptr };
+// register the blank QActive object as the idle-AO (cast 'const' away)
 QActive::registry_[0] = QF_CONST_CAST_(QActive*,
-    reinterpret_cast&lt;QActive const*&gt;(&amp;idle_ao[0]));
+    reinterpret_cast&lt;QActive const*&gt;(idle_ao));
 
 #ifdef QXK_INIT
 QXK_INIT(); // port-specific initialization of the QXK kernel
@@ -12274,8 +12285,8 @@ QF_CRIT_X_();</code>
 //
 #define QP_VERSION_STR &quot;7.1.3&quot;
 
-//! Encrypted  current QP release (7.1.3) and date (2022-11-11)
-#define QP_RELEASE 0x7C3520C6U
+//! Encrypted  current QP release (7.1.3) and date (2022-11-18)
+#define QP_RELEASE 0x7C340F56U
 
 //============================================================================
 // Global namespace...
@@ -12355,23 +12366,13 @@ constexpr std::uint8_t TE_TICK_RATE    = 0x0FU;     // bitmask
 
 // internal helper inline functions
 
-//! return the Pool-ID of an event `e`
-inline std::uint8_t QF_EVT_POOL_ID_ (QEvt const * const e) noexcept {
-    return e-&gt;poolId_;
-}
-
-//! return the Reference Conter of an event `e`
-inline std::uint8_t QF_EVT_REF_CTR_ (QEvt const * const e) noexcept {
-    return e-&gt;refCtr_;
-}
-
 //! increment the refCtr_ of an event `e`
-inline void QF_EVT_REF_CTR_INC_(QEvt const * const e) noexcept {
+inline void QEvt_refCtr_inc_(QEvt const * const e) noexcept {
     (QF_CONST_CAST_(QEvt*, e))-&gt;refCtr_ = e-&gt;refCtr_ + 1U;
 }
 
 //! decrement the refCtr_ of an event `e`
-inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) noexcept {
+inline void QEvt_refCtr_dec_(QEvt const * const e) noexcept {
     (QF_CONST_CAST_(QEvt*, e))-&gt;refCtr_ = e-&gt;refCtr_ - 1U;
 }
 
@@ -13422,65 +13423,118 @@ extern char const BUILD_TIME[9];
 #endif // Q_SPY
 #include &quot;qassert.h&quot;        // QP embedded systems-friendly assertions
 
-// local helper macros...
-
-//! helper macro to trigger internal event in an HSM
-#define QEP_TRIG_(state_, sig_) \
-    ((*(state_))(this, &amp;QEP_reservedEvt_[sig_]))
-
-//! helper macro to trigger exit action in an HSM
-#define QEP_EXIT_(state_) do {                            \
-    if (QEP_TRIG_(state_, Q_EXIT_SIG) == Q_RET_HANDLED) { \
-        QS_BEGIN_PRE_(QS_QEP_STATE_EXIT, qs_id)           \
-            QS_OBJ_PRE_(this);                            \
-            QS_FUN_PRE_(state_);                          \
-        QS_END_PRE_() \
-    } \
-} while (false)
-
-//! helper macro to trigger entry action in an HSM
-#define QEP_ENTER_(state_) do { \
-    if (QEP_TRIG_(state_, Q_ENTRY_SIG) == Q_RET_HANDLED) { \
-        QS_BEGIN_PRE_(QS_QEP_STATE_ENTRY, qs_id)           \
-            QS_OBJ_PRE_(this);                             \
-            QS_FUN_PRE_(state_);                           \
-        QS_END_PRE_() \
-    } \
-} while (false)
+//============================================================================
+$define ${QEP::versionStr[]}
 
 //============================================================================
 // unnamed namespace for local definitions with internal linkage
 namespace {
 Q_DEFINE_THIS_MODULE(&quot;qep_hsm&quot;)
 
-enum : QP::QSignal {
-    //! empty signal for internal use only
-    QEP_EMPTY_SIG_ = 0U
-};
-
-//============================================================================
-//! @details
-//! Static, preallocated standard events that the QEP event processor sends
-//! to state handler functions of QP::QHsm-style state machine to execute
-//! entry actions, exit actions, and initial transitions.
+//----------------------------------------------------------------------------
+//! Immutable events corresponding to the reserved signals.
 //!
-static QP::QEvt const QEP_reservedEvt_[4] {
+//! @details
+//! Static, immutable reserved events that the QEP event processor sends
+//! to state handler functions of QHsm-style state machine to execute entry
+//! actions, exit actions, and initial transitions.
+//!
+static QP::QEvt const l_reservedEvt_[4] {
 #ifdef Q_EVT_CTOR // Is the QEvt constructor provided?
-    QP::QEvt(0U, 0U),
-    QP::QEvt(1U, 0U),
-    QP::QEvt(2U, 0U),
-    QP::QEvt(3U, 0U)
+    QP::QEvt(static_cast&lt;QP::QSignal&gt;(QP::QHsm::Q_EMPTY_SIG), 0U),
+    QP::QEvt(static_cast&lt;QP::QSignal&gt;(QP::QHsm::Q_ENTRY_SIG), 0U),
+    QP::QEvt(static_cast&lt;QP::QSignal&gt;(QP::QHsm::Q_EXIT_SIG),  0U),
+    QP::QEvt(static_cast&lt;QP::QSignal&gt;(QP::QHsm::Q_INIT_SIG),  0U)
 #else // QEvt is a POD (Plain Old Datatype)
-    { 0U, 0U, 0U },
-    { 1U, 0U, 0U },
-    { 2U, 0U, 0U },
-    { 3U, 0U, 0U }
+    { static_cast&lt;QP::QSignal&gt;(QP::QHsm::Q_EMPTY_SIG), 0U, 0U },
+    { static_cast&lt;QP::QSignal&gt;(QP::QHsm::Q_ENTRY_SIG), 0U, 0U },
+    { static_cast&lt;QP::QSignal&gt;(QP::QHsm::Q_EXIT_SIG),  0U, 0U },
+    { static_cast&lt;QP::QSignal&gt;(QP::QHsm::Q_INIT_SIG),  0U, 0U }
 #endif
 };
 
+//----------------------------------------------------------------------------
+// inline helper functions
+
+//............................................................................
+//! helper function to trigger reserved event in an QHsm
+//!
+//! @param[in] state state handler function
+//! @param[in] sig   reserved signal to trigger
+static inline QP::QState hsm_reservedEvt_(
+    QP::QHsm * const me,
+    QP::QStateHandler const state,
+    enum QP::QHsm::ReservedSig const sig)
+{
+    return (*state)(me, &amp;l_reservedEvt_[sig]);
+}
+
+//............................................................................
+//! Helper function to execute entry into a given state in a
+//! hierarchical state machine (HSM).
+//!
+//! @param[in] state   state handler function
+//! @param[in] qs_id   QS-id of this state machine (for QS local filter)
+static inline void hsm_state_entry_(
+    QP::QHsm * const me,
+    QP::QStateHandler const state,
+    std::uint_fast8_t const qs_id)
+{
+#ifdef Q_SPY
+    if ((*state)(me, &amp;l_reservedEvt_[QP::QHsm::Q_ENTRY_SIG])
+         == QP::QHsm::Q_RET_HANDLED)
+    {
+        QS_CRIT_STAT_
+        QS_BEGIN_PRE_(QP::QS_QEP_STATE_ENTRY, qs_id)
+            QS_OBJ_PRE_(me);
+            QS_FUN_PRE_(state);
+        QS_END_PRE_()
+    }
+#else
+    Q_UNUSED_PAR(qs_id);
+    static_cast&lt;void&gt;((*state)(me, &amp;l_reservedEvt_[QP::QHsm::Q_ENTRY_SIG]));
+#endif // Q_SPY
+}
+
+//............................................................................
+//! Helper function to execute exit from a given state in a
+//! hierarchical state machine (HSM).
+//!
+//! @param[in] state   state handler function
+//! @param[in] qs_id   QS-id of this state machine (for QS local filter)
+//!
+//! @returns
+//! 'true' if the exit action has been found in the state and
+//! 'flase' otherwise.
+static inline bool hsm_state_exit_(
+    QP::QHsm * const me,
+    QP::QStateHandler const state,
+    std::uint_fast8_t const qs_id)
+{
+#ifdef Q_SPY
+    bool isHandled;
+    if ((*state)(me, &amp;l_reservedEvt_[QP::QHsm::Q_EXIT_SIG])
+        == QP::QHsm::Q_RET_HANDLED)
+    {
+        QS_CRIT_STAT_
+        QS_BEGIN_PRE_(QP::QS_QEP_STATE_EXIT, qs_id)
+            QS_OBJ_PRE_(me);
+            QS_FUN_PRE_(state);
+        QS_END_PRE_()
+        isHandled = true;
+    }
+    else {
+        isHandled = false;
+    }
+    return isHandled;
+#else
+    Q_UNUSED_PAR(qs_id);
+    return (*state)(me, &amp;l_reservedEvt_[QP::QHsm::Q_EXIT_SIG]);
+#endif // Q_SPY
+}
+
 } // unnamed namespace
 
-$define ${QEP::versionStr[]}
 $define ${QEP::QHsm}</text>
    </file>
    <!--${src::qf::qep_msm.cpp}-->

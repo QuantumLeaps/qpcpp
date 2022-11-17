@@ -822,9 +822,9 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
 //..........................................................................*/
 static void playerTrigger(void) {
     static QP::QEvt const fireEvt = { PLAYER_TRIGGER_SIG, 0U, 0U };
-    QP::QF::PUBLISH(&fireEvt, nullptr);
+    static QP::QSpyId const sender = { 0U };
+    QP::QF::PUBLISH(&fireEvt, &sender);
 }
-
 
 } // namespace GAME
 
@@ -833,16 +833,16 @@ namespace QP {
 
 //............................................................................
 void QF::onStartup(void) {
-    QF_setTickRate(GAME::BSP_TICKS_PER_SEC, 30); // set the desired tick rate
+    setTickRate(GAME::BSP_TICKS_PER_SEC, 30); // set the desired tick rate
 }
 //............................................................................
 void QF::onCleanup(void) {
 }
 //............................................................................
-void QF_onClockTick(void) {
+void QF::onClockTick(void) {
     static QP::QEvt const tickEvt = QEVT_INITIALIZER(GAME::TIME_TICK_SIG);
-    QP::QTimeEvt::TICK_X(0U, &GAME::l_clock_tick); // process time events at rate 0
-    QP::QF::PUBLISH(&tickEvt, &GAME::l_clock_tick); // publish the tick event
+    QTimeEvt::TICK_X(0U, &GAME::l_clock_tick); // process time events at rate 0
+    QF::PUBLISH(&tickEvt, &GAME::l_clock_tick); // publish the tick event
 
     QS_RX_INPUT(); // handle the QS-RX input
     QS_OUTPUT();   // handle the QS output
@@ -868,13 +868,10 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 void QS::onCommand(uint8_t cmdId, uint32_t param1,
                    uint32_t param2, uint32_t param3)
 {
-    (void)cmdId;
-    (void)param1;
-    (void)param2;
-    (void)param3;
-    if (cmdId == 10U) {
-        Q_onAssert("QS::onCommand", 10);
-    }
+    Q_UNUSED_PAR(cmdId);
+    Q_UNUSED_PAR(param1);
+    Q_UNUSED_PAR(param2);
+    Q_UNUSED_PAR(param3);
 }
 
 #endif // Q_SPY

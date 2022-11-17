@@ -37,7 +37,7 @@
 
 extern "C" {
     #include "GUI.h"
-    #include "GUI_SIM.h"
+    #include "LCD_SIM.h"
     #include "DIALOG.h"
 }
 
@@ -123,7 +123,7 @@ void BSP_init(void) {
         SIM_HARDKEY_SetCallback(n, &simHardKey);
     }
 
-    QF_setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
+    QF::setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
 }
 //............................................................................
 void QF::onStartup(void) {
@@ -135,7 +135,7 @@ void QF::onCleanup(void) {
 #endif
 }
 //............................................................................
-void QP::QF_onClockTick(void) {
+void QF::onClockTick(void) {
     QTimeEvt::TICK(&l_clock_tick); // perform the QF clock tick processing
 }
 

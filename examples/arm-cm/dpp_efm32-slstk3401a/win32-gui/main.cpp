@@ -47,7 +47,7 @@ int main() {
     static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-    DPP::BSP::init(); // initialize the BSP
+    BSP::init(); // initialize the BSP
 
     QP::QActive::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
 

@@ -83,7 +83,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\ports\win32;.\Config;..\..\..\3rd_party\emWin\GUI\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\ports\win32-qv;.\Config;..\..\..\3rd_party\emWin\GUI\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -100,10 +100,10 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>qp.lib;legacy_stdio_definitions.lib;ws2_32.lib;winmm.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;winmm.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Release/demo_no_wm.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\ports\win32\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <ProgramDatabaseFile>.\Release/demo_no_wm.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -131,7 +131,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\ports\win32;.\Config;..\..\..\3rd_party\emWin\GUI\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\ports\win32-qv;.\Config;..\..\..\3rd_party\emWin\GUI\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -148,10 +148,10 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>qp.lib;legacy_stdio_definitions.lib;ws2_32.lib;winmm.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;winmm.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Debug/demo_no_wm.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\ports\win32\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/demo_no_wm.pdb</ProgramDatabaseFile>
@@ -180,7 +180,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\ports\win32;.\Config;..\..\..\3rd_party\emWin\GUI\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\ports\win32-qv;.\Config;..\..\..\3rd_party\emWin\GUI\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;Q_SPY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -198,10 +198,10 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>qp.lib;legacy_stdio_definitions.lib;ws2_32.lib;winmm.lib;libcmt.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;winmm.lib;libcmt.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\QSpy/demo_no_wm.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\ports\win32\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\QSpy/demo_no_wm.pdb</ProgramDatabaseFile>
@@ -221,6 +221,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\include\qstamp.cpp" />
+    <ClCompile Include="..\..\..\ports\win32-qv\qf_port.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qep_hsm.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qep_msm.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_act.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_actq.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_defer.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_dyn.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_mem.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_ps.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_qact.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_qeq.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_qmact.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_time.cpp" />
     <ClCompile Include="bsp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="philo.cpp" />
@@ -232,6 +245,9 @@
     <ClCompile Include="Config\SIMConf.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\ports\win32-qv\qep_port.hpp" />
+    <ClInclude Include="..\..\..\ports\win32-qv\qf_port.hpp" />
+    <ClInclude Include="..\..\..\ports\win32-qv\safe_std.h" />
     <ClInclude Include="bsp.h" />
     <ClInclude Include="dpp.h" />
     <ClInclude Include="Config\GUIConf.h" />
@@ -243,6 +259,9 @@
   <ItemGroup>
     <Library Include="..\..\..\3rd_party\emWin\GUI\Library\GUI.lib" />
     <Library Include="..\..\..\3rd_party\emWin\Simulation\GUISim.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\ports\win32-qv\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
