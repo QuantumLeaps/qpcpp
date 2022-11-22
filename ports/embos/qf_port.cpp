@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-09-17
-//! @version Last updated for: @ref qpcpp_7_1_1
+//! @date Last updated on: 2022-11-22
+//! @version Last updated for: @ref qpcpp_7_1_3
 //!
 //! @file
 //! @brief QF/C++ port to embOS RTOS kernel, all supported compilers
@@ -74,7 +74,7 @@ int_t QF::run(void) {
 
     OS_Start();      // start embOS multitasking
     Q_ERROR_ID(100); // OS_Start() should never return
-    return 0;       // dummy return to make the compiler happy
+    return 0;        // dummy return to make the compiler happy
 }
 //............................................................................
 void QF::stop(void) {
@@ -186,17 +186,17 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     if (status) { // can post the event?
 
         QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
-            QS_TIME_PRE_();        // timestamp
-            QS_OBJ_PRE_(sender);   // the sender object
-            QS_SIG_PRE_(e->sig);   // the signal of the event
-            QS_OBJ_PRE_(this);     // this active object (recipient)
+            QS_TIME_PRE_();      // timestamp
+            QS_OBJ_PRE_(sender); // the sender object
+            QS_SIG_PRE_(e->sig); // the signal of the event
+            QS_OBJ_PRE_(this);   // this active object (recipient)
             QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
-            QS_EQC_PRE_(nFree);    // # free entries
-            QS_EQC_PRE_(0U);       // min # free (unknown)
+            QS_EQC_PRE_(nFree);  // # free entries
+            QS_EQC_PRE_(0U);     // min # free (unknown)
         QS_END_NOCRIT_PRE_()
 
-        if (e->poolId_ != 0U) {     // is it a pool event?
-            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+        if (e->poolId_ != 0U) {  // is it a pool event?
+            QEvt_refCtr_inc_(e); // increment the reference counter
         }
 
         QF_CRIT_X_();
@@ -209,13 +209,13 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     else {
 
         QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
-            QS_TIME_PRE_();             // timestamp
-            QS_OBJ_PRE_(sender);        // the sender object
-            QS_SIG_PRE_(e->sig);        // the signal of the event
-            QS_OBJ_PRE_(this);          // this active object (recipient)
+            QS_TIME_PRE_();      // timestamp
+            QS_OBJ_PRE_(sender); // the sender object
+            QS_SIG_PRE_(e->sig); // the signal of the event
+            QS_OBJ_PRE_(this);   // this active object (recipient)
             QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
-            QS_EQC_PRE_(nFree);         // # free entries
-            QS_EQC_PRE_(0U);            // min # free (unknown)
+            QS_EQC_PRE_(nFree);  // # free entries
+            QS_EQC_PRE_(0U);     // min # free (unknown)
         QS_END_NOCRIT_PRE_()
 
         QF_CRIT_X_();
@@ -229,16 +229,16 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_E_();
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
-        QS_TIME_PRE_();             // timestamp
-        QS_SIG_PRE_(e->sig);        // the signal of this event
-        QS_OBJ_PRE_(this);          // this active object
+        QS_TIME_PRE_();      // timestamp
+        QS_SIG_PRE_(e->sig); // the signal of this event
+        QS_OBJ_PRE_(this);   // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
         QS_EQC_PRE_(m_eQueue.maxMsg - m_eQueue.nofMsg); // # free entries
-        QS_EQC_PRE_(0U); // min # free entries (unknown)
+        QS_EQC_PRE_(0U);     // min # free entries (unknown)
     QS_END_NOCRIT_PRE_()
 
-    if (e->poolId_ != 0U) {     // is it a pool event?
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    if (e->poolId_ != 0U) {  // is it a pool event?
+        QEvt_refCtr_inc_(e); // increment the reference counter
     }
 
     QF_CRIT_X_();
@@ -256,9 +256,9 @@ QEvt const *QActive::get_(void) noexcept {
     OS_GetMail(&m_eQueue, &e);
 
     QS_BEGIN_PRE_(QS_QF_ACTIVE_GET, m_prio)
-        QS_TIME_PRE_();             // timestamp
-        QS_SIG_PRE_(e->sig);        // the signal of this event
-        QS_OBJ_PRE_(this);          // this active object
+        QS_TIME_PRE_();      // timestamp
+        QS_SIG_PRE_(e->sig); // the signal of this event
+        QS_OBJ_PRE_(this);   // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
         QS_EQC_PRE_(m_eQueue.maxMsg - m_eQueue.nofMsg); // # free entries
     QS_END_PRE_()

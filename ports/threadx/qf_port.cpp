@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-09-17
-//! @version Last updated for: @ref qpcpp_7_1_1
+//! @date Last updated on: 2022-11-22
+//! @version Last updated for: @ref qpcpp_7_1_3
 //!
 //! @file
 //! @brief QF/C++ port to ThreadX, all supported compilers
@@ -168,9 +168,8 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
             QS_EQC_PRE_(0U);      // min # free (unknown)
         QS_END_NOCRIT_PRE_()
 
-        // is it a pool event?
-        if (e->poolId_ != 0U) {
-            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+        if (e->poolId_ != 0U) {   // is it a pool event?
+            QEvt_refCtr_inc_(e);  // increment the reference counter
         }
 
         QF_CRIT_X_();
@@ -209,12 +208,11 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
         // # free entries available
         QS_EQC_PRE_(m_eQueue.tx_queue_available_storage);
-        QS_EQC_PRE_(0U); // min # free entries (unknown)
+        QS_EQC_PRE_(0U);      // min # free entries (unknown)
     QS_END_NOCRIT_PRE_()
 
-    // is it a pool event?
-    if (e->poolId_ != 0U) {
-        QF_EVT_REF_CTR_INC_(e);  // increment the reference counter
+    if (e->poolId_ != 0U) {   // is it a pool event?
+        QEvt_refCtr_inc_(e);  // increment the reference counter
     }
 
     QF_CRIT_X_();

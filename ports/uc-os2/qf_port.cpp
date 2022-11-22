@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-09-22
-//! @version Last updated for: @ref qpcpp_7_1_1
+//! @date Last updated on: 2022-11-22
+//! @version Last updated for: @ref qpcpp_7_1_3
 //!
 //! @file
 //! @brief QF/C++ port to uC-OS2, generic C++11 compiler
@@ -75,16 +75,16 @@ void QActive::start(QPrioSpec const prioSpec,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
-    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
-    register_(); // make QF aware of this AO
-
     // task name to be passed to OSTaskCreateExt()
     void * const task_name = static_cast<void *>(m_eQueue);
 
     // create uC-OS2 queue and make sure it was created correctly
     m_eQueue = OSQCreate((void **)qSto, qLen);
     Q_ASSERT_ID(210, m_eQueue != nullptr);
+
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
+    register_(); // make QF aware of this AO
 
     init(par, m_prio); // take the top-most initial tran.
     QS_FLUSH();     // flush the trace buffer to the host
@@ -148,8 +148,6 @@ void QActive::thread_(QActive *act) {
         act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
         QF::gc(e); // check if the event is garbage, and collect it if so
     }
-    act->unregister_(); // remove this object from QF
-    OSTaskDel(OS_PRIO_SELF); // make uC-OS2 forget about this task
 }
 //............................................................................
 static void task_function(void *pdata) { // uC-OS2 task signature
@@ -160,7 +158,6 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
                     void const * const sender) noexcept
 {
     QF_CRIT_STAT_
-
     QF_CRIT_E_();
     std::uint_fast16_t const nFree = static_cast<std::uint_fast16_t>(
         reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSQSize
@@ -169,15 +166,15 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     bool status;
     if (margin == QF::NO_MARGIN) {
         if (nFree > 0U) {
-            status = true; // can post
+            status = true;   // can post
         }
         else {
-            status = false; // cannot post
+            status = false;  // cannot post
             Q_ERROR_ID(710); // must be able to post the event
         }
     }
     else if (nFree > static_cast<QEQueueCtr>(margin)) {
-        status = true; // can post
+        status = true;  // can post
     }
     else {
         status = false; // cannot post
@@ -195,8 +192,8 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
             QS_EQC_PRE_(0U);     // min # free (unknown)
         QS_END_NOCRIT_PRE_()
 
-        if (e->poolId_ != 0U) { // is it a pool event?
-            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+        if (e->poolId_ != 0U) {  // is it a pool event?
+            QEvt_refCtr_inc_(e); // increment the reference counter
         }
 
         QF_CRIT_X_();
@@ -228,18 +225,18 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_E_();
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
-        QS_TIME_PRE_();       // timestamp
-        QS_SIG_PRE_(e->sig);  // the signal of this event
-        QS_OBJ_PRE_(this);    // this active object
+        QS_TIME_PRE_();      // timestamp
+        QS_SIG_PRE_(e->sig); // the signal of this event
+        QS_OBJ_PRE_(this);   // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
-                              // # free entries
+                             // # free entries
         QS_EQC_PRE_(reinterpret_cast<OS_Q *>(m_eQueue)->OSQSize
                     - reinterpret_cast<OS_Q *>(m_eQueue)->OSQEntries);
-        QS_EQC_PRE_(0U);      // min # free (unknown)
+        QS_EQC_PRE_(0U);     // min # free (unknown)
     QS_END_NOCRIT_PRE_()
 
-    if (e->poolId_ != 0U) { // is it a pool event?
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    if (e->poolId_ != 0U) {  // is it a pool event?
+        QEvt_refCtr_inc_(e); // increment the reference counter
     }
 
     QF_CRIT_X_();

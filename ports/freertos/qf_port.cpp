@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-09-17
-//! @version Last updated for: @ref qpcpp_7_1_1
+//! @date Last updated on: 2022-11-22
+//! @version Last updated for: @ref qpcpp_7_1_3
 //!
 //! @file
 //! @brief QF/C++ port to FreeRTOS (v10.x) kernel, all supported compilers
@@ -229,7 +229,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
         // is it a pool event?
         if (e->poolId_ != 0U) {
-            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+            QEvt_refCtr_inc_(e);  // increment the reference counter
         }
 
         QF_CRIT_X_();
@@ -267,12 +267,12 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
         QS_OBJ_PRE_(this);    // this active object
         QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
         QS_EQC_PRE_(FREERTOS_QUEUE_GET_FREE()); // # free slots
-        QS_EQC_PRE_(0U); // min # free entries (unknown)
+        QS_EQC_PRE_(0U);      // min # free entries (unknown)
     QS_END_NOCRIT_PRE_()
 
     // is it a pool event?
     if (e->poolId_ != 0U) {
-        QF_EVT_REF_CTR_INC_(e);  // increment the reference counter
+        QEvt_refCtr_inc_(e);  // increment the reference counter
     }
 
     QF_CRIT_X_();
@@ -340,8 +340,8 @@ bool QActive::postFromISR_(QEvt const * const e,
             QS_EQC_PRE_(0U);     // min # free entries (unknown)
         QS_END_NOCRIT_PRE_()
 
-        if (e->poolId_ != 0U) { // is it a pool event?
-            QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+        if (e->poolId_ != 0U) {  // is it a pool event?
+            QEvt_refCtr_inc_(e); // increment the reference counter
         }
 
         portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
@@ -396,7 +396,7 @@ void QActive::publishFromISR_(QEvt const *e, void *par,
         // and recycles the event if the counter drops to zero. This covers
         // the case when the event was published without any subscribers.
         //
-        QF_EVT_REF_CTR_INC_(e);
+        QEvt_refCtr_inc_(e);
     }
 
     // make a local, modifiable copy of the subscriber list
@@ -600,7 +600,7 @@ void QF::gcFromISR(QEvt const * const e) noexcept {
 
         // isn't this the last reference?
         if (e->refCtr_ > 1U) {
-            QF_EVT_REF_CTR_DEC_(e); // decrement the ref counter
+            QEvt_refCtr_dec_(e); // decrement the ref counter
 
             QS_BEGIN_NOCRIT_PRE_(QS_QF_GC_ATTEMPT,
                                  static_cast<uint_fast8_t>(e->poolId_))

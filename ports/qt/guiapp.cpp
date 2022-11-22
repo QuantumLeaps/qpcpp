@@ -21,8 +21,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-25
-//! @version Last updated for: @ref qpcpp_7_1_0
+//! @date Last updated on: 2022-11-22
+//! @version Last updated for: @ref qpcpp_7_1_3
 //!
 //! @file
 //! @brief QP/C++ port to Qt
@@ -114,9 +114,8 @@ bool GuiQActive::post_(QEvt const * const e,
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
-    // is it a dynamic event?
-    if (QF_EVT_POOL_ID_(e) != 0U) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    if (e->poolId_ != 0U) {  // is it a dynamic event?
+        QEvt_refCtr_inc_(e); // increment the reference counter
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
@@ -124,8 +123,7 @@ bool GuiQActive::post_(QEvt const * const e,
         QS_OBJ_PRE_(sender); // the sender object
         QS_SIG_PRE_(e->sig); // the signal of the event
         QS_OBJ_PRE_(this);   // this active object
-        QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
-                QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
+        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool-Id & ref-ctr
         QS_EQC_PRE_(0U);     // number of free entries (not used)
         QS_EQC_PRE_(0U);     // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
@@ -141,17 +139,15 @@ void GuiQActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
-    // is it a dynamic event?
-    if (QF_EVT_POOL_ID_(e) != 0U) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    if (e->poolId_ != 0U) {  // is it a dynamic event?
+        QEvt_refCtr_inc_(e); // increment the reference counter
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
         QS_TIME_PRE_();      // timestamp
         QS_SIG_PRE_(e->sig); // the signal of this event
         QS_OBJ_PRE_(this);   // this active object
-        QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
-                QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
+        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool-Id & ref-ctr
         QS_EQC_PRE_(0U);     // number of free entries (not used)
         QS_EQC_PRE_(0U);     // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
@@ -193,9 +189,8 @@ bool GuiQMActive::post_(QEvt const * const e,
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
-    // is it a dynamic event?
-    if (QF_EVT_POOL_ID_(e) != 0U) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    if (e->poolId_ != 0U) {  // is it a dynamic event?
+        QEvt_refCtr_inc_(e); // increment the reference counter
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST, m_prio)
@@ -203,8 +198,7 @@ bool GuiQMActive::post_(QEvt const * const e,
         QS_OBJ_PRE_(sender); // the sender object
         QS_SIG_PRE_(e->sig); // the signal of the event
         QS_OBJ_PRE_(this);   // this active object
-        QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
-                QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
+        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool-Id & ref-ctr
         QS_EQC_PRE_(0U);     // number of free entries (not used)
         QS_EQC_PRE_(0U);     // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
@@ -220,17 +214,15 @@ void GuiQMActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT_
     QF_CRIT_E_();
 
-    // is it a dynamic event?
-    if (QF_EVT_POOL_ID_(e) != 0U) {
-        QF_EVT_REF_CTR_INC_(e); // increment the reference counter
+    if (e->poolId_ != 0U) {  // is it a dynamic event?
+        QEvt_refCtr_inc_(e); // increment the reference counter
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
         QS_TIME_PRE_();      // timestamp
         QS_SIG_PRE_(e->sig); // the signal of this event
         QS_OBJ_PRE_(this);   // this active object
-        QS_2U8_PRE_(QF_EVT_POOL_ID_(e),  /* the poolID of the event */
-                QF_EVT_REF_CTR_(e)); // the ref Ctr of the event
+        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool-Id & ref-ctr
         QS_EQC_PRE_(0U);     // number of free entries (not used)
         QS_EQC_PRE_(0U);     // min number of free entries (not used)
     QS_END_NOCRIT_PRE_()
