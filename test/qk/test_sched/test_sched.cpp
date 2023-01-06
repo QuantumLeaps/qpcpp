@@ -1,7 +1,7 @@
 //============================================================================
 // Product: System test fixture for QK on the EFM32 target
-// Last updated for version 7.1.2
-// Last updated on  2022-10-06
+// Last updated for version 7.2.0
+// Last updated on  2022-12-14
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -98,6 +98,13 @@ Q_STATE_DEF(ObjB, active) {
     return status_;
 }
 
+//============================================================================
+enum UserCommands {
+    MEM_READ, MEM_WRITE,
+    ROM_READ, ROM_WRITE,
+    RAM_READ, RAM_WRITE,
+};
+
 ObjB ObjB::inst[NUM_B];
 
 } // unnamed namespace
@@ -117,20 +124,25 @@ int main() {
     QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
     // dictionaries
-    QS_SIG_DICTIONARY(TEST0_SIG,   nullptr);
-    QS_SIG_DICTIONARY(TEST1_SIG,   nullptr);
-    QS_SIG_DICTIONARY(TEST2_SIG,   nullptr);
-    QS_SIG_DICTIONARY(TEST3_SIG,   nullptr);
+    QS_SIG_DICTIONARY(TEST0_SIG,  nullptr);
+    QS_SIG_DICTIONARY(TEST1_SIG,  nullptr);
+    QS_SIG_DICTIONARY(TEST2_SIG,  nullptr);
+    QS_SIG_DICTIONARY(TEST3_SIG,  nullptr);
+
+    QS_ENUM_DICTIONARY(MEM_READ,  QS_CMD);
+    QS_ENUM_DICTIONARY(MEM_WRITE, QS_CMD);
+    QS_ENUM_DICTIONARY(ROM_READ,  QS_CMD);
+    QS_ENUM_DICTIONARY(ROM_WRITE, QS_CMD);
+    QS_ENUM_DICTIONARY(RAM_READ,  QS_CMD);
+    QS_ENUM_DICTIONARY(RAM_WRITE, QS_CMD);
+
+    for (std::uint8_t n = 0U; n < NUM_B; ++n) {
+        QS_OBJ_ARR_DICTIONARY(&ObjB::inst[n], n);
+    }
 
     // priority specifications for ObjBs...
     static QP::QPrioSpec pspecB[NUM_B];
     QS_OBJ_DICTIONARY(pspecB);
-
-    std::uint8_t n;
-
-    for (n = 0U; n < NUM_B; ++n) {
-        QS_OBJ_ARR_DICTIONARY(&ObjB::inst[n], n);
-    }
 
     // pause execution of the test and wait for the test script to continue
     // NOTE:
@@ -138,8 +150,8 @@ int main() {
     // variables to start the threads with the desired prio-specifications.
     QS_TEST_PAUSE();
 
-    static QP::QEvt const *aoB_queueSto[NUM_B][5];
-    for (n = 0U; n < NUM_B; ++n) {
+    static QP::QEvt const *aoB_queueSto[NUM_B][10];
+    for (std::uint8_t n = 0U; n < NUM_B; ++n) {
         if (pspecB[n] != 0U) {
             ObjB::inst[n].start(pspecB[n],        // QF-prio/p-thre.
                          aoB_queueSto[n],         // event queue storage
@@ -165,21 +177,81 @@ void QS::onTestTeardown(void) {
 void QS::onCommand(uint8_t cmdId,
                   uint32_t param1, uint32_t param2, uint32_t param3)
 {
-    Q_UNUSED_PAR(cmdId);
-    Q_UNUSED_PAR(param1);
-    Q_UNUSED_PAR(param2);
-    Q_UNUSED_PAR(param3);
+    uint32_t volatile value;
+
+    switch (cmdId) {
+        case MEM_READ: { // read MEM (can trip the MPU)
+            value = *(uint32_t volatile *)(param1 + param2);
+            QS_BEGIN_ID(QS_USER, 0U)
+                QS_ENUM(QS_CMD, cmdId);
+                QS_U32(0, value);
+            QS_END()
+            break;
+        }
+        case MEM_WRITE: { // write MEM (can trip the MPU)
+            *(uint32_t volatile *)(param1 + param2) = param3;
+            QS_BEGIN_ID(QS_USER, 0U)
+                QS_ENUM(QS_CMD, cmdId);
+                QS_U32(QS_HEX_FMT , param1);
+                QS_U32(QS_HEX_FMT , param2);
+                QS_U32(0 , param3);
+            QS_END()
+            break;
+        }
+        case ROM_READ: { // read ROM (can trip the MPU)
+            value = BSP::romRead((int32_t)param1, param2);
+            QS_BEGIN_ID(QS_USER, 0U)
+                QS_ENUM(QS_CMD, cmdId);
+                QS_U32(0, value);
+            QS_END()
+            break;
+        }
+        case ROM_WRITE: { // write ROM (can trip the MPU)
+            BSP::romWrite(param1, param2, param3);
+            QS_BEGIN_ID(QS_USER, 0U)
+                QS_ENUM(QS_CMD, cmdId);
+                QS_U32(QS_HEX_FMT , param1);
+                QS_U32(QS_HEX_FMT , param2);
+                QS_U32(0 , param3);
+            QS_END()
+            break;
+        }
+        case RAM_READ: { // read RAM (can trip the MPU)
+            value = BSP::ramRead(param1, param2);
+            QS_BEGIN_ID(QS_USER, 0U)
+                QS_ENUM(QS_CMD, cmdId);
+                QS_U32(0, value);
+            QS_END()
+            break;
+        }
+        case RAM_WRITE: { // write RAM (can trip the MPU)
+            BSP::ramWrite(param1, param2, param3);
+            QS_BEGIN_ID(QS_USER, 0U)
+                QS_ENUM(QS_CMD, cmdId);
+                QS_U32(QS_HEX_FMT , param1);
+                QS_U32(QS_HEX_FMT , param2);
+                QS_U32(0, param3);
+            QS_END()
+            break;
+        }
+        default: {
+            break;
+        }
+    }
 }
 
 //============================================================================
 //! Host callback function to "massage" the event, if necessary
 void QS::onTestEvt(QEvt *e) {
-    (void)e;
+    Q_UNUSED_PAR(e);
 }
 //............................................................................
 //! callback function to output the posted QP events (not used here)
 void QS::onTestPost(void const *sender, QActive *recipient,
                    QEvt const *e, bool status)
-{}
+{
+    Q_UNUSED_PAR(sender);
+    Q_UNUSED_PAR(status);
+}
 
 } // namespace QP

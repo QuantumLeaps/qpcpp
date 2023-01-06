@@ -1,13 +1,13 @@
 //============================================================================
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QXK kernel
-// Last updated for: @qpcpp_7_1_0
-// Last updated on  2021-08-26
+// Last updated for: @qpcpp_721_0
+// Last updated on  2022-12-13
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -282,10 +282,10 @@ void QF::onCleanup(void) {
 }
 
 //............................................................................
-#ifdef QXK_ON_CONTEXT_SW
+#ifdef QF_ON_CONTEXT_SW
 // NOTE: the context-switch callback is called with interrupts DISABLED
 extern "C"
-void QXK_onContextSw(QActive *prev, QActive *next) {
+void QF_onContextSw(QActive *prev, QActive *next) {
     (void)prev;
     if (next != (QActive *)0) {
         //_impure_ptr = next->thread; // switch to next TLS
@@ -295,7 +295,7 @@ void QXK_onContextSw(QActive *prev, QActive *next) {
         QS_OBJ(next);
     QS_END_NOCRIT()
 }
-#endif // QXK_ON_CONTEXT_SW
+#endif // QF_ON_CONTEXT_SW
 //............................................................................
 void QXK::onIdle(void) {
     // toggle the User LED on and then off (not enough LEDs, see NOTE2)

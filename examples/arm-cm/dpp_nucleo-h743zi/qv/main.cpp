@@ -1,7 +1,7 @@
 //============================================================================
 // DPP example
-// Last updated for: @qpcpp_7_0_0
-// Last updated on  2022-02-28
+// Last updated for: @qpcpp_7_2_0
+// Last updated on  2022-12-26
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -35,6 +35,8 @@
 #include "dpp.hpp"
 #include "bsp.hpp"
 
+QP::QTicker DPP::ticker0(0U); // ticker for tick rate 0
+
 //............................................................................
 int main() {
     static QP::QEvt const *tableQueueSto[N_PHILO];
@@ -54,12 +56,20 @@ int main() {
 
     // start the active objects...
     for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
-            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-            nullptr, 0U);
+        DPP::AO_Philo[n]->start(
+            n + 1U,                  // QP priority
+            philoQueueSto[n],        // event queue storage
+            Q_DIM(philoQueueSto[n]), // queue length [events]
+            nullptr, 0U);            // no stack storage
     }
 
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 1U), // priority
+    // example of prioritizing the Ticker0 active object
+    DPP::ticker0.start(N_PHILO + 2U, // priority
+                       nullptr, 0U, nullptr, 0U); // not used
+    QS_LOC_FILTER(-DPP::ticker0.getPrio()); // don't trace ticker0
+
+    DPP::AO_Table->start(
+        N_PHILO + 3U,            // priority
         tableQueueSto, Q_DIM(tableQueueSto),
         nullptr, 0U);
 

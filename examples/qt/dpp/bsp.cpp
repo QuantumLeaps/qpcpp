@@ -1,13 +1,13 @@
 //============================================================================
 // Product: BSP for DPP-console example with Qt5
-// Last updated for: @qpcpp_7_0_0
-// Last updated on  2021-07-19
+// Last updated for: @qpcpp_7_2_0
+// Last updated on  2022-12-27
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -66,9 +66,8 @@ void BSP_init(void) {
     QS_USR_DICTIONARY(PHILO_STAT);
 
     // setup the QS filters...
-    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
-    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
-    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS); // all records
+    QS_GLB_FILTER(-QP::QS_QF_TICK);    // exclude the clock tick
 }
 //............................................................................
 void BSP_terminate(int) {

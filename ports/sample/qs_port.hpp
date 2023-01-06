@@ -22,27 +22,26 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-12
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2023-01-05
+//! @version Last updated for: @ref qpcpp_7_2_0
 //!
 //! @file
-//! @brief QS/C++ port for testing on Windows/Linux/macOS, GNU or Visual C++
+//! @brief QS/C++ sample port with all configurable options
 
-#ifndef QS_PORT_HPP
-#define QS_PORT_HPP
+#ifndef QS_PORT_HPP_
+#define QS_PORT_HPP_
 
-#define QS_TIME_SIZE        4U
+//! QS buffer counter size in bytes
+#define QS_CTR_SIZE      2U
 
-#if defined(_WIN64) || defined(__LP64__) || defined(_LP64)  // 64-bit OS?
-    #define QS_OBJ_PTR_SIZE 8U
-    #define QS_FUN_PTR_SIZE 8U
-#else  // 32-bit OS
-    #define QS_OBJ_PTR_SIZE 4U
-    #define QS_FUN_PTR_SIZE 4U
-#endif
+//! QS time-stamp size in bytes
+#define QS_TIME_SIZE     4U
 
-// flush the QS output buffer after each QS record
-#define QS_REC_DONE()  QP::QS::onFlush()
+//! object pointer size in bytes
+#define QS_OBJ_PTR_SIZE  4U
+
+//! function pointer size in bytes
+#define QS_FUN_PTR_SIZE  4U
 
 //============================================================================
 // NOTE: QS might be used with or without other QP components, in which case
@@ -56,5 +55,4 @@
 
 #include "qs.hpp"      // QS platform-independent public interface
 
-#endif // QS_PORT_HPP
-
+#endif // QS_PORT_HPP_

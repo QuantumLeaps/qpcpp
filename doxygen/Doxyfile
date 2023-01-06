@@ -7,7 +7,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = QP/C++
-PROJECT_NUMBER         = 7.1.3
+PROJECT_NUMBER         = 7.2.0
 PROJECT_BRIEF          = "Real-Time Embedded Framework"
 PROJECT_LOGO           = ../../ql-doxygen/images/logo_ql.png
 OUTPUT_DIRECTORY       =
@@ -131,6 +131,7 @@ INPUT                  = main.dox \
                          ../../cert-pack/sds_sm-cpp.dox \
                          ../../cert-pack/autosar.dox \
                          ../../cert-pack/metrics.dox \
+                         history.dox \
                          exa.dox \
                          exa_native.dox \
                          exa_rtos.dox \
@@ -143,12 +144,12 @@ INPUT                  = main.dox \
                          ports_rtos.dox \
                          ports_os.dox \
                          api.dox \
-                         history.dox \
                          ../../ql-doxygen/help.dox \
                          dir.dox \
                          config.hpp \
                          ../include \
                          ../src \
+                         ../ports/sample \
                          ../ports/lint-plus/std.lnt \
                          ../ports/lint-plus/qpcpp.lnt \
                          ../ports/lint-plus/options.lnt
@@ -163,8 +164,7 @@ FILE_PATTERNS          = *.dox \
                          *.asm \
                          *.lnt
 RECURSIVE              = YES
-EXCLUDE                = ../include/qs_dummy.hpp \
-                         ../include/quit.hpp
+EXCLUDE                = ../include/qs_dummy.hpp
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        = QP_IMPL
@@ -288,8 +288,9 @@ SEARCH_INCLUDES        = YES
 INCLUDE_PATH           =
 INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = Q_SPY \
-                         QP_IMPL \
                          Q_UTEST \
+                         QP_IMPL \
+                         Q_EVT_CTOR \
                          QF_MAX_ACTIVE=32 \
                          QF_MAX_TICK_RATE=2 \
                          QF_MAX_EPOOL=3 \
@@ -299,11 +300,10 @@ PREDEFINED             = Q_SPY \
                          QF_MPOOL_CTR_SIZE=2 \
                          QF_TIMEEVT_CTR_SIZE=4 \
                          QF_ACTIVE_STOP=0 \
+                         QF_ON_CONTEXT_SW \
                          QS_TIME_SIZE=4 \
                          QF_EQUEUE_TYPE=QEQueue \
                          QF_OS_OBJECT_TYPE=void* \
-                         QF_THREAD_TYPE=void* \
-                         QK_ON_CONTEXT_SW \
-                         QXK_ON_CONTEXT_SW
+                         QF_THREAD_TYPE=void*
 EXPAND_AS_DEFINED      =
-SKIP_FUNCTION_MACROS   = YES
+SKIP_FUNCTION_MACROS   = NO

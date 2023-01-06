@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for version: 7.0.1
+//! @date Last updated on: 2022-12-15
+//! @version Last updated for version: 7.2.0
 //!
 //! @file
 //! @brief PC-Lint-Plus option file for linting QP/C++ __Applications__
@@ -43,7 +43,7 @@
 -esym(9436,
  QP::versionStr)
 
-// MC++R16-0-4 function-like macro
+// AC++M16-3-2 function-like macro
 -esym(9026,
  Q_ASSERT,
  Q_ASSERT_ID,
@@ -90,7 +90,7 @@
 -esym(9141,
  Q_this_module_)
 
-// MC++R16-0-4 function-like macro
+// AC++M16-3-2 function-like macro
 -esym(9026,
  Q_UNUSED_PAR,
  Q_DIM,
@@ -113,7 +113,7 @@
  float32_t,
  float64_t)
 
-// MC++R16-0-4 function-like macro
+// AC++M16-3-2 function-like macro
 -esym(9026,
  QEVT_INITIALIZER,
  Q_STATE_DECL,
@@ -180,7 +180,7 @@
  QM_SM_STATE_DECL,
  QM_ACTION_DEF)
 
-// MC++16-3-2 pasting operator used in definition of function-like macro
+// AC++M16-3-2 stringize operator used in definition of function-like macro
 -esym(9024,
  Q_STATE_DECL,
  Q_STATE_DEF,
@@ -217,7 +217,7 @@
 
 
 // QF ------------------------------------------------------------------------
-// MC++R16-0-4 function-like macro
+// AC++M16-3-2 function-like macro
 -esym(9026,
  POST,
  POST_X,
@@ -303,7 +303,7 @@
 
 // QK ------------------------------------------------------------------------
 
-// MC++R16-0-4 function-like macro
+// AC++M16-3-2 function-like macro
 -esym(9026,
  QK_ISR_ENTRY,
  QK_ISR_EXIT)
@@ -365,7 +365,7 @@
 
 // QS ------------------------------------------------------------------------
 
-// MC++R16-0-4 function-like macro
+// AC++M16-3-2 function-like macro
 -esym(9026,
  QS_INIT,
  QS_EXIT,
@@ -399,9 +399,11 @@
  QS_OBJ_ARR_DICTIONARY,
  QS_FUN_DICTIONARY,
  QS_USR_DICTIONARY,
+ QS_ENUM_DICTIONARY,
  QS_ASSERTION,
  QS_FLUSH,
  QS_MEM,
+ QS_ENUM,
  QS_SIG,
  QS_PTR_AT_,
  QS_RX_PUT,
@@ -412,7 +414,7 @@
  QS_TEST_PROBE,
  QS_TEST_PROBE_ID)
 
-// MC++R16-0-4 function-like macro
+// AC++M16-3-2 function-like macro
 -esym(9026,
  QS_GLB_CHECK_,
  QS_LOC_CHECK_,
@@ -435,7 +437,7 @@
  QS_MPS_PRE_,
  QS_TEC_PRE_)
 
-// MC++R16-0-4 function-like macro
+// AC++M16-3-2 function-like macro
 -esym(9026,
  QS_REC_DONE)
 
@@ -448,13 +450,14 @@
  QS_FUN_DICTIONARY,
  QS_TEST_PROBE_DEF)
 
-// M3-R20.10(a) stringize operator
+// AC++M16-3-2 stringize operator used in definition of function-like macro
 -esym(9024,
  QS_OBJ_DICTIONARY,
  QS_OBJ_ARR_DICTIONARY,
  QS_FUN_DICTIONARY,
  QS_SIG_DICTIONARY,
- QS_USR_DICTIONARY)
+ QS_USR_DICTIONARY,
+ QS_ENUM_DICTIONARY)
 
 // MC++R9-5-1 union 'TCast' declared
 -esym(9018,
@@ -478,5 +481,4 @@
  F32Rep,
  F64Rep,
  U32Rep)
-
 

@@ -106,10 +106,7 @@ void BSP::init(void) {
     //
     SystemCoreClockUpdate();
 
-    // Explictily Disable the automatic FPU state preservation as well as
-    // the FPU lazy stacking
-    //
-    FPU->FPCCR &= ~((1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos));
+    // NOTE: The VFP (hardware Floating Point) unit is configured by RTOS
 
     // enable clock for to the peripherals used by this application...
     SYSCTL->RCGCGPIO |= (1U << 5); // enable Run mode for GPIOF

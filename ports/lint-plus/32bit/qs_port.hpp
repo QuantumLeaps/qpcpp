@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-12
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2023-01-06
+//! @version Last updated for: @ref qpcpp_7_2_0
 //!
 //! @file
 //! @brief QS/C++ port to a 32-bit CPU, generic C++ compiler
@@ -31,16 +31,19 @@
 //! This is an example QP/C++ port with the documentation for the main
 //! items, such as configuration macros, functions, and includes.
 
-#ifndef QS_PORT_HPP
-#define QS_PORT_HPP
+#ifndef QS_PORT_HPP_
+#define QS_PORT_HPP_
 
-// QS time-stamp size in bytes
+//! QS buffer counter size in bytes
+#define QS_CTR_SIZE      2U
+
+//! QS time-stamp size in bytes
 #define QS_TIME_SIZE     4U
 
-// object pointer size in bytes
+//! object pointer size in bytes
 #define QS_OBJ_PTR_SIZE  4U
 
-// function pointer size in bytes
+//! function pointer size in bytes
 #define QS_FUN_PTR_SIZE  4U
 
 //============================================================================
@@ -55,4 +58,4 @@
 
 #include "qs.hpp"      // QS platform-independent public interface
 
-#endif // QS_PORT_HPP
+#endif // QS_PORT_HPP_

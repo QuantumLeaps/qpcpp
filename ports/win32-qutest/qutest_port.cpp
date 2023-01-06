@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-07
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-12-19
+//! @version Last updated for: @ref qpcpp_7_2_0
 //!
 //! @file
 //! @brief QUTEST port for Windows, GNU or Visual C++
@@ -95,13 +95,13 @@ bool QS::onStartup(void const *arg) {
 
     // initialize Windows sockets version 2.2
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR) {
-        fprintf(stderr,
-            "<TARGET> ERROR Windows Sockets cannot be initialized\n");
+        FPRINTF_S(stderr, "<TARGET> ERROR %s\n",
+                  "Windows Sockets cannot be initialized");
         goto error;
     }
 
     // extract hostName from 'arg' (hostName:port_remote)...
-    src = (arg != (void const *)0)
+    src = (arg != (void *)0)
           ? (char const *)arg
           : "localhost"; // default QSPY host
     dst = hostName;
@@ -126,7 +126,7 @@ bool QS::onStartup(void const *arg) {
     hints.ai_protocol = IPPROTO_TCP;
     status = getaddrinfo(hostName, serviceName, &hints, &result);
     if (status != 0) {
-        fprintf(stderr,
+        FPRINTF_S(stderr,
             "<TARGET> ERROR   cannot resolve host Name=%s:%s,Err=%d\n",
                     hostName, serviceName, status);
         goto error;
@@ -135,8 +135,8 @@ bool QS::onStartup(void const *arg) {
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         l_sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (l_sock != INVALID_SOCKET) {
-            if (connect(l_sock, rp->ai_addr,
-                        static_cast<int>(rp->ai_addrlen)) == SOCKET_ERROR)
+            if (connect(l_sock, rp->ai_addr, static_cast<int>(rp->ai_addrlen))
+                == SOCKET_ERROR)
             {
                 closesocket(l_sock);
                 l_sock = INVALID_SOCKET;
@@ -149,7 +149,7 @@ bool QS::onStartup(void const *arg) {
 
     // socket could not be opened & connected?
     if (l_sock == INVALID_SOCKET) {
-        fprintf(stderr, "<TARGET> ERROR   cannot connect to QSPY at "
+        FPRINTF_S(stderr, "<TARGET> ERROR   cannot connect to QSPY at "
             "host=%s:%s\n",
             hostName, serviceName);
         goto error;
@@ -158,8 +158,8 @@ bool QS::onStartup(void const *arg) {
     // set the socket to non-blocking mode
     ioctl_opt = 1;
     if (ioctlsocket(l_sock, FIONBIO, &ioctl_opt) != NO_ERROR) {
-        fprintf(stderr, "<TARGET> ERROR   Failed to set non-blocking socket "
-            "WASErr=%d\n", WSAGetLastError());
+        FPRINTF_S(stderr, "<TARGET> ERROR   %s WASErr=%d\n,",
+            "Failed to set non-blocking socket", WSAGetLastError());
         goto error;
     }
 
@@ -171,7 +171,7 @@ bool QS::onStartup(void const *arg) {
     setsockopt(l_sock, SOL_SOCKET, SO_DONTLINGER,
                (const char *)&sockopt_bool, sizeof(sockopt_bool));
 
-    //printf("<TARGET> Connected to QSPY at Host=%s:%d\n",
+    //PRINTF_S("<TARGET> Connected to QSPY at Host=%s:%d\n",
     //       hostName, port_remote);
     onFlush();
 
@@ -182,29 +182,29 @@ error:
 }
 //............................................................................
 void QS::onCleanup(void) {
+    Sleep(QS_TIMEOUT_MS * 10U); // allow the last QS output to come out
     if (l_sock != INVALID_SOCKET) {
         closesocket(l_sock);
         l_sock = INVALID_SOCKET;
     }
     WSACleanup();
-    //printf("<TARGET> Disconnected from QSPY\n");
+    //PRINTF_S("\n%s\n", "QS_onCleanup");
 }
 //............................................................................
 void QS::onReset(void) {
     onCleanup();
+    //PRINTF_S("\n%s\n", "QS_onReset");
     exit(0);
 }
 //............................................................................
 void QS::onFlush(void) {
-    uint16_t nBytes;
-    uint8_t const *data;
-
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         fprintf(stderr, "<TARGET> ERROR   invalid TCP socket\n");
         return;
     }
 
-    nBytes = QS_TX_CHUNK;
+    uint16_t nBytes = QS_TX_CHUNK;
+    uint8_t const *data;
     while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
@@ -246,13 +246,16 @@ void QS::onTestLoop() {
     while (rxPriv_.inTestLoop) {
         FD_SET(l_sock, &readSet);
 
-        // selective, timed blocking on the TCP/IP socket...
         struct timeval timeout = {
             (long)0, (long)(QS_TIMEOUT_MS * 1000)
         };
+
+        FD_SET(l_sock, &readSet);
+
+        // selective, timed blocking on the TCP/IP socket...
         int status = select(0, &readSet, (fd_set *)0, (fd_set *)0, &timeout);
         if (status == SOCKET_ERROR) {
-            fprintf(stderr,
+            FPRINTF_S(stderr,
                 "<TARGET> ERROR socket select,WSAErr=%d",
                 WSAGetLastError());
             onCleanup();
@@ -268,10 +271,9 @@ void QS::onTestLoop() {
             }
         }
 
-        // flush the QS TX buffer
         onFlush();
 
-        int ch = 0;
+        wint_t ch = 0;
         while (_kbhit()) { // any key pressed?
             ch = _getch();
         }

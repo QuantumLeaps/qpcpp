@@ -169,10 +169,7 @@ void BSP::init(void) {
     // but SystemCoreClock needs to be updated
     SystemCoreClockUpdate();
 
-    // FPU ( Floating Point Unit) configuration for QXK
-    // Use the automatic FPU state preservation and the FPU lazy stacking.
-    //
-    FPU->FPCCR |= (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
+    // NOTE: The VFP (hardware Floating Point) unit is configured by QXK
 
     // enable clock for to the peripherals used by this application...
     SYSCTL->RCGCGPIO |= (1U << 5); // enable Run mode for GPIOF

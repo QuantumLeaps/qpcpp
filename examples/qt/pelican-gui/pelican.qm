@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.2.3" links="1">
+<model version="5.2.4" links="1">
  <documentation>PEdestrian LIghto CONtrolled (PELICA) crossing for Qt with GUI</documentation>
  <!--${qpcpp}-->
  <framework name="qpcpp"/>
@@ -212,20 +212,6 @@ subscribe(TERMINATE_SIG);
 
 QS_OBJ_DICTIONARY(&amp;l_Pelican);
 QS_OBJ_DICTIONARY(&amp;l_Pelican.m_timeout);
-
-QS_FUN_DICTIONARY(&amp;QP::QHsm::top);
-QS_FUN_DICTIONARY(&amp;Pelican::initial);
-QS_FUN_DICTIONARY(&amp;Pelican::offline);
-QS_FUN_DICTIONARY(&amp;Pelican::operational);
-QS_FUN_DICTIONARY(&amp;Pelican::carsEnabled);
-QS_FUN_DICTIONARY(&amp;Pelican::carsGreen);
-QS_FUN_DICTIONARY(&amp;Pelican::carsGreenNoPed);
-QS_FUN_DICTIONARY(&amp;Pelican::carsGreenPedWait);
-QS_FUN_DICTIONARY(&amp;Pelican::carsGreenInt);
-QS_FUN_DICTIONARY(&amp;Pelican::carsYellow);
-QS_FUN_DICTIONARY(&amp;Pelican::pedsEnabled);
-QS_FUN_DICTIONARY(&amp;Pelican::pedsWalk);
-QS_FUN_DICTIONARY(&amp;Pelican::pedsFlash);
 
 QS_SIG_DICTIONARY(PEDS_WAITING_SIG, nullptr);  // global signals
 QS_SIG_DICTIONARY(ON_SIG,           nullptr);

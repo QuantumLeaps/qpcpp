@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, NUCLEO-L552ZE board, dual-mode QXK kernel
-// Last updated for: @qpcpp_7_0_0
-// Last updated on  2022-02-28
+// Last updated for: @qpcpp_7_2_0
+// Last updated on  2022-12-13
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -321,9 +321,9 @@ void QF::onCleanup(void) {
 }
 
 //............................................................................
-#ifdef QXK_ON_CONTEXT_SW
+#ifdef QF_ON_CONTEXT_SW
 /* NOTE: the context-switch callback is called with interrupts DISABLED */
-void QXK_onContextSw(QActive *prev, QActive *next) {
+void QF_onContextSw(QActive *prev, QActive *next) {
     (void)prev;
     if (next != (QActive *)0) {
         //_impure_ptr = next->thread; /* switch to next TLS */
@@ -333,7 +333,7 @@ void QXK_onContextSw(QActive *prev, QActive *next) {
         QS_OBJ(next);
     QS_END_NOCRIT()
 }
-#endif /* QXK_ON_CONTEXT_SW */
+#endif /* QF_ON_CONTEXT_SW */
 //............................................................................
 void QXK::onIdle(void) {
     // toggle the User LED on and then off, see NOTE2

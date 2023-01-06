@@ -22,11 +22,11 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-25
-//! @version Last updated for: Zephyr 3.1.99 and @ref qpcpp_7_1_0
+//! @date Last updated on: 2023-01-04
+//! @version Last updated for: Zephyr 3.2.0 and @ref qpcpp_7_2_0
 //!
 //! @file
-//! @brief QF/C++ port to Zephyr RTOS (v 3.1.99)
+//! @brief QF/C++ port to Zephyr RTOS
 
 #ifndef QF_PORT_HPP
 #define QF_PORT_HPP
@@ -46,11 +46,11 @@
 #define QF_CRIT_ENTRY(key_)  ((key_) = k_spin_lock(&QP::QF::spinlock))
 #define QF_CRIT_EXIT(key_)   (k_spin_unlock(&QP::QF::spinlock, (key_)))
 
-#include <zephyr/zephyr.h> // Zephyr API
-#include "qep_port.hpp"    // QEP port
-#include "qequeue.hpp"     // used for event deferral
-#include "qmpool.hpp"      // this QP port uses the native QF memory pool
-#include "qf.hpp"          // QF platform-independent public interface
+#include <zephyr/kernel.h>   // Zephyr API
+#include "qep_port.hpp"      // QEP port
+#include "qequeue.hpp"       // used for event deferral
+#include "qmpool.hpp"        // this QP port uses the native QF memory pool
+#include "qf.hpp"            // QF platform-independent public interface
 
 namespace QP {
 namespace QF {
@@ -64,7 +64,7 @@ extern struct k_spinlock spinlock;
 // Q_PRINTK() macro to avoid conflicts with Zephyr's printk()
 // when Q_SPY configuation is used
 #ifndef Q_SPY
-#define Q_PRINTK(fmt_, ...) printk(fmt_, ##__VA_ARGS__)
+#define Q_PRINTK(fmt_, ...)  printk(fmt_, ##__VA_ARGS__)
 #else
 #define Q_PRINTK(dummy, ...) (static_cast<void>(0))
 #endif
@@ -88,7 +88,7 @@ extern struct k_spinlock spinlock;
         ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
     #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
 
-#endif // ifdef QP_IMPL
+#endif // QP_IMPL
 
 //============================================================================
 // NOTE1:

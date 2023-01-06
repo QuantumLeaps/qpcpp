@@ -102,10 +102,7 @@ void BSP_init(void) {
                        SYSCTL_XTAL_16MHZ);
     SystemCoreClock = XTAL_HZ;
 
-    // FPU ( Floating Point Unit) configuration for QK
-    // Use the automatic FPU state preservation and the FPU lazy stacking.
-    //
-    FPU->FPCCR |= (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
+    // NOTE: The VFP (hardware Floating Point) unit is configured by QK
 
     // enable clock for to the peripherals used by this application...
     SYSCTL->RCGCGPIO  |= (1U << 5);  // enable Run mode for GPIOF

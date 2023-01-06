@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, NUCLEO-H743ZI board, dual-mode QXK kernel
-// Last updated for: @qpcpp_7_0_0
-// Last updated on  2022-02-28
+// Last updated for version 7.2.0
+// Last updated on  2022-12-13
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -139,9 +139,62 @@ void USART3_IRQHandler(void) {
 } // extern "C"
 
 // BSP functions =============================================================
+// MPU setup for STM32H743ZI MCU
+static void STM32H743ZI_MPU_setup(void) {
+    // The following MPU configuration contains just a generic ROM
+    // region (with read-only access) and NULL-pointer protection region.
+    // Otherwise, the MPU will fall back on the background region (PRIVDEFENA).
+    //
+    static struct {
+        std::uint32_t rbar;
+        std::uint32_t rasr;
+    } const mpu_setup[] = {
+
+        { // region #0: Flash: base=0x0000'0000, size=512M=2^(28+1)
+          0x00000000U                       // base address
+              | MPU_RBAR_VALID_Msk          // valid region
+              | (MPU_RBAR_REGION_Msk & 0U), // region #0
+          (28U << MPU_RASR_SIZE_Pos)        // 2^(18+1) region
+              | (0x6U << MPU_RASR_AP_Pos)   // PA:ro/UA:ro
+              | (1U << MPU_RASR_C_Pos)      // C=1
+              | MPU_RASR_ENABLE_Msk         // region enable
+        },
+
+        { // region #7: NULL-pointer: base=0x000'0000, size=128M=2^(26+1)
+          // NOTE: this region extends to  0x080'0000, which is where
+          // the ROM is re-mapped by STM32
+          //
+          0x00000000U                       // base address
+              | MPU_RBAR_VALID_Msk          // valid region
+              | (MPU_RBAR_REGION_Msk & 7U), // region #7
+          (26U << MPU_RASR_SIZE_Pos)        // 2^(26+1)=128M region
+              | (0x0U << MPU_RASR_AP_Pos)   // PA:na/UA:na
+              | (1U << MPU_RASR_XN_Pos)     // XN=1
+              | MPU_RASR_ENABLE_Msk         // region enable
+        },
+    };
+
+    // enable the MemManage_Handler for MPU exception
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+
+    __DSB();
+    MPU->CTRL = 0U; // disable the MPU */
+    for (std::uint_fast8_t n = 0U; n < Q_DIM(mpu_setup); ++n) {
+        MPU->RBAR = mpu_setup[n].rbar;
+        MPU->RASR = mpu_setup[n].rasr;
+    }
+    MPU->CTRL = MPU_CTRL_ENABLE_Msk         // enable the MPU */
+                | MPU_CTRL_PRIVDEFENA_Msk;  // enable background region */
+    __ISB();
+    __DSB();
+}
+//............................................................................
 void BSP::init(void) {
+    // setup the MPU...
+    STM32H743ZI_MPU_setup();
+
     // NOTE: SystemInit() has been already called from the startup code
-    //  but SystemCoreClock needs to be updated
+    // but SystemCoreClock needs to be updated
     //
     SystemCoreClockUpdate();
 
@@ -153,32 +206,7 @@ void BSP::init(void) {
     __HAL_FLASH_ART_ENABLE();
 #endif // ART_ACCLERATOR_ENABLE
 
-    // configure the FPU usage by choosing one of the options...
-#if 1
-    // OPTION 1:
-    // Use the automatic FPU state preservation and the FPU lazy stacking.
-    //
-    // NOTE:
-    // Use the following setting when FPU is used in more than one task or
-    // in any ISRs. This setting is the safest and recommended, but requires
-    // extra stack space and CPU cycles.
-    //
-    FPU->FPCCR |= (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
-#else
-    // OPTION 2:
-    // Do NOT to use the automatic FPU state preservation and
-    // do NOT to use the FPU lazy stacking.
-    //
-    // NOTE:
-    // Use the following setting when FPU is used in ONE task only and not
-    // in any ISR. This setting is very efficient, but if more than one task
-    // (or ISR) start using the FPU, this can lead to corruption of the
-    // FPU registers. This option should be used with CAUTION.
-    //
-    FPU->FPCCR &= ~((1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos));
-#endif
-
-    /* Configure the LEDs */
+    // Configure the LEDs
     BSP_LED_Init(LED1);
     BSP_LED_Init(LED2);
     BSP_LED_Init(LED3);
@@ -194,13 +222,15 @@ void BSP::init(void) {
         Q_ERROR();
     }
 
-    /* object dictionaries... */
+    // dictionaries...
     QS_OBJ_DICTIONARY(AO_Table);
     QS_OBJ_DICTIONARY(AO_Philo[0]);
     QS_OBJ_DICTIONARY(AO_Philo[1]);
     QS_OBJ_DICTIONARY(AO_Philo[2]);
     QS_OBJ_DICTIONARY(AO_Philo[3]);
     QS_OBJ_DICTIONARY(AO_Philo[4]);
+    QS_OBJ_DICTIONARY(XT_Test1);
+    QS_OBJ_DICTIONARY(XT_Test2);
 
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&DPP::ticker0);
@@ -210,15 +240,18 @@ void BSP::init(void) {
     QS_USR_DICTIONARY(CONTEXT_SW);
 
     // setup the QS filters...
-    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
-    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
-    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS); // all records
+    QS_GLB_FILTER(-QP::QS_QF_TICK);    // exclude the clock tick
 }
-/*..........................................................................*/
+//............................................................................
+void BSP::terminate(int16_t result) {
+    Q_UNUSED_PAR(result);
+}
+//............................................................................
 void BSP::ledOn(void) {
     BSP_LED_On(LED1);
 }
-/*..........................................................................*/
+//............................................................................
 void BSP::ledOff(void) {
     BSP_LED_Off(LED1);
 }
@@ -266,10 +299,6 @@ void BSP::randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
 
-//............................................................................
-void BSP::terminate(int16_t result) {
-    (void)result;
-}
 
 } // namespace DPP
 
@@ -285,12 +314,7 @@ void QF::onStartup(void) {
     // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
-    // set priorities of ALL ISRs used in the system, see NOTE1
-    //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-    // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-    //
+    // set priorities of ALL ISRs used in the system
     NVIC_SetPriority(USART3_IRQn,  0U); // kernel unaware interrupt
     NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 1U);
     // ...
@@ -303,22 +327,6 @@ void QF::onStartup(void) {
 //............................................................................
 void QF::onCleanup(void) {
 }
-
-//............................................................................
-#ifdef QXK_ON_CONTEXT_SW
-// NOTE: the context-switch callback is called with interrupts DISABLED
-extern "C"
-void QXK_onContextSw(QActive *prev, QActive *next) {
-    (void)prev;
-    if (next != (QActive *)0) {
-        //_impure_ptr = next->thread; // switch to next TLS
-    }
-    QS_BEGIN_NOCRIT(DPP::ON_CONTEXT_SW, 0U) // no critical section!
-        QS_OBJ(prev);
-        QS_OBJ(next);
-    QS_END_NOCRIT()
-}
-#endif // QXK_ON_CONTEXT_SW
 //............................................................................
 void QXK::onIdle(void) {
     // toggle the User LED on and then off, see NOTE01
@@ -458,16 +466,28 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()
-
-    if (cmdId == 10U) {
-        assert_failed("QS_onCommand", 11);
-    }
 }
 
 #endif // Q_SPY
 //----------------------------------------------------------------------------
 
 } // namespace QP
+
+extern "C" {
+//............................................................................
+#ifdef QF_ON_CONTEXT_SW
+// NOTE: the context-switch callback is called with interrupts DISABLED
+void QF_onContextSw(QP::QActive *prev, QP::QActive *next) {
+    if ((prev != &DPP::ticker0) && (next != &DPP::ticker0)) {
+        QS_BEGIN_NOCRIT(DPP::CONTEXT_SW, 0U) // no critical section!
+            QS_OBJ(prev);
+            QS_OBJ(next);
+        QS_END_NOCRIT()
+    }
+}
+#endif // QF_ON_CONTEXT_SW
+
+} // extern "C"
 
 //============================================================================
 // NOTE1:

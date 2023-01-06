@@ -5,17 +5,19 @@
 def on_reset():
     expect_pause()
 
-test("extened->basic")
+scenario("extened->basic")
+# given...
 current_obj(OBJ_AP, "pspecB")
 poke(0, 2, pack("<HHH", 4, 0, 0))
 current_obj(OBJ_AP, "pspecX")
 poke(0, 2, pack("<HHH", 1, 0, 0))
 continue_test()
 expect_run()
-#----
+# when...
 glb_filter(GRP_SC, GRP_UA)
 current_obj(OBJ_AO, "ThrX::inst[0]")
 post("TEST0_SIG")
+# then...
 expect("@timestamp Sch-Next Pri=0->1")
 expect("@timestamp CONTEXT_SW NULL ThrX::inst[0]")
 expect("@timestamp TRACE_MSG ThrX::inst[0] TEST0 1of2")
@@ -39,17 +41,20 @@ expect("@timestamp Sch-Idle Pri=1->0")
 expect("@timestamp CONTEXT_SW ThrX::inst[0] NULL")
 expect("@timestamp Trg-Done QS_RX_EVENT")
 
-test("extended->extened->basic")
+
+scenario("extended->extened->basic")
+# given...
 current_obj(OBJ_AP, "pspecB")
 poke(0, 2, pack("<HHH", 1, 2, 3))
 current_obj(OBJ_AP, "pspecX")
 poke(0, 2, pack("<HHH", 4, 5, 0))
 continue_test()
 expect_run()
-#----
+# when...
 glb_filter(GRP_SC, GRP_UA)
 current_obj(OBJ_AO, "ThrX::inst[0]")
 post("TEST0_SIG")
+# then...
 expect("@timestamp Sch-Next Pri=0->4")
 expect("@timestamp CONTEXT_SW NULL ThrX::inst[0]")
 expect("@timestamp TRACE_MSG ThrX::inst[0] TEST0 1of2")
@@ -94,17 +99,19 @@ expect("@timestamp CONTEXT_SW ObjB::inst[0] NULL")
 expect("@timestamp Trg-Done QS_RX_EVENT")
 
 
-test("extened->basic->extended")
+scenario("extened->basic->extended")
+# given...
 current_obj(OBJ_AP, "pspecB")
 poke(0, 2, pack("<HHH", 4, 0, 0))
 current_obj(OBJ_AP, "pspecX")
 poke(0, 2, pack("<HHH", 1, 5, 0))
 continue_test()
 expect_run()
-#----
+# when...
 glb_filter(GRP_SC, GRP_UA)
 current_obj(OBJ_AO, "ThrX::inst[0]")
 post("TEST0_SIG")
+# then...
 expect("@timestamp Sch-Next Pri=0->1")
 expect("@timestamp CONTEXT_SW NULL ThrX::inst[0]")
 expect("@timestamp TRACE_MSG ThrX::inst[0] TEST0 1of2")

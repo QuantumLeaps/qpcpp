@@ -21,8 +21,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-10-04
-//! @version Last updated for: @ref qpcpp_7_1_2
+//! @date Last updated on: 2022-12-18
+//! @version Last updated for: @ref qpcpp_7_2_0
 //!
 //! @file
 //! @brief QXK/C++ port to ARM Cortex-M, ARM-CLANG toolset
@@ -58,7 +58,7 @@ static inline uint32_t QXK_get_IPSR(void) {
 
 #if (__ARM_ARCH == 6) // ARMv6-M?
     #define QXK_ARM_ERRATUM_838869() ((void)0)
-#else // Cortex-M3/M4/M7 (v7-M)
+#else // ARMv7-M or higher
     // The following macro implements the recommended workaround for the
     // ARM Erratum 838869. Specifically, for Cortex-M3/M4/M7 the DSB
     // (memory barrier) instruction needs to be added before exiting an ISR.
@@ -83,6 +83,13 @@ static inline uint32_t QXK_get_IPSR(void) {
 #define QXK_INIT() QXK_init()
 extern "C" void QXK_init(void);
 extern "C" void QXK_thread_ret(void);
+
+#if (__ARM_FP != 0) // if VFP available...
+/// When the FPU is configured, clear the FPCA bit in the CONTROL register
+// to prevent wasting the stack space for the FPU context.
+//
+#define QXK_START() __asm volatile ("msr CONTROL,%0" :: "r" (0) : )
+#endif
 
 #include "qxk.hpp" // QXK platform-independent public interface
 

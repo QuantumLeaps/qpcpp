@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, STM32 NUCLEO-L053R8 board, preemptive QK kernel
-// Last updated for version 7.1.0
-// Last updated on  2022-08-26
+// Last updated for version 7.2.0
+// Last updated on  2022-12-13
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -305,15 +305,15 @@ void QK::onIdle(void) {
 //============================================================================
 extern "C" {
 
-#ifdef QK_ON_CONTEXT_SW
+#ifdef QF_ON_CONTEXT_SW
 // NOTE: the context-switch callback is called with interrupts DISABLED
-void QK_onContextSw(QP::QActive *prev, QP::QActive *next) {
+void QF_onContextSw(QP::QActive *prev, QP::QActive *next) {
     QS_BEGIN_NOCRIT(DPP::CONTEXT_SW, 0U) // no critical section!
         QS_OBJ(prev);
         QS_OBJ(next);
     QS_END_NOCRIT()
 }
-#endif // QK_ON_CONTEXT_SW
+#endif // QF_ON_CONTEXT_SW
 
 //............................................................................
 Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {

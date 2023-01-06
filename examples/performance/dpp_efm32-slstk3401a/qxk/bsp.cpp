@@ -175,8 +175,7 @@ void BSP::init(void) {
     //
     SystemCoreClockUpdate();
 
-    /* NOTE: The VFP (hardware Floating Point) unit is configured by QXK */
-    //FPU->FPCCR |= (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
+    // NOTE: The VFP (hardware Floating Point) unit is configured by QXK
 
     // enable clock for to the peripherals used by this application...
     CMU_ClockEnable(cmuClock_HFPER, true);

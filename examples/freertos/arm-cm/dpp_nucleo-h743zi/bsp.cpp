@@ -177,7 +177,7 @@ void vApplicationIdleHook(void) {
         b = QP::QS::getByte();
         QF_INT_ENABLE();
 
-        if (b != QP::QS_EOD) {  // not End-Of-Data?
+        if (b != QS_EOD) {  // not End-Of-Data?
             DPP::l_uartHandle.Instance->TDR = (b & 0xFFU); // put into TDR
         }
     }

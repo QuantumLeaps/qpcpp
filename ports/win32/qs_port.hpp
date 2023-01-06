@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-12
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2023-01-04
+//! @version Last updated for: @ref qpcpp_7_2_0
 //!
 //! @file
 //! @brief QS/C++ port to Win32
@@ -31,6 +31,7 @@
 #ifndef QS_PORT_HPP
 #define QS_PORT_HPP
 
+#define QS_CTR_SIZE         4U
 #define QS_TIME_SIZE        4U
 
 #if defined(_WIN64) || defined(__LP64__) || defined(_LP64)  // 64-bit OS?

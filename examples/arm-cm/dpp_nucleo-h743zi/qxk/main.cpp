@@ -82,24 +82,25 @@ int main() {
     // example of prioritizing the Ticker0 active object
     DPP::ticker0.start(N_PHILO + 3U, // priority
                        nullptr, 0U, nullptr, 0U); // not used
+    QS_LOC_FILTER(-DPP::ticker0.getPrio()); // don't trace ticker0
 
     // NOTE: leave priority (N_PHILO + 4) free for mutex
 
     // start the extended Test2 thread
     DPP::XT_Test2->start(
-            N_PHILO + 5U,            // QP prio of the thread
-            test2QueueSto,           // event queue storage
-            Q_DIM(test2QueueSto),    // queue length [events]
-            test2StackSto,           // stack storage
-            sizeof(test2StackSto));  // stack size [bytes]
+        N_PHILO + 5U,            // QP prio of the thread
+        test2QueueSto,           // event queue storage
+        Q_DIM(test2QueueSto),    // queue length [events]
+        test2StackSto,           // stack storage
+        sizeof(test2StackSto));  // stack size [bytes]
 
     // NOTE: leave priority (N_PHILO + 6) free for mutex
 
     DPP::AO_Table->start(
-            N_PHILO + 7U,            // QP priority of the AO
-            tableQueueSto,           // event queue storage
-            Q_DIM(tableQueueSto),    // queue length [events]
-            nullptr, 0U);            // no stack storage
+        N_PHILO + 7U,            // QP priority of the AO
+        tableQueueSto,           // event queue storage
+        Q_DIM(tableQueueSto),    // queue length [events]
+        nullptr, 0U);            // no stack storage
 
     return QP::QF::run(); // run the QF application
 }

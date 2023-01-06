@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on NUCLEO-L053R8, QXK kernel, GNU-ARM
-# Last Updated for Version: 7.0.1
-# Date of the Last Update:  2022-05-23
+# Last Updated for Version: 7.2.0
+# Date of the Last Update:  2022-12-14
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -45,7 +45,7 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    https://sourceforge.net/projects/qpc/files/QTools/
+#    https://github.com/QuantumLeaps/qtools/releases
 #
 
 #-----------------------------------------------------------------------------
@@ -137,7 +137,7 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DQXK_ON_CONTEXT_SW \
+DEFINES   := -DQF_ON_CONTEXT_SW \
 	-DQXK_USE_IRQ_HANDLER=LCD_IRQHandler \
 	-DQXK_USE_IRQ_NUM=30
 

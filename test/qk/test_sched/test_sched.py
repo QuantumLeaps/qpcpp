@@ -1,22 +1,33 @@
 # test-script for QUTest unit testing harness
 # see https://www.state-machine.com/qtools/qutest.html/qutest.html
 
+note('''
+This test group verifies the preemption scenarios
+in the QK preemptive kernel
+''')
+
 # preamble
 def on_reset():
     expect_pause()
+    # don't call continue_test() yet
+    # this will be done by the individual tests
+    # after they poke the priorities of threads
 
+# helper function to repliacte the Q_PRIO() macro
 def Q_PRIO(prio, pthre):
     return prio | (pthre << 8)
 
-test("ao->ao->ao (NO PTS)")
+scenario("ao->ao->ao (NO PTS)")
+# given...
 current_obj(OBJ_AP, "pspecB")
 poke(0, 2, pack("<HHH", Q_PRIO(1,0), Q_PRIO(2,0), Q_PRIO(3,0)))
-continue_test()
-expect_run()
-#----
 glb_filter(GRP_SC, GRP_UA)
 current_obj(OBJ_AO, "ObjB::inst[1]")
+continue_test()
+expect_run()
+# when...
 post("TEST0_SIG")
+# then...
 expect("@timestamp Sch-Next Pri=0->2")
 expect("@timestamp CONTEXT_SW NULL ObjB::inst[1]")
 expect("@timestamp TRACE_MSG ObjB::inst[1] TEST0 1of2")
@@ -63,15 +74,17 @@ expect("@timestamp CONTEXT_SW ObjB::inst[0] NULL")
 expect("@timestamp Trg-Done QS_RX_EVENT")
 
 
-test("ao->ao->ao (PTS1)")
+scenario("ao->ao->ao (PTS1)")
+# given...
 current_obj(OBJ_AP, "pspecB")
 poke(0, 2, pack("<HHH", Q_PRIO(1,3), Q_PRIO(2,3), Q_PRIO(3,0)))
-continue_test()
-expect_run()
-#----
 glb_filter(GRP_SC, GRP_UA)
 current_obj(OBJ_AO, "ObjB::inst[1]")
+continue_test()
+expect_run()
+# when...
 post("TEST0_SIG")
+# then...
 expect("@timestamp Sch-Next Pri=0->2")
 expect("@timestamp CONTEXT_SW NULL ObjB::inst[1]")
 expect("@timestamp TRACE_MSG ObjB::inst[1] TEST0 1of2")
@@ -118,15 +131,17 @@ expect("@timestamp CONTEXT_SW ObjB::inst[0] NULL")
 expect("@timestamp Trg-Done QS_RX_EVENT")
 
 
-test("ao->ao->ao (PTS2)")
+scenario("ao->ao->ao (PTS2)")
+# given...
 current_obj(OBJ_AP, "pspecB")
 poke(0, 2, pack("<HHH", Q_PRIO(1,0), Q_PRIO(2,3), Q_PRIO(3,0)))
-continue_test()
-expect_run()
-#----
 glb_filter(GRP_SC, GRP_UA)
 current_obj(OBJ_AO, "ObjB::inst[1]")
+continue_test()
+expect_run()
+# when...
 post("TEST0_SIG")
+# then...
 expect("@timestamp Sch-Next Pri=0->2")
 expect("@timestamp CONTEXT_SW NULL ObjB::inst[1]")
 expect("@timestamp TRACE_MSG ObjB::inst[1] TEST0 1of2")

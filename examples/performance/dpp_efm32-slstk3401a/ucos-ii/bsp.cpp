@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, EFM32-SLSTK3401A board, uC/OS-II kernel
-// Last updated for version 6.9.3
-// Last updated on  2021-03-03
+// Last updated for version 7.2.0
+// Last updated on  2022-12-27
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -150,7 +150,7 @@ void App_TaskIdleHook(void) {
         b = QP::QS::getByte();
         OS_EXIT_CRITICAL();
 
-        if (b != QP::QS_EOD) {  // not End-Of-Data?
+        if (b != QS_EOD) {  // not End-Of-Data?
             DPP::l_USART0->TXDATA = (b & 0xFFU); // put into the DR register
         }
     }

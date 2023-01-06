@@ -1,13 +1,13 @@
 //============================================================================
 // Product: DPP example (console)
-// Last Updated for Version: 6.9.3
-// Date of the Last Update:  2021-03-02
+// Last updated for version 7.2.0
+// Last updated on  2022-12-22
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -82,7 +82,6 @@ void BSP::init(int argc, char **argv) {
 
     QS_OBJ_DICTIONARY(&l_clock_tick); // must be called *after* QF::init()
     QS_USR_DICTIONARY(PHILO_STAT);
-    QS_FUN_DICTIONARY(&QP::QHsm::top);
 
     // setup the QS filters...
     QS_GLB_FILTER(QP::QS_ALL_RECORDS);

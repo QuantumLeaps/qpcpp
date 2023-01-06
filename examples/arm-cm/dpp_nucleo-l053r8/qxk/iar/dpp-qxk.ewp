@@ -214,7 +214,7 @@
                 </option>
                 <option>
                     <name>CCDefines</name>
-                    <state>QXK_ON_CONTEXT_SW</state>
+                    <state>QF_ON_CONTEXT_SW</state>
                     <state>QXK_USE_IRQ_HANDLER=LCD_IRQHandler</state>
                     <state>QXK_USE_IRQ_NUM=30</state>
                 </option>
@@ -2319,7 +2319,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>Q_SPY</state>
-                    <state>QXK_ON_CONTEXT_SW</state>
+                    <state>QF_ON_CONTEXT_SW</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -3280,7 +3280,7 @@
                         </option>
                         <option>
                             <name>CCDefines</name>
-                            <state>QXK_ON_CONTEXT_SW</state>
+                            <state>QF_ON_CONTEXT_SW</state>
                             <state>QXK_USE_IRQ_NUM=30</state>
                             <state>QXK_USE_IRQ_HANDLER=LCD_IRQHandler</state>
                         </option>

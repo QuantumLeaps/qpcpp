@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-07
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2022-12-19
+//! @version Last updated for: @ref qpcpp_7_2_0
 //!
 //! @file
 //! @brief QUTEST port for POSIX, GNU
@@ -195,6 +195,8 @@ error:
 }
 //............................................................................
 void QS::onCleanup(void) {
+    static struct timespec const c_timeout = {0, 10L*QS_TIMEOUT_MS*1000000L };
+    nanosleep(&c_timeout, NULL); // allow the last QS output to come out
     if (l_sock != INVALID_SOCKET) {
         close(l_sock);
         l_sock = INVALID_SOCKET;
@@ -208,16 +210,14 @@ void QS::onReset(void) {
 }
 //............................................................................
 void QS::onFlush(void) {
-    uint16_t nBytes;
-    uint8_t const *data;
-    static struct timespec const c_timeout = { 0, QS_TIMEOUT_MS * 1000000L };
-
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
         return;
     }
 
-    nBytes = QS_TX_CHUNK;
+    uint8_t const *data;
+    static struct timespec const c_timeout = { 0, QS_TIMEOUT_MS*1000000L };
+    uint16_t nBytes = QS_TX_CHUNK;
     while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
@@ -258,12 +258,14 @@ void QS::onTestLoop() {
     while (rxPriv_.inTestLoop) {
         FD_SET(l_sock, &readSet);
 
-        // selective, timed blocking on the TCP/IP socket...
         struct timeval timeout = {
             (long)0, (long)(QS_TIMEOUT_MS * 1000)
         };
+
+        // selective, timed blocking on the TCP/IP socket...
+        timeout.tv_usec = (long)(QS_TIMEOUT_MS * 1000);
         int status = select(l_sock + 1, &readSet,
-                          (fd_set *)0, (fd_set *)0, &timeout);
+                      (fd_set *)0, (fd_set *)0, &timeout);
         if (status < 0) {
             FPRINTF_S(stderr, "<TARGET> ERROR socket select,errno=%d\n",
                 errno);
@@ -280,7 +282,6 @@ void QS::onTestLoop() {
             }
         }
 
-        // flush the QS TX buffer
         onFlush();
     }
     // set inTestLoop to true in case calls to QS_onTestLoop() nest,
@@ -289,3 +290,4 @@ void QS::onTestLoop() {
 }
 
 } // namespace QP
+

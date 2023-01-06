@@ -1,13 +1,13 @@
 //============================================================================
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QK kernel
-// Last updated for version 7.1.0
-// Last updated on  2022-08-28
+// Last updated for version 7.2.0
+// Last updated on  2022-12-13
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -171,9 +171,7 @@ void BSP::init(void) {
     //
     SystemCoreClockUpdate();
 
-    /* NOTE: The VFP (hardware Floating Point) unit is configured by QXK */
-    //FPU->FPCCR = FPU->FPCCR
-    //              | (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
+    // NOTE: The VFP (hardware Floating Point) unit is configured by QXK
 
     // enable clock for to the peripherals used by this application...
     CMU_ClockEnable(cmuClock_HFPER, true);
@@ -300,6 +298,21 @@ void QF::onStartup(void) {
 void QF::onCleanup(void) {
 }
 //............................................................................
+#ifdef QF_ON_CONTEXT_SW
+// NOTE: the context-switch callback is called with interrupts DISABLED
+extern "C"
+void QF_onContextSw(QActive *prev, QActive *next) {
+    (void)prev;
+    if (next != nullptr) {
+        //_impure_ptr = next->thread; // switch to next TLS
+    }
+    QS_BEGIN_NOCRIT(DPP::CONTEXT_SW, 0U) // no critical section!
+        QS_OBJ(prev);
+        QS_OBJ(next);
+    QS_END_NOCRIT()
+}
+#endif // QF_ON_CONTEXT_SW
+//............................................................................
 void QK::onIdle(void) {
     // toggle the User LED on and then off, see NOTE01
 //    QF_INT_DISABLE();
@@ -338,9 +351,9 @@ void QK::onIdle(void) {
 extern "C" {
 
 //............................................................................
-#ifdef QK_ON_CONTEXT_SW
+#ifdef QF_ON_CONTEXT_SW
 // NOTE: the context-switch callback is called with interrupts DISABLED
-void QK_onContextSw(QActive *prev, QActive *next) {
+void QF_onContextSw(QActive *prev, QActive *next) {
     if (next != nullptr) {
         //_impure_ptr = next->thread; // switch to next TLS
     }
@@ -349,7 +362,7 @@ void QK_onContextSw(QActive *prev, QActive *next) {
         QS_OBJ(next);
     QS_END_NOCRIT()
 }
-#endif // QK_ON_CONTEXT_SW
+#endif // QF_ON_CONTEXT_SW
 
 //............................................................................
 Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {

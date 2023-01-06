@@ -1,13 +1,13 @@
 //============================================================================
 // DPP example
-// Last updated for version 7.1.2
-// Last updated on  2022-10-05
+// Last updated for: @qpcpp_7_2_0
+// Last updated on  2022-12-26
 //
-//                    Q u a n t u m  L e a P s
-//                    ------------------------
-//                    Modern Embedded Software
+//                    Q u a n t u m     L e a P s
+//                    ---------------------------
+//                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,7 +25,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses/>.
+// along with this program. If not, see <www.gnu.org/licenses>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
@@ -34,6 +34,8 @@
 #include "qpcpp.hpp"
 #include "dpp.hpp"
 #include "bsp.hpp"
+
+QP::QTicker DPP::ticker0(0U); // ticker for tick rate 0
 
 //............................................................................
 int main() {
@@ -61,8 +63,13 @@ int main() {
             nullptr, 0U);            // no stack storage
     }
 
+    // example of prioritizing the Ticker0 active object
+    DPP::ticker0.start(N_PHILO + 2U, // priority
+                       nullptr, 0U, nullptr, 0U); // not used
+    QS_LOC_FILTER(-DPP::ticker0.getPrio()); // don't trace ticker0
+
     DPP::AO_Table->start(
-        N_PHILO + 1U,                // priority
+        N_PHILO + 3U,            // priority
         tableQueueSto, Q_DIM(tableQueueSto),
         nullptr, 0U);
 

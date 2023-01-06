@@ -1,13 +1,13 @@
 //============================================================================
 // Product: DPP example, QUTEST
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated for version 7.2.0
+// Last updated on  2022-12-22
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -54,7 +54,6 @@ void BSP::init(int argc, char **argv) {
     QS_FUN_DICTIONARY(&BSP::displayPhilStat);
     QS_FUN_DICTIONARY(&BSP::random);
     QS_FUN_DICTIONARY(&BSP::randomSeed);
-    QS_FUN_DICTIONARY(&QP::QHsm::top);
 
     QS_USR_DICTIONARY(BSP_CALL);
 

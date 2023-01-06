@@ -1,7 +1,7 @@
 //============================================================================
 // Product: BSP for system-testing QXK
-// Last updated for version 7.1.2
-// Last updated on  2022-10-06
+// Last updated for version 7.2.0
+// Last updated on  2022-12-14
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -45,6 +45,12 @@ void wait4PB1(void);
 void ledOn(void);
 void ledOff(void);
 void trigISR(void);
+
+uint32_t romRead(int32_t offset, uint32_t fromEnd);
+void romWrite(int32_t offset, uint32_t fromEnd, uint32_t value);
+
+uint32_t ramRead(int32_t offset, uint32_t fromEnd);
+void ramWrite(int32_t offset, uint32_t fromEnd, uint32_t value);
 
 } // namespace BSP
 

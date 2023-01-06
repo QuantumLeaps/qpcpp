@@ -6,13 +6,14 @@ def on_reset():
     glb_filter(GRP_ALL)
     continue_test()
     expect("@timestamp TE0-Arm  Obj=Blinky::inst.m_timeEvt,AO=Blinky::inst,*")
-    expect("===RTC===> St-Init  Obj=Blinky::inst,State=QHsm::top->Blinky::off")
+    expect("===RTC===> St-Init  Obj=Blinky::inst,State=QP::QHsm::top->Blinky::off")
     expect("@timestamp LED 0")
     expect("===RTC===> St-Entry Obj=Blinky::inst,State=Blinky::off")
     expect("@timestamp Init===> Obj=Blinky::inst,State=Blinky::off")
     expect_run()
     current_obj(OBJ_SM_AO,"Blinky::inst")
     current_obj(OBJ_TE,"Blinky::inst.m_timeEvt")
+
 
 test("TIMEOUT_SIG->Blinky::inst")
 query_curr(OBJ_SM)

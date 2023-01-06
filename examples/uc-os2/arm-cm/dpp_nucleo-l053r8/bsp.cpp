@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, NUCLEO-L053R8 board, uC/OS-II RTOS
-// Last updated for version 6.9.3
-// Last updated on  2021-03-03
+// Last updated for version 7.2.0
+// Last updated on  2022-12-27
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -93,7 +93,7 @@ void App_TaskIdleHook(void) {
         b = QP::QS::getByte();
         OS_EXIT_CRITICAL();
 
-        if (b != QP::QS_EOD) {  // not End-Of-Data?
+        if (b != QS_EOD) {  // not End-Of-Data?
             USART2->TDR  = (b & 0xFFU);  // put into the DR register
         }
     }

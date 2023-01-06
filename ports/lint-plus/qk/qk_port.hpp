@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-10-04
-//! @version Last updated for: @ref qpcpp_7_1_2
+//! @date Last updated on: 2022-12-13
+//! @version Last updated for: @ref qpcpp_7_2_0
 //!
 //! @file
 //! @brief QK/C++ port to Lint, Generic C++ compiler
@@ -35,7 +35,7 @@
 
 //============================================================================
 //! enable the context-switch callback
-#define QK_ON_CONTEXT_SW 1
+#define QF_ON_CONTEXT_SW   1
 
 //============================================================================
 // QK interrupt entry and exit

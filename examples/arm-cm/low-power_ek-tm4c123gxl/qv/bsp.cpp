@@ -99,32 +99,7 @@ void BSP_init(void) {
                        SYSCTL_XTAL_16MHZ);
     SystemCoreClock = XTAL_HZ;
 
-    // FPU ( Floating Point Unit) configuration for QV
-    // choose one of the options...
-#if 1
-    // OPTION 1:
-    // Use the automatic FPU state preservation and the FPU lazy stacking.
-    //
-    // NOTE:
-    // Use the following setting when FPU is used in more than one task or
-    // in any ISRs. This setting is the safest and recommended, but requires
-    // extra stack space and CPU cycles.
-    //
-    FPU->FPCCR |= (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
-#else
-    // OPTION 2:
-    // Do NOT to use the automatic FPU state preservation and
-    // do NOT to use the FPU lazy stacking.
-    //
-    // NOTE:
-    // Use the following setting when FPU is used in ONE task only and not
-    // in any ISR. This setting is very efficient, but if more than one task
-    // (or ISR) start using the FPU, this can lead to corruption of the
-    // FPU registers. This option should be used with CAUTION.
-    //
-    FPU->FPCCR &= ~((1U << FPU_FPCCR_ASPEN_Pos)
-                   | (1U << FPU_FPCCR_LSPEN_Pos));
-#endif
+    // NOTE: The VFP (hardware Floating Point) unit is configured by QV
 
     // enable clock for to the peripherals used by this application...
     SYSCTL->RCGCGPIO  |= (1U << 5);  // enable Run mode for GPIOF

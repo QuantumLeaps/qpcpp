@@ -161,7 +161,7 @@ void OS_Idle(void) {
             b = QP::QS::getByte();
             QF_INT_ENABLE();
 
-            if (b != QP::QS_EOD) {  // not End-Of-Data?
+            if (b != QS_EOD) {  // not End-Of-Data?
                 DPP::l_uartHandle.Instance->TDR = (b & 0xFFU); // put into TDR
             }
         }
@@ -216,10 +216,7 @@ void BSP::init(void) {
     __HAL_FLASH_ART_ENABLE();
 #endif // ART_ACCLERATOR_ENABLE
 
-    // Explictily Disable the automatic FPU state preservation as well as
-    // the FPU lazy stacking
-    //
-    FPU->FPCCR &= ~((1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos));
+    // NOTE: The VFP (hardware Floating Point) unit is configured by RTOS
 
     // Configure the LEDs
     BSP_LED_Init(LED1);

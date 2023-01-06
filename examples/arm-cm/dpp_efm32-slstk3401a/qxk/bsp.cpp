@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last updated for version 7.1.0
-// Last updated on  2022-08-28
+// Last updated for version 7.2.0
+// Last updated on  2022-12-13
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -173,9 +173,7 @@ void BSP::init(void) {
     //
     SystemCoreClockUpdate();
 
-    /* NOTE: The VFP (hardware Floating Point) unit is configured by QXK */
-    //FPU->FPCCR = FPU->FPCCR
-    //              | (1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos);
+    // NOTE: The VFP (hardware Floating Point) unit is configured by QXK
 
     // enable clock for to the peripherals used by this application...
     CMU_ClockEnable(cmuClock_HFPER, true);
@@ -345,9 +343,9 @@ void QXK::onIdle(void) {
 extern "C" {
 
 //............................................................................
-#ifdef QXK_ON_CONTEXT_SW
+#ifdef QF_ON_CONTEXT_SW
 // NOTE: the context-switch callback is called with interrupts DISABLED
-void QXK_onContextSw(QActive *prev, QActive *next) {
+void QF_onContextSw(QActive *prev, QActive *next) {
     if (next != nullptr) {
         //_impure_ptr = next->thread; // switch to next TLS
     }
@@ -356,7 +354,7 @@ void QXK_onContextSw(QActive *prev, QActive *next) {
         QS_OBJ(next);
     QS_END_NOCRIT()
 }
-#endif // QXK_ON_CONTEXT_SW
+#endif // QF_ON_CONTEXT_SW
 
 //............................................................................
 Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {

@@ -1,13 +1,13 @@
 //============================================================================
 // Product: DPP example, EFM32-SLSTK3401A board, cooperative QV kernel
-// Last updated for version 7.1.0
-// Last updated on  2022-08-28
+// Last updated for version 7.2.0
+// Last updated on  2022-12-13
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -99,8 +99,8 @@ void SysTick_Handler(void) {
     }
 #endif
 
-    //QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time evts for rate 0
-    DPP::the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
+    QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time evts for rate 0
+    //DPP::the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
@@ -156,20 +156,12 @@ void USART0_RX_IRQHandler(void) {}
 
 // BSP functions =============================================================
 void BSP::init(void) {
-    // NOTE: SystemInit() already called from the startup code
-    //  but SystemCoreClock needs to be updated
+    // NOTE: SystemInit() has been already called from the startup code
+    // but SystemCoreClock needs to be updated
     //
     SystemCoreClockUpdate();
 
-    // configure the FPU usage by choosing one of the options...
-    // Do NOT to use the automatic FPU state preservation and
-    // do NOT to use the FPU lazy stacking.
-    //
-    // NOTE:
-    // Use the following setting when FPU is used in ONE task only and not
-    // in any ISR. This option should be used with CAUTION.
-    //
-    FPU->FPCCR &= ~((1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos));
+    // NOTE: The VFP (hardware Floating Point) unit is configured by QV
 
     // enable clock for to the peripherals used by this application...
     CMU_ClockEnable(cmuClock_HFPER, true);
@@ -295,6 +287,21 @@ void QF::onStartup(void) {
 //............................................................................
 void QF::onCleanup(void) {
 }
+//............................................................................
+#ifdef QF_ON_CONTEXT_SW
+// NOTE: the context-switch callback is called with interrupts DISABLED
+extern "C"
+void QF_onContextSw(QActive *prev, QActive *next) {
+    (void)prev;
+    if (next != nullptr) {
+        //_impure_ptr = next->thread; // switch to next TLS
+    }
+    QS_BEGIN_NOCRIT(CONTEXT_SW, 0U) // no critical section!
+        QS_OBJ(prev);
+        QS_OBJ(next);
+    QS_END_NOCRIT()
+}
+#endif // QF_ON_CONTEXT_SW
 //............................................................................
 void QV::onIdle(void) { // called with interrupts disabled, see NOTE01
     // toggle the User LED on and then off, see NOTE02

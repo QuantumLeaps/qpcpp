@@ -167,15 +167,7 @@ void BSP_init(void) {
     //
     SystemCoreClockUpdate();
 
-    // configure the FPU usage by choosing one of the options...
-    // Do NOT to use the automatic FPU state preservation and
-    // do NOT to use the FPU lazy stacking.
-    //
-    // NOTE:
-    // Use the following setting when FPU is used in ONE task only and not
-    // in any ISR. This option should be used with CAUTION.
-    //
-    FPU->FPCCR &= ~((1U << FPU_FPCCR_ASPEN_Pos) | (1U << FPU_FPCCR_LSPEN_Pos));
+    // NOTE: The VFP (hardware Floating Point) unit is configured by QV
 
     // enable clock for to the peripherals used by this application...
     CMU_ClockEnable(cmuClock_HFPER, true);

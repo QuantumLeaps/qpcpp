@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on EMF32-SLSTK3401A, QXK kernel, GNU-ARM
-# Last Updated for Version: 7.0.1
-# Date of the Last Update:  2022-05-23
+# Last Updated for Version: 7.2.0
+# Date of the Last Update:  2022-12-14
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2022 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -45,7 +45,7 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    https://sourceforge.net/projects/qpc/files/QTools/
+#    https://github.com/QuantumLeaps/qtools/releases
 #
 
 #-----------------------------------------------------------------------------
@@ -143,9 +143,9 @@ LIBS      :=
 
 # defines
 DEFINES   := -DEFM32PG1B200F256GM48=1 \
-	-DQXK_ON_CONTEXT_SW \
 	-DQXK_USE_IRQ_HANDLER=CRYPTO_IRQHandler \
-	-DQXK_USE_IRQ_NUM=25
+	-DQXK_USE_IRQ_NUM=25 \
+	-DQF_ON_CONTEXT_SW
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -186,7 +186,7 @@ MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build options for various configurations for ARM Cortex-M4F
+# build options for various configurations for ARM Cortex-M
 #
 
 # combine all the soruces...

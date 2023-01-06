@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-09-17
-//! @version Last updated for: @ref qpcpp_7_1_1
+//! @date Last updated on: 2022-12-27
+//! @version Last updated for: @ref qpcpp_7_2_0
 //!
 //! @file
 //! @brief QF/C++ port to FreeRTOS 10.x
@@ -97,16 +97,16 @@
 
 #ifdef Q_EVT_CTOR
     #define Q_NEW_FROM_ISR(evtT_, sig_, ...) \
-        (new(QP::QF::newXfromISR_(sizeof(evtT_), QP::QF::NO_MARGIN, 0)) \
+        (new(QP::QF::newXfromISR_(sizeof(evtT_), QP::QF::NO_MARGIN, (sig_))) \
             evtT_((sig_),  ##__VA_ARGS__))
 
     #define Q_NEW_X_FROM_ISR(e_, evtT_, margin_, sig_, ...) do {        \
         (e_) = static_cast<evtT_ *>(                                    \
                   QP::QF::newXfromISR_(static_cast<std::uint_fast16_t>( \
-                  sizeof(evtT_)), (margin_), 0));                       \
+                      sizeof(evtT_)), (margin_), (sig_)));              \
         if ((e_) != nullptr) {                                          \
-            new((e_)) evtT_((sig_),  ##__VA_ARGS__); \
-        } \
+            new((e_)) evtT_((sig_),  ##__VA_ARGS__);                    \
+        }                                                               \
      } while (false)
 
 #else // QEvt is a POD (Plain Old Datatype)

@@ -10,7 +10,7 @@ def on_reset():
 # tests...
 test("QHsmTst init")
 init()
-expect("===RTC===> St-Init  Obj=the_hsm,State=QHsm::top->QHsmTst::s2")
+expect("===RTC===> St-Init  Obj=the_hsm,State=QP::QHsm::top->QHsmTst::s2")
 expect("===RTC===> St-Entry Obj=the_hsm,State=QHsmTst::s")
 expect("===RTC===> St-Entry Obj=the_hsm,State=QHsmTst::s2")
 expect("===RTC===> St-Init  Obj=the_hsm,State=QHsmTst::s2->QHsmTst::s211")

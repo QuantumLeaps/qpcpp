@@ -321,9 +321,9 @@ void QF::onCleanup(void) {
 }
 
 //............................................................................
-#ifdef QK_ON_CONTEXT_SW
+#ifdef QF_ON_CONTEXT_SW
 /* NOTE: the context-switch callback is called with interrupts DISABLED */
-void QK_onContextSw(QActive *prev, QActive *next) {
+void QF_onContextSw(QActive *prev, QActive *next) {
     (void)prev;
     if (next != (QActive *)0) {
         //_impure_ptr = next->thread; /* switch to next TLS */
@@ -333,7 +333,7 @@ void QK_onContextSw(QActive *prev, QActive *next) {
         QS_OBJ(next);
     QS_END_NOCRIT()
 }
-#endif /* QK_ON_CONTEXT_SW */
+#endif /* QF_ON_CONTEXT_SW */
 //............................................................................
 void QK::onIdle(void) {
     // toggle the User LED on and then off, see NOTE2

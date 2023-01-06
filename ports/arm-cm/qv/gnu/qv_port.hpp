@@ -21,8 +21,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-04-10
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-12-18
+//! @version Last updated for: @ref qpcpp_7_2_0
 //!
 //! @file
 //! @brief QV/C++ port to ARM Cortex-M, cooperative QV kernel, GNU-ARM
@@ -30,7 +30,7 @@
 #ifndef QV_PORT_HPP
 #define QV_PORT_HPP
 
-#if (__ARM_ARCH == 6) // if ARMv6-M...
+#if (__ARM_ARCH == 6) // if ARMv6-M?
 
     // macro to put the CPU to sleep inside QV::onIdle()
     #define QV_CPU_SLEEP() do { \
@@ -40,7 +40,7 @@
 
     #define QV_ARM_ERRATUM_838869() ((void)0)
 
-#else // Cortex-M3/M4/M7(v7-M)
+#else // ARMv7-M or higher
 
     // macro to put the CPU to sleep inside QV::onIdle()
     #define QV_CPU_SLEEP() do { \
@@ -62,7 +62,18 @@
     #define QV_ARM_ERRATUM_838869() \
         __asm volatile ("dsb 0xf" ::: "memory")
 
-#endif // ARMv6-M
+#endif
+
+// initialization of the QV kernel
+#define QV_INIT()  QV_init()
+extern "C" void QV_init(void);
+
+#if (__ARM_FP != 0) // if VFP available...
+// When the FPU is configured, clear the FPCA bit in the CONTROL register
+// to prevent wasting the stack space for the FPU context.
+//
+#define QV_START() __asm volatile ("msr CONTROL,%0" :: "r" (0) : )
+#endif
 
 #include "qv.hpp"   // QV platform-independent public interface
 
