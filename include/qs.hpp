@@ -1228,9 +1228,9 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) { \
 //! and the binary address of the state machine that consumes that signal
 //! with the human-readable name of the signal.
 //!
-//! Providing a signal dictionary QS record can vastly improve readability of
-//! the QS log, because instead of dealing with cryptic machine addresses the
-//! QSpy host utility can display human-readable names.
+//! @param[in] sig_ event signal (typically enumerated, e.g. `TIMEOUT_SIG`)
+//! @param[in] obj_ pointer to the associated state machine object
+//!                 (might be `nullptr` for globally recognized signals)
 //!
 //! A signal dictionary entry is associated with both the signal value `sig_`
 //! and the state machine `obj_`, because signals are required to be unique
@@ -1239,40 +1239,30 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) { \
 //!
 //! For the "global" signals that have the same meaning in all state machines
 //! (such as globally published signals), you can specify a signal dictionary
-//! entry with the `obj_` parameter set to NULL.
+//! entry with the `obj_` parameter set to `nullptr`.
 //!
 //! The following example shows the definition of signal dictionary entries
 //! in the initial transition of the Table active object. Please note that
 //! signals HUNGRY_SIG and DONE_SIG are associated with the Table state
 //! machine only ("me" `obj_` pointer). The EAT_SIG signal, on the other
-//! hand, is global (0 `obj_` pointer):
+//! hand, is global (`obj_ == nullptr`):
 //! @include qs_sigDic.cpp
-//!
-//! @note The QSpy log utility must capture the signal dictionary record
-//! in order to use the human-readable information. You need to connect to
-//! the target before the dictionary entries have been transmitted.
 //!
 //! The following QSpy log example shows the signal dictionary records
 //! generated from the Table initial transition and subsequent records that
 //! show human-readable names of the signals:
 //! @include qs_sigLog.txt
-//!
-//! The following QSpy log example shows the same sequence of records, but
-//! with dictionary records removed. The human-readable signal names are not
-//! available.
 #define QS_SIG_DICTIONARY(sig_, obj_) \
     (QP::QS::sig_dict_pre_((sig_), (obj_), #sig_))
 
 //${QS-macros::QS_OBJ_DICTIONARY} ............................................
-//! Output object dictionary record
+//! Output QS object dictionary record
 //!
 //! @details
 //! An object dictionary record associates the binary address of an object
 //! in the target's memory with the human-readable name of the object.
 //!
-//! Providing an object dictionary QS record can vastly improve readability of
-//! the QS log, because instead of dealing with cryptic machine addresses the
-//! QSpy host utility can display human-readable object names.
+//! @param[in] obj_  pointer to the object (any object)
 //!
 //! The following example shows the definition of object dictionary entry
 //! for the Table active object:
@@ -1281,20 +1271,19 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) { \
     (QP::QS::obj_dict_pre_((obj_), #obj_))
 
 //${QS-macros::QS_OBJ_ARR_DICTIONARY} ........................................
-//! Output object-array dictionary record
+//! Output QS object-array dictionary record
 //!
 //! @details
 //! An object array dictionary record associates the binary address of the
 //! object element in the target's memory with the human-readable name
 //! of the object.
 //!
-//! Providing a dictionary QS record can vastly improve readability of
-//! the QS log, because instead of dealing with cryptic machine addresses the
-//! QSpy host utility can display human-readable object names.
+//! @param[in] obj_  pointer to the object (any object)
+//! @param[in] idx_  array index
 //!
 //! The following example shows the definition of object array dictionary
 //! for `Philo::inst[n]` and `Philo::inst[n].m_timeEvt`:
-//! @include qs_objDic.cpp
+//! @include qs_objArrDic.cpp
 #define QS_OBJ_ARR_DICTIONARY(obj_, idx_) \
     (QP::QS::obj_arr_dict_pre_((obj_), (idx_), #obj_))
 

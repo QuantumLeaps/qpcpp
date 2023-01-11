@@ -59,7 +59,7 @@
        3      1     18      0       3 QP::QSpyId::getPrio@335-337@..\include\qs.hpp
        7      1     28      1       7 QP::QS::force_cast@417-423@..\include\qs.hpp
       14      3     70      1      14 QP::QS::rxPut@831-844@..\include\qs.hpp
-       9      1     49      5       9 QP::QActiveDummy::start@1573-1581@..\include\qs.hpp
+       9      1     49      5       9 QP::QActiveDummy::start@1562-1570@..\include\qs.hpp
        3      1     18      0       3 QP::QSpyId::getPrio@137-139@..\include\qs_dummy.hpp
        3      1     11      0       3 QP::QXThread::getTimeEvt@208-210@..\include\qxk.hpp
        9      1     49      5       9 QP::QXThread::start@310-318@..\include\qxk.hpp
