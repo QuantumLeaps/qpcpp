@@ -6709,7 +6709,7 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qs_id_)) { \
     QS_MTX_UNLOCK_ATTEMPT,//!&lt; a mutex unlock was attempted
 
     // [81]
-    QS_PRE_MAX,           //!&lt; the number of predefined signals
+    QS_PRE_MAX            //!&lt; the number of predefined signals
 };</code>
   </attribute>
   <!--${QS::QSpyGroups}-->
@@ -6731,7 +6731,7 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qs_id_)) { \
     QS_U2_RECORDS,  //!&lt; User Group 110-114 records
     QS_U3_RECORDS,  //!&lt; User Group 115-119 records
     QS_U4_RECORDS,  //!&lt; User Group 120-124 records
-    QS_UA_RECORDS,  //!&lt; All User records
+    QS_UA_RECORDS   //!&lt; All User records
 };</code>
   </attribute>
   <!--${QS::QSpyUserOffsets}-->
@@ -6743,7 +6743,7 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qs_id_)) { \
     QS_USER1 = QS_USER0 + 5, //!&lt; offset of Group 1
     QS_USER2 = QS_USER1 + 5, //!&lt; offset of Group 2
     QS_USER3 = QS_USER2 + 5, //!&lt; offset of Group 3
-    QS_USER4 = QS_USER3 + 5, //!&lt; offset of Group 4
+    QS_USER4 = QS_USER3 + 5  //!&lt; offset of Group 4
 };</code>
   </attribute>
   <!--${QS::QSpyIdOffsets}-->
@@ -6753,7 +6753,7 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qs_id_)) { \
     QS_AO_ID = 0,  //!&lt; offset for AO priorities
     QS_EP_ID = 64, //!&lt; offset for event-pool IDs
     QS_EQ_ID = 80, //!&lt; offset for event-queue IDs
-    QS_AP_ID = 96, //!&lt; offset for Appl-spec IDs
+    QS_AP_ID = 96  //!&lt; offset for Appl-spec IDs
 };</code>
   </attribute>
   <!--${QS::QSpyIdGroups}-->
@@ -6764,7 +6764,7 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qs_id_)) { \
     QS_AO_IDS  = 0x80 + QS_AO_ID, //!&lt; AO IDs (priorities)
     QS_EP_IDS  = 0x80 + QS_EP_ID, //!&lt; event-pool IDs
     QS_EQ_IDS  = 0x80 + QS_EQ_ID, //!&lt; event-queue IDs
-    QS_AP_IDS  = 0x80 + QS_AP_ID, //!&lt; Application-specific IDs
+    QS_AP_IDS  = 0x80 + QS_AP_ID  //!&lt; Application-specific IDs
 };</code>
   </attribute>
   <!--${QS::QSpyFunPtr}-->
@@ -6857,7 +6857,7 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qs_id_)) { \
     OBJ_T,        //!&lt; object pointer format
     FUN_T,        //!&lt; function pointer format
     I64_T,        //!&lt; signed 64-bit integer format
-    U64_T,        //!&lt; unsigned 64-bit integer format
+    U64_T         //!&lt; unsigned 64-bit integer format
 };</code>
    </attribute>
    <!--${QS::QS-tx::priv_}-->
@@ -11315,7 +11315,7 @@ return signaled;</code>
    </operation>
   </class>
   <!--${QXK::QXMutex}-->
-  <class name="QXMutex" superclass="QF::QActive">
+  <class name="QXMutex">
    <documentation>//! Blocking, Priority-Ceiling Mutex the QXK preemptive kernel
 //!
 //! @details
@@ -11352,6 +11352,11 @@ return signaled;</code>
 //! in your application.
 //! @include qxk_mutex.cpp
 //!</documentation>
+   <!--${QXK::QXMutex::m_ao}-->
+   <attribute name="m_ao" type="QActive" visibility="0x02" properties="0x00">
+    <documentation>//! active object used as a placeholder AO for this mutex
+//! in QActive::registry_[]</documentation>
+   </attribute>
    <!--${QXK::QXMutex::m_waitSet}-->
    <attribute name="m_waitSet" type="QPSet" visibility="0x02" properties="0x00">
     <documentation>//! set of extended-threads waiting on this mutex</documentation>
@@ -11359,7 +11364,7 @@ return signaled;</code>
    <!--${QXK::QXMutex::QXMutex}-->
    <operation name="QXMutex" type="" visibility="0x00" properties="0x00">
     <documentation>//! default constructor</documentation>
-    <code>  : QActive(Q_STATE_CAST(0))</code>
+    <code>  : m_ao(Q_STATE_CAST(0))</code>
    </operation>
    <!--${QXK::QXMutex::init}-->
    <operation name="init" type="void" visibility="0x00" properties="0x00">
@@ -11394,11 +11399,11 @@ return signaled;</code>
     <code>//! @pre preemption-threshold must not be used
 Q_REQUIRE_ID(100, (prioSpec &amp; 0xFF00U) == 0U);
 
-m_prio  = static_cast&lt;std::uint8_t&gt;(prioSpec &amp; 0xFFU);
-m_pthre = 0U; // preemption-threshold not used
+m_ao.m_prio  = static_cast&lt;std::uint8_t&gt;(prioSpec &amp; 0xFFU); //  QF-prio.
+m_ao.m_pthre = 0U; // preemption-threshold not used
 
 if (prioSpec != 0U) {  // priority-ceiling protocol used?
-    register_();  // register this mutex as AO
+    m_ao.register_();  // register this mutex as AO
 }</code>
    </operation>
    <!--${QXK::QXMutex::tryLock}-->
@@ -11427,7 +11432,7 @@ QF_CRIT_E_();
 
 QActive *curr = QXK_attr_.curr;
 if (curr == nullptr) { // called from a basic thread?
-    curr = registry_[QXK_attr_.actPrio];
+    curr = QActive::registry_[QXK_attr_.actPrio];
 }
 
 //! @pre this function must:
@@ -11436,77 +11441,76 @@ if (curr == nullptr) { // called from a basic thread?
 //! - the mutex-priority must be in range
 Q_REQUIRE_ID(300, (!QXK_ISR_CONTEXT_()) // don't call from an ISR!
     &amp;&amp; (curr != nullptr) // current thread must be valid
-    &amp;&amp; (m_prio &lt;= QF_MAX_ACTIVE));
+    &amp;&amp; (m_ao.m_prio &lt;= QF_MAX_ACTIVE));
 //! @pre also: the thread must NOT be holding a scheduler lock.
 Q_REQUIRE_ID(301, QXK_attr_.lockHolder != curr-&gt;m_prio);
 
 // is the mutex available?
-if (m_eQueue.m_nFree == 0U) {
-    m_eQueue.m_nFree = 1U;  // mutex lock nesting
+if (m_ao.m_eQueue.m_nFree == 0U) {
+    m_ao.m_eQueue.m_nFree = 1U;  // mutex lock nesting
 
     //! @pre also: the newly locked mutex must have no holder yet
-    Q_REQUIRE_ID(302, m_thread == nullptr);
+    Q_REQUIRE_ID(302, m_ao.m_thread == nullptr);
 
     // set the new mutex holder to the curr thread and
-    // save the thread's prio/pthre in the mutex
+    // save the thread's prio in the mutex
     // NOTE: reuse the otherwise unused eQueue data member.
-    m_thread = curr;
-    m_eQueue.m_head = static_cast&lt;QEQueueCtr&gt;(curr-&gt;m_prio);
-    m_eQueue.m_tail = static_cast&lt;QEQueueCtr&gt;(curr-&gt;m_pthre);
+    m_ao.m_thread = curr;
+    m_ao.m_eQueue.m_head = static_cast&lt;QEQueueCtr&gt;(curr-&gt;m_prio);
 
     QS_BEGIN_NOCRIT_PRE_(QS_MTX_LOCK, curr-&gt;m_prio)
         QS_TIME_PRE_();  // timestamp
         QS_OBJ_PRE_(this); // this mutex
-        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head),
-                    static_cast&lt;std::uint8_t&gt;(m_eQueue.m_nFree));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_nFree));
     QS_END_NOCRIT_PRE_()
 
-    if (m_prio != 0U) { // priority-ceiling protocol used?
+    if (m_ao.m_prio != 0U) { // priority-ceiling protocol used?
         // the holder priority must be lower than that of the mutex
         // and the priority slot must be occupied by this mutex
-        Q_ASSERT_ID(210, (curr-&gt;m_prio &lt; m_prio)
-            &amp;&amp; (registry_[m_prio] == this));
+        Q_ASSERT_ID(210, (curr-&gt;m_prio &lt; m_ao.m_prio)
+            &amp;&amp; (QActive::registry_[m_ao.m_prio] == &amp;m_ao));
 
         // remove the thread's original prio from the ready set
         // and insert the mutex's prio into the ready set
         QF::readySet_.remove(
-            static_cast&lt;std::uint_fast8_t&gt;(m_eQueue.m_head));
+            static_cast&lt;std::uint_fast8_t&gt;(m_ao.m_eQueue.m_head));
         QF::readySet_.insert(
-            static_cast&lt;std::uint_fast8_t&gt;(m_prio));
+            static_cast&lt;std::uint_fast8_t&gt;(m_ao.m_prio));
 
         // put the thread into the AO registry in place of the mutex
-        registry_[m_prio] = curr;
+        QActive::registry_[m_ao.m_prio] = curr;
 
-        // set thread's prio/pthre to that of the mutex
-        curr-&gt;m_prio  = m_prio;
-        curr-&gt;m_pthre = m_pthre;
+        // set thread's prio to that of the mutex
+        curr-&gt;m_prio  = m_ao.m_prio;
     }
 }
 // is the mutex locked by this thread already (nested locking)?
-else if (m_thread == curr) {
+else if (m_ao.m_thread == curr) {
     // the nesting level must not exceed the specified limit
-    Q_ASSERT_ID(320, m_eQueue.m_nFree &lt; 0xFFU);
+    Q_ASSERT_ID(320, m_ao.m_eQueue.m_nFree &lt; 0xFFU);
 
-    m_eQueue.m_nFree = m_eQueue.m_nFree + 1U; // lock one more level
+    // lock one more level
+    m_ao.m_eQueue.m_nFree = m_ao.m_eQueue.m_nFree + 1U;
 
     QS_BEGIN_NOCRIT_PRE_(QS_MTX_LOCK, curr-&gt;m_prio)
         QS_TIME_PRE_();  // timestamp
         QS_OBJ_PRE_(this); // this mutex
-        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head),
-                    static_cast&lt;std::uint8_t&gt;(m_eQueue.m_nFree));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_nFree));
     QS_END_NOCRIT_PRE_()
 }
 else { // the mutex is already locked by a different thread
-    if (m_prio != 0U) {  // priority-ceiling protocol used?
+    if (m_ao.m_prio != 0U) {  // priority-ceiling protocol used?
         // the prio slot must be occupied by the thr. holding the mutex
-        Q_ASSERT_ID(340, registry_[m_prio]
-                         == QXK_PTR_CAST_(QActive *, m_thread));
+        Q_ASSERT_ID(340, QActive::registry_[m_ao.m_prio]
+                         == QXK_PTR_CAST_(QActive *, m_ao.m_thread));
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_MTX_BLOCK_ATTEMPT, curr-&gt;m_prio)
         QS_TIME_PRE_();  // timestamp
         QS_OBJ_PRE_(this); // this mutex
-        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head),
+        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head),
                     curr-&gt;m_prio); // trying thread prio
     QS_END_NOCRIT_PRE_()
 
@@ -11555,77 +11559,77 @@ QXThread * const curr = QXK_PTR_CAST_(QXThread*, QXK_attr_.curr);
 
 Q_REQUIRE_ID(200, (!QXK_ISR_CONTEXT_()) // don't call from an ISR!
 &amp;&amp; (curr != nullptr) // current thread must be extended
-&amp;&amp; (m_prio &lt;= QF_MAX_ACTIVE)
+&amp;&amp; (m_ao.m_prio &lt;= QF_MAX_ACTIVE)
 &amp;&amp; (curr-&gt;m_temp.obj == nullptr)); // not blocked
 //! @pre also: the thread must NOT be holding a scheduler lock
 Q_REQUIRE_ID(201, QXK_attr_.lockHolder != curr-&gt;m_prio);
 
 // is the mutex available?
 bool locked = true; // assume that the mutex will be locked
-if (m_eQueue.m_nFree == 0U) {
-    m_eQueue.m_nFree = 1U; // mutex lock nesting
+if (m_ao.m_eQueue.m_nFree == 0U) {
+    m_ao.m_eQueue.m_nFree = 1U; // mutex lock nesting
 
     //! @pre also: the newly locked mutex must have no holder yet
-    Q_REQUIRE_ID(202, m_thread == nullptr);
+    Q_REQUIRE_ID(202, m_ao.m_thread == nullptr);
 
     // set the new mutex holder to the curr thread and
-    // save the thread's prio/pthre in the mutex
+    // save the thread's prio in the mutex
     // NOTE: reuse the otherwise unused eQueue data member.
-    m_thread = curr;
-    m_eQueue.m_head = static_cast&lt;QEQueueCtr&gt;(curr-&gt;m_prio);
-    m_eQueue.m_tail = static_cast&lt;QEQueueCtr&gt;(curr-&gt;m_pthre);
+    m_ao.m_thread = curr;
+    m_ao.m_eQueue.m_head = static_cast&lt;QEQueueCtr&gt;(curr-&gt;m_prio);
 
     QS_BEGIN_NOCRIT_PRE_(QS_MTX_LOCK, curr-&gt;m_prio)
         QS_TIME_PRE_();  // timestamp
         QS_OBJ_PRE_(this); // this mutex
-        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head),
-                    static_cast&lt;std::uint8_t&gt;(m_eQueue.m_nFree));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_nFree));
     QS_END_NOCRIT_PRE_()
 
-    if (m_prio != 0U) { // priority-ceiling protocol used?
+    if (m_ao.m_prio != 0U) { // priority-ceiling protocol used?
         // the holder priority must be lower than that of the mutex
         // and the priority slot must be occupied by this mutex
-        Q_ASSERT_ID(210, (curr-&gt;m_prio &lt; m_prio)
-            &amp;&amp; (registry_[m_prio] == this));
+        Q_ASSERT_ID(210, (curr-&gt;m_prio &lt; m_ao.m_prio)
+            &amp;&amp; (QActive::registry_[m_ao.m_prio] == &amp;m_ao));
 
         // remove the thread's original prio from the ready set
         // and insert the mutex's prio into the ready set
         QF::readySet_.remove(
-            static_cast&lt;std::uint_fast8_t&gt;(m_eQueue.m_head));
-        QF::readySet_.insert(static_cast&lt;std::uint_fast8_t&gt;(m_prio));
+            static_cast&lt;std::uint_fast8_t&gt;(m_ao.m_eQueue.m_head));
+        QF::readySet_.insert(
+            static_cast&lt;std::uint_fast8_t&gt;(m_ao.m_prio));
 
         // put the thread into the AO registry in place of the mutex
-        registry_[m_prio] = curr;
+        QActive::registry_[m_ao.m_prio] = curr;
 
-        // set thread's prio/pthre to that of the mutex
-        curr-&gt;m_prio  = m_prio;
-        curr-&gt;m_pthre = m_pthre;
+        // set thread's prio to that of the mutex
+        curr-&gt;m_prio  = m_ao.m_prio;
     }
 }
 // is the mutex locked by this thread already (nested locking)?
-else if (m_thread == curr) {
+else if (m_ao.m_thread == curr) {
 
     // the nesting level beyond the arbitrary but high limit
     // most likely means cyclic or recursive locking of a mutex.
-    Q_ASSERT_ID(220, m_eQueue.m_nFree &lt; 0xFFU);
+    Q_ASSERT_ID(220, m_ao.m_eQueue.m_nFree &lt; 0xFFU);
 
-    m_eQueue.m_nFree = m_eQueue.m_nFree + 1U; // lock one more level
+    // lock one more level
+    m_ao.m_eQueue.m_nFree = m_ao.m_eQueue.m_nFree + 1U;
 
     QS_BEGIN_NOCRIT_PRE_(QS_MTX_LOCK, curr-&gt;m_prio)
         QS_TIME_PRE_();  // timestamp
         QS_OBJ_PRE_(this); // this mutex
-        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head),
-                    static_cast&lt;std::uint8_t&gt;(m_eQueue.m_nFree));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_nFree));
     QS_END_NOCRIT_PRE_()
 }
 else { // the mutex is already locked by a different thread
     // the mutex holder must be valid
-    Q_ASSERT_ID(230, m_thread != nullptr);
+    Q_ASSERT_ID(230, m_ao.m_thread != nullptr);
 
-    if (m_prio != 0U) { // priority-ceiling protocol used?
+    if (m_ao.m_prio != 0U) { // priority-ceiling protocol used?
         // the prio slot must be occupied by the thr. holding the mutex
-        Q_ASSERT_ID(240, registry_[m_prio]
-                         == QXK_PTR_CAST_(QActive *, m_thread));
+        Q_ASSERT_ID(240, QActive::registry_[m_ao.m_prio]
+                         == QXK_PTR_CAST_(QActive *, m_ao.m_thread));
     }
 
     // remove the curr thread's prio from the ready set (will block)
@@ -11642,7 +11646,7 @@ else { // the mutex is already locked by a different thread
     QS_BEGIN_NOCRIT_PRE_(QS_MTX_BLOCK, curr-&gt;m_prio)
         QS_TIME_PRE_();  // timestamp
         QS_OBJ_PRE_(this); // this mutex
-        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head),
+        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head),
                     curr-&gt;m_prio);
     QS_END_NOCRIT_PRE_()
 
@@ -11699,44 +11703,46 @@ QF_CRIT_E_();
 
 QActive *curr = QXK_attr_.curr;
 if (curr == nullptr) { // called from a basic thread?
-    curr = registry_[QXK_attr_.actPrio];
+    curr = QActive::registry_[QXK_attr_.actPrio];
 }
 
 //! @pre this function must:
 //! - NOT be called from an ISR;
-//! - the calling thread must be valid;
+//! - the calling thread must be valid
+//! - the mutex priority must be in range
 Q_REQUIRE_ID(400, (!QXK_ISR_CONTEXT_()) // don't call from an ISR!
-    &amp;&amp; (curr != nullptr)); // current thread must be valid
+    &amp;&amp; (curr != nullptr)
+    &amp;&amp; (m_ao.m_prio &lt;= QF_MAX_ACTIVE));
 
 //! @pre also: the mutex must be already locked at least once
-Q_REQUIRE_ID(401, m_eQueue.m_nFree &gt; 0U);
+Q_REQUIRE_ID(401, m_ao.m_eQueue.m_nFree &gt; 0U);
 //! @pre also: the mutex must be held by this thread
-Q_REQUIRE_ID(402, m_thread == curr);
+Q_REQUIRE_ID(402, m_ao.m_thread == curr);
 
 // is this the last nesting level?
-if (m_eQueue.m_nFree == 1U) {
+if (m_ao.m_eQueue.m_nFree == 1U) {
 
-    if (m_prio != 0U) { // priority-ceiling protocol used?
+    if (m_ao.m_prio != 0U) { // priority-ceiling protocol used?
 
-        // restore the holding thread's prio/pthre from the mutex
-        curr-&gt;m_prio  = static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head);
-        curr-&gt;m_pthre = static_cast&lt;std::uint8_t&gt;(m_eQueue.m_tail);
+        // restore the holding thread's prio from the mutex
+        curr-&gt;m_prio  =
+            static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head);
 
-        // put the mutex back into the AO registry
-        registry_[m_prio] = this;
+        // put the placeholder AO back into the AO registry
+        QActive::registry_[m_ao.m_prio] = &amp;m_ao;
 
         // remove the mutex' prio from the ready set
         // and insert the original thread's priority
         QF::readySet_.remove(
-            static_cast&lt;std::uint_fast8_t&gt;(m_prio));
+            static_cast&lt;std::uint_fast8_t&gt;(m_ao.m_prio));
         QF::readySet_.insert(
-            static_cast&lt;std::uint_fast8_t&gt;(m_eQueue.m_head));
+            static_cast&lt;std::uint_fast8_t&gt;(m_ao.m_eQueue.m_head));
     }
 
     QS_BEGIN_NOCRIT_PRE_(QS_MTX_UNLOCK, curr-&gt;m_prio)
         QS_TIME_PRE_();  // timestamp
         QS_OBJ_PRE_(this); // this mutex
-        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head),
+        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head),
                     0U);
     QS_END_NOCRIT_PRE_()
 
@@ -11750,14 +11756,15 @@ if (m_eQueue.m_nFree == 1U) {
         m_waitSet.remove(p);
         QF::readySet_.insert(p);
 
-        QXThread * const thr = QXK_PTR_CAST_(QXThread*, registry_[p]);
+        QXThread * const thr =
+            QXK_PTR_CAST_(QXThread*, QActive::registry_[p]);
 
         // the waiting thread must:
         // - be registered in QF
         // - have the priority corresponding to the registration
         // - be an extended thread
         // - be blocked on this mutex
-        Q_ASSERT_ID(410, (thr != (QXThread *)0)
+        Q_ASSERT_ID(410, (thr != nullptr)
             &amp;&amp; (thr-&gt;m_prio == static_cast&lt;std::uint8_t&gt;(p))
             &amp;&amp; (thr-&gt;m_state.act == Q_ACTION_CAST(0))
             &amp;&amp; (thr-&gt;m_temp.obj == QXK_PTR_CAST_(QMState*, this)));
@@ -11766,41 +11773,37 @@ if (m_eQueue.m_nFree == 1U) {
         static_cast&lt;void&gt;(thr-&gt;teDisarm_());
 
         // set the new mutex holder to the curr thread and
-        // save the thread's prio/pthre in the mutex
+        // save the thread's prio in the mutex
         // NOTE: reuse the otherwise unused eQueue data member.
-        m_thread = thr;
-        m_eQueue.m_head = static_cast&lt;QEQueueCtr&gt;(thr-&gt;m_prio);
-        m_eQueue.m_tail = static_cast&lt;QEQueueCtr&gt;(thr-&gt;m_pthre);
+        m_ao.m_thread = thr;
+        m_ao.m_eQueue.m_head = static_cast&lt;QEQueueCtr&gt;(thr-&gt;m_prio);
 
         QS_BEGIN_NOCRIT_PRE_(QS_MTX_LOCK, thr-&gt;m_prio)
             QS_TIME_PRE_();  // timestamp
             QS_OBJ_PRE_(this); // this mutex
-            QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head),
-                        static_cast&lt;std::uint8_t&gt;(m_eQueue.m_nFree));
+            QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head));
+            QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_nFree));
         QS_END_NOCRIT_PRE_()
 
-        if (m_prio != 0U) { // priority-ceiling protocol used?
+        if (m_ao.m_prio != 0U) { // priority-ceiling protocol used?
             // the holder priority must be lower than that of the mutex
-            Q_ASSERT_ID(410, thr-&gt;m_prio &lt; m_prio);
-
-            // set thread's preemption-threshold to that of the mutex
-            thr-&gt;m_pthre = m_pthre;
+            Q_ASSERT_ID(410, thr-&gt;m_prio &lt; m_ao.m_prio);
 
             // put the thread into AO registry in place of the mutex
-            registry_[m_prio] = thr;
+            QActive::registry_[m_ao.m_prio] = thr;
         }
     }
     else { // no threads are waiting for this mutex
-        m_eQueue.m_nFree = 0U; // free up the nesting count
+        m_ao.m_eQueue.m_nFree = 0U; // free up the nesting count
 
         // the mutex no longer held by any thread
-        m_thread = nullptr;
-        m_eQueue.m_head = 0U;
-        m_eQueue.m_tail = 0U;
+        m_ao.m_thread = nullptr;
+        m_ao.m_eQueue.m_head = 0U;
+        m_ao.m_eQueue.m_tail = 0U;
 
-        if (m_prio != 0U) { // priority-ceiling protocol used?
-            // put the mutex back at the original mutex slot
-            registry_[m_prio] = QXK_PTR_CAST_(QActive*, this);
+        if (m_ao.m_prio != 0U) { // priority-ceiling protocol used?
+            // put the placeholder AO back at the original mutex slot
+            QActive::registry_[m_ao.m_prio] = &amp;m_ao;
         }
     }
 
@@ -11810,14 +11813,14 @@ if (m_eQueue.m_nFree == 1U) {
     }
 }
 else { // releasing one level of nested mutex lock
-    Q_ASSERT_ID(420, m_eQueue.m_nFree &gt; 0U);
-    m_eQueue.m_nFree = m_eQueue.m_nFree - 1U; // unlock one level
+    // unlock one more level
+    m_ao.m_eQueue.m_nFree = m_ao.m_eQueue.m_nFree - 1U;
 
     QS_BEGIN_NOCRIT_PRE_(QS_MTX_UNLOCK_ATTEMPT, curr-&gt;m_prio)
         QS_TIME_PRE_();  // timestamp
         QS_OBJ_PRE_(this); // this mutex
-        QS_2U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_eQueue.m_head),
-                    static_cast&lt;std::uint8_t&gt;(m_eQueue.m_nFree));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_head));
+        QS_U8_PRE_(static_cast&lt;std::uint8_t&gt;(m_ao.m_eQueue.m_nFree));
     QS_END_NOCRIT_PRE_()
 }
 QF_CRIT_X_();</code>
@@ -12392,8 +12395,8 @@ QF_CRIT_X_();</code>
 //
 #define QP_VERSION_STR &quot;7.2.1&quot;
 
-//! Encrypted  current QP release (7.2.1) and date (2023-01-11)
-#define QP_RELEASE 0x76D7D63EU
+//! Encrypted  current QP release (7.2.1) and date (2023-01-15)
+#define QP_RELEASE 0x76D739FEU
 
 //============================================================================
 // Global namespace...
@@ -14326,15 +14329,16 @@ enum RxStateEnum : std::uint8_t {
     WAIT4_EVT_SIG,
     WAIT4_EVT_LEN,
     WAIT4_EVT_PAR,
-    WAIT4_EVT_FRAME,
+    WAIT4_EVT_FRAME
 
 #ifdef Q_UTEST
+    ,
     WAIT4_TEST_SETUP_FRAME,
     WAIT4_TEST_TEARDOWN_FRAME,
     WAIT4_TEST_PROBE_DATA,
     WAIT4_TEST_PROBE_ADDR,
     WAIT4_TEST_PROBE_FRAME,
-    WAIT4_TEST_CONTINUE_FRAME,
+    WAIT4_TEST_CONTINUE_FRAME
 #endif // Q_UTEST
 };
 

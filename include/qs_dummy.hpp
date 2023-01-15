@@ -105,7 +105,7 @@ enum QSpyIdOffsets : std::int16_t {
     QS_AO_ID = 0,  //!< offset for AO priorities
     QS_EP_ID = 64, //!< offset for event-pool IDs
     QS_EQ_ID = 80, //!< offset for event-queue IDs
-    QS_AP_ID = 96, //!< offset for Appl-spec IDs
+    QS_AP_ID = 96  //!< offset for Appl-spec IDs
 };
 
 } // namespace QP
@@ -120,7 +120,7 @@ enum QSpyIdGroups : std::int16_t {
     QS_AO_IDS  = 0x80 + QS_AO_ID, //!< AO IDs (priorities)
     QS_EP_IDS  = 0x80 + QS_EP_ID, //!< event-pool IDs
     QS_EQ_IDS  = 0x80 + QS_EQ_ID, //!< event-queue IDs
-    QS_AP_IDS  = 0x80 + QS_AP_ID, //!< Application-specific IDs
+    QS_AP_IDS  = 0x80 + QS_AP_ID  //!< Application-specific IDs
 };
 
 } // namespace QP

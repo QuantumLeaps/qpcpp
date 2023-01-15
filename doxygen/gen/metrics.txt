@@ -158,10 +158,10 @@
       19      5    105      1      26 QXK_contextSw@461-486@..\src\qxk\qxk.cpp
       14      2    110      0      23 QXK_threadExit_@490-512@..\src\qxk\qxk.cpp
        3      1     15      0       3 QP::QXMutex::QXMutex@76-78@..\src\qxk\qxk_mutex.cpp
-       8      2     54      1      11 QP::QXMutex::init@81-91@..\src\qxk\qxk_mutex.cpp
-      61      9    422      0      95 QP::QXMutex::tryLock@94-188@..\src\qxk\qxk_mutex.cpp
-      81     11    599      1     133 QP::QXMutex::lock@191-323@..\src\qxk\qxk_mutex.cpp
-      77     12    578      0     129 QP::QXMutex::unlock@326-454@..\src\qxk\qxk_mutex.cpp
+       8      2     60      1      11 QP::QXMutex::init@81-91@..\src\qxk\qxk_mutex.cpp
+      59      9    467      0      94 QP::QXMutex::tryLock@94-187@..\src\qxk\qxk_mutex.cpp
+      80     11    644      1     133 QP::QXMutex::lock@190-322@..\src\qxk\qxk_mutex.cpp
+      76     13    599      0     128 QP::QXMutex::unlock@325-452@..\src\qxk\qxk_mutex.cpp
        9      1     58      2      11 QP::QXSemaphore::init@76-86@..\src\qxk\qxk_sema.cpp
       54      7    346      1      79 QP::QXSemaphore::wait@89-167@..\src\qxk\qxk_sema.cpp
       27      3    131      0      38 QP::QXSemaphore::tryWait@170-207@..\src\qxk\qxk_sema.cpp
@@ -199,7 +199,7 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
      25       0.0     0.0        0.0         0     ..\include\qs_pkg.hpp
       9       0.0     0.0        0.0         0     ..\include\quit.hpp
       8       0.0     0.0        0.0         0     ..\include\qv.hpp
-    118       6.0     1.0       30.0         2     ..\include\qxk.hpp
+    119       6.0     1.0       30.0         2     ..\include\qxk.hpp
     364      31.3     5.1      182.1        11     ..\src\qf\qep_hsm.cpp
     317      42.9     7.6      236.1         7     ..\src\qf\qep_msm.cpp
       2       0.0     0.0        0.0         0     ..\src\qf\qf_act.cpp
@@ -215,7 +215,7 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
     210      23.5     5.0      146.0         8     ..\src\qk\qk.cpp
      92      18.2     5.0      109.2         4     ..\src\qv\qv.cpp
     279      23.4     5.0      144.7        11     ..\src\qxk\qxk.cpp
-    241      46.0     7.0      333.6         5     ..\src\qxk\qxk_mutex.cpp
+    237      45.2     7.2      357.0         5     ..\src\qxk\qxk_mutex.cpp
     142      32.8     4.5      196.5         4     ..\src\qxk\qxk_sema.cpp
     309      21.3     3.5      128.8        14     ..\src\qxk\qxk_xthr.cpp
 
@@ -228,5 +228,5 @@ NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
 ==========================================================================================
 Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
 ------------------------------------------------------------------------------------------
-      4541      18.1     3.3      108.0      178            1      0.01    0.04
+      4538      18.1     3.3      108.7      178            1      0.01    0.04
 @endcode

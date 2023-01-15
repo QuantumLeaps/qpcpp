@@ -268,7 +268,7 @@ enum QSpyPre : std::int8_t {
     QS_MTX_UNLOCK_ATTEMPT,//!< a mutex unlock was attempted
 
     // [81]
-    QS_PRE_MAX,           //!< the number of predefined signals
+    QS_PRE_MAX            //!< the number of predefined signals
 };
 
 //${QS::QSpyGroups} ..........................................................
@@ -289,7 +289,7 @@ enum QSpyGroups : std::int16_t {
     QS_U2_RECORDS,  //!< User Group 110-114 records
     QS_U3_RECORDS,  //!< User Group 115-119 records
     QS_U4_RECORDS,  //!< User Group 120-124 records
-    QS_UA_RECORDS,  //!< All User records
+    QS_UA_RECORDS   //!< All User records
 };
 
 //${QS::QSpyUserOffsets} .....................................................
@@ -300,7 +300,7 @@ enum QSpyUserOffsets : std::int16_t {
     QS_USER1 = QS_USER0 + 5, //!< offset of Group 1
     QS_USER2 = QS_USER1 + 5, //!< offset of Group 2
     QS_USER3 = QS_USER2 + 5, //!< offset of Group 3
-    QS_USER4 = QS_USER3 + 5, //!< offset of Group 4
+    QS_USER4 = QS_USER3 + 5  //!< offset of Group 4
 };
 
 //${QS::QSpyIdOffsets} .......................................................
@@ -309,7 +309,7 @@ enum QSpyIdOffsets : std::int16_t {
     QS_AO_ID = 0,  //!< offset for AO priorities
     QS_EP_ID = 64, //!< offset for event-pool IDs
     QS_EQ_ID = 80, //!< offset for event-queue IDs
-    QS_AP_ID = 96, //!< offset for Appl-spec IDs
+    QS_AP_ID = 96  //!< offset for Appl-spec IDs
 };
 
 //${QS::QSpyIdGroups} ........................................................
@@ -319,7 +319,7 @@ enum QSpyIdGroups : std::int16_t {
     QS_AO_IDS  = 0x80 + QS_AO_ID, //!< AO IDs (priorities)
     QS_EP_IDS  = 0x80 + QS_EP_ID, //!< event-pool IDs
     QS_EQ_IDS  = 0x80 + QS_EQ_ID, //!< event-queue IDs
-    QS_AP_IDS  = 0x80 + QS_AP_ID, //!< Application-specific IDs
+    QS_AP_IDS  = 0x80 + QS_AP_ID  //!< Application-specific IDs
 };
 
 //${QS::QSpyFunPtr} ..........................................................
@@ -398,7 +398,7 @@ enum QSType : std::uint8_t {
     OBJ_T,        //!< object pointer format
     FUN_T,        //!< function pointer format
     I64_T,        //!< signed 64-bit integer format
-    U64_T,        //!< unsigned 64-bit integer format
+    U64_T         //!< unsigned 64-bit integer format
 };
 
 //${QS::QS-tx::priv_} ........................................................

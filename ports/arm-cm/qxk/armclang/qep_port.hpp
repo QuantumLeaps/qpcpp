@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2021-12-23
-//! @version Last updated for: @ref qpcpp_7_0_0
+//! @date Last updated on: 2022-01-15
+//! @version Last updated for: @ref qpcpp_7_2_1
 //!
 //! @file
 //! @brief QEP/C++ port, ARM-CLANG C++11 compiler
@@ -31,8 +31,8 @@
 #ifndef QEP_PORT_HPP
 #define QEP_PORT_HPP
 
-//! no-return function specifier (C11/C++11 Standard)
-#define Q_NORETURN  _Noreturn void
+//! no-return function specifier (C++11 Standard)
+#define Q_NORETURN  [[noreturn]] void
 
 #include <cstdint>  // Exact-width types. C++11 Standard
 

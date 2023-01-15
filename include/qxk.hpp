@@ -564,8 +564,12 @@ namespace QP {
 //! in your application.
 //! @include qxk_mutex.cpp
 //!
-class QXMutex : public QP::QActive {
+class QXMutex {
 private:
+
+    //! active object used as a placeholder AO for this mutex
+    //! in QActive::registry_[]
+    QActive m_ao;
 
     //! set of extended-threads waiting on this mutex
     QPSet m_waitSet;
