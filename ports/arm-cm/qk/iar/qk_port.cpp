@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-18
-* @version Last updated for: @ref qpc_7_2_0
+* @date Last updated on: 2023-01-14
+* @version Last updated for: @ref qpc_7_2_1
 *
 * @file
 * @brief QK/C++ port to ARM Cortex-M, IAR-ARM toolset
@@ -72,6 +72,7 @@ void NMI_Handler(void);
 * changed by the application-level code.
 */
 void QK_init(void) {
+
 #if (__ARM_ARCH != 6)   /*--------- if ARMv7-M and higher... */
 
     /* set exception priorities to QF_BASEPRI...
@@ -103,12 +104,12 @@ void QK_init(void) {
     * to return to thread mode (default is to use the NMI exception)
     */
     NVIC_IP[QK_USE_IRQ_NUM] = 0U; /* priority 0 (highest) */
-    NVIC_EN[QK_USE_IRQ_NUM / 32U] = (1U << (QK_USE_IRQ_NUM % 32U));
+    NVIC_EN[QK_USE_IRQ_NUM >> 5U] = (1U << (QK_USE_IRQ_NUM & 0x1FU));
 #endif                  /*--------- QK IRQ specified */
 
 #if (__ARM_FP != 0)     /*--------- if VFP available... */
-    /* configure the FPU for QK */
-    FPU_FPCCR |= (1U << 30U)    /* automatic FPU state preservation (ASPEN) */
+    /* configure the FPU for QK: automatic FPU state preservation (ASPEN) */
+    FPU_FPCCR = FPU_FPCCR | (1U << 30U)
                  | (1U << 31U); /* lazy stacking (LSPEN) */
 #endif                  /*--------- VFP available */
 }
@@ -151,7 +152,7 @@ __asm volatile (
     "  PUSH    {r0,lr}          \n" /* ... push lr plus stack-aligner */
 #endif                  /*--------- VFP available */
     "  MOVS    r0,#" STRINGIFY(QF_BASEPRI) "\n"
-    "  CPSID   i                \n" /* disable interrutps with BASEPRI */
+    "  CPSID   i                \n" /* disable interrupts with BASEPRI */
     "  MSR     BASEPRI,r0       \n" /* apply the Cortex-M7 erraturm */
     "  CPSIE   i                \n" /* 837070, see SDEN-1068427. */
 #endif                  /*--------- ARMv7-M and higher */
@@ -224,13 +225,9 @@ __asm volatile (
     "  STR     r1,[r0]          \n" /* ICSR[31] := 1 (pend NMI) */
 
 #else                   /*--------- use the selected IRQ */
-    "  LDR     r0,=" STRINGIFY(NVIC_PEND + (QK_USE_IRQ_NUM / 32)) "\n"
+    "  LDR     r0,=" STRINGIFY(NVIC_PEND + ((QK_USE_IRQ_NUM >> 5) << 2)) "\n"
     "  MOVS    r1,#1            \n"
-    /* NOTE: the following IRQ bit calculation should be done simply as
-    * (QK_USE_IRQ_NUM % 32), but the IAR assembler does not accept it.
-    * As a workaround the modulo (%) operation is replaced with the following:
-    */
-    "  LSLS    r1,r1,#" STRINGIFY(QK_USE_IRQ_NUM - (QK_USE_IRQ_NUM/32)*32) "\n"
+    "  LSLS    r1,r1,#" STRINGIFY(QK_USE_IRQ_NUM & 0x1F) "\n" /* r1 := IRQ bit */
     "  STR     r1,[r0]          \n" /* pend the IRQ */
 
     /* now enable interrupts so that pended IRQ can be entered */

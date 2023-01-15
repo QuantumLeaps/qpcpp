@@ -1,5 +1,5 @@
 /*============================================================================
-* QP/C Real-Time Embedded Framework (RTEF)
+* QP/C++ Real-Time Embedded Framework (RTEF)
 * Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
 * SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-18
-* @version Last updated for: @ref qpc_7_2_0
+* @date Last updated on: 2023-01-14
+* @version Last updated for: @ref qpc_7_2_1
 *
 * @file
 * @brief QXK/C++ port to ARM Cortex-M, GNU-ARM toolset
@@ -104,12 +104,12 @@ void QXK_init(void) {
     * to return to thread mode (default is to use the NMI exception)
     */
     NVIC_IP[QXK_USE_IRQ_NUM] = 0U; /* priority 0 (highest) */
-    NVIC_EN[QXK_USE_IRQ_NUM / 32U] = (1U << (QXK_USE_IRQ_NUM % 32U));
+    NVIC_EN[QXK_USE_IRQ_NUM >> 5U] = (1U << (QXK_USE_IRQ_NUM & 0x1FU));
 #endif                  /*--------- QXK IRQ specified */
 
 #if (__ARM_FP != 0)     /*--------- if VFP available... */
-    /* configure the FPU for QK */
-    FPU_FPCCR |= (1U << 30U)    /* automatic FPU state preservation (ASPEN) */
+    /* configure the FPU for QXK: automatic FPU state preservation (ASPEN) */
+    FPU_FPCCR = FPU_FPCCR | (1U << 30U)
                  | (1U << 31U); /* lazy stacking (LSPEN) */
 #endif                  /*--------- VFP available */
 }
@@ -546,9 +546,9 @@ __asm volatile (
     "  STR     r1,[r0]          \n" /* ICSR[31] := 1 (pend NMI) */
 
 #else                   /*--------- use the selected IRQ */
-    "  LDR     r0,=" STRINGIFY(NVIC_PEND + (QXK_USE_IRQ_NUM / 32)) "\n"
+    "  LDR     r0,=" STRINGIFY(NVIC_PEND + ((QXK_USE_IRQ_NUM >> 5) << 2)) "\n"
     "  MOV     r1,#1            \n"
-    "  LSL     r1,r1,#" STRINGIFY(QXK_USE_IRQ_NUM % 32) "\n" /* r1 := IRQ bit */
+    "  LSL     r1,r1,#" STRINGIFY(QXK_USE_IRQ_NUM & 0x1F) "\n" /* r1 := IRQ bit */
     "  STR     r1,[r0]          \n" /* pend the IRQ */
 
     /* now enable interrupts so that pended IRQ can be entered */

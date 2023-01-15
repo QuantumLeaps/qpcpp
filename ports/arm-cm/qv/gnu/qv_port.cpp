@@ -29,7 +29,7 @@
 * @file
 * @brief QV/C++ port to ARM Cortex-M, GNU-ARM toolset
 */
-/* This QV port is part of the interanl QP implementation */
+/* This QV port is part of the internal QP implementation */
 #define QP_IMPL 1U
 #include "qf_port.hpp"
 
@@ -41,7 +41,8 @@ extern "C" {
 #define FPU_FPCCR   *((uint32_t volatile *)0xE000EF34U)
 
 /*..........................................................................*/
-/* Initialize the exception priorities and IRQ priorities to safe values.
+/*
+* Initialize the exception priorities and IRQ priorities to safe values.
 *
 * Description:
 * On ARMv7-M or higher, this QK port disables interrupts by means of the
@@ -85,8 +86,8 @@ void QV_init(void) {
     SCB_SYSPRI[3] = (SCB_SYSPRI[3] | (0xFFU << 16U));
 
 #if (__ARM_FP != 0)     /*--------- if VFP available... */
-    /* configure the FPU for QK */
-    FPU_FPCCR |= (1U << 30U)    /* automatic FPU state preservation (ASPEN) */
+    /* configure the FPU for QV: automatic FPU state preservation (ASPEN) */
+    FPU_FPCCR = FPU_FPCCR | (1U << 30U)
                  | (1U << 31U); /* lazy stacking (LSPEN) */
 #endif                  /*--------- VFP available */
 }

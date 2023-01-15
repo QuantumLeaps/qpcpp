@@ -1,5 +1,5 @@
 /*============================================================================
-* QXK/C++ Real-Time to ARM Cortex-M, ARM-CLANG
+* QP/C++ Real-Time Embedded Framework (RTEF)
 * Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
 * SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-18
-* @version Last updated for: @ref qpc_7_2_0
+* @date Last updated on: 2023-01-14
+* @version Last updated for: @ref qpc_7_2_1
 *
 * @file
 * @brief QXK/C++ port to ARM Cortex-M, ARM-CLANG toolset
@@ -47,11 +47,11 @@ void QXK_USE_IRQ_HANDLER(void);
 void NMI_Handler(void);
 #endif
 
-#define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004)
-#define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED14)
-#define NVIC_EN      ((uint32_t volatile *)0xE000E100)
-#define NVIC_IP      ((uint8_t  volatile *)0xE000E400)
-#define FPU_FPCCR   *((uint32_t volatile *)0xE000EF34)
+#define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004U)
+#define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED14U)
+#define NVIC_EN      ((uint32_t volatile *)0xE000E100U)
+#define NVIC_IP      ((uint8_t  volatile *)0xE000E400U)
+#define FPU_FPCCR   *((uint32_t volatile *)0xE000EF34U)
 #define NVIC_PEND    0xE000E200
 #define NVIC_ICSR    0xE000ED04
 
@@ -104,12 +104,12 @@ void QXK_init(void) {
     * to return to thread mode (default is to use the NMI exception)
     */
     NVIC_IP[QXK_USE_IRQ_NUM] = 0U; /* priority 0 (highest) */
-    NVIC_EN[QXK_USE_IRQ_NUM / 32U] = (1U << (QXK_USE_IRQ_NUM % 32U));
+    NVIC_EN[QXK_USE_IRQ_NUM >> 5U] = (1U << (QXK_USE_IRQ_NUM & 0x1FU));
 #endif                  /*--------- QXK IRQ specified */
 
 #if (__ARM_FP != 0)     /*--------- if VFP available... */
-    /* configure the FPU for QK */
-    FPU_FPCCR |= (1U << 30U)    /* automatic FPU state preservation (ASPEN) */
+    /* configure the FPU for QXK: automatic FPU state preservation (ASPEN) */
+    FPU_FPCCR = FPU_FPCCR | (1U << 30U)
                  | (1U << 31U); /* lazy stacking (LSPEN) */
 #endif                  /*--------- VFP available */
 }
@@ -541,9 +541,9 @@ __asm volatile (
     "  STR     r1,[r0]          \n" /* ICSR[31] := 1 (pend NMI) */
 
 #else                   /*--------- use the selected IRQ */
-    "  LDR     r0,=" STRINGIFY(NVIC_PEND + (QXK_USE_IRQ_NUM / 32)) "\n"
+    "  LDR     r0,=" STRINGIFY(NVIC_PEND + ((QXK_USE_IRQ_NUM >> 5) << 2)) "\n"
     "  MOVS    r1,#1            \n"
-    "  LSLS    r1,r1,#" STRINGIFY(QXK_USE_IRQ_NUM % 32) "\n" /* r1 := IRQ bit */
+    "  LSLS    r1,r1,#" STRINGIFY(QXK_USE_IRQ_NUM & 0x1F) "\n" /* r1 := IRQ bit */
     "  STR     r1,[r0]          \n" /* pend the IRQ */
 
     /* now enable interrupts so that pended IRQ can be entered */

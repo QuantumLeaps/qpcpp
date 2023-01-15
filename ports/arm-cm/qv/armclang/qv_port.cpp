@@ -86,8 +86,8 @@ void QV_init(void) {
     SCB_SYSPRI[3] = (SCB_SYSPRI[3] | (0xFFU << 16U));
 
 #if (__ARM_FP != 0)     /*--------- if VFP available... */
-    /* configure the FPU for QK */
-    FPU_FPCCR |= (1U << 30U)    /* automatic FPU state preservation (ASPEN) */
+    /* configure the FPU for QV: automatic FPU state preservation (ASPEN) */
+    FPU_FPCCR = FPU_FPCCR | (1U << 30U)
                  | (1U << 31U); /* lazy stacking (LSPEN) */
 #endif                  /*--------- VFP available */
 }
