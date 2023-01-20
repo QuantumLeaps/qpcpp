@@ -1,13 +1,13 @@
 //============================================================================
-// DPP example
-// Last updated for: @qpcpp_7_0_0
-// Last updated on  2022-02-28
+// APP example
+// Last updated for version 7.3.0
+// Last updated on  2023-08-09
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. <www.state-machine.com>
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,62 +25,20 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#include "qpcpp.hpp"
-#include "dpp.hpp"
-#include "bsp.hpp"
-
-//............................................................................
-namespace {
-
-static QP::QEvt const *tableQueueSto[10];
-K_THREAD_STACK_DEFINE(tableStack, 1024); /* stack storage */
-
-static QP::QEvt const *philoQueueSto[N_PHILO][10];
-K_THREAD_STACK_DEFINE(philoStack[N_PHILO], 512); /* stack storage */
-
-static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
-static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO]; /* small pool */
-
-}
+#include "qpcpp.hpp"        // QP/C++ real-time embedded framework
+#include "dpp.hpp"          // DPP Application interface
+#include "bsp.hpp"          // Board Support Package
 
 //............................................................................
 int main() {
-    QP::QF::init();   // initialize the framework and the underlying RT kernel
-    DPP::BSP::init(); // initialize the Board Support Package
-
-    // init publish-subscribe
-    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
-
-    // initialize event pools...
-    QP::QF::poolInit(smlPoolSto,
-                     sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
-
-    // start the active objects...
-    for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->setAttr(0,        // thread opions
-                                  "Philo"); // thread name
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
-            philoQueueSto[n],
-            Q_DIM(philoQueueSto[n]),
-            (void *)philoStack[n], /* stack storage */
-            K_THREAD_STACK_SIZEOF(philoStack[n]), /* stack size [bytes] */
-            nullptr);         // no initialization param
-    }
-
-    DPP::AO_Table->setAttr(0,        // thread opions
-                           "Table"); // thread name
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 1U), // priority
-        tableQueueSto,
-        Q_DIM(tableQueueSto),
-        (void *)tableStack,        /* stack storage */
-        K_THREAD_STACK_SIZEOF(tableStack), /* stack size [bytes] */
-        nullptr);         // no initialization param
-
-    return QP::QF::run(); // run the QF application
+    QP::QF::init();         // initialize the framework
+    BSP::init();            // initialize the BSP
+    BSP::start();           // start the AOs/Threads
+    return QP::QF::run();   // run the QF application
 }

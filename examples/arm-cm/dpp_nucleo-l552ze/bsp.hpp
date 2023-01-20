@@ -1,13 +1,13 @@
 //============================================================================
 // Product: DPP example
-// Last updated for: @ref qpcpp_7_0_0
-// Date of the Last Update:  2022-01-21
+// Last Updated for Version: 7.3.0
+// Date of the Last Update:  2023-08-12
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. <www.state-machine.com>
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,33 +28,28 @@
 // along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// https://state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#ifndef BSP_HPP
-#define BSP_HPP
+#ifndef BSP_HPP_
+#define BSP_HPP_
 
-namespace DPP {
+namespace BSP {
 
-class BSP {
-public:
-    enum { TICKS_PER_SEC = 100 };
+constexpr std::uint32_t TICKS_PER_SEC {100};
 
-    static void init(void);
-    static void displayPaused(uint8_t const paused);
-    static void displayPhilStat(uint8_t const n, char const *stat);
-    static void terminate(int16_t const result);
+void init();
+void start();
+void displayPaused(std::uint8_t const paused);
+void displayPhilStat(std::uint8_t const n, char const *stat);
+void terminate(std::int16_t const result);
 
-    static void randomSeed(uint32_t const seed); // random seed
-    static uint32_t random(void); // pseudo-random generator
+void randomSeed(std::uint32_t const seed); // random seed
+std::uint32_t random(); // pseudo-random generator
 
-    // for testing...
-    static void ledOn(void);
-    static void ledOff(void);
-};
+void ledOn();
+void ledOff();
 
-extern QP::QTicker ticker0;
+} // namespace BSP
 
-} // namespace DPP
-
-#endif // BSP_HPP
+#endif // BSP_HPP_

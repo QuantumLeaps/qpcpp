@@ -270,7 +270,7 @@ void Table::displayPhilStat(uint8_t n, char const *stat) {
         str[1] = '\0';
         RIT128x96x4StringDraw(str, (6*6 + 3*6*n), 4*8, 15);
     }
-    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->getPrio()) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()

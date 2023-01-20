@@ -22,14 +22,14 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-12
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2023-08-16
+//! @version Last updated for: @ref qpcpp_7_3_0
 //!
 //! @file
 //! @brief QS/C++ port, generic C++ compiler
 
-#ifndef QS_PORT_HPP
-#define QS_PORT_HPP
+#ifndef QS_PORT_HPP_
+#define QS_PORT_HPP_
 
 // QS time-stamp size in bytes
 #define QS_TIME_SIZE     4U
@@ -41,15 +41,16 @@
 #define QS_FUN_PTR_SIZE  4U
 
 //============================================================================
-// NOTE: QS might be used with or without other QP components, in which case
-// the separate definitions of the macros QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY,
-// and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
-// the QF framework, by simply including "qf_port.hpp" *before* "qs.hpp".
-//
-#ifndef QF_PORT_HPP
-#include "qf_port.hpp" // use QS with QF
+// NOTE: QS might be used with or without other QP components, in which
+// case the separate definitions of the macros QF_CRIT_STAT, QF_CRIT_ENTRY(),
+// and QF_CRIT_EXIT() are needed. In this port QS is configured to be used
+// with the other QP component, by simply including "qp_port.hpp"
+//*before* "qs.hpp".
+#ifndef QP_PORT_HPP_
+#include "qp_port.hpp" // use QS with QP
 #endif
 
 #include "qs.hpp"      // QS platform-independent public interface
 
-#endif // QS_PORT_HPP
+#endif // QS_PORT_HPP_
+

@@ -1,13 +1,13 @@
 //============================================================================
-// DPP example for FreeRTOS kernel
-// Last updated for version 6.0.4
-// Last updated on  2018-01-07
+// APP example
+// Last updated for version 7.3.0
+// Last updated on  2023-08-09
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. <www.state-machine.com>
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,56 +31,14 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#include "qpcpp.hpp"
-#include "dpp.hpp"
-#include "bsp.hpp"
+#include "qpcpp.hpp"             // QP/C++ real-time embedded framework
+#include "dpp.hpp"               // DPP Application interface
+#include "bsp.hpp"               // Board Support Package
 
 //............................................................................
 int main() {
-    static QP::QEvt const *tableQueueSto[10];
-    static QP::QEvt const *philoQueueSto[N_PHILO][10];
-    static StackType_t philoStack[N_PHILO][configMINIMAL_STACK_SIZE];
-    static StackType_t tableStack[configMINIMAL_STACK_SIZE];
-
-    static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
-    static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO]; // small pool
-
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-
-    // init publish-subscribe
-    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
-
-    // initialize event pools...
-    QP::QF::poolInit(smlPoolSto,
-                     sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
-
-    // initialize the Board Support Package
-    // NOTE: BSP::init() is called *after* initializing publish-subscribe and
-    // event pools, to make the system ready to accept SysTick interrupts.
-    // Unfortunately, the STM32Cube code that must be called from BSP,
-    // configures and starts SysTick.
-    //
-    DPP::BSP::init();
-
-    // start the extended Test1 thread
-    for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->setAttr(QP::TASK_NAME_ATTR, "Philo");
-        DPP::AO_Philo[n]->start(
-            n + 1U,                  // QP priority of the AO
-            philoQueueSto[n],        // event queue storage
-            Q_DIM(philoQueueSto[n]), // queue length [events]
-            philoStack[n],           // stack storage
-            sizeof(philoStack[n]));  // stack size [bytes]
-    }
-
-    DPP::AO_Table->setAttr(QP::TASK_NAME_ATTR, "Table");
-    DPP::AO_Table->start(
-        N_PHILO + 1U,            // QP priority of the AO
-        tableQueueSto,           // event queue storage
-        Q_DIM(tableQueueSto),    // queue length [events]
-        tableStack,              // stack storage
-        sizeof(tableStack));     // stack size [bytes]
-
+    BSP::init();     // initialize the BSP
+    BSP::start();    // start the AOs/Threads
     return QP::QF::run(); // run the QF application
 }
-

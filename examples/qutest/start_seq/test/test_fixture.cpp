@@ -1,7 +1,7 @@
 //***************************************************************************
 // Product: Fixture for QUTEST
-// Last updated for version 7.2.0
-// Last updated on  2022-12-22
+// Last updated for version 7.3.0
+// Last updated on  2023-07-19
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -45,7 +45,9 @@ int main(int argc, char *argv[]) {
     QF::init();  // initialize the framework
 
     // initialize the QS software tracing
-    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
+    if (!QS_INIT(argc > 1 ? argv[1] : nullptr)) {
+        Q_ERROR();
+    }
 
     BSP::init(); // initialize the BSP
 

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on NUCLEO-H743ZI, QV kernel, GNU-ARM
-# Last Updated for Version: 7.2.0
-# Date of the Last Update:  2022-12-14
+# Last Updated for Version: 7.3.0
+# Date of the Last Update:  2023-09-10
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -279,7 +279,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/src/qs/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.c
@@ -312,7 +312,7 @@ clean:
 	$(BIN_DIR)/*.bin \
 	$(BIN_DIR)/*.elf \
 	$(BIN_DIR)/*.map
-	
+
 show:
 	@echo PROJECT = $(PROJECT)
 	@echo CONF = $(CONF)

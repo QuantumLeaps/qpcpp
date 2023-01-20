@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>0</interw>
-            <Optim>2</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>TARGET_IS_TM4C123_RB1</Define>
+              <Define></Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\ports\arm-cm\qxk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\ek-tm4c123gxl</IncludePath>
             </VariousControls>
@@ -361,7 +361,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -370,7 +370,7 @@
             <TextAddressRange>0x00000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>.\dpp-qxk.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--entry Reset_Handler</Misc>
@@ -399,19 +399,29 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
+              <FileName>xthread1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+              <FilePath>..\xthread1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>xthread2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\xthread2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\bsp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>dpp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\dpp.hpp</FilePath>
             </File>
             <File>
               <FileName>main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>test.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\test.cpp</FilePath>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -641,6 +651,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1039,19 +1054,29 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
+              <FileName>xthread1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+              <FilePath>..\xthread1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>xthread2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\xthread2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\bsp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>dpp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\dpp.hpp</FilePath>
             </File>
             <File>
               <FileName>main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>test.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\test.cpp</FilePath>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1281,6 +1306,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1679,19 +1709,29 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
+              <FileName>xthread1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+              <FilePath>..\xthread1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>xthread2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\xthread2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\bsp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>dpp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\dpp.hpp</FilePath>
             </File>
             <File>
               <FileName>main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>test.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\test.cpp</FilePath>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1852,6 +1892,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>

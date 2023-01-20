@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
-// Copyright Gimpel Software LLC 2020. All rights reserved.
+// Copyright Vector Informatik GmbH 2020. All rights reserved.
 //
-// This file is provided by Gimpel Software LLC (https://www.gimpel.com) for
+// This file is provided by Vector Informatik GmbH (https://www.vector.com) for
 // use with PC-lint Plus. Redistribution is permitted but any redistribution
 // must preserve this notice and, if the redistributed file has been modified,
 // provide notice that the file has been modified from the original.
@@ -14,9 +14,9 @@
     This options file can be used to explicitly activate those
     checks advocated AUTOSAR for C++ code.
 
-    Gimpel Software relies on the document, "Guidelines for the use of
+    Vector Informatik GmbH relies on the document, "Guidelines for the use of
     the C++14 language in critical and safety-related systems" copyright
-    2017 by AUTOSAR, as the primary source for this file.  Gimpel Software
+    2017 by AUTOSAR, as the primary source for this file. Vector Informatik GmbH
     makes no warranty as to the completeness or applicability of this
     options file and reserves the right to amend or alter the official
     contents of such at any time.
@@ -25,8 +25,8 @@
 
  */
 
-/* version check */ -cond('%PCLP_NO_LNT_VERSION_CHECK%' != '1' && (%LINT_MAJOR_VERSION% != 1 || %LINT_MINOR_VERSION% != 4),
-    +fatal_error(This configuration file is intended for PC-lint Plus 1.4.
+/* version check */ -cond('%PCLP_NO_LNT_VERSION_CHECK%' != '1' && (%LINT_MAJOR_VERSION% != 2 || %LINT_MINOR_VERSION% != 0),
+    +fatal_error(This configuration file is intended for PC-lint Plus 2.0.
                  You are attempting to use it with PC-lint Plus %LINT_MAJOR_VERSION%.%LINT_MINOR_VERSION%.
                  It is recommended that you use configuration files intended
                  for PC-lint Plus %LINT_MAJOR_VERSION%.%LINT_MINOR_VERSION%.)
@@ -334,6 +334,30 @@
     +elib(1906)
     -append(1906,[AUTOSAR Rule A1-1-1])
 
+    /* 586 - function random_shuffle is deprecated */
+    +e586
+    +elib(586)
+    -deprecate(function,std::random_shuffle)
+    -append(586(std::random_shuffle),[AUTOSAR Rule A1-1-1])
+
+    /* 586 - function adaptors are deprecated */
+    +e586
+    +elib(586)
+    -deprecate(function,std::ptr_fun,[AUTOSAR Rule A1-1-1])
+    -deprecate(function,std::mem_fun,[AUTOSAR Rule A1-1-1])
+    -deprecate(function,std::mem_fun_ref,[AUTOSAR Rule A1-1-1])
+    -append(586(std::ptr_fun),[AUTOSAR Rule A1-1-1])
+    -append(586(std::mem_fun),[AUTOSAR Rule A1-1-1])
+    -append(586(std::mem_fun_ref),[AUTOSAR Rule A1-1-1])
+
+    /* 586 - functions bind1st and bind2nd are deprecated */
+    +e586
+    +elib(586)
+    -deprecate(function,std::bind1st,[AUTOSAR Rule A1-1-1])
+    -append(586(std::bind1st),[AUTOSAR Rule A1-1-1])
+    -deprecate(function,std::bind2nd,[AUTOSAR Rule A1-1-1])
+    -append(586(std::bind2nd),[AUTOSAR Rule A1-1-1])
+
 /* Rule M1-0-2 (required, implementation, non-automated) */
 
     /* not statically checkable */
@@ -411,12 +435,7 @@
 
 /* Rule M2-10-1 (required, implementation, automated) */
 
-    +fta            /* enable typographical ambiguity checking */
-
-    /* 9046 - symbol is typographically ambiguous with respect to string */
-    +e9046
-    +elib(9046)
-    -append(9046,[AUTOSAR Rule M2-10-1])
+    /* not currently supported */
 
 /* Rule A2-11-1 (required, implementation, automated) */
 
@@ -690,15 +709,7 @@
 
 /* Rule A4-7-1 (required, implementation, automated) */
 
-    /* 9119 - implicit conversion of integer to smaller type */
-    +e9119
-    +elib(9119)
-    -append(9119,[AUTOSAR Rule A4-7-1])
-
-    /* 9120 - implicit conversion of floating point to smaller type */
-    +e9120
-    +elib(9120)
-    -append(9120,[AUTOSAR Rule A4-7-1])
+    /* not currently supported */
 
 /* Rule M4-10-1 (required, implementation, automated) */
 
@@ -918,7 +929,10 @@
 
 /* Rule A5-1-3 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 9424 - parameter list omitted from lambda expression */
+    +e9424
+    +elib(9424)
+    -append(9424,[AUTOSAR Rule A5-1-3])
 
 /* Rule A5-1-4 (required, implementation, automated) */
 
@@ -930,15 +944,24 @@
 
 /* Rule A5-1-6 (advisory, implementation, automated) */
 
-    /* not currently supported */
+    /* 3903 - lambda return type not explicitly specified */
+    +e3903
+    +elib(3903)
+    -append(3903,[AUTOSAR Rule A5-1-6])
 
 /* Rule A5-1-7 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 9426 - lambda used as operand to decltype or typeid */
+    +e9426
+    +elib(9426)
+    -append(9426,[AUTOSAR Rule A5-1-7])
 
 /* Rule A5-1-8 (advisory, implementation, automated) */
 
-    /* not currently supported */
+    /* 9442 - nested lambda expression */
+    +e9442
+    +elib(9442)
+    -append(9442,[AUTOSAR Rule A5-1-8])
 
 /* Rule M5-2-1 (required, implementation, automated) */
 
@@ -1717,6 +1740,11 @@
     +elib(9410)
     -append(9410,[AUTOSAR Rule A10-3-5])
 
+    /* 9438 - assignment operator should not be virtual */
+    +e9438
+    +elib(9438)
+    -append(9438,[AUTOSAR Rule A10-3-5])
+
 /* Rule M10-3-3 (required, implementation, automated) */
 
     /* 9170 - pure function 'Symbol' overrides non-pure function 'Symbol' */
@@ -1793,7 +1821,10 @@
 
 /* Rule A12-4-2 (advisory, implementation, automated) */
 
-    /* not currently supported */
+    /* 9441 - non-final class symbol has a public non-virtual destructor */
+    +e9441
+    +elib(9441)
+    -append(9441,[AUTOSAR Rule A12-4-2])
 
 /* Rule A12-6-1 (required, implementation, automated) */
 
@@ -1859,7 +1890,15 @@
 
 /* Rule A13-2-1 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 9447 - assignment operator should return type */
+    +e9447
+    +elib(9447)
+    -append(9447,[AUTOSAR Rule A13-2-1])
+
+    /* 9448 - assignment operator should return value */
+    +e9448
+    +elib(9448)
+    -append(9448,[AUTOSAR Rule A13-2-1])
 
 /* Rule A13-2-2 (required, implementation, automated) */
 
@@ -1885,7 +1924,10 @@
 
 /* Rule A13-6-1 (required, implementation, automated) */
 
-    /* not currently supported */
+    /* 9440 - Digit sequence separators in STRING TYPE literal 'STRING' should be every INTEGER digits */
+    +e9440
+    +elib(9440)
+    -append(9440,[AUTOSAR Rule A13-6-1])
 
 /* Rule A14-1-1 (advisory, implementation, non-automated) */
 
@@ -2299,6 +2341,10 @@
     +e9093
     +elib(9093)
     -append(9093,[AUTOSAR Rule M17-0-2])
+
+/* Rule M17-0-3 (required, implementation, automated) */
+
+    /* not currently supported */
 
 /* Rule M17-0-5 (required, implementation, automated) */
 

@@ -133,7 +133,7 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DTARGET_IS_TM4C123_RB1
+DEFINES   :=
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -261,7 +261,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/src/qs/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.c

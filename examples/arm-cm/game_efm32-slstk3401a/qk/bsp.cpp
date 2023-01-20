@@ -1,39 +1,37 @@
 //============================================================================
 // Product: "Fly 'n' Shoot" game example, EFM32-SLSTK3401A board, QK kernel
-// Last updated for version 6.9.3
-// Last updated on  2021-03-03
+// Last updated for: @qpcpp_7_3_0
+// Last updated on  2023-07-19
 //
-//                    Q u a n t u m  L e a P s
-//                    ------------------------
-//                    Modern Embedded Software
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
 //
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
 //
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses>.
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#include "qpcpp.hpp"
-#include "game.hpp"
-#include "bsp.hpp"
+#include "qpcpp.hpp"             // QP/C++ real-time embedded framework
+#include "game.hpp"              // Game Application interface
+#include "bsp.hpp"               // Board Support Package
 
 #include "em_device.h"  // the device specific header (SiLabs)
 #include "em_cmu.h"     // Clock Management Unit (SiLabs)
@@ -42,25 +40,25 @@
 #include "display_ls013b7dh03.h" // LS013b7DH03 display (SiLabs/QL)
 // add other drivers if necessary...
 
+//============================================================================
+namespace { // unnamed local namespace
+
 Q_DEFINE_THIS_FILE
 
-// namespace GAME ************************************************************
-namespace GAME {
-
 // Local-scope objects -------------------------------------------------------
-#define LED_PORT    gpioPortF
-#define LED0_PIN    4
-#define LED1_PIN    5
+constexpr GPIO_Port_TypeDef LED_PORT {gpioPortF};
+constexpr std::uint32_t LED0_PIN     {4U};
+constexpr std::uint32_t LED1_PIN     {5U};
 
-#define PB_PORT     gpioPortF
-#define PB0_PIN     6
-#define PB1_PIN     7
+constexpr GPIO_Port_TypeDef PB_PORT  {gpioPortF};
+constexpr std::uint32_t PB0_PIN      {6U};
+constexpr std::uint32_t PB1_PIN      {7U};
 
 /* LCD geometry and frame buffer */
-static uint32_t l_fb[BSP_SCREEN_HEIGHT + 1][BSP_SCREEN_WIDTH / 32U];
+static uint32_t l_fb[BSP::SCREEN_HEIGHT + 1][BSP::SCREEN_WIDTH / 32U];
 
 /* the walls buffer */
-static uint32_t l_walls[GAME_TUNNEL_HEIGHT + 1][BSP_SCREEN_WIDTH / 32U];
+static uint32_t l_walls[GAME_TUNNEL_HEIGHT + 1][BSP::SCREEN_WIDTH / 32U];
 
 static unsigned l_rnd;  /* random seed */
 
@@ -69,108 +67,152 @@ static void paintBitsClear(uint8_t x, uint8_t y,
                            uint8_t const *bits, uint8_t h);
 #ifdef Q_SPY
 
-    QP::QSTimeCtr QS_tickTime_;
-    QP::QSTimeCtr QS_tickPeriod_;
-
-    // QS source IDs
+    // QSpy source IDs
     static QP::QSpyId const l_SysTick_Handler = { 0U };
-    static QP::QSpyId const l_GPIO_EVEN_IRQHandler = { 0U };
 
     static USART_TypeDef * const l_USART0 = ((USART_TypeDef *)(0x40010000UL));
 
+    static QP::QSTimeCtr QS_tickTime_;
+    static QP::QSTimeCtr QS_tickPeriod_;
+
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,
-        COMMAND_STAT
+        PAUSED_STAT,
+        CONTEXT_SW,
     };
 
 #endif
 
-// ISRs used in this project =================================================
+} // unnamed namespace
+
+//============================================================================
+// Error handler and ISRs...
 extern "C" {
 
-//............................................................................
-void SysTick_Handler(void); // prototype
-void SysTick_Handler(void) {
-    // state of the button debouncing, see below
-    static struct ButtonsDebouncing {
-        uint32_t depressed;
-        uint32_t previous;
-    } buttons = { 0U, 0U };
-    uint32_t current;
-    uint32_t tmp;
+Q_NORETURN Q_onError(char const * const module, int_t const id) {
+    // NOTE: this implementation of the error handler is intended only
+    // for debugging and MUST be changed for deployment of the application
+    // (assuming that you ship your production code with assertions enabled).
+    Q_UNUSED_PAR(module);
+    Q_UNUSED_PAR(id);
+    QS_ASSERTION(module, id, 10000U);
 
-    QK_ISR_ENTRY();   // inform QK about entering an ISR
-
-#ifdef Q_SPY
-    {
-        tmp = SysTick->CTRL; // clear SysTick_CTRL_COUNTFLAG
-        QS_tickTime_ += QS_tickPeriod_; // account for the clock rollover
+#ifndef NDEBUG
+    // light up both LEDs
+    GPIO->P[LED_PORT].DOUT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
+    // for debugging, hang on in an endless loop...
+    for (;;) {
+    }
+#else
+    NVIC_SystemReset();
+    for (;;) { // explicitly "no-return"
     }
 #endif
+}
+//............................................................................
+void assert_failed(char const * const module, int_t const id); // prototype
+void assert_failed(char const * const module, int_t const id) {
+    Q_onError(module, id);
+}
 
-    //QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
-    the_Ticker0->POST(0, 0); // post a don't-care event to Ticker0
+// ISRs used in the application ==============================================
 
-    static QP::QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
+void SysTick_Handler(void); // prototype
+void SysTick_Handler(void) {
+    QK_ISR_ENTRY();   // inform QK about entering an ISR
+
+
+    //QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // time events at rate 0
+    BSP::the_Ticker0->TRIG(&l_SysTick_Handler); // trigger Ticker0
+
+    static QP::QEvt const tickEvt(GAME::TIME_TICK_SIG);
     QP::QF::PUBLISH(&tickEvt, &l_SysTick_Handler); // publish to subscribers
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
     // and Michael Barr, page 71.
-    //
-    current = ~GPIO->P[PB_PORT].DIN; // read PB0 and BP1
-    tmp = buttons.depressed; // save the debounced depressed buttons
+    static struct {
+        std::uint32_t depressed;
+        std::uint32_t previous;
+    } buttons = { 0U, 0U };
+
+    std::uint32_t current = ~GPIO->P[PB_PORT].DIN; // read PB0 and BP1
+    std::uint32_t tmp = buttons.depressed; // save the depressed buttons
     buttons.depressed |= (buttons.previous & current); // set depressed
     buttons.depressed &= (buttons.previous | current); // clear released
     buttons.previous   = current; // update the history
     tmp ^= buttons.depressed;     // changed debounced depressed
+    current = buttons.depressed;
+
     if ((tmp & (1U << PB0_PIN)) != 0U) {  // debounced PB0 state changed?
-        if ((buttons.depressed & (1U << PB0_PIN)) != 0U) { // PB0 depressed?
-            static QP::QEvt const trigEvt = { GAME::PLAYER_TRIGGER_SIG, 0U, 0U};
+        if ((current & (1U << PB0_PIN)) != 0U) { // is PB0 depressed?
+            static QP::QEvt const trigEvt(GAME::PLAYER_TRIGGER_SIG);
             QP::QF::PUBLISH(&trigEvt, &l_SysTick_Handler);
         }
     }
 
-    QK_ISR_EXIT();  // inform QK about exiting an ISR
-}
-//............................................................................
-void GPIO_EVEN_IRQHandler(void);  // prototype
-void GPIO_EVEN_IRQHandler(void) {
-    QK_ISR_ENTRY(); // inform QK about entering an ISR
-
-    // for testing...
-    AO_Tunnel->POST(Q_NEW(QP::QEvt, MAX_PUB_SIG), &l_GPIO_EVEN_IRQHandler);
+#ifdef Q_SPY
+    tmp = SysTick->CTRL; // clear CTRL_COUNTFLAG
+    QS_tickTime_ += QS_tickPeriod_; // account for the clock rollover
+#endif
 
     QK_ISR_EXIT();  // inform QK about exiting an ISR
 }
 
 //............................................................................
-void USART0_RX_IRQHandler(void); // prototype
 #ifdef Q_SPY
 // ISR for receiving bytes from the QSPY Back-End
 // NOTE: This ISR is "QF-unaware" meaning that it does not interact with
-// the QF/QK and is not disabled. Such ISRs don't need to call QK_ISR_ENTRY/
-// QK_ISR_EXIT and they cannot post or publish events.
-//
+// the QF/QK and is not disabled. Such ISRs don't need to call
+// QK_ISR_ENTRY/QK_ISR_EXIT and they cannot post or publish events.
+
+void USART0_RX_IRQHandler(void); // prototype
 void USART0_RX_IRQHandler(void) {
     // while RX FIFO NOT empty
-    while ((GAME::l_USART0->STATUS & USART_STATUS_RXDATAV) != 0) {
-        uint32_t b = GAME::l_USART0->RXDATA;
+    while ((l_USART0->STATUS & USART_STATUS_RXDATAV) != 0U) {
+        std::uint8_t b = static_cast<uint8_t>(l_USART0->RXDATA);
         QP::QS::rxPut(b);
     }
+
     QK_ARM_ERRATUM_838869();
 }
-#else
-void USART0_RX_IRQHandler(void) {}
 #endif // Q_SPY
+
+//............................................................................
+#ifdef QF_ON_CONTEXT_SW
+// NOTE: the context-switch callback is called with interrupts DISABLED
+void QF_onContextSw(QP::QActive *prev, QP::QActive *next) {
+    QS_BEGIN_INCRIT(CONTEXT_SW, 0U) // in critical section!
+        QS_OBJ(prev);
+        QS_OBJ(next);
+    QS_END_INCRIT()
+}
+#endif // QF_ON_CONTEXT_SW
 
 } // extern "C"
 
-// BSP functions =============================================================
-void BSP_init(void) {
-    // NOTE: SystemInit() already called from the startup code
-    //  but SystemCoreClock needs to be updated
-    //
+
+//============================================================================
+namespace BSP {
+
+void init() {
+    // Configure the MPU to prevent NULL-pointer dereferencing ...
+    MPU->RBAR = 0x0U                          // base address (NULL)
+                | MPU_RBAR_VALID_Msk          // valid region
+                | (MPU_RBAR_REGION_Msk & 7U); // region #7
+    MPU->RASR = (7U << MPU_RASR_SIZE_Pos)     // 2^(7+1) region
+                | (0x0U << MPU_RASR_AP_Pos)   // no-access region
+                | MPU_RASR_ENABLE_Msk;        // region enable
+    MPU->CTRL = MPU_CTRL_PRIVDEFENA_Msk       // enable background region
+                | MPU_CTRL_ENABLE_Msk;        // enable the MPU
+    __ISB();
+    __DSB();
+
+    // enable the MemManage_Handler for MPU exception
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+
+    // NOTE: SystemInit() has been already called from the startup code
+    // but SystemCoreClock needs to be updated
     SystemCoreClockUpdate();
 
     // NOTE: The VFP (hardware Floating Point) unit is configured by QK
@@ -191,19 +233,23 @@ void BSP_init(void) {
     GPIO_PinModeSet(PB_PORT, PB0_PIN, gpioModeInputPull, 1);
     GPIO_PinModeSet(PB_PORT, PB1_PIN, gpioModeInputPull, 1);
 
+    BSP::randomSeed(1234U);
+
     /* Initialize the DISPLAY driver. */
     if (!Display_init()) {
         Q_ERROR();
     }
 
-    // initialize the QS software tracing
+    // initialize the QS software tracing...
     if (!QS_INIT(nullptr)) {
         Q_ERROR();
     }
+
+    // dictionaries...
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
-    QS_OBJ_DICTIONARY(&l_GPIO_EVEN_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
-    QS_USR_DICTIONARY(COMMAND_STAT);
+    QS_USR_DICTIONARY(PAUSED_STAT);
+    QS_USR_DICTIONARY(CONTEXT_SW);
 
     // setup the QS filters...
     QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
@@ -211,15 +257,15 @@ void BSP_init(void) {
     QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
 }
 //..........................................................................*/
-void BSP_updateScreen(void) {
+void updateScreen(void) {
     GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
     Display_sendPA(&l_fb[0][0], 0, LS013B7DH03_HEIGHT);
     GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
 }
 //..........................................................................*/
-void BSP_clearFB() {
+void clearFB() {
     uint_fast8_t y;
-    for (y = 0U; y < BSP_SCREEN_HEIGHT; ++y) {
+    for (y = 0U; y < SCREEN_HEIGHT; ++y) {
         l_fb[y][0] = 0U;
         l_fb[y][1] = 0U;
         l_fb[y][2] = 0U;
@@ -227,7 +273,7 @@ void BSP_clearFB() {
     }
 }
 //..........................................................................*/
-void BSP_clearWalls() {
+void clearWalls() {
     uint_fast8_t y;
     for (y = 0U; y < GAME_TUNNEL_HEIGHT; ++y) {
         l_walls[y][0] = 0U;
@@ -237,11 +283,11 @@ void BSP_clearWalls() {
     }
 }
 //..........................................................................*/
-bool BSP_isThrottle(void) { // is the throttle button depressed?
+bool isThrottle(void) { // is the throttle button depressed?
     return (GPIO->P[PB_PORT].DIN & (1U << PB1_PIN)) == 0U;
 }
 //..........................................................................*/
-void BSP_paintString(uint8_t x, uint8_t y, char const *str) {
+void paintString(uint8_t x, uint8_t y, char const *str) {
     static uint8_t const font5x7[95][7] = {
         { 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U }, //
         { 0x04U, 0x04U, 0x04U, 0x04U, 0x00U, 0x00U, 0x04U }, // !
@@ -303,7 +349,7 @@ void BSP_paintString(uint8_t x, uint8_t y, char const *str) {
         { 0x11U, 0x11U, 0x11U, 0x0AU, 0x04U, 0x04U, 0x04U }, // Y
         { 0x1FU, 0x10U, 0x08U, 0x04U, 0x02U, 0x01U, 0x1FU }, // Z
         { 0x0EU, 0x02U, 0x02U, 0x02U, 0x02U, 0x02U, 0x0EU }, // [
-        { 0x00U, 0x01U, 0x02U, 0x04U, 0x08U, 0x10U, 0x00U }, // back-slash
+        { 0x00U, 0x01U, 0x02U, 0x04U, 0x08U, 0x10U, 0x00U }, // '\'
         { 0x0EU, 0x08U, 0x08U, 0x08U, 0x08U, 0x08U, 0x0EU }, // ]
         { 0x04U, 0x0AU, 0x11U, 0x00U, 0x00U, 0x00U, 0x00U }, // ^
         { 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x1FU }, // _
@@ -456,7 +502,7 @@ static uint8_t const explosion3_bits[] = {
     0x49, 0x2A, 0x14, 0x6B, 0x14, 0x2A, 0x49
 };
 
-static Bitmap const l_bitmap[MAX_BMP] = {
+static Bitmap const l_bitmap[GAME::MAX_BMP] = {
     { ship_bits,       Q_DIM(ship_bits) },
     { missile_bits,    Q_DIM(missile_bits) },
     { mine1_bits,      Q_DIM(mine1_bits) },
@@ -469,12 +515,12 @@ static Bitmap const l_bitmap[MAX_BMP] = {
 };
 
 //..........................................................................*/
-void BSP_paintBitmap(uint8_t x, uint8_t y, uint8_t bmp_id) {
+void paintBitmap(uint8_t x, uint8_t y, uint8_t bmp_id) {
     Bitmap const *bmp = &l_bitmap[bmp_id];
     paintBits(x, y, bmp->bits, bmp->height);
 }
 //..........................................................................*/
-void BSP_advanceWalls(uint8_t top, uint8_t bottom) {
+void advanceWalls(uint8_t top, uint8_t bottom) {
     uint_fast8_t y;
     for (y = 0U; y < GAME_TUNNEL_HEIGHT; ++y) {
         // shift the walls one pixel to the left
@@ -499,7 +545,7 @@ void BSP_advanceWalls(uint8_t top, uint8_t bottom) {
     }
 }
 //..........................................................................*/
-bool BSP_doBitmapsOverlap(uint8_t bmp_id1, uint8_t x1, uint8_t y1,
+bool doBitmapsOverlap(uint8_t bmp_id1, uint8_t x1, uint8_t y1,
                           uint8_t bmp_id2, uint8_t x2, uint8_t y2)
 {
     uint8_t y;
@@ -563,11 +609,11 @@ bool BSP_doBitmapsOverlap(uint8_t bmp_id1, uint8_t x1, uint8_t y1,
     return false; // the bitmaps do not overlap
 }
 //..........................................................................*/
-bool BSP_isWallHit(uint8_t bmp_id, uint8_t x, uint8_t y) {
+bool isWallHit(uint8_t bmp_id, uint8_t x, uint8_t y) {
     Bitmap const *bmp = &l_bitmap[bmp_id];
     uint32_t shft = (x & 0x1FU);
     uint32_t *walls = &l_walls[y][x >> 5];
-    for (y = 0; y < bmp->height; ++y, walls += (BSP_SCREEN_WIDTH >> 5)) {
+    for (y = 0; y < bmp->height; ++y, walls += (SCREEN_WIDTH >> 5)) {
         if (*walls & ((uint32_t)bmp->bits[y] << shft)) {
             return true;
         }
@@ -581,12 +627,12 @@ bool BSP_isWallHit(uint8_t bmp_id, uint8_t x, uint8_t y) {
 }
 
 //..........................................................................*/
-void BSP_updateScore(uint16_t score) {
+void updateScore(uint16_t score) {
     uint8_t seg[5];
     char str[5];
 
     if (score == 0U) {
-        BSP_paintString(1U, BSP_SCREEN_HEIGHT - 8U, "SCORE:");
+        paintString(1U, SCREEN_HEIGHT - 8U, "SCORE:");
     }
 
     seg[0] = score % 10U; score /= 10U;
@@ -600,24 +646,24 @@ void BSP_updateScore(uint16_t score) {
     str[2] = seg[1] + '0';
     str[3] = seg[0] + '0';
     str[4] = '\0';
-    BSP_paintString(6U*6U, BSP_SCREEN_HEIGHT - 8U, str);
+    paintString(6U*6U, SCREEN_HEIGHT - 8U, str);
 }
 //............................................................................
-void BSP_displayOn(void) {
+void displayOn(void) {
     Display_enable(true);
 }
 //............................................................................
-void BSP_displayOff(void) {
+void displayOff(void) {
     Display_enable(false);
 }
 //............................................................................
-uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
-    // The flating point code is to exercise the FPU
+uint32_t random(void) { // a very cheap pseudo-random-number generator
+    // some floating point code is to exercise the FPU
     float volatile x = 3.1415926F;
     x = x + 2.7182818F;
 
     // lock the scheduler around l_rnd up to the Tunnel priority
-    QP::QSchedStatus lockStat = QP::QK::schedLock(GAME::AO_Tunnel->m_prio);
+    QP::QSchedStatus lockStat = QP::QK::schedLock(GAME::AO_Tunnel->getPrio());
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     //
@@ -628,14 +674,19 @@ uint32_t BSP_random(void) { // a very cheap pseudo-random-number generator
     return (rnd >> 8);
 }
 //............................................................................
-void BSP_randomSeed(uint32_t seed) {
+void randomSeed(uint32_t seed) {
     l_rnd = seed;
 }
-//..........................................................................*/
+
+} // namespace BSP
+
+//============================================================================
+namespace { // unnamed local namespace
+
 static void paintBits(uint8_t x, uint8_t y, uint8_t const *bits, uint8_t h) {
     uint32_t *fb = &l_fb[y][x >> 5];
     uint32_t shft = (x & 0x1FU);
-    for (y = 0; y < h; ++y, fb += (BSP_SCREEN_WIDTH >> 5)) {
+    for (y = 0; y < h; ++y, fb += (BSP::SCREEN_WIDTH >> 5)) {
         *fb |= ((uint32_t)bits[y] << shft);
         if (shft > 24U) {
             *(fb + 1) |= ((uint32_t)bits[y] >> (32U - shft));
@@ -653,7 +704,7 @@ static void paintBitsClear(uint8_t x, uint8_t y,
     if (shft > 24U) {
         mask2 = ~(0xFFU >> (32U - shft));
     }
-    for (y = 0; y < h; ++y, fb += (BSP_SCREEN_WIDTH >> 5)) {
+    for (y = 0; y < h; ++y, fb += (BSP::SCREEN_WIDTH >> 5)) {
         *fb = ((*fb & mask1) | ((uint32_t)bits[y] << shft));
         if (shft > 24U) {
             *(fb + 1) = ((*(fb + 1) & mask2)
@@ -662,97 +713,83 @@ static void paintBitsClear(uint8_t x, uint8_t y,
     }
 }
 
-} // namespace GAME
+} // unnamed local namespace
 
 
-// namespace QP **************************************************************
+//============================================================================
 namespace QP {
 
-// QF callbacks ==============================================================
-void QF::onStartup(void) {
-    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / GAME::BSP_TICKS_PER_SEC);
+// QF callbacks --------------------------------------------------------------
+
+void QF::onStartup() {
+    // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
+    SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
 
     // assing all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE1
-    //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-    // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-    //
     NVIC_SetPriority(USART0_RX_IRQn, 0U); // kernel unaware interrupt
-    NVIC_SetPriority(GPIO_EVEN_IRQn, QF_AWARE_ISR_CMSIS_PRI);
+    NVIC_SetPriority(GPIO_EVEN_IRQn, QF_AWARE_ISR_CMSIS_PRI + 0U);
     NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 1U);
     // ...
 
     // enable IRQs...
     NVIC_EnableIRQ(GPIO_EVEN_IRQn);
+
 #ifdef Q_SPY
     NVIC_EnableIRQ(USART0_RX_IRQn); // UART0 interrupt used for QS-RX
 #endif
 }
 //............................................................................
-void QF::onCleanup(void) {
+void QF::onCleanup() {
 }
 //............................................................................
-void QK::onIdle(void) {
-    // toggle the User LED on and then off, see NOTE01
+void QK::onIdle() {
+    // toggle the User LED on and then off, see NOTE1
     QF_INT_DISABLE();
     GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
     GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
     QF_INT_ENABLE();
 
 #ifdef Q_SPY
+    QF_INT_DISABLE();
     QS::rxParse();  // parse all the received bytes
+    QF_INT_ENABLE();
 
-    if ((GAME::l_USART0->STATUS & USART_STATUS_TXBL) != 0) { // is TXE empty?
-        uint16_t b;
-
+    if ((l_USART0->STATUS & USART_STATUS_TXBL) != 0) {  // is TXE empty?
         QF_INT_DISABLE();
-        b = QS::getByte();
+        std::uint16_t b = QS::getByte();
         QF_INT_ENABLE();
 
         if (b != QS_EOD) {  // not End-Of-Data?
-            GAME::l_USART0->TXDATA = (b & 0xFFU); // put into the DR register
+            l_USART0->TXDATA = b;  // put into the DR register
         }
     }
 #elif defined NDEBUG
     // Put the CPU and peripherals to the low-power mode.
     // you might need to customize the clock management for your application,
-    // see the datasheet for your particular Cortex-M3 MCU.
+    // see the datasheet for your particular Cortex-M MCU.
     //
     __WFI(); // Wait-For-Interrupt
 #endif
 }
 
-//............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
-    //
-    // NOTE: add here your application-specific error handling
-    //
-    (void)module;
-    (void)loc;
-    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
-
-#ifndef NDEBUG
-    // light up both LEDs
-    GPIO->P[LED_PORT].DOUT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
-    // for debugging, hang on in an endless loop until PB1 is pressed...
-    while ((GPIO->P[PB_PORT].DIN & (1U << PB1_PIN)) != 0) {
-    }
-#endif
-
-    NVIC_SystemReset();
-}
-
-// QS callbacks ==============================================================
+//============================================================================
+// QS callbacks...
 #ifdef Q_SPY
+namespace QS {
+
 //............................................................................
-bool QS::onStartup(void const *arg) {
-    static uint8_t qsTxBuf[2*1024]; // buffer for QS transmit channel
-    static uint8_t qsRxBuf[100];    // buffer for QS receive channel
+bool onStartup(void const *arg) {
+    Q_UNUSED_PAR(arg);
+
+    static std::uint8_t qsTxBuf[2*1024]; // buffer for QS-TX channel
+    initBuf(qsTxBuf, sizeof(qsTxBuf));
+
+    static std::uint8_t qsRxBuf[100];    // buffer for QS-RX channel
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+
     static USART_InitAsync_TypeDef init = {
         usartEnable,      // Enable RX/TX when init completed
         0,                // Use current clock for configuring baudrate
@@ -769,9 +806,6 @@ bool QS::onStartup(void const *arg) {
         0                 // Auto CS Setup cycles
     };
 
-    initBuf  (qsTxBuf, sizeof(qsTxBuf));
-    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
-
     // Enable peripheral clocks
     CMU_ClockEnable(cmuClock_HFPER, true);
     CMU_ClockEnable(cmuClock_GPIO, true);
@@ -786,86 +820,81 @@ bool QS::onStartup(void const *arg) {
 
     // configure the UART for the desired baud rate, 8-N-1 operation
     init.enable = usartDisable;
-    USART_InitAsync(GAME::l_USART0, &init);
+    USART_InitAsync(l_USART0, &init);
 
     // enable pins at correct UART/USART location.
-    GAME::l_USART0->ROUTEPEN = USART_ROUTEPEN_RXPEN | USART_ROUTEPEN_TXPEN;
-    GAME::l_USART0->ROUTELOC0 = (GAME::l_USART0->ROUTELOC0 &
+    l_USART0->ROUTEPEN = USART_ROUTEPEN_RXPEN | USART_ROUTEPEN_TXPEN;
+    l_USART0->ROUTELOC0 = (l_USART0->ROUTELOC0 &
                            ~(_USART_ROUTELOC0_TXLOC_MASK
                            | _USART_ROUTELOC0_RXLOC_MASK));
 
     // Clear previous RX interrupts
-    USART_IntClear(GAME::l_USART0, USART_IF_RXDATAV);
+    USART_IntClear(l_USART0, USART_IF_RXDATAV);
     NVIC_ClearPendingIRQ(USART0_RX_IRQn);
 
     // Enable RX interrupts
-    USART_IntEnable(GAME::l_USART0, USART_IF_RXDATAV);
+    USART_IntEnable(l_USART0, USART_IF_RXDATAV);
     // NOTE: do not enable the UART0 interrupt in the NVIC yet.
     // Wait till QF::onStartup()
 
-
     // Finally enable the UART
-    USART_Enable(GAME::l_USART0, usartEnable);
+    USART_Enable(l_USART0, usartEnable);
 
-    GAME::QS_tickPeriod_ = SystemCoreClock / GAME::BSP_TICKS_PER_SEC;
-    GAME::QS_tickTime_ = GAME::QS_tickPeriod_; // to start the timestamp at zero
+    QS_tickPeriod_ = SystemCoreClock / BSP::TICKS_PER_SEC;
+    QS_tickTime_ = QS_tickPeriod_; // to start the timestamp at zero
 
     return true; // return success
 }
 //............................................................................
-void QS::onCleanup(void) {
+void onCleanup() {
 }
 //............................................................................
-QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
-    if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0) { // not set?
-        return GAME::QS_tickTime_ - static_cast<QSTimeCtr>(SysTick->VAL);
+QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
+    if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0U) { // not set?
+        return QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
     }
     else { // the rollover occured, but the SysTick_ISR did not run yet
-        return GAME::QS_tickTime_ + GAME::QS_tickPeriod_
-               - static_cast<QSTimeCtr>(SysTick->VAL);
+        return QS_tickTime_ + QS_tickPeriod_ - (QSTimeCtr)SysTick->VAL;
     }
 }
 //............................................................................
-void QS::onFlush(void) {
-    uint16_t b;
-
-    QF_INT_DISABLE();
-    while ((b = getByte()) != QS_EOD) { // while not End-Of-Data...
-        QF_INT_ENABLE();
-        // while TXE not empty
-        while ((GAME::l_USART0->STATUS & USART_STATUS_TXBL) == 0U) {
-        }
-        GAME::l_USART0->TXDATA  = (b & 0xFFU); // put into the DR register
+void onFlush() {
+    for (;;) {
         QF_INT_DISABLE();
+        std::uint16_t b = getByte();
+        if (b != QS_EOD) {
+            while ((l_USART0->STATUS & USART_STATUS_TXBL) == 0U) {
+                QF_INT_ENABLE();
+                QF_CRIT_EXIT_NOP();
+
+                QF_INT_DISABLE();
+            }
+            l_USART0->TXDATA  = b;
+            QF_INT_ENABLE();
+        }
+        else {
+            QF_INT_ENABLE();
+            break;
+        }
     }
-    QF_INT_ENABLE();
 }
 //............................................................................
 //! callback function to reset the target (to be implemented in the BSP)
-void QS::onReset(void) {
+void onReset() {
     NVIC_SystemReset();
 }
 //............................................................................
-//! callback function to execute a user command (to be implemented in BSP)
-extern "C" void assert_failed(char const *module, int loc);
-void QS::onCommand(uint8_t cmdId, uint32_t param1,
-                   uint32_t param2, uint32_t param3)
+// callback function to execute a user command
+void onCommand(std::uint8_t cmdId, std::uint32_t param1,
+               std::uint32_t param2, std::uint32_t param3)
 {
-    (void)cmdId;
-    (void)param1;
-    (void)param2;
-    (void)param3;
-
-    QS_BEGIN_ID(GAME::COMMAND_STAT, 0U) // app-specific record
-        QS_U8(2, cmdId);
-        QS_U32(8, param1);
-    QS_END()
-
-    if (cmdId == 10U) {
-        assert_failed("QS::onCommand", 11);
-    }
+    Q_UNUSED_PAR(cmdId);
+    Q_UNUSED_PAR(param1);
+    Q_UNUSED_PAR(param2);
+    Q_UNUSED_PAR(param3);
 }
 
+} // namespace QS
 #endif // Q_SPY
 //----------------------------------------------------------------------------
 
@@ -879,20 +908,21 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
 //
 // Only ISRs prioritized at or below the QF_AWARE_ISR_CMSIS_PRI level (i.e.,
 // with the numerical values of priorities equal or higher than
-// QF_AWARE_ISR_CMSIS_PRI) are allowed to call the QK_ISR_ENTRY/QK_ISR_ENTRY
-// macros or any other QF/QK  services. These ISRs are "QF-aware".
+// QF_AWARE_ISR_CMSIS_PRI) are allowed to call the QK_ISR_ENTRY/
+// QK_ISR_ENTRY macros or any other QF/QK services. These ISRs are
+// "QF-aware".
 //
 // Conversely, any ISRs prioritized above the QF_AWARE_ISR_CMSIS_PRI priority
 // level (i.e., with the numerical values of priorities less than
 // QF_AWARE_ISR_CMSIS_PRI) are never disabled and are not aware of the kernel.
-// Such "QF-unaware" ISRs cannot call any QF/QK services. In particular they
+// Such "QF-unaware" ISRs cannot call ANY QF/QK services. In particular they
 // can NOT call the macros QK_ISR_ENTRY/QK_ISR_ENTRY. The only mechanism
 // by which a "QF-unaware" ISR can communicate with the QF framework is by
 // triggering a "QF-aware" ISR, which can post/publish events.
 //
 // NOTE2:
 // The User LED is used to visualize the idle loop activity. The brightness
-// of the LED is proportional to the frequency of invcations of the idle loop.
+// of the LED is proportional to the frequency of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt
 // execution time contributes to the brightness of the User LED.
-//
+

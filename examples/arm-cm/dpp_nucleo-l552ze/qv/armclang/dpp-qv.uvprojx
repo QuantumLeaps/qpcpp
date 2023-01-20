@@ -389,11 +389,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>bsp.hpp</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\bsp.hpp</FilePath>
@@ -414,9 +409,9 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
+              <FileName>main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -599,29 +594,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qep_port.hpp</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qf_port.hpp</FilePath>
-            </File>
-            <File>
               <FileName>qv_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qv_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.hpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qs_port.hpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -712,6 +687,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
             </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -790,9 +770,9 @@
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>fromelf --bin --output .\rel\dpp-qv.bin .\rel\dpp-qv.axf</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1099,11 +1079,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>bsp.hpp</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\bsp.hpp</FilePath>
@@ -1124,9 +1099,9 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
+              <FileName>main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1309,29 +1284,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qep_port.hpp</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qf_port.hpp</FilePath>
-            </File>
-            <File>
               <FileName>qv_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qv_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.hpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qs_port.hpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1421,6 +1376,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1809,11 +1769,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>bsp.hpp</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\bsp.hpp</FilePath>
@@ -1834,9 +1789,9 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
+              <FileName>main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2019,29 +1974,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qep_port.hpp</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qf_port.hpp</FilePath>
-            </File>
-            <File>
               <FileName>qv_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qv_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qv_port.hpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qv\armclang\qs_port.hpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2131,6 +2066,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>

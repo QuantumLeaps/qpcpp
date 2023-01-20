@@ -1,13 +1,13 @@
 //============================================================================
 // Product: DPP example for ThreadX
-// Last updated for: @qpcpp_7_0_0
-// Last updated on  2021-12-05
+// Last updated for: @ref qpcpp_7_3_0
+// Last updated on  2023-08-22
 //
-//                    Q u a n t u m  L e a P s
-//                    ------------------------
-//                    Modern Embedded Software
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -35,61 +35,43 @@
 #include "dpp.hpp"
 #include "bsp.hpp"
 
-// Local-scope objects -------------------------------------------------------
-static QP::QEvt const *l_tableQueueSto[N_PHILO];
-static QP::QEvt const *l_philoQueueSto[N_PHILO][N_PHILO];
-static QP::QSubscrList l_subscrSto[DPP::MAX_PUB_SIG];
-
-static union SmallEvents {
-    void   *e0;  // minimum event size
-    uint8_t e1[sizeof(DPP::TableEvt)];
-    // ... other event types to go into this pool
-} l_smlPoolSto[2*N_PHILO + 10]; // storage for the small event pool
-
-static ULONG l_philoStk[N_PHILO][256]; // stacks for the Philosophers
-static ULONG l_tableStk[256];          // stack for the Table
-
 //............................................................................
 int main() {
-    tx_kernel_enter();  // transfet control to the ThreadX RTOS
+    tx_kernel_enter(); // transfer control to the ThreadX RTOS
     return 0; // tx_kernel_enter() does not return
 }
 //............................................................................
 void tx_application_define(void * /*first_unused_memory*/) {
-    DPP::BSP::init();   // initialize the Board Support Package
-
-    // initialize the framework and the underlying RT kernel...
-    QP::QF::init();
+    QP::QF::init(); // initialize the framework
+    BSP::init();    // initialize the Board Support Package
 
     // init publish-subscribe
+    static QP::QSubscrList l_subscrSto[APP::MAX_PUB_SIG];
     QP::QActive::psInit(l_subscrSto, Q_DIM(l_subscrSto));
 
-    // initialize event pools...
-    QP::QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto),
-                     sizeof(l_smlPoolSto[0]));
-
-    QS_OBJ_DICTIONARY(l_smlPoolSto);
-    QS_OBJ_DICTIONARY(DPP::AO_Table);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[0]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[1]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[2]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
+    // init event pools...
+    static QF_MPOOL_EL(APP::TableEvt) smlPoolSto[2*APP::N_PHILO];
+    QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
     // start the active objects...
-    for (uint8_t n = 0; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->setAttr(QP::THREAD_NAME_ATTR, "Philo");
-        DPP::AO_Philo[n]->start(
-            static_cast<uint_fast8_t>(n + 1),
-            l_philoQueueSto[n], Q_DIM(l_philoQueueSto[n]),
-            l_philoStk[n], sizeof(l_philoStk[n]));
+
+    static QP::QEvt const *philoQueueSto[APP::N_PHILO][10];
+    static ULONG philoStk[APP::N_PHILO][200]; // stacks for the Philos
+    for (std::uint8_t n = 0U; n < APP::N_PHILO; ++n) {
+        APP::AO_Philo[n]->setAttr(QP::THREAD_NAME_ATTR, "Philo");
+        APP::AO_Philo[n]->start(
+            n + 1U,
+            philoQueueSto[n], Q_DIM(philoQueueSto[n]),
+            philoStk[n], sizeof(philoStk[n]));
     }
 
-    DPP::AO_Table->setAttr(QP::THREAD_NAME_ATTR, "Table");
-    DPP::AO_Table->start(
-        static_cast<uint_fast8_t>(N_PHILO + 1),
-        l_tableQueueSto, Q_DIM(l_tableQueueSto),
-        l_tableStk, sizeof(l_tableStk));
+    static QP::QEvt const *tableQueueSto[APP::N_PHILO];
+    static ULONG tableStk[200]; // stack for the Table
+    APP::AO_Table->setAttr(QP::THREAD_NAME_ATTR, "Table");
+    APP::AO_Table->start(
+        APP::N_PHILO + 1U,
+        tableQueueSto, Q_DIM(tableQueueSto),
+        tableStk, sizeof(tableStk));
 
     (void)QP::QF::run(); // run the QF application
 }

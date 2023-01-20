@@ -1,39 +1,37 @@
 //============================================================================
-// Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last updated for version 7.2.0
-// Last updated on  2022-12-13
+// Product: DPP example, EFM32-SLSTK3401A board, QXK kernel
+// Last updated for version 7.3.0
+// Last updated on  2023-08-09
 //
-//                    Q u a n t u m  L e a P s
-//                    ------------------------
-//                    Modern Embedded Software
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
 //
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
 //
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses>.
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#include "qpcpp.hpp"
-#include "dpp.hpp"
-#include "bsp.hpp"
+#include "qpcpp.hpp"             // QP/C++ real-time embedded framework
+#include "dpp.hpp"               // DPP Application interface
+#include "bsp.hpp"               // Board Support Package
 
 #include "em_device.h"  // the device specific header (SiLabs)
 #include "em_cmu.h"     // Clock Management Unit (SiLabs)
@@ -41,136 +39,184 @@
 #include "em_usart.h"   // USART (SiLabs)
 // add other drivers if necessary...
 
+//============================================================================
+namespace { // unnamed namespace for local stuff with internal linkage
+
 Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
-#define LED_PORT    gpioPortF
-#define LED0_PIN    4
-#define LED1_PIN    5
+constexpr GPIO_Port_TypeDef LED_PORT {gpioPortF};
+constexpr std::uint32_t LED0_PIN     {4U};
+constexpr std::uint32_t LED1_PIN     {5U};
 
-#define PB_PORT     gpioPortF
-#define PB0_PIN     6
-#define PB1_PIN     7
+constexpr GPIO_Port_TypeDef PB_PORT  {gpioPortF};
+constexpr std::uint32_t PB0_PIN      {6U};
+constexpr std::uint32_t PB1_PIN      {7U};
 
-namespace { // empty namespace
-
-static uint32_t l_rnd; // random seed
+static std::uint32_t l_rndSeed;
 
 #ifdef Q_SPY
 
-    QP::QSTimeCtr QS_tickTime_;
-    QP::QSTimeCtr QS_tickPeriod_;
-
     // QSpy source IDs
-    static QP::QSpyId const l_SysTick_Handler = { 0U };
-    static QP::QSpyId const l_GPIO_EVEN_IRQHandler = { 0U };
+    QP::QSpyId const l_SysTick_Handler = { 0U };
+    QP::QSpyId const l_GPIO_EVEN_IRQHandler = { 0U };
 
     static USART_TypeDef * const l_USART0 = ((USART_TypeDef *)(0x40010000UL));
+
+    static QP::QSTimeCtr QS_tickTime_;
+    static QP::QSTimeCtr QS_tickPeriod_;
 
     enum AppRecords { // application-specific trace records
         PHILO_STAT = QP::QS_USER,
         PAUSED_STAT,
         CONTEXT_SW,
-        COMMAND_STAT
     };
 
 #endif
 
-} // empty namespace
+} // unnamed namespace
 
-// ISRs used in this project =================================================
+//============================================================================
+// Error handler and ISRs...
 extern "C" {
 
-//............................................................................
-void SysTick_Handler(void); // prototype
-void SysTick_Handler(void) {
-    // state of the button debouncing, see below
-    static struct ButtonsDebouncing {
-        uint32_t depressed;
-        uint32_t previous;
-    } buttons = { 0U, 0U };
-    uint32_t current;
-    uint32_t tmp;
+Q_NORETURN Q_onError(char const * const module, int_t const id) {
+    // NOTE: this implementation of the error handler is intended only
+    // for debugging and MUST be changed for deployment of the application
+    // (assuming that you ship your production code with assertions enabled).
+    Q_UNUSED_PAR(module);
+    Q_UNUSED_PAR(id);
+    QS_ASSERTION(module, id, 10000U);
 
-    QXK_ISR_ENTRY();   // inform QXK about entering an ISR
-
-#ifdef Q_SPY
-    {
-        tmp = SysTick->CTRL; // clear SysTick_CTRL_COUNTFLAG
-        QS_tickTime_ += QS_tickPeriod_; // account for the clock rollover
+#ifndef NDEBUG
+    // light up both LEDs
+    GPIO->P[LED_PORT].DOUT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
+    // for debugging, hang on in an endless loop...
+    for (;;) {
+    }
+#else
+    NVIC_SystemReset();
+    for (;;) { // explicitly "no-return"
     }
 #endif
+}
+//............................................................................
+void assert_failed(char const * const module, int_t const id); // prototype
+void assert_failed(char const * const module, int_t const id) {
+    Q_onError(module, id);
+}
 
-    QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // process time events for rate 0
-    //the_Ticker0->POST(0, &l_SysTick_Handler); // post to Ticker0 active object
+// ISRs used in the application ==============================================
+
+void SysTick_Handler(void); // prototype
+void SysTick_Handler(void) {
+    QXK_ISR_ENTRY();   // inform QXK about entering an ISR
+
+    QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler); // time events at rate 0
 
     // Perform the debouncing of buttons. The algorithm for debouncing
     // adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
     // and Michael Barr, page 71.
-    //
-    current = ~GPIO->P[PB_PORT].DIN; // read PB0 and BP1
-    tmp = buttons.depressed; // save the debounced depressed buttons
+    static struct {
+        std::uint32_t depressed;
+        std::uint32_t previous;
+    } buttons = { 0U, 0U };
+
+    std::uint32_t current = ~GPIO->P[PB_PORT].DIN; // read PB0 and BP1
+    std::uint32_t tmp = buttons.depressed; // save the depressed buttons
     buttons.depressed |= (buttons.previous & current); // set depressed
     buttons.depressed &= (buttons.previous | current); // clear released
     buttons.previous   = current; // update the history
     tmp ^= buttons.depressed;     // changed debounced depressed
+    current = buttons.depressed;
+
     if ((tmp & (1U << PB0_PIN)) != 0U) {  // debounced PB0 state changed?
-        if ((buttons.depressed & (1U << PB0_PIN)) != 0U) { // PB0 depressed?
-            static QP::QEvt const pauseEvt = { DPP::PAUSE_SIG, 0U, 0U};
-            QP::QF::PUBLISH(&pauseEvt, &l_SysTick_Handler);
+        if ((current & (1U << PB0_PIN)) != 0U) { // is PB0 depressed?
+            static QP::QEvt const pauseEvt(APP::PAUSE_SIG);
+            QP::QActive::PUBLISH(&pauseEvt, &l_SysTick_Handler);
         }
-        else {            // the button is released
-            static QP::QEvt const serveEvt = { DPP::SERVE_SIG, 0U, 0U};
-            QP::QF::PUBLISH(&serveEvt, &l_SysTick_Handler);
+        else { // the button is released
+            static QP::QEvt const serveEvt(APP::SERVE_SIG);
+            QP::QActive::PUBLISH(&serveEvt, &l_SysTick_Handler);
         }
     }
 
+#ifdef Q_SPY
+    tmp = SysTick->CTRL; // clear CTRL_COUNTFLAG
+    QS_tickTime_ += QS_tickPeriod_; // account for the clock rollover
+#endif
+
     QXK_ISR_EXIT();  // inform QXK about exiting an ISR
 }
 //............................................................................
-void GPIO_EVEN_IRQHandler(void);  // prototype
-
-// NOTE: to trigger this ISR from the debugger, write 0x200 to NVIC_ISPR0.
-//
+// interrupt handler for testing preemptions
+void GPIO_EVEN_IRQHandler(void); // prototype
 void GPIO_EVEN_IRQHandler(void) {
-    QXK_ISR_ENTRY(); // inform QXK about entering an ISR
+    QXK_ISR_ENTRY();   // inform QXK about entering an ISR
 
-    // for testing...
-    //DPP::AO_Table->POST(Q_NEW(QP::QEvt, DPP::MAX_PUB_SIG),
-    //                    &l_GPIO_EVEN_IRQHandler);
-    QP::QF::PUBLISH(Q_NEW(QP::QEvt, DPP::TEST_SIG), // for testing...
-                         &l_GPIO_EVEN_IRQHandler);
+    static QP::QEvt const testEvt(APP::TEST_SIG);
+    APP::AO_Table->POST(&testEvt, &l_GPIO_EVEN_IRQHandler);
 
     QXK_ISR_EXIT();  // inform QXK about exiting an ISR
 }
 
 //............................................................................
-void USART0_RX_IRQHandler(void); // prototype
 #ifdef Q_SPY
 // ISR for receiving bytes from the QSPY Back-End
 // NOTE: This ISR is "QF-unaware" meaning that it does not interact with
 // the QF/QXK and is not disabled. Such ISRs don't need to call
 // QXK_ISR_ENTRY/QXK_ISR_EXIT and they cannot post or publish events.
-//
+
+void USART0_RX_IRQHandler(void); // prototype
 void USART0_RX_IRQHandler(void) {
     // while RX FIFO NOT empty
-    while ((l_USART0->STATUS & USART_STATUS_RXDATAV) != 0) {
-        uint32_t b = l_USART0->RXDATA;
+    while ((l_USART0->STATUS & USART_STATUS_RXDATAV) != 0U) {
+        std::uint8_t b = static_cast<uint8_t>(l_USART0->RXDATA);
         QP::QS::rxPut(b);
     }
+
     QXK_ARM_ERRATUM_838869();
 }
-#else
-void USART0_RX_IRQHandler(void) {}
 #endif // Q_SPY
+
+//............................................................................
+#ifdef QF_ON_CONTEXT_SW
+// NOTE: the context-switch callback is called with interrupts DISABLED
+void QF_onContextSw(QP::QActive *prev, QP::QActive *next) {
+    Q_UNUSED_PAR(prev);
+    Q_UNUSED_PAR(next);
+
+    QS_BEGIN_INCRIT(CONTEXT_SW, 0U) // in critical section!
+        QS_OBJ(prev);
+        QS_OBJ(next);
+    QS_END_INCRIT()
+}
+#endif // QF_ON_CONTEXT_SW
 
 } // extern "C"
 
-// BSP functions =============================================================
-void BSP::init(void) {
-    // NOTE: SystemInit() already called from the startup code
-    //  but SystemCoreClock needs to be updated
-    //
+
+//============================================================================
+namespace BSP {
+
+void init() {
+    // Configure the MPU to prevent NULL-pointer dereferencing ...
+    MPU->RBAR = 0x0U                          // base address (NULL)
+                | MPU_RBAR_VALID_Msk          // valid region
+                | (MPU_RBAR_REGION_Msk & 7U); // region #7
+    MPU->RASR = (7U << MPU_RASR_SIZE_Pos)     // 2^(7+1) region
+                | (0x0U << MPU_RASR_AP_Pos)   // no-access region
+                | MPU_RASR_ENABLE_Msk;        // region enable
+    MPU->CTRL = MPU_CTRL_PRIVDEFENA_Msk       // enable background region
+                | MPU_CTRL_ENABLE_Msk;        // enable the MPU
+    __ISB();
+    __DSB();
+
+    // enable the MemManage_Handler for MPU exception
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+
+    // NOTE: SystemInit() has been already called from the startup code
+    // but SystemCoreClock needs to be updated
     SystemCoreClockUpdate();
 
     // NOTE: The VFP (hardware Floating Point) unit is configured by QXK
@@ -191,200 +237,211 @@ void BSP::init(void) {
     GPIO_PinModeSet(PB_PORT, PB0_PIN, gpioModeInputPull, 1);
     GPIO_PinModeSet(PB_PORT, PB1_PIN, gpioModeInputPull, 1);
 
-    //...
     BSP::randomSeed(1234U);
 
-    if (!QS_INIT(nullptr)) { // initialize the QS software tracing
+    // initialize the QS software tracing...
+    if (!QS_INIT(nullptr)) {
         Q_ERROR();
     }
+
+    // dictionaries...
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
     QS_OBJ_DICTIONARY(&l_GPIO_EVEN_IRQHandler);
     QS_USR_DICTIONARY(PHILO_STAT);
     QS_USR_DICTIONARY(PAUSED_STAT);
     QS_USR_DICTIONARY(CONTEXT_SW);
-    QS_USR_DICTIONARY(COMMAND_STAT);
+
+    QS_ONLY(APP::produce_sig_dict());
 
     // setup the QS filters...
-    QS_GLB_FILTER(QP::QS_ALL_RECORDS); // all records
-    QS_GLB_FILTER(-QP::QS_QF_TICK);    // exclude the clock tick
+    QS_GLB_FILTER(QP::QS_ALL_RECORDS);   // all records
+    QS_GLB_FILTER(-QP::QS_QF_TICK);      // exclude the clock tick
+    QS_LOC_FILTER(-(APP::N_PHILO + 3U)); // exclude prio. of AO_Ticker0
 }
 //............................................................................
-void BSP::displayPhilStat(uint8_t n, char const *stat) {
-    if (stat[0] == 'e') {
-        GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED0_PIN);
-    }
-    else {
-        GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED0_PIN);
+void start() {
+    // initialize event pools
+    static QF_MPOOL_EL(APP::TableEvt) smlPoolSto[2*APP::N_PHILO];
+    QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+    // initialize publish-subscribe
+    static QP::QSubscrList subscrSto[APP::MAX_PUB_SIG];
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
+
+    // start AOs/threads...
+    static QP::QEvt const *xThread1QueueSto[5];
+    static uint64_t xThread1StackSto[64];
+    APP::TH_XThread1->start(
+        1U,                          // QP priority of the thread
+        xThread1QueueSto,            // event queue storage
+        Q_DIM(xThread1QueueSto),     // event length [events]
+        &xThread1StackSto[0],        // stack storage
+        sizeof(xThread1StackSto));   // stack size [bytes]
+
+    static QP::QEvt const *philoQueueSto[APP::N_PHILO][APP::N_PHILO];
+    for (std::uint8_t n = 0U; n < APP::N_PHILO; ++n) {
+        APP::AO_Philo[n]->start(
+            n + 3U,                  // QF-prio/pthre. see NOTE1
+            philoQueueSto[n],        // event queue storage
+            Q_DIM(philoQueueSto[n]), // queue length [events]
+            nullptr, 0U);            // no stack storage
     }
 
-    QS_BEGIN_ID(PHILO_STAT, DPP::AO_Philo[n]->m_prio) // app-specific record
+    static QP::QEvt const *xThread2QueueSto[5];
+    static uint64_t xThread2StackSto[64];
+    APP::TH_XThread2->start(
+        APP::N_PHILO + 5U,           // QP priority of the thread
+        xThread2QueueSto,            // event queue storage
+        Q_DIM(xThread2QueueSto),     // event length [events]
+        &xThread2StackSto[0],        // stack storage
+        sizeof(xThread2StackSto));   // stack size [bytes]
+
+    static QP::QEvt const *tableQueueSto[APP::N_PHILO];
+    APP::AO_Table->start(
+        APP::N_PHILO + 7U,           // QP prio. of the AO
+        tableQueueSto,               // event queue storage
+        Q_DIM(tableQueueSto),        // queue length [events]
+        nullptr, 0U);                // no stack storage
+}
+//............................................................................
+void displayPhilStat(std::uint8_t n, char const *stat) {
+    Q_UNUSED_PAR(n);
+
+    if (stat[0] == 'e') {
+        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+    }
+    else {
+        GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
+    }
+
+    // app-specific trace record...
+    QS_BEGIN_ID(PHILO_STAT, APP::AO_Table->getPrio())
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()
 }
 //............................................................................
-void BSP::displayPaused(uint8_t paused) {
+void displayPaused(std::uint8_t const paused) {
     if (paused != 0U) {
-        GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED0_PIN);
-
-        // for testing the extended threads...
-        static QP::QEvt const pauseEvt = { DPP::PAUSE_SIG, 0U, 0U};
-        DPP::XT_Test2->delayCancel(); // make sure Test2 is not delayed
-        DPP::XT_Test2->POST_X(&pauseEvt, 1U, nullptr); // post to Test2
+        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
     }
     else {
-        GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
     }
 
-    QS_BEGIN_ID(PAUSED_STAT, DPP::AO_Table->m_prio) // app-specific record
+    // application-specific trace record
+    QS_BEGIN_ID(PAUSED_STAT, APP::AO_Table->getPrio())
         QS_U8(1, paused);  // Paused status
     QS_END()
 }
 //............................................................................
-uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
-    // Some flating point code is to exercise the VFP...
+void randomSeed(uint32_t const seed) {
+    l_rndSeed = seed;
+}
+//............................................................................
+std::uint32_t random() { // a very cheap pseudo-random-number generator
+    // Some floating point code is to exercise the VFP...
     float volatile x = 3.1415926F;
     x = x + 2.7182818F;
 
-    QP::QSchedStatus lockStat = QP::QXK::schedLock(N_PHILO); // protect l_rnd
+    QP::QSchedStatus lockStat = QP::QXK::schedLock(APP::N_PHILO);
     // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
-    //
-    uint32_t rnd = l_rnd * (3U*7U*11U*13U*23U);
-    l_rnd = rnd; // set for the next time
-    QP::QXK::schedUnlock(lockStat); // sched unlock around l_rnd
+    std::uint32_t rnd = l_rndSeed * (3U*7U*11U*13U*23U);
+    l_rndSeed = rnd; // set for the next time
+    QP::QXK::schedUnlock(lockStat);
 
-    return (rnd >> 8);
+    return (rnd >> 8U);
 }
 //............................................................................
-void BSP::randomSeed(uint32_t seed) {
-    l_rnd = seed;
+void ledOn() {
+    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
 }
 //............................................................................
-void BSP::ledOn(void) {
-    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED1_PIN);
+void ledOff() {
+    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
 }
 //............................................................................
-void BSP::ledOff(void) {
-    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED1_PIN);
-}
-//............................................................................
-void BSP::terminate(int16_t result) {
-    (void)result;
+void terminate(int16_t result) {
+    Q_UNUSED_PAR(result);
 }
 
-// namespace QP **************************************************************
+} // namespace BSP
+
+//============================================================================
+// namespace QP
 namespace QP {
 
-// QF callbacks ==============================================================
-void QF::onStartup(void) {
+// QF callbacks...
+void QF::onStartup() {
     // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
     SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
 
     // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
-    // set priorities of ALL ISRs used in the system, see NOTE00
-    //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-    // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-    //
+    // set priorities of ALL ISRs used in the system, see NOTE1
     NVIC_SetPriority(USART0_RX_IRQn, 0U); // kernel unaware interrupt
-    NVIC_SetPriority(GPIO_EVEN_IRQn, QF_AWARE_ISR_CMSIS_PRI);
+    NVIC_SetPriority(GPIO_EVEN_IRQn, QF_AWARE_ISR_CMSIS_PRI + 0U);
     NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 1U);
     // ...
 
     // enable IRQs...
     NVIC_EnableIRQ(GPIO_EVEN_IRQn);
+
 #ifdef Q_SPY
     NVIC_EnableIRQ(USART0_RX_IRQn); // UART0 interrupt used for QS-RX
 #endif
 }
 //............................................................................
-void QF::onCleanup(void) {
+void QF::onCleanup() {
 }
 //............................................................................
-void QXK::onIdle(void) {
-    // toggle the User LED on and then off, see NOTE01
-//    QF_INT_DISABLE();
-//    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT | (1U << LED1_PIN);
-//    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT & ~(1U << LED1_PIN);
-//    QF_INT_ENABLE();
-
-    // Some floating point code to exercise the VFP...
-    float volatile x = 1.73205F;
-    x = x * 1.73205F;
+void QXK::onIdle() {
+    // toggle the User LED on and then off, see NOTE3
+//  QF_INT_DISABLE();
+//  GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
+//  GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
+//  QF_INT_ENABLE();
 
 #ifdef Q_SPY
+    QF_INT_DISABLE();
     QS::rxParse();  // parse all the received bytes
+    QF_INT_ENABLE();
 
-    if ((l_USART0->STATUS & USART_STATUS_TXBL) != 0) { // is TXE empty?
-        uint16_t b;
-
+    if ((l_USART0->STATUS & USART_STATUS_TXBL) != 0) {  // is TXE empty?
         QF_INT_DISABLE();
-        b = QS::getByte();
+        std::uint16_t b = QS::getByte();
         QF_INT_ENABLE();
 
         if (b != QS_EOD) {  // not End-Of-Data?
-            l_USART0->TXDATA = (b & 0xFFU); // put into the DR register
+            l_USART0->TXDATA = b;  // put into the DR register
         }
     }
 #elif defined NDEBUG
     // Put the CPU and peripherals to the low-power mode.
     // you might need to customize the clock management for your application,
-    // see the datasheet for your particular Cortex-M3 MCU.
+    // see the datasheet for your particular Cortex-M MCU.
     //
     __WFI(); // Wait-For-Interrupt
 #endif
 }
 
-//............................................................................
-extern "C" {
-
-//............................................................................
-#ifdef QF_ON_CONTEXT_SW
-// NOTE: the context-switch callback is called with interrupts DISABLED
-void QF_onContextSw(QActive *prev, QActive *next) {
-    if (next != nullptr) {
-        //_impure_ptr = next->thread; // switch to next TLS
-    }
-    QS_BEGIN_NOCRIT(CONTEXT_SW, 0U) // no critical section!
-        QS_OBJ(prev);
-        QS_OBJ(next);
-    QS_END_NOCRIT()
-}
-#endif // QF_ON_CONTEXT_SW
-
-//............................................................................
-Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
-    //
-    // NOTE: add here your application-specific error handling
-    //
-    (void)module;
-    (void)loc;
-    QS_ASSERTION(module, loc, 10000U);
-
-#ifndef NDEBUG
-    // light up both LEDs
-    GPIO->P[LED_PORT].DOUT = GPIO->P[LED_PORT].DOUT
-                             | ((1U << LED0_PIN) | (1U << LED1_PIN));
-    // for debugging, hang on in an endless loop until PB1 is pressed...
-    while ((GPIO->P[PB_PORT].DIN & (1U << PB1_PIN)) != 0) {
-    }
-#endif
-
-    NVIC_SystemReset();
-}
-
-} // extern "C"
-
-// QS callbacks ==============================================================
+//============================================================================
+// QS callbacks...
 #ifdef Q_SPY
+namespace QS {
+
 //............................................................................
-bool QS::onStartup(void const *arg) {
-    static uint8_t qsTxBuf[2*1024]; // buffer for QS transmit channel
-    static uint8_t qsRxBuf[100];    // buffer for QS receive channel
+bool onStartup(void const *arg) {
+    Q_UNUSED_PAR(arg);
+
+    static std::uint8_t qsTxBuf[2*1024]; // buffer for QS-TX channel
+    initBuf(qsTxBuf, sizeof(qsTxBuf));
+
+    static std::uint8_t qsRxBuf[100];    // buffer for QS-RX channel
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+
     static USART_InitAsync_TypeDef init = {
         usartEnable,      // Enable RX/TX when init completed
         0,                // Use current clock for configuring baudrate
@@ -400,9 +457,6 @@ bool QS::onStartup(void const *arg) {
         0,                // Auto CS Hold cycles
         0                 // Auto CS Setup cycles
     };
-
-    initBuf  (qsTxBuf, sizeof(qsTxBuf));
-    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     // Enable peripheral clocks
     CMU_ClockEnable(cmuClock_HFPER, true);
@@ -433,99 +487,93 @@ bool QS::onStartup(void const *arg) {
     // Enable RX interrupts
     USART_IntEnable(l_USART0, USART_IF_RXDATAV);
     // NOTE: do not enable the UART0 interrupt in the NVIC yet.
-    // Wait till QF::onStartup()
-
+    // Wait till QF_onStartup()
 
     // Finally enable the UART
     USART_Enable(l_USART0, usartEnable);
 
     QS_tickPeriod_ = SystemCoreClock / BSP::TICKS_PER_SEC;
-    QS_tickTime_   = QS_tickPeriod_; // to start the timestamp at zero
+    QS_tickTime_ = QS_tickPeriod_; // to start the timestamp at zero
 
     return true; // return success
 }
 //............................................................................
-void QS::onCleanup(void) {
+void onCleanup() {
 }
 //............................................................................
-QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
-    if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0) { // not set?
-        return QS_tickTime_ - static_cast<QSTimeCtr>(SysTick->VAL);
+QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
+    if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0U) { // not set?
+        return QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
     }
     else { // the rollover occured, but the SysTick_ISR did not run yet
-        return QS_tickTime_ + QS_tickPeriod_
-               - static_cast<QSTimeCtr>(SysTick->VAL);
+        return QS_tickTime_ + QS_tickPeriod_ - (QSTimeCtr)SysTick->VAL;
     }
 }
 //............................................................................
-void QS::onFlush(void) {
-    uint16_t b;
-
-    QF_INT_DISABLE();
-    while ((b = getByte()) != QS_EOD) { // while not End-Of-Data...
-        QF_INT_ENABLE();
-        // while TXE not empty
-        while ((l_USART0->STATUS & USART_STATUS_TXBL) == 0U) {
-        }
-        l_USART0->TXDATA  = (b & 0xFFU); // put into the DR register
+void onFlush() {
+    for (;;) {
         QF_INT_DISABLE();
+        std::uint16_t b = getByte();
+        if (b != QS_EOD) {
+            while ((l_USART0->STATUS & USART_STATUS_TXBL) == 0U) {
+                QF_INT_ENABLE();
+                QF_CRIT_EXIT_NOP();
+
+                QF_INT_DISABLE();
+            }
+            l_USART0->TXDATA  = b;
+            QF_INT_ENABLE();
+        }
+        else {
+            QF_INT_ENABLE();
+            break;
+        }
     }
-    QF_INT_ENABLE();
 }
 //............................................................................
 //! callback function to reset the target (to be implemented in the BSP)
-void QS::onReset(void) {
+void onReset() {
     NVIC_SystemReset();
 }
 //............................................................................
-//! callback function to execute a user command (to be implemented in BSP)
-extern "C" void assert_failed(char const *module, int loc);
-void QS::onCommand(uint8_t cmdId, uint32_t param1,
-                   uint32_t param2, uint32_t param3)
+void onCommand(std::uint8_t cmdId, std::uint32_t param1,
+               std::uint32_t param2, std::uint32_t param3)
 {
-    (void)cmdId;
-    (void)param1;
-    (void)param2;
-    (void)param3;
-
-    // application-specific record
-    QS_BEGIN_ID(COMMAND_STAT, 0U)
-        QS_U8(2, cmdId);
-        QS_U32(8, param1);
-    QS_END()
-
-    if (cmdId == 10U) {
-        assert_failed("QS_onCommand", 11);
-    }
+    Q_UNUSED_PAR(cmdId);
+    Q_UNUSED_PAR(param1);
+    Q_UNUSED_PAR(param2);
+    Q_UNUSED_PAR(param3);
 }
 
+} // namespace QS
 #endif // Q_SPY
 //----------------------------------------------------------------------------
 
 } // namespace QP
 
 //============================================================================
-// NOTE00:
+// NOTE1:
 // The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
 // ISR priority that is disabled by the QF framework. The value is suitable
 // for the NVIC_SetPriority() CMSIS function.
 //
 // Only ISRs prioritized at or below the QF_AWARE_ISR_CMSIS_PRI level (i.e.,
 // with the numerical values of priorities equal or higher than
-// QF_AWARE_ISR_CMSIS_PRI) are allowed to call the QK_ISR_ENTRY/QK_ISR_ENTRY
-// macros or any other QF/QK  services. These ISRs are "QF-aware".
+// QF_AWARE_ISR_CMSIS_PRI) are allowed to call the QXK_ISR_ENTRY/
+// QXK_ISR_ENTRY macros or any other QF/QXK services. These ISRs are
+// "QF-aware".
 //
 // Conversely, any ISRs prioritized above the QF_AWARE_ISR_CMSIS_PRI priority
 // level (i.e., with the numerical values of priorities less than
 // QF_AWARE_ISR_CMSIS_PRI) are never disabled and are not aware of the kernel.
-// Such "QF-unaware" ISRs cannot call any QF/QK services. In particular they
-// can NOT call the macros QK_ISR_ENTRY/QK_ISR_ENTRY. The only mechanism
+// Such "QF-unaware" ISRs cannot call ANY QF/QXK services. In particular they
+// can NOT call the macros QXK_ISR_ENTRY/QXK_ISR_ENTRY. The only mechanism
 // by which a "QF-unaware" ISR can communicate with the QF framework is by
 // triggering a "QF-aware" ISR, which can post/publish events.
 //
-// NOTE01:
+// NOTE2:
 // The User LED is used to visualize the idle loop activity. The brightness
-// of the LED is proportional to the frequency of invocations of the idle loop.
+// of the LED is proportional to the frequency of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt
 // execution time contributes to the brightness of the User LED.
-//
+

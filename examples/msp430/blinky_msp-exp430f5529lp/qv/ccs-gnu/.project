@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>dpp-qv_msp-exp430f5529lp</name>
+	<name>blinky-qv_msp-exp430f5529lp</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -28,42 +28,64 @@
 		<link>
 			<name>QP</name>
 			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/src/qf</locationURI>
+			<locationURI>copy_PARENT/src/qf</locationURI>
 		</link>
 		<link>
 			<name>QP_port</name>
 			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/ports/msp430/qv</locationURI>
+			<locationURI>copy_PARENT/ports/msp430/qv</locationURI>
 		</link>
 		<link>
 			<name>QS</name>
 			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/src/qs</locationURI>
+			<locationURI>copy_PARENT/src/qs</locationURI>
 		</link>
 		<link>
 			<name>blinky.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/blinky.cpp</locationURI>
+			<locationURI>copy_PARENT1/blinky.cpp</locationURI>
 		</link>
 		<link>
 			<name>bsp.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/bsp.cpp</locationURI>
+			<locationURI>copy_PARENT12/bsp.cpp</locationURI>
 		</link>
 		<link>
 			<name>bsp.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/bsp.h</locationURI>
+			<locationURI>copy_PARENT123/bsp.h</locationURI>
 		</link>
 		<link>
 			<name>main.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/main.cpp</locationURI>
+			<locationURI>copy_PARENT1234/main.cpp</locationURI>
 		</link>
 		<link>
 			<name>qv</name>
 			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/src/qv</locationURI>
+			<locationURI>copy_PARENT/src/qv</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>copy_PARENT</name>
+			<value>$%7BPARENT-1-TI_PRODUCTS_DIR%7D/qp-dev/qpcpp</value>
+		</variable>
+		<variable>
+			<name>copy_PARENT1</name>
+			<value>$%7Bcopy_PARENT%7D/examples/msp430/blinky_msp-exp430f5529lp</value>
+		</variable>
+		<variable>
+			<name>copy_PARENT12</name>
+			<value>$%7Bcopy_PARENT1%7D/qv</value>
+		</variable>
+		<variable>
+			<name>copy_PARENT123</name>
+			<value>$%7Bcopy_PARENT1%7D</value>
+		</variable>
+		<variable>
+			<name>copy_PARENT1234</name>
+			<value>$%7Bcopy_PARENT1%7D</value>
+		</variable>
+	</variableList>
 </projectDescription>

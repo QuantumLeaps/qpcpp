@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on NUCLEO-L053R8, QXK kernel, GNU-ARM
-# Last Updated for Version: 7.2.0
-# Date of the Last Update:  2022-12-14
+# Last Updated for Version: 7.3.0
+# Date of the Last Update:  2023-09-08
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2022 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -46,7 +46,6 @@
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
 #    https://github.com/QuantumLeaps/qtools/releases
-#
 
 #-----------------------------------------------------------------------------
 # project name
@@ -102,7 +101,8 @@ CPP_SRCS := \
 	main.cpp \
 	philo.cpp \
 	table.cpp \
-	test.cpp
+	xthread1.cpp \
+	xthread2.cpp
 
 OUTPUT    := $(PROJECT)
 LD_SCRIPT := $(PROJECT).ld
@@ -137,9 +137,8 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DQF_ON_CONTEXT_SW \
-	-DQXK_USE_IRQ_HANDLER=LCD_IRQHandler \
-	-DQXK_USE_IRQ_NUM=30
+DEFINES   := \
+	-DQF_ON_CONTEXT_SW
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -171,16 +170,16 @@ BIN   := $(GNU_ARM)/bin/arm-none-eabi-objcopy
 
 
 ##############################################################################
-# Typically, you should not need to change anything below this line
+# Typically you should not need to change anything below this line
 
-# basic utilities (included in Qtools for Windows), see:
-#    http://sourceforge.net/projects/qpc/files/Qtools
+# basic utilities (included in QTools for Windows), see:
+#     https://www.state-machine.com/qtools
 
 MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build options for various configurations for ARM Cortex-M4F
+# build options for various configurations for ARM Cortex-M
 #
 
 # combine all the soruces...
@@ -211,11 +210,11 @@ ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
 CFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
-	-O2 $(INCLUDES) $(DEFINES) -DQ_SPY
+	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
 CPPFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
-	-O2 $(INCLUDES) $(DEFINES) -DQ_SPY
+	-O $(INCLUDES) $(DEFINES) -DQ_SPY
 
 else # default Debug configuration ..........................................
 
@@ -225,11 +224,11 @@ ASFLAGS = -g $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
 CFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
-	-O2 $(INCLUDES) $(DEFINES)
+	-O $(INCLUDES) $(DEFINES)
 
 CPPFLAGS = -c -g $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
-	-O2 $(INCLUDES) $(DEFINES)
+	-O $(INCLUDES) $(DEFINES)
 
 endif # ......................................................................
 
@@ -267,7 +266,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/src/qs/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.c

@@ -67,23 +67,23 @@ Blinky::Blinky()
 
 // HSM definition ------------------------------------------------------------
 QState Blinky::initial(Blinky * const me, QEvt const * const e) {
-    (void)e; // unused parameter
+    Q_UNUSED_PAR(e);
 
     // arm the time event to expire in half a second and every half second
-    me->m_timeEvt.armX(BSP_TICKS_PER_SEC/2U, BSP_TICKS_PER_SEC/2U);
-    return Q_TRAN(&Blinky::off);
+    me->m_timeEvt.armX(BSP::TICKS_PER_SEC/2U, BSP::TICKS_PER_SEC/2U);
+    return Q_TRAN(&off);
 }
 //............................................................................
 QState Blinky::off(Blinky * const me, QEvt const * const e) {
     QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            BSP_ledOff();
+            BSP::ledOff();
             status = Q_HANDLED();
             break;
         }
         case TIMEOUT_SIG: {
-            status = Q_TRAN(&Blinky::on);
+            status = Q_TRAN(&on);
             break;
         }
         default: {
@@ -98,12 +98,12 @@ QState Blinky::on(Blinky * const me, QEvt const * const e) {
     QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            BSP_ledOn();
+            BSP::ledOn();
             status = Q_HANDLED();
             break;
         }
         case TIMEOUT_SIG: {
-            status = Q_TRAN(&Blinky::off);
+            status = Q_TRAN(&off);
             break;
         }
         default: {

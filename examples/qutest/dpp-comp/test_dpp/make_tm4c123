@@ -253,13 +253,18 @@ endif
 $(TARGET_BIN) : $(TARGET_ELF)
 	$(BIN) -O binary $< $@
 	$(FLASH) $@
+	@echo
+	@echo Reset the board MANUALLY!
+	@pause
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/src/qs/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 flash :
 	$(FLASH) $(TARGET_BIN)
+	@echo
+	@echo Reset the board MANUALLY!
 
 run : $(TARGET_BIN)
 	$(QUTEST) -q$(QSPY) -l$(LOG) -o$(OPT) -- $(TESTS)

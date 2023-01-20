@@ -45,8 +45,8 @@
 
 Q_DEFINE_THIS_FILE
 
-               // application signals cannot overlap the device-driver signals
-Q_ASSERT_COMPILE((LWIP_DRIVER_END - LWIP_DRIVER_GROUP) >= LWIP_MAX_OFFSET);
+// application signals cannot overlap the device-driver signals
+Q_ASSERT_STATIC((LWIP_DRIVER_END - LWIP_DRIVER_GROUP) >= LWIP_MAX_OFFSET);
 
 #define FLASH_USERREG0          (*(uint32_t const *)0x400FE1E0)
 #define FLASH_USERREG1          (*(uint32_t const *)0x400FE1E4)

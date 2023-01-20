@@ -11,12 +11,12 @@
             <name>General</name>
             <archiveVersion>3</archiveVersion>
             <data>
-                <version>33</version>
+                <version>35</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
                     <name>BrowseInfoPath</name>
-                    <state>Debug\BrowseInfo</state>
+                    <state>dbg\BrowseInfo</state>
                 </option>
                 <option>
                     <name>ExePath</name>
@@ -62,7 +62,7 @@
                 </option>
                 <option>
                     <name>RTDescription</name>
-                    <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                    <state>A compact configuration of the C/C++14 runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
                 </option>
                 <option>
                     <name>OGProductVersion</name>
@@ -70,7 +70,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>9.10.2.39304</state>
+                    <state>9.32.1.54977</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -98,7 +98,7 @@
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>30</version>
+                    <version>32</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -115,7 +115,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>30</version>
+                    <version>32</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -138,7 +138,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>30</version>
+                    <version>32</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -199,6 +199,18 @@
                     <name>OG_32_64Device</name>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>BuildFilesPath</name>
+                    <state>dbg</state>
+                </option>
+                <option>
+                    <name>PointerAuthentication</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>FPU64</name>
+                    <state>1</state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -209,12 +221,12 @@
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
-                    <name>CCOptimizationNoSizeConstraints</name>
-                    <state>0</state>
+                    <name>CCDefines</name>
+                    <state></state>
                 </option>
                 <option>
-                    <name>CCDefines</name>
-                    <state>__FPU_PRESENT</state>
+                    <name>CCOptimizationNoSizeConstraints</name>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -673,7 +685,7 @@
             <name>ILINK</name>
             <archiveVersion>0</archiveVersion>
             <data>
-                <version>25</version>
+                <version>27</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -1025,6 +1037,22 @@
                     <name>IlinkDemangle</name>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>IlinkWrapperFileEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkWrapperFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkFpuProcessor</name>
+                    <state>1</state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -1064,12 +1092,12 @@
             <name>General</name>
             <archiveVersion>3</archiveVersion>
             <data>
-                <version>33</version>
+                <version>35</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
                 <option>
                     <name>BrowseInfoPath</name>
-                    <state>Release\BrowseInfo</state>
+                    <state>rel\BrowseInfo</state>
                 </option>
                 <option>
                     <name>ExePath</name>
@@ -1089,11 +1117,11 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing.</state>
+                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing, without multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>No specifier a, A, no specifier n, no float nor long long, no flags.</state>
+                    <state>No specifier a, A, no specifier n, no float nor long long, no flags, without multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -1115,7 +1143,7 @@
                 </option>
                 <option>
                     <name>RTDescription</name>
-                    <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                    <state>A compact configuration of the C/C++14 runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
                 </option>
                 <option>
                     <name>OGProductVersion</name>
@@ -1123,7 +1151,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.2.22864</state>
+                    <state>9.32.1.54977</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -1151,7 +1179,7 @@
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>30</version>
+                    <version>32</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -1168,7 +1196,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>30</version>
+                    <version>32</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -1191,7 +1219,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>30</version>
+                    <version>32</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -1252,6 +1280,18 @@
                     <name>OG_32_64Device</name>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>BuildFilesPath</name>
+                    <state>rel</state>
+                </option>
+                <option>
+                    <name>PointerAuthentication</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>FPU64</name>
+                    <state>1</state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -1268,7 +1308,6 @@
                 <option>
                     <name>CCDefines</name>
                     <state>NDEBUG</state>
-                    <state>__FPU_PRESENT</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1727,7 +1766,7 @@
             <name>ILINK</name>
             <archiveVersion>0</archiveVersion>
             <data>
-                <version>25</version>
+                <version>27</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
                 <option>
@@ -2079,6 +2118,22 @@
                     <name>IlinkDemangle</name>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>IlinkWrapperFileEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkWrapperFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkFpuProcessor</name>
+                    <state>1</state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -2118,12 +2173,12 @@
             <name>General</name>
             <archiveVersion>3</archiveVersion>
             <data>
-                <version>33</version>
+                <version>35</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
                     <name>BrowseInfoPath</name>
-                    <state>Spy\BrowseInfo</state>
+                    <state>spy\BrowseInfo</state>
                 </option>
                 <option>
                     <name>ExePath</name>
@@ -2143,11 +2198,11 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing.</state>
+                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing, without multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>No specifier a, A, no specifier n, no float nor long long, no flags.</state>
+                    <state>No specifier a, A, no specifier n, no float nor long long, no flags, without multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -2169,7 +2224,7 @@
                 </option>
                 <option>
                     <name>RTDescription</name>
-                    <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                    <state>A compact configuration of the C/C++14 runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
                 </option>
                 <option>
                     <name>OGProductVersion</name>
@@ -2177,7 +2232,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.2.22864</state>
+                    <state>9.32.1.54977</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -2205,7 +2260,7 @@
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>30</version>
+                    <version>32</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -2222,7 +2277,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>30</version>
+                    <version>32</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -2245,7 +2300,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>30</version>
+                    <version>32</version>
                     <state>39</state>
                 </option>
                 <option>
@@ -2306,6 +2361,18 @@
                     <name>OG_32_64Device</name>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>BuildFilesPath</name>
+                    <state>spy</state>
+                </option>
+                <option>
+                    <name>PointerAuthentication</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>FPU64</name>
+                    <state>1</state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -2322,7 +2389,6 @@
                 <option>
                     <name>CCDefines</name>
                     <state>Q_SPY</state>
-                    <state>__FPU_PRESENT</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -2399,7 +2465,7 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
@@ -2465,7 +2531,7 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
@@ -2474,7 +2540,7 @@
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCPosIndRopi</name>
@@ -2502,7 +2568,7 @@
                 </option>
                 <option>
                     <name>IccStaticDestr</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>IccCppInlineSemantics</name>
@@ -2781,7 +2847,7 @@
             <name>ILINK</name>
             <archiveVersion>0</archiveVersion>
             <data>
-                <version>25</version>
+                <version>27</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -3091,7 +3157,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>###Unitialized###</state>
+                    <state>dpp_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>
@@ -3133,6 +3199,22 @@
                     <name>IlinkDemangle</name>
                     <state>0</state>
                 </option>
+                <option>
+                    <name>IlinkWrapperFileEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkWrapperFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkFpuProcessor</name>
+                    <state>1</state>
+                </option>
             </data>
         </settings>
         <settings>
@@ -3162,9 +3244,6 @@
             <data />
         </settings>
     </configuration>
-    <mfc>
-        <configuration>Debug</configuration>
-    </mfc>
     <group>
         <name>Application</name>
         <file>
@@ -3187,9 +3266,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\philo.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\include\qstamp.cpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\table.cpp</name>
@@ -3264,16 +3340,7 @@
             <name>$PROJ_DIR$\..\..\..\..\..\ports\uc-os2\os_cfg.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\uc-os2\qep_port.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\ports\uc-os2\qf_port.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\uc-os2\qf_port.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\uc-os2\qs_port.h</name>
         </file>
     </group>
     <group>
@@ -3295,11 +3362,11 @@
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_rx.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qutest.cpp</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qstamp.cpp</name>
         </file>
     </group>
     <group>
-        <name>uCOS-II</name>
+        <name>uC-OS2</name>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uC-OS2\Source\os.h</name>
         </file>
@@ -3338,7 +3405,7 @@
         </file>
     </group>
     <group>
-        <name>uCOS-II_Port</name>
+        <name>uC-OS2_Port</name>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\3rd_party\uC-OS2\Ports\ARM-Cortex-M\ARMv7-M\IAR\os_cpu.h</name>
         </file>

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on EMF32-SLSTK3401A, QK kernel, GNU-ARM
-# Last Updated for Version: 7.2.1
-# Date of the Last Update:  2023-01-14
+# Last Updated for Version: 7.3.0
+# Date of the Last Update:  2023-09-08
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -137,9 +137,9 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DEFM32PG1B200F256GM48=1 \
-	-DQK_USE_IRQ_NUM=33 \
-	-DQK_USE_IRQ_HANDLER=FPUEH_IRQHandler
+DEFINES   := \
+	-DQP_CONFIG \
+	-DEFM32PG1B200F256GM48=1
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -267,7 +267,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/src/qs/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.c

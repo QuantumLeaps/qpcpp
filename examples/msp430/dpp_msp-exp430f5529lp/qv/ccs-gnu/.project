@@ -46,16 +46,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/bsp.cpp</locationURI>
 		</link>
 		<link>
-			<name>bsp.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/bsp.h</locationURI>
-		</link>
-		<link>
-			<name>dpp.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/dpp.h</locationURI>
-		</link>
-		<link>
 			<name>main.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/main.cpp</locationURI>

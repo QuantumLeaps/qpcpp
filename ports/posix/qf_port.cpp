@@ -1,4 +1,5 @@
 //============================================================================
+// QP/C++ Real-Time Embedded Framework (RTEF)
 // Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -21,19 +22,19 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-29
-//! @version Last updated for: @ref qpcpp_7_1_0
+//! @date Last updated on: 2023-08-26
+//! @version Last updated for: @ref qpcpp_7_3_0
 //!
 //! @file
-//! @brief QF/C++ port to POSIX/P-threads
+//! @brief QF/C++ port to POSIX (multithreaded with P-threads)
 
 // expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
 #define _POSIX_C_SOURCE 200809L
 
 #define QP_IMPL             // this is QP implementation
-#include "qf_port.hpp"      // QF port
-#include "qf_pkg.hpp"       // QF package-scope interface
-#include "qassert.h"        // QP embedded systems-friendly assertions
+#include "qp_port.hpp"      // QP port
+#include "qp_pkg.hpp"       // QP package-scope interface
+#include "qsafe.h"          // QP Functional Safety (FuSa) Subsystem
 #ifdef Q_SPY                // QS software tracing enabled?
     #include "qs_port.hpp"  // QS port
     #include "qs_pkg.hpp"   // QS package-scope internal interface
@@ -43,8 +44,8 @@
 
 #include <limits.h>         // for PTHREAD_STACK_MIN
 #include <sys/mman.h>       // for mlockall()
-#include <sys/select.h>
 #include <sys/ioctl.h>
+#include <time.h>           // for clock_nanosleep()
 #include <string.h>         // for memcpy() and memset()
 #include <stdlib.h>
 #include <stdio.h>
@@ -56,19 +57,28 @@ namespace { // unnamed local namespace
 
 Q_DEFINE_THIS_MODULE("qf_port")
 
-static pthread_mutex_t l_startupMutex;
+// Local objects =============================================================
+// initialize the startup mutex with default non-recursive initializer
+static pthread_mutex_t l_startupMutex = PTHREAD_MUTEX_INITIALIZER;
+
 static bool l_isRunning;      // flag indicating when QF is running
 static struct termios l_tsav; // structure with saved terminal attributes
 static struct timespec l_tick;
 static int_t l_tickPrio;
-enum { NANOSLEEP_NSEC_PER_SEC = 1000000000 }; // see NOTE05
 
-static void sigIntHandler(int /* dummy */) {
+constexpr long NSEC_PER_SEC {1000000000L};
+constexpr long DEFAULT_TICKS_PER_SEC {100L};
+
+static void sigIntHandler(int dummy); // prototype
+static void sigIntHandler(int dummy) {
+    Q_UNUSED_PAR(dummy);
     QP::QF::onCleanup();
     exit(-1);
 }
+
+static void *ao_thread(void *arg); // prototype
 static void *ao_thread(void *arg) { // thread routine for all AOs
-    QP::QActive::thread_(static_cast<QP::QActive *>(arg));
+    QP::QActive::evtLoop_(static_cast<QP::QActive *>(arg));
     return nullptr; // return success
 }
 
@@ -76,27 +86,33 @@ static void *ao_thread(void *arg) { // thread routine for all AOs
 
 //============================================================================
 namespace QP {
+namespace QF {
 
-pthread_mutex_t QF::pThreadMutex_; // mutex for QF critical section
+// NOTE: initialize the critical section mutex first with default
+// non-recursive initializer, but later in QF_init() it will be
+// re-initialized it as *recursive mutex* in a portable way
+pthread_mutex_t critSectMutex_ = PTHREAD_MUTEX_INITIALIZER;
 
 //............................................................................
-void QF::init(void) {
+void init() {
     // lock memory so we're never swapped out to disk
-    //mlockall(MCL_CURRENT | MCL_FUTURE); // uncomment when supported
-
-    // init the global mutex with the default non-recursive initializer
-    pthread_mutex_init(&QF::pThreadMutex_, NULL);
-
-    // init the startup mutex with the default non-recursive initializer
-    pthread_mutex_init(&l_startupMutex, NULL);
+    //mlockall(MCL_CURRENT | MCL_FUTURE); // un-comment when supported
 
     // lock the startup mutex to block any active objects started before
     // calling QF::run()
     pthread_mutex_lock(&l_startupMutex);
 
+    // initialize the critical section mutex QF_critSectMutex_ as a
+    // *recursive mutex* in a portable way according to the POSIX Standard
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&critSectMutex_, &attr);
+    pthread_mutexattr_destroy(&attr);
+
     l_tick.tv_sec = 0;
-    l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC/100L; // default clock tick
-    l_tickPrio = sched_get_priority_min(SCHED_FIFO); // default tick prio
+    l_tick.tv_nsec = NSEC_PER_SEC / DEFAULT_TICKS_PER_SEC; // default tick
+    l_tickPrio = sched_get_priority_min(SCHED_FIFO); // default ticker prio
 
     // install the SIGINT (Ctrl-C) signal handler
     struct sigaction sig_act;
@@ -104,23 +120,27 @@ void QF::init(void) {
     sig_act.sa_handler = &sigIntHandler;
     sigaction(SIGINT, &sig_act, NULL);
 }
-//............................................................................
-void QF::enterCriticalSection_(void) {
-    pthread_mutex_lock(&QF::pThreadMutex_);
-}
-//............................................................................
-void QF::leaveCriticalSection_(void) {
-    pthread_mutex_unlock(&QF::pThreadMutex_);
-}
 
 //............................................................................
-int_t QF::run(void) {
+void enterCriticalSection_() {
+    if (l_isRunning) {
+        pthread_mutex_lock(&critSectMutex_);
+    }
+}
+//............................................................................
+void leaveCriticalSection_() {
+    if (l_isRunning) {
+        pthread_mutex_unlock(&critSectMutex_);
+    }
+}
+//............................................................................
+int run() {
 
     onStartup(); // application-specific startup callback
 
     // produce the QS_QF_RUN trace record
-    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, 0U)
-    QS_END_NOCRIT_PRE_()
+    QS_BEGIN_PRE_(QS_QF_RUN, 0U)
+    QS_END_PRE_()
 
     // try to set the priority of the ticker thread, see NOTE01
     struct sched_param sparam;
@@ -132,35 +152,56 @@ int_t QF::run(void) {
         // setting priority failed, probably due to insufficient privileges
     }
 
-    // unlock the startup mutex to unblock any active objects started before
-    // calling QF::run()
+    // exit the startup critical section to unblock any active objects
+    // started before calling QF_run()
     pthread_mutex_unlock(&l_startupMutex);
+
+    // get the absolute monotonic time for no-drift sleeping
+    static struct timespec next_tick;
+    clock_gettime(CLOCK_MONOTONIC, &next_tick);
+
+    // round down nanoseconds to the nearest configured period
+    next_tick.tv_nsec = (next_tick.tv_nsec / l_tick.tv_nsec) * l_tick.tv_nsec;
 
     l_isRunning = true;
     while (l_isRunning) { // the clock tick loop...
-        QF::onClockTick(); // clock tick callback (must call TICK_X())
 
-        nanosleep(&l_tick, NULL); // sleep for the number of ticks, NOTE05
+        // advance to the next tick (absolute time)
+        next_tick.tv_nsec += l_tick.tv_nsec;
+        if (next_tick.tv_nsec >= NSEC_PER_SEC) {
+            next_tick.tv_nsec -= NSEC_PER_SEC;
+            next_tick.tv_sec  += 1;
+        }
+
+        // sleep without drifting till next_time (absolute), see NOTE03
+        if (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,
+                            &next_tick, NULL) == 0) // success?
+        {
+            // clock tick callback (must call QTIMEEVT_TICK_X())
+            onClockTick();
+        }
     }
     onCleanup(); // cleanup callback
+    QS_EXIT();   // cleanup the QSPY connection
+
     pthread_mutex_destroy(&l_startupMutex);
-    pthread_mutex_destroy(&QF::pThreadMutex_);
+    pthread_mutex_destroy(&critSectMutex_);
 
     return 0; // return success
 }
 //............................................................................
-void QF::stop(void) {
-    l_isRunning = false; // stop the loop in QF::run()
+void stop() {
+    l_isRunning = false; // terminate the main (ticker) thread
 }
 //............................................................................
-void QF::setTickRate(std::uint32_t ticksPerSec, int_t tickPrio) {
-    Q_REQUIRE_ID(300, ticksPerSec != 0U);
-    l_tick.tv_nsec = NANOSLEEP_NSEC_PER_SEC / ticksPerSec;
+void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
+    Q_REQUIRE_ID(600, ticksPerSec != 0U);
+    l_tick.tv_nsec = NSEC_PER_SEC / ticksPerSec;
     l_tickPrio = tickPrio;
 }
 
 //............................................................................
-void QF::consoleSetup(void) {
+void consoleSetup() {
     struct termios tio;   // modified terminal attributes
 
     tcgetattr(0, &l_tsav); // save the current terminal attributes
@@ -169,31 +210,34 @@ void QF::consoleSetup(void) {
     tcsetattr(0, TCSANOW, &tio);     // set the new attributes
 }
 //............................................................................
-void QF::consoleCleanup(void) {
+void consoleCleanup() {
     tcsetattr(0, TCSANOW, &l_tsav); // restore the saved attributes
 }
 //............................................................................
-int QF::consoleGetKey(void) {
+int consoleGetKey() {
     int byteswaiting;
     ioctl(0, FIONREAD, &byteswaiting);
     if (byteswaiting > 0) {
         char ch;
-        (void)read(0, &ch, 1);
+        read(0, &ch, 1);
         return (int)ch;
     }
     return 0; // no input at this time
 }
 //............................................................................
-int QF::consoleWaitForKey(void) {
-    return getchar();
+int consoleWaitForKey() {
+    return static_cast<int>(getchar());
 }
-//............................................................................
-void QActive::thread_(QActive *act) {
+
+} // namespace QF
+
+//============================================================================
+void QActive::evtLoop_(QActive *act) {
     // block this thread until the startup mutex is unlocked from QF::run()
     pthread_mutex_lock(&l_startupMutex);
     pthread_mutex_unlock(&l_startupMutex);
 
-#ifdef QF_ACTIVE_STOP
+#ifdef QACTIVE_CAN_STOP
     act->m_thread = true;
     while (act->m_thread)
 #else
@@ -201,10 +245,10 @@ void QActive::thread_(QActive *act) {
 #endif
     {
         QEvt const *e = act->get_(); // wait for event
-        act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
+        act->dispatch(e, act->m_prio); // dispatch to the HSM
         QF::gc(e); // check if the event is garbage, and collect it if so
     }
-#ifdef QF_ACTIVE_STOP
+#ifdef QACTIVE_CAN_STOP
     act->unregister_(); // remove this object from QF
 #endif
 }
@@ -219,17 +263,18 @@ void QActive::start(QPrioSpec const prioSpec,
     Q_UNUSED_PAR(stkSize);
 
     // p-threads allocate stack internally
-    Q_REQUIRE_ID(600, stkSto == nullptr);
-
-    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
-    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
-    register_(); // make QF aware of this AO
+    Q_REQUIRE_ID(800, stkSto == nullptr);
 
     pthread_cond_init(&m_osObject, 0);
     m_eQueue.init(qSto, qLen);
 
-    this->init(par, m_prio); // execute initial transition (virtual call)
-    QS_FLUSH(); // flush the QS trace buffer to the host
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = 0U; // preemption-threshold (not used in this port)
+    register_(); // register this AO
+
+    // top-most initial tran. (virtual call)
+    this->init(par, m_prio);
+    QS_FLUSH(); // flush the trace buffer to the host
 
     pthread_attr_t attr;
     pthread_attr_init(&attr);
@@ -256,13 +301,12 @@ void QActive::start(QPrioSpec const prioSpec,
         // Creating p-thread with the SCHED_FIFO policy failed. Most likely
         // this application has no superuser privileges, so we just fall
         // back to the default SCHED_OTHER policy and priority 0.
-        //
         pthread_attr_setschedpolicy(&attr, SCHED_OTHER);
         param.sched_priority = 0;
         pthread_attr_setschedparam(&attr, &param);
         err = pthread_create(&thread, &attr, &ao_thread, this);
     }
-    Q_ASSERT_ID(610, err == 0); // AO thread must be created
+    Q_ASSERT_ID(810, err == 0); // AO thread must be created
 
     //pthread_attr_getschedparam(&attr, &param);
     //printf("param.sched_priority==%d\n", param.sched_priority);
@@ -270,8 +314,8 @@ void QActive::start(QPrioSpec const prioSpec,
     pthread_attr_destroy(&attr);
 }
 //............................................................................
-#ifdef QF_ACTIVE_STOP
-void QActive::stop(void) {
+#ifdef QACTIVE_CAN_STOP
+void QActive::stop() {
     unsubscribeAll(); // unsubscribe this AO from all events
     m_thread = false; // stop the thread loop (see QF::thread_)
 }
@@ -284,19 +328,12 @@ void QActive::stop(void) {
 // In Linux, the scheduler policy closest to real-time is the SCHED_FIFO
 // policy, available only with superuser privileges. QF::run() attempts to set
 // this policy as well as to maximize its priority, so that the ticking
-// occurrs in the most timely manner (as close to an interrupt as possible).
+// occurs in the most timely manner (as close to an interrupt as possible).
 // However, setting the SCHED_FIFO policy might fail, most probably due to
 // insufficient privileges.
 //
-// NOTE02:
-// On some Linux systems nanosleep() might actually not deliver the finest
-// time granularity. For example, on some Linux implementations, nanosleep()
-// could not block for shorter intervals than 20ms, while the underlying
-// clock tick period was only 10ms. Sometimes, the select() system call can
-// provide a finer granularity.
-//
 // NOTE03:
-// Any blocking system call, such as nanosleep() or select() system call can
+// Any blocking system call, such as clock_nanosleep() system call can
 // be interrupted by a signal, such as ^C from the keyboard. In this case this
 // QF port breaks out of the event-loop and returns to main() that exits and
 // terminates all spawned p-threads.
@@ -315,10 +352,5 @@ void QActive::stop(void) {
 // Assuming that a QF application will be real-time, this port reserves the
 // three highest p-thread priorities for the ISR-like threads (e.g., I/O),
 // and the rest highest-priorities for the active objects.
-//
-// NOTE05:
-// In some (older) Linux kernels, the POSIX nanosleep() system call might
-// deliver only 2*actual-system-tick granularity. To compensate for this,
-// you would need to reduce the constant NANOSLEEP_NSEC_PER_SEC by factor 2.
 //
 

@@ -1,13 +1,13 @@
 //============================================================================
 // Product: main task for emWin/uC/GUI, Win32 simulation
-// Last updated for version 6.8.0
-// Last updated on  2020-01-22
+// Last updated for version 7.3.0
+// Last updated on  2023-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -40,9 +40,8 @@ Q_DEFINE_THIS_FILE
 
 //............................................................................
 extern "C" void MainTask(void) {
-    BSP_init(); // initialize the BSP
-
     QF::init(); // initialize the framework and the underlying RT kernel
+    BSP_init(); // initialize the BSP
 
     // initialize event pools...
     static union SmallEvents {

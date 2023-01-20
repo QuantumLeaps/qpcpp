@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on NUCLEOL552ZE, QV kernel, GNU-ARM
-# Last Updated for Version: 7.0.1
-# Date of the Last Update:  2022-05-23
+# Last Updated for Version: 7.3.0
+# Date of the Last Update:  2023-09-10
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -45,7 +45,7 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    https://sourceforge.net/projects/QPCPP/files/QTools/
+#    https://github.com/QuantumLeaps/qtools/releases
 #
 
 #-----------------------------------------------------------------------------
@@ -155,7 +155,10 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := -DUSE_HAL_DRIVER -DSTM32L552xx
+DEFINES   := \
+	-DQF_ON_CONTEXT_SW \
+	-DUSE_HAL_DRIVER \
+	-DSTM32L552xx
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -283,7 +286,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/src/qs/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.c

@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, EFM32-SLSTK3401A board, preemptive QXK kernel
-// Last updated for version 6.9.3
-// Last updated on  2021-03-03
+// Last updated for version 7.3.0
+// Last updated on  2023-09-10
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -85,6 +85,32 @@ static uint32_t l_rnd; // random seed
 extern "C" {
 
 //............................................................................
+Q_NORETURN Q_onError(char const * const module, int_t const id) {
+    //
+    // NOTE: add here your application-specific error handling
+    //
+    (void)module;
+    (void)id;
+    QS_ASSERTION(module, id, 10000U);
+
+#ifndef NDEBUG
+    // light up both LEDs
+    GPIO->P[LED_PORT].DOUT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
+    // for debugging, hang on in an endless loop until PB1 is pressed...
+    while ((GPIO->P[PB_PORT].DIN & (1U << PB1_PIN)) != 0) {
+    }
+#endif
+
+    NVIC_SystemReset();
+}
+//............................................................................
+void assert_failed(char const * const module, int const id); // prototype
+void assert_failed(char const * const module, int const id) {
+    Q_onError(module, id);
+}
+
+
+//............................................................................
 void SysTick_Handler(void); // prototype
 void SysTick_Handler(void) {
     // state of the button debouncing, see below
@@ -118,11 +144,11 @@ void SysTick_Handler(void) {
     tmp ^= buttons.depressed;     // changed debounced depressed
     if ((tmp & (1U << PB0_PIN)) != 0U) {  // debounced PB0 state changed?
         if ((buttons.depressed & (1U << PB0_PIN)) != 0U) { // PB0 depressed?
-            static QP::QEvt const pauseEvt = { DPP::PAUSE_SIG, 0U, 0U};
+            static QP::QEvt const pauseEvt(DPP::PAUSE_SIG);
             QP::QF::PUBLISH(&pauseEvt, &l_SysTick_Handler);
         }
         else {            // the button is released
-            static QP::QEvt const serveEvt = { DPP::SERVE_SIG, 0U, 0U};
+            static QP::QEvt const serveEvt(DPP::SERVE_SIG);
             QP::QF::PUBLISH(&serveEvt, &l_SysTick_Handler);
         }
     }
@@ -218,7 +244,7 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
         GPIO->P[LED_PORT].DOUT &=  ~(1U << LED0_PIN);
     }
 
-    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->getPrio()) // app-specific record begin
         QS_U8(1, n);  // Philosopher number
         QS_STR(stat); // Philosopher status
     QS_END()
@@ -329,26 +355,6 @@ void QXK::onIdle(void) {
 #endif
 }
 
-//............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
-    //
-    // NOTE: add here your application-specific error handling
-    //
-    (void)module;
-    (void)loc;
-    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
-
-#ifndef NDEBUG
-    // light up both LEDs
-    GPIO->P[LED_PORT].DOUT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
-    // for debugging, hang on in an endless loop until PB1 is pressed...
-    while ((GPIO->P[PB_PORT].DIN & (1U << PB1_PIN)) != 0) {
-    }
-#endif
-
-    NVIC_SystemReset();
-}
-
 // QS callbacks ==============================================================
 #ifdef Q_SPY
 //............................................................................
@@ -449,7 +455,6 @@ void QS::onReset(void) {
 }
 //............................................................................
 //! callback function to execute a user command (to be implemented in BSP)
-extern "C" void assert_failed(char const *module, int loc);
 void QS::onCommand(uint8_t cmdId, uint32_t param1,
                    uint32_t param2, uint32_t param3)
 {
@@ -462,10 +467,6 @@ void QS::onCommand(uint8_t cmdId, uint32_t param1,
         QS_U8(2, cmdId);
         QS_U32(8, param1);
     QS_END()
-
-    if (cmdId == 10U) {
-        assert_failed("QS_onCommand", 11);
-    }
 }
 
 #endif // Q_SPY

@@ -1,94 +1,70 @@
 //============================================================================
-// Product: QUTEST fixture for the Philo AO
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Test fixture for DPP example
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                    Q u a n t u m  L e a P s
-//                    ------------------------
-//                    Modern Embedded Software
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
 //
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
 //
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses>.
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // Contact information:
-// <www.state-machine.com/licensing>
+// <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 #include "dpp.hpp"
 
-namespace DPP {
+namespace { // unnamed namespace
 
 // instantiate dummy collaborator AOs...
-static QP::QActiveDummy l_dummyTable;
-QP::QActive * const AO_Table = &l_dummyTable;
+static QP::QActiveDummy Table_dummy;
 
-} // namespace DPP
+} // unnamed namespace
 
-using namespace DPP;
+QP::QActive * const APP::AO_Table = &Table_dummy;
 
-//............................................................................
-int main(int argc, char *argv[]) {
-    static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
-    static QP::QSubscrList subscrSto[MAX_PUB_SIG];
-    static QF_MPOOL_EL(TableEvt) smlPoolSto[2*N_PHILO];
-
+int main() {
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-
-    BSP::init(argc, argv); // initialize the BSP
+    BSP::init();     // initialize the BSP
 
     // object dictionaries...
-    QS_OBJ_DICTIONARY(AO_Table);
-    QS_OBJ_DICTIONARY(AO_Philo[0]);
-    QS_OBJ_DICTIONARY(AO_Philo[1]);
-    QS_OBJ_DICTIONARY(AO_Philo[2]);
-    QS_OBJ_DICTIONARY(AO_Philo[3]);
-    QS_OBJ_DICTIONARY(AO_Philo[4]);
-
-    // signal dictionaries
-    QS_SIG_DICTIONARY(DONE_SIG,      nullptr);
-    QS_SIG_DICTIONARY(EAT_SIG,       nullptr);
-    QS_SIG_DICTIONARY(PAUSE_SIG,     nullptr);
-    QS_SIG_DICTIONARY(SERVE_SIG,     nullptr);
-    QS_SIG_DICTIONARY(TEST_SIG,      nullptr);
-    QS_SIG_DICTIONARY(HUNGRY_SIG,    nullptr);
-    QS_SIG_DICTIONARY(TIMEOUT_SIG,   nullptr);
+    QS_OBJ_DICTIONARY(&Table_dummy);
 
     // pause execution of the test and wait for the test script to continue
     QS_TEST_PAUSE();
 
-    // initialize publish-subscribe...
-    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
-
     // initialize event pools...
+    static QF_MPOOL_EL(APP::TableEvt) smlPoolSto[2*APP::N_PHILO];
     QP::QF::poolInit(smlPoolSto,
                      sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
 
+    // initialize publish-subscribe...
+    static QP::QSubscrList subscrSto[APP::MAX_PUB_SIG];
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
+
     // start the active objects...
-    uint8_t n = 2;
-    AO_Philo[n]->start(n + 1U, // QP priority
-                       philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-                       nullptr, 0U);
-    AO_Table->start(N_PHILO + 1U, // QP priority of the dummy
-                    nullptr, 0U, nullptr, 0U);
+    static QP::QEvt const *philoQueueSto[APP::N_PHILO][10];
+    std::uint8_t n = 2;
+    APP::AO_Philo[n]->start(
+        n + 1U,   // QP priority
+        philoQueueSto[n], Q_DIM(philoQueueSto[n]),
+        nullptr, 0U);
+
+    APP::AO_Table->start(
+        APP::N_PHILO + 1U, // QP priority of the dummy
+        nullptr, 0U, nullptr, 0U);
 
     return QP::QF::run(); // run the QF application
 }
@@ -115,14 +91,14 @@ void QS::onCommand(uint8_t cmdId,
 
     switch (cmdId) {
        case 0U: {
-           QEvt const e_pause = { PAUSE_SIG, 0U, 0U };
-           AO_Table->dispatch(&e_pause,
+           QEvt const e_pause(APP::PAUSE_SIG);
+           APP::AO_Table->dispatch(&e_pause,
                               static_cast<std::uint_fast8_t>(param1));
            break;
        }
        case 1U: {
-           QEvt const e_serve = { SERVE_SIG, 0U, 0U };
-           AO_Table->dispatch(&e_serve,
+           QEvt const e_serve(APP::SERVE_SIG);
+           APP::AO_Table->dispatch(&e_serve,
                               static_cast<std::uint_fast8_t>(param1));
            break;
        }
@@ -133,7 +109,7 @@ void QS::onCommand(uint8_t cmdId,
 
 //============================================================================
 // callback function to "massage" the event, if necessary
-void QS::onTestEvt(QEvt *e) {
+void QS::onTestEvt(QP::QEvt *e) {
     (void)e;
 #ifdef Q_HOST  // is this test compiled for a desktop Host computer?
 #else // this test is compiled for an embedded Target system
@@ -141,19 +117,18 @@ void QS::onTestEvt(QEvt *e) {
 }
 //............................................................................
 // callback function to output the posted QP events (not used here)
-void QS::onTestPost(void const *sender, QActive *recipient,
-                    QEvt const *e, bool status)
+void QS::onTestPost(void const *sender, QP::QActive *recipient,
+                    QP::QEvt const *e, bool status)
 {
     (void)sender;
     (void)status;
-
     switch (e->sig) {
-        case EAT_SIG:
-        case DONE_SIG:
-        case HUNGRY_SIG:
-            QS_BEGIN_ID(QUTEST_ON_POST, 0U) // application-specific record
+        case APP::EAT_SIG:
+        case APP::DONE_SIG:
+        case APP::HUNGRY_SIG:
+            QS_BEGIN_ID(QUTEST_ON_POST, 0U) // app-specific record
                 QS_SIG(e->sig, recipient);
-                QS_U8(0, Q_EVT_CAST(TableEvt)->philoNum);
+                QS_U8(0, Q_EVT_CAST(APP::TableEvt)->philoId);
             QS_END()
             break;
         default:

@@ -361,7 +361,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -370,7 +370,7 @@
             <TextAddressRange>0x00000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>dpp-qk.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--entry Reset_Handler</Misc>
@@ -389,11 +389,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -404,9 +399,9 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
+              <FileName>main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -606,6 +601,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -966,7 +966,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -994,11 +994,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1009,9 +1004,9 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
+              <FileName>main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1211,6 +1206,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1571,7 +1571,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -1599,11 +1599,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1614,9 +1609,9 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
+              <FileName>main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1747,6 +1742,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="bsp.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mine1.cpp" />
+    <ClCompile Include="mine2.cpp" />
+    <ClCompile Include="missile.cpp" />
+    <ClCompile Include="ship.cpp" />
+    <ClCompile Include="tunnel.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qf_act.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_actq.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_defer.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_dyn.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_mem.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ports\win32-qv\qf_port.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_ps.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_qact.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_qeq.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_qmact.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_time.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qs.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qs_64bit.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qs_fp.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ports\win32-qv\qs_port.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qs_rx.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qstamp.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qep_hsm.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qep_msm.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ports\win32-qv\qwin_gui.c">
+      <Filter>QP</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\..\ports\win32-qv\safe_std.h" />
+    <ClInclude Include="bsp.hpp" />
+    <ClInclude Include="game.hpp" />
+    <ClInclude Include="..\..\..\ports\win32-qv\qf_port.hpp">
+      <Filter>QP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ports\win32-qv\qep_port.hpp">
+      <Filter>QP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ports\win32-qv\qs_port.hpp">
+      <Filter>QP_port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ports\win32-qv\qwin_gui.h">
+      <Filter>QP</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Res\BTN_DWN.bmp">
+      <Filter>Res</Filter>
+    </None>
+    <None Include="Res\BTN_UP.bmp">
+      <Filter>Res</Filter>
+    </None>
+    <None Include="Res\eating.bmp">
+      <Filter>Res</Filter>
+    </None>
+    <None Include="Res\hungry.bmp">
+      <Filter>Res</Filter>
+    </None>
+    <None Include="RES\ql.bmp">
+      <Filter>Res</Filter>
+    </None>
+    <None Include="Res\qp.ico">
+      <Filter>Res</Filter>
+    </None>
+    <None Include="Res\thinking.bmp">
+      <Filter>Res</Filter>
+    </None>
+    <None Include="..\..\..\ports\win32-qv\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Res">
+      <UniqueIdentifier>{c8d4d732-dcf8-4466-ad8e-3f15ab6fe204}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QP_port">
+      <UniqueIdentifier>{4edf856c-7db0-4957-a143-44a72f59a0af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QS">
+      <UniqueIdentifier>{65d40db6-59fb-41d1-8a98-2187dc3217a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QP">
+      <UniqueIdentifier>{c4527ddf-c49e-4957-bd70-77babf9183e2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+</Project>

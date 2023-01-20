@@ -22,14 +22,14 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-01-04
-//! @version Last updated for: @ref qpcpp_7_2_0
+//! @date Last updated on: 2023-08-20
+//! @version Last updated for: @ref qpcpp_7_3_0
 //!
 //! @file
 //! @brief QS/C++ port to POIX
 
-#ifndef QS_PORT_HPP
-#define QS_PORT_HPP
+#ifndef QS_PORT_HPP_
+#define QS_PORT_HPP_
 
 #define QS_CTR_SIZE         4U
 #define QS_TIME_SIZE        4U
@@ -49,15 +49,14 @@ void QS_rx_input(void);  // handle the QS-RX input
 
 //============================================================================
 // NOTE: QS might be used with or without other QP components, in which case
-// the separate definitions of the macros QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY,
-// and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
-// the QF framework, by simply including "qf_port.hpp" *before* "qs.hpp".
+// the separate definitions of the macros QF_CRIT_STAT, QF_CRIT_ENTRY(),
+// and QF_CRIT_EXIT() are needed. In this port QS is configured to be used with
+// the other QP component, by simply including "qp_port.hpp" *before* "qs.hpp".
 //
-#ifndef QF_PORT_HPP
-#include "qf_port.hpp" // use QS with QF
+#ifndef QP_PORT_HPP_
+#include "qp_port.hpp" // use QS with QP
 #endif
 
 #include "qs.hpp"      // QS platform-independent public interface
 
-#endif // QS_PORT_HPP
-
+#endif // QS_PORT_HPP_

@@ -10,13 +10,13 @@
       <TargetName>dpp-dbg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32L152RE</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L1xx_DFP.1.0.2</PackID>
+          <PackID>Keil.STM32L1xx_DFP.1.4.1</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IROM(0x08000000,0x80000) IRAM(0x20000000,0x14000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -185,6 +185,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -351,7 +352,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>Stack_Size=2048 Heap_Size=16</Define>
@@ -360,7 +361,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -369,7 +370,7 @@
             <TextAddressRange>0x00000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>dpp-qv.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--entry Reset_Handler</Misc>
@@ -388,11 +389,6 @@
               <FilePath>..\..\philo.cpp</FilePath>
             </File>
             <File>
-              <FileName>README.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\README.txt</FilePath>
-            </File>
-            <File>
               <FileName>table.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\table.cpp</FilePath>
@@ -403,16 +399,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>bsp.hpp</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\bsp.hpp</FilePath>
@@ -421,6 +407,11 @@
               <FileName>dpp.hpp</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\dpp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -595,7 +586,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -621,6 +612,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
             </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -635,7 +631,7 @@
         <TargetCommonOption>
           <Device>STM32L152RE</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L1xx_DFP.1.0.2</PackID>
+          <PackID>Keil.STM32L1xx_DFP.1.4.1</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IROM(0x08000000,0x80000) IRAM(0x20000000,0x14000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -804,6 +800,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -970,7 +967,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>Stack_Size=2048 Heap_Size=16</Define>
@@ -979,7 +976,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -1007,11 +1004,6 @@
               <FilePath>..\..\philo.cpp</FilePath>
             </File>
             <File>
-              <FileName>README.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\README.txt</FilePath>
-            </File>
-            <File>
               <FileName>table.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\table.cpp</FilePath>
@@ -1022,16 +1014,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>bsp.hpp</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\bsp.hpp</FilePath>
@@ -1040,6 +1022,11 @@
               <FileName>dpp.hpp</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\dpp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1214,7 +1201,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1240,6 +1227,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
             </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1248,13 +1240,13 @@
       <TargetName>dpp-spy</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32L152RE</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L1xx_DFP.1.0.2</PackID>
+          <PackID>Keil.STM32L1xx_DFP.1.4.1</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IROM(0x08000000,0x80000) IRAM(0x20000000,0x14000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1423,6 +1415,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1589,7 +1582,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>Stack_Size=2048 Heap_Size=16</Define>
@@ -1598,7 +1591,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -1626,11 +1619,6 @@
               <FilePath>..\..\philo.cpp</FilePath>
             </File>
             <File>
-              <FileName>README.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\README.txt</FilePath>
-            </File>
-            <File>
               <FileName>table.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\table.cpp</FilePath>
@@ -1641,16 +1629,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>bsp.hpp</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\bsp.hpp</FilePath>
@@ -1659,6 +1637,11 @@
               <FileName>dpp.hpp</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\dpp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1789,6 +1772,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>

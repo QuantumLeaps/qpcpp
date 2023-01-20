@@ -44,7 +44,7 @@ zephyr_library_sources(
  ${QPCPP_DIR}/src/qs/qs_fp.cpp
  ${QPCPP_DIR}/src/qs/qutest.cpp
  ${QPCPP_DIR}/src/qs/qs_64bit.cpp
- ${QPCPP_DIR}/include/qstamp.cpp
+ ${QPCPP_DIR}/src/qs/qstamp.cpp
 )
 
 endif() # QSPY

@@ -1,11 +1,11 @@
 //============================================================================
-// Product: Simple Blinky example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// Blinky example
+// Last Updated for Version: 7.3.0
+// Date of the Last Update:  2023-08-24
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -31,14 +31,20 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#ifndef BSP_HPP
-#define BSP_HPP
+#ifndef BSP_HPP_
+#define BSP_HPP_
 
-constexpr std::uint32_t BSP_TICKS_PER_SEC = 1000U;
+namespace BSP {
 
-void BSP_init(void);
-void BSP_ledOn(void);
-void BSP_ledOff(void);
+constexpr std::uint32_t TICKS_PER_SEC {1000U};
 
-#endif // BSP_HPP
+void init();
+void start();
+void terminate(std::int16_t const result);
+void ledOn(void);
+void ledOff(void);
+
+} // namespace BSP
+
+#endif // BSP_HPP_
 

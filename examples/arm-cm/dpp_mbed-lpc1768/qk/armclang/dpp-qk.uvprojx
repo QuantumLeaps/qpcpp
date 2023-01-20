@@ -10,13 +10,13 @@
       <TargetName>dpp-dbg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>LPC1768</Device>
           <Vendor>NXP</Vendor>
-          <PackID>Keil.LPC1700_DFP.2.2.0</PackID>
+          <PackID>Keil.LPC1700_DFP.2.7.1</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IROM(0x00000000,0x80000) IRAM(0x10000000,0x8000) IRAM2(0x2007C000,0x8000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -185,6 +185,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -336,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>rvmdk __FPU_PRESENT</Define>
+              <Define></Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\ports\arm-cm\qk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\mbed-lpc1768</IncludePath>
             </VariousControls>
@@ -351,7 +352,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>Stack_Size=2048 Heap_Size=16</Define>
@@ -360,7 +361,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -369,7 +370,7 @@
             <TextAddressRange>0x00000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>dpp-qk.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--entry Reset_Handler</Misc>
@@ -393,6 +394,16 @@
               <FilePath>..\..\main.cpp</FilePath>
             </File>
             <File>
+              <FileName>bsp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\bsp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>dpp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\dpp.hpp</FilePath>
+            </File>
+            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -401,11 +412,6 @@
               <FileName>table.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\table.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -498,29 +504,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qk_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qk_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qk_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qk_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qs_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -585,7 +571,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -607,14 +593,14 @@
               <FilePath>..\..\..\..\..\src\qs\qs_fp.cpp</FilePath>
             </File>
             <File>
-              <FileName>qs_pkg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\src\qs\qs_pkg.h</FilePath>
-            </File>
-            <File>
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -624,13 +610,13 @@
       <TargetName>dpp-rel</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060020::V5.06 (build 20)::ARMCC</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>LPC1768</Device>
           <Vendor>NXP</Vendor>
-          <PackID>Keil.LPC1700_DFP.2.2.0</PackID>
+          <PackID>Keil.LPC1700_DFP.2.7.1</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IROM(0x00000000,0x80000) IRAM(0x10000000,0x8000) IRAM2(0x2007C000,0x8000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -799,6 +785,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -950,7 +937,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>NDEBUG __FPU_PRESENT</Define>
+              <Define>NDEBUG</Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\ports\arm-cm\qk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\mbed-lpc1768</IncludePath>
             </VariousControls>
@@ -965,7 +952,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>Stack_Size=2048 Heap_Size=16</Define>
@@ -974,7 +961,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -1007,6 +994,16 @@
               <FilePath>..\..\main.cpp</FilePath>
             </File>
             <File>
+              <FileName>bsp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\bsp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>dpp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\dpp.hpp</FilePath>
+            </File>
+            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1015,11 +1012,6 @@
               <FileName>table.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\table.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1112,29 +1104,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qk_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qk_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qk_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qk_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qs_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1199,7 +1171,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1221,14 +1193,14 @@
               <FilePath>..\..\..\..\..\src\qs\qs_fp.cpp</FilePath>
             </File>
             <File>
-              <FileName>qs_pkg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\src\qs\qs_pkg.h</FilePath>
-            </File>
-            <File>
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1238,13 +1210,13 @@
       <TargetName>dpp-spy</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>LPC1768</Device>
           <Vendor>NXP</Vendor>
-          <PackID>Keil.LPC1700_DFP.2.2.0</PackID>
+          <PackID>Keil.LPC1700_DFP.2.7.1</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IROM(0x00000000,0x80000) IRAM(0x10000000,0x8000) IRAM2(0x2007C000,0x8000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1413,6 +1385,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1564,7 +1537,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>Q_SPY __FPU_PRESENT</Define>
+              <Define>Q_SPY</Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\ports\arm-cm\qk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\mbed-lpc1768</IncludePath>
             </VariousControls>
@@ -1579,7 +1552,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>Stack_Size=2048 Heap_Size=16</Define>
@@ -1588,7 +1561,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -1621,6 +1594,16 @@
               <FilePath>..\..\main.cpp</FilePath>
             </File>
             <File>
+              <FileName>bsp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\bsp.hpp</FilePath>
+            </File>
+            <File>
+              <FileName>dpp.hpp</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\dpp.hpp</FilePath>
+            </File>
+            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1629,11 +1612,6 @@
               <FileName>table.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\table.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1726,29 +1704,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qep_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qf_port.h</FilePath>
-            </File>
-            <File>
-              <FileName>qk_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qk_port.h</FilePath>
-            </File>
-            <File>
               <FileName>qk_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qk_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\arm-cm\qk\armclang\qs_port.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1766,14 +1724,14 @@
               <FilePath>..\..\..\..\..\src\qs\qs_fp.cpp</FilePath>
             </File>
             <File>
-              <FileName>qs_pkg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\src\qs\qs_pkg.h</FilePath>
-            </File>
-            <File>
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>

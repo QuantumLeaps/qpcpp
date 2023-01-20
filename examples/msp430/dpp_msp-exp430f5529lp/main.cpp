@@ -1,13 +1,13 @@
 //============================================================================
-// DPP example
-// Last updated for version 5.4.0
-// Last updated on  2015-04-29
+// APP example
+// Last updated for version 7.3.0
+// Last updated on  2023-08-09
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) 2005 Quantum Leaps, LLC. <www.state-machine.com>
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -28,39 +28,17 @@
 // along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#include "qpcpp.hpp"
-#include "dpp.hpp"
-#include "bsp.hpp"
+#include "qpcpp.hpp"             // QP/C++ real-time embedded framework
+#include "dpp.hpp"               // DPP Application interface
+#include "bsp.hpp"               // Board Support Package
 
 //............................................................................
 int main() {
-    static QP::QEvt const *tableQueueSto[N_PHILO];
-    static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
-    static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
-
-    static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO];
-
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-    DPP::BSP::init(); // initialize the BSP
-
-    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
-
-    // initialize event pools...
-    QP::QF::poolInit(smlPoolSto,
-                     sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
-
-    // start the active objects...
-    for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint8_t)(n + 1U),
-                           philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-                           nullptr, 0U);
-    }
-    DPP::AO_Table->start((uint8_t)(N_PHILO + 1U),
-                    tableQueueSto, Q_DIM(tableQueueSto),
-                    nullptr, 0U);
-
+    BSP::init();     // initialize the BSP
+    BSP::start();    // start the AOs/Threads
     return QP::QF::run(); // run the QF application
 }

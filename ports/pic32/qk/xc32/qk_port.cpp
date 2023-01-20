@@ -22,13 +22,16 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-10-04
-//! @version Last updated for: @ref qpcpp_7_1_2
+//! @date Last updated on: 2023-08-31
+//! @version Last updated for: @ref qpcpp_7_3_0
 //!
 //! @file
-//! @brief QK/C++ port to PIC32, preemptive QK kernel, XC32 toolchain
+//! @brief QK/C++ port to PIC32, XC32 toolchain
 
-#include "qf_port.hpp"
+#define QP_IMPL 1U
+#include "qp_port.hpp"
+
+extern "C" {
 
 //............................................................................
 void QK_init(void) {
@@ -42,7 +45,6 @@ void QK_init(void) {
 }
 
 //............................................................................
-extern "C"
 __attribute__((vector(_CORE_SOFTWARE_0_VECTOR),interrupt(IPL1AUTO), nomips16))
 void QK_isr_(void) { // see NOTE2
     IFS0CLR = _IFS0_CS0IF_MASK; // clear the Core Software Interrupt 0 flag
@@ -53,6 +55,8 @@ void QK_isr_(void) { // see NOTE2
     _mtc0(_CP0_STATUS, _CP0_STATUS_SELECT, 1U << 10); //restore IPL to 1
     QF_INT_ENABLE();
 }
+
+} // extern "C"
 
 //============================================================================
 // NOTE1:

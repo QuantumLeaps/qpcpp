@@ -1,13 +1,13 @@
 //============================================================================
 // Product: BSP for emWin/uC/GUI, Win32 simulation, NO Window Manager
-// Last updated for version 6.8.0
-// Last updated on  2020-01-22
+// Last updated for version 7.3.0
+// Last updated on  2023-07-20
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -60,18 +60,18 @@ Q_DEFINE_THIS_FILE
 //............................................................................
 static void simHardKey(int keyIndex, int keyState) {
     static const QEvt keyEvt[] = {
-        { KEY_UP_REL_SIG,       0 }, // hardkey UP released
-        { KEY_UP_PRESS_SIG,     0 }, // hardkey UP pressed
-        { KEY_RIGHT_REL_SIG,    0 }, // hardkey RIGHT released
-        { KEY_RIGHT_PRESS_SIG,  0 }, // hardkey RIGHT pressed
-        { KEY_CENTER_REL_SIG,   0 }, // hardkey CENTER released
-        { KEY_CENTER_PRESS_SIG, 0 }, // hardkey CENTER pressed
-        { KEY_LEFT_REL_SIG,     0 }, // hardkey LEFT released
-        { KEY_LEFT_PRESS_SIG,   0 }, // hardkey LEFT pressed
-        { KEY_DOWN_REL_SIG,     0 }, // hardkey DOWN released
-        { KEY_DOWN_PRESS_SIG,   0 }, // hardkey DOWN pressed
-        { KEY_POWER_REL_SIG,    0 }, // hardkey POWER released
-        { KEY_POWER_PRESS_SIG,  0 }  // hardkey POWER pressed
+        QP::QEvt(KEY_UP_REL_SIG),      // hardkey UP released
+        QP::QEvt(KEY_UP_PRESS_SIG),    // hardkey UP pressed
+        QP::QEvt(KEY_RIGHT_REL_SIG),   // hardkey RIGHT released
+        QP::QEvt(KEY_RIGHT_PRESS_SIG), // hardkey RIGHT pressed
+        QP::QEvt(KEY_CENTER_REL_SIG),  // hardkey CENTER released
+        QP::QEvt(KEY_CENTER_PRESS_SIG),// hardkey CENTER pressed
+        QP::QEvt(KEY_LEFT_REL_SIG),    // hardkey LEFT released
+        QP::QEvt(KEY_LEFT_PRESS_SIG),  // hardkey LEFT pressed
+        QP::QEvt(KEY_DOWN_REL_SIG),    // hardkey DOWN released
+        QP::QEvt(KEY_DOWN_PRESS_SIG),  // hardkey DOWN pressed
+        QP::QEvt(KEY_POWER_REL_SIG),   // hardkey POWER released
+        QP::QEvt(KEY_POWER_PRESS_SIG)  // hardkey POWER pressed
     };
 
     // do not overrun the array
@@ -93,25 +93,7 @@ extern "C" void GUI_MOUSE_StoreState(const GUI_PID_STATE *pState) {
     pe->Layer = pState->Layer;
     AO_Table->POST(pe, &l_MOUSE_StoreState);
 }
-//............................................................................
-#ifdef Q_SPY
-static DWORD WINAPI idleThread(LPVOID par) { // signature for CreateThread()
-    (void)par;
-    l_running = (uint8_t)1;
-    while (l_running) {
-        uint16_t nBytes = 1024;
-        uint8_t const *block;
-        QF_CRIT_ENTRY(dummy);
-        block = QS::getBlock(&nBytes);
-        QF_CRIT_EXIT(dummy);
-        if (block != (uint8_t *)0) {
-            send(l_sock, (char const *)block, nBytes, 0);
-        }
-        Sleep(10); // wait for a while
-    }
-    return 0; // return success
-}
-#endif
+
 //............................................................................
 void BSP_init(void) {
     int n;
@@ -139,13 +121,18 @@ void QF::onClockTick(void) {
     QTimeEvt::TICK(&l_clock_tick); // perform the QF clock tick processing
 }
 
+extern "C" {
 //............................................................................
-Q_NORETURN Q_onAssert(char const * const file, int_t const loc) {
+Q_NORETURN Q_onError(char const * const file, int_t const loc) {
     char str[256];
-
-    QF_CRIT_ENTRY(dummy); // make sure nothing else is running
     SNPRINTF_S(str, sizeof(str), "%s:%d", file, loc);
     MessageBox(NULL, str, "Assertion Failure", MB_TASKMODAL | MB_OK);
     QF::stop(); // terminate the QF, causes termination of the MainTask()
 }
+//............................................................................
+void assert_failed(char const * const module, int_t const id); // prototype
+void assert_failed(char const * const module, int_t const id) {
+    Q_onError(module, id);
+}
 
+} // extern "C"

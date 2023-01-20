@@ -7,7 +7,7 @@ def on_reset():
     continue_test()
     expect_run()
     glb_filter(GRP_ALL)
-    loc_filter(IDS_ALL, -IDS_AO, -IDS_AP)
+    loc_filter(IDS_ALL, -IDS_AP) # disable records from Philo components
     ao_filter("Table::inst")
     current_obj(OBJ_SM_AO, "Table::inst")
 

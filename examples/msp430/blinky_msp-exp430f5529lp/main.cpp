@@ -1,13 +1,13 @@
 //============================================================================
-// Product: Simple Blinky example
-// Last Updated for Version: 5.4.0
-// Date of the Last Update:  2015-05-04
+// APP example
+// Last updated for version 7.3.0
+// Last updated on  2023-08-09
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. <www.state-machine.com>
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,23 +31,14 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#include "qpcpp.hpp"
-#include "bsp.hpp"
-#include "blinky.hpp"
+#include "qpcpp.hpp"             // QP/C++ real-time embedded framework
+#include "blinky.hpp"            // Application interface
+#include "bsp.hpp"               // Board Support Package
 
+//............................................................................
 int main() {
-    static QEvt const *blinkyQSto[10]; // Event queue storage for Blinky
-
-    BSP_init(); // initialize the Board Support Package
-    QF::init(); // initialize the framework and the underlying RT kernel
-
-    // publish-subscribe not used, no call to QActive::psInit()
-    // dynamic event allocation not used, no call to QF::poolInit()
-
-    // instantiate and start the active objects...
-    AO_Blinky->start(1U,                            // priority
-                     blinkyQSto, Q_DIM(blinkyQSto), // event queue
-                     nullptr, 0U);                // stack (unused)
-
-    return QF::run(); // run the QF application
+    QP::QF::init();  // initialize the framework and the underlying RT kernel
+    BSP::init();     // initialize the BSP
+    BSP::start();    // start the AOs/Threads
+    return QP::QF::run(); // run the QF application
 }

@@ -1,13 +1,13 @@
 //============================================================================
 // DPP example
-// Last updated for version 7.1.1
-// Last updated on  2022-09-21
+// Last updated for version 7.2.2
+// Last updated on  2023-02-28
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -40,11 +40,11 @@ int main() {
     static QP::QSubscrList subscrSto[MAX_PUB_SIG];
 
     static QP::QEvt const *blinky0QueueSto[10]; // queue storage for Blinky0
-#ifdef QP_INC_QXK_HPP_ // QXK kernel?
+#ifdef QXK_HPP_ // QXK kernel?
     static uint32_t const *xblinky1Stack[64]; // stack for XBlinky1
 #else
     static QP::QEvt const *blinky1QueueSto[10]; // queue storage for Blinky1
-#endif // QP_INC_QXK_HPP_
+#endif // QXK_HPP_
 
     QP::QF::init();  // initialize the framework and the underlying RT kernel
 
@@ -62,7 +62,7 @@ int main() {
                       blinky0QueueSto, Q_DIM(blinky0QueueSto),
                       0, 0U, 0);
 
-#ifdef QP_INC_QXK_HPP_ // QXK kernel?
+#ifdef QXK_HPP_ // QXK kernel?
     XSEM_sw1.init(0U, 1U); /* binary signaling semaphore */
     XT_Blinky1.start(2U,     /* unique QP priority of the AO */
                   0, 0U, /* event queue (not used) */
@@ -73,7 +73,7 @@ int main() {
     AO_Blinky1->start(2U, // priority
                     blinky1QueueSto, Q_DIM(blinky1QueueSto),
                     0, 0U, 0);
-#endif // QP_INC_QXK_HPP_
+#endif // QXK_HPP_
 
     return QP::QF::run(); // run the QF application
 }

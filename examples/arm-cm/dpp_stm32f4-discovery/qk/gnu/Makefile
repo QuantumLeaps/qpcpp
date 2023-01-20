@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on STM32F4-Discovery, QK kernel, GNU-ARM
-# Last Updated for Version: 7.0.1
-# Date of the Last Update:  2022-05-23
+# Last Updated for Version: 7.3.0
+# Date of the Last Update:  2023-09-08
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -45,8 +45,7 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    https://sourceforge.net/projects/qpc/files/QTools/
-#
+#    https://github.com/QuantumLeaps/qtools/releases
 
 #-----------------------------------------------------------------------------
 # project name
@@ -170,16 +169,16 @@ BIN   := $(GNU_ARM)/bin/arm-none-eabi-objcopy
 
 
 ##############################################################################
-# Typically, you should not need to change anything below this line
+# Typically you should not need to change anything below this line
 
-# basic utilities (included in Qtools for Windows), see:
-#    http://sourceforge.net/projects/qpc/files/Qtools
+# basic utilities (included in QTools for Windows), see:
+#     https://www.state-machine.com/qtools
 
 MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build options for various configurations for ARM Cortex-M4F
+# build options for various configurations for ARM Cortex-M
 #
 
 # combine all the soruces...
@@ -194,11 +193,11 @@ ASFLAGS = $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
 CFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
-	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
-	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
@@ -266,7 +265,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@
 
 $(TARGET_ELF) : $(ASM_OBJS_EXT) $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/src/qs/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 $(BIN_DIR)/%.d : %.c

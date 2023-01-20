@@ -22,22 +22,24 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-12-15
-//! @version Last updated for version: 7.2.0
+//! @date Last updated on: 2023-09-01
+//! @version Last updated for version: 7.3.0
 //!
 //! @file
 //! @brief PC-Lint-Plus option file for linting QP/C++ __Applications__
 
+//----------------------------------------------------------------------------
+// globally supress the following warnings:
+-e546           // explicitly taking address of function
+-e717           // monocarpic do-while used to group statements
+-e1756          // variable has 'static' storage duration and non-POD type
+-e3412          // class has virtual functions but non-virtual destructor
 
 // Assertions ----------------------------------------------------------------
 
-// old-style c comment [AUTOSAR Rule A2-8-4]
--efile(1904,
- -qassert.h)
-
-// give Q_onAssert() the semantics of "exit"
+// give Q_onError() the semantics of "exit"
 -function(exit,
- Q_onAssert)
+ Q_onError)
 
 // C-style array type [AUTOSAR Rule A18-1-1]
 -esym(9436,
@@ -45,10 +47,10 @@
 
 // AC++M16-3-2 function-like macro
 -esym(9026,
+ Q_DEFINE_THIS_MODULE,
+ Q_ASSERT_STATIC,
  Q_ASSERT,
  Q_ASSERT_ID,
- Q_ALLEGE,
- Q_ALLEGE_ID,
  Q_ERROR,
  Q_ERROR_ID,
  Q_REQUIRE,
@@ -57,16 +59,12 @@
  Q_ENSURE_ID,
  Q_INVARIANT,
  Q_INVARIANT_ID,
- Q_ASSERT_STATIC,
- Q_ASSERT_COMPILE,
- Q_DEFINE_THIS_MODULE)
+ Q_DIM)
 
 // use of c-style cast to void [AS-A5-2-2]
 -emacro(1954,
  Q_ASSERT,
  Q_ASSERT_ID,
- Q_ALLEGE,
- Q_ALLEGE_ID,
  Q_ERROR,
  Q_ERROR_ID,
  Q_REQUIRE,
@@ -74,9 +72,10 @@
  Q_ENSURE,
  Q_ENSURE_ID,
  Q_INVARIANT,
- Q_INVARIANT_ID)
+ Q_INVARIANT_ID,
+ Q_ASSERT_INCRIT)
 
-// MC++R10-0-6 unparenthesized macro parameter 'class_' in definition of macro
+// MC++R10-0-6 unparenthesized macro parameter in definition of macro
 -esym(9022,
  Q_DEFINE_THIS_FILE,
  Q_DEFINE_THIS_MODULE)
@@ -86,15 +85,12 @@
  Q_DEFINE_THIS_FILE,
  Q_DEFINE_THIS_MODULE)
 
-// MC++R7-3-1 global declaration of symbol 'Q_this_module_'
--esym(9141,
- Q_this_module_)
-
 // AC++M16-3-2 function-like macro
 -esym(9026,
  Q_UNUSED_PAR,
  Q_DIM,
- Q_UINT2PTR_CAST)
+ Q_UINT2PTR_CAST,
+ Q_UINTPTR_CAST_)
 
 // MC++R5-2-4 use of c-style cast
 -emacro(1924,
@@ -102,6 +98,7 @@
  Q_ASSERT_ID,
  Q_ERROR,
  Q_ERROR_ID)
+
 
 // QEP -----------------------------------------------------------------------
 
@@ -113,9 +110,15 @@
  float32_t,
  float64_t)
 
+// AUTOSAR Rule A3-3-2 non-private data member within a non-POD structure
+// NOTE: public access needed for extern "C" functions
+-esym(9150,
+ QP::QAsm::*)
+
 // AC++M16-3-2 function-like macro
 -esym(9026,
- QEVT_INITIALIZER,
+ INIT,
+ DISPATCH,
  Q_STATE_DECL,
  Q_STATE_DEF,
  QM_STATE_DECL,
@@ -144,9 +147,8 @@
  QM_UNHANDLED,
  Q_HSM_UPCAST,
  Q_EVT_CAST,
- Q_UINT2PTR_CAST,
  Q_STATE_CAST,
- Q_ACTION_CAST)
+ Q_UINT2PTR_CAST)
 
 // MC++R5-2-8 conversion from pointer to other pointer type
 -emacro(9079,
@@ -203,12 +205,11 @@
 
 // MC++9-5-1 union declared
 -esym(9018,
- QP::QHsmAttr)
+ QP::QAsmAttr)
 
 // MC++5-2-8 conversion from integer type (0) to pointer type
 -emacro(9010,
- Q_STATE_CAST,
- Q_ACTION_CAST)
+ Q_STATE_CAST)
 
 // public virtual function 'QP::QHsm::...'
 -esym(1731,
@@ -217,15 +218,20 @@
 
 
 // QF ------------------------------------------------------------------------
+
+// AUTOSAR Rule A3-3-2 non-private data member within a non-POD structure
+// NOTE: public access needed for extern "C" functions
+-esym(9150,
+ QP::QF::QF_Attr::*)
+
 // AC++M16-3-2 function-like macro
 -esym(9026,
  POST,
  POST_X,
  PUBLISH,
- TICK,
  TICK_X,
- QF_CRIT_ENTRY,
- QF_CRIT_EXIT,
+ TICK,
+ TRIG,
  QF_INT_DISABLE,
  QF_INT_ENABLE,
  QF_CRIT_EXIT_NOP,
@@ -237,19 +243,7 @@
  Q_DELETE_REF,
  QF_INT_DISABLE,
  QF_INT_ENABLE,
- QF_CRIT_ENTRY,
- QF_CRIT_EXIT,
- QF_QS_CRIT_ENTRY,
- QF_QS_CRIT_EXIT,
- QF_QS_ISR_ENTRY,
- QF_QS_ISR_EXIT,
- QF_QS_ACTION,
  QF_MPOOL_EL)
-
-// MC++R11-0-1 non-private data member within a non-POD structure
-// NOTE: public access needed for extern "C" functions
--esym(9150,
- QP::QActive::*)
 
 // MC++R0-3-2  ignoring return value of function
 -emacro(534,
@@ -294,12 +288,6 @@
 // public base 'QP::QEvt' has no non-destructor virtual functions
 -esym(1790,
  QP::QEvt)
-
-// variable has 'static' storage duration and non-POD type
-// [AUTOSAR Rule A3-3-2]
--esym(1756,
- QP::QTimeEvt::timeEvtHead_)
-
 
 // QK ------------------------------------------------------------------------
 
@@ -378,8 +366,13 @@
  QS_GET_BLOCK,
  QS_BEGIN_ID,
  QS_END,
- QS_BEGIN_NOCRIT,
- QS_END_NOCRIT,
+ QS_BEGIN_INCRIT,
+ QS_END_INCRIT,
+ QS_QF_CRIT_ENTRY,
+ QS_QF_CRIT_EXIT,
+ QS_QF_ISR_ENTRY,
+ QS_QF_ISR_EXIT,
+ QS_ONLY,
  QS_I8,
  QS_U8,
  QS_I16,
@@ -420,8 +413,8 @@
  QS_LOC_CHECK_,
  QS_BEGIN_PRE_,
  QS_END_PRE_,
- QS_BEGIN_NOCRIT_PRE_,
- QS_END_NOCRIT_PRE_,
+ QS_BEGIN_PRE_,
+ QS_END_PRE_,
  QS_U8_PRE_,
  QS_2U8_PRE_,
  QS_U16_PRE_,
@@ -473,7 +466,9 @@
 
 // MC++R11-0-1 non-private data member within a non-POD structure
 -esym(9150,
+ QP::QEvt::*,
  QP::QActive::*,
+ QP::QF::Attr::*,
  QP::QS::QSrxPriv::*)
 
 // MC++9-5-1 union declared

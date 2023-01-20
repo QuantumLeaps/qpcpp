@@ -1,13 +1,13 @@
 //============================================================================
-// DPP example
-// Last updated for version 6.3.3
-// Last updated on  2018-06-23
+// APP example
+// Last updated for version 7.3.0
+// Last updated on  2023-08-09
 //
-//                    Q u a n t u m     L e a P s
-//                    ---------------------------
-//                    innovating embedded systems
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. <www.state-machine.com>
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -31,53 +31,14 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#include "qpcpp.hpp"
-#include "dpp.hpp"
-#include "bsp.hpp"
-
-static QP::QTicker l_ticker0(0); // ticker for tick rate 0
-QP::QActive *DPP::the_Ticker0 = &l_ticker0;
+#include "qpcpp.hpp"             // QP/C++ real-time embedded framework
+#include "dpp.hpp"               // DPP Application interface
+#include "bsp.hpp"               // Board Support Package
 
 //............................................................................
 int main() {
-    static QP::QEvt const *tableQueueSto[N_PHILO];
-    static QP::QEvt const *philoQueueSto[N_PHILO][N_PHILO];
-    static QP::QSubscrList subscrSto[DPP::MAX_PUB_SIG];
-    static QF_MPOOL_EL(DPP::TableEvt) smlPoolSto[2*N_PHILO];
-
     QP::QF::init();  // initialize the framework and the underlying RT kernel
-
-    DPP::BSP::init(); // initialize the BSP
-
-    // object dictionaries...
-    QS_OBJ_DICTIONARY(DPP::AO_Table);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[0]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[1]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[2]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[3]);
-    QS_OBJ_DICTIONARY(DPP::AO_Philo[4]);
-
-    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto)); // init publish-subscribe
-
-    // initialize event pools...
-    QP::QF::poolInit(smlPoolSto,
-                     sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
-
-    // start the active objects...
-    for (uint8_t n = 0U; n < N_PHILO; ++n) {
-        DPP::AO_Philo[n]->start((uint_fast8_t)(n + 1U), // priority
-                           philoQueueSto[n], Q_DIM(philoQueueSto[n]),
-                           nullptr, 0U);
-    }
-
-    // example of prioritizing the Ticker0 active object
-    DPP::the_Ticker0->start((uint_fast8_t)(N_PHILO + 1U), // priority
-                            0, 0,
-                            0, 0);
-
-    DPP::AO_Table->start((uint_fast8_t)(N_PHILO + 2U), // priority
-                    tableQueueSto, Q_DIM(tableQueueSto),
-                    nullptr, 0U);
-
+    BSP::init();     // initialize the BSP
+    BSP::start();    // start the AOs/Threads
     return QP::QF::run(); // run the QF application
 }

@@ -94,7 +94,7 @@ Q_STATE_DEF(ObjB, active) {
     }
     return status_;
 }
-
+//..........................................................................
 ObjB ObjB::inst[NUM_B];
 
 //============================================================================
@@ -120,7 +120,7 @@ static void ThrX_run(QP::QXThread * const me) {
                 break;
             }
             case TEST1_SIG: {
-                static QP::QEvt const t2 = { TEST2_SIG, 0U, 0U };
+                static QP::QEvt const t2(TEST2_SIG);
                 BSP::trace(me, "TEST1 1of2");
                 QP::QActive::PUBLISH(&t2, me);
                 BSP::trace(me, "TEST1 2of2");
@@ -223,7 +223,7 @@ int main() {
     return QP::QF::run(); // run the QF application
 }
 
-//============================================================================
+//==========================================================================
 namespace QP {
 
 void QS::onTestSetup(void) {

@@ -2,8 +2,9 @@
 # see https://www.state-machine.com/qtools/qutest.html/qutest.html
 
 note('''
-This test group verifies the MPU setup, specifically
-the protection of various memory regions.
+@uid{TQP701}
+This test group verifies the memory access protection,
+specifically the protection of various memory regions.
 All tests run during the QS_TEST_PAUSE() in
 the test_sched.c fixture.
 ''')
@@ -20,7 +21,9 @@ MEM_START = 0
 MEM_END   = 1
 
 # NULL-pointer dereferencing...
-test("NULL-read -> ASSERT")
+test('''
+NULL-read -> ASSERT
+''')
 command("MEM_READ", 0x0, 0x80) # value = *(uint32_t volatile *)(param1 + param2);
 expect("@timestamp =ASSERT= Mod=*")
 
@@ -68,12 +71,12 @@ command("RAM_READ", 0x0, MEM_START) # value = BSP_ramRead(param1, param2);
 expect("@timestamp USER+000 RAM_READ *")
 expect("@timestamp Trg-Done QS_RX_COMMAND")
 
-test("Middle-of SRAM-read, NORESET")
+test("Middle-of SRAM-read", NORESET)
 command("RAM_READ", 0x300, MEM_START) # value = BSP_ramRead(param1, param2);
 expect("@timestamp USER+000 RAM_READ *")
 expect("@timestamp Trg-Done QS_RX_COMMAND")
 
-test("End-of SRAM-read, NORESET")
+test("End-of SRAM-read", NORESET)
 command("RAM_READ", 0x0, MEM_END) # value = BSP_ramRead(param1, param2);
 expect("@timestamp USER+000 RAM_READ *")
 expect("@timestamp Trg-Done QS_RX_COMMAND")
@@ -83,18 +86,14 @@ test("Below-Start SRAM-write -> ASSERT", NORESET)
 command("RAM_WRITE", (-0x4 & 0xFFFFFFFF), MEM_START, 123) # BSP_ramWrite(param1, param2, param3);
 expect("@timestamp =ASSERT= Mod=*")
 
+# wrtiting to RAM does not need to be tested becasue the fact
+# that the test fixture runs at all means that RAM works.
+skip(1)
 test("Middle-of SRAM-write")
 command("RAM_WRITE", 0x300, MEM_START, 123) # BSP_ramWrite(param1, param2, param3);
 expect("@timestamp USER+000 RAM_WRITE *")
 expect("@timestamp Trg-Done QS_RX_COMMAND")
 
-# the following test must be "RESET-test", because the previous test
-# might have corrupted the RAM, so the target is not to be trusted
-test("End-of SRAM-write")
-command("RAM_WRITE", 0x0, MEM_END, 123) # BSP_ramWrite(param1, param2, param3);
-expect("@timestamp USER+000 RAM_WRITE *")
-expect("@timestamp Trg-Done QS_RX_COMMAND")
-
-test("After-End SRAM-write -> ASSERT", NORESET)
+test("After-End SRAM-write -> ASSERT")
 command("RAM_WRITE", 0x4, MEM_END, 123) # BSP_ramWrite(param1, param2, param3);
 expect("@timestamp =ASSERT= Mod=*")

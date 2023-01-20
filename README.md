@@ -1,6 +1,10 @@
-![QP Framework](doxygen/images/qp_banner.jpg)
+![QP Framework](https://www.state-machine.com/img/qp_banner.jpg)
 
 # What's New?
+
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/QuantumLeaps/qpcpp)](https://github.com/QuantumLeaps/qpcpp/releases/latest)
+
+
 View QP/C++ Revision History at: https://www.state-machine.com/qpcpp/history.html
 
 > **NOTE:** If you're interested in the latest QP/C++ version from GitHub,
@@ -121,7 +125,7 @@ open the file [html/index.html](html/index.html) in your web browser.
 # How to Help this Project?
 If you like this project, please give it a star (in the upper-right corner of your browser window):
 
-![GitHub star](doxygen/images/github-star.jpg)
+![GitHub star](https://www.state-machine.com/img/github-star.jpg)
 
 
    [RTEF]: <https://www.state-machine.com/rtef>

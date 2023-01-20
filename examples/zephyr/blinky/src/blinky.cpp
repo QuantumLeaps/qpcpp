@@ -32,15 +32,23 @@
 #include "bsp.hpp"
 #include "blinky.hpp"
 
+// unnamed namespace for local definitions with internal linkage
+namespace {
+
 //Q_DEFINE_THIS_FILE
 
+} // unnamed namespace
+
+namespace APP {
+
 //............................................................................
-class Blinky : public QActive {
+class Blinky : public QP::QActive {
 private:
-    QTimeEvt m_timeEvt;
+    QP::QTimeEvt m_timeEvt;
 
 public:
     Blinky();
+    static Blinky inst;
 
 protected:
     Q_STATE_DECL(initial);
@@ -48,15 +56,15 @@ protected:
     Q_STATE_DECL(on);
 };
 
-// local bjects --------------------------------------------------------------
-Blinky l_blinky;
+// local objects --------------------------------------------------------------
+Blinky Blinky::inst;
 
 // global objects ------------------------------------------------------------
-QActive * const AO_Blinky = &l_blinky; // opaque pointer
+QP::QActive * const AO_Blinky = &Blinky::inst; // opaque pointer
 
 //............................................................................
 Blinky::Blinky()
-  : QActive(&initial),
+  : QP::QActive(&initial),
     m_timeEvt(this, TIMEOUT_SIG, 0U)
 {
     // empty
@@ -67,15 +75,15 @@ Q_STATE_DEF(Blinky, initial) {
     (void)e; // unused parameter
 
     // arm the time event to expire in half a second and every half second
-    m_timeEvt.armX(BSP_TICKS_PER_SEC/2U, BSP_TICKS_PER_SEC/2U);
+    m_timeEvt.armX(BSP::TICKS_PER_SEC/2U, BSP::TICKS_PER_SEC/2U);
     return tran(&off);
 }
 //............................................................................
 Q_STATE_DEF(Blinky, off) {
-    QState status;
+    QP::QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            BSP_ledOff();
+            BSP::ledOff();
             status = Q_RET_HANDLED;
             break;
         }
@@ -92,10 +100,10 @@ Q_STATE_DEF(Blinky, off) {
 }
 //............................................................................
 Q_STATE_DEF(Blinky, on) {
-    QState status;
+    QP::QState status;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-            BSP_ledOn();
+            BSP::ledOn();
             status = Q_RET_HANDLED;
             break;
         }
@@ -110,3 +118,6 @@ Q_STATE_DEF(Blinky, on) {
     }
     return status;
 }
+
+} // namespace APP
+

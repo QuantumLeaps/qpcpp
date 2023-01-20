@@ -1,7 +1,7 @@
 //============================================================================
 // Product: "Fly 'n' Shoot" game example
-// Last updated for version 6.3.3
-// Last updated on  2018-06-23
+// Last updated for version 7.3.0
+// Last updated on  2023-08-06
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -36,27 +36,21 @@
 #include "game.hpp"
 
 static QP::QTicker l_ticker0(0); // ticker for tick rate 0
-QP::QActive *GAME::the_Ticker0 = &l_ticker0;
+QP::QTicker *BSP::the_Ticker0 = &l_ticker0;
 
 //............................................................................
 int main() {
-    static QP::QEvt const * missileQueueSto[2];
-    static QP::QEvt const * shipQueueSto[3];
-    static QP::QEvt const * tunnelQueueSto[GAME_MINES_MAX + 5];
-
-    static QF_MPOOL_EL(QP::QEvt) smlPoolSto[10];
-    static QF_MPOOL_EL(GAME::ObjectImageEvt) medPoolSto[2*GAME_MINES_MAX +10];
-
-    static QP::QSubscrList subscrSto[GAME::MAX_PUB_SIG];
-
-    QP::QF::init();  // initialize the framework and the underlying RT kernel
-    GAME::BSP_init(); // initialize the Board Support Package
+    QP::QF::init(); // initialize the framework and the underlying RT kernel
+    BSP::init();    // initialize the Board Support Package
 
     // initialize the event pools...
-    QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+    //static QF_MPOOL_EL(QP::QEvt) smlPoolSto[10];
+    //QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+    static QF_MPOOL_EL(GAME::ObjectImageEvt) medPoolSto[2*GAME_MINES_MAX +10];
     QP::QF::poolInit(medPoolSto, sizeof(medPoolSto), sizeof(medPoolSto[0]));
 
     // init publish-subscribe
+    static QP::QSubscrList subscrSto[GAME::MAX_PUB_SIG];
     QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // object dictionaries for AOs...
@@ -71,14 +65,20 @@ int main() {
     QS_SIG_DICTIONARY(GAME::GAME_OVER_SIG,      nullptr);
 
     // start the active objects...
-    GAME::the_Ticker0->start(1U, // priority
+    BSP::the_Ticker0->start(1U, // priority
                              0, 0, 0, 0);
+
+    static QP::QEvt const * tunnelQueueSto[GAME_MINES_MAX + 5];
     GAME::AO_Tunnel ->start(2U,                     // priority
                       tunnelQueueSto, Q_DIM(tunnelQueueSto), // evt queue
                       nullptr, 0U);  // no per-thread stack
+
+    static QP::QEvt const * shipQueueSto[3];
     GAME::AO_Ship   ->start(3U,                     // priority
                       shipQueueSto, Q_DIM(shipQueueSto), // evt queue
                       nullptr, 0U);  // no per-thread stack
+
+    static QP::QEvt const * missileQueueSto[2];
     GAME::AO_Missile->start(4U,                     // priority
                       missileQueueSto, Q_DIM(missileQueueSto), // evt queue
                       nullptr, 0U);  // no per-thread stack

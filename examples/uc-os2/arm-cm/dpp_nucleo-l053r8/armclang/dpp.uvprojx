@@ -423,11 +423,6 @@
               <FileType>8</FileType>
               <FilePath>..\table.cpp</FilePath>
             </File>
-            <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -524,24 +519,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\uc-os2\qep_port.hpp</FilePath>
-            </File>
-            <File>
               <FileName>qf_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\uc-os2\qf_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\uc-os2\qf_port.hpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\uc-os2\qs_port.hpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -636,6 +616,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1138,11 +1123,6 @@
               <FileType>8</FileType>
               <FilePath>..\table.cpp</FilePath>
             </File>
-            <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1239,24 +1219,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\uc-os2\qep_port.hpp</FilePath>
-            </File>
-            <File>
               <FileName>qf_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\uc-os2\qf_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\uc-os2\qf_port.hpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\uc-os2\qs_port.hpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1351,6 +1316,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1853,11 +1823,6 @@
               <FileType>8</FileType>
               <FilePath>..\table.cpp</FilePath>
             </File>
-            <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1954,24 +1919,9 @@
           <GroupName>QP_port</GroupName>
           <Files>
             <File>
-              <FileName>qep_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\uc-os2\qep_port.hpp</FilePath>
-            </File>
-            <File>
               <FileName>qf_port.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\ports\uc-os2\qf_port.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>qf_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\uc-os2\qf_port.hpp</FilePath>
-            </File>
-            <File>
-              <FileName>qs_port.hpp</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\ports\uc-os2\qs_port.hpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1997,6 +1947,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,7 +1,7 @@
 //============================================================================
 // Purpose: Fixture for QUTEST
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Last updated for version 7.3.0
+// Last updated on  2023-07-26
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -30,54 +30,46 @@
 // Contact information:
 // <www.state-machine.com/licensing>
 //============================================================================
-
 #include "qpcpp.hpp"
 #include "qhsmtst.hpp"
 
 Q_DEFINE_THIS_FILE
 
-using namespace QP;
-using namespace QHSMTST;
+//============================================================================
+namespace APP {
 
 enum {
-    BSP_DISPLAY = QS_USER,
+    BSP_DISPLAY = QP::QS_USER,
 };
 
-//----------------------------------------------------------------------------
-int main(int argc, char *argv[]) {
-    static QF_MPOOL_EL(QEvt) smlPoolSto[10]; // small pool
-
-    QF::init(); // initialize the framework and the underlying RT kernel
-
-    // initialize the QS software tracing
-    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : nullptr));
-
-    // initialize event pools...
-    QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
-
-    // dictionaries...
-    QS_FUN_DICTIONARY(&QHsm::top);
-    QS_OBJ_DICTIONARY(the_hsm);
-    QS_USR_DICTIONARY(BSP_DISPLAY);
-
-    return QF::run();
+void BSP_display(char const *msg) {
+    QS_BEGIN_ID(BSP_DISPLAY, 0U) // application-specific record
+        QS_STR(msg);
+    QS_END()
+}
+//............................................................................
+void BSP_terminate(int16_t const result) {
+    Q_UNUSED_PAR(result);
 }
 
-//----------------------------------------------------------------------------
+} // namespace APP
 
+//============================================================================
+namespace QP {
+
+//............................................................................
 void QS::onTestSetup(void) {
 }
 //............................................................................
 void QS::onTestTeardown(void) {
 }
-
 //............................................................................
 void QS::onCommand(uint8_t cmdId,
                    uint32_t param1, uint32_t param2, uint32_t param3)
 {
-    (void)param1;
-    (void)param2;
-    (void)param3;
+    Q_UNUSED_PAR(param1);
+    Q_UNUSED_PAR(param2);
+    Q_UNUSED_PAR(param3);
 
     switch (cmdId) {
        case 0U: {
@@ -87,11 +79,10 @@ void QS::onCommand(uint8_t cmdId,
            break;
     }
 }
-
 //............................................................................
 // callback function to "massage" the event, if necessary
 void QS::onTestEvt(QEvt *e) {
-    (void)e;
+    Q_UNUSED_PAR(e);
 #ifdef Q_HOST  // is this test compiled for a desktop Host computer?
 #else // this test is compiled for an embedded Target system
 #endif
@@ -101,23 +92,34 @@ void QS::onTestEvt(QEvt *e) {
 void QS::onTestPost(void const *sender, QActive *recipient,
                     QEvt const *e, bool status)
 {
-    (void)sender;
-    (void)recipient;
-    (void)e;
-    (void)status;
+    Q_UNUSED_PAR(sender);
+    Q_UNUSED_PAR(recipient);
+    Q_UNUSED_PAR(e);
+    Q_UNUSED_PAR(status);
 }
 
-//----------------------------------------------------------------------------
-namespace QHSMTST {
+} // namespace QP
 
-void BSP_display(char const *msg) {
-    QS_BEGIN_ID(BSP_DISPLAY, 0U) // application-specific record
-        QS_STR(msg);
-    QS_END()
-}
-//............................................................................
-void BSP_terminate(int16_t const result) {
-    (void)result;
+//============================================================================
+using namespace APP;
+
+int main(int argc, char *argv[]) {
+    static QF_MPOOL_EL(QP::QEvt) smlPoolSto[10]; // small pool
+
+    QP::QF::init(); // initialize the framework and the underlying RT kernel
+
+    // initialize the QS software tracing
+    if (!QS_INIT(argc > 1 ? argv[1] : nullptr)) {
+        Q_ERROR();
+    }
+
+    // initialize event pools...
+    QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+    // dictionaries...
+    QS_OBJ_DICTIONARY(the_sm);
+    QS_USR_DICTIONARY(BSP_DISPLAY);
+
+    return QP::QF::run();
 }
 
-} // namespace QHSMTST

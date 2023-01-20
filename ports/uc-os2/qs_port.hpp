@@ -1,5 +1,5 @@
 //============================================================================
-// QP/C Real-Time Embedded Framework (RTEF)
+// QP/C++ Real-Time Embedded Framework (RTEF)
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -22,35 +22,35 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-12
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2023-08-16
+//! @version Last updated for: @ref qpcpp_7_3_0
 //!
 //! @file
-//! @brief QS/C++ port to uC-OS2, generic C++11 compiler
+//! @brief QS/C++ port to a 32-bit CPU, generic C++11 compiler
 
-#ifndef QS_PORT_HPP
-#define QS_PORT_HPP
+#ifndef QS_PORT_HPP_
+#define QS_PORT_HPP_
 
-#define QS_TIME_SIZE        4U
-#define QS_OBJ_PTR_SIZE     4U
-#define QS_FUN_PTR_SIZE     4U
+// QS time-stamp size in bytes
+#define QS_TIME_SIZE     4U
+
+// object pointer size in bytes
+#define QS_OBJ_PTR_SIZE  4U
+
+// function pointer size in bytes
+#define QS_FUN_PTR_SIZE  4U
 
 //============================================================================
-// NOTE: QS might be used with or without other QP components, in which case
-// the separate definitions of the macros QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY,
-// and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
-// the QF framework, by simply including "qf_port.hpp" *before* "qs.hpp".
-//
-#ifndef QF_PORT_HPP
-#include "qf_port.hpp" // use QS with QF
+// NOTE: QS might be used with or without other QP components, in which
+// case the separate definitions of the macros QF_CRIT_STAT, QF_CRIT_ENTRY(),
+// and QF_CRIT_EXIT() are needed. In this port QS is configured to be used
+// with the other QP component, by simply including "qp_port.hpp"
+//*before* "qs.hpp".
+#ifndef QP_PORT_H_
+#include "qp_port.hpp" // use QS with QP
 #endif
-
-#if (OS_CRITICAL_METHOD == 3U)
-    #define QS_CRIT_STAT_    OS_CPU_SR cpu_sr;
-    #define QS_CRIT_E_()     OS_ENTER_CRITICAL()
-    #define QS_CRIT_X_()     OS_EXIT_CRITICAL(); QS_REC_DONE()
-#endif // OS_CRITICAL_METHOD
 
 #include "qs.hpp"      // QS platform-independent public interface
 
-#endif // QS_PORT_HPP
+#endif // QS_PORT_HPP_
+

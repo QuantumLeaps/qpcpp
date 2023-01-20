@@ -28,6 +28,10 @@ namespace std {
     using uint_fast16_t = unsigned int;  //!< fast at-least 16-bit unsigned int
     using int_fast32_t  = signed   long; //!< fast at-least 32-bit signed   int
     using uint_fast32_t = unsigned long; //!< fast at-least 32-bit unsigned int
+
+    // unsigned integer type capable of holding a pointer to void.
+    using uintptr_t = unsigned;    //!< unsigned int capable of holding void*
+
 } // namespace std
 
 //lint -restore

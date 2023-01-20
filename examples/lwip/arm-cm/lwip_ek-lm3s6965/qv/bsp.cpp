@@ -1,7 +1,7 @@
 //============================================================================
 // Product: BSP for DPP with lwIP on EK-LM3S9665 board, QV kernel
-// Last updated for version 6.9.3
-// Last updated on  2021-03-03
+// Last updated for version 7.3.0
+// Last updated on  2023-08-06
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -56,7 +56,6 @@ static uint32_t l_nTicks;
     QSTimeCtr QS_tickTime_;
     QSTimeCtr QS_tickPeriod_;
 
-
     // QS source IDs
     static QP::QSpyId const l_SysTick_Handler = { 0U };
 
@@ -98,11 +97,11 @@ extern "C" void SysTick_Handler(void) {
     tmp ^= buttons.depressed;     // changed debounced depressed
     if ((tmp & USER_BTN) != 0U) { // debounced USER_BTN state changed?
         if ((buttons.depressed & USER_BTN) != 0U) { // is USER_BTN depressed?
-            static QEvt const bd = { BTN_DOWN_SIG, 0U, 0U };
+            static QEvt const bd(BTN_DOWN_SIG);
             QF::PUBLISH(&bd, &l_SysTick_Handler);
         }
         else { // the button is released
-            static QEvt const bu = { BTN_UP_SIG, 0U, 0U };
+            static QEvt const bu(BTN_UP_SIG);
             QF::PUBLISH(&bu, &l_SysTick_Handler);
         }
     }
@@ -218,15 +217,25 @@ void QV::onIdle(void) {  // NOTE: called with interrutps DISABLED, see NOTE01
 }
 
 //............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
+extern "C" {
+
+Q_NORETURN Q_onError(char const * const module, int_t const id) {
     //
     // NOTE: add here your application-specific error handling
     //
     (void)module;
-    (void)loc;
-    QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
+    (void)id;
+    QS_ASSERTION(module, id, static_cast<uint32_t>(10000U));
+
     NVIC_SystemReset();
 }
+//............................................................................
+void assert_failed(char const * const module, int_t const id); // prototype
+void assert_failed(char const * const module, int_t const id) {
+    Q_onError(module, id);
+}
+
+} // extern "C"
 
 //............................................................................
 // sys_now() is used in the lwIP stack

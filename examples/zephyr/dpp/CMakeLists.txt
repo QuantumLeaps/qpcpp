@@ -29,6 +29,7 @@ option(QSPY "QSPY software tracing" OFF)
 zephyr_include_directories(
  ${QPCPP_DIR}/include
  ${QPCPP_DIR}/zephyr
+ ./src
 )
 target_sources(app PRIVATE
  ${QPCPP_DIR}/src/qf/qep_hsm.cpp
@@ -57,7 +58,7 @@ target_sources(app PRIVATE
  ${QPCPP_DIR}/src/qs/qs_fp.cpp
  ${QPCPP_DIR}/src/qs/qutest.cpp
  ${QPCPP_DIR}/src/qs/qs_64bit.cpp
- ${QPCPP_DIR}/include/qstamp.cpp
+ ${QPCPP_DIR}/src/qs/qstamp.cpp
 )
 
 endif()

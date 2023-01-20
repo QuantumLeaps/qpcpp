@@ -220,7 +220,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\include\qstamp.cpp" />
+    <ClCompile Include="..\..\..\src\qs\qstamp.cpp" />
     <ClCompile Include="..\..\..\ports\win32-qv\qf_port.cpp" />
     <ClCompile Include="..\..\..\src\qf\qep_hsm.cpp" />
     <ClCompile Include="..\..\..\src\qf\qep_msm.cpp" />

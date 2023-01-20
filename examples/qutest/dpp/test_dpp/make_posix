@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QUTEST; QP/C++ on POSIX *Target*
-# Last Updated for Version: 7.2.0
-# Date of the Last Update:  2022-12-21
+# Last Updated for Version: 7.3.0
+# Date of the Last Update:  2023-09-04
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -81,7 +81,6 @@ C_SRCS :=
 # C++ source files...
 CPP_SRCS := \
 	bsp.cpp \
-	main.cpp \
 	philo.cpp \
 	table.cpp \
 	test_dpp.cpp
@@ -192,7 +191,7 @@ all : $(TARGET_EXE) run
 endif
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-	$(CPP) $(CPPFLAGS) $(QPCPP)/include/qstamp.cpp -o $(BIN_DIR)/qstamp.o
+	$(CPP) $(CPPFLAGS) $(QPCPP)/src/qs/qstamp.cpp -o $(BIN_DIR)/qstamp.o
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
 
 # run the test fixture on a POSIX target in a loop, so that it is re-started

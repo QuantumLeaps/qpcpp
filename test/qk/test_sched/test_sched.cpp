@@ -78,7 +78,7 @@ Q_STATE_DEF(ObjB, active) {
             break;
         }
         case TEST1_SIG: {
-            static QP::QEvt const t2 = { TEST2_SIG, 0U, 0U };
+            static QP::QEvt const t2(TEST2_SIG);
             BSP::trace(this, "TEST1 1of2");
             QActive::PUBLISH(&t2, this);
             BSP::trace(this, "TEST1 2of2");

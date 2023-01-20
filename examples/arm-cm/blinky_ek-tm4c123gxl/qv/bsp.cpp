@@ -1,13 +1,13 @@
 //============================================================================
-// Product: "Blinky" example, EK-TM4C123GXL board, cooperative Vanilla kernel
-// Last updated for version 6.9.1
-// Last updated on  2020-09-21
+// Blinky example, EK-TM4C123GXL board, QV kernel
+// Last updated for: @ref qpcpp_7_3_0
+// Last updated on  2023-08-24
 //
-//                    Q u a n t u m  L e a P s
-//                    ------------------------
-//                    Modern Embedded Software
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,15 +25,15 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#include "qpcpp.hpp"
-#include "blinky.hpp"
-#include "bsp.hpp"
+#include "qpcpp.hpp"             // QP/C++ real-time embedded framework
+#include "blinky.hpp"            // Blinky Application interface
+#include "bsp.hpp"               // Board Support Package
 
 #include "TM4C123GH6PM.h"        // the device specific header (TI)
 #include "rom.h"                 // the built-in ROM functions (TI)
@@ -45,118 +45,189 @@
     #error Simple Blinky Application does not provide Spy build configuration
 #endif
 
+namespace { // unnamed local namespace
+
 //Q_DEFINE_THIS_FILE
 
-// Local-scope objects -------------------------------------------------------
-#define LED_RED     (1U << 1)
-#define LED_GREEN   (1U << 3)
-#define LED_BLUE    (1U << 2)
+} // unnamed local namespace
 
-#define BTN_SW1     (1U << 4)
-#define BTN_SW2     (1U << 0)
+// Local-scope defines -------------------------------------------------------
+#define LED_RED     (1U << 1U)
+#define LED_GREEN   (1U << 3U)
+#define LED_BLUE    (1U << 2U)
 
-// ISRs used in this project =================================================
+#define BTN_SW1     (1U << 4U)
+#define BTN_SW2     (1U << 0U)
+
+//============================================================================
+// Error handler and ISRs...
+
 extern "C" {
+
+Q_NORETURN Q_onError(char const * const module, int_t const id) {
+    // for debugging and MUST be changed for deployment of the application
+    // (assuming that you ship your production code with assertions enabled).
+    Q_UNUSED_PAR(module);
+    Q_UNUSED_PAR(id);
+    QS_ASSERTION(module, id, 10000U);
+
+#ifndef NDEBUG
+    // light up all LEDs
+    GPIOF_AHB->DATA_Bits[LED_GREEN | LED_RED | LED_BLUE] = 0xFFU;
+    // for debugging, hang on in an endless loop...
+    for (;;) {
+    }
+#endif
+
+    NVIC_SystemReset();
+}
+//............................................................................
+void assert_failed(char const * const module, int_t const id); // prototype
+void assert_failed(char const * const module, int_t const id) {
+    Q_onError(module, id);
+}
 
 //............................................................................
 void SysTick_Handler(void); // prototype
 void SysTick_Handler(void) {
-    QTimeEvt::TICK_X(0U, nullptr); // process time events for rate 0
+    QP::QTimeEvt::TICK_X(0U, nullptr); // process time events at rate 0
 }
 
 } // extern "C"
 
-// BSP functions =============================================================
-void BSP_init(void) {
-    // NOTE: SystemInit() already called from the startup code
-    //  but SystemCoreClock needs to be updated
-    //
+//============================================================================
+namespace BSP {
+
+void init() {
+    // Configure the MPU to prevent NULL-pointer dereferencing ...
+    MPU->RBAR = 0x0U                          // base address (NULL)
+                | MPU_RBAR_VALID_Msk          // valid region
+                | (MPU_RBAR_REGION_Msk & 7U); // region #7
+    MPU->RASR = (7U << MPU_RASR_SIZE_Pos)     // 2^(7+1) region
+                | (0x0U << MPU_RASR_AP_Pos)   // no-access region
+                | MPU_RASR_ENABLE_Msk;        // region enable
+    MPU->CTRL = MPU_CTRL_PRIVDEFENA_Msk       // enable background region
+                | MPU_CTRL_ENABLE_Msk;        // enable the MPU
+    __ISB();
+    __DSB();
+
+    // enable the MemManage_Handler for MPU exception
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+
+    // NOTE: SystemInit() has been already called from the startup code
+    // but SystemCoreClock needs to be updated
     SystemCoreClockUpdate();
 
     // NOTE: The VFP (hardware Floating Point) unit is configured by QV
 
     // enable clock for to the peripherals used by this application...
-    SYSCTL->RCGCGPIO |= (1U << 5); // enable Run mode for GPIOF
+    SYSCTL->RCGCGPIO  |= (1U << 5U); // enable Run mode for GPIOF
+    SYSCTL->GPIOHBCTL |= (1U << 5U); // enable AHB for GPIOF
+    __ISB();
+    __DSB();
 
-    // configure the LEDs and push buttons
-    GPIOF->DIR |= (LED_RED | LED_GREEN | LED_BLUE); // set direction: output
-    GPIOF->DEN |= (LED_RED | LED_GREEN | LED_BLUE); // digital enable
-    GPIOF->DATA_Bits[LED_RED]   = 0U;  // turn the LED off
-    GPIOF->DATA_Bits[LED_GREEN] = 0U;  // turn the LED off
-    GPIOF->DATA_Bits[LED_BLUE]  = 0U;  // turn the LED off
+    // configure LEDs (digital output)
+    GPIOF_AHB->DIR |= (LED_RED | LED_BLUE | LED_GREEN);
+    GPIOF_AHB->DEN |= (LED_RED | LED_BLUE | LED_GREEN);
+    GPIOF_AHB->DATA_Bits[LED_RED | LED_BLUE | LED_GREEN] = 0U;
 
-    // configure the Buttons
-    GPIOF->DIR &= ~(BTN_SW1 | BTN_SW2); //  set direction: input
-    ROM_GPIOPadConfigSet(GPIOF_BASE, (BTN_SW1 | BTN_SW2),
-                         GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    // configure switches...
+
+    // unlock access to the SW2 pin because it is PROTECTED
+    GPIOF_AHB->LOCK = 0x4C4F434BU; // unlock GPIOCR register for SW2
+    // commit the write (cast const away)
+    *(uint32_t volatile *)&GPIOF_AHB->CR = 0x01U;
+
+    GPIOF_AHB->DIR &= ~(BTN_SW1 | BTN_SW2); // input
+    GPIOF_AHB->DEN |= (BTN_SW1 | BTN_SW2); // digital enable
+    GPIOF_AHB->PUR |= (BTN_SW1 | BTN_SW2); // pull-up resistor enable
+
+    *(uint32_t volatile *)&GPIOF_AHB->CR = 0x00U;
+    GPIOF_AHB->LOCK = 0x0; // lock GPIOCR register for SW2
 }
 //............................................................................
-void BSP_ledOff(void) {
-    GPIOF->DATA_Bits[LED_GREEN] = 0U;
+void start() {
+    // initialize event pools
+    static QF_MPOOL_EL(QP::QEvt) smlPoolSto[200];
+    QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+    // initialize publish-subscribe
+    static QP::QSubscrList subscrSto[APP::MAX_PUB_SIG];
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
+
+    // instantiate and start AOs/threads...
+
+    static QP::QEvt const *blinkyQueueSto[10];
+    APP::AO_Blinky->start(
+        1U,                         // QP prio. of the AO
+        blinkyQueueSto,             // event queue storage
+        Q_DIM(blinkyQueueSto),      // queue length [events]
+        nullptr, 0U,                // no stack storage
+        nullptr);                   // no initialization param
 }
 //............................................................................
-void BSP_ledOn(void) {
-    // exercise the FPU with some floating point computations
-    float volatile x = 3.1415926F;
-    x = x + 2.7182818F;
-
-    GPIOF->DATA_Bits[LED_GREEN] = 0xFFU;
+void ledOn() {
+    GPIOF_AHB->DATA_Bits[LED_RED] = 0xFFU;
+}
+//............................................................................
+void ledOff() {
+    GPIOF_AHB->DATA_Bits[LED_RED] = 0x00U;
+}
+//............................................................................
+void terminate(int16_t result) {
+    Q_UNUSED_PAR(result);
 }
 
+} // namespace BSP
 
-// QF callbacks ==============================================================
-void QF::onStartup(void) {
+//============================================================================
+namespace QP {
+
+void QF::onStartup() {
     // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
+    SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
 
-    // assing all priority bits for preemption-prio. and none to sub-prio.
+    // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
-    // set priorities of ALL ISRs used in the system, see NOTE00
-    //
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-    // DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-    //
+    // set priorities of ALL ISRs used in the system, see NOTE1
     NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI);
     // ...
 
     // enable IRQs...
 }
 //............................................................................
-void QF::onCleanup(void) {
+void QF::onCleanup() {
 }
 //............................................................................
-void QV::onIdle(void) { // CATION: called with interrupts DISABLED, NOTE01
+void QV::onIdle() { // CATION: called with interrupts DISABLED, NOTE0
 
-    // toggle LED2 on and then off, see NOTE01
-    GPIOF->DATA_Bits[LED_BLUE] = 0xFFU;
-    GPIOF->DATA_Bits[LED_BLUE] = 0x00U;
+    // toggle the User LED on and then off, see NOTE2
+    GPIOF_AHB->DATA_Bits[LED_BLUE] = 0xFFU;  // turn the Blue LED on
+    GPIOF_AHB->DATA_Bits[LED_BLUE] = 0U;     // turn the Blue LED off
 
 #ifdef NDEBUG
     // Put the CPU and peripherals to the low-power mode.
     // you might need to customize the clock management for your application,
-    // see the datasheet for your particular Cortex-M3 MCU.
+    // see the datasheet for your particular Cortex-M MCU.
     //
-    QV_CPU_SLEEP();  // atomically go to sleep and enable interrupts
+    QV_CPU_SLEEP(); // atomically go to sleep and enable interrupts
 #else
     QF_INT_ENABLE(); // just enable interrupts
 #endif
 }
 
-//............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
-    //
-    // NOTE: add here your application-specific error handling
-    //
-    (void)module;
-    (void)loc;
-    QS_ASSERTION(module, loc, 10000U);
-    NVIC_SystemReset();
-}
+
+} // namespace QP
 
 //============================================================================
-// NOTE00:
+// NOTE0:
+// The QV::onIdle() callback is called with interrupts disabled, because the
+// determination of the idle condition might change by any interrupt posting
+// an event. QV::onIdle() must internally enable interrupts, ideally
+// atomically with putting the CPU to the power-saving mode.
+//
+// NOTE1:
 // The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
 // ISR priority that is disabled by the QF framework. The value is suitable
 // for the NVIC_SetPriority() CMSIS function.
@@ -173,13 +244,7 @@ extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
 // by which a "QF-unaware" ISR can communicate with the QF framework is by
 // triggering a "QF-aware" ISR, which can post/publish events.
 //
-// NOTE01:
-// The QV::onIdle() callback is called with interrupts disabled, because the
-// determination of the idle condition might change by any interrupt posting
-// an event. QV::onIdle() must internally enable interrupts, ideally
-// atomically with putting the CPU to the power-saving mode.
-//
-// NOTE02:
+// NOTE2:
 // One of the LEDs is used to visualize the idle loop activity. The brightness
 // of the LED is proportional to the frequency of invcations of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt

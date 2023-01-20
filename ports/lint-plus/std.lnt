@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for version: 7.0.1
+//! @date Last updated on: 2023-08-08
+//! @version Last updated for version: 7.3.0
 //!
 //! @file
 //! @brief PC-Lint-Plus standard option file
@@ -43,7 +43,3 @@
 -restore_at_end // don't let -e<nn> options bleed to other files
 -summary()      // produce a summary of all produced messages
 
-// globally supress the following warning:
--e546           // explicitly taking address of function
--e717           // monocarpic do-while used to group statements
--e3412          // class has virtual functions but non-virtual destructor

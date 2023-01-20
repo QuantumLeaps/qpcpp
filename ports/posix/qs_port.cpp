@@ -22,11 +22,11 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2023-08-20
+//! @version Last updated for: @ref qpcpp_7_3_0
 //!
 //! @file
-//! @brief QS/C++ port to POSIX API
+//! @brief QS/C++ port to POSIX
 
 // expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
 #define _POSIX_C_SOURCE 200809L
@@ -35,12 +35,12 @@
     #error "Q_SPY must be defined to compile qs_port.cpp"
 #endif // Q_SPY
 
-#define QP_IMPL         // this is QP implementation
-#include "qf_port.hpp"  // QF port
-#include "qassert.h"    // QP embedded systems-friendly assertions
-#include "qs_port.hpp"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qp_port.hpp"      // QP port
+#include "qsafe.h"          // QP Functional Safety (FuSa) Subsystem
+#include "qs_port.hpp"      // QS port
 
-#include "safe_std.h" // portable "safe" <stdio.h>/<string.h> facilities
+#include "safe_std.h"       // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -54,12 +54,12 @@
 #define QS_TX_SIZE     (8*1024)
 #define QS_RX_SIZE     (2*1024)
 #define QS_TX_CHUNK    QS_TX_SIZE
-#define QS_TIMEOUT_MS  10
+#define QS_TIMEOUT_MS  10L
 
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR   -1
 
-namespace QP {
+namespace { // unnamed local namespace
 
 //DEFINE_THIS_MODULE("qs_port")
 
@@ -67,10 +67,21 @@ namespace QP {
 static int l_sock = INVALID_SOCKET;
 static struct timespec const c_timeout = { 0, QS_TIMEOUT_MS*1000000L };
 
+
+} // unnamed local namespace
+
+//============================================================================
+namespace QP {
+
 //............................................................................
 bool QS::onStartup(void const *arg) {
+
     static uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
+    initBuf(qsBuf, sizeof(qsBuf));
+
     static uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+
     char hostName[128];
     char const *serviceName = "6601";   // default QSPY server port
     char const *src;
@@ -81,10 +92,6 @@ bool QS::onStartup(void const *arg) {
     struct addrinfo *rp = NULL;
     struct addrinfo hints;
     int sockopt_bool;
-
-    // initialize the QS transmit and receive buffers
-    initBuf(qsBuf, sizeof(qsBuf));
-    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     // extract hostName from 'arg' (hostName:port_remote)...
     src = (arg != nullptr)
@@ -103,8 +110,6 @@ bool QS::onStartup(void const *arg) {
     if (*src == ':') {
         serviceName = src + 1;
     }
-    //PRINTF_S("<TARGET> Connecting to QSPY on Host=%s:%s...\n",
-    //         hostName, serviceName);
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -114,7 +119,7 @@ bool QS::onStartup(void const *arg) {
     if (status != 0) {
         FPRINTF_S(stderr,
             "<TARGET> ERROR   cannot resolve host Name=%s:%s,Err=%d\n",
-            hostName, serviceName, status);
+                    hostName, serviceName, status);
         goto error;
     }
 
@@ -153,7 +158,7 @@ bool QS::onStartup(void const *arg) {
     if (fcntl(l_sock, F_SETFL, status | O_NONBLOCK) != 0) {
         FPRINTF_S(stderr, "<TARGET> ERROR   Failed to set non-blocking socket "
             "errno=%d\n", errno);
-        QS_EXIT();
+        QF::stop(); // <== stop and exit the application
         goto error;
     }
 
@@ -164,18 +169,15 @@ bool QS::onStartup(void const *arg) {
     sockopt_bool = 0; // negative option
     setsockopt(l_sock, SOL_SOCKET, SO_LINGER,
                &sockopt_bool, sizeof(sockopt_bool));
-
-    //PRINTF_S("<TARGET> Connected to QSPY at Host=%s:%d\n",
-    //         hostName, port_remote);
     onFlush();
 
-    return true;  // success
+    return true; // success
 
 error:
     return false; // failure
 }
 //............................................................................
-void QS::onCleanup(void) {
+void QS::onCleanup() {
     if (l_sock != INVALID_SOCKET) {
         close(l_sock);
         l_sock = INVALID_SOCKET;
@@ -183,38 +185,38 @@ void QS::onCleanup(void) {
     //PRINTF_S("%s\n", "<TARGET> Disconnected from QSPY");
 }
 //............................................................................
-void QS::onReset(void) {
+void QS::onReset() {
     onCleanup();
+    //PRINTF_S("\n%s\n", "QS_onReset");
     exit(0);
 }
 //............................................................................
-void QS::onFlush(void) {
-    uint16_t nBytes;
-    uint8_t const *data;
-    QS_CRIT_STAT_
-
+void QS::onFlush() {
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
-        FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
+        FPRINTF_S(stderr, "<TARGET> ERROR   %s\n",
+                  "invalid TCP socket");
+        QF::stop(); // <== stop and exit the application
         return;
     }
 
-    nBytes = QS_TX_CHUNK;
-    QS_CRIT_E_();
-    while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
-        QS_CRIT_X_();
+    QS_CRIT_STAT
+    QS_CRIT_ENTRY();
+    std::uint16_t nBytes = QS_TX_CHUNK;
+    std::uint8_t const *data;
+    while ((data = getBlock(&nBytes)) != nullptr) {
+        QS_CRIT_EXIT();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
                 if ((errno == EWOULDBLOCK) || (errno == EAGAIN)) {
                     // sleep for the timeout and then loop back
                     // to send() the SAME data again
-                    //
                     nanosleep(&c_timeout, NULL);
                 }
                 else { // some other socket error...
-                    FPRINTF_S(stderr,
-                        "<TARGET> ERROR   sending data over TCP,errno=%d\n",
-                        errno);
+                    FPRINTF_S(stderr, "<TARGET> ERROR   sending data over TCP,"
+                           "errno=%d\n", errno);
+                    QF::stop(); // <== stop and exit the application
                     return;
                 }
             }
@@ -225,54 +227,54 @@ void QS::onFlush(void) {
                 nBytes -= (uint16_t)nSent;
             }
             else {
-                break;
+                break; // break out of the for-ever loop
             }
         }
         // set nBytes for the next call to QS::getBlock()
         nBytes = QS_TX_CHUNK;
-        QS_CRIT_E_();
+        QS_CRIT_ENTRY();
     }
-    QS_CRIT_X_();
+    QS_CRIT_EXIT();
 }
 //............................................................................
-QSTimeCtr QS::onGetTime(void) {
+QSTimeCtr QS::onGetTime() {
     struct timespec tspec;
-    QSTimeCtr time;
     clock_gettime(CLOCK_MONOTONIC_RAW, &tspec);
 
     // convert to units of 0.1 microsecond
-    time = (QSTimeCtr)(tspec.tv_sec * 10000000 + tspec.tv_nsec / 100);
+    QSTimeCtr time = (QSTimeCtr)(tspec.tv_sec * 10000000 + tspec.tv_nsec / 100);
     return time;
 }
 
 //............................................................................
-void QS::doOutput(void) {
-    uint16_t nBytes;
-    uint8_t const *data;
-
+void QS::doOutput() {
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
-        FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
+        FPRINTF_S(stderr, "<TARGET> ERROR   %s\n",
+                  "invalid TCP socket");
+        QF::stop(); // <== stop and exit the application
         return;
     }
 
-    nBytes = QS_TX_CHUNK;
-    QS_CRIT_STAT_
-    QS_CRIT_E_();
-    if ((data = QS::getBlock(&nBytes)) != (uint8_t *)0) {
-        QS_CRIT_X_();
+    QS_CRIT_STAT
+    QS_CRIT_ENTRY();
+    std::uint16_t nBytes = QS_TX_CHUNK;
+    std::uint8_t const *data = getBlock(&nBytes);
+    QS_CRIT_EXIT();
+
+    if (nBytes > 0U) { // any bytes to send?
         for (;;) { // for-ever until break or return
-            int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
+            int nSent = send(l_sock, reinterpret_cast<char const *>(data),
+                             static_cast<int>(nBytes), 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
                 if ((errno == EWOULDBLOCK) || (errno == EAGAIN)) {
-                    // sleep for timeout and then loop back
+                    // sleep for the timeout and then loop back
                     // to send() the SAME data again
-                    //
                     nanosleep(&c_timeout, NULL);
                 }
                 else { // some other socket error...
-                    FPRINTF_S(stderr,
-                        "<TARGET> ERROR   sending data over TCP,errno=%d\n",
-                        errno);
+                    FPRINTF_S(stderr, "<TARGET> ERROR   sending data over TCP,"
+                           "errno=%d\n", errno);
+                    QF::stop(); // <== stop and exit the application
                     return;
                 }
             }
@@ -283,14 +285,9 @@ void QS::doOutput(void) {
                 nBytes -= (uint16_t)nSent;
             }
             else {
-                break;
+                break; // break out of the for-ever loop
             }
         }
-        // set nBytes for the next call to QS::getBlock()
-        nBytes = QS_TX_CHUNK;
-    }
-    else {
-        QS_CRIT_X_();
     }
 }
 //............................................................................
@@ -305,3 +302,4 @@ void QS::doInput(void) {
 }
 
 } // namespace QP
+

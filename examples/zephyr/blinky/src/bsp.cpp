@@ -1,100 +1,153 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Product: Blinky example, Zephyr RTOS kernel
+// Last updated for: @ref qpcpp_7_3_0
+// Last updated on  2023-08-24
 //
-// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// This software is dual-licensed under the terms of the open source GNU
-// General Public License version 3 (or any later version), or alternatively,
-// under the terms of one of the closed source Quantum Leaps commercial
-// licenses.
+// Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
 //
-// The terms of the open source GNU General Public License version 3
-// can be found at: <www.gnu.org/licenses/gpl-3.0>
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// The terms of the closed source Quantum Leaps commercial licenses
-// can be found at: <www.state-machine.com/licensing>
+// Alternatively, this program may be distributed and modified under the
+// terms of Quantum Leaps commercial licenses, which expressly supersede
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
 //
-// Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
-// <www.state-machine.com>
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-08-25
-//! @version Last updated for: Zephyr 3.1.99 and @ref qpcpp_7_1_0
-//!
-//! @file
-//! @brief BSP for Zephyr, Blinky example
-
-#include "qpcpp.hpp"
-//#include "blinky.hpp"
-#include "bsp.hpp"
+#include "qpcpp.hpp"             // QP/C++ real-time embedded framework
+#include "blinky.hpp"            // Blinky Application interface
+#include "bsp.hpp"               // Board Support Package
 
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/sys/reboot.h>
 // add other drivers if necessary...
 
+// The devicetree node identifier for the "led0" alias.
+#define LED0_NODE DT_ALIAS(led0)
+
 #ifdef Q_SPY
     #error Simple Blinky Application does not provide Spy build configuration
 #endif
 
-namespace {
-    Q_DEFINE_THIS_FILE
-}
+// Local-scope objects -----------------------------------------------------
+namespace { // unnamed local namespace
 
-using namespace QP;
-
-// The devicetree node identifier for the "led0" alias
-#define LED0_NODE DT_ALIAS(led0)
+Q_DEFINE_THIS_FILE // define the name of this file for assertions
 
 static struct gpio_dt_spec const l_led0 = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
-static struct k_timer QF_tick_timer;
+static struct k_timer zephyr_tick_timer;
 
+} // unnamed local namespace
+
+//============================================================================
+// Error handler
+
+extern "C" {
+
+Q_NORETURN Q_onError(char const * const module, int_t const id) {
+    // NOTE: this implementation of the assertion handler is intended only
+    // for debugging and MUST be changed for deployment of the application
+    // (assuming that you ship your production code with assertions enabled).
+    Q_UNUSED_PAR(module);
+    Q_UNUSED_PAR(id);
+    QS_ASSERTION(module, id, 10000U);
+    Q_PRINTK("\nERROR in %s:%d\n", module, id);
+
+#ifndef NDEBUG
+    k_panic(); // debug build: halt the system for error search...
+#else
+    sys_reboot(SYS_REBOOT_COLD); // release build: reboot the system
+#endif
+    for (;;) { // explicitly no-return
+    }
+}
 //............................................................................
-static void QF_tick_function(struct k_timer *tid) {
-    (void)tid; /* unused parameter */
-    QTimeEvt::TICK_X(0U, nullptr);
+void assert_failed(char const * const module, int_t const id); // prototype
+void assert_failed(char const * const module, int_t const id) {
+    Q_onError(module, id);
 }
 
-// BSP functions =============================================================
-void BSP_init(void) {
+//............................................................................
+static void zephyr_tick_function(struct k_timer *tid); // prototype
+static void zephyr_tick_function(struct k_timer *tid) {
+    Q_UNUSED_PAR(tid);
+
+    QP::QTimeEvt::TICK_X(0U, &timerID);
+}
+
+} // extern "C"
+
+//============================================================================
+namespace BSP {
+
+void init() {
     int ret = gpio_pin_configure_dt(&l_led0, GPIO_OUTPUT_ACTIVE);
     Q_ASSERT(ret >= 0);
 
-    k_timer_init(&QF_tick_timer, &QF_tick_function, nullptr);
+    k_timer_init(&zephyr_tick_timer, &zephyr_tick_function, nullptr);
 }
 //............................................................................
-void BSP_ledOff(void) {
-    printk("BSP_ledOn\n");
+void start() {
+    // initialize event pools
+    static QF_MPOOL_EL(QP::QEvt) smlPoolSto[10];
+    QP::QF::poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+    // initialize publish-subscribe
+    static QP::QSubscrList subscrSto[APP::MAX_PUB_SIG];
+    QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
+
+    // start AOs/threads...
+
+    static QP::QEvt const *blinkyQueueSto[10];
+    static K_THREAD_STACK_DEFINE(blinkyStack, 1024);
+    APP::AO_Blinky->start(
+        1U,                         // QP prio. of the AO
+        blinkyQueueSto,             // event queue storage
+        Q_DIM(blinkyQueueSto),      // queue length [events]
+        blinkyStack,                // private stack for embOS
+        K_THREAD_STACK_SIZEOF(blinkyStack), // stack size [Zephyr]
+        nullptr);                   // no initialization param
+}
+//............................................................................
+void ledOn() {
     gpio_pin_set_dt(&l_led0, true);
 }
 //............................................................................
-void BSP_ledOn(void) {
-    printk("BSP_ledOff\n");
+void ledOff() {
     gpio_pin_set_dt(&l_led0, false);
 }
 
-// QF callbacks ==============================================================
-void QF::onStartup(void) {
-    k_timer_start(&QF_tick_timer, K_MSEC(1), K_MSEC(1));
-    printk("QF::onStartup\n");
-}
-//............................................................................
-void QF::onCleanup(void) {
-}
+} // namespace BSP
+
+//============================================================================
+namespace QP {
 
 //............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int_t const loc) {
-    /*
-    * NOTE: add here your application-specific error handling
-    */
-    printk("\nASSERTION in %s:%d\n", module, loc);
-    QS_ASSERTION(module, loc, 10000U); /* report assertion to QS */
-#ifndef NDEBUG
-    k_panic(); /* debug build: halt the system for error search... */
-#else
-    sys_reboot(SYS_REBOOT_COLD); /* release build: reboot the system */
-#endif
+void QF::onStartup() {
+    k_timer_start(&zephyr_tick_timer, K_MSEC(1), K_MSEC(1));
+    Q_PRINTK("QF::onStartup\n");
 }
+//............................................................................
+void QF::onCleanup() {
+    Q_PRINTK("QF::onCleanup\n");
+}
+
+} // namespace QP
+

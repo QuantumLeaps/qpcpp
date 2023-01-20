@@ -52,7 +52,7 @@
     <ClCompile Include="Config\SIMConf.c">
       <Filter>emWin</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\include\qstamp.cpp">
+    <ClCompile Include="..\..\..\src\qs\qstamp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\qf\qep_hsm.cpp">

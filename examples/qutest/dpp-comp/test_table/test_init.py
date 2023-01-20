@@ -5,7 +5,7 @@
 def on_reset():
     expect_pause()
     glb_filter(GRP_ALL)
-    loc_filter(IDS_ALL, -IDS_AP)
+    loc_filter(IDS_ALL, -IDS_AP) # disable records from Philo components
     continue_test()
     expect("@timestamp AO-Subsc Obj=Table::inst,Sig=PAUSE_SIG")
     expect("@timestamp AO-Subsc Obj=Table::inst,Sig=SERVE_SIG")

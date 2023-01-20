@@ -8,9 +8,9 @@
   <Extensions>
     <cExt>*.c</cExt>
     <aExt>*.s*; *.src; *.a*</aExt>
-    <oExt>*.obj</oExt>
+    <oExt>*.obj; *.o</oExt>
     <lExt>*.lib</lExt>
-    <tExt>*.txt; *.h; *.inc</tExt>
+    <tExt>*.txt; *.h; *.inc; *.md</tExt>
     <pExt>*.plm</pExt>
     <CppX>*.cpp</CppX>
     <nMigrate>0</nMigrate>
@@ -103,7 +103,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>8</nTsel>
+        <nTsel>19</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -293,7 +293,7 @@ X0ÂiôîA</Name>
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>8</nTsel>
+        <nTsel>19</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -483,7 +483,7 @@ X0ÂiôîA</Name>
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>8</nTsel>
+        <nTsel>19</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -634,20 +634,20 @@ X0ÂiôîA</Name>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\blinky.h</PathWithFileName>
-      <FilenameWithoutPath>blinky.h</FilenameWithoutPath>
+      <PathWithFileName>..\..\blinky.hpp</PathWithFileName>
+      <FilenameWithoutPath>blinky.hpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>5</FileNumber>
-      <FileType>8</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\include\qstamp.cpp</PathWithFileName>
-      <FilenameWithoutPath>qstamp.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\bsp.hpp</PathWithFileName>
+      <FilenameWithoutPath>bsp.hpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -954,8 +954,8 @@ X0ÂiôîA</Name>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\src\qs\qs_64bit.cpp</PathWithFileName>
-      <FilenameWithoutPath>qs_64bit.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\src\qs\qs_rx.cpp</PathWithFileName>
+      <FilenameWithoutPath>qs_rx.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -966,20 +966,8 @@ X0ÂiôîA</Name>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\src\qs\qs_fp.cpp</PathWithFileName>
-      <FilenameWithoutPath>qs_fp.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>30</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\src\qs\qs_rx.cpp</PathWithFileName>
-      <FilenameWithoutPath>qs_rx.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\src\qs\qstamp.cpp</PathWithFileName>
+      <FilenameWithoutPath>qstamp.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

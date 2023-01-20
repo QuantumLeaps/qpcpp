@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>0</interw>
-            <Optim>7</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>QXK_USE_IRQ_HANDLER=FPUEH_IRQHandler QXK_USE_IRQ_NUM=33</Define>
+              <Define>QP_CONFIG</Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\ports\arm-cm\qxk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\efm32pg1b</IncludePath>
             </VariousControls>
@@ -361,7 +361,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -370,7 +370,7 @@
             <TextAddressRange>0x00000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>dpp-qxk.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--entry Reset_Handler</Misc>
@@ -389,16 +389,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -409,9 +399,19 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>test.cpp</FileName>
+              <FileName>xthread1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\test.cpp</FilePath>
+              <FilePath>..\xthread1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>xthread2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\xthread2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -646,6 +646,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -982,7 +987,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>NDEBUG</Define>
+              <Define>NDEBUG,QP_CONFIG</Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\ports\arm-cm\qxk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\efm32pg1b</IncludePath>
             </VariousControls>
@@ -1006,7 +1011,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -1034,16 +1039,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1054,9 +1049,19 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>test.cpp</FileName>
+              <FileName>xthread1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\test.cpp</FilePath>
+              <FilePath>..\xthread1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>xthread2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\xthread2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1291,6 +1296,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1627,7 +1637,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>Q_SPY</Define>
+              <Define>Q_SPY,QP_CONFIG</Define>
               <Undefine></Undefine>
               <IncludePath>..\..;..\..\..\..\..\include;..\..\..\..\..\ports\arm-cm\qxk\armclang;..\..\..\..\..\3rd_party\CMSIS\Include;..\..\..\..\..\3rd_party\efm32pg1b</IncludePath>
             </VariousControls>
@@ -1651,7 +1661,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -1660,7 +1670,7 @@
             <TextAddressRange>0x00000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>dpp-qxk.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--entry Reset_Handler</Misc>
@@ -1679,16 +1689,6 @@
               <FilePath>..\bsp.cpp</FilePath>
             </File>
             <File>
-              <FileName>qstamp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\include\qstamp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\main.cpp</FilePath>
-            </File>
-            <File>
               <FileName>philo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\philo.cpp</FilePath>
@@ -1699,9 +1699,19 @@
               <FilePath>..\..\table.cpp</FilePath>
             </File>
             <File>
-              <FileName>test.cpp</FileName>
+              <FileName>xthread1.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\test.cpp</FilePath>
+              <FilePath>..\xthread1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>xthread2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\xthread2.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1867,6 +1877,11 @@
               <FileName>qs_rx.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\src\qs\qs_rx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>qstamp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\src\qs\qstamp.cpp</FilePath>
             </File>
           </Files>
         </Group>

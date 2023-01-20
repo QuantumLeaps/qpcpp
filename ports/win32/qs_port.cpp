@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-06-30
-//! @version Last updated for: @ref qpcpp_7_0_1
+//! @date Last updated on: 2023-08-18
+//! @version Last updated for: @ref qpcpp_7_3_0
 //!
 //! @file
 //! @brief QS/C++ port to Win32 API
@@ -33,12 +33,12 @@
     #error "Q_SPY must be defined to compile qs_port.cpp"
 #endif // Q_SPY
 
-#define QP_IMPL         // this is QP implementation
-#include "qf_port.hpp"  // QF port
-#include "qassert.h"    // QP embedded systems-friendly assertions
-#include "qs_port.hpp"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qp_port.hpp"      // QP port
+#include "qsafe.h"          // QP Functional Safety (FuSa) Subsystem
+#include "qs_port.hpp"      // include QS port
 
-#include "safe_std.h"   // portable "safe" <stdio.h>/<string.h> facilities
+#include "safe_std.h"       // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 #include <time.h>
 #include <conio.h>
@@ -200,7 +200,7 @@ void QS::onReset(void) {
 void QS::onFlush(void) {
     uint16_t nBytes;
     uint8_t const *data;
-    QS_CRIT_STAT_
+    QS_CRIT_STAT
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
@@ -208,9 +208,9 @@ void QS::onFlush(void) {
     }
 
     nBytes = QS_TX_CHUNK;
-    QS_CRIT_E_();
+    QS_CRIT_ENTRY();
     while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
-        QS_CRIT_X_();
+        QS_CRIT_EXIT();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
@@ -240,9 +240,9 @@ void QS::onFlush(void) {
         }
         // set nBytes for the next call to QS::getBlock()
         nBytes = QS_TX_CHUNK;
-        QS_CRIT_E_();
+        QS_CRIT_ENTRY();
     }
-    QS_CRIT_X_();
+    QS_CRIT_EXIT();
 }
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {
@@ -255,7 +255,7 @@ QSTimeCtr QS::onGetTime(void) {
 void QS::doOutput(void) {
     uint16_t nBytes;
     uint8_t const *data;
-    QS_CRIT_STAT_
+    QS_CRIT_STAT
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
@@ -263,9 +263,9 @@ void QS::doOutput(void) {
     }
 
     nBytes = QS_TX_CHUNK;
-    QS_CRIT_E_();
+    QS_CRIT_ENTRY();
     if ((data = QS::getBlock(&nBytes)) != (uint8_t *)0) {
-        QS_CRIT_X_();
+        QS_CRIT_EXIT();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
@@ -295,7 +295,7 @@ void QS::doOutput(void) {
         }
     }
     else {
-        QS_CRIT_X_();
+        QS_CRIT_EXIT();
     }
 }
 //............................................................................
