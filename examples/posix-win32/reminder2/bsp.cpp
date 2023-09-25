@@ -57,7 +57,7 @@ void QF::onCleanup(void) {
 void QP::QF::onClockTick(void) {
     QTimeEvt::TICK_X(0U, &l_clock_tick); // perform the QF clock tick processing
     int key = QF::consoleGetKey();
-    if (key != 0) { /* any key pressed? */
+    if (key != 0U) { /* any key pressed? */
         BSP_onKeyboardInput((uint8_t)key);
     }
 }

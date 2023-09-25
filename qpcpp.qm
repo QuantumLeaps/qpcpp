@@ -9825,7 +9825,7 @@ void glbFilter_(std::int_fast16_t const filter) noexcept {
             break;
         case QS_U4_RECORDS:
             if (isRemove) {
-                filt_.glb[15] &amp;= 0x1FU;
+                filt_.glb[15] &amp;= static_cast&lt;std::uint8_t&gt;(~0x1FU &amp; 0xFFU);
             }
             else {
                 filt_.glb[15] |= 0x1FU;
