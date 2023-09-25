@@ -28,7 +28,7 @@
 // <info@state-machine.com>
 //============================================================================
 //! @date Last updated on: 2023-08-16
-//! @version Last updated for: @ref qpc_7_3_0
+//! @version Last updated for: @ref qpcpp_7_3_0
 //!
 //! @file
 //! @brief QS/C++ port to a 32-bit CPU, generic C++ compiler

@@ -113,6 +113,7 @@
 // AUTOSAR Rule A3-3-2 non-private data member within a non-POD structure
 // NOTE: public access needed for extern "C" functions
 -esym(9150,
+ QP::QAsmAttr::*,
  QP::QAsm::*)
 
 // AC++M16-3-2 function-like macro

@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, NUCLEO-C031C6 board, QXK kernel, MPU isolation
-// Last updated for version 7.3.0
-// Last updated on  2023-08-15
+// Last updated for version 7.3.1
+// Last updated on  2023-12-03
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -157,6 +157,7 @@ void EXTI0_1_IRQHandler(void); // prototype
 void EXTI0_1_IRQHandler(void) {
     QXK_ISR_ENTRY();   // inform QXK about entering an ISR
 
+    // for testing..
     static QP::QEvt const testEvt(APP::TEST_SIG);
     APP::AO_Table->POST(&testEvt, &l_EXTI0_1_IRQHandler);
 
@@ -171,7 +172,7 @@ void EXTI0_1_IRQHandler(void) {
 // QXK_ISR_ENTRY/QXK_ISR_EXIT and they cannot post or publish events.
 
 void USART2_IRQHandler(void); // prototype
-void USART2_IRQHandler(void) {
+void USART2_IRQHandler(void) { // used in QS-RX (kernel UNAWARE interrutp)
     // is RX register NOT empty?
     QF_MEM_SYS();
     if ((USART2->ISR & (1U << 5U)) != 0U) {
@@ -238,7 +239,7 @@ constexpr std::uint32_t STACK_SIZE_POW2 {11U};
 
 // Table AO...................................................................
 // size of Table instance, as power-of-2
-constexpr std::uint32_t TABLE_SIZE_POW2 {6};
+constexpr std::uint32_t TABLE_SIZE_POW2 {7U};
 
 __attribute__((aligned((1U << TABLE_SIZE_POW2))))
 static std::uint8_t Table_sto[1U << TABLE_SIZE_POW2];
@@ -270,7 +271,7 @@ static MPU_Region const MPU_Table[3] = {
 
 // Philo AOs..................................................................
 // size of Philo instance, as power-of-2
-constexpr std::uint32_t PHILO_SIZE_POW2 {6};
+constexpr std::uint32_t PHILO_SIZE_POW2 {7U};
 
 __attribute__((aligned((1U << PHILO_SIZE_POW2))))
 static std::uint8_t Philo_sto[APP::N_PHILO][1U << PHILO_SIZE_POW2];
@@ -388,8 +389,8 @@ static MPU_Region const MPU_Philo[APP::N_PHILO][3] = {
 #endif
 
 // XThread1 thread............................................................
-constexpr std::uint32_t XTHREAD1_SIZE_POW2 {9U}; // XThread1 instance + stack
-constexpr std::uint32_t XTHREAD1_STACK_SIZE {448U}; // Thread1 stack size
+constexpr std::uint32_t XTHREAD1_SIZE_POW2  {10U};  // XThread1 instance + stack
+constexpr std::uint32_t XTHREAD1_STACK_SIZE {400U}; // XThread1 stack size
 
 __attribute__((aligned((1U << XTHREAD1_SIZE_POW2))))
 std::uint8_t XThread1_sto[1U << XTHREAD1_SIZE_POW2];
@@ -422,8 +423,8 @@ static MPU_Region const MPU_XThread1[3] = {
 #endif
 
 // XThread2 thread............................................................
-constexpr std::uint32_t XTHREAD2_SIZE_POW2 {9U}; // XThread1 instance + stack
-constexpr std::uint32_t XTHREAD2_STACK_SIZE {448U}; // Thread1 stack size
+constexpr std::uint32_t XTHREAD2_SIZE_POW2  {10U};  // XThread2 instance + stack
+constexpr std::uint32_t XTHREAD2_STACK_SIZE {400U}; // XThread2 stack size
 
 __attribute__((aligned((1U << XTHREAD2_SIZE_POW2))))
 std::uint8_t XThread2_sto[1U << XTHREAD2_SIZE_POW2];
@@ -818,18 +819,7 @@ void QXK::onIdle() {
     // Put the CPU and peripherals to the low-power mode.
     // you might need to customize the clock management for your application,
     // see the datasheet for your particular Cortex-M MCU.
-    //
-    // !!!CAUTION!!!
-    // The WFI instruction stops the CPU clock, which unfortunately disables
-    // the JTAG port, so the ST-Link debugger can no longer connect to the
-    // board. For that reason, the call to __WFI() has to be used with CAUTION.
-    //
-    // NOTE: If you find your board "frozen" like this, strap BOOT0 to VDD and
-    // reset the board, then connect with ST-Link Utilities and erase the part.
-    // The trick with BOOT(0) is it gets the part to run the System Loader
-    // instead of your broken code. When done disconnect BOOT0, and start over.
-    //
-    //__WFI(); // Wait-For-Interrupt
+    __WFI(); // Wait-For-Interrupt
 #endif
 }
 

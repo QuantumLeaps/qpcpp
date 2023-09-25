@@ -212,7 +212,7 @@ std::uint_fast8_t QXK_sched_() noexcept {
                 p = 0U; // no activation needed
             }
         }
-        else { // below the pre-thre
+        else { // below the active prio.
             QXK_priv_.next = nullptr;
             p = 0U; // no activation needed
         }
@@ -399,7 +399,6 @@ namespace QF {
 void init() {
     bzero_(&QF::priv_,                 sizeof(QF::priv_));
     bzero_(&QXK_priv_,                 sizeof(QXK_priv_));
-    bzero_(&QTimeEvt::timeEvtHead_[0], sizeof(QTimeEvt::timeEvtHead_));
     bzero_(&QActive::registry_[0],     sizeof(QActive::registry_));
 
     #ifndef Q_UNSAFE
@@ -449,16 +448,16 @@ int_t run() {
     QF_INT_DISABLE();
     QF_MEM_SYS();
 
+    #ifdef QXK_START
+    QXK_START(); // port-specific startup of the QXK kernel
+    #endif
+
     QXK_priv_.lockCeil = 0U; // unlock the QXK scheduler
 
     // activate AOs to process events posted so far
     if (QXK_sched_() != 0U) {
         QXK_activate_();
     }
-
-    #ifdef QXK_START
-    QXK_START(); // port-specific startup of the QXK kernel
-    #endif
 
     QF_MEM_APP();
     QF_INT_ENABLE();
@@ -497,7 +496,7 @@ void QActive::start(
     QF_CRIT_EXIT();
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-prio.
-    m_pthre = 0U; // preemption-threshold NOT used
+    m_pthre = 0U; // not used
     register_(); // make QF aware of this QActive/QXThread
 
     if (stkSto == nullptr) { // starting basic thread (AO)?

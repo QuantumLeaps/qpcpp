@@ -278,7 +278,7 @@ void QMsm::dispatch(
                     // take the tran-to-XP segment inside submachine
                     static_cast<void>(execTatbl_(tatbl, qs_id));
     #ifdef Q_SPY
-                    m_temp.obj = s; // restore me->temp
+                    m_temp.obj = s; // restore m_temp
     #endif // Q_SPY
                     s = m_state.obj;
                     m_state.obj = tmp.obj; // restore the history

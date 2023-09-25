@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-14
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2023-12-04
+//! @version Last updated for: @ref qpcpp_7_3_1
 //!
 //! @file
 //! @brief QF/C++ port to ThreadX (a.k.a. Azure RTOS), generic C++11 compiler
@@ -131,7 +131,7 @@ void QActive::start(QPrioSpec const prioSpec,
 //............................................................................
 void QActive::setAttr(std::uint32_t const attr1, void const *attr2) {
     // this function must be called before QACTIVE_START(),
-    // which implies that me->thread.tx_thread_name must not be used yet;
+    // which implies that m_thread.tx_thread_name must not be used yet;
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
     Q_REQUIRE_INCRIT(300, m_thread.tx_thread_name == nullptr);

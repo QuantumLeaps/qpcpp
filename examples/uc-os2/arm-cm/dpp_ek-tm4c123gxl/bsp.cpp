@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, EK-TM4C123GXL board, uC-OS2 RTOS kernel
-// Last updated for @ref qpc_7_3_0
-// Last updated on  2023-08-31
+// Last updated for @ref qpcpp_7_3_1
+// Last updated on  2023-12-04
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -283,11 +283,15 @@ void start() {
     QP::QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // start AOs/threads...
+    // NOTE: The QP priorities don't start at 1 because
+    // the lowest priority levels are reserved for the internal
+    // uC-OS2 tasks.
+
     static QP::QEvt const *philoQueueSto[APP::N_PHILO][10];
     static OS_STK philoStack[APP::N_PHILO][128]; // stacks for the Philos
     for (std::uint8_t n = 0U; n < APP::N_PHILO; ++n) {
         APP::AO_Philo[n]->start(
-            n + 3U,                  // QP prio. of the AO
+            Q_PRIO(n + 1U, n + 4U),  // QP-prio., uC-OS2 prio.
             philoQueueSto[n],        // event queue storage
             Q_DIM(philoQueueSto[n]), // queue length [events]
             philoStack[n],           // stack storage
@@ -297,7 +301,7 @@ void start() {
     static QP::QEvt const *tableQueueSto[APP::N_PHILO];
     static OS_STK tableStack[128]; // stack for the Table
     APP::AO_Table->start(
-        APP::N_PHILO + 7U,       // QP prio. of the AO
+        Q_PRIO(APP::N_PHILO + 1U, APP::N_PHILO + 4U), // QP-prio., uC-OS2 prio.
         tableQueueSto,           // event queue storage
         Q_DIM(tableQueueSto),    // queue length [events]
         tableStack,              // stack storage

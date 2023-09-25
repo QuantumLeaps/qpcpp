@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-14
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2023-12-04
+//! @version Last updated for: @ref qpcpp_7_3_1
 //!
 //! @file
 //! @brief QF/C++ port to uC-OS2 RTOS, generic C++11 compiler
@@ -116,7 +116,28 @@ void QActive::start(QPrioSpec const prioSpec,
     QS_FLUSH(); // flush the trace buffer to the host
 
     // map from QP to uC-OS2 priority
-    INT8U const p_ucos = static_cast<INT8U>(QF_MAX_ACTIVE - m_prio);
+    // The uC-OS2 priority of the AO thread can be specificed in two ways:
+    //
+    // 1. Implictily based on the AO's priority (uC-OS2 uses the reverse
+    //    priority numbering scheme than QP). This option is chosen when
+    //    the higher-byte of the prioSpec parameter is set to zero.
+    //
+    // 2. Explicitly as the higher-byte of the prioSpec parameter.
+    //    This option is chosen when the prioSpec parameter is not-zero.
+    //    For example, Q_PRIO(10U, 5U) will explicitly specify AO priority
+    //    as 10 and FreeRTOS priority as 5.
+    //
+    //    NOTE: The explicit uC-OS2 priority is NOT sanity-checked,
+    //    so it is the responsibility of the application to ensure that
+    //    it is consistent witht the AO's priority. An example of
+    //    inconsistent setting would be assigning uC-OS2 priorities that
+    //    would result in a different relative priritization of AO's threads
+    //    than indicated by the AO priorities assigned.
+    //
+    INT8U ucos2_prio = (prioSpec >> 8U);
+    if (ucos2_prio == 0U) {
+        ucos2_prio = (INT8U)(OS_LOWEST_PRIO - m_prio);
+    }
 
     // create AO's task...
     //
@@ -130,17 +151,17 @@ void QActive::start(QPrioSpec const prioSpec,
 #if OS_STK_GROWTH
         &static_cast<OS_STK *>(stkSto)[(stkSize/sizeof(OS_STK)) - 1], // ptos
 #else
-        static_cast<OS_STK *>(stkSto), // ptos
+        static_cast<OS_STK *>(stkSto),  // ptos
 #endif
-        p_ucos,                      // uC-OS2 task priority
-        static_cast<INT16U>(m_prio), // the unique AO priority as task ID
+        ucos2_prio,       // uC-OS2 task priority
+        static_cast<INT16U>(m_prio),    // the unique AO priority as task ID
 #if OS_STK_GROWTH
-        static_cast<OS_STK *>(stkSto), // pbos
+        static_cast<OS_STK *>(stkSto),  // pbos
 #else
         &static_cast<OS_STK *>(stkSto)[(stkSize/sizeof(OS_STK)) - 1], // pbos
 #endif
         static_cast<INT32U>(stkSize/sizeof(OS_STK)), // size in OS_STK units
-        task_name,                 // pext
+        task_name,                      // pext
         static_cast<INT16U>(m_thread)); // task options, see NOTE1
 
     QF_CRIT_ENTRY();
@@ -156,7 +177,7 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
     switch (attr1) {
         case TASK_NAME_ATTR:
            // this function must be called before QACTIVE_START(),
-           // which implies that me->eQueue must not be used yet;
+           // which implies that m_eQueue must not be used yet;
            Q_ASSERT_INCRIT(300, m_eQueue == nullptr);
            // temporarily store the name, cast 'const' away
            m_eQueue = static_cast<OS_EVENT *>(

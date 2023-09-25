@@ -44,11 +44,11 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION     730U
-#define QP_VERSION_STR "7.3.0"
+#define QP_VERSION     731U
+#define QP_VERSION_STR "7.3.1"
 
-//! Encrypted  current QP release (7.3.0) and date (2023-09-12)
-#define QP_RELEASE     0x765D9D25U
+//! Encrypted  current QP release (7.3.1) and date (2023-12-05)
+#define QP_RELEASE     0x7630E7D4U
 
 //============================================================================
 //! @cond INTERNAL
@@ -218,6 +218,7 @@ union QAsmAttr {
 #ifndef Q_UNSAFE
     std::uintptr_t  uint;
 #endif
+    constexpr QAsmAttr() : fun(nullptr) {}
 };
 
 //${QEP::Q_USER_SIG} .........................................................
@@ -270,18 +271,18 @@ public:
     };
 
 protected:
-    explicit QAsm() noexcept    {
-        m_state.fun = nullptr;
-        m_temp.fun  = nullptr;
-    }
+    explicit QAsm() noexcept
+      : m_state(),
+        m_temp ()
+    {}
 
 public:
 
-#ifdef QASM_XTOR
+#ifdef Q_XTOR
     virtual ~QAsm() noexcept {
         // empty
     }
-#endif // def QASM_XTOR
+#endif // def Q_XTOR
     virtual void init(
         void const * const e,
         std::uint_fast8_t const qs_id) = 0;
@@ -723,22 +724,30 @@ namespace QP {
 //${QF::QActive} .............................................................
 class QActive : public QP::QAsm {
 protected:
+    std::uint8_t m_prio;
+    std::uint8_t m_pthre;
 
-#ifdef QACTIVE_EQUEUE_TYPE
-    QACTIVE_EQUEUE_TYPE m_eQueue;
-#endif // def QACTIVE_EQUEUE_TYPE
+#ifdef QACTIVE_THREAD_TYPE
+    QACTIVE_THREAD_TYPE m_thread;
+#endif // def QACTIVE_THREAD_TYPE
 
 #ifdef QACTIVE_OS_OBJ_TYPE
     QACTIVE_OS_OBJ_TYPE m_osObject;
 #endif // def QACTIVE_OS_OBJ_TYPE
 
-#ifdef QACTIVE_THREAD_TYPE
-    QACTIVE_THREAD_TYPE m_thread;
-#endif // def QACTIVE_THREAD_TYPE
-    std::uint8_t m_prio;
-    std::uint8_t m_pthre;
+#ifdef QACTIVE_EQUEUE_TYPE
+    QACTIVE_EQUEUE_TYPE m_eQueue;
+#endif // def QACTIVE_EQUEUE_TYPE
 
 public:
+
+#ifndef Q_UNSAFE
+    std::uint8_t m_prio_dis;
+#endif // ndef Q_UNSAFE
+
+#ifndef Q_UNSAFE
+    std::uint8_t m_pthre_dis;
+#endif // ndef Q_UNSAFE
     static QActive * registry_[QF_MAX_ACTIVE + 1U];
     static QSubscrList * subscrList_;
     static enum_t maxPubSignal_;
@@ -755,7 +764,19 @@ public:
     friend void schedLock();
 
 protected:
-    QActive(QStateHandler const initial) noexcept;
+    explicit QActive(QStateHandler const initial) noexcept
+      : QAsm(),
+        m_prio(0U),
+        m_pthre(0U)
+    {
+        m_state.fun = Q_STATE_CAST(&top);
+        m_temp.fun  = initial;
+
+        #ifndef Q_UNSAFE
+        m_prio_dis  = static_cast<std::uint8_t>(~m_prio);
+        m_pthre_dis = static_cast<std::uint8_t>(~m_pthre);
+        #endif
+    }
 
 public:
     void init(
@@ -819,7 +840,9 @@ public:
         QEQueue * const eq,
         QEvt const * const e) const noexcept;
     bool recall(QEQueue * const eq) noexcept;
-    std::uint_fast16_t flushDeferred(QEQueue * const eq) const noexcept;
+    std::uint_fast16_t flushDeferred(
+        QEQueue * const eq,
+        std::uint_fast16_t const num = 0xFFFFU) const noexcept;
     std::uint_fast8_t getPrio() const noexcept {
         return static_cast<std::uint_fast8_t>(m_prio);
     }
@@ -942,6 +965,10 @@ public:
         QActive * const act,
         QSignal const sig,
         std::uint_fast8_t const tickRate = 0U) noexcept;
+
+#ifdef Q_XTOR
+    ~QTimeEvt();
+#endif // def Q_XTOR
     void armX(
         QTimeEvtCtr const nTicks,
         QTimeEvtCtr const interval = 0U) noexcept;

@@ -83,7 +83,8 @@ LIBS      :=
 
 # defines...
 # QP_API_VERSION controls the QP API compatibility; 9999 means the latest API
-DEFINES   := -DQP_API_VERSION=9999
+DEFINES   := -DQP_API_VERSION=9999 \
+	$(DEF)
 
 ifeq (,$(CONF))
 	CONF := dbg
@@ -129,8 +130,8 @@ else
 
 # NOTE:
 # For POSIX hosts (Linux, MacOS), you can choose:
-# - the single-threaded QP/C++ port (win32-qv) or
-# - the multithreaded QP/C++ port (win32).
+# - the single-threaded QP/C++ port (posix-qv) or
+# - the multithreaded QP/C++ port (posix).
 #
 QP_PORT_DIR := $(QPCPP)/ports/posix-qv
 #QP_PORT_DIR := $(QPCPP)/ports/posix

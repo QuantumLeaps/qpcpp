@@ -37,14 +37,19 @@
 #include "safe_std.h" // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 
-using namespace std;
-using namespace QP;
-
 Q_DEFINE_THIS_FILE
 
 #ifdef Q_SPY
-static uint8_t const l_QF::onClockTick = 0;
+static std::uint8_t const l_QF::onClockTick = 0;
 #endif
+
+//............................................................................
+extern "C" Q_NORETURN Q_onError(char const * const module, int_t const loc) {
+    printf("Assertion failed in %s:%d\n", module, loc);
+    FPRINTF_S(stderr, "Assertion failed in %s:%d", module, loc);
+    QP::QF::onCleanup();
+    exit(-1);
+}
 
 //............................................................................
 void BSP_init(int argc, char * argv[]) {
@@ -61,6 +66,8 @@ void BSP_init(int argc, char * argv[]) {
     QS_GLB_FILTER(-QP::QS_QF_TICK);
 }
 //............................................................................
+namespace QP {
+
 void QF::onStartup(void) {
     QF::setTickRate(BSP_TICKS_PER_SEC, 30); // set the desired tick rate
     QF::consoleSetup();
@@ -70,7 +77,7 @@ void QF::onCleanup(void) {
     QF::consoleCleanup();
 }
 //............................................................................
-void QP::QF::onClockTick(void) {
+void QF::onClockTick(void) {
     QTimeEvt::TICK_X(0U, &l_QF::onClockTick); // perform the QF clock tick processing
 
     QS_RX_INPUT(); // handle the QS-RX input
@@ -81,6 +88,13 @@ void QP::QF::onClockTick(void) {
         BSP_onKeyboardInput((uint8_t)key);
     }
 }
+
+//............................................................................
+#ifdef Q_XTOR
+QP::QTimeEvt::~QTimeEvt() {}
+QP::QEQueue::~QEQueue() {}
+QP::QMPool::~QMPool() {}
+#endif
 
 //----------------------------------------------------------------------------
 #ifdef Q_SPY
@@ -107,11 +121,4 @@ void QS::onCommand(uint8_t cmdId,
 #endif // Q_SPY
 //----------------------------------------------------------------------------
 
-//............................................................................
-extern "C" Q_NORETURN Q_onError(char const * const module, int_t const loc) {
-    printf("Assertion failed in %s:%d\n", module, loc);
-    FPRINTF_S(stderr, "Assertion failed in %s:%d", module, loc);
-    QP::QF::onCleanup();
-    exit(-1);
-}
-
+} // namespace QP

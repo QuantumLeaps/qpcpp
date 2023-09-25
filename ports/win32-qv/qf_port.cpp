@@ -22,8 +22,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-08-21
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2023-11-30
+//! @version Last updated for: @ref qpcpp_7_3_1
 //!
 //! @file
 //! @brief QF/C++ port to Win32 API (single-threaded, like the QV kernel)
@@ -47,7 +47,6 @@ namespace { // unnamed local namespace
 Q_DEFINE_THIS_MODULE("qf_port")
 
 // Local objects =============================================================
-static CRITICAL_SECTION l_win32CritSect;
 static DWORD l_tickMsec = 10U; // clock tick in msec (argument for Sleep())
 static int   l_tickPrio = 50;  // default priority of the "ticker" thread
 static bool  l_isRunning;      // flag indicating when QF is running
@@ -88,32 +87,42 @@ QPSet readySet_;
 QPSet readySet_dis_;
 HANDLE win32Event_; // Win32 event to signal events
 
-//............................................................................
-void init() {
-    readySet_.setEmpty();
-#ifndef Q_UNSAFE
-    readySet_.update_(&readySet_dis_);
-#endif
-
-    InitializeCriticalSection(&l_win32CritSect);
-    win32Event_ = CreateEvent(NULL, FALSE, FALSE, NULL);
-}
+static CRITICAL_SECTION l_win32CritSect;
+static int_t l_critSectNest;   // critical section nesting up-down counter
 
 //............................................................................
 void enterCriticalSection_() {
     if (l_isRunning) {
         EnterCriticalSection(&l_win32CritSect);
+        Q_ASSERT_INCRIT(100, l_critSectNest == 0); // NO nesting of crit.sect!
+        ++l_critSectNest;
     }
 }
 //............................................................................
 void leaveCriticalSection_() {
     if (l_isRunning) {
-        LeaveCriticalSection(&l_win32CritSect);
+        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect. must ballace!
+        if ((--l_critSectNest) == 0) {
+            LeaveCriticalSection(&l_win32CritSect);
+        }
     }
 }
 
 //............................................................................
+void init() {
+    InitializeCriticalSection(&l_win32CritSect);
+    win32Event_ = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+    readySet_.setEmpty();
+#ifndef Q_UNSAFE
+    readySet_.update_(&readySet_dis_);
+#endif
+
+}
+
+//............................................................................
 int run() {
+    l_isRunning = true; // QF is running
 
     onStartup(); // application-specific startup callback
 
@@ -135,9 +144,8 @@ int run() {
     QS_BEGIN_PRE_(QS_QF_RUN, 0U)
     QS_END_PRE_()
 
-    l_isRunning = true; // QF is running
     while (l_isRunning) {
-        Q_ASSERT_INCRIT(200, readySet_.verify_(&readySet_dis_));
+        Q_ASSERT_INCRIT(300, readySet_.verify_(&readySet_dis_));
 
         // find the maximum priority AO ready to run
         if (readySet_.notEmpty()) {
@@ -180,13 +188,19 @@ int run() {
 
     //CloseHandle(win32Event_);
     //DeleteCriticalSection(&l_win32CritSect);
-    //free all "fudged" event pools...
+
     return 0; // return success
 }
 //............................................................................
 void stop() {
-    l_isRunning = false; // terminate the main event-loop thread
-    SetEvent(win32Event_); // unblock the event-loop so it can terminate
+    l_isRunning = false; // this will exit the main event-loop
+
+    // unblock the event-loop so it can terminate
+    readySet_.insert(1U);
+#ifndef Q_UNSAFE
+    readySet_.update_(&readySet_dis_);
+#endif
+    SetEvent(win32Event_);
 }
 //............................................................................
 void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {

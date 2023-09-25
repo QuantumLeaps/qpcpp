@@ -226,7 +226,7 @@
                 </option>
                 <option>
                     <name>CCDefines</name>
-                    <state></state>
+                    <state>STM32L053xx</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1306,6 +1306,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>NDEBUG</state>
+                    <state>STM32L053xx</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -2385,6 +2386,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>Q_SPY</state>
+                    <state>STM32L053xx</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>

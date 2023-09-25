@@ -27,8 +27,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-07
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2023-11-30
+//! @version Last updated for: @ref qpc_7_3_1
 //!
 //! @file
 //! @brief QP/C++ port to Win32 (multithreaded), generic C++11
@@ -99,8 +99,8 @@ int consoleWaitForKey();
 
     // QF scheduler locking for Win32, see NOTE2
     #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) QF::enterCriticalSection_()
-    #define QF_SCHED_UNLOCK_()    QF::leaveCriticalSection_()
+    #define QF_SCHED_LOCK_(dummy) static_cast<void>(0)
+    #define QF_SCHED_UNLOCK_()    static_cast<void>(0)
 
     // QF event queue customization for Win32...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
@@ -171,10 +171,11 @@ int consoleWaitForKey();
 // information.
 //
 // NOTE2:
-// Scheduler locking (used inside QActive::publish_()) is implemented in this
-// port with the main critical section. This means that event multicasting
-// will appear atomic, in the sense that no thread will be able to post
-// events during multicasting.
+// Scheduler locking (used inside QActive_publish_()) is NOT implemented
+// in this port. This means that event multicasting is NOT atomic, so thread
+// preemption CAN happen during that time, especially when a low-priority
+// thread publishes events to higher-priority threads. This can lead to
+// (occasionally) unexpected event sequences.
 //
 
 #endif // QP_PORT_HPP_

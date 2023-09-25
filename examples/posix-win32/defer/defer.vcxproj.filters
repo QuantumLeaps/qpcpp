@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="bsp.cpp" />
+    <ClCompile Include="..\..\..\src\qf\qep_hsm.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qep_msm.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_act.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_actq.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_defer.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_dyn.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_mem.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_ps.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_qact.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_qeq.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_qmact.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qf\qf_time.cpp">
+      <Filter>QP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qs.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qs_64bit.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qs_fp.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qs_rx.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qs\qstamp.cpp">
+      <Filter>QS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ports\win32-qv\qf_port.cpp">
+      <Filter>QP_port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ports\win32-qv\qs_port.cpp">
+      <Filter>QP_port</Filter>
+    </ClCompile>
+    <ClCompile Include="defer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\ports\win32-qv\safe_std.h">
+      <Filter>QP_port</Filter>
+    </ClInclude>
+    <ClInclude Include="bsp.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="QP_port">
+      <UniqueIdentifier>{132373cd-4fbf-4759-b90b-33d062646870}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QS">
+      <UniqueIdentifier>{3782d84c-89fd-4955-b3bb-1a48d8ed5e1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QP">
+      <UniqueIdentifier>{63c2ea15-0007-4619-903e-97d5e7a963d6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\ports\win32-qv\README.md">
+      <Filter>QP_port</Filter>
+    </None>
+  </ItemGroup>
+</Project>

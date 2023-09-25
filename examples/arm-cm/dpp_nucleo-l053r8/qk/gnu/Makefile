@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on STM32 NUCLEO-L053R8, QK kernel, GNU-ARM
-# Last Updated for Version: 7.2.0
-# Date of the Last Update:  2022-12-14
+# Last Updated for Version: 7.3.1
+# Date of the Last Update:  2023-11-13
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -132,10 +132,8 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := \
-	-DQF_ON_CONTEXT_SW \
-	-DQK_USE_IRQ_HANDLER=LCD_IRQHandler \
-	-DQK_USE_IRQ_NUM=30
+DEFINES   := -DSTM32L053xx \
+	-DQF_ON_CONTEXT_SW
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]

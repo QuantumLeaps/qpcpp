@@ -171,7 +171,7 @@ void EXTI0_1_IRQHandler(void) {
 // QK_ISR_ENTRY/QK_ISR_EXIT and they cannot post or publish events.
 
 void USART2_IRQHandler(void); // prototype
-void USART2_IRQHandler(void) {
+void USART2_IRQHandler(void) { // used in QS-RX (kernel UNAWARE interrutp)
     // is RX register NOT empty?
     QF_MEM_SYS();
     if ((USART2->ISR & (1U << 5U)) != 0U) {
@@ -707,7 +707,6 @@ void QK::onIdle() {
     QF_MEM_SYS();
     if ((USART2->ISR & (1U << 7U)) != 0U) { // is TXE empty?
         std::uint16_t b = QS::getByte();
-
         if (b != QS_EOD) {   // not End-Of-Data?
             USART2->TDR = b; // put into the DR register
         }

@@ -114,11 +114,23 @@ if (defer(&amp;m_requestQueue, e)) {
     PRINTF_S(&quot;Request #%d deferred;\n&quot;,
            (int)Q_EVT_CAST(RequestEvt)-&gt;ref_num);
 }
-else {
-    // notify the request sender that his request was denied...
-    PRINTF_S(&quot;Request #%d IGNORED;\n&quot;,
-           (int)Q_EVT_CAST(RequestEvt)-&gt;ref_num);
-}</action>
+else { // deferred queue full
+    // option1: ignore the new request and do nothing here
+
+    // option2:
+    // flush the oldest request to make room for the new one
+    QP::QEvt const *old_evt = m_requestQueue.get(0U);
+    Q_ASSERT(old_evt != nullptr);
+    PRINTF_S(&quot;Previous request #%d DISCARDED;\n&quot;,
+             (int)((RequestEvt*)old_evt)-&gt;ref_num);
+    QP::QF::gc(old_evt); // explicitly recycle old
+
+    // repeat the defer request after making room in the queue
+    if (!defer(&amp;m_requestQueue, e)) {
+        Q_ERROR(); // now it must succeed
+    }
+}
+</action>
       <tran_glyph conn="2,40,3,-1,26">
        <action box="0,-2,24,2"/>
       </tran_glyph>

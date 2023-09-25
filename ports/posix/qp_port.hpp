@@ -27,8 +27,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-07
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2023-11-30
+//! @version Last updated for: @ref qpc_7_3_1
 //!
 //! @file
 //! @brief QP/C++ port to POSIX (multithreaded with P-threads), generic C++11
@@ -96,9 +96,15 @@ int consoleWaitForKey();
     #define QF_SCHED_UNLOCK_()    (static_cast<void>(0))
 
     // QF event queue customization for POSIX...
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == nullptr) \
-            pthread_cond_wait(&(me_)->m_osObject, &QF::critSectMutex_)
+    #define QACTIVE_EQUEUE_WAIT_(me_) do { \
+        while ((me_)->m_eQueue.m_frontEvt == nullptr) { \
+            Q_ASSERT_INCRIT(301, QF::critSectNest_ == 1); \
+            --QF::critSectNest_; \
+            pthread_cond_wait(&(me_)->m_osObject, &QF::critSectMutex_); \
+            Q_ASSERT_INCRIT(302, QF::critSectNest_ == 0); \
+            ++QF::critSectNest_; \
+        } \
+    } while (false)
 
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
         pthread_cond_signal(&(me_)->m_osObject)
@@ -115,6 +121,7 @@ int consoleWaitForKey();
 namespace QP {
 namespace QF {
     extern pthread_mutex_t critSectMutex_;
+    extern int_t critSectNest_;
 } // namespace QF
 } // namespace QP
 

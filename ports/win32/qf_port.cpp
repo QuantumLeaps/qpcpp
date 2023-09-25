@@ -22,8 +22,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-08-21
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2023-11-30
+//! @version Last updated for: @ref qpcpp_7_3_1
 //!
 //! @file
 //! @brief QF/C++ port to Win32 (multithreaded)
@@ -47,7 +47,6 @@ namespace { // unnamed local namespace
 Q_DEFINE_THIS_MODULE("qf_port")
 
 // Local objects =============================================================
-static CRITICAL_SECTION l_win32CritSect;
 static CRITICAL_SECTION l_startupCritSect;
 static DWORD l_tickMsec = 10U; // clock tick in msec (argument for Sleep())
 static int   l_tickPrio = 50;  // default priority of the "ticker" thread
@@ -66,6 +65,27 @@ static DWORD WINAPI ao_thread(LPVOID me) {
 namespace QP {
 namespace QF {
 
+static CRITICAL_SECTION l_win32CritSect;
+static int_t l_critSectNest;   // critical section nesting up-down counter
+
+//............................................................................
+void enterCriticalSection_() {
+    if (l_isRunning) {
+        EnterCriticalSection(&l_win32CritSect);
+        Q_ASSERT_INCRIT(100, l_critSectNest == 0); // NO nesting of crit.sect!
+        ++l_critSectNest;
+    }
+}
+//............................................................................
+void leaveCriticalSection_() {
+    if (l_isRunning) {
+        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect. must ballace!
+        if ((--l_critSectNest) == 0) {
+            LeaveCriticalSection(&l_win32CritSect);
+        }
+    }
+}
+
 //............................................................................
 void init() {
     InitializeCriticalSection(&l_win32CritSect);
@@ -76,22 +96,6 @@ void init() {
     EnterCriticalSection(&l_startupCritSect);
 }
 
-//............................................................................
-void enterCriticalSection_() {
-    if (l_isRunning) {
-        EnterCriticalSection(&l_win32CritSect);
-    }
-}
-//............................................................................
-void leaveCriticalSection_() {
-    if (l_isRunning) {
-        LeaveCriticalSection(&l_win32CritSect);
-    }
-}
-//............................................................................
-void stop() {
-    l_isRunning = false; // terminate the main (ticker) thread
-}
 //............................................................................
 int run() {
 
@@ -131,11 +135,16 @@ int run() {
     return 0; // return success
 }
 //............................................................................
+void stop() {
+    l_isRunning = false; // terminate the main (ticker) thread
+}
+//............................................................................
 void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
     Q_REQUIRE_ID(600, ticksPerSec != 0U);
     l_tickMsec = 1000UL / ticksPerSec;
     l_tickPrio = tickPrio;
 }
+
 //............................................................................
 void consoleSetup() {
 }

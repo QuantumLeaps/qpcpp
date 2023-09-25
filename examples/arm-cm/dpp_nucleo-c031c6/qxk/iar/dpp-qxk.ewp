@@ -3249,12 +3249,6 @@
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\dpp.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\main.cpp</name>
         </file>
         <file>

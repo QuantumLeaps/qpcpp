@@ -75,6 +75,59 @@ namespace QV {
 //${QV::QV-base::priv_} ......................................................
 QV::Attr priv_;
 
+//${QV::QV-base::schedDisable} ...............................................
+void schedDisable(std::uint_fast8_t const ceiling) {
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    QF_MEM_SYS();
+
+    Q_ASSERT_INCRIT(102, priv_.schedCeil
+        == static_cast<std::uint_fast8_t>(~priv_.schedCeil_dis));
+
+    if (ceiling > priv_.schedCeil) { // raising the scheduler ceiling?
+
+        QS_BEGIN_PRE_(QS_SCHED_LOCK, 0U)
+            QS_TIME_PRE_();   // timestamp
+            // the previous sched ceiling & new sched ceiling
+            QS_2U8_PRE_(static_cast<std::uint8_t>(priv_.schedCeil),
+                        static_cast<std::uint8_t>(ceiling));
+        QS_END_PRE_()
+
+        priv_.schedCeil = ceiling;
+    #ifndef Q_UNSAFE
+        priv_.schedCeil_dis = static_cast<std::uint_fast16_t>(~ceiling);
+    #endif
+    }
+    QF_MEM_APP();
+    QF_CRIT_EXIT();
+}
+
+//${QV::QV-base::schedEnable} ................................................
+void schedEnable() {
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    QF_MEM_SYS();
+
+    Q_ASSERT_INCRIT(202, priv_.schedCeil
+        == static_cast<std::uint_fast8_t>(~priv_.schedCeil_dis));
+
+    if (priv_.schedCeil != 0U) { // actually enabling the scheduler?
+
+        QS_BEGIN_PRE_(QS_SCHED_UNLOCK, 0U)
+            QS_TIME_PRE_(); // timestamp
+            // current sched ceiling (old), previous sched ceiling (new)
+            QS_2U8_PRE_(static_cast<std::uint8_t>(priv_.schedCeil), 0U);
+        QS_END_PRE_()
+
+        priv_.schedCeil = 0U;
+    #ifndef Q_UNSAFE
+        priv_.schedCeil_dis = ~static_cast<std::uint_fast16_t>(0U);
+    #endif
+    }
+    QF_MEM_APP();
+    QF_CRIT_EXIT();
+}
+
 } // namespace QV
 } // namespace QP
 //$enddef${QV::QV-base} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -87,11 +140,11 @@ namespace QF {
 void init() {
     bzero_(&QF::priv_,                 sizeof(QF::priv_));
     bzero_(&QV::priv_,                 sizeof(QV::priv_));
-    bzero_(&QTimeEvt::timeEvtHead_[0], sizeof(QTimeEvt::timeEvtHead_));
     bzero_(&QActive::registry_[0],     sizeof(QActive::registry_));
 
     #ifndef Q_UNSAFE
     QV::priv_.readySet.update_(&QV::priv_.readySet_dis);
+    QV::priv_.schedCeil_dis = ~static_cast<std::uint_fast16_t>(0U);
     #endif
 
     #ifdef QV_INIT
@@ -115,7 +168,7 @@ int_t run() {
     QS::endRec_();
     QF_MEM_APP();
     QF_INT_ENABLE();
-    #endif
+    #endif // Q_SPY
 
     onStartup(); // application-specific startup callback
 
@@ -132,19 +185,26 @@ int_t run() {
 
     for (;;) { // QV event loop...
 
-         // check internal integrity (duplicate inverse storage)
-         Q_ASSERT_INCRIT(202,
+        // check internal integrity (duplicate inverse storage)
+        Q_ASSERT_INCRIT(302,
              QV::priv_.readySet.verify_(&QV::priv_.readySet_dis));
+        // check internal integrity (duplicate inverse storage)
+        Q_ASSERT_INCRIT(303, QV::priv_.schedCeil
+            == static_cast<std::uint_fast8_t>(~QV::priv_.schedCeil_dis));
 
         // find the maximum prio. AO ready to run
-        if (QV::priv_.readySet.notEmpty()) {
-            std::uint_fast8_t const p = QV::priv_.readySet.findMax();
+        std::uint_fast8_t const p = (QV::priv_.readySet.notEmpty()
+                               ? QV::priv_.readySet.findMax()
+                               : 0U);
+
+        if (p > QV::priv_.schedCeil) { // is it above the sched ceiling?
             QActive * const a = QActive::registry_[p];
 
     #if (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
             QS_BEGIN_PRE_(QS_SCHED_NEXT, p)
                 QS_TIME_PRE_();        // timestamp
-                QS_2U8_PRE_(p, pprev); // scheduled prio & previous prio
+                QS_2U8_PRE_(static_cast<std::uint8_t>(p),
+                            static_cast<std::uint8_t>(pprev));
             QS_END_PRE_()
 
     #ifdef QF_ON_CONTEXT_SW
@@ -182,7 +242,7 @@ int_t run() {
             if (pprev != 0U) {
                 QS_BEGIN_PRE_(QS_SCHED_IDLE, pprev)
                     QS_TIME_PRE_();    // timestamp
-                    QS_U8_PRE_(pprev); // previous prio
+                    QS_U8_PRE_(static_cast<std::uint8_t>(pprev));
                 QS_END_PRE_()
 
     #ifdef QF_ON_CONTEXT_SW
@@ -241,7 +301,7 @@ void QActive::start(
     QF_CRIT_EXIT();
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); //  QF-prio.
-    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // preemption-thre.
+    m_pthre = 0U; // not used
     register_(); // make QF aware of this AO
 
     m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO

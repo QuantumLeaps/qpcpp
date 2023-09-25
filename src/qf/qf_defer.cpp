@@ -158,17 +158,24 @@ bool QActive::recall(QEQueue * const eq) noexcept {
 namespace QP {
 
 //${QF::QActive::flushDeferred} ..............................................
-std::uint_fast16_t QActive::flushDeferred(QEQueue * const eq) const noexcept {
+std::uint_fast16_t QActive::flushDeferred(
+    QEQueue * const eq,
+    std::uint_fast16_t const num) const noexcept
+{
     std::uint_fast16_t n = 0U;
-    for (QEvt const *e = eq->get(m_prio);
-         e != nullptr;
-         e = eq->get(m_prio))
-    {
-        ++n; // count the flushed event
+    while (n < num) {
+        QEvt const *e = eq->get(m_prio);
+        if (e != nullptr) {
+            ++n; // count one more flushed event
     #if (QF_MAX_EPOOL > 0U)
-        QF::gc(e); // garbage collect
+            QF::gc(e); // garbage collect
     #endif
+        }
+        else {
+            break;
+        }
     }
+
     return n;
 }
 

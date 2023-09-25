@@ -102,12 +102,8 @@ void poolInit(
         obj_name[7] = static_cast<std::uint8_t>(
             static_cast<std::uint8_t>('0')
             + static_cast<std::uint8_t>(poolId + 1U));
-        QS_CRIT_ENTRY();
-        QS_MEM_SYS();
         QS::obj_dict_pre_(&priv_.ePool_[poolId],
                           reinterpret_cast<char *>(&obj_name[0]));
-        QS_MEM_APP();
-        QS_CRIT_EXIT();
     }
     #endif // Q_SPY
 }

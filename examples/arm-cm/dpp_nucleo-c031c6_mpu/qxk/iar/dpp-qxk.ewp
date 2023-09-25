@@ -78,7 +78,7 @@
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
@@ -146,7 +146,7 @@
                 </option>
                 <option>
                     <name>OgLibHeap</name>
-                    <state>0</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>OGLibAdditionalLocale</name>
@@ -226,6 +226,7 @@
                 </option>
                 <option>
                     <name>CCDefines</name>
+                    <state>QF_MEM_ISOLATE</state>
                     <state>STM32C031xx</state>
                 </option>
                 <option>
@@ -1306,6 +1307,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>NDEBUG</state>
+                    <state>QF_MEM_ISOLATE</state>
                     <state>STM32C031xx</state>
                 </option>
                 <option>
@@ -2386,6 +2388,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>Q_SPY</state>
+                    <state>QF_MEM_ISOLATE</state>
                     <state>STM32C031xx</state>
                 </option>
                 <option>
@@ -3244,12 +3247,6 @@
         <name>Application</name>
         <file>
             <name>$PROJ_DIR$\..\bsp.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\dpp.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\main.cpp</name>

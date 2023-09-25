@@ -285,11 +285,13 @@ void QTimeEvt::tick(
     Q_UNUSED_PAR(sender);
     #endif
 
-    QTimeEvt *prev = &timeEvtHead_[tickRate];
-
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
     QF_MEM_SYS();
+
+    Q_REQUIRE_INCRIT(100, tickRate < Q_DIM(timeEvtHead_));
+
+    QTimeEvt *prev = &timeEvtHead_[tickRate];
 
     QS_BEGIN_PRE_(QS_QF_TICK, 0U)
         prev->m_ctr = (prev->m_ctr + 1U);
@@ -298,10 +300,11 @@ void QTimeEvt::tick(
     QS_END_PRE_()
 
     // scan the linked-list of time events at this rate...
-    for (;;) {
-        QTimeEvt *t = prev->m_next; // advance down the time evt. list
+    std::uint_fast8_t limit = 2U*QF_MAX_ACTIVE; // iteration hard limit
+    for (; limit > 0U; --limit) {
+        QTimeEvt *e = prev->m_next; // advance down the time evt. list
 
-        if (t == nullptr) { // end of the list?
+        if (e == nullptr) { // end of the list?
 
             // any new time events armed since the last run of tick()?
             if (timeEvtHead_[tickRate].m_act != nullptr) {
@@ -310,17 +313,20 @@ void QTimeEvt::tick(
                 Q_ASSERT_INCRIT(110, prev != nullptr);
                 prev->m_next = timeEvtHead_[tickRate].toTimeEvt();
                 timeEvtHead_[tickRate].m_act = nullptr;
-                t = prev->m_next; // switch to the new list
+                e = prev->m_next; // switch to the new list
             }
-            else {
-                break; // all currently armed time evts. processed
+            else { // all currently armed time events are processed
+                break; // terminate the for-loop
             }
         }
 
-        if (t->m_ctr == 0U) { // time event scheduled for removal?
-            prev->m_next = t->m_next;
-            // mark time event 't' as NOT linked
-            t->refCtr_ = static_cast<std::uint8_t>(t->refCtr_
+        // the time event 'e' must be valid
+        Q_ASSERT_INCRIT(112, QEvt::verify_(e));
+
+        if (e->m_ctr == 0U) { // time event scheduled for removal?
+            prev->m_next = e->m_next;
+            // mark time event 'e' as NOT linked
+            e->refCtr_ = static_cast<std::uint8_t>(e->refCtr_
                 & static_cast<std::uint8_t>(~TE_IS_LINKED));
             // do NOT advance the prev pointer
             QF_MEM_APP();
@@ -337,25 +343,25 @@ void QTimeEvt::tick(
             QF_CRIT_EXIT_NOP();
         }
         else {
-            t->m_ctr = (t->m_ctr - 1U);
+            e->m_ctr = (e->m_ctr - 1U);
 
-            if (t->m_ctr == 0U) { // is time evt about to expire?
-                QActive * const act = t->toActive();
+            if (e->m_ctr == 0U) { // is time evt about to expire?
+                QActive * const act = e->toActive();
 
-                if (t->m_interval != 0U) { // periodic time evt?
-                    t->m_ctr = t->m_interval; // rearm the time event
-                    prev = t; // advance to this time event
+                if (e->m_interval != 0U) { // periodic time evt?
+                    e->m_ctr = e->m_interval; // rearm the time event
+                    prev = e; // advance to this time event
                 }
                 else { // one-shot time event: automatically disarm
-                    prev->m_next = t->m_next;
+                    prev->m_next = e->m_next;
 
-                    // mark time event 't' as NOT linked
-                    t->refCtr_ = static_cast<std::uint8_t>(t->refCtr_
+                    // mark time event 'e' as NOT linked
+                    e->refCtr_ = static_cast<std::uint8_t>(e->refCtr_
                         & static_cast<std::uint8_t>(~TE_IS_LINKED));
                     // do NOT advance the prev pointer
 
                     QS_BEGIN_PRE_(QS_QF_TIMEEVT_AUTO_DISARM, act->m_prio)
-                        QS_OBJ_PRE_(t);        // this time event object
+                        QS_OBJ_PRE_(e);        // this time event object
                         QS_OBJ_PRE_(act);      // the target AO
                         QS_U8_PRE_(tickRate);  // tick rate
                     QS_END_PRE_()
@@ -363,33 +369,35 @@ void QTimeEvt::tick(
 
                 QS_BEGIN_PRE_(QS_QF_TIMEEVT_POST, act->m_prio)
                     QS_TIME_PRE_();            // timestamp
-                    QS_OBJ_PRE_(t);            // the time event object
-                    QS_SIG_PRE_(t->sig);       // signal of this time event
+                    QS_OBJ_PRE_(e);            // the time event object
+                    QS_SIG_PRE_(e->sig);       // signal of this time event
                     QS_OBJ_PRE_(act);          // the target AO
                     QS_U8_PRE_(tickRate);      // tick rate
                 QS_END_PRE_()
 
     #ifdef QXK_HPP_
-                if (t->sig < Q_USER_SIG) {
+                if (e->sig < Q_USER_SIG) {
                     QXThread::timeout_(act);
+                    QF_MEM_APP();
+                    QF_CRIT_EXIT();
                 }
                 else {
                     QF_MEM_APP();
                     QF_CRIT_EXIT(); // exit crit. section before posting
 
                     // act->POST() asserts if the queue overflows
-                    act->POST(t, sender);
+                    act->POST(e, sender);
                 }
     #else
                 QF_MEM_APP();
                 QF_CRIT_EXIT(); // exit crit. section before posting
 
                 // act->POST() asserts if the queue overflows
-                act->POST(t, sender);
+                act->POST(e, sender);
     #endif
             }
             else {
-                prev = t; // advance to this time event
+                prev = e; // advance to this time event
 
                 QF_MEM_APP();
                 QF_CRIT_EXIT(); // exit crit. section to reduce latency
@@ -402,6 +410,7 @@ void QTimeEvt::tick(
         QF_MEM_SYS();
     }
 
+    Q_ENSURE_INCRIT(190, limit > 0U);
     QF_MEM_APP();
     QF_CRIT_EXIT();
 }

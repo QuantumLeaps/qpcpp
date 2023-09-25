@@ -164,7 +164,9 @@ void QActive::publish_(
 
         QF_SCHED_STAT_
         QF_SCHED_LOCK_(p); // lock the scheduler up to AO's prio
+        std::uint_fast8_t limit = QF_MAX_ACTIVE + 1U;
         do { // loop over all subscribers
+            --limit;
 
             // POST() asserts internally if the queue overflows
             a->POST(e, sender);
@@ -186,7 +188,12 @@ void QActive::publish_(
             else {
                 p = 0U; // no more subscribers
             }
-        } while (p != 0U);
+        } while ((p != 0U) && (limit > 0U));
+
+        QF_CRIT_ENTRY();
+        Q_ENSURE_INCRIT(290, p == 0U);
+        QF_CRIT_EXIT();
+
         QF_SCHED_UNLOCK_(); // unlock the scheduler
     }
 

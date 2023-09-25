@@ -89,7 +89,10 @@ bool QActive::post_(
     QF_CRIT_ENTRY();
     QF_MEM_SYS();
 
-    Q_REQUIRE_INCRIT(102, QEvt::verify_(e));
+    #ifndef Q_UNSAFE
+    std::uint8_t const pcopy = static_cast<std::uint8_t>(~m_prio_dis);
+    Q_REQUIRE_INCRIT(102, (QEvt::verify_(e)) && (m_prio == pcopy));
+    #endif
 
     QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into temporary
 
@@ -191,7 +194,7 @@ bool QActive::post_(
     #ifdef Q_UTEST
         // callback to examine the posted event under the same conditions
         // as producing the #QS_QF_ACTIVE_POST trace record, which are:
-        // the local filter for this AO ('me->prio') is set
+        // the local filter for this AO ('m_prio') is set
         if (QS_LOC_CHECK_(m_prio)) {
             QS::onTestPost(sender, this, e, status);
         }
@@ -229,7 +232,10 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_ENTRY();
     QF_MEM_SYS();
 
-    Q_REQUIRE_INCRIT(202, QEvt::verify_(e));
+    #ifndef Q_UNSAFE
+    std::uint8_t const pcopy = static_cast<std::uint8_t>(~m_prio_dis);
+    Q_REQUIRE_INCRIT(202, (QEvt::verify_(e)) && (m_prio == pcopy));
+    #endif
 
     #ifdef QXK_HPP_
     Q_REQUIRE_INCRIT(200, m_state.act != Q_ACTION_CAST(0));

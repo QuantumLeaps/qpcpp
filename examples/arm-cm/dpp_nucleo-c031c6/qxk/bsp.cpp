@@ -121,11 +121,11 @@ void SysTick_Handler(void) {
 
     if ((tmp & (1U << B1_PIN)) != 0U) { // debounced B1 state changed?
         if ((current & (1U << B1_PIN)) != 0U) { // is B1 depressed?
-            static QP::QEvt const pauseEvt(APP::PAUSE_SIG);
+            static QP::QEvt const pauseEvt { APP::PAUSE_SIG };
             QP::QActive::PUBLISH(&pauseEvt, &l_SysTick_Handler);
         }
         else { // the button is released
-            static QP::QEvt const serveEvt(APP::SERVE_SIG);
+            static QP::QEvt const serveEvt { APP::SERVE_SIG };
             QP::QActive::PUBLISH(&serveEvt, &l_SysTick_Handler);
         }
     }
@@ -144,7 +144,7 @@ void EXTI0_1_IRQHandler(void) {
     QXK_ISR_ENTRY();   // inform QXK about entering an ISR
 
     // for testing..
-    static QP::QEvt const testEvt(APP::TEST_SIG);
+    static QP::QEvt const testEvt { APP::TEST_SIG };
     APP::AO_Table->POST(&testEvt, &l_EXTI0_1_IRQHandler);
 
     QXK_ISR_EXIT();  // inform QXK about exiting an ISR

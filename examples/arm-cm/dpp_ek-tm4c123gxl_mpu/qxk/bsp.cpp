@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, EK-TM4C123GXL board, QXK kernel, MPU isolation
-// Last updated for version 7.3.0
-// Last updated on  2023-08-15
+// Last updated for version 7.3.1
+// Last updated on  2023-12-04
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -160,6 +160,7 @@ void GPIOPortA_IRQHandler(void); // prototype
 void GPIOPortA_IRQHandler(void) {
     QXK_ISR_ENTRY();   // inform QXK about entering an ISR
 
+    // for testing..
     static QP::QEvt const testEvt(APP::TEST_SIG);
     APP::AO_Table->POST(&testEvt, &l_GPIOPortA_IRQHandler);
 
@@ -244,7 +245,7 @@ constexpr std::uint32_t STACK_SIZE_POW2 {11U};
 
 // Table AO...................................................................
 // size of Table instance, as power-of-2
-constexpr std::uint32_t TABLE_SIZE_POW2 {6};
+constexpr std::uint32_t TABLE_SIZE_POW2 {7U};
 
 __attribute__((aligned((1U << TABLE_SIZE_POW2))))
 static std::uint8_t Table_sto[1U << TABLE_SIZE_POW2];
@@ -276,7 +277,7 @@ static MPU_Region const MPU_Table[3] = {
 
 // Philo AOs..................................................................
 // size of Philo instance, as power-of-2
-constexpr std::uint32_t PHILO_SIZE_POW2 {6};
+constexpr std::uint32_t PHILO_SIZE_POW2 {7U};
 
 __attribute__((aligned((1U << PHILO_SIZE_POW2))))
 static std::uint8_t Philo_sto[APP::N_PHILO][1U << PHILO_SIZE_POW2];
@@ -394,8 +395,8 @@ static MPU_Region const MPU_Philo[APP::N_PHILO][3] = {
 #endif
 
 // XThread1 thread............................................................
-constexpr std::uint32_t XTHREAD1_SIZE_POW2 {10U}; // XThread1 instance + stack
-constexpr std::uint32_t XTHREAD1_STACK_SIZE {896U}; // Thread1 stack size
+constexpr std::uint32_t XTHREAD1_SIZE_POW2  {10U};  // XThread1 instance + stack
+constexpr std::uint32_t XTHREAD1_STACK_SIZE {880U}; // Thread1 stack size
 
 __attribute__((aligned((1U << XTHREAD1_SIZE_POW2))))
 std::uint8_t XThread1_sto[1U << XTHREAD1_SIZE_POW2];
@@ -428,8 +429,8 @@ static MPU_Region const MPU_XThread1[3] = {
 #endif
 
 // Thread2 thread.............................................................
-constexpr std::uint32_t XTHREAD2_SIZE_POW2 {10U}; // XThread2 instance + stack
-constexpr std::uint32_t XTHREAD2_STACK_SIZE {896U}; // XThread2 stack size
+constexpr std::uint32_t XTHREAD2_SIZE_POW2  {10U};  // XThread2 instance + stack
+constexpr std::uint32_t XTHREAD2_STACK_SIZE {880U}; // XThread2 stack size
 
 __attribute__((aligned((1U << XTHREAD2_SIZE_POW2))))
 std::uint8_t XThread2_sto[1U << XTHREAD2_SIZE_POW2];

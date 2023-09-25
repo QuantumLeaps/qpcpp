@@ -51,14 +51,25 @@ namespace QV {
 class Attr {
 public:
     QPSet readySet;
+    std::uint_fast8_t schedCeil;
 
 #ifndef Q_UNSAFE
     QPSet readySet_dis;
+#endif // ndef Q_UNSAFE
+
+#ifndef Q_UNSAFE
+    std::uint_fast8_t schedCeil_dis;
 #endif // ndef Q_UNSAFE
 }; // class Attr
 
 //${QV::QV-base::priv_} ......................................................
 extern QV::Attr priv_;
+
+//${QV::QV-base::schedDisable} ...............................................
+void schedDisable(std::uint_fast8_t const ceiling);
+
+//${QV::QV-base::schedEnable} ................................................
+void schedEnable();
 
 //${QV::QV-base::onIdle} .....................................................
 void onIdle();

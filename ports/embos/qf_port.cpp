@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-14
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2023-12-04
+//! @version Last updated for: @ref qpcpp_7_3_1
 //!
 //! @file
 //! @brief QF/C++ port to embOS RTOS kernel, generic C++11 compiler
@@ -134,6 +134,29 @@ void QActive::start(QPrioSpec const prioSpec,
     init(par, m_prio);
     QS_FLUSH(); // flush the trace buffer to the host
 
+    // The embOS priority of the AO thread can be specificed in two ways:
+    //
+    // 1. Implictily based on the AO's priority (embOS uses the same
+    //    priority numbering scheme as QP). This option is chosen when
+    //    the higher-byte of the prioSpec parameter is set to zero.
+    //
+    // 2. Explicitly as the higher-byte of the prioSpec parameter.
+    //    This option is chosen when the prioSpec parameter is not-zero.
+    //    For example, Q_PRIO(10U, 5U) will explicitly specify AO priority
+    //    as 10 and embOS priority as 5.
+    //
+    //    NOTE: The explicit embOS priority is NOT sanity-checked,
+    //    so it is the responsibility of the application to ensure that
+    //    it is consistent witht the AO's priority. An example of
+    //    inconsistent setting would be assigning embOS priorities that
+    //    would result in a different relative priritization of AO's threads
+    //    than indicated by the AO priorities assigned.
+    //
+    OS_PRIO embos_prio = (prioSpec >> 8U);
+    if (embos_prio == 0U) {
+        embos_prio = m_prio;
+    }
+
     // create an embOS task for the AO
     OS_TASK_CreateEx(&m_thread,
 #if (OS_TRACKNAME != 0)
@@ -141,7 +164,7 @@ void QActive::start(QPrioSpec const prioSpec,
 #elif
                     "AO",          // a generic AO task name
 #endif
-        static_cast<OS_PRIO>(m_prio), // embOS uses same numbering as QP
+        embos_prio,                // embOS priority
         &thread_function,
         static_cast<void OS_STACKPTR *>(stkSto),
         static_cast<OS_UINT>(stkSize),

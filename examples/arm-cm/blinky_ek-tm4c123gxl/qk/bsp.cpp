@@ -1,6 +1,6 @@
 //============================================================================
 // Blinky example, EK-TM4C123GXL board, QK kernel
-// Last updated for: @ref qpc_7_3_0
+// Last updated for: @ref qpcpp_7_3_0
 // Last updated on  2023-08-24
 //
 //                   Q u a n t u m  L e a P s

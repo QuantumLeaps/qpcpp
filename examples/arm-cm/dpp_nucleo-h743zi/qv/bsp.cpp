@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, NUCLEO-H743ZI board, QV kernel
-// Last updated for version 7.3.0
-// Last updated on  2023-08-15
+// Last updated for version 7.3.1
+// Last updated on  2023-11-30
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -193,10 +193,6 @@ void init() {
     // enable the MemManage_Handler for MPU exception
     SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
 
-    // NOTE: SystemInit() has been already called from the startup code
-    // but SystemCoreClock needs to be updated
-    SystemCoreClockUpdate();
-
     SCB_EnableICache(); // Enable I-Cache
     SCB_EnableDCache(); // Enable D-Cache
 
@@ -330,19 +326,17 @@ namespace QP {
 
 // QF callbacks...
 void QF::onStartup() {
-    // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
+    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
+    SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
 
     // assign all priority bits for preemption-prio. and none to sub-prio.
     // NOTE: this might have been changed by STM32Cube.
     NVIC_SetPriorityGrouping(0U);
 
-    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
-
     // set priorities of ALL ISRs used in the system, see NOTE1
     NVIC_SetPriority(USART3_IRQn,    0U); // kernel UNAWARE interrupt
-    NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 1U);
+    NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 0U);
     // ...
 
     // enable IRQs...
@@ -358,6 +352,12 @@ void QV::onIdle() { // CAUTION: called with interrupts DISABLED, see NOTE0
     // toggle an LED on and then off (not enough LEDs, see NOTE02)
     BSP_LED_On (LED3);
     BSP_LED_Off(LED3);
+
+    // Some floating point code is to exercise the VFP...
+    QF_INT_ENABLE();
+    double volatile x = 1.73205;
+    x = x * 1.73205;
+    QF_INT_DISABLE();
 
 #ifdef Q_SPY
     // interrupts still disabled
@@ -487,8 +487,8 @@ void onCommand(std::uint8_t cmdId, std::uint32_t param1,
 //
 // Only ISRs prioritized at or below the QF_AWARE_ISR_CMSIS_PRI level (i.e.,
 // with the numerical values of priorities equal or higher than
-// QF_AWARE_ISR_CMSIS_PRI) are allowed to call the QV_ISR_ENTRY/QV_ISR_ENTRY
-// macros or any other QF services. These ISRs are "QF-aware".
+// QF_AWARE_ISR_CMSIS_PRI) are allowed to call any QF services. These ISRs
+// are "QF-aware".
 //
 // Conversely, any ISRs prioritized above the QF_AWARE_ISR_CMSIS_PRI priority
 // level (i.e., with the numerical values of priorities less than
@@ -499,8 +499,14 @@ void onCommand(std::uint8_t cmdId, std::uint32_t param1,
 // triggering a "QF-aware" ISR, which can post/publish events.
 //
 // NOTE2:
+// The QV_onIdle() callback is called with interrupts disabled, because the
+// determination of the idle condition might change by any interrupt posting
+// an event. QV_onIdle() must internally enable interrupts, ideally
+// atomically with putting the CPU to the power-saving mode.
+//
+// NOTE3:
 // The User LED is used to visualize the idle loop activity. The brightness
-// of the LED is proportional to the frequency of the idle loop.
+// of the LED is proportional to the frequency of invcations of the idle loop.
 // Please note that the LED is toggled with interrupts locked, so no interrupt
 // execution time contributes to the brightness of the User LED.
 //

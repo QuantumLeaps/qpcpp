@@ -118,6 +118,10 @@ public:
         m_nFree(0U),
         m_nMin(0U)
     {}
+
+#ifdef Q_XTOR
+    ~QMPool();
+#endif // def Q_XTOR
     void init(
         void * const poolSto,
         std::uint_fast32_t const poolSize,

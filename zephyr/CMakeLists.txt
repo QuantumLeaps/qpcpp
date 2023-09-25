@@ -20,7 +20,7 @@ target_include_directories(app PUBLIC
 zephyr_library_sources(
  ${QPCPP_DIR}/src/qf/qep_hsm.cpp
  ${QPCPP_DIR}/src/qf/qep_msm.cpp
- ${QPCPP_DIR}/src/qf/qf_qact.cpp
+ ${QPCPP_DIR}/src/qf/qf_act.cpp
  ${QPCPP_DIR}/src/qf/qf_defer.cpp
  ${QPCPP_DIR}/src/qf/qf_dyn.cpp
  ${QPCPP_DIR}/src/qf/qf_mem.cpp

@@ -51,10 +51,19 @@ enum ReminderSignals {
 class ReminderEvt : public QP::QEvt {
 public:
     std::uint32_t iter;
+
+public:
+
+#ifdef QEVT_DYN_CTOR
+    explicit ReminderEvt(std::uint32_t i) noexcept
+      : QEvt(QP::QEvt::DYNAMIC),
+        iter(i)
+    {}
+#endif // def QEVT_DYN_CTOR
 }; // class ReminderEvt
 //$enddecl${Events::ReminderEvt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-// Active object class -----------------------------------------------------..
+// Active object class -------------------------------------------------------
 //$declare${Components::Cruncher} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 //${Components::Cruncher} ....................................................
@@ -90,7 +99,7 @@ protected:
 //${Components::Cruncher::SM} ................................................
 Q_STATE_DEF(Cruncher, initial) {
     //${Components::Cruncher::SM::initial}
-    (void)e; // unused parameter
+    Q_UNUSED_PAR(e);
 
     QS_FUN_DICTIONARY(&Cruncher::processing);
     QS_FUN_DICTIONARY(&Cruncher::final);
@@ -104,8 +113,13 @@ Q_STATE_DEF(Cruncher, processing) {
     switch (e->sig) {
         //${Components::Cruncher::SM::processing}
         case Q_ENTRY_SIG: {
+            #ifdef QEVT_DYN_CTOR
+            ReminderEvt *reminder = Q_NEW(ReminderEvt, CRUNCH_SIG, 0U);
+            #else
             ReminderEvt *reminder = Q_NEW(ReminderEvt, CRUNCH_SIG);
-            reminder->iter = 0;
+            reminder->iter = 0U;
+            #endif
+
             POST(reminder, this);
             m_sum = 0.0;
             status_ = Q_RET_HANDLED;
@@ -113,22 +127,27 @@ Q_STATE_DEF(Cruncher, processing) {
         }
         //${Components::Cruncher::SM::processing::CRUNCH}
         case CRUNCH_SIG: {
-            uint32_t i = Q_EVT_CAST(ReminderEvt)->iter;
-            uint32_t n = i;
+            std::uint32_t i = Q_EVT_CAST(ReminderEvt)->iter;
+            std::uint32_t n = i;
             i += 100U;
             for (; n < i; ++n) {
                 if ((n & 1) == 0) {
-                    m_sum += 1.0/(2*n + 1);
+                    m_sum += 1.0/(2U*n + 1U);
                 }
                 else {
-                    m_sum -= 1.0/(2*n + 1);
+                    m_sum -= 1.0/(2U*n + 1U);
                 }
             }
             //${Components::Cruncher::SM::processing::CRUNCH::[i<0x07000000U]}
             if (i < 0x07000000U) {
+                #ifdef QEVT_DYN_CTOR
+                ReminderEvt *reminder = Q_NEW(ReminderEvt, CRUNCH_SIG, i);
+                #else
                 ReminderEvt *reminder = Q_NEW(ReminderEvt, CRUNCH_SIG);
                 reminder->iter = i;
-                POST(reminder, me);
+                #endif
+
+                POST(reminder, this);
                 status_ = Q_RET_HANDLED;
             }
             //${Components::Cruncher::SM::processing::CRUNCH::[else]}
@@ -189,7 +208,7 @@ int main(int argc, char *argv[]) {
     PRINTF_S("Reminder state pattern\nQP version: %s\n"
            "Press 'e' to echo the current value...\n"
            "Press ESC to quit...\n",
-           QP::versionStr);
+           QP_VERSION_STR);
 
     BSP_init(argc, argv); // initialize the BSP
     QF::init(); // initialize the framework and the underlying RT kernel
@@ -210,14 +229,24 @@ int main(int argc, char *argv[]) {
 void BSP_onKeyboardInput(uint8_t key) {
     switch (key) {
         case 'e': {
-            static QEvt const echoEvt(ECHO_SIG);
-            l_cruncher.POST(&echoEvt, nullptr);
+            // NOTE:
+            // The following Q_NEW_X() allocation might potentially fail
+            // but this is acceptable becasue the "ECHO" event is not
+            // considered critical. This code illustrates the Q_NEW_X()
+            // API and its use.
+            #ifdef QEVT_DYN_CTOR
+            QEvt const *echoEvt = Q_NEW_X(QEvt, 2U, ECHO_SIG, QEvt::DYNAMIC);
+            #else
+            QEvt const *echoEvt = Q_NEW_X(QEvt, 2U, ECHO_SIG);
+            #endif
+            if (echoEvt != nullptr) { // event allocated successfully?
+                l_cruncher.POST(echoEvt, nullptr);
+            }
             break;
         }
         case '\033': { // ESC pressed?
             // NOTE: this constant event is statically pre-allocated.
             // It can be posted/published as any other event.
-            //
             static QEvt const terminateEvt(TERMINATE_SIG);
             l_cruncher.POST(&terminateEvt, nullptr);
             break;

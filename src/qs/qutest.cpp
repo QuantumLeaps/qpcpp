@@ -519,7 +519,7 @@ bool QActiveDummy::fakePost(
 
     // callback to examine the posted event under the same conditions
     // as producing the #QS_QF_ACTIVE_POST trace record, which are:
-    // the local filter for this AO ('me->prio') is set
+    // the local filter for this AO ('m_prio') is set
     if (QS_LOC_CHECK_(m_prio)) {
         QS::onTestPost(sender, this, e, status);
     }
@@ -564,7 +564,7 @@ void QActiveDummy::fakePostLIFO(QEvt const * const e) noexcept {
 
     // callback to examine the posted event under the same conditions
     // as producing the #QS_QF_ACTIVE_POST trace record, which are:
-    // the local filter for this AO ('me->prio') is set
+    // the local filter for this AO ('m_prio') is set
     if (QS_LOC_CHECK_(m_prio)) {
         QS::onTestPost(nullptr, this, e, true);
     }

@@ -47,7 +47,7 @@
 namespace QP {
 
 //${QK::QSchedStatus} ........................................................
-using QSchedStatus = std::uint_fast16_t;
+using QSchedStatus = std::uint_fast8_t;
 
 } // namespace QP
 //$enddecl${QK::QSchedStatus} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -60,7 +60,7 @@ namespace QK {
 QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept;
 
 //${QK::QK-base::schedUnlock} ................................................
-void schedUnlock(QSchedStatus const stat) noexcept;
+void schedUnlock(QSchedStatus const prevCeil) noexcept;
 
 //${QK::QK-base::onIdle} .....................................................
 void onIdle();
@@ -76,16 +76,31 @@ extern "C" {
 class QK_Attr {
 public:
     QP::QPSet readySet;
+    std::uint_fast8_t actPrio;
+    std::uint_fast8_t nextPrio;
+    std::uint_fast8_t actThre;
+    std::uint_fast8_t lockCeil;
+    std::uint_fast8_t intNest;
 
 #ifndef Q_UNSAFE
     QP::QPSet readySet_dis;
 #endif // ndef Q_UNSAFE
-    std::uint_fast8_t volatile actPrio;
-    std::uint_fast8_t volatile nextPrio;
-    std::uint_fast8_t volatile actThre;
-    std::uint_fast8_t volatile lockCeil;
-    std::uint_fast8_t volatile lockHolder;
-    std::uint_fast8_t volatile intNest;
+
+#ifndef Q_UNSAFE
+    std::uint_fast8_t actPrio_dis;
+#endif // ndef Q_UNSAFE
+
+#ifndef Q_UNSAFE
+    std::uint_fast8_t nextPrio_dis;
+#endif // ndef Q_UNSAFE
+
+#ifndef Q_UNSAFE
+    std::uint_fast8_t actThre_dis;
+#endif // ndef Q_UNSAFE
+
+#ifndef Q_UNSAFE
+    std::uint_fast8_t lockCeil_dis;
+#endif // ndef Q_UNSAFE
 }; // class QK_Attr
 
 //${QK-extern-C::QK_priv_} ...................................................

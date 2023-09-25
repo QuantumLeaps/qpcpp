@@ -66,16 +66,6 @@ Q_DEFINE_THIS_MODULE("qf_qact")
 //$define${QF::QActive::QActive} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 
-//${QF::QActive::QActive} ....................................................
-QActive::QActive(QStateHandler const initial) noexcept
-  : QAsm(),
-    m_prio(0U),
-    m_pthre(0U)
-{
-    m_state.fun = Q_STATE_CAST(&top);
-    m_temp.fun  = initial;
-}
-
 } // namespace QP
 //$enddef${QF::QActive::QActive} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -119,6 +109,10 @@ void QActive::register_() noexcept {
 
     Q_ASSERT_INCRIT(190, (prev_thre <= m_pthre)
                           && (m_pthre <= next_thre));
+
+    m_prio_dis  = static_cast<std::uint8_t>(~m_prio);
+    m_pthre_dis = static_cast<std::uint8_t>(~m_pthre);
+
     #endif // Q_UNSAFE
 
     // register the AO at the QF-prio.

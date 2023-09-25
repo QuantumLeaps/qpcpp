@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, NUCLEO-H743ZI board, QK kernel
-// Last updated for version 7.3.0
-// Last updated on  2023-08-15
+// Last updated for version 7.3.1
+// Last updated on  2023-11-29
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -145,8 +145,8 @@ void SysTick_Handler(void) {
 #ifdef Q_SPY
 // ISR for receiving bytes from the QSPY Back-End
 // NOTE: This ISR is "QF-unaware" meaning that it does not interact with
-// the QF/QK and is not disabled. Such ISRs don't need to call
-// QK_ISR_ENTRY/QK_ISR_EXIT and they cannot post or publish events.
+// the QF/QK and is not disabled. Such ISRs don't need to call QK_ISR_ENTRY/
+// QK_ISR_EXIT and they cannot post or publish events.
 
 void USART3_IRQHandler(void); // prototype
 void USART3_IRQHandler(void) {
@@ -194,10 +194,6 @@ void init() {
     // enable the MemManage_Handler for MPU exception
     SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
 
-    // NOTE: SystemInit() has been already called from the startup code
-    // but SystemCoreClock needs to be updated
-    SystemCoreClockUpdate();
-
     SCB_EnableICache(); // Enable I-Cache
     SCB_EnableDCache(); // Enable D-Cache
 
@@ -231,7 +227,9 @@ void init() {
 
     // setup the QS filters...
     QS_GLB_FILTER(QP::QS_ALL_RECORDS);   // all records
-    QS_GLB_FILTER(-QP::QS_QF_TICK);      // exclude the clock tick
+    QS_GLB_FILTER(-QP::QS_QF_TICK);      // exclude
+    QS_GLB_FILTER(-QP::QS_SCHED_LOCK);   // exclude
+    QS_GLB_FILTER(-QP::QS_SCHED_UNLOCK); // exclude
 }
 //............................................................................
 void start() {
@@ -316,16 +314,16 @@ std::uint32_t random() { // a very cheap pseudo-random-number generator
     return (rnd >> 8U);
 }
 //............................................................................
+void terminate(std::int16_t result) {
+    Q_UNUSED_PAR(result);
+}
+//............................................................................
 void ledOn() {
     BSP_LED_On(LED1);
 }
 //............................................................................
 void ledOff() {
     BSP_LED_Off(LED1);
-}
-//............................................................................
-void terminate(int16_t result) {
-    Q_UNUSED_PAR(result);
 }
 
 } // namespace BSP
@@ -336,14 +334,12 @@ namespace QP {
 
 // QF callbacks...
 void QF::onStartup() {
-    // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
-
     // assign all priority bits for preemption-prio. and none to sub-prio.
     // NOTE: this might have been changed by STM32Cube.
     NVIC_SetPriorityGrouping(0U);
 
     // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
+    SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
 
     // set priorities of ALL ISRs used in the system, see NOTE1
@@ -367,9 +363,14 @@ void QK::onIdle() {
     BSP_LED_Off(LED3);
     QF_INT_ENABLE();
 
+    // exercise scheduler lock from idle thread
+    QP::QSchedStatus lockStat = QP::QK::schedLock(1U); // 1U prio. ceiling
+
     // Some floating point code is to exercise the VFP...
     double volatile x = 1.73205;
     x = x * 1.73205;
+
+    QP::QK::schedUnlock(lockStat);
 
 #ifdef Q_SPY
     QF_INT_DISABLE();
@@ -381,7 +382,7 @@ void QK::onIdle() {
         std::uint16_t b = QS::getByte();
         QF_INT_ENABLE();
 
-        if (b != QS_EOD) {   // not End-Of-Data?
+        if (b != QS_EOD) {  // not End-Of-Data?
             l_uartHandle.Instance->TDR = b;  // put into TDR
         }
     }
@@ -495,7 +496,7 @@ void onCommand(std::uint8_t cmdId, std::uint32_t param1,
 } // namespace QP
 
 //============================================================================
-// NOTE1:
+// NOTE0:
 // The QF_AWARE_ISR_CMSIS_PRI constant from the QF port specifies the highest
 // ISR priority that is disabled by the QF framework. The value is suitable
 // for the NVIC_SetPriority() CMSIS function.
@@ -508,7 +509,7 @@ void onCommand(std::uint8_t cmdId, std::uint32_t param1,
 // Conversely, any ISRs prioritized above the QF_AWARE_ISR_CMSIS_PRI priority
 // level (i.e., with the numerical values of priorities less than
 // QF_AWARE_ISR_CMSIS_PRI) are never disabled and are not aware of the kernel.
-// Such "QF-unaware" ISRs cannot call ANY QF/QK services. In particular they
+// Such "QF-unaware" ISRs cannot call ANY QF services. In particular they
 // can NOT call the macros QK_ISR_ENTRY/QK_ISR_ENTRY. The only mechanism
 // by which a "QF-unaware" ISR can communicate with the QF framework is by
 // triggering a "QF-aware" ISR, which can post/publish events.

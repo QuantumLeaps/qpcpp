@@ -87,7 +87,7 @@ void QXMutex::init(QPrioSpec const prioSpec) noexcept {
     Q_REQUIRE_INCRIT(100, (prioSpec & 0xFF00U) == 0U);
 
     m_ao.m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-prio.
-    m_ao.m_pthre = 0U; // preemption-threshold (not used)
+    m_ao.m_pthre = 0U; // not used
     QActive &ao  = m_ao;
 
     QF_MEM_APP();
@@ -157,6 +157,9 @@ bool QXMutex::lock(QTimeEvtCtr const nTicks) noexcept {
 
             // set thread's prio to that of the mutex
             curr->m_prio  = m_ao.m_prio;
+    #ifndef Q_UNSAFE
+            curr->m_prio_dis = static_cast<std::uint8_t>(~curr->m_prio);
+    #endif
         }
     }
     // is the mutex locked by this thread already (nested locking)?
@@ -259,7 +262,8 @@ bool QXMutex::tryLock() noexcept {
         && (curr != nullptr)
         && (m_ao.m_prio <= QF_MAX_ACTIVE));
     // also: the thread must NOT be holding a scheduler lock.
-    Q_REQUIRE_INCRIT(301, QXK_priv_.lockHolder != curr->m_prio);
+    Q_REQUIRE_INCRIT(301,
+        QXK_priv_.lockHolder != static_cast<std::uint_fast8_t>(curr->m_prio));
 
     // is the mutex available?
     if (m_ao.m_eQueue.m_nFree == 0U) {
@@ -301,6 +305,9 @@ bool QXMutex::tryLock() noexcept {
 
             // set thread's prio to that of the mutex
             curr->m_prio  = m_ao.m_prio;
+    #ifndef Q_UNSAFE
+            curr->m_prio_dis = static_cast<std::uint8_t>(~curr->m_prio);
+    #endif
         }
     }
     // is the mutex locked by this thread already (nested locking)?
@@ -366,6 +373,9 @@ void QXMutex::unlock() noexcept {
             // restore the holding thread's prio from the mutex
             curr->m_prio  =
                 static_cast<std::uint8_t>(m_ao.m_eQueue.m_head);
+    #ifndef Q_UNSAFE
+            curr->m_prio_dis = static_cast<std::uint8_t>(~curr->m_prio);
+    #endif
 
             // put the mutex back into the AO registry
             QActive::registry_[m_ao.m_prio] = &m_ao;

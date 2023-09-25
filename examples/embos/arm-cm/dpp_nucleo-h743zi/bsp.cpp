@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, NUCLEO-H743ZI board, embOS RTOS kernel
-// Last updated for version 7.3.0
-// Last updated on  2023-08-29
+// Last updated for version 7.3.1
+// Last updated on  2023-11-15
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -287,7 +287,7 @@ void start() {
     static OS_STACKPTR int philoStack[APP::N_PHILO][128];
     for (std::uint8_t n = 0U; n < APP::N_PHILO; ++n) {
         APP::AO_Philo[n]->start(
-            n + 3U,                  // QP prio. of the AO
+            Q_PRIO(n + 3U, 3U),      // QP-prio., embOS prio.
             philoQueueSto[n],        // event queue storage
             Q_DIM(philoQueueSto[n]), // queue length [events]
             philoStack[n],           // stack storage
@@ -297,7 +297,7 @@ void start() {
     static QP::QEvt const *tableQueueSto[APP::N_PHILO];
     static OS_STACKPTR int tableStack[128];
     APP::AO_Table->start(
-        APP::N_PHILO + 7U,       // QP prio. of the AO
+        Q_PRIO(APP::N_PHILO + 7U, 7U),// QP-prio., embOS prio.
         tableQueueSto,           // event queue storage
         Q_DIM(tableQueueSto),    // queue length [events]
         tableStack,              // stack storage

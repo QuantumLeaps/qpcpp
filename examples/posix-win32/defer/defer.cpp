@@ -193,11 +193,23 @@ Q_STATE_DEF(TServer, busy) {
                 PRINTF_S("Request #%d deferred;\n",
                        (int)Q_EVT_CAST(RequestEvt)->ref_num);
             }
-            else {
-                // notify the request sender that his request was denied...
-                PRINTF_S("Request #%d IGNORED;\n",
-                       (int)Q_EVT_CAST(RequestEvt)->ref_num);
+            else { // deferred queue full
+                // option1: ignore the new request and do nothing here
+
+                // option2:
+                // flush the oldest request to make room for the new one
+                QP::QEvt const *old_evt = m_requestQueue.get(0U);
+                Q_ASSERT(old_evt != nullptr);
+                PRINTF_S("Previous request #%d DISCARDED;\n",
+                         (int)((RequestEvt*)old_evt)->ref_num);
+                QP::QF::gc(old_evt); // explicitly recycle old
+
+                // repeat the defer request after making room in the queue
+                if (!defer(&m_requestQueue, e)) {
+                    Q_ERROR(); // now it must succeed
+                }
             }
+
             status_ = Q_RET_HANDLED;
             break;
         }
