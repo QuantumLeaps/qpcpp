@@ -3246,13 +3246,13 @@
             <name>$PROJ_DIR$\..\..\blinky.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\blinky.h</name>
+            <name>$PROJ_DIR$\..\..\blinky.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
+            <name>$PROJ_DIR$\..\..\bsp.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\main.cpp</name>

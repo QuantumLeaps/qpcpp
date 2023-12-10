@@ -164,7 +164,7 @@ std::uint_fast16_t QActive::flushDeferred(
 {
     std::uint_fast16_t n = 0U;
     while (n < num) {
-        QEvt const *e = eq->get(m_prio);
+        QEvt const * const e = eq->get(m_prio);
         if (e != nullptr) {
             ++n; // count one more flushed event
     #if (QF_MAX_EPOOL > 0U)

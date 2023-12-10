@@ -31,9 +31,10 @@
    <operation name="SporadicSpecEvt" type="constexpr" visibility="0x00" properties="0x02">
     <parameter name="s" type="QP::QSignal"/>
     <parameter name="tg" type="std::uint16_t"/>
+    <parameter name="trc_tg" type="std::uint16_t"/>
     <code> : QP::QEvt(s),
    toggles(tg),
-   rtc_toggles(0U)</code>
+   rtc_toggles(trc_tg)</code>
    </operation>
   </class>
   <attribute name="AO_Periodic1" type="QP::QActive * const" visibility="0x00" properties="0x00">

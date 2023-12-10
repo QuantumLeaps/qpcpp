@@ -3244,10 +3244,10 @@
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
+            <name>$PROJ_DIR$\..\..\bsp.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\dpp.h</name>
+            <name>$PROJ_DIR$\..\..\dpp.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\main.cpp</name>
@@ -3304,9 +3304,6 @@
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_mem.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qf_pkg.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_ps.cpp</name>
         </file>
         <file>
@@ -3326,9 +3323,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qxk\qxk_mutex.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qxk_pkg.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qxk\qxk_sema.cpp</name>
@@ -3354,9 +3348,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_fp.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qs_pkg.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_rx.cpp</name>

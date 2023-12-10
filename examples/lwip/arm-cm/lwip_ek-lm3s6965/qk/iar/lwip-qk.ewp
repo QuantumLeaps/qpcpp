@@ -3265,10 +3265,10 @@
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
+            <name>$PROJ_DIR$\..\..\bsp.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\dpp.h</name>
+            <name>$PROJ_DIR$\..\..\dpp.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\fsdata.h</name>
@@ -3346,9 +3346,6 @@
             <name>$PROJ_DIR$\..\..\..\..\..\..\src\qf\qf_mem.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\..\src\qf_pkg.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\..\src\qf\qf_ps.cpp</name>
         </file>
         <file>
@@ -3365,9 +3362,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\..\src\qk\qk.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\..\src\qk_pkg.h</name>
         </file>
     </group>
     <group>

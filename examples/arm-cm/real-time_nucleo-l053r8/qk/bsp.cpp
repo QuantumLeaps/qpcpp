@@ -89,8 +89,8 @@ void assert_failed(char const * const module, int_t const id) {
 
 // ISRs used in the application ==========================================
 
-void SysTick_Handler(); // prototype
-void SysTick_Handler() {
+void SysTick_Handler(void); // prototype
+void SysTick_Handler(void) {
     BSP::d1on();
 
     QK_ISR_ENTRY(); // inform QK about entering an ISR
@@ -116,10 +116,10 @@ void SysTick_Handler() {
         if ((current & (1U << B1_PIN)) != 0U) { // is B1 depressed?
             // immutable sporadic-press event
             static APP::SporadicSpecEvt const
-                sporadicA(APP::SPORADIC_A_SIG, 189U, 23U);
+                sporadicA(APP::SPORADIC_A_SIG, 189U, 0U);
             // immutable forward-press event
             static APP::SporadicSpecEvt const
-                sporadicB(APP::SPORADIC_B_SIG, 89U, 23U);
+                sporadicB(APP::SPORADIC_B_SIG, 89U, 0U);
             APP::AO_Sporadic2->POST(&sporadicA, &l_SysTick_Handler);
             APP::AO_Sporadic2->POST(&sporadicB, &l_SysTick_Handler);
         }

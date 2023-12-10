@@ -3246,13 +3246,13 @@
             <name>$PROJ_DIR$\..\..\blinky.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\blinky.h</name>
+            <name>$PROJ_DIR$\..\..\blinky.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
+            <name>$PROJ_DIR$\..\..\bsp.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\main.cpp</name>
@@ -3342,9 +3342,6 @@
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_mem.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qf_pkg.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_ps.cpp</name>
         </file>
         <file>
@@ -3366,16 +3363,10 @@
     <group>
         <name>QP_port</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cr\qv\iar\qep_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cr\qv\iar\qf_port.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cr\qv\iar\qf_port.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cr\qv\iar\qs_port.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cr\qv\iar\qv_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cr\qv\iar\qs_port.hpp</name>
         </file>
     </group>
     <group>

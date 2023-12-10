@@ -71,10 +71,11 @@ public:
 public:
     constexpr SporadicSpecEvt(
         QP::QSignal s,
-        std::uint16_t tg)
+        std::uint16_t tg,
+        std::uint16_t trc_tg)
      : QP::QEvt(s),
        toggles(tg),
-       rtc_toggles(0U)
+       rtc_toggles(trc_tg)
     {}
 }; // class SporadicSpecEvt
 

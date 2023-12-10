@@ -3248,10 +3248,10 @@
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
+            <name>$PROJ_DIR$\..\..\bsp.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\dpp.h</name>
+            <name>$PROJ_DIR$\..\..\dpp.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\main.cpp</name>
@@ -3305,9 +3305,6 @@
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_mem.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_pkg.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_ps.cpp</name>
         </file>
         <file>
@@ -3325,17 +3322,11 @@
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qk\qk.cpp</name>
         </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qk_pkg.h</name>
-        </file>
     </group>
     <group>
         <name>QP_port</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qk\iar\qep_port.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qk\iar\qf_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qk\iar\qp_port.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qk\iar\qk_port.cpp</name>
@@ -3588,10 +3579,10 @@
             </configuration>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qk\iar\qk_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qk\iar\qp_port.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qk\iar\qs_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qk\iar\qs_port.hpp</name>
         </file>
     </group>
     <group>

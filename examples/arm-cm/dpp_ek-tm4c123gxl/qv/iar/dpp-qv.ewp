@@ -3338,9 +3338,6 @@
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_fp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qs_pkg.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_rx.cpp</name>
         </file>
         <file>

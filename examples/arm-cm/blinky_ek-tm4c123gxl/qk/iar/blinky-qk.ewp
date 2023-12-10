@@ -3247,7 +3247,7 @@
             <name>$PROJ_DIR$\..\..\blinky.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\blinky.h</name>
+            <name>$PROJ_DIR$\..\..\blinky.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\blinky.hpp</name>
@@ -3256,7 +3256,7 @@
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
+            <name>$PROJ_DIR$\..\..\bsp.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\bsp.hpp</name>
@@ -3304,9 +3304,6 @@
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_mem.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_pkg.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_ps.cpp</name>
         </file>
         <file>
@@ -3323,9 +3320,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qk\qk.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qk_pkg.h</name>
         </file>
     </group>
     <group>

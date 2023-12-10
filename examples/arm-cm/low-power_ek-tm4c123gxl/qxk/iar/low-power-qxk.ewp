@@ -3246,7 +3246,7 @@
     <group>
         <name>Application</name>
         <file>
-            <name>$PROJ_DIR$\..\..\blinky.h</name>
+            <name>$PROJ_DIR$\..\..\blinky.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\blinky0.cpp</name>
@@ -3255,10 +3255,10 @@
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\bsp.h</name>
+            <name>$PROJ_DIR$\..\..\bsp.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\low_power.h</name>
+            <name>$PROJ_DIR$\..\..\low_power.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\main.cpp</name>
@@ -3306,9 +3306,6 @@
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_mem.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qf_pkg.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qf\qf_ps.cpp</name>
         </file>
         <file>
@@ -3330,9 +3327,6 @@
             <name>$PROJ_DIR$\..\..\..\..\..\src\qxk\qxk_mutex.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qxk_pkg.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qxk\qxk_sema.cpp</name>
         </file>
         <file>
@@ -3342,19 +3336,13 @@
     <group>
         <name>QP_port</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qep_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qp_port.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qf_port.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qs_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qs_port.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qxk_port.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\arm-cm\qxk\iar\qxk_port.h</name>
         </file>
     </group>
     <group>
@@ -3368,9 +3356,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_fp.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\src\qs_pkg.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\src\qs\qs_rx.cpp</name>

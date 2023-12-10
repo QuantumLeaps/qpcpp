@@ -3249,10 +3249,10 @@
             <name>$PROJ_DIR$\..\bsp.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\bsp.h</name>
+            <name>$PROJ_DIR$\..\bsp.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\dpp.h</name>
+            <name>$PROJ_DIR$\..\dpp.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\FreeRTOSConfig.h</name>
@@ -3351,16 +3351,13 @@
     <group>
         <name>QP_port</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\freertos\qep_port.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\ports\freertos\qf_port.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\freertos\qf_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\freertos\qp_port.hpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\ports\freertos\qs_port.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\ports\freertos\qs_port.hpp</name>
         </file>
     </group>
     <group>

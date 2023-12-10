@@ -2612,7 +2612,7 @@ return recalled;</code>
     <parameter name="num = 0xFFFFU" type="std::uint_fast16_t const"/>
     <code>std::uint_fast16_t n = 0U;
 while (n &lt; num) {
-    QEvt const *e = eq-&gt;get(m_prio);
+    QEvt const * const e = eq-&gt;get(m_prio);
     if (e != nullptr) {
         ++n; // count one more flushed event
 #if (QF_MAX_EPOOL &gt; 0U)
