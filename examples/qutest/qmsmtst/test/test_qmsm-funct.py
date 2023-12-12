@@ -8,7 +8,7 @@ def on_reset():
     current_obj(OBJ_SM, "the_sm")
 
 # tests...
-test("QHsmTst_init")
+test("QMsmTst_init")
 init()
 expect("@timestamp BSP_DISPLAY top-INIT;")
 expect("@timestamp BSP_DISPLAY s-ENTRY;")
@@ -18,7 +18,18 @@ expect("@timestamp BSP_DISPLAY s21-ENTRY;")
 expect("@timestamp BSP_DISPLAY s211-ENTRY;")
 expect("@timestamp Trg-Done QS_RX_EVENT")
 
-test("QHsmTst dispatch", NORESET)
+test("QMsmTst isInState", NORESET)
+command(1, 1)
+expect("@timestamp CMD 0 1");
+expect("@timestamp Trg-Done QS_RX_COMMAND")
+command(1, 21)
+expect("@timestamp CMD 1 21");
+expect("@timestamp Trg-Done QS_RX_COMMAND")
+command(1, 211)
+expect("@timestamp CMD 1 211");
+expect("@timestamp Trg-Done QS_RX_COMMAND")
+
+test("QMsmTst dispatch", NORESET)
 dispatch("A_SIG")
 expect("@timestamp BSP_DISPLAY s21-A;")
 expect("@timestamp BSP_DISPLAY s211-EXIT;")

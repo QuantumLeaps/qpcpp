@@ -31,6 +31,10 @@
 #include "qpcpp.hpp"
 #include "qhsmtst.hpp"
 
+namespace {
+Q_DEFINE_THIS_FILE
+}
+
 namespace APP {
 
 //$declare${SMs::QHsmTst} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -39,6 +43,9 @@ namespace APP {
 class QHsmTst : public QP::QHsm {
 private:
     bool m_foo;
+
+public:
+    friend bool QHsmTst_isIn(std::uint32_t const state_num);
 
 public:
     QHsmTst()
@@ -63,8 +70,8 @@ QP::QAsm * const the_sm = &l_hsmtst; // the opaque pointer
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 // Check for the minimum required QP version
-#if (QP_VERSION < 700U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
-#error qpcpp version 7.0.0 or higher required
+#if (QP_VERSION < 730U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
+#error qpcpp version 7.3.0 or higher required
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -417,5 +424,33 @@ Q_STATE_DEF(QHsmTst, s211) {
     return status_;
 }
 //$enddef${SMs::QHsmTst} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+bool QHsmTst_isIn(std::uint32_t const state_num) {
+    QP::QHsm * const me = &l_hsmtst;
+    bool stat = false;
+    switch (state_num) {
+    case 0:
+        stat = me->isIn(Q_STATE_CAST(&QHsmTst::s));
+        break;
+    case 1:
+        stat = me->isIn(Q_STATE_CAST(&QHsmTst::s1));
+        break;
+    case 11:
+        stat = me->isIn(Q_STATE_CAST(&QHsmTst::s11));
+        break;
+    case 2:
+        stat = me->isIn(Q_STATE_CAST(&QHsmTst::s2));
+        break;
+    case 21:
+        stat = me->isIn(Q_STATE_CAST(&QHsmTst::s21));
+        break;
+    case 211:
+        stat = me->isIn(Q_STATE_CAST(&QHsmTst::s211));
+        break;
+    default:
+        Q_ERROR();
+    }
+    return stat;
+}
 
 } // namespace APP

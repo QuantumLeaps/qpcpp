@@ -435,17 +435,23 @@ bool QHsm::isIn(QStateHandler const state) noexcept {
     bool inState = false; // assume that this HSM is not in 'state'
 
     // scan the state hierarchy bottom-up
-    QState r;
-    do {
-        // do the states match?
-        if (m_temp.fun == state) {
-            inState = true;    // 'true' means that match found
-            r = Q_RET_IGNORED; // cause breaking out of the loop
+    QStateHandler s = m_state.fun;
+    std::int_fast8_t limit = MAX_NEST_DEPTH_ + 1; // loop hard limit
+    QState r = Q_RET_SUPER;
+    for (; (r != Q_RET_IGNORED) && (limit > 0); --limit) {
+        if (s == state) { // do the states match?
+            inState = true;  // 'true' means that match found
+            break; // break out of the for-loop
         }
         else {
-            r = QHSM_RESERVED_EVT_(m_temp.fun, Q_EMPTY_SIG);
+            r = QHSM_RESERVED_EVT_(s, Q_EMPTY_SIG);
+            s = m_temp.fun;
         }
-    } while (r != Q_RET_IGNORED); // QHsm::top() state not reached
+    }
+
+    QF_CRIT_ENTRY();
+    Q_ENSURE_INCRIT(690, limit > 0);
+    QF_CRIT_EXIT();
 
     #ifndef Q_UNSAFE
     m_temp.uint = ~m_state.uint;

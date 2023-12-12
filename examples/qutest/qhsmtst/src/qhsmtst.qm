@@ -10,6 +10,8 @@
    <documentation>Test active object</documentation>
    <!--${SMs::QHsmTst::m_foo}-->
    <attribute name="m_foo" type="bool" visibility="0x02" properties="0x00"/>
+   <!--${SMs::QHsmTst::bool QHsmTst_isIn(std::uint32_t ~}-->
+   <attribute name="bool QHsmTst_isIn(std::uint32_t const state_num);" type="friend" visibility="0x04" properties="0x00"/>
    <!--${SMs::QHsmTst::QHsmTst}-->
    <operation name="QHsmTst" type="" visibility="0x00" properties="0x02">
     <code>  : QHsm(&amp;initial)</code>
@@ -321,6 +323,8 @@ enum QHsmTstSignals {
 
 extern QP::QAsm * const the_sm; // opaque pointer to the test SM
 
+bool QHsmTst_isIn(std::uint32_t const state_num);
+
 // BSP functions to display a message and exit
 void BSP_display(char const *msg);
 void BSP_terminate(int16_t const result);
@@ -334,6 +338,10 @@ void BSP_terminate(int16_t const result);
    <text>#include &quot;qpcpp.hpp&quot;
 #include &quot;qhsmtst.hpp&quot;
 
+namespace {
+Q_DEFINE_THIS_FILE
+}
+
 namespace APP {
 
 $declare ${SMs::QHsmTst}
@@ -344,6 +352,34 @@ static QHsmTst l_hsmtst; // the only instance of the QHsmTst class
 QP::QAsm * const the_sm = &amp;l_hsmtst; // the opaque pointer
 
 $define ${SMs::QHsmTst}
+
+bool QHsmTst_isIn(std::uint32_t const state_num) {
+    QP::QHsm * const me = &amp;l_hsmtst;
+    bool stat = false;
+    switch (state_num) {
+    case 0:
+        stat = me-&gt;isIn(Q_STATE_CAST(&amp;QHsmTst::s));
+        break;
+    case 1:
+        stat = me-&gt;isIn(Q_STATE_CAST(&amp;QHsmTst::s1));
+        break;
+    case 11:
+        stat = me-&gt;isIn(Q_STATE_CAST(&amp;QHsmTst::s11));
+        break;
+    case 2:
+        stat = me-&gt;isIn(Q_STATE_CAST(&amp;QHsmTst::s2));
+        break;
+    case 21:
+        stat = me-&gt;isIn(Q_STATE_CAST(&amp;QHsmTst::s21));
+        break;
+    case 211:
+        stat = me-&gt;isIn(Q_STATE_CAST(&amp;QHsmTst::s211));
+        break;
+    default:
+        Q_ERROR();
+    }
+    return stat;
+}
 
 } // namespace APP</text>
   </file>

@@ -1,13 +1,13 @@
 //============================================================================
 // Purpose: Fixture for QUTEST
-// Last updated for version 7.3.0
-// Last updated on  2023-07-26
+// Last Updated for Version: 7.3.1
+// Date of the Last Update:  2023-12-11
 //
-//                    Q u a n t u m  L e a P s
-//                    ------------------------
-//                    Modern Embedded Software
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -25,10 +25,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses>.
+// along with this program. If not, see <www.gnu.org/licenses/>.
 //
 // Contact information:
 // <www.state-machine.com/licensing>
+// <info@state-machine.com>
 //============================================================================
 #include "qpcpp.hpp"
 #include "qmsmtst.hpp"
@@ -40,10 +41,11 @@ namespace APP {
 
 enum {
     BSP_DISPLAY = QP::QS_USER,
+    CMD,
 };
 
 void BSP_display(char const *msg) {
-    QS_BEGIN_ID(BSP_DISPLAY, 0U) // application-specific record
+    QS_BEGIN_ID(BSP_DISPLAY, 0U) // app-specific record
         QS_STR(msg);
     QS_END()
 }
@@ -64,21 +66,33 @@ void QS::onTestSetup(void) {
 void QS::onTestTeardown(void) {
 }
 //............................................................................
-void QS::onCommand(uint8_t cmdId,
-                   uint32_t param1, uint32_t param2, uint32_t param3)
+void QS::onCommand(std::uint8_t cmdId, std::uint32_t param1,
+                   std::uint32_t param2, std::uint32_t param3)
 {
     Q_UNUSED_PAR(param1);
     Q_UNUSED_PAR(param2);
     Q_UNUSED_PAR(param3);
 
+    //PRINTF_S("<TARGET> Command id=%d param=%d\n", (int)cmdId, (int)param);
     switch (cmdId) {
-       case 0U: {
-           break;
+        case 0U: {
+            QS_BEGIN_ID(APP::CMD, 0U) // app-specific record
+            QS_END()
+            break;
+        }
+        case 1U: {
+            bool ret = APP::QMsmTst_isInState(param1);
+            QS_BEGIN_ID(APP::CMD, 0U) // app-specific record
+                QS_U8(0U, ret ? 1 : 0);
+                QS_U8(0U, (uint8_t)param1);
+            QS_END()
+            break;
        }
        default:
            break;
     }
 }
+
 //............................................................................
 // callback function to "massage" the event, if necessary
 void QS::onTestEvt(QEvt *e) {
@@ -119,6 +133,7 @@ int main(int argc, char *argv[]) {
     // dictionaries...
     QS_OBJ_DICTIONARY(the_sm);
     QS_USR_DICTIONARY(BSP_DISPLAY);
+    QS_USR_DICTIONARY(CMD);
 
     return QP::QF::run();
 }

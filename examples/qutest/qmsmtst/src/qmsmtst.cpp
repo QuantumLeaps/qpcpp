@@ -31,6 +31,10 @@
 #include "qpcpp.hpp"
 #include "qmsmtst.hpp"
 
+namespace {
+Q_DEFINE_THIS_FILE
+}
+
 namespace APP {
 
 //$declare${SMs::QMsmTst} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -39,6 +43,9 @@ namespace APP {
 class QMsmTst : public QP::QMsm {
 private:
     bool m_foo;
+
+public:
+    friend bool QMsmTst_isInState(std::uint32_t const state_num);
 
 public:
     QMsmTst()
@@ -72,15 +79,15 @@ protected:
 }; // class QMsmTst
 //$enddecl${SMs::QMsmTst} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-static QMsmTst l_hsmtst; // the only instance of the QMsmTst class
+static QMsmTst l_msmtst; // the only instance of the QMsmTst class
 
 // global-scope definitions -----------------------------------------
-QP::QAsm * const the_sm = &l_hsmtst; // the opaque pointer
+QP::QAsm * const the_sm = &l_msmtst; // the opaque pointer
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 // Check for the minimum required QP version
-#if (QP_VERSION < 700U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
-#error qpcpp version 7.0.0 or higher required
+#if (QP_VERSION < 730U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
+#error qpcpp version 7.3.0 or higher required
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -733,5 +740,33 @@ QM_STATE_DEF(QMsmTst, s211) {
     return status_;
 }
 //$enddef${SMs::QMsmTst} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+bool QMsmTst_isInState(std::uint32_t const state_num) {
+    QP::QMsm * const me = &l_msmtst;
+    bool stat = false;
+    switch (state_num) {
+    case 0:
+        stat = me->isInState(&QMsmTst::s_s);
+        break;
+    case 1:
+        stat = me->isInState(&QMsmTst::s1_s);
+        break;
+    case 11:
+        stat = me->isInState(&QMsmTst::s11_s);
+        break;
+    case 2:
+        stat = me->isInState(&QMsmTst::s21_s);
+        break;
+    case 21:
+        stat = me->isInState(&QMsmTst::s21_s);
+        break;
+    case 211:
+        stat = me->isInState(&QMsmTst::s211_s);
+        break;
+    default:
+        Q_ERROR();
+    }
+    return stat;
+}
 
 } // namespace APP

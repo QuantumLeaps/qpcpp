@@ -300,7 +300,7 @@ void QTimeEvt::tick(
     QS_END_PRE_()
 
     // scan the linked-list of time events at this rate...
-    std::uint_fast8_t limit = 2U*QF_MAX_ACTIVE; // iteration hard limit
+    std::uint_fast8_t limit = 2U*QF_MAX_ACTIVE; // loop hard limit
     for (; limit > 0U; --limit) {
         QTimeEvt *e = prev->m_next; // advance down the time evt. list
 

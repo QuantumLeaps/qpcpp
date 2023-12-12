@@ -10,6 +10,8 @@
    <documentation>Test State Machine</documentation>
    <!--${SMs::QMsmTst::m_foo}-->
    <attribute name="m_foo" type="bool" visibility="0x02" properties="0x00"/>
+   <!--${SMs::QMsmTst::bool QMsmTst_isInState(std::uint~}-->
+   <attribute name="bool QMsmTst_isInState(std::uint32_t const state_num);" type="friend" visibility="0x04" properties="0x00"/>
    <!--${SMs::QMsmTst::QMsmTst}-->
    <operation name="QMsmTst" type="" visibility="0x00" properties="0x02">
     <code>  : QMsm(&amp;initial)</code>
@@ -322,6 +324,8 @@ enum QMsmTstSignals {
 
 extern QP::QAsm * const the_sm; // opaque pointer to the test SM
 
+bool QMsmTst_isInState(std::uint32_t const state_num);
+
 // BSP functions to display a message and exit
 void BSP_display(char const *msg);
 void BSP_terminate(int16_t const result);
@@ -335,16 +339,48 @@ void BSP_terminate(int16_t const result);
    <text>#include &quot;qpcpp.hpp&quot;
 #include &quot;qmsmtst.hpp&quot;
 
+namespace {
+Q_DEFINE_THIS_FILE
+}
+
 namespace APP {
 
 $declare ${SMs::QMsmTst}
 
-static QMsmTst l_hsmtst; // the only instance of the QMsmTst class
+static QMsmTst l_msmtst; // the only instance of the QMsmTst class
 
 // global-scope definitions -----------------------------------------
-QP::QAsm * const the_sm = &amp;l_hsmtst; // the opaque pointer
+QP::QAsm * const the_sm = &amp;l_msmtst; // the opaque pointer
 
 $define ${SMs::QMsmTst}
+
+bool QMsmTst_isInState(std::uint32_t const state_num) {
+    QP::QMsm * const me = &amp;l_msmtst;
+    bool stat = false;
+    switch (state_num) {
+    case 0:
+        stat = me-&gt;isInState(&amp;QMsmTst::s_s);
+        break;
+    case 1:
+        stat = me-&gt;isInState(&amp;QMsmTst::s1_s);
+        break;
+    case 11:
+        stat = me-&gt;isInState(&amp;QMsmTst::s11_s);
+        break;
+    case 2:
+        stat = me-&gt;isInState(&amp;QMsmTst::s21_s);
+        break;
+    case 21:
+        stat = me-&gt;isInState(&amp;QMsmTst::s21_s);
+        break;
+    case 211:
+        stat = me-&gt;isInState(&amp;QMsmTst::s211_s);
+        break;
+    default:
+        Q_ERROR();
+    }
+    return stat;
+}
 
 } // namespace APP</text>
   </file>

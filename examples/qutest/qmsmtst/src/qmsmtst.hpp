@@ -50,6 +50,8 @@ enum QMsmTstSignals {
 
 extern QP::QAsm * const the_sm; // opaque pointer to the test SM
 
+bool QMsmTst_isInState(std::uint32_t const state_num);
+
 // BSP functions to display a message and exit
 void BSP_display(char const *msg);
 void BSP_terminate(int16_t const result);
