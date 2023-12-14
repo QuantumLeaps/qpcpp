@@ -44,11 +44,11 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION     731U
-#define QP_VERSION_STR "7.3.1"
+#define QP_VERSION     732U
+#define QP_VERSION_STR "7.3.2"
 
-//! Encrypted  current QP release (7.3.1) and date (2023-12-05)
-#define QP_RELEASE     0x7630E7D4U
+//! Encrypted  current QP release (7.3.2) and date (2023-12-14)
+#define QP_RELEASE     0x762F8843U
 
 //============================================================================
 //! @cond INTERNAL
@@ -292,6 +292,10 @@ public:
     virtual void dispatch(
         QEvt const * const e,
         std::uint_fast8_t const qs_id) = 0;
+    virtual bool isIn(QStateHandler const state) noexcept {
+        static_cast<void>(state);
+        return false;
+    }
 
 #ifdef Q_SPY
     virtual QStateHandler getStateHandler() noexcept {
@@ -404,7 +408,7 @@ public:
     void dispatch(
         QEvt const * const e,
         std::uint_fast8_t const qs_id) override;
-    bool isIn(QStateHandler const state) noexcept;
+    bool isIn(QStateHandler const state) noexcept override;
     QStateHandler state() const noexcept {
         return m_state.fun;
     }
@@ -443,6 +447,9 @@ public:
         return m_state.obj->stateHandler;
     }
 #endif // def Q_SPY
+    bool isIn(QStateHandler const state) noexcept override;
+
+    //! @deprecated instead use: QMsm::isIn()
     bool isInState(QMState const * const stateObj) const noexcept;
     QMState const * stateObj() const noexcept {
         return m_state.obj;
@@ -794,6 +801,9 @@ public:
     {
         reinterpret_cast<QHsm *>(this)->QHsm::dispatch(e, qs_id);
     }
+    bool isIn(QStateHandler const state) noexcept override {
+        return reinterpret_cast<QHsm *>(this)->QHsm::isIn(state);
+    }
     void setAttr(
         std::uint32_t attr1,
         void const * attr2 = nullptr);
@@ -921,6 +931,9 @@ public:
         std::uint_fast8_t const qs_id) override
     {
         reinterpret_cast<QMsm *>(this)->QMsm::dispatch(e, qs_id);
+    }
+    bool isIn(QStateHandler const state) noexcept override {
+        return reinterpret_cast<QMsm *>(this)->QMsm::isIn(state);
     }
 
 #ifdef Q_SPY

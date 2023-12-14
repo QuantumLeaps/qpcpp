@@ -1,7 +1,7 @@
 //============================================================================
 // BSP for DPP example, Microstick II board, preemptive QK kernel, XC32
-// Last updated for version 7.3.0
-// Last updated on  2023-08-31
+// Last updated for version 7.3.2
+// Last updated on  2023-12-13
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -339,21 +339,27 @@ bool QS::onStartup(void const *arg) {
 void QS::onCleanup() {
 }
 //............................................................................
-void QS::onFlush() {
-    std::uint16_t b;
-    while ((b = getByte()) != QS_EOD) { // next QS trace byte available?
-        while (U2STAbits.UTXBF) { // TX Buffer full?
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
+void QS::onFlush(void) {
+    for (;;) {
+        std::uint16_t b = getByte();
+        if (b != QS_EOD) {
+            while (U2STAbits.UTXBF) { // TX Buffer full?
+            }
+            U2TXREG = b; // stick the byte to TXREG for transmission
         }
-        U2TXREG = b; // stick the byte to TXREG for transmission
+        else {
+            break;
+        }
     }
 }
 //............................................................................
-// NOTE: works properly with interrupts enabled or disabled
 QSTimeCtr QS::onGetTime() {
     return __builtin_mfc0(_CP0_COUNT, _CP0_COUNT_SELECT);
 }
 //............................................................................
-//! callback function to reset the target (to be implemented in the BSP)
 void QS::onReset() {
     // perform a system unlock sequence ,starting critical sequence
     SYSKEY = 0x00000000; //write invalid key to force lock
@@ -366,7 +372,6 @@ void QS::onReset() {
     // prevent any unwanted code execution until reset occurs
 }
 //............................................................................
-//! callback function to execute a user command (to be implemented in BSP)
 void QS::onCommand(std::uint8_t cmdId, std::uint32_t param1,
                    std::uint32_t param2, std::uint32_t param3)
 {

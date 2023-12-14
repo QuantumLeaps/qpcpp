@@ -81,7 +81,7 @@ void QS::onCommand(std::uint8_t cmdId, std::uint32_t param1,
             break;
         }
         case 1U: {
-            bool ret = APP::QMsmTst_isInState(param1);
+            bool ret = APP::QMsmTst_isIn(param1);
             QS_BEGIN_ID(APP::CMD, 0U) // app-specific record
                 QS_U8(0U, ret ? 1 : 0);
                 QS_U8(0U, (uint8_t)param1);

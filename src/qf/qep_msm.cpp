@@ -349,6 +349,30 @@ void QMsm::dispatch(
     #endif
 }
 
+//${QEP::QMsm::isIn} .........................................................
+bool QMsm::isIn(QStateHandler const state) noexcept {
+    bool inState = false; // assume that this MSM is not in 'state'
+
+    QMState const *s = m_state.obj;
+    std::int_fast8_t limit = 6; // loop hard limit
+    for (; (s != nullptr) && (limit > 0); --limit) {
+        if (s->stateHandler == state) {  // match found?
+            inState = true;
+            break;
+        }
+        else {
+            s = s->superstate; // advance to the superstate
+        }
+    }
+
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    Q_ENSURE_INCRIT(690, limit > 0);
+    QF_CRIT_EXIT();
+
+    return inState;
+}
+
 //${QEP::QMsm::isInState} ....................................................
 bool QMsm::isInState(QMState const * const stateObj) const noexcept {
     bool inState = false; // assume that this MSM is not in 'state'
@@ -367,7 +391,7 @@ bool QMsm::isInState(QMState const * const stateObj) const noexcept {
 
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_ENSURE_INCRIT(690, limit > 0);
+    Q_ENSURE_INCRIT(790, limit > 0);
     QF_CRIT_EXIT();
 
     return inState;

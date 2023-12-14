@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, NXP mbed-LPC1768  board, QV kernel
-// Last updated for version 7.3.0
-// Last updated on  2023-09-09
+// Last updated for version 7.3.2
+// Last updated on  2023-12-13
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -481,23 +481,18 @@ QSTimeCtr onGetTime() {  // NOTE: invoked with interrupts DISABLED
     }
 }
 //............................................................................
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
 void onFlush() {
     for (;;) {
-        QF_INT_DISABLE();
         std::uint16_t b = getByte();
-        QF_INT_ENABLE();
         if (b != QS_EOD) {
             while ((LPC_UART0->LSR & 0x20U) == 0U) { // while THR empty...
-                QF_INT_ENABLE();
-                QF_CRIT_EXIT_NOP();
-
-                QF_INT_DISABLE();
             }
             LPC_UART0->THR = b; // put into the THR register
-            QF_INT_ENABLE();
         }
         else {
-            QF_INT_ENABLE();
             break;
         }
     }

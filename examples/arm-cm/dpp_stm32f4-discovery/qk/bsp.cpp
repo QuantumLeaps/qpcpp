@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, STM32F4-Discovery board, QK kernel
-// Last updated for version 7.3.0
-// Last updated on  2023-09-10
+// Last updated for version 7.3.2
+// Last updated on  2023-12-13
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -505,33 +505,27 @@ QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
     }
 }
 //............................................................................
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
 void onFlush() {
     for (;;) {
-        QF_INT_DISABLE();
         std::uint16_t b = getByte();
         if (b != QS_EOD) {
             while ((USART2->SR & USART_FLAG_TXE) == 0U) { // while TXE not empty
-                QF_INT_ENABLE();
-                QF_CRIT_EXIT_NOP();
-
-                QF_INT_DISABLE();
             }
             USART2->DR = b; // put into the DR register
-            QF_INT_ENABLE();
         }
         else {
-            QF_INT_ENABLE();
             break;
         }
     }
 }
 //............................................................................
-//! callback function to reset the target (to be implemented in the BSP)
 void onReset() {
     NVIC_SystemReset();
 }
 //............................................................................
-//! callback function to execute a user command
 void onCommand(std::uint8_t cmdId, std::uint32_t param1,
                std::uint32_t param2, std::uint32_t param3)
 {

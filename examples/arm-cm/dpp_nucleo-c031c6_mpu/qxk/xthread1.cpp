@@ -101,6 +101,24 @@ void XThread1_ctor(
 
 } // namespace APP
 //$enddef${Shared-TH::XThread1_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$define${Shared-TH::TH_obj_dict} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace APP {
+
+//${Shared-TH::TH_obj_dict} ..................................................
+#ifdef Q_SPY
+void TH_obj_dict() {
+    QS_OBJ_DICTIONARY(TH_XThread1);
+    QS_OBJ_DICTIONARY(TH_XThread1->getTimeEvt());
+
+    QS_OBJ_DICTIONARY(TH_XThread2);
+    QS_OBJ_DICTIONARY(TH_XThread2->getTimeEvt());
+    QS_OBJ_DICTIONARY(&TH_sema);
+    QS_OBJ_DICTIONARY(&TH_mutex);
+}
+#endif // def Q_SPY
+
+} // namespace APP
+//$enddef${Shared-TH::TH_obj_dict} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //$define${XThreads::XThread1} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace APP {
 
@@ -115,9 +133,6 @@ XThread1::XThread1()
 void XThread1::run(QP::QXThread * const thr) {
     // downcast the generic thr pointer to the specific thread
     auto me = static_cast<XThread1 *>(thr);
-
-    QS_OBJ_DICTIONARY(TH_XThread1);
-    QS_OBJ_DICTIONARY(TH_XThread1->getTimeEvt());
 
     // subscribe to the EAT signal (from the application)
     me->subscribe(APP::EAT_SIG);

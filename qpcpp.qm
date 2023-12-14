@@ -251,6 +251,14 @@ Contact information:
     <!--${QEP::QAsm::dispatch::qs_id}-->
     <parameter name="qs_id" type="std::uint_fast8_t const"/>
    </operation>
+   <!--${QEP::QAsm::isIn}-->
+   <operation name="isIn" type="bool" visibility="0x00" properties="0x06">
+    <specifiers>noexcept</specifiers>
+    <!--${QEP::QAsm::isIn::state}-->
+    <parameter name="state" type="QStateHandler const"/>
+    <code>static_cast&lt;void&gt;(state);
+return false;</code>
+   </operation>
    <!--${QEP::QAsm::getStateHandler}-->
    <operation name="getStateHandler?def Q_SPY" type="QStateHandler" visibility="0x00" properties="0x06">
     <specifiers>noexcept</specifiers>
@@ -715,7 +723,7 @@ m_temp.uint = ~m_state.uint;
    </operation>
    <!--${QEP::QHsm::isIn}-->
    <operation name="isIn" type="bool" visibility="0x00" properties="0x00">
-    <specifiers>noexcept</specifiers>
+    <specifiers>noexcept override</specifiers>
     <!--${QEP::QHsm::isIn::state}-->
     <parameter name="state" type="QStateHandler const"/>
     <code>QF_CRIT_STAT
@@ -1224,9 +1232,36 @@ m_temp.uint = ~m_state.uint;
     <specifiers>noexcept override</specifiers>
     <code>return m_state.obj-&gt;stateHandler;</code>
    </operation>
+   <!--${QEP::QMsm::isIn}-->
+   <operation name="isIn" type="bool" visibility="0x00" properties="0x00">
+    <specifiers>noexcept override</specifiers>
+    <!--${QEP::QMsm::isIn::state}-->
+    <parameter name="state" type="QStateHandler const"/>
+    <code>bool inState = false; // assume that this MSM is not in 'state'
+
+QMState const *s = m_state.obj;
+std::int_fast8_t limit = 6; // loop hard limit
+for (; (s != nullptr) &amp;&amp; (limit &gt; 0); --limit) {
+    if (s-&gt;stateHandler == state) {  // match found?
+        inState = true;
+        break;
+    }
+    else {
+        s = s-&gt;superstate; // advance to the superstate
+    }
+}
+
+QF_CRIT_STAT
+QF_CRIT_ENTRY();
+Q_ENSURE_INCRIT(690, limit &gt; 0);
+QF_CRIT_EXIT();
+
+return inState;</code>
+   </operation>
    <!--${QEP::QMsm::isInState}-->
    <operation name="isInState" type="bool" visibility="0x00" properties="0x00">
     <specifiers>const noexcept</specifiers>
+    <documentation>//! @deprecated instead use: QMsm::isIn()</documentation>
     <!--${QEP::QMsm::isInState::stateObj}-->
     <parameter name="stateObj" type="QMState const * const"/>
     <code>bool inState = false; // assume that this MSM is not in 'state'
@@ -1245,7 +1280,7 @@ for (; (s != nullptr) &amp;&amp; (limit &gt; 0); --limit) {
 
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_ENSURE_INCRIT(690, limit &gt; 0);
+Q_ENSURE_INCRIT(790, limit &gt; 0);
 QF_CRIT_EXIT();
 
 return inState;</code>
@@ -1911,6 +1946,13 @@ m_pthre_dis = static_cast&lt;std::uint8_t&gt;(~m_pthre);
     <!--${QF::QActive::dispatch::qs_id}-->
     <parameter name="qs_id" type="std::uint_fast8_t const"/>
     <code>reinterpret_cast&lt;QHsm *&gt;(this)-&gt;QHsm::dispatch(e, qs_id);</code>
+   </operation>
+   <!--${QF::QActive::isIn}-->
+   <operation name="isIn" type="bool" visibility="0x00" properties="0x02">
+    <specifiers>noexcept override</specifiers>
+    <!--${QF::QActive::isIn::state}-->
+    <parameter name="state" type="QStateHandler const"/>
+    <code>return reinterpret_cast&lt;QHsm *&gt;(this)-&gt;QHsm::isIn(state);</code>
    </operation>
    <!--${QF::QActive::setAttr}-->
    <operation name="setAttr" type="void" visibility="0x00" properties="0x00">
@@ -2743,6 +2785,13 @@ m_temp.fun  = initial;</code>
     <!--${QF::QMActive::dispatch::qs_id}-->
     <parameter name="qs_id" type="std::uint_fast8_t const"/>
     <code>reinterpret_cast&lt;QMsm *&gt;(this)-&gt;QMsm::dispatch(e, qs_id);</code>
+   </operation>
+   <!--${QF::QMActive::isIn}-->
+   <operation name="isIn" type="bool" visibility="0x00" properties="0x02">
+    <specifiers>noexcept override</specifiers>
+    <!--${QF::QMActive::isIn::state}-->
+    <parameter name="state" type="QStateHandler const"/>
+    <code>return reinterpret_cast&lt;QMsm *&gt;(this)-&gt;QMsm::isIn(state);</code>
    </operation>
    <!--${QF::QMActive::getStateHandler}-->
    <operation name="getStateHandler?def Q_SPY" type="QStateHandler" visibility="0x00" properties="0x02">
@@ -8299,11 +8348,11 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qs_id_)) { \
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION     731U
-#define QP_VERSION_STR &quot;7.3.1&quot;
+#define QP_VERSION     732U
+#define QP_VERSION_STR &quot;7.3.2&quot;
 
-//! Encrypted  current QP release (7.3.1) and date (2023-12-05)
-#define QP_RELEASE     0x7630E7D4U
+//! Encrypted  current QP release (7.3.2) and date (2023-12-14)
+#define QP_RELEASE     0x762F8843U
 
 //============================================================================
 //! @cond INTERNAL
@@ -10580,6 +10629,8 @@ void assertion_pre_(
         QS_STR_PRE_((module != nullptr) ? module : &quot;?&quot;);
     endRec_();
     onFlush();
+
+    // busy-wait until all QS data makes it over to the host
     for (std::uint32_t volatile ctr = delay; ctr &gt; 0U; ) {
         ctr = (ctr - 1U);
     }
@@ -12093,14 +12144,19 @@ QSTimeCtr onGetTime() {
 //............................................................................
 extern &quot;C&quot; {
 
-Q_NORETURN Q_onError(char const * const module, int_t const location) {
+Q_NORETURN Q_onError(
+    char const * const module, 
+    int_t const id)
+{
+    // NOTE: called in a critical section
+
     QP::QS::beginRec_(static_cast&lt;std::uint_fast8_t&gt;(QP::QS_ASSERT_FAIL));
         QS_TIME_PRE_();
-        QS_U16_PRE_(location);
+        QS_U16_PRE_(id);
         QS_STR_PRE_((module != nullptr) ? module : &quot;?&quot;);
     QP::QS::endRec_();
-
     QP::QS::onFlush();   // flush the assertion record to the host
+
     QP::QS::onCleanup(); // cleanup after the failure
     QP::QS::onReset();   // reset the target to prevent it from continuing
     for (;;) { // onReset() should not return, but to ensure no-return...
@@ -12144,7 +12200,7 @@ void processTestEvts_() {
         if (a-&gt;getEQueue().isEmpty()) { // empty queue?
             tstPriv_.readySet.remove(p);
 #ifndef Q_UNSAFE
-            tstPriv_.readySet.verify_(&amp;tstPriv_.readySet_dis);
+            tstPriv_.readySet.update_(&amp;tstPriv_.readySet_dis);
 #endif
         }
     }

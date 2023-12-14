@@ -904,6 +904,8 @@ void assertion_pre_(
         QS_STR_PRE_((module != nullptr) ? module : "?");
     endRec_();
     onFlush();
+
+    // busy-wait until all QS data makes it over to the host
     for (std::uint32_t volatile ctr = delay; ctr > 0U; ) {
         ctr = (ctr - 1U);
     }

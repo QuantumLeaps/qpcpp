@@ -100,11 +100,6 @@ void XThread2::run(QP::QXThread * const thr) {
     // downcast the generic thr pointer to the specific thread
     //auto me = static_cast<XThread2 *>(thr);
 
-    QS_OBJ_DICTIONARY(TH_XThread2);
-    QS_OBJ_DICTIONARY(TH_XThread2->getTimeEvt());
-    QS_OBJ_DICTIONARY(&TH_sema);
-    QS_OBJ_DICTIONARY(&TH_mutex);
-
     // initialize the semaphore before using it
     // NOTE: Here the semaphore is initialized in the highest-priority thread
     // that uses it. Alternatively, the semaphore can be initialized

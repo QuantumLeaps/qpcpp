@@ -135,6 +135,16 @@ me-&gt;setThread(mpu);</code>
    <documentation>// NOTE: kernel objects can be allocated outside any memory regions
 // accessible to the threads.</documentation>
   </attribute>
+  <!--${Shared-TH::TH_obj_dict}-->
+  <operation name="TH_obj_dict?def Q_SPY" type="void" visibility="0x00" properties="0x00">
+   <code>QS_OBJ_DICTIONARY(TH_XThread1);
+QS_OBJ_DICTIONARY(TH_XThread1-&gt;getTimeEvt());
+
+QS_OBJ_DICTIONARY(TH_XThread2);
+QS_OBJ_DICTIONARY(TH_XThread2-&gt;getTimeEvt());
+QS_OBJ_DICTIONARY(&amp;TH_sema);
+QS_OBJ_DICTIONARY(&amp;TH_mutex);</code>
+  </operation>
  </package>
  <!--${AOs}-->
  <package name="AOs" stereotype="0x02" namespace="APP::">
@@ -522,9 +532,6 @@ m_fork[n] = FREE;</action>
     <code>// downcast the generic thr pointer to the specific thread
 auto me = static_cast&lt;XThread1 *&gt;(thr);
 
-QS_OBJ_DICTIONARY(TH_XThread1);
-QS_OBJ_DICTIONARY(TH_XThread1-&gt;getTimeEvt());
-
 // subscribe to the EAT signal (from the application)
 me-&gt;subscribe(APP::EAT_SIG);
 
@@ -567,11 +574,6 @@ for (;;) {
     <parameter name="thr" type="QP::QXThread * const"/>
     <code>// downcast the generic thr pointer to the specific thread
 //auto me = static_cast&lt;XThread2 *&gt;(thr);
-
-QS_OBJ_DICTIONARY(TH_XThread2);
-QS_OBJ_DICTIONARY(TH_XThread2-&gt;getTimeEvt());
-QS_OBJ_DICTIONARY(&amp;TH_sema);
-QS_OBJ_DICTIONARY(&amp;TH_mutex);
 
 // initialize the semaphore before using it
 // NOTE: Here the semaphore is initialized in the highest-priority thread
@@ -702,6 +704,7 @@ $define ${Shared-TH::TH_mutex}
 
 $declare ${XThreads::XThread1}
 $define ${Shared-TH::XThread1_ctor}
+$define ${Shared-TH::TH_obj_dict}
 $define ${XThreads::XThread1}</text>
   </file>
   <!--${qxk::xthread2.cpp}-->

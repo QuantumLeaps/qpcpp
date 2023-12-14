@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-08-18
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2023-12-13
+//! @version Last updated for: @ref qpcpp_7_3_2
 //!
 //! @file
 //! @brief QS/C++ port to Win32 API
@@ -197,20 +197,19 @@ void QS::onReset(void) {
     exit(0);
 }
 //............................................................................
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
 void QS::onFlush(void) {
-    uint16_t nBytes;
-    uint8_t const *data;
-    QS_CRIT_STAT
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
         return;
     }
 
-    nBytes = QS_TX_CHUNK;
-    QS_CRIT_ENTRY();
+    std::uint16_t nBytes = QS_TX_CHUNK;
+    std::uint8_t const *data;
     while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
-        QS_CRIT_EXIT();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
@@ -240,9 +239,7 @@ void QS::onFlush(void) {
         }
         // set nBytes for the next call to QS::getBlock()
         nBytes = QS_TX_CHUNK;
-        QS_CRIT_ENTRY();
     }
-    QS_CRIT_EXIT();
 }
 //............................................................................
 QSTimeCtr QS::onGetTime(void) {
@@ -253,16 +250,15 @@ QSTimeCtr QS::onGetTime(void) {
 
 //............................................................................
 void QS::doOutput(void) {
-    uint16_t nBytes;
-    uint8_t const *data;
-    QS_CRIT_STAT
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
         return;
     }
 
-    nBytes = QS_TX_CHUNK;
+    std::uint16_t nBytes = QS_TX_CHUNK;
+    std::uint8_t const *data;
+    QS_CRIT_STAT
     QS_CRIT_ENTRY();
     if ((data = QS::getBlock(&nBytes)) != (uint8_t *)0) {
         QS_CRIT_EXIT();

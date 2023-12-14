@@ -122,14 +122,19 @@ QSTimeCtr onGetTime() {
 //............................................................................
 extern "C" {
 
-Q_NORETURN Q_onError(char const * const module, int_t const location) {
+Q_NORETURN Q_onError(
+    char const * const module,
+    int_t const id)
+{
+    // NOTE: called in a critical section
+
     QP::QS::beginRec_(static_cast<std::uint_fast8_t>(QP::QS_ASSERT_FAIL));
         QS_TIME_PRE_();
-        QS_U16_PRE_(location);
+        QS_U16_PRE_(id);
         QS_STR_PRE_((module != nullptr) ? module : "?");
     QP::QS::endRec_();
-
     QP::QS::onFlush();   // flush the assertion record to the host
+
     QP::QS::onCleanup(); // cleanup after the failure
     QP::QS::onReset();   // reset the target to prevent it from continuing
     for (;;) { // onReset() should not return, but to ensure no-return...
@@ -173,7 +178,7 @@ void processTestEvts_() {
         if (a->getEQueue().isEmpty()) { // empty queue?
             tstPriv_.readySet.remove(p);
 #ifndef Q_UNSAFE
-            tstPriv_.readySet.verify_(&tstPriv_.readySet_dis);
+            tstPriv_.readySet.update_(&tstPriv_.readySet_dis);
 #endif
         }
     }

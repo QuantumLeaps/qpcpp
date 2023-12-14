@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-08-20
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2023-12-13
+//! @version Last updated for: @ref qpcpp_7_3_2
 //!
 //! @file
 //! @brief QS/C++ port to POSIX
@@ -191,6 +191,9 @@ void QS::onReset() {
     exit(0);
 }
 //............................................................................
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
 void QS::onFlush() {
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "<TARGET> ERROR   %s\n",
@@ -199,12 +202,9 @@ void QS::onFlush() {
         return;
     }
 
-    QS_CRIT_STAT
-    QS_CRIT_ENTRY();
     std::uint16_t nBytes = QS_TX_CHUNK;
     std::uint8_t const *data;
     while ((data = getBlock(&nBytes)) != nullptr) {
-        QS_CRIT_EXIT();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
@@ -232,9 +232,7 @@ void QS::onFlush() {
         }
         // set nBytes for the next call to QS::getBlock()
         nBytes = QS_TX_CHUNK;
-        QS_CRIT_ENTRY();
     }
-    QS_CRIT_EXIT();
 }
 //............................................................................
 QSTimeCtr QS::onGetTime() {

@@ -45,7 +45,7 @@ private:
     bool m_foo;
 
 public:
-    friend bool QMsmTst_isInState(std::uint32_t const state_num);
+    friend bool QMsmTst_isIn(std::uint32_t const state_num);
 
 public:
     QMsmTst()
@@ -741,27 +741,27 @@ QM_STATE_DEF(QMsmTst, s211) {
 }
 //$enddef${SMs::QMsmTst} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-bool QMsmTst_isInState(std::uint32_t const state_num) {
+bool QMsmTst_isIn(std::uint32_t const state_num) {
     QP::QMsm * const me = &l_msmtst;
     bool stat = false;
     switch (state_num) {
     case 0:
-        stat = me->isInState(&QMsmTst::s_s);
+        stat = me->isIn(Q_STATE_CAST(&QMsmTst::s));
         break;
     case 1:
-        stat = me->isInState(&QMsmTst::s1_s);
+        stat = me->isIn(Q_STATE_CAST(&QMsmTst::s1));
         break;
     case 11:
-        stat = me->isInState(&QMsmTst::s11_s);
+        stat = me->isIn(Q_STATE_CAST(&QMsmTst::s11));
         break;
     case 2:
-        stat = me->isInState(&QMsmTst::s21_s);
+        stat = me->isIn(Q_STATE_CAST(&QMsmTst::s2));
         break;
     case 21:
-        stat = me->isInState(&QMsmTst::s21_s);
+        stat = me->isIn(Q_STATE_CAST(&QMsmTst::s21));
         break;
     case 211:
-        stat = me->isInState(&QMsmTst::s211_s);
+        stat = me->isIn(Q_STATE_CAST(&QMsmTst::s211));
         break;
     default:
         Q_ERROR();

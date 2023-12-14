@@ -1,7 +1,7 @@
 //============================================================================
 // Product: QUTEST port for Zephyr RTOS
-// Last updated for version 7.3.0
-// Last updated on  2023-10-10
+// Last updated for version 7.3.2
+// Last updated on  2023-12-13
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -98,6 +98,9 @@ QSTimeCtr QS::onGetTime() {  // NOTE: invoked inside a critical section
     return k_cycle_get_32();
 }
 //............................................................................
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
 void QS::onFlush(void) {
     std::uint16_t len = 0xFFFFU; // to get as many bytes as available
     std::uint8_t const *buf;

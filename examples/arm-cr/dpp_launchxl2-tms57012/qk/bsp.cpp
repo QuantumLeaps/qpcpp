@@ -1,7 +1,7 @@
 //============================================================================
 // Product: "DPP" on LAUCHXL2-TMS570LS12 board, preemptive QK kernel
-// Last updated for version 7.3.0
-// Last updated on  2023-08-15
+// Last updated for version 7.3.2
+// Last updated on  2023-12-13
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -409,33 +409,25 @@ QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
     return rtiREG1->CNT[0].FRCx; // free running RTI counter0
 }
 //............................................................................
+//! callback function to execute a user command
 void onFlush() {
     for (;;) {
-        QF_INT_DISABLE();
         std::uint16_t b = getByte();
         if (b != QS_EOD) {
             while ((scilinREG->FLR & (uint32)SCI_TX_INT) == 0U) {
-                QF_INT_ENABLE();
-                QF_CRIT_EXIT_NOP();
-
-                QF_INT_DISABLE();
             }
             scilinREG->TD = b;
-            QF_INT_ENABLE();
         }
         else {
-            QF_INT_ENABLE();
             break;
         }
     }
 }
 //............................................................................
-//! callback function to reset the target (to be implemented in the BSP)
 void onReset() {
     systemREG1->SYSECR = 0U; // perform system reset
 }
 //............................................................................
-// callback function to execute a user command
 void onCommand(std::uint8_t cmdId, std::uint32_t param1,
                std::uint32_t param2, std::uint32_t param3)
 {

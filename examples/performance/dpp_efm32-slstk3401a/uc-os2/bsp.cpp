@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, EFM32-SLSTK3401A board, uC/OS-II kernel
-// Last updated for version 7.3.0
-// Last updated on  2023-09-10
+// Last updated for version 7.3.2
+// Last updated on  2023-12-13
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -445,31 +445,27 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
     }
 }
 //............................................................................
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
 void QS::onFlush(void) {
-#if OS_CRITICAL_METHOD == 3u  // Allocate storage for CPU status register
-    OS_CPU_SR cpu_sr;
-#endif
-    uint16_t b;
-
-    OS_ENTER_CRITICAL();
-    while ((b = getByte()) != QS_EOD) { // while not End-Of-Data...
-        OS_EXIT_CRITICAL();
-        // while TXE not empty
-        while ((DPP::l_USART0->STATUS & USART_STATUS_TXBL) == 0U) {
+    for (;;) {
+        std::uint16_t b = getByte();
+        if (b != QS_EOD) {
+            while ((DPP::l_USART0->STATUS & USART_STATUS_TXBL) == 0U) {
+            }
+            DPP::l_USART0->TXDATA  = (b & 0xFFU); // put into the DR register
         }
-        DPP::l_USART0->TXDATA  = (b & 0xFFU); // put into the DR register
-        OS_ENTER_CRITICAL();
+        else {
+            break;
+        }
     }
-    OS_EXIT_CRITICAL();
-;
 }
 //............................................................................
-//! callback function to reset the target (to be implemented in the BSP)
 void QS::onReset(void) {
     NVIC_SystemReset();
 }
 //............................................................................
-//! callback function to execute a user command (to be implemented in BSP)
 void QS::onCommand(uint8_t cmdId, uint32_t param1,
                    uint32_t param2, uint32_t param3)
 {

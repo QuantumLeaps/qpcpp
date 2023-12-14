@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, NUCLEO-C031C6 board, QXK kernel, MPU isolation
-// Last updated for version 7.3.1
-// Last updated on  2023-12-03
+// Last updated for version 7.3.2
+// Last updated on  2023-12-13
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -616,6 +616,7 @@ void init() {
     QS_USR_DICTIONARY(PAUSED_STAT);
 
     QS_ONLY(APP::produce_sig_dict());
+    QS_ONLY(APP::TH_obj_dict());
 
     // setup the QS filters...
     QS_GLB_FILTER(QP::QS_ALL_RECORDS);   // all records
@@ -900,38 +901,27 @@ QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
     }
 }
 //............................................................................
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
 void onFlush() {
     for (;;) {
-        QF_INT_DISABLE();
-        QF_MEM_SYS();
         std::uint16_t b = getByte();
         if (b != QS_EOD) {
             while ((USART2->ISR & (1U << 7U)) == 0U) { // while TXE not empty
-                QF_MEM_APP();
-                QF_INT_ENABLE();
-                QF_CRIT_EXIT_NOP();
-
-                QF_INT_DISABLE();
-                QF_MEM_SYS();
             }
             USART2->TDR = b; // put into the DR register
-            QF_MEM_APP();
-            QF_INT_ENABLE();
         }
         else {
-            QF_MEM_APP();
-            QF_INT_ENABLE();
             break;
         }
     }
 }
 //............................................................................
-//! callback function to reset the target (to be implemented in the BSP)
 void onReset() {
     NVIC_SystemReset();
 }
 //............................................................................
-// callback function to execute a user command
 void onCommand(std::uint8_t cmdId, std::uint32_t param1,
                std::uint32_t param2, std::uint32_t param3)
 {

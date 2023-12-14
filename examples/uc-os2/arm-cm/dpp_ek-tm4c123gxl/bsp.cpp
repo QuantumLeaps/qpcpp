@@ -1,7 +1,7 @@
 //============================================================================
 // Product: DPP example, EK-TM4C123GXL board, uC-OS2 RTOS kernel
-// Last updated for @ref qpcpp_7_3_1
-// Last updated on  2023-12-04
+// Last updated for @ref qpcpp_7_3_2
+// Last updated on  2023-12-13
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
@@ -453,15 +453,12 @@ QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
     return TIMER5->TAV;
 }
 //............................................................................
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
 void onFlush() {
     for (;;) {
-        QF_CRIT_STAT
-
-        // try to get next byte to transmit
-        QF_CRIT_ENTRY();
         std::uint16_t b = getByte();
-        QF_CRIT_EXIT();
-
         if (b != QS_EOD) { // NOT end-of-data
             // busy-wait as long as TX FIFO has data to transmit
             while ((UART0->FR & UART_FR_TXFE) == 0U) {
@@ -474,7 +471,6 @@ void onFlush() {
     }
 }
 //............................................................................
-//! callback function to reset the target (to be implemented in the BSP)
 void onReset() {
     NVIC_SystemReset();
 }

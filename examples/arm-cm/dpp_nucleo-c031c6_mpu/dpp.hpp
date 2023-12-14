@@ -140,6 +140,11 @@ extern QP::QXSemaphore TH_sema;
 // accessible to the threads.
 extern QP::QXMutex TH_mutex;
 
+//${Shared-TH::TH_obj_dict} ..................................................
+#ifdef Q_SPY
+void TH_obj_dict();
+#endif // def Q_SPY
+
 } // namespace APP
 //$enddecl${Shared-TH} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #endif // QXK_HPP_

@@ -294,6 +294,9 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
     return k_cycle_get_32();
 }
 //............................................................................
+// NOTE:
+// No critical section in QS::onFlush() to avoid nesting of critical sections
+// in case QS::onFlush() is called from Q_onError().
 void QS::onFlush(void) {
     std::uint16_t len = 0xFFFFU; // to get as many bytes as available
     std::uint8_t const *buf;
@@ -319,7 +322,6 @@ void QS::doOutput(void) {
     }
 }
 //............................................................................
-//! callback function to reset the target (to be implemented in the BSP)
 void QS::onReset(void) {
     sys_reboot(SYS_REBOOT_COLD);
 }
