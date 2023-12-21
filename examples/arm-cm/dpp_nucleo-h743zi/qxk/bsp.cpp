@@ -355,9 +355,6 @@ void QF::onStartup() {
     // NOTE: this might have been changed by STM32Cube.
     NVIC_SetPriorityGrouping(0U);
 
-    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
-
     // set priorities of ALL ISRs used in the system, see NOTE1
     NVIC_SetPriority(USART3_IRQn,    0U); // kernel UNAWARE interrupt
     NVIC_SetPriority(SysTick_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 1U);

@@ -192,6 +192,10 @@ void init() {
     //
     HAL_Init();
 
+    // NOTE: SystemInit() has been already called from the startup code
+    // but SystemCoreClock needs to be updated
+    SystemCoreClockUpdate();
+
     // Configure the system clock
     RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
     RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
@@ -383,9 +387,6 @@ void QF::onStartup() {
     // assign all priority bits for preemption-prio. and none to sub-prio.
     // NOTE: this might have been changed by STM32Cube.
     NVIC_SetPriorityGrouping(0U);
-
-    // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
-    SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
 
     // set priorities of ALL ISRs used in the system, see NOTE1
     NVIC_SetPriority(USART3_IRQn,    0U); // kernel UNAWARE interrupt
