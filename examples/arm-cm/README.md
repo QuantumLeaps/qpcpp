@@ -45,7 +45,7 @@ This is how you might go about an MCU that is not directly supported in the `qpc
 
 - at this point, it is highly recommend that you just buy one of the supported ARM Cortex-M boards, which are carefully chosen to be very inexpensive. With your own board, you'd be able to run and debug the QP application at your desk, which is priceless because as you surely remember: *In embedded systems NOTING works until EVERYTHING works*.
 
-- only *after* you get started with a working example, you can try to modify it for your own board. This typically requiers only changes to the BSP (Board Support Package), which is provided in the `bsp.cpp` file.
+- only *after* you get started with a working example, you can try to modify it for your own board. This typically requiers only changes to the BSP (Board Support Package), which is provided in the `bsp.c` file.
 
 
 # Code Organization
