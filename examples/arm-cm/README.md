@@ -35,7 +35,7 @@ With dozens of silicon vendors offering ARM Cortex-M MCUs, each providing hundre
 
 This is how you might go about an MCU that is not directly supported in the `qpc/examples/arm-cm`:
 
-- choose example that most closely matches your particular MCU. In your case of the NXP MKE02Z64VLC2, which is based on the Cortex-M0+ core, the closest are the examples for NUCLEO-C031C6
+- choose example that most closely matches your particular MCU. For instance, suppose that you're interested in NXP MKE02Z64VLC2, which is based on the Cortex-M0+ core, the closest are the examples for NUCLEO-C031C6 (also based on M0+)
 
 - choose the kernel you'd like to use. For example, assuming that you like QK, you are interested in the qk subdirectory.
 
@@ -76,9 +76,9 @@ examples\arm-cm\dpp_nucleo-c031c6
 |   |   \---targetConfigs
 |   |       Makefile          // Makefile for GNU-ARM
 |   +---armclang   // ARM/KEIL toolchain with Compiler 6 (ARM/CLANG)
-|   |       dpp-qk.uvprojx // uVision project
+|   |       dpp-qxk.uvprojx // uVision project
 |   \---iar        // IAR EWARM
-|           dpp-qk.eww     // IAR EW-ARM workspace
+|           dpp-qxk.eww     // IAR EW-ARM workspace
 |
 ```
 

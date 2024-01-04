@@ -10,7 +10,7 @@ This example demonstrates the [Dining Philosophers Problem (DPP) application](ht
 </p>
 
 > **NOTE**
-This example can be used as a starting point for any other ARM Cortex-M MCU, including those based on differnt Cortex-M cores (M0/M0+/M3/M4/M7/M23/M33/M55/M85...) The most simplifying factor is that the QP-ports to Cortex-M don't need to change at all (the correct port is selected automatically based on the standard preprocessor macros provided by the compiler).
+This example can be used as a starting point for any other ARM Cortex-M MCU, including those based on different Cortex-M cores (M0/M0+/M3/M4/M7/M23/M33/M55/M85...) The most simplifying factor is that the QP-ports to Cortex-M don't need to change at all (the correct port is selected automatically based on the standard preprocessor macros provided by the compiler).
 
 <p align="center">
 <img src="../qp_arm-cm.jpg"/>
@@ -68,9 +68,9 @@ examples\arm-cm\dpp_nucleo-c031c6
 |   |   \---targetConfigs
 |   |       Makefile          // Makefile for GNU-ARM
 |   +---armclang   // ARM/KEIL toolchain with Compiler 6 (ARM/CLANG)
-|   |       dpp-qk.uvprojx // uVision project
+|   |       dpp-qxk.uvprojx // uVision project
 |   \---iar        // IAR EWARM
-|           dpp-qk.eww     // IAR EW-ARM workspace
+|           dpp-qxk.eww     // IAR EW-ARM workspace
 |
 ```
 
