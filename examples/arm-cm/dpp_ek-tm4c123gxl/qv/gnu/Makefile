@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on EK-TM4C123GXL, QV kernel, GNU-ARM
-# Last Updated for Version: 7.0.1
-# Date of the Last Update:  2022-05-23
+# Last Updated for Version: 7.3.3
+# Date of the Last Update:  2024-01-29
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -45,8 +45,7 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    https://sourceforge.net/projects/qpc/files/QTools/
-#
+#    https://github.com/QuantumLeaps/qtools
 
 #-----------------------------------------------------------------------------
 # project name
@@ -57,7 +56,7 @@ PROJECT     := dpp-qv
 # project directories
 #
 
-# location of the QP/C++ framework (if not provided in an environemnt var.)
+# location of the QP/C++ framework (if not provided in an environment var.)
 ifeq ($(QPCPP),)
 QPCPP := ../../../../..
 endif
@@ -133,7 +132,7 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   :=
+DEFINES   := -DQP_CONFIG
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -141,8 +140,8 @@ DEFINES   :=
 # FLOAT_ABI: [ | soft | softfp | hard]
 #
 ARM_CPU   := -mcpu=cortex-m4
-ARM_FPU   := -mfpu=vfp
-FLOAT_ABI := -mfloat-abi=softfp
+ARM_FPU   := -mfpu=fpv4-sp-d16
+FLOAT_ABI := -mfloat-abi=hard
 
 #-----------------------------------------------------------------------------
 # GNU-ARM toolset (NOTE: You need to adjust to your machine)
@@ -165,19 +164,19 @@ BIN   := $(GNU_ARM)/bin/arm-none-eabi-objcopy
 
 
 ##############################################################################
-# Typically, you should not need to change anything below this line
+# Typically you should not need to change anything below this line
 
-# basic utilities (included in Qtools for Windows), see:
-#    http://sourceforge.net/projects/qpc/files/Qtools
+# basic utilities (included in QTools for Windows), see:
+#     https://www.state-machine.com/qtools
 
 MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build options for various configurations for ARM Cortex-M4F
+# build options for various configurations for ARM Cortex-M
 #
 
-# combine all the soruces...
+# combine all the sources...
 CPP_SRCS += $(QP_SRCS)
 ASM_SRCS += $(QP_ASMS)
 
@@ -189,11 +188,11 @@ ASFLAGS = $(ARM_CPU) $(ARM_FPU) $(ASM_CPU) $(ASM_FPU)
 
 CFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections \
-	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c $(ARM_CPU) $(ARM_FPU) $(FLOAT_ABI) -mthumb -Wall \
 	-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions \
-	-O1 $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O2 $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
@@ -279,6 +278,8 @@ $(BIN_DIR)/%.o : %.c
 $(BIN_DIR)/%.o : %.cpp
 	$(CPP) $(CPPFLAGS) $< -o $@
 
+.PHONY : clean show
+
 # include dependency files only if our goal depends on their existence
 ifneq ($(MAKECMDGOALS),clean)
   ifneq ($(MAKECMDGOALS),show)
@@ -287,7 +288,6 @@ ifneq ($(MAKECMDGOALS),clean)
 endif
 
 
-.PHONY : clean
 clean:
 	-$(RM) $(BIN_DIR)/*.o \
 	$(BIN_DIR)/*.d \

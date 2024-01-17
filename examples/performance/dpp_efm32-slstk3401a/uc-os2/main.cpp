@@ -41,7 +41,7 @@ Q_DEFINE_THIS_FILE
 
 //............................................................................
 int main() {
-    // stacks for all uC/OS-II threads (grouped toghether for ease of testing)
+    // stacks for all uC/OS-II threads (grouped together for ease of testing)
     static OS_STK philoStackSto[N_PHILO][128];
     static OS_STK tableStackSto[256];
     static OS_STK testStackSto[128];

@@ -7,7 +7,6 @@
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
-			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -26,11 +25,6 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
 	<linkedResources>
-		<link>
-			<name>GNU_CPP</name>
-			<type>2</type>
-			<locationURI>PARENT-5-PROJECT_LOC/3rd_party/gnu_cpp</locationURI>
-		</link>
 		<link>
 			<name>QK</name>
 			<type>2</type>
@@ -62,24 +56,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/bsp.cpp</locationURI>
 		</link>
 		<link>
-			<name>bsp.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/bsp.h</locationURI>
-		</link>
-		<link>
-			<name>dpp.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/dpp.h</locationURI>
-		</link>
-		<link>
-			<name>gpio.h</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/3rd_party/ek-tm4c123gxl/gpio.h</locationURI>
-		</link>
-		<link>
 			<name>main.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/main.cpp</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/main.cpp</locationURI>
 		</link>
 		<link>
 			<name>philo.cpp</name>
@@ -87,24 +66,14 @@
 			<locationURI>PARENT-2-PROJECT_LOC/philo.cpp</locationURI>
 		</link>
 		<link>
-			<name>qstamp.cpp</name>
+			<name>qp_config.hpp</name>
 			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/src/qs/qstamp.cpp</locationURI>
-		</link>
-		<link>
-			<name>rom.h</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/3rd_party/ek-tm4c123gxl/rom.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/qp_config.hpp</locationURI>
 		</link>
 		<link>
 			<name>startup_TM4C123GH6PM.c</name>
 			<type>1</type>
 			<locationURI>PARENT-5-PROJECT_LOC/3rd_party/ek-tm4c123gxl/gnu/startup_TM4C123GH6PM.c</locationURI>
-		</link>
-		<link>
-			<name>sysctl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/3rd_party/ek-tm4c123gxl/sysctl.h</locationURI>
 		</link>
 		<link>
 			<name>system_TM4C123GH6PM.c</name>
@@ -122,4 +91,10 @@
 			<locationURI>PARENT-2-PROJECT_LOC/table.cpp</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>CG_TOOL_GPP</name>
+			<value>$%7BCG_TOOL_ROOT%7D/bin/arm-none-eabi-g++</value>
+		</variable>
+	</variableList>
 </projectDescription>

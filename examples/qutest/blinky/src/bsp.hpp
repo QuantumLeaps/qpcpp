@@ -37,7 +37,7 @@
 // a very simple Board Support Package (BSP) -----========--------------------
 class BSP {
 public:
-    enum { TICKS_PER_SEC = 100 }; // numer of clock ticks in a second
+    enum { TICKS_PER_SEC = 100 }; // number of clock ticks in a second
     static void init(void);
     static void ledOff(void);
     static void ledOn(void);

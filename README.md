@@ -8,7 +8,7 @@
 View QP/C++ Revision History at: https://www.state-machine.com/qpcpp/history.html
 
 > **NOTE:** If you're interested in the latest QP/C++ version from GitHub,
-it is highly recommened that you clone this repo like that:
+it is highly recommended that you clone this repo like that:
 
 ```
 git clone https://github.com/QuantumLeaps/qpcpp --recurse-submodules --depth 1
@@ -105,7 +105,7 @@ you don't use any open source license and you do not violate your policy.
 
 
 # QP/C++ Documentation
-The online HTML documention for the **latest** version of QP/C++ is located
+The online HTML documentation for the **latest** version of QP/C++ is located
 at: https://www.state-machine.com/qpcpp
 
 The offline HTML documentation for **this** particular version of QP/C++

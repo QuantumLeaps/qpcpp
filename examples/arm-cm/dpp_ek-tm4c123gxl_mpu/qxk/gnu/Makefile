@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on EK-TM4C123GXL, QXK kernel, GNU-ARM
-# Last Updated for Version: 7.3.0
-# Date of the Last Update:  2023-09-07
+# Last Updated for Version: 7.3.3
+# Date of the Last Update:  2024-01-29
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -56,7 +56,7 @@ PROJECT     := dpp-qxk
 # project directories
 #
 
-# location of the QP/C++ framework (if not provided in an environemnt var.)
+# location of the QP/C++ framework (if not provided in an environment var.)
 ifeq ($(QPCPP),)
 QPCPP := ../../../../..
 endif
@@ -137,9 +137,7 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := \
-	-DQP_CONFIG \
-	-DTARGET_IS_TM4C123_RB1
+DEFINES   := -DQP_CONFIG
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -147,8 +145,8 @@ DEFINES   := \
 # FLOAT_ABI: [ | soft | softfp | hard]
 #
 ARM_CPU   := -mcpu=cortex-m4
-ARM_FPU   := -mfpu=vfp
-FLOAT_ABI := -mfloat-abi=softfp
+ARM_FPU   := -mfpu=fpv4-sp-d16
+FLOAT_ABI := -mfloat-abi=hard
 
 #-----------------------------------------------------------------------------
 # GNU-ARM toolset (NOTE: You need to adjust to your machine)
@@ -169,6 +167,7 @@ AS    := $(GNU_ARM)/bin/arm-none-eabi-as
 LINK  := $(GNU_ARM)/bin/arm-none-eabi-g++
 BIN   := $(GNU_ARM)/bin/arm-none-eabi-objcopy
 
+
 ##############################################################################
 # Typically you should not need to change anything below this line
 
@@ -182,7 +181,7 @@ RM    := rm
 # build options for various configurations for ARM Cortex-M
 #
 
-# combine all the soruces...
+# combine all the sources...
 CPP_SRCS += $(QP_SRCS)
 ASM_SRCS += $(QP_ASMS)
 
@@ -259,14 +258,8 @@ endif
 # rules
 #
 
-.PHONY : run norun flash clean show
-
-ifeq ($(MAKECMDGOALS),norun)
-all : $(TARGET_BIN)
-norun : all
-else
-all : $(TARGET_BIN) run
-endif
+all: $(TARGET_BIN)
+#all: $(TARGET_ELF)
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(BIN) -O binary $< $@
@@ -289,6 +282,8 @@ $(BIN_DIR)/%.o : %.c
 
 $(BIN_DIR)/%.o : %.cpp
 	$(CPP) $(CPPFLAGS) $< -o $@
+
+.PHONY : clean show
 
 # include dependency files only if our goal depends on their existence
 ifneq ($(MAKECMDGOALS),clean)

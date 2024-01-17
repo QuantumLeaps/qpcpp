@@ -246,7 +246,7 @@ void QK::onIdle() {
 //
 // NOTE2:
 // One of the LEDs is used to visualize the idle loop activity. The brightness
-// of the LED is proportional to the frequency of invcations of the idle loop.
-// Please note that the LED is toggled with interrupts locked, so no interrupt
-// execution time contributes to the brightness of the User LED.
+// of the LED is proportional to the frequency of the idle loop. Please note
+// that the LED is toggled with interrupts locked, so no interrupt execution
+// time contributes to the brightness of the User LED.
 //

@@ -609,14 +609,14 @@ bool doBitmapsOverlap(uint8_t bmp_id1, uint8_t x1, uint8_t y1,
 //..........................................................................*/
 bool isWallHit(uint8_t bmp_id, uint8_t x, uint8_t y) {
     Bitmap const *bmp = &l_bitmap[bmp_id];
-    uint32_t shft = (x & 0x1FU);
+    uint32_t shift = (x & 0x1FU);
     uint32_t *walls = &l_walls[y][x >> 5];
     for (y = 0; y < bmp->height; ++y, walls += (SCREEN_WIDTH >> 5)) {
-        if (*walls & ((uint32_t)bmp->bits[y] << shft)) {
+        if (*walls & ((uint32_t)bmp->bits[y] << shift)) {
             return true;
         }
-        if (shft > 24U) {
-            if (*(walls + 1) & ((uint32_t)bmp->bits[y] >> (32U - shft))) {
+        if (shift > 24U) {
+            if (*(walls + 1) & ((uint32_t)bmp->bits[y] >> (32U - shift))) {
                 return true;
             }
         }
@@ -682,11 +682,11 @@ namespace { // unnamed local namespace
 
 static void paintBits(uint8_t x, uint8_t y, uint8_t const *bits, uint8_t h) {
     uint32_t *fb = &l_fb[y][x >> 5];
-    uint32_t shft = (x & 0x1FU);
+    uint32_t shift = (x & 0x1FU);
     for (y = 0; y < h; ++y, fb += (BSP::SCREEN_WIDTH >> 5)) {
-        *fb |= ((uint32_t)bits[y] << shft);
-        if (shft > 24U) {
-            *(fb + 1) |= ((uint32_t)bits[y] >> (32U - shft));
+        *fb |= ((uint32_t)bits[y] << shift);
+        if (shift > 24U) {
+            *(fb + 1) |= ((uint32_t)bits[y] >> (32U - shift));
         }
     }
 }
@@ -695,17 +695,17 @@ static void paintBitsClear(uint8_t x, uint8_t y,
                            uint8_t const *bits, uint8_t h)
 {
     uint32_t *fb = &l_fb[y][x >> 5];
-    uint32_t shft = (x & 0x1FU);
-    uint32_t mask1 = ~((uint32_t)0xFFU << shft);
+    uint32_t shift = (x & 0x1FU);
+    uint32_t mask1 = ~((uint32_t)0xFFU << shift);
     uint32_t mask2;
-    if (shft > 24U) {
-        mask2 = ~(0xFFU >> (32U - shft));
+    if (shift > 24U) {
+        mask2 = ~(0xFFU >> (32U - shift));
     }
     for (y = 0; y < h; ++y, fb += (BSP::SCREEN_WIDTH >> 5)) {
-        *fb = ((*fb & mask1) | ((uint32_t)bits[y] << shft));
-        if (shft > 24U) {
+        *fb = ((*fb & mask1) | ((uint32_t)bits[y] << shift));
+        if (shift > 24U) {
             *(fb + 1) = ((*(fb + 1) & mask2)
-                | ((uint32_t)bits[y] >> (32U - shft)));
+                | ((uint32_t)bits[y] >> (32U - shift)));
         }
     }
 }
@@ -722,7 +722,7 @@ void QF::onStartup() {
     // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
     SysTick_Config(SystemCoreClock / BSP::TICKS_PER_SEC);
 
-    // assing all priority bits for preemption-prio. and none to sub-prio.
+    // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE1
@@ -850,7 +850,7 @@ QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
     if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0U) { // not set?
         return QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
     }
-    else { // the rollover occured, but the SysTick_ISR did not run yet
+    else { // the rollover occurred, but the SysTick_ISR did not run yet
         return QS_tickTime_ + QS_tickPeriod_ - (QSTimeCtr)SysTick->VAL;
     }
 }

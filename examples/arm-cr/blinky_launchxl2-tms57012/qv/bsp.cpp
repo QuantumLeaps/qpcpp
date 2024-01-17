@@ -155,6 +155,8 @@ extern "C" Q_NORETURN Q_onError(char const * const module, int_t const loc) {
     (void)loc;
     QS_ASSERTION(module, loc, static_cast<uint32_t>(10000U));
     systemREG1->SYSECR = 0; // perform system reset
+    for (;;) { // explicitly no return
+    }
 }
 
 //============================================================================

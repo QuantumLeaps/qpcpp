@@ -241,7 +241,7 @@ void displayPhilStat(std::uint8_t n, char const *stat) {
 }
 //............................................................................
 void displayPaused(std::uint8_t const paused) {
-    // not enouhg LEDs to implement this feature
+    // not enough LEDs to implement this feature
     if (paused != 0U) {
         //P1OUT |=  LED1;
     }
@@ -297,7 +297,7 @@ void QF::onStartup() {
 void QF::onCleanup() {
 }
 //............................................................................
-void QV::onIdle() { // CAUTION: called with interrutps DISABLED, see NOTE1
+void QV::onIdle() { // CAUTION: called with interrupts DISABLED, see NOTE1
     // toggle LED2 on and then off, see NOTE2
     QF_INT_DISABLE();
     P4OUT |=  LED2;  // turn LED2 on
@@ -371,7 +371,7 @@ QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
     if ((TA0CTL & TAIFG) == 0U) {  /* interrupt not pending? */
         return QS_tickTime_ + TA0R;
     }
-    else { /* the rollover occured, but the timerA_ISR did not run yet */
+    else { /* the rollover occurred, but the timerA_ISR did not run yet */
         return QS_tickTime_
            + (((BSP_SMCLK/8U) + BSP::TICKS_PER_SEC/2U)
                  / BSP::TICKS_PER_SEC) + 1U

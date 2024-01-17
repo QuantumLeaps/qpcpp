@@ -113,7 +113,7 @@
 
 // <o>Maximum # event pools (QF_MAX_EPOOL)
 // <0=>0 no event pools
-// <1=>1 <2=>2 <3=>3 (deafult) <4=>4 <5=>5
+// <1=>1 <2=>2 <3=>3 (default) <4=>4 <5=>5
 // <6=>6 <7=>7 <8=>8 <9=>9 <10=>10 <11=>11
 // <12=>12 <13=>13 <14=>14 <15=>15
 // <i>Maximum # Event Pools <1..15>
@@ -184,7 +184,7 @@
 //..........................................................................
 // <h>QS Software Tracing
 // <i>Target-resident component of QP/Spy software tracing system
-// <i>(tracing instrumenation and command-input).
+// <i>(tracing instrumentation and command-input).
 
 // <n>NOTE: Requires command-line macro: Q_SPY
 // <i>The QS software tracing instrumenation is activated only when

@@ -173,7 +173,7 @@ void QF::onStartup(void) {
     // set up the SysTick timer to fire at BSP_TICKS0_PER_SEC rate
     SysTick_Config(SystemCoreClock / BSP_TICKS0_PER_SEC);
 
-    // assing all priority bits for preemption-prio. and none to sub-prio.
+    // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE00

@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QP/C++ on EK-TM4C123GXL, QK kernel, GNU-ARM
-# Last Updated for Version: 7.3.0
-# Date of the Last Update:  2023-05-26
+# Last Updated for Version: 7.3.3
+# Date of the Last Update:  2024-01-29
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -56,7 +56,7 @@ PROJECT     := dpp-qk
 # project directories
 #
 
-# location of the QP/C++ framework (if not provided in an environemnt var.)
+# location of the QP/C++ framework (if not provided in an environment var.)
 ifeq ($(QPCPP),)
 QPCPP := ../../../../..
 endif
@@ -132,8 +132,7 @@ LIB_DIRS  :=
 LIBS      :=
 
 # defines
-DEFINES   := \
-	-DQF_ON_CONTEXT_SW
+DEFINES   := -DQP_CONFIG
 
 # ARM CPU, ARCH, FPU, and Float-ABI types...
 # ARM_CPU:   [cortex-m0 | cortex-m0plus | cortex-m1 | cortex-m3 | cortex-m4]
@@ -141,8 +140,8 @@ DEFINES   := \
 # FLOAT_ABI: [ | soft | softfp | hard]
 #
 ARM_CPU   := -mcpu=cortex-m4
-ARM_FPU   := -mfpu=vfp
-FLOAT_ABI := -mfloat-abi=softfp
+ARM_FPU   := -mfpu=fpv4-sp-d16
+FLOAT_ABI := -mfloat-abi=hard
 
 #-----------------------------------------------------------------------------
 # GNU-ARM toolset (NOTE: You need to adjust to your machine)
@@ -177,7 +176,7 @@ RM    := rm
 # build options for various configurations for ARM Cortex-M
 #
 
-# combine all the soruces...
+# combine all the sources...
 CPP_SRCS += $(QP_SRCS)
 ASM_SRCS += $(QP_ASMS)
 
@@ -279,6 +278,8 @@ $(BIN_DIR)/%.o : %.c
 $(BIN_DIR)/%.o : %.cpp
 	$(CPP) $(CPPFLAGS) $< -o $@
 
+.PHONY : clean show
+
 # include dependency files only if our goal depends on their existence
 ifneq ($(MAKECMDGOALS),clean)
   ifneq ($(MAKECMDGOALS),show)
@@ -287,7 +288,6 @@ ifneq ($(MAKECMDGOALS),clean)
 endif
 
 
-.PHONY : clean
 clean:
 	-$(RM) $(BIN_DIR)/*.o \
 	$(BIN_DIR)/*.d \

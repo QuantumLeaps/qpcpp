@@ -67,7 +67,7 @@ examples\arm-cm\dpp_nucleo-c031c6
 |
 ```
 
-# Builing the example
+# Building the example
 
 ### GNU/ARM
 - open terminal window

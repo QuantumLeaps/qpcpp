@@ -181,12 +181,12 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
             QS_OBJ_PRE_(sender); // the sender object
             QS_SIG_PRE_(e->sig); // the signal of the event
             QS_OBJ_PRE_(this);   // this active object (recipient)
-            QS_2U8_PRE_(e->getPoolId_(), e->refCtr_); // pool-Id&ref-Count
+            QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // poolNum & refCtr
             QS_EQC_PRE_(nFree);  // # free entries
             QS_EQC_PRE_(0U);     // min # free entries (unknown)
         QS_END_PRE_()
 
-        if (e->getPoolId_() != 0U) { // is it a pool event?
+        if (e->getPoolNum_() != 0U) { // is it a pool event?
             QEvt_refCtr_inc_(e); // increment the reference counter
         }
         QF_CRIT_EXIT();
@@ -204,7 +204,7 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
             QS_OBJ_PRE_(sender); // the sender object
             QS_SIG_PRE_(e->sig); // the signal of the event
             QS_OBJ_PRE_(this);   // this active object (recipient)
-            QS_2U8_PRE_(e->getPoolId_(), e->refCtr_); // pool-Id&ref-Count
+            QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // poolNum & refCtr
             QS_EQC_PRE_(nFree);  // # free entries
             QS_EQC_PRE_(margin); // margin requested
         QS_END_PRE_()
@@ -223,12 +223,12 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
         QS_TIME_PRE_();          // timestamp
         QS_SIG_PRE_(e->sig);     // the signal of this event
         QS_OBJ_PRE_(this);       // this active object
-        QS_2U8_PRE_(e->getPoolId_(), e->refCtr_); // pool-Id&ref-Count
+        QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // poolNum & refCtr
         QS_EQC_PRE_(m_eQueue.tx_queue_available_storage); // # free
         QS_EQC_PRE_(0U);         // min # free entries (unknown)
     QS_END_PRE_()
 
-    if (e->getPoolId_() != 0U) { // is it a pool event?
+    if (e->getPoolNum_() != 0U) { // is it a pool event?
         QEvt_refCtr_inc_(e); // increment the reference counter
     }
     QF_CRIT_EXIT();
@@ -254,7 +254,7 @@ QEvt const *QActive::get_(void) noexcept {
         QS_TIME_PRE_();          // timestamp
         QS_SIG_PRE_(e->sig);     // the signal of this event
         QS_OBJ_PRE_(this);       // this active object
-        QS_2U8_PRE_(e->getPoolId_(), e->refCtr_); // pool-Id&ref-Count
+        QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // poolNum & refCtr
         QS_EQC_PRE_(m_eQueue.tx_queue_available_storage); // # free
     QS_END_PRE_()
     QF_CRIT_EXIT();

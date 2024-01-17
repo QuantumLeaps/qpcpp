@@ -321,7 +321,7 @@ void QF::onStartup() {
     tx_err = tx_thread_create(&idle_thread, // thread control block
         const_cast<CHAR *>("idle"), // thread name
         &idle_thread_fun,       // thread function
-        0LU,                    // thread input (unsued)
+        0LU,                    // thread input (unused)
         idle_thread_stack,       // stack start
         sizeof(idle_thread_stack), // stack size in bytes
         TX_MAX_PRIORITIES - 1U, // ThreadX priority (LOWEST possible), NOTE1

@@ -439,7 +439,7 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
     if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0) { // not set?
         return DPP::QS_tickTime_ - static_cast<QSTimeCtr>(SysTick->VAL);
     }
-    else { // the rollover occured, but the SysTick_ISR did not run yet
+    else { // the rollover occurred, but the SysTick_ISR did not run yet
         return DPP::QS_tickTime_ + DPP::QS_tickPeriod_
                - static_cast<QSTimeCtr>(SysTick->VAL);
     }

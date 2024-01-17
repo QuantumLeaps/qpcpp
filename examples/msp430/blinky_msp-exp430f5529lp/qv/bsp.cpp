@@ -177,7 +177,7 @@ void QF::onStartup() {
 void QF::onCleanup() {
 }
 //............................................................................
-void QV::onIdle(void) { // CAUTION: called with interrutps DISABLED, see NOTE1
+void QV::onIdle(void) { // CAUTION: called with interrupts DISABLED, see NOTE1
     // toggle LED2 on and then off, see NOTE2
     P4OUT |=  LED2;  // turn LED2 on
     P4OUT &= ~LED2;  // turn LED2 off

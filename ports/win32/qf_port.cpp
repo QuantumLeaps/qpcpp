@@ -53,7 +53,7 @@ static int   l_tickPrio = 50;  // default priority of the "ticker" thread
 static bool  l_isRunning;      // flag indicating when QF is running
 
 //............................................................................
-// helper function to match the signature expeced by CreateThread() Win32 API
+// helper function to match the signature expected by CreateThread() Win32 API
 static DWORD WINAPI ao_thread(LPVOID me) {
     QP::QActive::evtLoop_(static_cast<QP::QActive *>(me));
     return static_cast<DWORD>(0); // return success

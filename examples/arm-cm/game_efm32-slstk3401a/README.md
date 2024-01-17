@@ -45,7 +45,7 @@ Please check the Device Manager to find the COM port number.
 
 # Win32-GUI Emulation
 The sub-directory "win32-gui" provides the emulation of the example
-on Windows GUI, either single-threaded (win32-qv) or multithreded (win32).
+on Windows GUI, either single-threaded (win32-qv) or multithreaded (win32).
 This sub-directory contains the Makefile for the GNU-GCC toolset (MinGW)
 and Visual Studio solution file (game-gui.sln) for Visual C++.
 

@@ -3,7 +3,7 @@
 # Overview
 
 Blinks an on-board LED once per second. The blinking is performed
- by an Active Object (Blinky) wiht a state machine.
+ by an Active Object (Blinky) with a state machine.
 
 
 # Building and Running (Linux)
@@ -37,7 +37,7 @@ west flash
 
 # Sample Output
 The application also produces ASCII output to the serial terminal
-(if suppoted by the board):
+(if supported by the board):
 
 ```
 *** Booting Zephyr OS build v2.6.0-rc2-88-g3d39f72a88b3  ***

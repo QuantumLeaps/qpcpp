@@ -60,8 +60,8 @@ constexpr gioPORT_t    *LED3_PORT {gioPORTB};
 // NOTE: Switch-A is multiplexed on the same port/pin as LED3,
 // so you can use one or the other but not both simultaneously.
 //
-constexpr std::uint32_t SWA_PIN   {2U};
-constexpr gioPORT_t    *SWA_PORT  {gioPORTB};
+//constexpr std::uint32_t SWA_PIN   {2U};
+//constexpr gioPORT_t    *SWA_PORT  {gioPORTB};
 
 constexpr std::uint32_t SWB_PIN   {15U};
 constexpr hetBASE_t    *SWB_PORT  {hetREG1};

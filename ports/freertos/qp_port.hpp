@@ -172,9 +172,9 @@ extern "C" {
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
     #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_, qs_id_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_), (qs_id_))))
-    #define QF_EPOOL_PUT_(p_, e_, qs_id_) ((p_).put((e_), (qs_id_)))
+    #define QF_EPOOL_GET_(p_, e_, m_, qsId_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
+    #define QF_EPOOL_PUT_(p_, e_, qsId_) ((p_).put((e_), (qsId_)))
 
 #endif // ifdef QP_IMPL
 

@@ -165,7 +165,7 @@ void QF::onStartup(void) {
     // set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate
     SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
 
-    // assing all priority bits for preemption-prio. and none to sub-prio.
+    // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE1
@@ -185,7 +185,7 @@ void QF::onStartup(void) {
 void QF::onCleanup(void) {
 }
 //............................................................................
-void QV::onIdle(void) {  // NOTE: called with interrutps DISABLED, see NOTE01
+void QV::onIdle(void) {  // NOTE: called with interrupts DISABLED, see NOTE01
 
     // toggle the User LED on and then off, see NOTE02
     GPIOF->DATA_Bits[USER_LED] = USER_LED; // turn the User LED on
@@ -291,7 +291,7 @@ QSTimeCtr QS::onGetTime(void) { // invoked with interrupts locked
     if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0U) { // flag not set?
         return QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
     }
-    else { // the rollover occured, but the SysTick_ISR did not run yet
+    else { // the rollover occurred, but the SysTick_ISR did not run yet
         return QS_tickTime_ + QS_tickPeriod_ - (QSTimeCtr)SysTick->VAL;
     }
 }
