@@ -259,6 +259,16 @@ Contact information:
     <code>static_cast&lt;void&gt;(state);
 return false;</code>
    </operation>
+   <!--${QEP::QAsm::state}-->
+   <operation name="state" type="QStateHandler" visibility="0x00" properties="0x02">
+    <specifiers>const noexcept</specifiers>
+    <code>return m_state.fun;</code>
+   </operation>
+   <!--${QEP::QAsm::stateObj}-->
+   <operation name="stateObj" type="QMState const *" visibility="0x00" properties="0x02">
+    <specifiers>const noexcept</specifiers>
+    <code>return m_state.obj;</code>
+   </operation>
    <!--${QEP::QAsm::getStateHandler}-->
    <operation name="getStateHandler?def Q_SPY" type="QStateHandler" visibility="0x00" properties="0x06">
     <specifiers>noexcept</specifiers>
@@ -758,11 +768,6 @@ m_temp.uint = ~m_state.uint;
 #endif
 
 return inState; // return the status</code>
-   </operation>
-   <!--${QEP::QHsm::state}-->
-   <operation name="state" type="QStateHandler" visibility="0x00" properties="0x02">
-    <specifiers>const noexcept</specifiers>
-    <code>return m_state.fun;</code>
    </operation>
    <!--${QEP::QHsm::childState}-->
    <operation name="childState" type="QStateHandler" visibility="0x00" properties="0x00">
@@ -1284,11 +1289,6 @@ Q_ENSURE_INCRIT(790, limit &gt; 0);
 QF_CRIT_EXIT();
 
 return inState;</code>
-   </operation>
-   <!--${QEP::QMsm::stateObj}-->
-   <operation name="stateObj" type="QMState const *" visibility="0x00" properties="0x02">
-    <specifiers>const noexcept</specifiers>
-    <code>return m_state.obj;</code>
    </operation>
    <!--${QEP::QMsm::childStateObj}-->
    <operation name="childStateObj" type="QMState const *" visibility="0x00" properties="0x00">
@@ -1953,6 +1953,13 @@ m_pthre_dis = static_cast&lt;std::uint8_t&gt;(~m_pthre);
     <!--${QF::QActive::isIn::state}-->
     <parameter name="state" type="QStateHandler const"/>
     <code>return reinterpret_cast&lt;QHsm *&gt;(this)-&gt;QHsm::isIn(state);</code>
+   </operation>
+   <!--${QF::QActive::childState}-->
+   <operation name="childState" type="QStateHandler" visibility="0x00" properties="0x02">
+    <specifiers>noexcept</specifiers>
+    <!--${QF::QActive::childState::parent}-->
+    <parameter name="parent" type="QStateHandler const"/>
+    <code>return reinterpret_cast&lt;QHsm *&gt;(this)-&gt;QHsm::childState(parent);</code>
    </operation>
    <!--${QF::QActive::setAttr}-->
    <operation name="setAttr" type="void" visibility="0x00" properties="0x00">
@@ -2804,11 +2811,6 @@ m_temp.fun  = initial;</code>
     <!--${QF::QMActive::isInState::st}-->
     <parameter name="st" type="QMState const * const"/>
     <code>return reinterpret_cast&lt;QMsm const *&gt;(this)-&gt;QMsm::isInState(st);</code>
-   </operation>
-   <!--${QF::QMActive::stateObj}-->
-   <operation name="stateObj" type="QMState const *" visibility="0x00" properties="0x02">
-    <specifiers>const noexcept</specifiers>
-    <code>return m_state.obj;</code>
    </operation>
    <!--${QF::QMActive::childStateObj}-->
    <operation name="childStateObj" type="QMState const *" visibility="0x00" properties="0x02">
@@ -8348,11 +8350,11 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qs_id_)) { \
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION     732U
-#define QP_VERSION_STR &quot;7.3.2&quot;
+#define QP_VERSION     733U
+#define QP_VERSION_STR &quot;7.3.3&quot;
 
-//! Encrypted  current QP release (7.3.2) and date (2023-12-14)
-#define QP_RELEASE     0x762F8843U
+//! Encrypted  current QP release (7.3.3) and date (2024-01-31)
+#define QP_RELEASE     0x70DEE7F2U
 
 //============================================================================
 //! @cond INTERNAL

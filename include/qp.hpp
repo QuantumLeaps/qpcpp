@@ -44,11 +44,11 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION     732U
-#define QP_VERSION_STR "7.3.2"
+#define QP_VERSION     733U
+#define QP_VERSION_STR "7.3.3"
 
-//! Encrypted  current QP release (7.3.2) and date (2023-12-14)
-#define QP_RELEASE     0x762F8843U
+//! Encrypted  current QP release (7.3.3) and date (2024-01-31)
+#define QP_RELEASE     0x70DEE7F2U
 
 //============================================================================
 //! @cond INTERNAL
@@ -296,6 +296,12 @@ public:
         static_cast<void>(state);
         return false;
     }
+    QStateHandler state() const noexcept {
+        return m_state.fun;
+    }
+    QMState const * stateObj() const noexcept {
+        return m_state.obj;
+    }
 
 #ifdef Q_SPY
     virtual QStateHandler getStateHandler() noexcept {
@@ -409,9 +415,6 @@ public:
         QEvt const * const e,
         std::uint_fast8_t const qs_id) override;
     bool isIn(QStateHandler const state) noexcept override;
-    QStateHandler state() const noexcept {
-        return m_state.fun;
-    }
     QStateHandler childState(QStateHandler const parent) noexcept;
 
 #ifdef Q_SPY
@@ -451,9 +454,6 @@ public:
 
     //! @deprecated instead use: QMsm::isIn()
     bool isInState(QMState const * const stateObj) const noexcept;
-    QMState const * stateObj() const noexcept {
-        return m_state.obj;
-    }
     QMState const * childStateObj(QMState const * const parent) const noexcept;
 
 private:
@@ -804,6 +804,9 @@ public:
     bool isIn(QStateHandler const state) noexcept override {
         return reinterpret_cast<QHsm *>(this)->QHsm::isIn(state);
     }
+    QStateHandler childState(QStateHandler const parent) noexcept {
+        return reinterpret_cast<QHsm *>(this)->QHsm::childState(parent);
+    }
     void setAttr(
         std::uint32_t attr1,
         void const * attr2 = nullptr);
@@ -943,9 +946,6 @@ public:
 #endif // def Q_SPY
     bool isInState(QMState const * const st) const noexcept {
         return reinterpret_cast<QMsm const *>(this)->QMsm::isInState(st);
-    }
-    QMState const * stateObj() const noexcept {
-        return m_state.obj;
     }
     QMState const * childStateObj(QMState const * const parent) const noexcept {
         return reinterpret_cast<QMsm const *>(this)
