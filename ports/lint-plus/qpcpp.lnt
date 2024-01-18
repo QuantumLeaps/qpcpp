@@ -29,7 +29,7 @@
 //! @brief PC-Lint-Plus option file for linting QP/C++ __Applications__
 
 //----------------------------------------------------------------------------
-// globally supress the following warnings:
+// globally suppress the following warnings:
 -e546           // explicitly taking address of function
 -e717           // monocarpic do-while used to group statements
 -e1756          // variable has 'static' storage duration and non-POD type
@@ -252,7 +252,7 @@
 
 // [AUTOSAR Rule M17-0-2] the name xxx is reserved to the compiler
 -esym(9093,
- remove) // QPrioSet::remvoe()
+ remove) // QPrioSet::remove()
 
 // MC++R5-2-7 pointer type converted to unrelated pointer type
 -emacro(9176,

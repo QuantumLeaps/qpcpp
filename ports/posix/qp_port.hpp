@@ -139,7 +139,7 @@ namespace QF {
 //
 // These functions are implemented in the qf_port.cpp module, where they
 // manipulate the file-scope POSIX mutex object QF::critSectMutex_
-// to protect all critical sections. Using the single mutex for all crtical
+// to protect all critical sections. Using the single mutex for all critical
 // section guarantees that only one thread at a time can execute inside a
 // critical section. This prevents race conditions and data corruption.
 //

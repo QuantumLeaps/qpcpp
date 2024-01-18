@@ -174,9 +174,9 @@ void QActive::start(
                              ? static_cast<char const *>(m_thread.pxDummy1)
                              : static_cast<char const *>("AO");
 
-    // The FreeRTOS priority of the AO thread can be specificed in two ways:
+    // The FreeRTOS priority of the AO thread can be specified in two ways:
     //
-    // 1. Implictily based on the AO's priority (by the forumla specified
+    // 1. Implictily based on the AO's priority (by the formula specified
     //    in the macro FREERTOS_TASK_PRIO(), see qp_port.h). This option
     //    is chosen, when the higher-byte of the prioSpec parameter is set
     //    to zero.
@@ -188,7 +188,7 @@ void QActive::start(
     //
     //    NOTE: The explicit FreeRTOS priority is NOT sanity-checked,
     //    so it is the responsibility of the application to ensure that
-    //    it is consistent witht the AO's priority. An example of
+    //    it is consistent with the AO's priority. An example of
     //    inconsistent setting would be assigning FreeRTOS priorities that
     //    would result in a different relative priritization of AO's threads
     //    than indicated by the AO priorities assigned.

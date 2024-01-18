@@ -134,7 +134,7 @@ void QActive::start(QPrioSpec const prioSpec,
     init(par, m_prio);
     QS_FLUSH(); // flush the trace buffer to the host
 
-    // The embOS priority of the AO thread can be specificed in two ways:
+    // The embOS priority of the AO thread can be specified in two ways:
     //
     // 1. Implictily based on the AO's priority (embOS uses the same
     //    priority numbering scheme as QP). This option is chosen when
@@ -147,7 +147,7 @@ void QActive::start(QPrioSpec const prioSpec,
     //
     //    NOTE: The explicit embOS priority is NOT sanity-checked,
     //    so it is the responsibility of the application to ensure that
-    //    it is consistent witht the AO's priority. An example of
+    //    it is consistent with the AO's priority. An example of
     //    inconsistent setting would be assigning embOS priorities that
     //    would result in a different relative priritization of AO's threads
     //    than indicated by the AO priorities assigned.

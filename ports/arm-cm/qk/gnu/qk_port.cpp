@@ -80,7 +80,7 @@ char const QF_port_module_[] = "qk_port";
 //
 // description:
 // On ARMv6-M, interrupts are disabled with the PRIMASK register.
-// On ARMv7-M and higer, interrupts are disabled *selectively* with the
+// On ARMv7-M and higher, interrupts are disabled *selectively* with the
 // BASEPRI register.
 // Additionally, the function also asserts that the interrupts are
 // NOT disabled upon the entry to the function.
@@ -109,7 +109,7 @@ __asm volatile (
 //
 // description:
 // On ARMv6-M, interrupts are enabled with the PRIMASK register.
-// On ARMv7-M and higer, interrupts are enabled with the BASEPRI register.
+// On ARMv7-M and higher, interrupts are enabled with the BASEPRI register.
 // Additionally, the function also asserts that the interrupts ARE
 // disabled upon the entry to the function.
 __attribute__ ((naked, weak)) void QF_int_enable_(void) {
@@ -141,7 +141,7 @@ __asm volatile (
 // description:
 // On ARMv6-M, critical section is entered by disabling interrupts
 // with the PRIMASK register.
-// On ARMv7-M and higer, critical section is entered by disabling
+// On ARMv7-M and higher, critical section is entered by disabling
 // interrupts *selectively* with the BASEPRI register.
 // Additionally, the function also asserts that the interrupts are
 // NOT disabled upon the entry to the function.
@@ -174,7 +174,7 @@ __asm volatile (
 // description:
 // On ARMv6-M, critical section is exited by enabling interrupts
 // with the PRIMASK register.
-// On ARMv7-M and higer, critical section is exited by enabling
+// On ARMv7-M and higher, critical section is exited by enabling
 // interrupts with the BASEPRI register.
 // Additionally, the function also asserts that the interrupts ARE
 // disabled upon the entry to the function.
@@ -246,7 +246,7 @@ void QK_init(void) {
 #endif                  //--------- QK IRQ specified
 
 #ifdef __ARM_FP         //--------- if VFP available...
-    // make sure that the FPU is enabled by seting CP10 & CP11 Full Access
+    // make sure that the FPU is enabled by setting CP10 & CP11 Full Access
     SCB_CPACR = (SCB_CPACR | ((3UL << 20U) | (3UL << 22U)));
 
     // FPU automatic state preservation (ASPEN) lazy stacking (LSPEN)

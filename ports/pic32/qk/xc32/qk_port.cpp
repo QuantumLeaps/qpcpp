@@ -37,7 +37,7 @@ extern "C" {
 void QK_init(void) {
     INTCONSET = _INTCON_MVEC_MASK; // configure multi-vectored interrupts
 
-    IPC0bits.CS0IP = 1; // prioirty 1 for Core Software Interrupt 0, NOTE1
+    IPC0bits.CS0IP = 1; // priority 1 for Core Software Interrupt 0, NOTE1
     IPC0bits.CS0IS = 0; // sub-prioirty 0 for Core Software Interrupt 0
 
     IFS0CLR = _IFS0_CS0IF_MASK; // clear the Core Software Interrupt 0 flag
