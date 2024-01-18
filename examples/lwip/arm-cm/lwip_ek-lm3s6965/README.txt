@@ -58,7 +58,7 @@ the code on the board from the EWARM IDE.
 
 Running the QP-lwIP Example
 ---------------------------
-Connect the EK-LM3S6965 board to the wired Ehternet and power it up by
+Connect the EK-LM3S6965 board to the wired Ethernet and power it up by
 plugging in the USB cable. Immediately after the power-up, you should see
 the startup screen on the OLED-display. The status of the Dining Philosophers
 should be changing.
@@ -75,7 +75,7 @@ website contains a few menu item for testing SSI, CGI, and UDP. Please
 refer to the instructions on the website to test these features.
 
 NOTE: By modifying the lwipopts.h header file, the application can also be
-configured to optain the IP address via AUTOIP (as described in RFC 3927),
+configured to obtain the IP address via AUTOIP (as described in RFC 3927),
 or to use a static IP address.
 
 

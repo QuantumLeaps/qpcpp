@@ -90,7 +90,7 @@ Q_NORETURN Q_onError(char const * const module, int_t const id) {
 
 #ifndef NDEBUG
     // light up both LEDs
-    GPIO->P[LED_PORT].DOUT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
+    GPIO->P[LED_PORT].DOUBT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
     // for debugging, hang on in an endless loop...
     for (;;) {
     }
@@ -284,10 +284,10 @@ void displayPhilStat(std::uint8_t n, char const *stat) {
     Q_UNUSED_PAR(n);
 
     if (stat[0] == 'e') {
-        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT |=  (1U << LED0_PIN);
     }
     else {
-        GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT &= ~(1U << LED0_PIN);
     }
 
     // app-specific trace record...
@@ -299,10 +299,10 @@ void displayPhilStat(std::uint8_t n, char const *stat) {
 //............................................................................
 void displayPaused(std::uint8_t const paused) {
     if (paused != 0U) {
-        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT |=  (1U << LED0_PIN);
     }
     else {
-        GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT &= ~(1U << LED0_PIN);
     }
 
     // application-specific trace record
@@ -331,11 +331,11 @@ std::uint32_t random() { // a very cheap pseudo-random-number generator
 }
 //............................................................................
 void ledOn() {
-    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
+    GPIO->P[LED_PORT].DOUBT |=  (1U << LED1_PIN);
 }
 //............................................................................
 void ledOff() {
-    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
+    GPIO->P[LED_PORT].DOUBT &= ~(1U << LED1_PIN);
 }
 //............................................................................
 void terminate(int16_t result) {
@@ -375,8 +375,8 @@ void QF::onCleanup() {
 //............................................................................
 void QV::onIdle() { // CAUTION: called with interrupts DISABLED, see NOTE0
     // toggle the User LED on and then off, see NOTE3
-//  GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
-//  GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
+//  GPIO->P[LED_PORT].DOUBT |=  (1U << LED1_PIN);
+//  GPIO->P[LED_PORT].DOUBT &= ~(1U << LED1_PIN);
 
 #ifdef Q_SPY
     // intgerrupts still disabled
@@ -481,7 +481,7 @@ QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
     if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0U) { // not set?
         return QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
     }
-    else { // the rollover occured, but the SysTick_ISR did not run yet
+    else { // the rollover occurred, but the SysTick_ISR did not run yet
         return QS_tickTime_ + QS_tickPeriod_ - (QSTimeCtr)SysTick->VAL;
     }
 }

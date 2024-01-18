@@ -39,10 +39,10 @@ Additional information:
 
     Packets with IDs 24..31 are standard packets with extendible
     structure and contain a length field.
-    <ID><Lenght><Data><TimeStampDelta>
+    <ID><Length><Data><TimeStampDelta>
 
     Packet ID 31 is used for SystemView extended events.
-    <ID><Lenght><ID_EX><Data><TimeStampDelta>
+    <ID><Length><ID_EX><Data><TimeStampDelta>
 
     Packets with IDs >= 32 always contain a length field.
     <ID><Length><Data><TimeStampDelta>
@@ -161,7 +161,7 @@ Additional information:
 // Timestamps may be less than full 32-bits, in which case we need to zero
 // the unused bits to properly handle overflows.
 // Note that this is a quite common scenario, as a 32-bit time such as
-// SysTick might be scaled down to reduce bandwith
+// SysTick might be scaled down to reduce bandwidth
 // or a 16-bit hardware time might be used.
 #if SEGGER_SYSVIEW_TIMESTAMP_BITS < 32  // Eliminate unused bits in case hardware timestamps are less than 32 bits
   #define MAKE_DELTA_32BIT(Delta) Delta <<= 32 - SEGGER_SYSVIEW_TIMESTAMP_BITS; \
@@ -2775,7 +2775,7 @@ void SEGGER_SYSVIEW_PrintfHost(const char* s, ...) {
 *       SEGGER_SYSVIEW_WarnfHost()
 *
 *  Function description
-*    Print a warnin string which is formatted on the host by
+*    Print a warning string which is formatted on the host by
 *    the SystemView Application.
 *
 *  Parameters

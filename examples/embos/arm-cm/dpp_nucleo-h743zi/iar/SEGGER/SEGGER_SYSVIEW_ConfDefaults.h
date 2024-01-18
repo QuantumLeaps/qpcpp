@@ -464,7 +464,7 @@ extern "C" {
 *       Define: SEGGER_SYSVIEW_SYNC_PERIOD_SHIFT
 *
 *  Description
-*    Configure how frequently syncronization is sent in post-mortem
+*    Configure how frequently synchronization is sent in post-mortem
 *    mode.
 *  Default
 *    8: (1 << 8) = Every 256 Events.

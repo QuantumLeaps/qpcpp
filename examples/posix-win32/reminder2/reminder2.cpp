@@ -231,7 +231,7 @@ void BSP_onKeyboardInput(uint8_t key) {
         case 'e': {
             // NOTE:
             // The following Q_NEW_X() allocation might potentially fail
-            // but this is acceptable becasue the "ECHO" event is not
+            // but this is acceptable because the "ECHO" event is not
             // considered critical. This code illustrates the Q_NEW_X()
             // API and its use.
             #ifdef QEVT_DYN_CTOR

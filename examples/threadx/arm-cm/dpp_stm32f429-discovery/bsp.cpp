@@ -356,7 +356,7 @@ void QF::onStartup() {
     tx_err = tx_thread_create(&idle_thread, // thread control block
         const_cast<CHAR *>("idle"), // thread name
         &idle_thread_fun,       // thread function
-        0LU,                    // thread input (unsued)
+        0LU,                    // thread input (unused)
         idle_thread_stack,       // stack start
         sizeof(idle_thread_stack), // stack size in bytes
         TX_MAX_PRIORITIES - 1U, // ThreadX priority (LOWEST possible), NOTE1
@@ -429,7 +429,7 @@ QSTimeCtr onGetTime() { // NOTE: invoked with interrupts DISABLED
     if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0) { // not set?
         return QS_tickTime_ - (QSTimeCtr)SysTick->VAL;
     }
-    else { // the rollover occured, but the SysTick_ISR did not run yet
+    else { // the rollover occurred, but the SysTick_ISR did not run yet
         return QS_tickTime_ + QS_tickPeriod_ - (QSTimeCtr)SysTick->VAL;
     }
 }

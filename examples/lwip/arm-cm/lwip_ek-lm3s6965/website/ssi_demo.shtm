@@ -65,7 +65,7 @@ You must also provide your SSI callback function and register it by calling the 
     <TD align="right" width="100px"><!--#s_xmit--></TD></TR>
   <TR bgColor=#eeeeee><TD>Packets received:</TD>
     <TD align="right"><!--#s_recv--></TD></TR>
-  <TR bgColor=#e0e0e0><TD>Packets forwared:</TD>
+  <TR bgColor=#e0e0e0><TD>Packets forwarded:</TD>
     <TD align="right"><!--#s_fw--></TD></TR>
   <TR bgColor=#eeeeee><TD>Packets dropped:</TD>
     <TD align="right"><!--#s_drop--></TD></TR>

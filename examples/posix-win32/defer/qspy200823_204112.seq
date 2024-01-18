@@ -5,23 +5,23 @@
            +-------+-------+   +-------+-------+   +-------+-------+
 3115372171         |                   |                (RcallA)
 3127751904         *--NEW_REQUEST_SIG--+------------------>|
-3127792184         |                   |           <TServer::receiv>
+3127792184         |                   |           <TServer::receive>
 3144424365         |                   *--RECEIVED_SIG---->|
 3144429488         |                   |           <TServer::author>
 3177742936         |                   *--AUTHORIZED_SIG-->|
 3177796020         |                   |                (RcallA)
 3177816231         |                   |            <TServer::idle>
 3190753295         *--NEW_REQUEST_SIG--+------------------>|
-3190792988         |                   |           <TServer::receiv>
+3190792988         |                   |           <TServer::receive>
 3200126862         *--NEW_REQUEST_SIG--+------------------>|
 3200127346         |                   |                (Defer)
 3207429692         |                   *--RECEIVED_SIG---->|
 3207435638         |                   |           <TServer::author>
 3240835283         |                   *--AUTHORIZED_SIG-->|
 3240884412         |                   |                   *<=NEW_REQUEST_SIG]
-3240884486         |                   |                (RCall)
+3240884486         |                   |                (recall)
 3240902469         |                   |            <TServer::idle>
-3240936680         |                   |           <TServer::receiv>
+3240936680         |                   |           <TServer::receive>
 3245246620         *--NEW_REQUEST_SIG--+------------------>|
 3245247305         |                   |                (Defer)
 3254598943         *--NEW_REQUEST_SIG--+------------------>|
@@ -30,16 +30,16 @@
 3257603521         |                   |           <TServer::author>
 3290915941         |                   *--AUTHORIZED_SIG-->|
 3290965115         |                   |                   *<=NEW_REQUEST_SIG]
-3290965193         |                   |                (RCall)
+3290965193         |                   |                (recall)
 3290987012         |                   |            <TServer::idle>
-3291020708         |                   |           <TServer::receiv>
+3291020708         |                   |           <TServer::receive>
 3307601831         |                   *--RECEIVED_SIG---->|
 3307606209         |                   |           <TServer::author>
 3340602871         |                   *--AUTHORIZED_SIG-->|
 3340652908         |                   |                   *<=NEW_REQUEST_SIG]
-3340652979         |                   |                (RCall)
+3340652979         |                   |                (recall)
 3340672425         |                   |            <TServer::idle>
-3340706328         |                   |           <TServer::receiv>
+3340706328         |                   |           <TServer::receive>
 3348619404         *--NEW_REQUEST_SIG--+------------------>|
 3348620116         |                   |                (Defer)
 3355616936         *--NEW_REQUEST_SIG--+------------------>|
@@ -56,30 +56,30 @@
 3384305951         |                   |                (Defer)
 3390606543         |                   *--AUTHORIZED_SIG-->|
 3390655825         |                   |                   *<=NEW_REQUEST_SIG]
-3390655893         |                   |                (RCall)
+3390655893         |                   |                (recall)
 3390673855         |                   |            <TServer::idle>
-3390707455         |                   |           <TServer::receiv>
+3390707455         |                   |           <TServer::receive>
 3407298923         |                   *--RECEIVED_SIG---->|
 3407304316         |                   |           <TServer::author>
 3440608262         |                   *--AUTHORIZED_SIG-->|
 3440664494         |                   |                   *<=NEW_REQUEST_SIG]
-3440664577         |                   |                (RCall)
+3440664577         |                   |                (recall)
 3440681734         |                   |            <TServer::idle>
-3440715647         |                   |           <TServer::receiv>
+3440715647         |                   |           <TServer::receive>
 3457296614         |                   *--RECEIVED_SIG---->|
 3457303486         |                   |           <TServer::author>
 3490610960         |                   *--AUTHORIZED_SIG-->|
 3490665429         |                   |                   *<=NEW_REQUEST_SIG]
-3490665509         |                   |                (RCall)
+3490665509         |                   |                (recall)
 3490682552         |                   |            <TServer::idle>
-3490703569         |                   |           <TServer::receiv>
+3490703569         |                   |           <TServer::receive>
 3507305279         |                   *--RECEIVED_SIG---->|
 3507310912         |                   |           <TServer::author>
 3540615829         |                   *--AUTHORIZED_SIG-->|
 3540644505         |                   |                   *<=NEW_REQUEST_SIG]
-3540644570         |                   |                (RCall)
+3540644570         |                   |                (recall)
 3540648118         |                   |            <TServer::idle>
-3540654807         |                   |           <TServer::receiv>
+3540654807         |                   |           <TServer::receive>
 3557301542         |                   *--RECEIVED_SIG---->|
 3557305878         |                   |           <TServer::author>
 3590617215         |                   *--AUTHORIZED_SIG-->|

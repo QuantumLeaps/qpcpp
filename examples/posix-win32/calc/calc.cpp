@@ -58,7 +58,7 @@ public:
 
     // guard function to evaluate the current expression
     // taking into account the precedence of operands.
-    // return: true if evaluation successfull
+    // return: true if evaluation successful
     // false when error encountered
     bool eval(
         double op,

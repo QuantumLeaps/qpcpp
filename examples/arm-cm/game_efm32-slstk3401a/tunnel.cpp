@@ -368,7 +368,7 @@ Q_STATE_DEF(Tunnel, demo) {
         }
         //${AOs::Tunnel::SM::active::demo::BLINK_TIMEOUT}
         case BLINK_TIMEOUT_SIG: {
-            m_blink_ctr ^= 1U; /* toggle the blink cunter */
+            m_blink_ctr ^= 1U; /* toggle the blink counter */
             status_ = Q_RET_HANDLED;
             break;
         }

@@ -57,7 +57,7 @@ cpu.lnt             // for the chosen CPU
 qpcpp.lnt         // QP/C++ options
 
 /////////////////////////////////////////////////////////////////////////////
-// addtitional supporession rules for bulding this application
+// additional suppression rules for building this application
 
 // underlying type for enums is always 'int'
 +fei

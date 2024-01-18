@@ -84,7 +84,7 @@ Additional information:
 #define GPIOB_AF_HIGH         (*(volatile unsigned long*)(GPIOB_BASE_ADDR + 0x24u))
 
 #define US_RXRDY              (0x20u)  // RXNE
-#define USART_RX_ERROR_FLAGS  (0x0Fu)  // ORE/NE/FE/PE
+#define USART_RX_ERROR_FLAGS  (0x0Fu)  // OR/NE/FE/PE
 #define US_TXEMPTY            (0x80u)  // TXE
 
 /*********************************************************************

@@ -96,7 +96,7 @@ Q_NORETURN Q_onError(char const * const module, int_t const id) {
 
 #ifndef NDEBUG
     // light up both LEDs
-    GPIO->P[LED_PORT].DOUT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
+    GPIO->P[LED_PORT].DOUBT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
     // for debugging, hang on in an endless loop until PB1 is pressed...
     while ((GPIO->P[PB_PORT].DIN & (1U << PB1_PIN)) != 0) {
     }
@@ -158,8 +158,8 @@ void App_TaskIdleHook(void) {
     // toggle LED1 on and then off, see NOTE01
     QF_CRIT_STAT
     QF_CRIT_ENTER();
-    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN); // turn the LED on
-    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN); // turn the LED off
+    GPIO->P[LED_PORT].DOUBT |=  (1U << LED1_PIN); // turn the LED on
+    GPIO->P[LED_PORT].DOUBT &= ~(1U << LED1_PIN); // turn the LED off
     QF_CRIT_EXIT();
 */
 
@@ -280,10 +280,10 @@ void BSP::init(void) {
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'e') {
-        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT |=  (1U << LED0_PIN);
     }
     else {
-        GPIO->P[LED_PORT].DOUT &=  ~(1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT &=  ~(1U << LED0_PIN);
     }
 
     QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->getPrio()) // app-specific record begin
@@ -294,11 +294,11 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
     if (paused != 0U) {
-        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT |=  (1U << LED0_PIN);
         OSSemPost(Sema); // signal the semaphore (test)
     }
     else {
-        GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT &= ~(1U << LED0_PIN);
     }
 }
 //............................................................................
@@ -327,11 +327,11 @@ void BSP::randomSeed(uint32_t seed) {
 }
 //............................................................................
 void BSP::ledOn(void) {
-    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
+    GPIO->P[LED_PORT].DOUBT |=  (1U << LED1_PIN);
 }
 //............................................................................
 void BSP::ledOff(void) {
-    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
+    GPIO->P[LED_PORT].DOUBT &= ~(1U << LED1_PIN);
 }
 //............................................................................
 void BSP::terminate(int16_t result) {
@@ -439,7 +439,7 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
     if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0) { // not set?
         return DPP::QS_tickTime_ - static_cast<QSTimeCtr>(SysTick->VAL);
     }
-    else { // the rollover occured, but the SysTick_ISR did not run yet
+    else { // the rollover occurred, but the SysTick_ISR did not run yet
         return DPP::QS_tickTime_ + DPP::QS_tickPeriod_
                - static_cast<QSTimeCtr>(SysTick->VAL);
     }

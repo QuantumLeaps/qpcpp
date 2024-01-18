@@ -51,7 +51,7 @@ protected:
     static QState on(Blinky * const me, QEvt const * const e);
 };
 
-// local bjects --------------------------------------------------------------
+// local objects --------------------------------------------------------------
 Blinky l_blinky;
 
 // global objects ------------------------------------------------------------

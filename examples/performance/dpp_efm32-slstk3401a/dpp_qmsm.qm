@@ -211,7 +211,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
      </tran>
      <!--${AOs::Table::SM::active::serving}-->
      <state name="serving">
-      <entry brief="give pending permitions to eat">for (uint8_t n = 0U; n &lt; N_PHILO; ++n) { // give permissions to eat...
+      <entry brief="give pending permissions to eat">for (uint8_t n = 0U; n &lt; N_PHILO; ++n) { // give permissions to eat...
     if (m_isHungry[n]
         &amp;&amp; (m_fork[LEFT(n)] == FREE)
         &amp;&amp; (m_fork[n] == FREE))
@@ -388,7 +388,7 @@ enum DPPSignals {
     TEST_SIG,       // published by BSP to test the application
     MAX_PUB_SIG,    // the last published signal
 
-    HUNGRY_SIG,     // posted direclty to Table from hungry Philo
+    HUNGRY_SIG,     // posted directly to Table from hungry Philo
     MAX_SIG         // the last signal
 };
 

@@ -37,7 +37,7 @@
 #define SHIP_WIDTH  5U
 #define SHIP_HEIGHT 3U
 
-// encapsulated delcaration of the Ship active object ------------------------
+// encapsulated declaration of the Ship active object ------------------------
 //$declare${AOs::Ship} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace GAME {
 
@@ -165,7 +165,7 @@ Q_STATE_DEF(Ship, flying) {
             sev->score = m_score;
             AO_Tunnel->POST(sev, this);
 
-            // lauch the ship from the initial position
+            // launch the ship from the initial position
             m_x = GAME_SHIP_X;
             m_y = (GAME_SHIP_Y << 2);
             status_ = Q_RET_HANDLED;

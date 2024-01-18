@@ -89,7 +89,7 @@ Q_NORETURN Q_onError(char const * const module, int_t const id) {
 
 #ifndef NDEBUG
     // light up both LEDs
-    GPIO->P[LED_PORT].DOUT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
+    GPIO->P[LED_PORT].DOUBT |= ((1U << LED0_PIN) | (1U << LED1_PIN));
     // for debugging, hang on in an endless loop until PB1 is pressed...
     while ((GPIO->P[PB_PORT].DIN & (1U << PB1_PIN)) != 0) {
     }
@@ -219,10 +219,10 @@ void BSP::init(void) {
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char const *stat) {
     if (stat[0] == 'e') {
-        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT |=  (1U << LED0_PIN);
     }
     else {
-        GPIO->P[LED_PORT].DOUT &=  ~(1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT &=  ~(1U << LED0_PIN);
     }
 
     QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->getPrio()) // app-specific record begin
@@ -233,10 +233,10 @@ void BSP::displayPhilStat(uint8_t n, char const *stat) {
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
     if (paused != 0U) {
-        GPIO->P[LED_PORT].DOUT |=  (1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT |=  (1U << LED0_PIN);
     }
     else {
-        GPIO->P[LED_PORT].DOUT &= ~(1U << LED0_PIN);
+        GPIO->P[LED_PORT].DOUBT &= ~(1U << LED0_PIN);
     }
 }
 //............................................................................
@@ -270,7 +270,7 @@ void QF::onStartup(void) {
     // set up the SysTick timer to fire at BSP::TICKS_PER_SEC rate
     SysTick_Config(SystemCoreClock / DPP::BSP::TICKS_PER_SEC);
 
-    // assing all priority bits for preemption-prio. and none to sub-prio.
+    // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE1
@@ -296,8 +296,8 @@ void QF::onCleanup(void) {
 //............................................................................
 void QV::onIdle(void) { // called with interrupts disabled, see NOTE01
     // toggle the User LED on and then off, see NOTE02
-    GPIO->P[LED_PORT].DOUT |=  (1U << LED1_PIN);
-    GPIO->P[LED_PORT].DOUT &= ~(1U << LED1_PIN);
+    GPIO->P[LED_PORT].DOUBT |=  (1U << LED1_PIN);
+    GPIO->P[LED_PORT].DOUBT &= ~(1U << LED1_PIN);
 
 #ifdef Q_SPY
     QF_INT_ENABLE();
@@ -398,7 +398,7 @@ QSTimeCtr QS::onGetTime(void) {  // NOTE: invoked with interrupts DISABLED
     if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0) { // not set?
         return DPP::QS_tickTime_ - static_cast<QSTimeCtr>(SysTick->VAL);
     }
-    else { // the rollover occured, but the SysTick_ISR did not run yet
+    else { // the rollover occurred, but the SysTick_ISR did not run yet
         return DPP::QS_tickTime_ + DPP::QS_tickPeriod_
                - static_cast<QSTimeCtr>(SysTick->VAL);
     }

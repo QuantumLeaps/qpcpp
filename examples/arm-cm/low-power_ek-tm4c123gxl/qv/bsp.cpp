@@ -170,7 +170,7 @@ void QF::onStartup() {
     // set up the SysTick timer to fire at BSP_TICKS0_PER_SEC rate
     SysTick_Config(SystemCoreClock / BSP_TICKS0_PER_SEC);
 
-    // assing all priority bits for preemption-prio. and none to sub-prio.
+    // assign all priority bits for preemption-prio. and none to sub-prio.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system, see NOTE00
@@ -209,7 +209,7 @@ void QV::onIdle() {
     }
 
     GPIOF->DATA_Bits[LED_RED] = 0xFFU; // turn LED on, see NOTE2
-    QV_CPU_SLEEP(); // atomically enter sleep mode and enable interrutps
+    QV_CPU_SLEEP(); // atomically enter sleep mode and enable interrupts
     GPIOF->DATA_Bits[LED_RED] = 0x00U; // turn LED off, see NOTE2
 }
 

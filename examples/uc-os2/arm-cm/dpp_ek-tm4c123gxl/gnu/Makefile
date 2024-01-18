@@ -57,7 +57,7 @@ PROJECT     := dpp
 # project directories
 #
 
-# location of the QP/C++ framework (if not provided in an environemnt var.)
+# location of the QP/C++ framework (if not provided in an environment var.)
 ifeq ($(QPCPP),)
 QPCPP := ../../../../..
 endif
@@ -192,7 +192,7 @@ RM    := rm
 # build options for various configurations for ARM Cortex-M
 #
 
-# combine all the soruces...
+# combine all the sources...
 CPP_SRCS += $(QP_SRCS)
 ASM_SRCS += $(QP_ASMS)
 C_SRCS   += $(RTOS_SRCS)

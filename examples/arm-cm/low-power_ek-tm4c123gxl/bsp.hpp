@@ -36,7 +36,7 @@
 
 // The following ticks-per-second constants determine the speed of the app.
 // The default (#if 1) is the SLOW speed for humans to see the blinking.
-// Change the #if 1 into #if 0 for FAST speed approprate for logic analyzers.
+// Change the #if 1 into #if 0 for FAST speed appropriate for logic analyzers.
 //
 #if 1
     #define BSP_TICKS0_PER_SEC   2U

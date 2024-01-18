@@ -117,7 +117,7 @@
 ;*      HardFault_Handler()
 ;*
 ;*  Function description
-;*    Evaluates the used stack (MSP, PSP) and passes the appropiate
+;*    Evaluates the used stack (MSP, PSP) and passes the appropriate
 ;*    stack pointer to the HardFaultHandler "C"-routine.
 ;*
 ;*  Notes

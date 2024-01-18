@@ -100,9 +100,9 @@
 #endif /* MSI_VALUE */
 
 /**
-  * @brief Internal High Speed oscillator (HSI) value.
+  * @brief Internal High Speed oscillator (HIS) value.
   *        This value is used by the RCC HAL module to compute the system frequency
-  *        (when HSI is used as system clock source, directly or through the PLL).
+  *        (when HIS is used as system clock source, directly or through the PLL).
   */
 #if !defined  (HSI_VALUE)
   #define HSI_VALUE    16000000UL /*!< Value of the Internal oscillator in Hz*/
