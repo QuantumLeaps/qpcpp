@@ -229,7 +229,7 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qs_id) noexcept {
 
     if (e != nullptr) { // was the queue not empty?
         QEQueueCtr const nFree = m_nFree + 1U;
-        m_nFree = nFree;  // upate the # free
+        m_nFree = nFree;  // update the # free
 
         // any events in the the ring buffer?
         if (nFree <= m_end) {

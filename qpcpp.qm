@@ -3591,7 +3591,7 @@ QEvt const * const e  = m_frontEvt; // always remove evt from the front
 
 if (e != nullptr) { // was the queue not empty?
     QEQueueCtr const nFree = m_nFree + 1U;
-    m_nFree = nFree;  // upate the # free
+    m_nFree = nFree;  // update the # free
 
     // any events in the the ring buffer?
     if (nFree &lt;= m_end) {
@@ -5055,7 +5055,7 @@ QF_CRIT_EXIT();</code>
   <!--${QK-extern-C::QK_sched_}-->
   <operation name="QK_sched_" type="std::uint_fast8_t" visibility="0x00" properties="0x00">
    <specifiers>noexcept</specifiers>
-   <code>// NOTE: this function is entered with iterrupts DISABLED
+   <code>// NOTE: this function is entered with interrupts DISABLED
 
 Q_REQUIRE_INCRIT(402,
     QK_priv_.readySet.verify_(&amp;QK_priv_.readySet_dis));
@@ -5099,7 +5099,7 @@ return p;</code>
   <!--${QK-extern-C::QK_activate_}-->
   <operation name="QK_activate_" type="void" visibility="0x00" properties="0x00">
    <specifiers>noexcept</specifiers>
-   <code>// NOTE: this function is entered with iterrupts DISABLED
+   <code>// NOTE: this function is entered with interrupts DISABLED
 
 std::uint_fast8_t const prio_in = QK_priv_.actPrio; // save initial prio.
 std::uint_fast8_t p = QK_priv_.nextPrio; // next prio to run
@@ -5949,7 +5949,7 @@ if (m_waitSet.notEmpty()) {
     QXThread * const thr =
         QXK_PTR_CAST_(QXThread*, QActive::registry_[p]);
 
-    // assert that the tread:
+    // assert that the thread:
     // - must be registered in QF;
     // - must be extended; and
     // - must be blocked on this semaphore;
@@ -7114,7 +7114,7 @@ QF_CRIT_EXIT();</code>
     <code>{
     std::uint8_t m_prio; //!&lt; prio. (qs_id) for the QS &quot;local filter&quot;
 
-    // get the prio. (qs_id) from the QSpyId opbject
+    // get the prio. (qs_id) from the QSpyId object
     std::uint_fast8_t getPrio() const noexcept {
         return static_cast&lt;std::uint_fast8_t&gt;(m_prio);
     }
@@ -7225,7 +7225,7 @@ endRec_();
 // produce the reset record to inform QSPY of a new session
 target_info_pre_(0xFFU);
 
-// hold off flushing after successfull initialization (see QS_INIT())</code>
+// hold off flushing after successful initialization (see QS_INIT())</code>
    </operation>
    <!--${QS::QS-TX::getByte}-->
    <operation name="getByte" type="std::uint16_t" visibility="0x00" properties="0x00">
@@ -11833,7 +11833,7 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
                 // dispatch to the current SM object
                 if (QP::QS::rxPriv_.currObj[QP::QS::SM_OBJ] != nullptr) {
                     // increment the ref-ctr to simulate the situation
-                    // when the event is just retreived from a queue.
+                    // when the event is just retrieved from a queue.
                     // This is expected for the following QF::gc() call.
                     QP::QEvt_refCtr_inc_(l_rx.var.evt.e);
 
@@ -11850,7 +11850,7 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
                 // init the current SM object&quot;
                 if (QP::QS::rxPriv_.currObj[QP::QS::SM_OBJ] != nullptr) {
                     // increment the ref-ctr to simulate the situation
-                    // when the event is just retreived from a queue.
+                    // when the event is just retrieved from a queue.
                     // This is expected for the following QF::gc() call.
                     QP::QEvt_refCtr_inc_(l_rx.var.evt.e);
 
@@ -12129,7 +12129,7 @@ std::uint32_t getTestProbe_(QSpyFunPtr const api) noexcept {
             }
             QS_MEM_APP();
             QS_CRIT_EXIT();
-            break; // we are done (Test-Probe retreived)
+            break; // we are done (Test-Probe retrieved)
         }
     }
     return data;

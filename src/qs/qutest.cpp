@@ -105,7 +105,7 @@ std::uint32_t getTestProbe_(QSpyFunPtr const api) noexcept {
             }
             QS_MEM_APP();
             QS_CRIT_EXIT();
-            break; // we are done (Test-Probe retreived)
+            break; // we are done (Test-Probe retrieved)
         }
     }
     return data;

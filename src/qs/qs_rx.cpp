@@ -1034,7 +1034,7 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
                 // dispatch to the current SM object
                 if (QP::QS::rxPriv_.currObj[QP::QS::SM_OBJ] != nullptr) {
                     // increment the ref-ctr to simulate the situation
-                    // when the event is just retreived from a queue.
+                    // when the event is just retrieved from a queue.
                     // This is expected for the following QF::gc() call.
                     QP::QEvt_refCtr_inc_(l_rx.var.evt.e);
 
@@ -1051,7 +1051,7 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
                 // init the current SM object"
                 if (QP::QS::rxPriv_.currObj[QP::QS::SM_OBJ] != nullptr) {
                     // increment the ref-ctr to simulate the situation
-                    // when the event is just retreived from a queue.
+                    // when the event is just retrieved from a queue.
                     // This is expected for the following QF::gc() call.
                     QP::QEvt_refCtr_inc_(l_rx.var.evt.e);
 

@@ -87,7 +87,7 @@ void initBuf(
     // produce the reset record to inform QSPY of a new session
     target_info_pre_(0xFFU);
 
-    // hold off flushing after successfull initialization (see QS_INIT())
+    // hold off flushing after successful initialization (see QS_INIT())
 }
 
 //${QS::QS-TX::getByte} ......................................................

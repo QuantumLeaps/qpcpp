@@ -157,7 +157,7 @@ QK_Attr QK_priv_;
 
 //${QK-extern-C::QK_sched_} ..................................................
 std::uint_fast8_t QK_sched_() noexcept {
-    // NOTE: this function is entered with iterrupts DISABLED
+    // NOTE: this function is entered with interrupts DISABLED
 
     Q_REQUIRE_INCRIT(402,
         QK_priv_.readySet.verify_(&QK_priv_.readySet_dis));
@@ -201,7 +201,7 @@ std::uint_fast8_t QK_sched_() noexcept {
 
 //${QK-extern-C::QK_activate_} ...............................................
 void QK_activate_() noexcept {
-    // NOTE: this function is entered with iterrupts DISABLED
+    // NOTE: this function is entered with interrupts DISABLED
 
     std::uint_fast8_t const prio_in = QK_priv_.actPrio; // save initial prio.
     std::uint_fast8_t p = QK_priv_.nextPrio; // next prio to run

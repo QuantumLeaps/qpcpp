@@ -237,7 +237,7 @@ bool QXSemaphore::signal() noexcept {
         QXThread * const thr =
             QXK_PTR_CAST_(QXThread*, QActive::registry_[p]);
 
-        // assert that the tread:
+        // assert that the thread:
         // - must be registered in QF;
         // - must be extended; and
         // - must be blocked on this semaphore;

@@ -243,7 +243,7 @@ enum QSpyIdGroups : std::int16_t {
 struct QSpyId {
     std::uint8_t m_prio; //!< prio. (qs_id) for the QS "local filter"
 
-    // get the prio. (qs_id) from the QSpyId opbject
+    // get the prio. (qs_id) from the QSpyId object
     std::uint_fast8_t getPrio() const noexcept {
         return static_cast<std::uint_fast8_t>(m_prio);
     }
