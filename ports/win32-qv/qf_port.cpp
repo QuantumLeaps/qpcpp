@@ -22,11 +22,11 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-11-30
-//! @version Last updated for: @ref qpcpp_7_3_1
+//! @date Last updated on: 2024-02-16
+//! @version Last updated for: @ref qpcpp_7_3_3
 //!
 //! @file
-//! @brief QF/C++ port to Win32 API (single-threaded, like the QV kernel)
+//! @brief QF/C++ port to Win32 (single-threaded, like the QV kernel)
 
 #define QP_IMPL             // this is QP implementation
 #include "qp_port.hpp"      // QP port
@@ -188,7 +188,6 @@ int run() {
 
     //CloseHandle(win32Event_);
     //DeleteCriticalSection(&l_win32CritSect);
-
     return 0; // return success
 }
 //............................................................................
@@ -251,7 +250,7 @@ void QActive::start(QPrioSpec const prioSpec,
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
     m_pthre = 0U; // preemption-threshold (not used in this port)
-    register_(); // register this AO
+    register_();  // register this AO
 
     m_eQueue.init(qSto, qLen);
 

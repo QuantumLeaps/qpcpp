@@ -27,8 +27,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-07
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2024-02-16
+//! @version Last updated for: @ref qpc_7_3_3
 //!
 //! @file
 //! @brief QP/C++ port to Win32-QV (single-threaded), generic C++11
@@ -46,7 +46,7 @@
 #define Q_NORETURN  [[ noreturn ]] void
 
 
-// QActive event queue type
+// QActive event queue, os-type, and thread types
 #define QACTIVE_EQUEUE_TYPE  QEQueue
 //QACTIVE_OS_OBJ_TYPE  not used in this port
 //QACTIVE_THREAD_TYPE  not used in this port
@@ -71,11 +71,13 @@ void setTickRate(uint32_t ticksPerSec, int tickPrio);
 // clock tick callback (NOTE not called when "ticker thread" is not running)
 void onClockTick();
 
-// abstractions for console access...
-void consoleSetup();
-void consoleCleanup();
-int consoleGetKey();
-int consoleWaitForKey();
+#ifdef QF_CONSOLE
+    // abstractions for console access...
+    void consoleSetup();
+    void consoleCleanup();
+    int consoleGetKey();
+    int consoleWaitForKey();
+#endif
 
 } // namespace QF
 } // namespace QP

@@ -22,8 +22,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-11-30
-//! @version Last updated for: @ref qpcpp_7_3_1
+//! @date Last updated on: 2024-02-16
+//! @version Last updated for: @ref qpcpp_7_3_3
 //!
 //! @file
 //! @brief QF/C++ port to Win32 (multithreaded)
@@ -186,7 +186,7 @@ void QActive::start(QPrioSpec const prioSpec,
     m_osObject = CreateEvent(NULL, FALSE, FALSE, NULL);
     m_eQueue.init(qSto, qLen);
 
-    // the top-most initial tran. (virtual)
+    // top-most initial tran. (virtual call)
     this->init(par, m_prio);
     QS_FLUSH(); // flush the QS trace buffer to the host
 
@@ -220,6 +220,7 @@ void QActive::start(QPrioSpec const prioSpec,
     }
     SetThreadPriority(m_thread, win32Prio);
 }
+
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {

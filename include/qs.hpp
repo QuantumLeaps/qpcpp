@@ -837,6 +837,11 @@ inline bool rxPut(std::uint8_t const b) noexcept {
 //${QS::QS-RX::rxParse} ......................................................
 void rxParse();
 
+//${QS::QS-RX::setCurrObj} ...................................................
+void setCurrObj(
+    std::uint8_t const obj_kind,
+    void * const obj_ptr);
+
 //${QS::QS-RX::rxGetNfree} ...................................................
 std::uint16_t rxGetNfree() noexcept;
 

@@ -22,11 +22,11 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-08-21
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2024-02-16
+//! @version Last updated for: @ref qpcpp_7_3_3
 //!
 //! @file
-//! @brief QUTEST port for POSIX, GNU
+//! @brief QS/C++ "port" to QUTest with POSIX
 
 // expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
 #define _POSIX_C_SOURCE 200809L
@@ -42,6 +42,7 @@
 
 #include "safe_std.h"       // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
+#include <sys/select.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -50,7 +51,6 @@
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/select.h>
 #include <signal.h>
 
 #define QS_TX_SIZE     (8*1024)
@@ -84,10 +84,10 @@ namespace QP {
 //............................................................................
 bool QS::onStartup(void const *arg) {
 
-    static uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
+    static std::uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
     initBuf(qsBuf, sizeof(qsBuf));
 
-    static uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
+    static std::uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     char hostName[128];
@@ -207,6 +207,9 @@ void QS::onReset() {
 }
 //............................................................................
 void QS::onFlush() {
+    // NOTE:
+    // No critical section in QS_onFlush() to avoid nesting of critical sections
+    // in case QS_onFlush() is called from Q_onError().
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "<TARGET> ERROR   %s\n",
                   "invalid TCP socket");
@@ -214,12 +217,9 @@ void QS::onFlush() {
         return;
     }
 
-    QS_CRIT_STAT
-    QS_CRIT_ENTRY();
     std::uint16_t nBytes = QS_TX_CHUNK;
     std::uint8_t const *data;
     while ((data = getBlock(&nBytes)) != nullptr) {
-        QS_CRIT_EXIT();
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
@@ -247,22 +247,20 @@ void QS::onFlush() {
         }
         // set nBytes for the next call to QS::getBlock()
         nBytes = QS_TX_CHUNK;
-        QS_CRIT_ENTRY();
     }
-    QS_CRIT_EXIT();
 }
 //............................................................................
 void QS::onTestLoop() {
     fd_set readSet;
     FD_ZERO(&readSet);
 
+    struct timeval timeout = {
+        (long)0, (long)(QS_TIMEOUT_MS * 1000)
+    };
+
     rxPriv_.inTestLoop = true;
     while (rxPriv_.inTestLoop) {
         FD_SET(l_sock, &readSet);
-
-        struct timeval timeout = {
-            (long)0, (long)(QS_TIMEOUT_MS * 1000)
-        };
 
         // selective, timed blocking on the TCP/IP socket...
         timeout.tv_usec = (long)(QS_TIMEOUT_MS * 1000);

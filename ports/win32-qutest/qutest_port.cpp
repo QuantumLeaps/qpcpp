@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-12-13
-//! @version Last updated for: @ref qpcpp_7_3_2
+//! @date Last updated on: 2023-11-30
+//! @version Last updated for: @ref qpcpp_7_3_3
 //!
 //! @file
 //! @brief QUTEST port for Windows, GNU or Visual C++
@@ -40,7 +40,6 @@
 #include "safe_std.h"       // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 #include <time.h>
-#include <conio.h>
 
 // Minimum required Windows version is Windows-XP or newer (0x0501)
 #ifdef WINVER
@@ -276,20 +275,6 @@ void QS::onTestLoop() {
         }
 
         onFlush();
-
-        wint_t ch = 0;
-        while (_kbhit()) { // any key pressed?
-            ch = _getwch();
-        }
-        switch (ch) {
-            case 'x':      // 'x' pressed?
-            case 'X':      // 'X' pressed?
-            case '\033': { // ESC pressed?
-                onCleanup();
-                exit(1);
-                break;
-            }
-        }
     }
     // set inTestLoop to true in case calls to QS_onTestLoop() nest,
     // which can happen through the calls to QS_TEST_PAUSE().

@@ -27,8 +27,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-11-30
-//! @version Last updated for: @ref qpc_7_3_1
+//! @date Last updated on: 2024-02-16
+//! @version Last updated for: @ref qpc_7_3_3
 //!
 //! @file
 //! @brief QP/C++ port to Win32 (multithreaded), generic C++11
@@ -68,14 +68,16 @@ void leaveCriticalSection_();
 // set clock tick rate and priority
 void setTickRate(uint32_t ticksPerSec, int tickPrio);
 
-// application-level clock tick callback
+// clock tick callback
 void onClockTick();
 
-// abstractions for console access...
-void consoleSetup();
-void consoleCleanup();
-int consoleGetKey();
-int consoleWaitForKey();
+#ifdef QF_CONSOLE
+    // abstractions for console access...
+    void consoleSetup();
+    void consoleCleanup();
+    int consoleGetKey();
+    int consoleWaitForKey();
+#endif
 
 } // namespace QF
 } // namespace QP

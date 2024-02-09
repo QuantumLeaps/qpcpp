@@ -27,8 +27,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-11-30
-//! @version Last updated for: @ref qpc_7_3_1
+//! @date Last updated on: 2024-02-16
+//! @version Last updated for: @ref qpcpp_7_3_3
 //!
 //! @file
 //! @brief QP/C++ port to POSIX (multithreaded with P-threads), generic C++11
@@ -71,11 +71,13 @@ void setTickRate(uint32_t ticksPerSec, int tickPrio);
 // clock tick callback
 void onClockTick();
 
-// abstractions for console access...
-void consoleSetup();
-void consoleCleanup();
-int consoleGetKey();
-int consoleWaitForKey();
+#ifdef QF_CONSOLE
+    // abstractions for console access...
+    void consoleSetup();
+    void consoleCleanup();
+    int consoleGetKey();
+    int consoleWaitForKey();
+#endif
 
 } // namespace QF
 } // namespace QP
@@ -134,7 +136,7 @@ namespace QF {
 // the time. Such sections of code are called "critical sections".
 //
 // This port uses a pair of functions QF::enterCriticalSection_() /
-// QF::leaveCriticalSection_() to enter/leave the cirtical section,
+// QF::leaveCriticalSection_() to enter/leave the critical section,
 // respectively.
 //
 // These functions are implemented in the qf_port.cpp module, where they
@@ -159,8 +161,9 @@ namespace QF {
 // NOTE2:
 // Scheduler locking (used inside QActive_publish_()) is NOT implemented
 // in this port. This means that event multicasting is NOT atomic, so thread
-// preemption CAN happen during that time. This can lead to (occasionally)
-// unexpected event sequences.
+// preemption CAN happen during that time, especially when a low-priority
+// thread publishes events to higher-priority threads. This can lead to
+// (occasionally) unexpected event sequences.
 //
 
 #endif // QP_PORT_HPP_

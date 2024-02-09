@@ -27,8 +27,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-07
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2024-02-16
+//! @version Last updated for: @ref qpcpp_7_3_3
 //!
 //! @file
 //! @brief QP/C++ port to POSIX-QV (signgle threaded), generic C++11
@@ -45,7 +45,7 @@
 // no-return function specifier (C++11 Standard)
 #define Q_NORETURN  [[ noreturn ]] void
 
-// QActive event queue type
+// QActive event queue and thread types for POSIX-QV
 #define QACTIVE_EQUEUE_TYPE  QEQueue
 //QACTIVE_OS_OBJ_TYPE  not used in this port
 //QACTIVE_THREAD_TYPE  not used in this port
@@ -66,16 +66,18 @@ void leaveCriticalSection_();
 
 // set clock tick rate and p-thread priority
 // (NOTE ticksPerSec==0 disables the "ticker thread"
-void setTickRate(uint32_t ticksPerSec, int tickPrio);
+void setTickRate(std::uint32_t ticksPerSec, int tickPrio);
 
 // clock tick callback (NOTE not called when "ticker thread" is not running)
 void onClockTick();
 
-// abstractions for console access...
-void consoleSetup();
-void consoleCleanup();
-int consoleGetKey();
-int consoleWaitForKey();
+#ifdef QF_CONSOLE
+    // abstractions for console access...
+    void consoleSetup();
+    void consoleCleanup();
+    int consoleGetKey();
+    int consoleWaitForKey();
+#endif
 
 } // namespace QF
 } // namespace QP
@@ -138,7 +140,7 @@ namespace QF {
 // the time. Such sections of code are called "critical sections".
 //
 // This port uses a pair of functions QF::enterCriticalSection_() /
-// QF::leaveCriticalSection_() to enter/leave the cirtical section,
+// QF::leaveCriticalSection_() to enter/leave the critical section,
 // respectively.
 //
 // These functions are implemented in the qf_port.cpp module, where they
@@ -162,7 +164,7 @@ namespace QF {
 //
 // NOTE2:
 // Scheduler locking (used inside QActive::publish()) is not needed in the
-// single-threaded port, because event multicasting is already atomic.
+// single-threaded port because event multicasting is already atomic.
 //
 
 #endif // QP_PORT_HPP_

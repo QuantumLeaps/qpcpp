@@ -22,8 +22,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-11-30
-//! @version Last updated for: @ref qpc_7_3_1
+//! @date Last updated on: 2024-02-16
+//! @version Last updated for: @ref qpcpp_7_3_3
 //!
 //! @file
 //! @brief QF/C++ port to POSIX-QV (single-threaded)
@@ -49,7 +49,6 @@
 #include <string.h>         // for memcpy() and memset()
 #include <stdlib.h>
 #include <stdio.h>
-#include <termios.h>
 #include <unistd.h>
 #include <signal.h>
 
@@ -60,7 +59,6 @@ Q_DEFINE_THIS_MODULE("qf_port")
 // Local objects =============================================================
 
 static bool l_isRunning;       // flag indicating when QF is running
-static struct termios l_tsav;  // structure with saved terminal attributes
 static struct timespec l_tick; // structure for the clock tick
 static int_t l_tickPrio;       // priority of the ticker thread
 
@@ -111,7 +109,7 @@ static void sigIntHandler(int dummy) {
 
 } // unnamed local namespace
 
-// Global objects ============================================================
+//============================================================================
 namespace QP {
 namespace QF {
 
@@ -139,9 +137,9 @@ void enterCriticalSection_() {
 //............................................................................
 void leaveCriticalSection_() {
     if (l_isRunning) {
-        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect must ballace!
+        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect. must ballace!
         if ((--l_critSectNest) == 0) {
-           pthread_mutex_unlock(&l_critSectMutex_);
+            pthread_mutex_unlock(&l_critSectMutex_);
         }
     }
 }
@@ -298,7 +296,13 @@ void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
     l_tickPrio = tickPrio;
 }
 
-//............................................................................
+// console access ============================================================
+#ifdef QF_CONSOLE
+
+#include <termios.h>
+
+static struct termios l_tsav;  // structure with saved terminal attributes
+
 void consoleSetup() {
     struct termios tio;   // modified terminal attributes
 
@@ -317,7 +321,7 @@ int consoleGetKey() {
     ioctl(0, FIONREAD, &byteswaiting);
     if (byteswaiting > 0) {
         char ch;
-        read(0, &ch, 1);
+        byteswaiting = read(0, &ch, 1);
         return (int)ch;
     }
     return 0; // no input at this time
@@ -326,6 +330,7 @@ int consoleGetKey() {
 int consoleWaitForKey() {
     return static_cast<int>(getchar());
 }
+#endif
 
 } // namespace QF
 
@@ -341,18 +346,18 @@ void QActive::start(QPrioSpec const prioSpec,
     // no per-AO stack needed for this port
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(600, stkSto == nullptr);
+    Q_REQUIRE_INCRIT(800, stkSto == nullptr);
     QF_CRIT_EXIT();
-
-    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
-    m_pthre = 0U; // preemption-threshold (not used in this port)
-    register_(); // make QF aware of this AO
 
     m_eQueue.init(qSto, qLen);
 
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = 0U; // preemption-threshold (not used in this port)
+    register_(); // register this AO
+
     // top-most initial tran. (virtual call)
     this->init(par, m_prio);
-    QS_FLUSH(); // flush the QS trace buffer to the host
+    QS_FLUSH(); // flush the trace buffer to the host
 }
 
 //............................................................................
