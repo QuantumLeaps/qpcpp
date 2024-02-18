@@ -249,6 +249,36 @@ struct QSpyId {
     }
 };
 
+//${QS::types::QSObj} ........................................................
+#if (QS_OBJ_PTR_SIZE == 2U)
+using QSObj = std::uint16_t;
+#endif //  (QS_OBJ_PTR_SIZE == 2U)
+
+//${QS::types::QSObj} ........................................................
+#if (QS_OBJ_PTR_SIZE == 4U)
+using QSObj = std::uint32_t;
+#endif //  (QS_OBJ_PTR_SIZE == 4U)
+
+//${QS::types::QSObj} ........................................................
+#if (QS_OBJ_PTR_SIZE == 8U)
+using QSObj = std::uint64_t;
+#endif //  (QS_OBJ_PTR_SIZE == 8U)
+
+//${QS::types::QSFun} ........................................................
+#if (QS_FUN_PTR_SIZE == 2U)
+using QSFun = std::uint16_t;
+#endif //  (QS_FUN_PTR_SIZE == 2U)
+
+//${QS::types::QSFun} ........................................................
+#if (QS_FUN_PTR_SIZE == 4U)
+using QSFun = std::uint32_t;
+#endif //  (QS_FUN_PTR_SIZE == 4U)
+
+//${QS::types::QSFun} ........................................................
+#if (QS_FUN_PTR_SIZE == 8U)
+using QSFun = std::uint64_t;
+#endif //  (QS_FUN_PTR_SIZE == 8U)
+
 //${QS::types::QSpyFunPtr} ...................................................
 using QSpyFunPtr = void (*)();
 
@@ -271,21 +301,6 @@ using QSTimeCtr = std::uint16_t;
 #if (QS_TIME_SIZE == 4U)
 using QSTimeCtr = std::uint32_t;
 #endif //  (QS_TIME_SIZE == 4U)
-
-//${QS::types::QSFun} ........................................................
-#if (QS_FUN_PTR_SIZE == 2U)
-using QSFun = std::uint16_t;
-#endif //  (QS_FUN_PTR_SIZE == 2U)
-
-//${QS::types::QSFun} ........................................................
-#if (QS_FUN_PTR_SIZE == 4U)
-using QSFun = std::uint32_t;
-#endif //  (QS_FUN_PTR_SIZE == 4U)
-
-//${QS::types::QSFun} ........................................................
-#if (QS_FUN_PTR_SIZE == 8U)
-using QSFun = std::uint64_t;
-#endif //  (QS_FUN_PTR_SIZE == 8U)
 
 } // namespace QP
 //$enddecl${QS::types} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -624,71 +639,43 @@ void beginRec_(std::uint_fast8_t const rec) noexcept;
 void endRec_() noexcept;
 
 void u8_raw_(std::uint8_t const d) noexcept;
-void u8u8_raw_(
-    std::uint8_t const d1,
-    std::uint8_t const d2) noexcept;
+void u8u8_raw_(std::uint8_t const d1, std::uint8_t const d2) noexcept;
 void u16_raw_(std::uint16_t d) noexcept;
 void u32_raw_(std::uint32_t d) noexcept;
 void u64_raw_(std::uint64_t d) noexcept;
 void obj_raw_(void const * const obj) noexcept;
 void str_raw_(char const * s) noexcept;
 
-void u8_fmt_(
-    std::uint8_t const format,
-    std::uint8_t const d) noexcept;
-void u16_fmt_(
-    std::uint8_t format,
-    std::uint16_t d) noexcept;
-void u32_fmt_(
-    std::uint8_t format,
+void u8_fmt_(std::uint8_t const format, std::uint8_t const d) noexcept;
+void u16_fmt_(std::uint8_t format, std::uint16_t d) noexcept;
+void u32_fmt_(std::uint8_t format,
     std::uint32_t d) noexcept;
-void u64_fmt_(
-    std::uint8_t format,
-    std::uint64_t d) noexcept;
-void f32_fmt_(
-    std::uint8_t format,
-    float32_t f) noexcept;
-void f64_fmt_(
-    std::uint8_t format,
-    float64_t d) noexcept;
+void u64_fmt_(std::uint8_t format, std::uint64_t d) noexcept;
+void f32_fmt_(std::uint8_t format, float32_t f) noexcept;
+void f64_fmt_(std::uint8_t format, float64_t d) noexcept;
 void str_fmt_(char const * s) noexcept;
-void mem_fmt_(
-    std::uint8_t const * blk,
-    std::uint8_t size) noexcept;
+void mem_fmt_(std::uint8_t const * blk, std::uint8_t size) noexcept;
 
-void sig_dict_pre_(
-    QSignal const sig,
-    void const * const obj,
+void sig_dict_pre_(QSignal const sig, void const * const obj,
     char const * const name) noexcept;
-void obj_dict_pre_(
-    void const * const obj,
+void obj_dict_pre_(void const * const obj,
     char const * const name) noexcept;
-void obj_arr_dict_pre_(
-    void const * const obj,
+void obj_arr_dict_pre_(void const * const obj,
     std::uint_fast16_t const idx,
     char const * const name) noexcept;
-void fun_dict_pre_(
-    QSpyFunPtr fun,
+void fun_dict_pre_(QSpyFunPtr fun,
     char const * const name) noexcept;
-void usr_dict_pre_(
-    enum_t const rec,
-    char const * const name) noexcept;
-void enum_dict_pre_(
-    enum_t const value,
-    std::uint8_t const group,
+void usr_dict_pre_(enum_t const rec, char const * const name) noexcept;
+void enum_dict_pre_(enum_t const value, std::uint8_t const group,
     char const * const name) noexcept;
 
-void assertion_pre_(
-    char const * const module,
-    int_t const id,
+void assertion_pre_(char const * const module, int_t const id,
     std::uint32_t const delay) noexcept;
 void crit_entry_pre_() noexcept;
 void crit_exit_pre_() noexcept;
-void isr_entry_pre_(
-    std::uint8_t const isrnest,
+void isr_entry_pre_(std::uint8_t const isrnest,
     std::uint8_t const prio) noexcept;
-void isr_exit_pre_(
-    std::uint8_t const isrnest,
+void isr_exit_pre_(std::uint8_t const isrnest,
     std::uint8_t const prio) noexcept;
 
 void target_info_pre_(std::uint8_t const isReset);
@@ -762,105 +749,6 @@ QSTimeCtr onGetTime();
 } // namespace QS
 } // namespace QP
 //$enddecl${QS::QS-TX} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-//============================================================================
-//! @cond INTERNAL
-
-namespace QP {
-namespace QS {
-
-struct RxAttr {
-    void * currObj[8];
-    std::uint8_t * buf;
-    QSCtr  end;
-    QSCtr volatile head;
-    QSCtr volatile tail;
-#ifdef Q_UTEST
-    bool inTestLoop;
-#endif
-} ;
-
-extern RxAttr rxPriv_;
-
-} // namespace QS
-} // namespace QP
-
-//! @endcond
-//============================================================================
-
-//$declare${QS::QS-RX} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-namespace QS {
-
-//${QS::QS-RX::QSpyObjKind} ..................................................
-//! Kinds of objects used QS-RX
-enum QSpyObjKind : std::uint8_t {
-    SM_OBJ,    //!< state machine object
-    AO_OBJ,    //!< active object
-    MP_OBJ,    //!< event pool object
-    EQ_OBJ,    //!< raw queue object
-    TE_OBJ,    //!< time event object
-    AP_OBJ,    //!< generic Application-specific object
-    MAX_OBJ
-};
-
-//${QS::QS-RX::OSpyObjCombnation} ............................................
-//! Object combinations for QS-RX
-enum OSpyObjCombnation : std::uint8_t {
-    SM_AO_OBJ = MAX_OBJ //!< combination of SM and AO
-};
-
-//${QS::QS-RX::rxInitBuf} ....................................................
-void rxInitBuf(
-    std::uint8_t * const sto,
-    std::uint16_t const stoSize) noexcept;
-
-//${QS::QS-RX::rxPut} ........................................................
-inline bool rxPut(std::uint8_t const b) noexcept {
-    // NOTE: does not need critical section
-    // But requires system-level memory access (QF_MEM_SYS()).
-
-    QSCtr head = rxPriv_.head + 1U;
-    if (head == rxPriv_.end) {
-        head = 0U;
-    }
-    if (head != rxPriv_.tail) { // buffer NOT full?
-        rxPriv_.buf[rxPriv_.head] = b;
-        rxPriv_.head = head;
-        return true;  // byte placed in the buffer
-    }
-    else {
-        return false; // byte NOT placed in the buffer
-    }
-}
-
-//${QS::QS-RX::rxParse} ......................................................
-void rxParse();
-
-//${QS::QS-RX::setCurrObj} ...................................................
-void setCurrObj(
-    std::uint8_t const obj_kind,
-    void * const obj_ptr);
-
-//${QS::QS-RX::rxGetNfree} ...................................................
-std::uint16_t rxGetNfree() noexcept;
-
-//${QS::QS-RX::doInput} ......................................................
-void doInput();
-
-//${QS::QS-RX::onReset} ......................................................
-void onReset();
-
-//${QS::QS-RX::onCommand} ....................................................
-void onCommand(
-    std::uint8_t cmdId,
-    std::uint32_t param1,
-    std::uint32_t param2,
-    std::uint32_t param3);
-
-} // namespace QS
-} // namespace QP
-//$enddecl${QS::QS-RX} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //============================================================================
 #ifdef Q_UTEST
@@ -1000,5 +888,171 @@ private:
 #define QS_TEST_PAUSE()  (static_cast<void>(0))
 
 #endif // Q_UTEST
+
+//============================================================================
+//! @cond INTERNAL
+
+namespace QP {
+namespace QS {
+
+//............................................................................
+struct CmdVar {
+    std::uint32_t param1;
+    std::uint32_t param2;
+    std::uint32_t param3;
+    std::uint8_t  idx;
+    std::uint8_t  cmdId;
+};
+
+struct TickVar {
+    std::uint_fast8_t rate;
+};
+
+struct PeekVar {
+    std::uint16_t offs;
+    std::uint8_t  size;
+    std::uint8_t  num;
+    std::uint8_t  idx;
+};
+
+struct PokeVar {
+    std::uint32_t data;
+    std::uint16_t offs;
+    std::uint8_t  size;
+    std::uint8_t  num;
+    std::uint8_t  idx;
+    std::uint8_t  fill;
+};
+
+struct FltVar {
+    std::uint8_t data[16];
+    std::uint8_t idx;
+    std::uint8_t recId; // global/local
+};
+
+struct ObjVar {
+    QSObj   addr;
+    std::uint8_t idx;
+    std::uint8_t kind; // see qs.hpp, enum QSpyObjKind
+    std::uint8_t recId;
+};
+
+struct EvtVar {
+    QP::QEvt     *e;
+    std::uint8_t *p;
+    QP::QSignal   sig;
+    std::uint16_t len;
+    std::uint8_t  prio;
+    std::uint8_t  idx;
+};
+
+struct RxAttr {
+    void * currObj[8];
+    std::uint8_t * buf;
+    QSCtr  end;
+    QSCtr volatile head;
+    QSCtr volatile tail;
+    std::uint8_t state;
+    std::uint8_t esc;
+    std::uint8_t seq;
+    std::uint8_t chksum;
+#ifdef Q_UTEST
+    bool inTestLoop;
+#endif
+    union Variant {
+        CmdVar   cmd;
+        TickVar  tick;
+        PeekVar  peek;
+        PokeVar  poke;
+        FltVar   flt;
+        ObjVar   obj;
+        EvtVar   evt;
+#ifdef Q_UTEST
+        QP::QS::TProbe tp;
+#endif // Q_UTEST
+    } var;
+} ;
+
+extern RxAttr rxPriv_;
+
+} // namespace QS
+} // namespace QP
+
+//! @endcond
+//============================================================================
+
+//$declare${QS::QS-RX} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+namespace QP {
+namespace QS {
+
+//${QS::QS-RX::QSpyObjKind} ..................................................
+//! Kinds of objects used QS-RX
+enum QSpyObjKind : std::uint8_t {
+    SM_OBJ,    //!< state machine object
+    AO_OBJ,    //!< active object
+    MP_OBJ,    //!< event pool object
+    EQ_OBJ,    //!< raw queue object
+    TE_OBJ,    //!< time event object
+    AP_OBJ,    //!< generic Application-specific object
+    MAX_OBJ
+};
+
+//${QS::QS-RX::OSpyObjCombnation} ............................................
+//! Object combinations for QS-RX
+enum OSpyObjCombnation : std::uint8_t {
+    SM_AO_OBJ = MAX_OBJ //!< combination of SM and AO
+};
+
+//${QS::QS-RX::rxInitBuf} ....................................................
+void rxInitBuf(
+    std::uint8_t * const sto,
+    std::uint16_t const stoSize) noexcept;
+
+//${QS::QS-RX::rxPut} ........................................................
+inline bool rxPut(std::uint8_t const b) noexcept {
+    // NOTE: does not need critical section
+    // But requires system-level memory access (QF_MEM_SYS()).
+
+    QSCtr head = rxPriv_.head + 1U;
+    if (head == rxPriv_.end) {
+        head = 0U;
+    }
+    if (head != rxPriv_.tail) { // buffer NOT full?
+        rxPriv_.buf[rxPriv_.head] = b;
+        rxPriv_.head = head;
+        return true;  // byte placed in the buffer
+    }
+    else {
+        return false; // byte NOT placed in the buffer
+    }
+}
+
+//${QS::QS-RX::rxParse} ......................................................
+void rxParse();
+
+//${QS::QS-RX::setCurrObj} ...................................................
+void setCurrObj(
+    std::uint8_t const obj_kind,
+    void * const obj_ptr);
+
+//${QS::QS-RX::rxGetNfree} ...................................................
+std::uint16_t rxGetNfree() noexcept;
+
+//${QS::QS-RX::doInput} ......................................................
+void doInput();
+
+//${QS::QS-RX::onReset} ......................................................
+void onReset();
+
+//${QS::QS-RX::onCommand} ....................................................
+void onCommand(
+    std::uint8_t cmdId,
+    std::uint32_t param1,
+    std::uint32_t param2,
+    std::uint32_t param3);
+
+} // namespace QS
+} // namespace QP
+//$enddecl${QS::QS-RX} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #endif // QS_HPP_

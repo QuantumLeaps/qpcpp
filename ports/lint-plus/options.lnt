@@ -22,7 +22,7 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-08
+//! @date Last updated on: 2024-02-19
 //! @version Last updated for: @ref qpcpp_7_3_0
 //!
 //! @file
@@ -141,12 +141,13 @@ qpcpp.lnt           // QP/C++ options
 -emacro(826,
  QTICKER_CAST_)
 
-// AUTOSAR Rule M5-2-9 casting from pointer type to integer type
+// AC++M5-2-9 casting from pointer type to integer type
 -emacro(9091,
  Q_UINTPTR_CAST_)
 
-// [AUTOSAR Rule A12-1-1] non-static data member not initialized by ctor
+// [AC++M12-1-1] non-static data member not initialized by ctor
 -esym(1401,
+ QP::QEvt::*,
  QP::QActive::*)
 
 // definition of macro ends in semi-colon
@@ -179,15 +180,6 @@ qpcpp.lnt           // QP/C++ options
 -emacro(9079,
  QF_EPOOL_GET_)
 
--efunc(9079,
- QP::QF::bzero_,
- QP::QTimeEvt::armX,
- QP::QTimeEvt::disarm,
- QP::QTimeEvt::rearm,
- QP::QMPool::init,
- QP::QMPool::get,
- QP::QMPool::put)
-
 // M3-R18.3(r) relational operator <= applied to pointers
 -emacro(946,
  QF_PTR_RANGE_)
@@ -208,16 +200,7 @@ qpcpp.lnt           // QP/C++ options
 -esym(952,
  QP::QEQueue::init)
 
-// call to unqualified virtual function 'QP::*::init'
-// from non-static member function
--esym(1933,
- QP::*::init)
-
-// [AUTOSAR Rule M7-3-1] lobal declaration of symbol 'dummy' in the file
--esym(9141,
- dummy)
-
-// AUTOSAR Rule M5-2-3: downcast of polymorphic type
+// AC++M5-2-3: downcast of polymorphic type
 -efunc(9171,
  QP::QActive::post_,
  QP::QActive::postLIFO)
@@ -227,10 +210,29 @@ qpcpp.lnt           // QP/C++ options
  QP::QActive::post_,
  QP::QActive::postLIFO)
 
-// PCLP-1939: casting from base class to derived class
+// [AC++M5-2-2]: casting from base class to derived class (QP::QActiveDummy)
 -efunc(1939,
  QP::QActive::post_,
  QP::QActive::postLIFO)
+
+// PCLP-1731: public virtual function (in a class without virtual destructor)
+-esym(1731,
+ QP::QTicker::*)
+
+ // PCLP-1933: call to unqualified virtual function from non-static member function
+-efunc(1933,
+ QP::QActive::start)
+
+// PCLP-9079:
+-efunc(9079,
+ QP::QF::bzero_,
+ QP::QTimeEvt::armX,
+ QP::QTimeEvt::disarm,
+ QP::QTimeEvt::rearm,
+ QP::QMPool::init,
+ QP::QMPool::get,
+ QP::QMPool::put)
+
 
 // QV ------------------------------------------------------------------------
 // MC++R16-0-4 function-like macro

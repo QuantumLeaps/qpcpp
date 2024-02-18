@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-01
-//! @version Last updated for version: 7.3.0
+//! @date Last updated on: 2024-02-18
+//! @version Last updated for version: 7.3.3
 //!
 //! @file
 //! @brief PC-Lint-Plus option file for linting QP/C++ __Applications__
@@ -270,25 +270,6 @@
  Q_NEW_X,
  Q_NEW_REF)
 
-// implicit conversion (call) from 'enum ...' to 'const enum_t'
--emacro(713,
- Q_NEW,
- Q_NEW_X)
-
-// implicit conversion of 'enum ...' to integral type 'enum_t'
--emacro(641,
- Q_NEW,
- Q_NEW_X)
-
-// public virtual function 'QP::QHsm::...'
--esym(1731,
- QP::QActive::*,
- QP::QMActive::*,
- QP::QTicker::*)
-
-// public base 'QP::QEvt' has no non-destructor virtual functions
--esym(1790,
- QP::QEvt)
 
 // QK ------------------------------------------------------------------------
 
@@ -297,7 +278,7 @@
  QK_ISR_ENTRY,
  QK_ISR_EXIT)
 
-// MC++R7-3-1 global declaration of symbol
+// AC++M7-3-1 global declaration of symbol
 -esym(9141,
  QK_Attr)
 
@@ -453,10 +434,6 @@
  QS_USR_DICTIONARY,
  QS_ENUM_DICTIONARY)
 
-// MC++R9-5-1 union 'TCast' declared
--esym(9018,
- TCast)
-
 // M3-R10.3(r) cannot assign enum to different essential type
 -emacro(9034,
  QS_SIG_DICTIONARY)
@@ -476,5 +453,7 @@
 -esym(9018,
  F32Rep,
  F64Rep,
- U32Rep)
+ U32Rep,
+ TCast,
+ QP::QS::RxAttr::Variant)
 

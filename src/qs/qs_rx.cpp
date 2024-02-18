@@ -53,85 +53,6 @@ namespace { // unnamed local namespace
 
 Q_DEFINE_THIS_MODULE("qs_rx")
 
-//............................................................................
-#if (QS_OBJ_PTR_SIZE == 2U)
-    using QSObj = std::uint16_t;
-#elif (QS_OBJ_PTR_SIZE == 4U)
-    using QSObj = std::uint32_t;
-#elif (QS_OBJ_PTR_SIZE == 8U)
-    using QSObj = std::uint64_t;
-#endif
-
-struct CmdVar {
-    std::uint32_t param1;
-    std::uint32_t param2;
-    std::uint32_t param3;
-    std::uint8_t  idx;
-    std::uint8_t  cmdId;
-};
-
-struct TickVar {
-    std::uint_fast8_t rate;
-};
-
-struct PeekVar {
-    std::uint16_t offs;
-    std::uint8_t  size;
-    std::uint8_t  num;
-    std::uint8_t  idx;
-};
-
-struct PokeVar {
-    std::uint32_t data;
-    std::uint16_t offs;
-    std::uint8_t  size;
-    std::uint8_t  num;
-    std::uint8_t  idx;
-    std::uint8_t  fill;
-};
-
-struct FltVar {
-    std::uint8_t data[16];
-    std::uint8_t idx;
-    std::uint8_t recId; // global/local
-};
-
-struct ObjVar {
-    QSObj   addr;
-    std::uint8_t idx;
-    std::uint8_t kind; // see qs.hpp, enum QSpyObjKind
-    std::uint8_t recId;
-};
-
-struct EvtVar {
-    QP::QEvt     *e;
-    std::uint8_t *p;
-    QP::QSignal   sig;
-    std::uint16_t len;
-    std::uint8_t  prio;
-    std::uint8_t  idx;
-};
-
-// extended-state variables for the current QS-RX state
-static struct ExtState {
-    union Variant {
-        CmdVar   cmd;
-        TickVar  tick;
-        PeekVar  peek;
-        PokeVar  poke;
-        FltVar   flt;
-        ObjVar   obj;
-        EvtVar   evt;
-#ifdef Q_UTEST
-        QP::QS::TProbe tp;
-#endif // Q_UTEST
-    } var;
-    std::uint8_t state;
-    std::uint8_t esc;
-    std::uint8_t seq;
-    std::uint8_t chksum;
-} l_rx;
-
 enum RxStateEnum : std::uint8_t {
     ERROR_STATE,
     WAIT4_SEQ,
@@ -193,16 +114,18 @@ static void rxPoke_() noexcept;
 
 // Internal QS-RX function to take a tran. in the QS-RX FSM
 static inline void tran_(RxStateEnum const target) noexcept {
-    l_rx.state = static_cast<std::uint8_t>(target);
+    QP::QS::rxPriv_.state = static_cast<std::uint8_t>(target);
 }
 
 } // unnamed namespace
 
+#ifndef QF_MEM_ISOLATE
 namespace QP {
 namespace QS {
 RxAttr rxPriv_;
 } // namespace QS
 } // namespace QP
+#endif // QF_MEM_ISOLATE
 
 //! @endcond
 //============================================================================
@@ -236,9 +159,9 @@ void rxInitBuf(
     rxPriv_.currObj[QS::AP_OBJ] = nullptr;
 
     tran_(WAIT4_SEQ);
-    l_rx.esc    = 0U;
-    l_rx.seq    = 0U;
-    l_rx.chksum = 0U;
+    QP::QS::rxPriv_.esc    = 0U;
+    QP::QS::rxPriv_.seq    = 0U;
+    QP::QS::rxPriv_.chksum = 0U;
 
     beginRec_(static_cast<std::uint_fast8_t>(QS_OBJ_DICT));
         QS_OBJ_PRE_(&rxPriv_);
@@ -254,9 +177,6 @@ void rxInitBuf(
 
 //${QS::QS-RX::rxParse} ......................................................
 void rxParse() {
-    // NOTE: Must be called IN critical section.
-    // Also requires system-level memory access (QF_MEM_SYS()).
-
     QSCtr tail = rxPriv_.tail;
     while (rxPriv_.head != tail) { // QS-RX buffer NOT empty?
         std::uint8_t b = rxPriv_.buf[tail];
@@ -267,34 +187,34 @@ void rxParse() {
         }
         rxPriv_.tail = tail; // update the tail to a *valid* index
 
-        if (l_rx.esc != 0U) {  // escaped byte arrived?
-            l_rx.esc = 0U;
+        if (QP::QS::rxPriv_.esc != 0U) {  // escaped byte arrived?
+            QP::QS::rxPriv_.esc = 0U;
             b ^= QS_ESC_XOR;
 
-            l_rx.chksum += b;
+            QP::QS::rxPriv_.chksum += b;
             rxParseData_(b);
         }
         else if (b == QS_ESC) {
-            l_rx.esc = 1U;
+            QP::QS::rxPriv_.esc = 1U;
         }
         else if (b == QS_FRAME) {
             // get ready for the next frame
-            b = l_rx.state; // save the current state in b
-            l_rx.esc = 0U;
+            b = QP::QS::rxPriv_.state; // save the current state in b
+            QP::QS::rxPriv_.esc = 0U;
             tran_(WAIT4_SEQ);
 
-            if (l_rx.chksum == QS_GOOD_CHKSUM) {
-                l_rx.chksum = 0U;
+            if (QP::QS::rxPriv_.chksum == QS_GOOD_CHKSUM) {
+                QP::QS::rxPriv_.chksum = 0U;
                 rxHandleGoodFrame_(b);
             }
             else { // bad checksum
-                l_rx.chksum = 0U;
+                QP::QS::rxPriv_.chksum = 0U;
                 rxReportError_(0x41U);
                 rxHandleBadFrame_(b);
             }
         }
         else {
-            l_rx.chksum += b;
+            QP::QS::rxPriv_.chksum += b;
             rxParseData_(b);
         }
     }
@@ -347,12 +267,12 @@ namespace { // unnamed local namespace
 
 //............................................................................
 static void rxParseData_(std::uint8_t const b) noexcept {
-    switch (l_rx.state) {
+    switch (QP::QS::rxPriv_.state) {
         case WAIT4_SEQ: {
-            ++l_rx.seq;
-            if (l_rx.seq != b) { // not the expected sequence?
+            ++QP::QS::rxPriv_.seq;
+            if (QP::QS::rxPriv_.seq != b) { // not the expected sequence?
                 rxReportError_(0x42U);
-                l_rx.seq = b; // update the sequence
+                QP::QS::rxPriv_.seq = b; // update the sequence
             }
             tran_(WAIT4_REC);
             break;
@@ -373,8 +293,8 @@ static void rxParseData_(std::uint8_t const b) noexcept {
                     break;
                 case QP::QS_RX_PEEK:
                     if (QP::QS::rxPriv_.currObj[QP::QS::AP_OBJ] != nullptr) {
-                        l_rx.var.peek.offs = 0U;
-                        l_rx.var.peek.idx  = 0U;
+                        QP::QS::rxPriv_.var.peek.offs = 0U;
+                        QP::QS::rxPriv_.var.peek.idx  = 0U;
                         tran_(WAIT4_PEEK_OFFS);
                     }
                     else {
@@ -385,18 +305,17 @@ static void rxParseData_(std::uint8_t const b) noexcept {
                     break;
                 case QP::QS_RX_POKE:
                 case QP::QS_RX_FILL:
-                    l_rx.var.poke.fill =
+                    QP::QS::rxPriv_.var.poke.fill =
                         (b == static_cast<std::uint8_t>(QP::QS_RX_FILL))
-                            ? 1U
-                            : 0U;
+                        ? 1U : 0U;
                     if (QP::QS::rxPriv_.currObj[QP::QS::AP_OBJ] != nullptr) {
-                        l_rx.var.poke.offs = 0U;
-                        l_rx.var.poke.idx  = 0U;
+                        QP::QS::rxPriv_.var.poke.offs = 0U;
+                        QP::QS::rxPriv_.var.poke.idx  = 0U;
                         tran_(WAIT4_POKE_OFFS);
                     }
                     else {
                         rxReportError_(
-                            (l_rx.var.poke.fill != 0U)
+                            (QP::QS::rxPriv_.var.poke.fill != 0U)
                                 ? static_cast<std::uint8_t>(QP::QS_RX_FILL)
                                 : static_cast<std::uint8_t>(QP::QS_RX_POKE));
                         tran_(ERROR_STATE);
@@ -404,16 +323,16 @@ static void rxParseData_(std::uint8_t const b) noexcept {
                     break;
                 case QP::QS_RX_GLB_FILTER: // intentionally fall-through
                 case QP::QS_RX_LOC_FILTER:
-                    l_rx.var.flt.recId = b;
+                    QP::QS::rxPriv_.var.flt.recId = b;
                     tran_(WAIT4_FILTER_LEN);
                     break;
                 case QP::QS_RX_AO_FILTER: // intentionally fall-through
                 case QP::QS_RX_CURR_OBJ:
-                    l_rx.var.obj.recId = b;
+                    QP::QS::rxPriv_.var.obj.recId = b;
                     tran_(WAIT4_OBJ_KIND);
                     break;
                 case QP::QS_RX_QUERY_CURR:
-                    l_rx.var.obj.recId =
+                    QP::QS::rxPriv_.var.obj.recId =
                         static_cast<std::uint8_t>(QP::QS_RX_QUERY_CURR);
                     tran_(WAIT4_QUERY_KIND);
                     break;
@@ -437,8 +356,8 @@ static void rxParseData_(std::uint8_t const b) noexcept {
                               (sizeof(QP::QS::tstPriv_.tpBuf)
                                / sizeof(QP::QS::tstPriv_.tpBuf[0]))))
                     {
-                        l_rx.var.tp.data = 0U;
-                        l_rx.var.tp.idx  = 0U;
+                        QP::QS::rxPriv_.var.tp.data = 0U;
+                        QP::QS::rxPriv_.var.tp.idx  = 0U;
                         tran_(WAIT4_TEST_PROBE_DATA);
                     }
                     else { // the # Test-Probes exceeded
@@ -461,40 +380,40 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_CMD_ID: {
-            l_rx.var.cmd.cmdId  = b;
-            l_rx.var.cmd.idx    = 0U;
-            l_rx.var.cmd.param1 = 0U;
-            l_rx.var.cmd.param2 = 0U;
-            l_rx.var.cmd.param3 = 0U;
+            QP::QS::rxPriv_.var.cmd.cmdId  = b;
+            QP::QS::rxPriv_.var.cmd.idx    = 0U;
+            QP::QS::rxPriv_.var.cmd.param1 = 0U;
+            QP::QS::rxPriv_.var.cmd.param2 = 0U;
+            QP::QS::rxPriv_.var.cmd.param3 = 0U;
             tran_(WAIT4_CMD_PARAM1);
             break;
         }
         case WAIT4_CMD_PARAM1: {
-            l_rx.var.cmd.param1 |=
-                (static_cast<std::uint32_t>(b) << l_rx.var.cmd.idx);
-            l_rx.var.cmd.idx    += 8U;
-            if (l_rx.var.cmd.idx == (8U*4U)) {
-                l_rx.var.cmd.idx = 0U;
+            QP::QS::rxPriv_.var.cmd.param1 |=
+                (static_cast<std::uint32_t>(b) << QP::QS::rxPriv_.var.cmd.idx);
+            QP::QS::rxPriv_.var.cmd.idx    += 8U;
+            if (QP::QS::rxPriv_.var.cmd.idx == (8U * 4U)) {
+                QP::QS::rxPriv_.var.cmd.idx = 0U;
                 tran_(WAIT4_CMD_PARAM2);
             }
             break;
         }
         case WAIT4_CMD_PARAM2: {
-            l_rx.var.cmd.param2 |=
-                static_cast<std::uint32_t>(b) << l_rx.var.cmd.idx;
-            l_rx.var.cmd.idx    += 8U;
-            if (l_rx.var.cmd.idx == (8U*4U)) {
-                l_rx.var.cmd.idx = 0U;
+            QP::QS::rxPriv_.var.cmd.param2 |=
+                static_cast<std::uint32_t>(b) << QP::QS::rxPriv_.var.cmd.idx;
+            QP::QS::rxPriv_.var.cmd.idx    += 8U;
+            if (QP::QS::rxPriv_.var.cmd.idx == (8U * 4U)) {
+                QP::QS::rxPriv_.var.cmd.idx = 0U;
                 tran_(WAIT4_CMD_PARAM3);
             }
             break;
         }
         case WAIT4_CMD_PARAM3: {
-            l_rx.var.cmd.param3 |=
-                static_cast<std::uint32_t>(b) << l_rx.var.cmd.idx;
-            l_rx.var.cmd.idx    += 8U;
-            if (l_rx.var.cmd.idx == (8U*4U)) {
-                l_rx.var.cmd.idx = 0U;
+            QP::QS::rxPriv_.var.cmd.param3 |=
+                static_cast<std::uint32_t>(b) << QP::QS::rxPriv_.var.cmd.idx;
+            QP::QS::rxPriv_.var.cmd.idx    += 8U;
+            if (QP::QS::rxPriv_.var.cmd.idx == (8U * 4U)) {
+                QP::QS::rxPriv_.var.cmd.idx = 0U;
                 tran_(WAIT4_CMD_FRAME);
             }
             break;
@@ -508,7 +427,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_TICK_RATE: {
-            l_rx.var.tick.rate = static_cast<std::uint_fast8_t>(b);
+            QP::QS::rxPriv_.var.tick.rate = static_cast<std::uint_fast8_t>(b);
             tran_(WAIT4_TICK_FRAME);
             break;
         }
@@ -517,12 +436,12 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_PEEK_OFFS: {
-            if (l_rx.var.peek.idx == 0U) {
-                l_rx.var.peek.offs = static_cast<std::uint16_t>(b);
-                l_rx.var.peek.idx += 8U;
+            if (QP::QS::rxPriv_.var.peek.idx == 0U) {
+                QP::QS::rxPriv_.var.peek.offs = static_cast<std::uint16_t>(b);
+                QP::QS::rxPriv_.var.peek.idx += 8U;
             }
             else {
-                l_rx.var.peek.offs |= static_cast<std::uint16_t>(
+                QP::QS::rxPriv_.var.peek.offs |= static_cast<std::uint16_t>(
                                          static_cast<std::uint16_t>(b) << 8U);
                 tran_(WAIT4_PEEK_SIZE);
             }
@@ -530,7 +449,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
         }
         case WAIT4_PEEK_SIZE: {
             if ((b == 1U) || (b == 2U) || (b == 4U)) {
-                l_rx.var.peek.size = b;
+                QP::QS::rxPriv_.var.peek.size = b;
                 tran_(WAIT4_PEEK_NUM);
             }
             else {
@@ -540,7 +459,7 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_PEEK_NUM: {
-            l_rx.var.peek.num = b;
+            QP::QS::rxPriv_.var.peek.num = b;
             tran_(WAIT4_PEEK_FRAME);
             break;
         }
@@ -549,12 +468,12 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_POKE_OFFS: {
-            if (l_rx.var.poke.idx == 0U) {
-                l_rx.var.poke.offs = static_cast<std::uint16_t>(b);
-                l_rx.var.poke.idx  = 1U;
+            if (QP::QS::rxPriv_.var.poke.idx == 0U) {
+                QP::QS::rxPriv_.var.poke.offs = static_cast<std::uint16_t>(b);
+                QP::QS::rxPriv_.var.poke.idx  = 1U;
             }
             else {
-                l_rx.var.poke.offs |= static_cast<std::uint16_t>(
+                QP::QS::rxPriv_.var.poke.offs |= static_cast<std::uint16_t>(
                                          static_cast<std::uint16_t>(b) << 8U);
                 tran_(WAIT4_POKE_SIZE);
             }
@@ -562,11 +481,11 @@ static void rxParseData_(std::uint8_t const b) noexcept {
         }
         case WAIT4_POKE_SIZE: {
             if ((b == 1U) || (b == 2U) || (b == 4U)) {
-                l_rx.var.poke.size = b;
+                QP::QS::rxPriv_.var.poke.size = b;
                 tran_(WAIT4_POKE_NUM);
             }
             else {
-                rxReportError_((l_rx.var.poke.fill != 0U)
+                rxReportError_((QP::QS::rxPriv_.var.poke.fill != 0U)
                                   ? static_cast<std::uint8_t>(QP::QS_RX_FILL)
                                   : static_cast<std::uint8_t>(QP::QS_RX_POKE));
                 tran_(ERROR_STATE);
@@ -575,15 +494,15 @@ static void rxParseData_(std::uint8_t const b) noexcept {
         }
         case WAIT4_POKE_NUM: {
             if (b > 0U) {
-                l_rx.var.poke.num  = b;
-                l_rx.var.poke.data = 0U;
-                l_rx.var.poke.idx  = 0U;
-                tran_((l_rx.var.poke.fill != 0U)
+                QP::QS::rxPriv_.var.poke.num  = b;
+                QP::QS::rxPriv_.var.poke.data = 0U;
+                QP::QS::rxPriv_.var.poke.idx  = 0U;
+                tran_((QP::QS::rxPriv_.var.poke.fill != 0U)
                             ? WAIT4_FILL_DATA
                             : WAIT4_POKE_DATA);
             }
             else {
-                rxReportError_((l_rx.var.poke.fill != 0U)
+                rxReportError_((QP::QS::rxPriv_.var.poke.fill != 0U)
                                   ? static_cast<std::uint8_t>(QP::QS_RX_FILL)
                                   : static_cast<std::uint8_t>(QP::QS_RX_POKE));
                 tran_(ERROR_STATE);
@@ -591,22 +510,22 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_FILL_DATA: {
-            l_rx.var.poke.data |=
-                static_cast<std::uint32_t>(b) << l_rx.var.poke.idx;
-            l_rx.var.poke.idx += 8U;
-            if ((l_rx.var.poke.idx >> 3U) == l_rx.var.poke.size) {
+            QP::QS::rxPriv_.var.poke.data |=
+                static_cast<std::uint32_t>(b) << QP::QS::rxPriv_.var.poke.idx;
+            QP::QS::rxPriv_.var.poke.idx += 8U;
+            if ((QP::QS::rxPriv_.var.poke.idx >> 3U) == QP::QS::rxPriv_.var.poke.size) {
                 tran_(WAIT4_FILL_FRAME);
             }
             break;
         }
         case WAIT4_POKE_DATA: {
-            l_rx.var.poke.data |=
-                static_cast<std::uint32_t>(b) << l_rx.var.poke.idx;
-            l_rx.var.poke.idx += 8U;
-            if ((l_rx.var.poke.idx >> 3U) == l_rx.var.poke.size) {
+            QP::QS::rxPriv_.var.poke.data |=
+                static_cast<std::uint32_t>(b) << QP::QS::rxPriv_.var.poke.idx;
+            QP::QS::rxPriv_.var.poke.idx += 8U;
+            if ((QP::QS::rxPriv_.var.poke.idx >> 3U) == QP::QS::rxPriv_.var.poke.size) {
                 rxPoke_();
-                --l_rx.var.poke.num;
-                if (l_rx.var.poke.num == 0U) {
+                --QP::QS::rxPriv_.var.poke.num;
+                if (QP::QS::rxPriv_.var.poke.num == 0U) {
                     tran_(WAIT4_POKE_FRAME);
                 }
             }
@@ -621,20 +540,20 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_FILTER_LEN: {
-            if (b == static_cast<std::uint8_t>(sizeof(l_rx.var.flt.data))) {
-                l_rx.var.flt.idx = 0U;
+            if (b == static_cast<std::uint8_t>(sizeof(QP::QS::rxPriv_.var.flt.data))) {
+                QP::QS::rxPriv_.var.flt.idx = 0U;
                 tran_(WAIT4_FILTER_DATA);
             }
             else {
-                rxReportError_(l_rx.var.flt.recId);
+                rxReportError_(QP::QS::rxPriv_.var.flt.recId);
                 tran_(ERROR_STATE);
             }
             break;
         }
         case WAIT4_FILTER_DATA: {
-            l_rx.var.flt.data[l_rx.var.flt.idx] = b;
-            ++l_rx.var.flt.idx;
-            if (l_rx.var.flt.idx == sizeof(l_rx.var.flt.data)) {
+            QP::QS::rxPriv_.var.flt.data[QP::QS::rxPriv_.var.flt.idx] = b;
+            ++QP::QS::rxPriv_.var.flt.idx;
+            if (QP::QS::rxPriv_.var.flt.idx == sizeof(QP::QS::rxPriv_.var.flt.data)) {
                 tran_(WAIT4_FILTER_FRAME);
             }
             break;
@@ -645,22 +564,22 @@ static void rxParseData_(std::uint8_t const b) noexcept {
         }
         case WAIT4_OBJ_KIND: {
             if (b <= static_cast<std::uint8_t>(QP::QS::SM_AO_OBJ)) {
-                l_rx.var.obj.kind = b;
-                l_rx.var.obj.addr = 0U;
-                l_rx.var.obj.idx  = 0U;
+                QP::QS::rxPriv_.var.obj.kind = b;
+                QP::QS::rxPriv_.var.obj.addr = 0U;
+                QP::QS::rxPriv_.var.obj.idx  = 0U;
                 tran_(WAIT4_OBJ_ADDR);
             }
             else {
-                rxReportError_(l_rx.var.obj.recId);
+                rxReportError_(QP::QS::rxPriv_.var.obj.recId);
                 tran_(ERROR_STATE);
             }
             break;
         }
         case WAIT4_OBJ_ADDR: {
-            l_rx.var.obj.addr |=
-                static_cast<QSObj>(b) << l_rx.var.obj.idx;
-            l_rx.var.obj.idx += 8U;
-            if (l_rx.var.obj.idx
+            QP::QS::rxPriv_.var.obj.addr |=
+                static_cast<QP::QSObj>(b) << QP::QS::rxPriv_.var.obj.idx;
+            QP::QS::rxPriv_.var.obj.idx += 8U;
+            if (QP::QS::rxPriv_.var.obj.idx
                 == (8U * static_cast<unsigned>(QS_OBJ_PTR_SIZE)))
             {
                 tran_(WAIT4_OBJ_FRAME);
@@ -673,11 +592,11 @@ static void rxParseData_(std::uint8_t const b) noexcept {
         }
         case WAIT4_QUERY_KIND: {
             if (b < static_cast<std::uint8_t>(QP::QS::MAX_OBJ)) {
-                l_rx.var.obj.kind = b;
+                QP::QS::rxPriv_.var.obj.kind = b;
                 tran_(WAIT4_QUERY_FRAME);
             }
             else {
-                rxReportError_(l_rx.var.obj.recId);
+                rxReportError_(QP::QS::rxPriv_.var.obj.recId);
                 tran_(ERROR_STATE);
             }
             break;
@@ -687,48 +606,47 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_EVT_PRIO: {
-            l_rx.var.evt.prio = b;
-            l_rx.var.evt.sig  = 0U;
-            l_rx.var.evt.idx  = 0U;
+            QP::QS::rxPriv_.var.evt.prio = b;
+            QP::QS::rxPriv_.var.evt.sig  = 0U;
+            QP::QS::rxPriv_.var.evt.idx  = 0U;
             tran_(WAIT4_EVT_SIG);
             break;
         }
         case WAIT4_EVT_SIG: {
-            l_rx.var.evt.sig |= static_cast<QP::QSignal>(
-                          static_cast<std::uint32_t>(b) << l_rx.var.evt.idx);
-            l_rx.var.evt.idx += 8U;
-            if (l_rx.var.evt.idx
+            QP::QS::rxPriv_.var.evt.sig |= static_cast<QP::QSignal>(
+                          static_cast<std::uint32_t>(b) << QP::QS::rxPriv_.var.evt.idx);
+            QP::QS::rxPriv_.var.evt.idx += 8U;
+            if (QP::QS::rxPriv_.var.evt.idx
                 == (8U *static_cast<unsigned>(Q_SIGNAL_SIZE)))
             {
-                l_rx.var.evt.len = 0U;
-                l_rx.var.evt.idx = 0U;
+                QP::QS::rxPriv_.var.evt.len = 0U;
+                QP::QS::rxPriv_.var.evt.idx = 0U;
                 tran_(WAIT4_EVT_LEN);
             }
             break;
         }
         case WAIT4_EVT_LEN: {
-            l_rx.var.evt.len |= static_cast<std::uint16_t>(
-                                static_cast<unsigned>(b) << l_rx.var.evt.idx);
-            l_rx.var.evt.idx += 8U;
-            if (l_rx.var.evt.idx == (8U * 2U)) {
-                if ((l_rx.var.evt.len + sizeof(QP::QEvt))
-                    <= static_cast<std::uint16_t>(
-                                   QP::QF::poolGetMaxBlockSize()))
+            QP::QS::rxPriv_.var.evt.len |= static_cast<std::uint16_t>(
+                                static_cast<unsigned>(b) << QP::QS::rxPriv_.var.evt.idx);
+            QP::QS::rxPriv_.var.evt.idx += 8U;
+            if (QP::QS::rxPriv_.var.evt.idx == (8U * 2U)) {
+                if ((QP::QS::rxPriv_.var.evt.len + sizeof(QP::QEvt))
+                    <= QP::QF::poolGetMaxBlockSize())
                 {
                     // report Ack before generating any other QS records
                     rxReportAck_(QP::QS_RX_EVENT);
 
-                    l_rx.var.evt.e = QP::QF::newX_(
-                        (static_cast<std::uint_fast16_t>(l_rx.var.evt.len)
+                    QP::QS::rxPriv_.var.evt.e = QP::QF::newX_(
+                        (static_cast<std::uint_fast16_t>(QP::QS::rxPriv_.var.evt.len)
                          + sizeof(QP::QEvt)),
                         0U, // margin
-                        static_cast<enum_t>(l_rx.var.evt.sig));
+                        static_cast<enum_t>(QP::QS::rxPriv_.var.evt.sig));
                     // event allocated?
-                    if (l_rx.var.evt.e != nullptr) {
-                        l_rx.var.evt.p =
-                            reinterpret_cast<std::uint8_t *>(l_rx.var.evt.e);
-                        l_rx.var.evt.p = &l_rx.var.evt.p[sizeof(QP::QEvt)];
-                        if (l_rx.var.evt.len > 0U) {
+                    if (QP::QS::rxPriv_.var.evt.e != nullptr) {
+                        QP::QS::rxPriv_.var.evt.p =
+                            reinterpret_cast<std::uint8_t *>(QP::QS::rxPriv_.var.evt.e);
+                        QP::QS::rxPriv_.var.evt.p = &QP::QS::rxPriv_.var.evt.p[sizeof(QP::QEvt)];
+                        if (QP::QS::rxPriv_.var.evt.len > 0U) {
                             tran_(WAIT4_EVT_PAR);
                         }
                         else {
@@ -750,10 +668,10 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_EVT_PAR: { // event parameters
-            *l_rx.var.evt.p = b;
-            ++l_rx.var.evt.p;
-            --l_rx.var.evt.len;
-            if (l_rx.var.evt.len == 0U) {
+            *QP::QS::rxPriv_.var.evt.p = b;
+            ++QP::QS::rxPriv_.var.evt.p;
+            --QP::QS::rxPriv_.var.evt.len;
+            if (QP::QS::rxPriv_.var.evt.len == 0U) {
                 tran_(WAIT4_EVT_FRAME);
             }
             break;
@@ -777,21 +695,21 @@ static void rxParseData_(std::uint8_t const b) noexcept {
             break;
         }
         case WAIT4_TEST_PROBE_DATA: {
-            l_rx.var.tp.data |=
-                (static_cast<QP::QSFun>(b) << l_rx.var.tp.idx);
-            l_rx.var.tp.idx += 8U;
-            if (l_rx.var.tp.idx == (8U * sizeof(std::uint32_t))) {
-                l_rx.var.tp.addr = 0U;
-                l_rx.var.tp.idx  = 0U;
+            QP::QS::rxPriv_.var.tp.data |=
+                (static_cast<QP::QSFun>(b) << QP::QS::rxPriv_.var.tp.idx);
+            QP::QS::rxPriv_.var.tp.idx += 8U;
+            if (QP::QS::rxPriv_.var.tp.idx == (8U * sizeof(std::uint32_t))) {
+                QP::QS::rxPriv_.var.tp.addr = 0U;
+                QP::QS::rxPriv_.var.tp.idx  = 0U;
                 tran_(WAIT4_TEST_PROBE_ADDR);
             }
             break;
         }
         case WAIT4_TEST_PROBE_ADDR: {
-            l_rx.var.tp.addr |=
-                (static_cast<std::uint32_t>(b) << l_rx.var.tp.idx);
-            l_rx.var.tp.idx += 8U;
-            if (l_rx.var.tp.idx
+            QP::QS::rxPriv_.var.tp.addr |=
+                (static_cast<std::uint32_t>(b) << QP::QS::rxPriv_.var.tp.idx);
+            QP::QS::rxPriv_.var.tp.idx += 8U;
+            if (QP::QS::rxPriv_.var.tp.idx
                 == (8U * static_cast<unsigned>(QS_FUN_PTR_SIZE)))
             {
                 tran_(WAIT4_TEST_PROBE_FRAME);
@@ -820,11 +738,16 @@ static void rxParseData_(std::uint8_t const b) noexcept {
 void rxHandleGoodFrame_(std::uint8_t const state) {
     std::uint8_t i;
     std::uint8_t *ptr;
+    QS_CRIT_STAT
 
     switch (state) {
         case WAIT4_INFO_FRAME: {
             // no need to report Ack or Done
+            QS_CRIT_ENTRY();
+            QS_MEM_SYS();
             QP::QS::target_info_pre_(0U); // send only Target info
+            QS_MEM_APP();
+            QS_CRIT_EXIT();
             break;
         }
         case WAIT4_RESET_FRAME: {
@@ -837,8 +760,8 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
         case WAIT4_CMD_PARAM3: // intentionally fall-through
         case WAIT4_CMD_FRAME: {
             rxReportAck_(QP::QS_RX_COMMAND);
-            QP::QS::onCommand(l_rx.var.cmd.cmdId, l_rx.var.cmd.param1,
-                          l_rx.var.cmd.param2, l_rx.var.cmd.param3);
+            QP::QS::onCommand(QP::QS::rxPriv_.var.cmd.cmdId, QP::QS::rxPriv_.var.cmd.param1,
+                          QP::QS::rxPriv_.var.cmd.param2, QP::QS::rxPriv_.var.cmd.param3);
 #ifdef Q_UTEST
     #if Q_UTEST != 0
             QP::QS::processTestEvts_(); // process all events produced
@@ -851,14 +774,14 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
             rxReportAck_(QP::QS_RX_TICK);
 #ifdef Q_UTEST
             QP::QTimeEvt::tick1_(
-                static_cast<std::uint_fast8_t>(l_rx.var.tick.rate),
+                static_cast<std::uint_fast8_t>(QP::QS::rxPriv_.var.tick.rate),
                 &QP::QS::rxPriv_);
     #if Q_UTEST != 0
             QP::QS::processTestEvts_(); // process all events produced
     #endif  // Q_UTEST != 0
 #else
             QP::QTimeEvt::tick(
-                static_cast<std::uint_fast8_t>(l_rx.var.tick.rate),
+                static_cast<std::uint_fast8_t>(QP::QS::rxPriv_.var.tick.rate),
                 &QP::QS::rxPriv_);
 #endif  // Q_UTEST
             rxReportDone_(QP::QS_RX_TICK);
@@ -866,17 +789,19 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
         }
         case WAIT4_PEEK_FRAME: {
             // no need to report Ack or Done
+            QS_CRIT_ENTRY();
+            QS_MEM_SYS();
             QP::QS::beginRec_(static_cast<std::uint_fast8_t>(
                                  QP::QS_PEEK_DATA));
                 ptr = static_cast<std::uint8_t*>(
                           QP::QS::rxPriv_.currObj[QP::QS::AP_OBJ]);
-                ptr = &ptr[l_rx.var.peek.offs];
+                ptr = &ptr[QP::QS::rxPriv_.var.peek.offs];
                 QS_TIME_PRE_();                  // timestamp
-                QS_U16_PRE_(l_rx.var.peek.offs); // data offset
-                QS_U8_PRE_(l_rx.var.peek.size);  // data size
-                QS_U8_PRE_(l_rx.var.peek.num);   // number of data items
-                for (i = 0U; i < l_rx.var.peek.num; ++i) {
-                    switch (l_rx.var.peek.size) {
+                QS_U16_PRE_(QP::QS::rxPriv_.var.peek.offs); // data offset
+                QS_U8_PRE_(QP::QS::rxPriv_.var.peek.size);  // data size
+                QS_U8_PRE_(QP::QS::rxPriv_.var.peek.num);   // number of data items
+                for (i = 0U; i < QP::QS::rxPriv_.var.peek.num; ++i) {
+                    switch (QP::QS::rxPriv_.var.peek.size) {
                         case 1:
                             QS_U8_PRE_(ptr[i]);
                             break;
@@ -894,6 +819,8 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
                     }
                 }
             QP::QS::endRec_();
+            QS_MEM_APP();
+            QS_CRIT_EXIT();
 
             QS_REC_DONE(); // user callback (if defined)
             break;
@@ -912,20 +839,20 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
             rxReportAck_(QP::QS_RX_FILL);
             ptr = static_cast<std::uint8_t *>(
                       QP::QS::rxPriv_.currObj[QP::QS::AP_OBJ]);
-            ptr = &ptr[l_rx.var.poke.offs];
-            for (i = 0U; i < l_rx.var.poke.num; ++i) {
-                switch (l_rx.var.poke.size) {
+            ptr = &ptr[QP::QS::rxPriv_.var.poke.offs];
+            for (i = 0U; i < QP::QS::rxPriv_.var.poke.num; ++i) {
+                switch (QP::QS::rxPriv_.var.poke.size) {
                     case 1:
                         ptr[i] =
-                            static_cast<std::uint8_t>(l_rx.var.poke.data);
+                            static_cast<std::uint8_t>(QP::QS::rxPriv_.var.poke.data);
                         break;
                     case 2:
                         reinterpret_cast<std::uint16_t *>(ptr)[i] =
-                            static_cast<std::uint16_t>(l_rx.var.poke.data);
+                            static_cast<std::uint16_t>(QP::QS::rxPriv_.var.poke.data);
                         break;
                     case 4:
                         reinterpret_cast<std::uint32_t *>(ptr)[i] =
-                            l_rx.var.poke.data;
+                            QP::QS::rxPriv_.var.poke.data;
                         break;
                     default:
                         // intentionally empty
@@ -936,17 +863,17 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
         }
         case WAIT4_FILTER_FRAME: {
             rxReportAck_(static_cast<enum QP::QSpyRxRecords>(
-                             l_rx.var.flt.recId));
+                             QP::QS::rxPriv_.var.flt.recId));
 
             // apply the received filters
-            if (l_rx.var.flt.recId
+            if (QP::QS::rxPriv_.var.flt.recId
                 == static_cast<std::uint8_t>(QP::QS_RX_GLB_FILTER))
             {
                 for (i = 0U;
                      i < static_cast<std::uint8_t>(sizeof(QP::QS::filt_.glb));
                      ++i)
                 {
-                    QP::QS::filt_.glb[i] = l_rx.var.flt.data[i];
+                    QP::QS::filt_.glb[i] = QP::QS::rxPriv_.var.flt.data[i];
                 }
                 // leave the "not maskable" filters enabled,
                 // see qs.hpp, Miscellaneous QS records (not maskable)
@@ -957,39 +884,39 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
                 // never enable the last 3 records (0x7D, 0x7E, 0x7F)
                 QP::QS::filt_.glb[15] &= 0x1FU;
             }
-            else if (l_rx.var.flt.recId
+            else if (QP::QS::rxPriv_.var.flt.recId
                      == static_cast<std::uint8_t>(QP::QS_RX_LOC_FILTER))
             {
                 for (i = 0U; i < Q_DIM(QP::QS::filt_.loc); ++i) {
-                    QP::QS::filt_.loc[i] = l_rx.var.flt.data[i];
+                    QP::QS::filt_.loc[i] = QP::QS::rxPriv_.var.flt.data[i];
                 }
                 // leave QS_ID == 0 always on
                 QP::QS::filt_.loc[0] |= 0x01U;
             }
             else {
-                rxReportError_(l_rx.var.flt.recId);
+                rxReportError_(QP::QS::rxPriv_.var.flt.recId);
             }
             // no need to report Done
             break;
         }
         case WAIT4_OBJ_FRAME: {
-            i = l_rx.var.obj.kind;
+            i = QP::QS::rxPriv_.var.obj.kind;
             if (i < static_cast<std::uint8_t>(QP::QS::MAX_OBJ)) {
-                if (l_rx.var.obj.recId
+                if (QP::QS::rxPriv_.var.obj.recId
                     == static_cast<std::uint8_t>(QP::QS_RX_CURR_OBJ))
                 {
                     QP::QS::rxPriv_.currObj[i] =
-                        reinterpret_cast<void *>(l_rx.var.obj.addr);
+                        reinterpret_cast<void *>(QP::QS::rxPriv_.var.obj.addr);
                     rxReportAck_(QP::QS_RX_CURR_OBJ);
                 }
-                else if (l_rx.var.obj.recId
+                else if (QP::QS::rxPriv_.var.obj.recId
                          == static_cast<std::uint8_t>(QP::QS_RX_AO_FILTER))
                 {
-                    if (l_rx.var.obj.addr != 0U) {
+                    if (QP::QS::rxPriv_.var.obj.addr != 0U) {
                         std::int_fast16_t const filter =
                             static_cast<std::int_fast16_t>(
                                 reinterpret_cast<QP::QActive *>(
-                                    l_rx.var.obj.addr)->getPrio());
+                                    QP::QS::rxPriv_.var.obj.addr)->getPrio());
                         QP::QS::locFilter_((i == 0)
                                            ? filter
                                            :-filter);
@@ -1001,92 +928,92 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
                     }
                 }
                 else {
-                    rxReportError_(l_rx.var.obj.recId);
+                    rxReportError_(QP::QS::rxPriv_.var.obj.recId);
                 }
             }
             // both SM and AO
             else if (i == static_cast<std::uint8_t>(QP::QS::SM_AO_OBJ)) {
-                if (l_rx.var.obj.recId
+                if (QP::QS::rxPriv_.var.obj.recId
                     == static_cast<std::uint8_t>(QP::QS_RX_CURR_OBJ))
                 {
                     QP::QS::rxPriv_.currObj[QP::QS::SM_OBJ]
-                        = reinterpret_cast<void *>(l_rx.var.obj.addr);
+                        = reinterpret_cast<void *>(QP::QS::rxPriv_.var.obj.addr);
                     QP::QS::rxPriv_.currObj[QP::QS::AO_OBJ]
-                        = reinterpret_cast<void *>(l_rx.var.obj.addr);
+                        = reinterpret_cast<void *>(QP::QS::rxPriv_.var.obj.addr);
                 }
                 rxReportAck_(
-                    static_cast<enum QP::QSpyRxRecords>(l_rx.var.obj.recId));
+                    static_cast<enum QP::QSpyRxRecords>(QP::QS::rxPriv_.var.obj.recId));
             }
             else {
-                rxReportError_(l_rx.var.obj.recId);
+                rxReportError_(QP::QS::rxPriv_.var.obj.recId);
             }
             break;
         }
         case WAIT4_QUERY_FRAME: {
-            queryCurrObj_(l_rx.var.obj.kind);
+            queryCurrObj_(QP::QS::rxPriv_.var.obj.kind);
             break;
         }
         case WAIT4_EVT_FRAME: {
             // NOTE: Ack was already reported in the WAIT4_EVT_LEN state
 #ifdef Q_UTEST
-            QP::QS::onTestEvt(l_rx.var.evt.e); // "massage" the event
+            QP::QS::onTestEvt(QP::QS::rxPriv_.var.evt.e); // "massage" the event
 #endif  // Q_UTEST
             // use 'i' as status, 0 == success,no-recycle
             i = 0U;
 
-            if (l_rx.var.evt.prio == 0U) { // publish
-                QP::QActive::publish_(l_rx.var.evt.e, &QP::QS::rxPriv_, 0U);
+            if (QP::QS::rxPriv_.var.evt.prio == 0U) { // publish
+                QP::QActive::publish_(QP::QS::rxPriv_.var.evt.e, &QP::QS::rxPriv_, 0U);
             }
-            else if (l_rx.var.evt.prio < QF_MAX_ACTIVE) {
-                if (!QP::QActive::registry_[l_rx.var.evt.prio]->POST_X(
-                                l_rx.var.evt.e,
+            else if (QP::QS::rxPriv_.var.evt.prio < QF_MAX_ACTIVE) {
+                if (!QP::QActive::registry_[QP::QS::rxPriv_.var.evt.prio]->POST_X(
+                                QP::QS::rxPriv_.var.evt.e,
                                 0U, // margin
                                 &QP::QS::rxPriv_))
                 {
                     // failed QACTIVE_POST() recycles the event
-                    i = 0x80U; // failure, no recycle
+                    i = 0x80U; // failure status, no recycle
                 }
             }
-            else if (l_rx.var.evt.prio == 255U) {
+            else if (QP::QS::rxPriv_.var.evt.prio == 255U) {
                 // dispatch to the current SM object
                 if (QP::QS::rxPriv_.currObj[QP::QS::SM_OBJ] != nullptr) {
                     // increment the ref-ctr to simulate the situation
                     // when the event is just retrieved from a queue.
                     // This is expected for the following QF::gc() call.
-                    QP::QEvt_refCtr_inc_(l_rx.var.evt.e);
+                    QP::QEvt_refCtr_inc_(QP::QS::rxPriv_.var.evt.e);
 
                     static_cast<QP::QAsm *>(
                         QP::QS::rxPriv_.currObj[QP::QS::SM_OBJ])
-                            ->dispatch(l_rx.var.evt.e, 0U);
+                            ->dispatch(QP::QS::rxPriv_.var.evt.e, 0U);
                     i = 0x01U;  // success, recycle
                 }
                 else {
                     i = 0x81U;  // failure, recycle
                 }
             }
-            else if (l_rx.var.evt.prio == 254U) {
+            else if (QP::QS::rxPriv_.var.evt.prio == 254U) {
                 // init the current SM object"
                 if (QP::QS::rxPriv_.currObj[QP::QS::SM_OBJ] != nullptr) {
                     // increment the ref-ctr to simulate the situation
                     // when the event is just retrieved from a queue.
                     // This is expected for the following QF::gc() call.
-                    QP::QEvt_refCtr_inc_(l_rx.var.evt.e);
+                    QP::QEvt_refCtr_inc_(QP::QS::rxPriv_.var.evt.e);
 
                     static_cast<QP::QAsm *>(
                         QP::QS::rxPriv_.currObj[QP::QS::SM_OBJ])
-                            ->init(l_rx.var.evt.e, 0U);
+                            ->init(QP::QS::rxPriv_.var.evt.e, 0U);
                     i = 0x01U;  // success, recycle
                 }
                 else {
                     i = 0x81U;  // failure, recycle
                 }
             }
-            else if (l_rx.var.evt.prio == 253U) {
+            else if (QP::QS::rxPriv_.var.evt.prio == 253U) {
                 // post to the current AO
                 if (QP::QS::rxPriv_.currObj[QP::QS::AO_OBJ] != nullptr) {
                     if (!static_cast<QP::QActive *>(
                             QP::QS::rxPriv_.currObj[QP::QS::AO_OBJ])->POST_X(
-                                l_rx.var.evt.e,
+                                QP::QS::rxPriv_.var.evt.e,
                                 0U, // margin
                                 &QP::QS::rxPriv_))
                     {
@@ -1105,7 +1032,7 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
 #if (QF_MAX_EPOOL > 0U)
             // recycle needed?
             if ((i & 1U) != 0U) {
-                QP::QF::gc(l_rx.var.evt.e);
+                QP::QF::gc(QP::QS::rxPriv_.var.evt.e);
             }
 #endif
             // failure?
@@ -1151,7 +1078,7 @@ void rxHandleGoodFrame_(std::uint8_t const state) {
                 QP::QS::tstPriv_.tpNum
                    < (sizeof(QP::QS::tstPriv_.tpBuf)
                       / sizeof(QP::QS::tstPriv_.tpBuf[0])));
-            QP::QS::tstPriv_.tpBuf[QP::QS::tstPriv_.tpNum] = l_rx.var.tp;
+            QP::QS::tstPriv_.tpBuf[QP::QS::tstPriv_.tpNum] = QP::QS::rxPriv_.var.tp;
             ++QP::QS::tstPriv_.tpNum;
             // no need to report Done
             break;
@@ -1174,9 +1101,12 @@ static void rxHandleBadFrame_(std::uint8_t const state) noexcept {
     rxReportError_(0x50U); // error for all bad frames
     switch (state) {
         case WAIT4_EVT_FRAME: {
-            Q_ASSERT_INCRIT(910, l_rx.var.evt.e != nullptr);
+            QS_CRIT_STAT
+            QS_CRIT_ENTRY();
+            Q_ASSERT_INCRIT(910, QP::QS::rxPriv_.var.evt.e != nullptr);
+            QS_CRIT_EXIT();
 #if (QF_MAX_EPOOL > 0U)
-            QP::QF::gc(l_rx.var.evt.e); // don't leak an allocated event
+            QP::QF::gc(QP::QS::rxPriv_.var.evt.e); // don't leak allocated evt
 #endif
             break;
         }
@@ -1189,34 +1119,54 @@ static void rxHandleBadFrame_(std::uint8_t const state) noexcept {
 
 //............................................................................
 static void rxReportAck_(enum QP::QSpyRxRecords const recId) noexcept {
+    QS_CRIT_STAT
+    QS_CRIT_ENTRY();
+    QS_MEM_SYS();
     QP::QS::beginRec_(static_cast<std::uint_fast8_t>(QP::QS_RX_STATUS));
         QS_U8_PRE_(recId); // record ID
     QP::QS::endRec_();
+    QS_MEM_APP();
+    QS_CRIT_EXIT();
     QS_REC_DONE(); // user callback (if defined)
 }
 
 //............................................................................
 static void rxReportError_(std::uint8_t const code) noexcept {
+    QS_CRIT_STAT
+    QS_CRIT_ENTRY();
+    QS_MEM_SYS();
     QP::QS::beginRec_(static_cast<std::uint_fast8_t>(QP::QS_RX_STATUS));
         QS_U8_PRE_(0x80U | code); // error code
     QP::QS::endRec_();
+    QS_MEM_APP();
+    QS_CRIT_EXIT();
     QS_REC_DONE(); // user callback (if defined)
 }
 
 //............................................................................
 static void rxReportDone_(enum QP::QSpyRxRecords const recId) noexcept {
+    QS_CRIT_STAT
+    QS_CRIT_ENTRY();
+    QS_MEM_SYS();
     QP::QS::beginRec_(static_cast<std::uint_fast8_t>(QP::QS_TARGET_DONE));
         QS_TIME_PRE_();    // timestamp
         QS_U8_PRE_(recId); // record ID
     QP::QS::endRec_();
+    QS_MEM_APP();
+    QS_CRIT_EXIT();
     QS_REC_DONE(); // user callback (if defined)
 }
 
 //............................................................................
 static void queryCurrObj_(std::uint8_t obj_kind) noexcept {
-    Q_REQUIRE_INCRIT(200, obj_kind < Q_DIM(QP::QS::rxPriv_.currObj));
+    QS_CRIT_STAT
+    QS_CRIT_ENTRY();
+    Q_REQUIRE_INCRIT(800, obj_kind < Q_DIM(QP::QS::rxPriv_.currObj));
+    QS_CRIT_EXIT();
 
     if (QP::QS::rxPriv_.currObj[obj_kind] != nullptr) {
+        QS_CRIT_ENTRY();
+        QS_MEM_SYS();
         QP::QS::beginRec_(static_cast<std::uint_fast8_t>(QP::QS_QUERY_DATA));
             QS_TIME_PRE_(); // timestamp
             QS_U8_PRE_(obj_kind);  // object kind
@@ -1256,6 +1206,8 @@ static void queryCurrObj_(std::uint8_t obj_kind) noexcept {
                     break;
             }
         QP::QS::endRec_();
+        QS_MEM_APP();
+        QS_CRIT_EXIT();
         QS_REC_DONE(); // user callback (if defined)
     }
     else {
@@ -1267,26 +1219,26 @@ static void queryCurrObj_(std::uint8_t obj_kind) noexcept {
 static void rxPoke_() noexcept {
     std::uint8_t * ptr =
         static_cast<std::uint8_t *>(QP::QS::rxPriv_.currObj[QP::QS::AP_OBJ]);
-    ptr = &ptr[l_rx.var.poke.offs];
-    switch (l_rx.var.poke.size) {
+    ptr = &ptr[QP::QS::rxPriv_.var.poke.offs];
+    switch (QP::QS::rxPriv_.var.poke.size) {
         case 1:
-            *ptr = static_cast<std::uint8_t>(l_rx.var.poke.data);
+            *ptr = static_cast<std::uint8_t>(QP::QS::rxPriv_.var.poke.data);
             break;
         case 2:
             *reinterpret_cast<std::uint16_t *>(ptr)
-                = static_cast<std::uint16_t>(l_rx.var.poke.data);
+                = static_cast<std::uint16_t>(QP::QS::rxPriv_.var.poke.data);
             break;
         case 4:
-            *reinterpret_cast<std::uint32_t *>(ptr) = l_rx.var.poke.data;
+            *reinterpret_cast<std::uint32_t *>(ptr) = QP::QS::rxPriv_.var.poke.data;
             break;
         default:
             Q_ERROR_ID(900);
             break;
     }
 
-    l_rx.var.poke.data = 0U;
-    l_rx.var.poke.idx  = 0U;
-    l_rx.var.poke.offs += static_cast<std::uint16_t>(l_rx.var.poke.size);
+    QP::QS::rxPriv_.var.poke.data = 0U;
+    QP::QS::rxPriv_.var.poke.idx  = 0U;
+    QP::QS::rxPriv_.var.poke.offs += static_cast<std::uint16_t>(QP::QS::rxPriv_.var.poke.size);
 }
 
 } // unnamed namespace

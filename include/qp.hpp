@@ -99,11 +99,6 @@
 
 //! @endcond
 //============================================================================
-#ifdef QEVT_DYN_CTOR
-#include <new>      // for placement new
-#include <cstdarg>  // for va_list
-#endif // QEVT_DYN_CTOR
-
 //$declare${glob-types} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 //${glob-types::int_t} .......................................................
@@ -155,19 +150,16 @@ public:
 #endif // def QEVT_DYN_CTOR
 
 public:
-    QEvt() = delete;
+
+#ifdef QEVT_DYN_CTOR
+    QEvt * ctor(DynEvt const dummy) noexcept;
+#endif // def QEVT_DYN_CTOR
     explicit constexpr QEvt(QSignal const s) noexcept
       : sig(s),
         refCtr_(0U),
         evtTag_(MARKER)
     {}
-
-#ifdef QEVT_DYN_CTOR
-    explicit QEvt(DynEvt dummy) noexcept    {
-        static_cast<void>(dummy); // unused parameter
-        // dynamic event already initialized in QP::QF::newX_()
-    }
-#endif // def QEVT_DYN_CTOR
+    QEvt() = delete;
     static bool verify_(QEvt const * const e) noexcept {
         return (e != nullptr)
                && ((e->evtTag_ & 0xF0U) == MARKER);
@@ -1188,9 +1180,8 @@ void QF_onContextSw(
 
 //${QF-macros::Q_NEW} ........................................................
 #ifdef QEVT_DYN_CTOR
-#define Q_NEW(evtT_, sig_, ...) (static_cast<evtT_ *>( \
-    new(QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, (sig_))) \
-        evtT_(__VA_ARGS__)))
+#define Q_NEW(evtT_, sig_, ...) ( static_cast<evtT_ *>( \
+    QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, (sig_)))->ctor(__VA_ARGS__))
 #endif // def QEVT_DYN_CTOR
 
 //${QF-macros::Q_NEW_X} ......................................................
@@ -1201,9 +1192,8 @@ void QF_onContextSw(
 
 //${QF-macros::Q_NEW_X} ......................................................
 #ifdef QEVT_DYN_CTOR
-#define Q_NEW_X(evtT_, margin_, sig_, ...) (static_cast<evtT_ *>( \
-    new(QP::QF::newX_(sizeof(evtT_), (margin_), (sig_))) \
-        evtT_(__VA_ARGS__)))
+#define Q_NEW_X(evtT_, margin_, sig_, ...) ( static_cast<evtT_ *>( \
+    QP::QF::newX_(sizeof(evtT_), (margin_), (sig_)))->ctor(__VA_ARGS__))
 #endif // def QEVT_DYN_CTOR
 
 //${QF-macros::Q_NEW_REF} ....................................................
