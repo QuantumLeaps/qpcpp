@@ -95,7 +95,7 @@ void schedDisable(std::uint_fast8_t const ceiling) {
 
         priv_.schedCeil = ceiling;
     #ifndef Q_UNSAFE
-        priv_.schedCeil_dis = static_cast<std::uint_fast16_t>(~ceiling);
+        priv_.schedCeil_dis = static_cast<std::uint_fast8_t>(~ceiling);
     #endif
     }
     QF_MEM_APP();
@@ -121,7 +121,7 @@ void schedEnable() {
 
         priv_.schedCeil = 0U;
     #ifndef Q_UNSAFE
-        priv_.schedCeil_dis = ~static_cast<std::uint_fast16_t>(0U);
+        priv_.schedCeil_dis = ~static_cast<std::uint_fast8_t>(0U);
     #endif
     }
     QF_MEM_APP();
@@ -144,7 +144,7 @@ void init() {
 
     #ifndef Q_UNSAFE
     QV::priv_.readySet.update_(&QV::priv_.readySet_dis);
-    QV::priv_.schedCeil_dis = ~static_cast<std::uint_fast16_t>(0U);
+    QV::priv_.schedCeil_dis = ~static_cast<std::uint_fast8_t>(0U);
     #endif
 
     #ifdef QV_INIT
