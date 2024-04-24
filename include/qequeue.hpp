@@ -93,10 +93,6 @@ public:
         m_nFree(0U),
         m_nMin(0U)
     {}
-
-#ifdef Q_XTOR
-    ~QEQueue();
-#endif // def Q_XTOR
     void init(
         QEvt const * qSto[],
         std::uint_fast16_t const qLen) noexcept;

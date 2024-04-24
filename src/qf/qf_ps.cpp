@@ -121,7 +121,7 @@ void QActive::publish_(
     QF_MEM_SYS();
 
     Q_REQUIRE_INCRIT(200, sig < static_cast<QSignal>(maxPubSignal_));
-    Q_REQUIRE_INCRIT(202,
+    Q_INVARIANT_INCRIT(202,
         subscrList_[sig].m_set.verify_(&subscrList_[sig].m_set_dis));
 
     QS_BEGIN_PRE_(QS_QF_PUBLISH, qsId)
@@ -164,9 +164,9 @@ void QActive::publish_(
 
         QF_SCHED_STAT_
         QF_SCHED_LOCK_(p); // lock the scheduler up to AO's prio
-        std::uint_fast8_t limit = QF_MAX_ACTIVE + 1U;
+        std::uint_fast8_t lbound = QF_MAX_ACTIVE + 1U;
         do { // loop over all subscribers
-            --limit;
+            --lbound;
 
             // POST() asserts internally if the queue overflows
             a->POST(e, sender);
@@ -188,7 +188,7 @@ void QActive::publish_(
             else {
                 p = 0U; // no more subscribers
             }
-        } while ((p != 0U) && (limit > 0U));
+        } while ((p != 0U) && (lbound > 0U));
 
         QF_CRIT_ENTRY();
         Q_ENSURE_INCRIT(290, p == 0U);
@@ -223,7 +223,7 @@ void QActive::subscribe(enum_t const sig) const noexcept {
         && (sig < maxPubSignal_)
         && (0U < p) && (p <= QF_MAX_ACTIVE)
         && (registry_[p] == this));
-    Q_REQUIRE_INCRIT(302,
+    Q_INVARIANT_INCRIT(302,
         subscrList_[sig].m_set.verify_(&subscrList_[sig].m_set_dis));
 
     QS_BEGIN_PRE_(QS_QF_ACTIVE_SUBSCRIBE, m_prio)
@@ -260,7 +260,7 @@ void QActive::unsubscribe(enum_t const sig) const noexcept {
         && (sig < maxPubSignal_)
         && (0U < p) && (p <= QF_MAX_ACTIVE)
         && (registry_[p] == this));
-    Q_REQUIRE_INCRIT(402,
+    Q_INVARIANT_INCRIT(402,
         subscrList_[sig].m_set.verify_(&subscrList_[sig].m_set_dis));
 
     QS_BEGIN_PRE_(QS_QF_ACTIVE_UNSUBSCRIBE, m_prio)

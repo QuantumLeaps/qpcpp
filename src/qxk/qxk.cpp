@@ -175,7 +175,7 @@ QXK_Attr QXK_priv_;
 
 //${QXK-extern-C::QXK_sched_} ................................................
 std::uint_fast8_t QXK_sched_() noexcept {
-    Q_REQUIRE_INCRIT(402,
+    Q_INVARIANT_INCRIT(402,
         QXK_priv_.readySet.verify_(&QXK_priv_.readySet_dis));
 
     std::uint_fast8_t p;
@@ -254,6 +254,7 @@ void QXK_activate_() noexcept {
     do  {
         QXK_priv_.actPrio = p; // next active prio
 
+        QF_MEM_APP();
         QF_INT_ENABLE(); // unconditionally enable interrupts
 
         QP::QEvt const * const e = next->get_();
@@ -269,7 +270,7 @@ void QXK_activate_() noexcept {
         QF_MEM_SYS();
 
         // check internal integrity (duplicate inverse storage)
-        Q_ASSERT_INCRIT(502,
+        Q_INVARIANT_INCRIT(502,
             QXK_priv_.readySet.verify_(&QXK_priv_.readySet_dis));
 
         if (next->getEQueue().isEmpty()) { // empty queue?

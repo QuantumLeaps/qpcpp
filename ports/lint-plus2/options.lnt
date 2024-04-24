@@ -36,11 +36,12 @@
 //-vf              // print names of all source files (for debugging linting)
 
 // include directories
--i.                 // QP/C++ port includes (see also qk/ and qv/)
--i%QPCPP%/include   // QP/C++ public includes
+-i%PCLP%/lnt       // PC-Lint-Plus standard .lnt files
+-i.                // QP/C++ port includes (see also qk/ and qv/)
+-i%QPCPP%/include  // QP/C++ public includes
 
 // standards
-au-autosar.lnt      // AUTOSAR:C++14
+au-autosar.lnt     // AUTOSAR:C++14
 au-ds.lnt          // Dan Saks recommendations
 cpu.lnt            // size/alignment options for the chosen CPU
 

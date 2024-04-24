@@ -236,7 +236,7 @@ QEvt * newX_(
 void gc(QEvt const * const e) noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(402, QEvt::verify_(e));
+    Q_INVARIANT_INCRIT(402, QEvt::verify_(e));
 
     std::uint_fast8_t const poolNum = e->getPoolNum_();
 
@@ -300,7 +300,7 @@ QEvt const * newRef_(
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    Q_REQUIRE_INCRIT(502, QEvt::verify_(e));
+    Q_INVARIANT_INCRIT(502, QEvt::verify_(e));
 
     std::uint_fast8_t const poolNum = e->getPoolNum_();
 
@@ -329,7 +329,7 @@ void deleteRef_(QEvt const * const evtRef) noexcept {
 
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(602, QEvt::verify_(e));
+    Q_INVARIANT_INCRIT(602, QEvt::verify_(e));
 
     #ifdef Q_SPY
     std::uint_fast8_t const poolNum = e->getPoolNum_();

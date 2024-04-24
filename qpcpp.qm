@@ -472,27 +472,27 @@ QS_MEM_APP();
 QF_CRIT_EXIT();
 
 // drill down into the state hierarchy with initial transitions...
-std::int_fast8_t limit = MAX_NEST_DEPTH_; // loop hard limit
 do {
     QStateHandler path[MAX_NEST_DEPTH_]; // tran entry path array
     std::int_fast8_t ip = 0; // tran entry path index
 
     path[0] = m_temp.fun;
     static_cast&lt;void&gt;(QHSM_RESERVED_EVT_(m_temp.fun, Q_EMPTY_SIG));
-    while (m_temp.fun != t) {
+    // note: ip is here the fixed upper loop bound
+    while ((m_temp.fun != t) &amp;&amp; (ip &lt; (MAX_NEST_DEPTH_ - 1))) {
         ++ip;
         path[ip] = m_temp.fun;
         static_cast&lt;void&gt;(QHSM_RESERVED_EVT_(m_temp.fun, Q_EMPTY_SIG));
     }
     QF_CRIT_ENTRY();
-    // The initial transition source state must be reached
-    // Too many state nesting levels or &quot;malformed&quot; HSM.
-    Q_ASSERT_INCRIT(220, m_temp.fun == t);
+    // too many state nesting levels or &quot;malformed&quot; HSM
+    Q_ENSURE_INCRIT(220, ip &lt; MAX_NEST_DEPTH_);
     QF_CRIT_EXIT();
 
     m_temp.fun = path[0];
 
     // retrace the entry path in reverse (desired) order...
+    // note: ip is the fixed upper loop bound
     do {
         // enter path[ip]
         if (QHSM_RESERVED_EVT_(path[ip], Q_ENTRY_SIG)
@@ -520,14 +520,9 @@ do {
         QS_CRIT_EXIT();
     }
 #endif // Q_SPY
-
-    --limit;
-} while ((r == Q_RET_TRAN) &amp;&amp; (limit &gt; 0));
+} while (r == Q_RET_TRAN);
 
 QF_CRIT_ENTRY();
-// Loop limit must not be reached.
-// Too many state nesting levels or likely &quot;malformed&quot; HSM
-Q_ENSURE_INCRIT(290, limit &gt; 0);
 
 QS_MEM_SYS();
 QS_BEGIN_PRE_(QS_QEP_INIT_TRAN, qsId)
@@ -567,9 +562,9 @@ QStateHandler t = s;
 QF_CRIT_STAT
 
 QF_CRIT_ENTRY();
-Q_REQUIRE_INCRIT(300, (s != Q_STATE_CAST(0))
+Q_INVARIANT_INCRIT(302, (s != Q_STATE_CAST(0))
     &amp;&amp; (m_state.uint == static_cast&lt;std::uintptr_t&gt;(~m_temp.uint)));
-Q_REQUIRE_INCRIT(302, QEvt::verify_(e));
+Q_INVARIANT_INCRIT(303, QEvt::verify_(e));
 
 QS_MEM_SYS();
 QS_BEGIN_PRE_(QS_QEP_DISPATCH, qsId)
@@ -585,7 +580,7 @@ QF_CRIT_EXIT();
 // process the event hierarchically...
 QState r;
 m_temp.fun = s;
-std::int_fast8_t limit = MAX_NEST_DEPTH_; // loop hard limit
+std::int_fast8_t ip = MAX_NEST_DEPTH_; // fixed upper loop bound
 do {
     s = m_temp.fun;
     r = (*s)(this, e); // invoke state handler s
@@ -605,11 +600,11 @@ do {
         r = QHSM_RESERVED_EVT_(s, Q_EMPTY_SIG); // superstate of s
     }
 
-    --limit;
-} while ((r == Q_RET_SUPER) &amp;&amp; (limit &gt; 0));
+    --ip;
+} while ((r == Q_RET_SUPER) &amp;&amp; (ip &gt; 0));
 
 QF_CRIT_ENTRY();
-Q_ASSERT_INCRIT(310, limit &gt; 0);
+Q_ENSURE_INCRIT(310, ip &gt; 0);
 QF_CRIT_EXIT();
 
 if (r &gt;= Q_RET_TRAN) { // regular tran. taken?
@@ -620,21 +615,21 @@ if (r &gt;= Q_RET_TRAN) { // regular tran. taken?
     path[2] = s; // tran. source
 
     // exit current state to tran. source s...
-    limit = MAX_NEST_DEPTH_; // loop hard limit
-    for (; (t != s) &amp;&amp; (limit &gt; 0); t = m_temp.fun) {
+    ip = MAX_NEST_DEPTH_; // fixed upper loop bound
+    for (; (t != s) &amp;&amp; (ip &gt; 0); t = m_temp.fun) {
         // exit from t
         if (QHSM_RESERVED_EVT_(t, Q_EXIT_SIG) == Q_RET_HANDLED) {
             QS_STATE_EXIT_(t, qsId);
             // find superstate of t
             static_cast&lt;void&gt;(QHSM_RESERVED_EVT_(t, Q_EMPTY_SIG));
         }
-        --limit;
+        --ip;
     }
     QF_CRIT_ENTRY();
-    Q_ASSERT_INCRIT(320, limit &gt; 0);
+    Q_ENSURE_INCRIT(320, ip &gt; 0);
     QF_CRIT_EXIT();
 
-    std::int_fast8_t ip = hsm_tran(path, qsId); // take the tran.
+    ip = hsm_tran(path, qsId); // take the tran.
 
 #ifdef Q_SPY
     if (r == Q_RET_TRAN_HIST) {
@@ -651,6 +646,7 @@ if (r &gt;= Q_RET_TRAN) { // regular tran. taken?
 #endif // Q_SPY
 
     // execute state entry actions in the desired order...
+    // note: ip is the fixed upper loop bound
     for (; ip &gt;= 0; --ip) {
         // enter path[ip]
         if (QHSM_RESERVED_EVT_(path[ip], Q_ENTRY_SIG)
@@ -681,6 +677,7 @@ if (r &gt;= Q_RET_TRAN) { // regular tran. taken?
         // find superstate
         static_cast&lt;void&gt;(QHSM_RESERVED_EVT_(m_temp.fun, Q_EMPTY_SIG));
 
+        // note: ip is the fixed upper loop bound
         while ((m_temp.fun != t) &amp;&amp; (ip &lt; (MAX_NEST_DEPTH_ - 1))) {
             ++ip;
             path[ip] = m_temp.fun;
@@ -689,14 +686,14 @@ if (r &gt;= Q_RET_TRAN) { // regular tran. taken?
                 QHSM_RESERVED_EVT_(m_temp.fun, Q_EMPTY_SIG));
         }
         QF_CRIT_ENTRY();
-        // The initial transition source state must be reached.
-        // Too many state nesting levels or &quot;malformed&quot; HSM.
-        Q_ASSERT_INCRIT(330, m_temp.fun == t);
+        // too many state nesting levels or &quot;malformed&quot; HSM
+        Q_ENSURE_INCRIT(330, ip &lt; MAX_NEST_DEPTH_);
         QF_CRIT_EXIT();
 
         m_temp.fun = path[0];
 
         // retrace the entry path in reverse (correct) order...
+        // note: ip is the fixed upper loop bound
         do {
             // enter path[ip]
             if (QHSM_RESERVED_EVT_(path[ip], Q_ENTRY_SIG)
@@ -762,17 +759,17 @@ m_temp.uint = ~m_state.uint;
     <parameter name="state" type="QStateHandler const"/>
     <code>QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_REQUIRE_INCRIT(602, m_state.uint
-                  == static_cast&lt;std::uintptr_t&gt;(~m_temp.uint));
+Q_INVARIANT_INCRIT(602, m_state.uint
+                   == static_cast&lt;std::uintptr_t&gt;(~m_temp.uint));
 QF_CRIT_EXIT();
 
 bool inState = false; // assume that this HSM is not in 'state'
 
 // scan the state hierarchy bottom-up
 QStateHandler s = m_state.fun;
-std::int_fast8_t limit = MAX_NEST_DEPTH_ + 1; // loop hard limit
+std::int_fast8_t lbound = MAX_NEST_DEPTH_ + 1; // fixed upper loop bound
 QState r = Q_RET_SUPER;
-for (; (r != Q_RET_IGNORED) &amp;&amp; (limit &gt; 0); --limit) {
+for (; (r != Q_RET_IGNORED) &amp;&amp; (lbound &gt; 0); --lbound) {
     if (s == state) { // do the states match?
         inState = true;  // 'true' means that match found
         break; // break out of the for-loop
@@ -784,7 +781,7 @@ for (; (r != Q_RET_IGNORED) &amp;&amp; (limit &gt; 0); --limit) {
 }
 
 QF_CRIT_ENTRY();
-Q_ENSURE_INCRIT(690, limit &gt; 0);
+Q_ENSURE_INCRIT(690, lbound &gt; 0);
 QF_CRIT_EXIT();
 
 #ifndef Q_UNSAFE
@@ -798,12 +795,13 @@ return inState; // return the status</code>
     <specifiers>noexcept</specifiers>
     <!--${QEP::QHsm::childState::parent}-->
     <parameter name="parent" type="QStateHandler const"/>
-    <code>QStateHandler child = m_state.fun; // start with the current state
+    <code>QStateHandler child = m_state.fun; // start with current state
 bool isFound = false; // start with the child not found
 
 // establish stable state configuration
 m_temp.fun = child;
 QState r;
+std::int_fast8_t lbound = MAX_NEST_DEPTH_; // fixed upper loop bound
 do {
     // is this the parent of the current child?
     if (m_temp.fun == parent) {
@@ -814,7 +812,9 @@ do {
         child = m_temp.fun;
         r = QHSM_RESERVED_EVT_(m_temp.fun, Q_EMPTY_SIG);
     }
-} while (r != Q_RET_IGNORED); // QHsm::top() state not reached
+    --lbound;
+} while ((r != Q_RET_IGNORED)  // QHsm::top() state not reached
+         &amp;&amp; (lbound &gt; 0));
 
 #ifndef Q_UNSAFE
 m_temp.uint = ~m_state.uint;
@@ -822,10 +822,12 @@ m_temp.uint = ~m_state.uint;
 
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_ASSERT_INCRIT(890, isFound);
+// NOTE: the following postcondition can only succeed when
+// (lbound &gt; 0), so no extra check is necessary.
+Q_ENSURE_INCRIT(890, isFound);
 QF_CRIT_EXIT();
 
-return child; // return the child</code>
+return child;</code>
    </operation>
    <!--${QEP::QHsm::getStateHandler}-->
    <operation name="getStateHandler?def Q_SPY" type="QStateHandler" visibility="0x00" properties="0x06">
@@ -894,6 +896,7 @@ else {
                 t = m_temp.fun;   // save source-&gt;super
 
                 // find target-&gt;super-&gt;super...
+                // note: ip is the fixed upper loop bound
                 QState r = QHSM_RESERVED_EVT_(path[1], Q_EMPTY_SIG);
                 while ((r == Q_RET_SUPER)
                        &amp;&amp; (ip &lt; (MAX_NEST_DEPTH_ - 1)))
@@ -910,9 +913,10 @@ else {
                     }
                 }
                 QF_CRIT_ENTRY();
-                // Tran. source must be found within the nesting depth
-                // Too many state nesting levels or &quot;malformed&quot; HSM.
-                Q_ASSERT_INCRIT(510, r != Q_RET_SUPER);
+                // NOTE: The following postcondition succeeds only when
+                // ip &lt; QHSM_MAX_NEST_DEPTH, so no additional check is necessary
+                // too many state nesting levels or &quot;malformed&quot; HSM.
+                Q_ENSURE_INCRIT(510, r != Q_RET_SUPER);
                 QF_CRIT_EXIT();
 
                 // the LCA not found yet?
@@ -928,6 +932,7 @@ else {
                     //                  == target-&gt;super-&gt;super...
                     iq = ip;
                     r = Q_RET_IGNORED; // indicate that the LCA NOT found
+                    // note: iq is the fixed upper loop bound
                     do {
                         if (t == path[iq]) { // is this the LCA?
                             r = Q_RET_HANDLED; // indicate the LCA found
@@ -944,7 +949,7 @@ else {
                         // (g) check each source-&gt;super-&gt;...
                         // for each target-&gt;super...
                         r = Q_RET_IGNORED; // keep looping
-                        std::int_fast8_t limit = MAX_NEST_DEPTH_;
+                        std::int_fast8_t lbound = MAX_NEST_DEPTH_;
                         do {
                             // exit from t
                             if (QHSM_RESERVED_EVT_(t, Q_EXIT_SIG)
@@ -969,10 +974,10 @@ else {
                                 }
                             } while (iq &gt;= 0);
 
-                            --limit;
-                        } while ((r != Q_RET_HANDLED) &amp;&amp; (limit &gt; 0));
+                            --lbound;
+                        } while ((r != Q_RET_HANDLED) &amp;&amp; (lbound &gt; 0));
                         QF_CRIT_ENTRY();
-                        Q_ASSERT_INCRIT(530, limit &gt; 0);
+                        Q_ASSERT_INCRIT(530, lbound &gt; 0);
                         QF_CRIT_EXIT();
                     }
                 }
@@ -1037,15 +1042,15 @@ QF_CRIT_EXIT();
 m_state.obj = m_temp.tatbl-&gt;target;
 
 // drill down into the state hierarchy with initial transitions...
-std::int_fast8_t limit = MAX_NEST_DEPTH_; // loop hard limit
+std::int_fast8_t lbound = MAX_NEST_DEPTH_; // fixed upper loop bound
 do {
     // execute the tran. table
     r = execTatbl_(m_temp.tatbl, qsId);
-    --limit;
-} while ((r &gt;= Q_RET_TRAN_INIT) &amp;&amp; (limit &gt; 0));
+    --lbound;
+} while ((r &gt;= Q_RET_TRAN_INIT) &amp;&amp; (lbound &gt; 0));
 
 QF_CRIT_ENTRY();
-Q_ENSURE_INCRIT(290, limit &gt; 0);
+Q_ENSURE_INCRIT(290, lbound &gt; 0);
 
 QS_MEM_SYS();
 QS_BEGIN_PRE_(QS_QEP_INIT_TRAN, qsId)
@@ -1084,9 +1089,9 @@ QMState const *t = s;
 
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_REQUIRE_INCRIT(300, (s != nullptr)
+Q_INVARIANT_INCRIT(300, (s != nullptr)
     &amp;&amp; (m_state.uint == static_cast&lt;std::uintptr_t&gt;(~m_temp.uint)));
-Q_REQUIRE_INCRIT(302, QEvt::verify_(e));
+Q_INVARIANT_INCRIT(302, QEvt::verify_(e));
 
 QS_MEM_SYS();
 QS_BEGIN_PRE_(QS_QEP_DISPATCH, qsId)
@@ -1101,7 +1106,7 @@ QF_CRIT_EXIT();
 
 // scan the state hierarchy up to the top state...
 QState r;
-std::int_fast8_t limit = MAX_NEST_DEPTH_; // loop hard limit
+std::int_fast8_t lbound = MAX_NEST_DEPTH_; // fixed upper loop bound
 do {
     r = (*t-&gt;stateHandler)(this, e); // call state handler function
 
@@ -1134,10 +1139,10 @@ do {
 
         t = t-&gt;superstate; // advance to the superstate
     }
-    --limit;
-} while ((t != nullptr) &amp;&amp; (limit &gt; 0));
+    --lbound;
+} while ((t != nullptr) &amp;&amp; (lbound &gt; 0));
 QF_CRIT_ENTRY();
-Q_ASSERT_INCRIT(310, limit &gt; 0);
+Q_ASSERT_INCRIT(310, lbound &gt; 0);
 QF_CRIT_EXIT();
 
 if (r &gt;= Q_RET_TRAN) { // any kind of tran. taken?
@@ -1150,7 +1155,7 @@ if (r &gt;= Q_RET_TRAN) { // any kind of tran. taken?
     QF_CRIT_EXIT();
 #endif // Q_SPY
 
-    limit = MAX_NEST_DEPTH_; // loop hard limit
+    lbound = MAX_NEST_DEPTH_; // fixed upper loop bound
     do {
         // save the tran-action table before it gets clobbered
         QMTranActTable const * const tatbl = m_temp.tatbl;
@@ -1217,11 +1222,11 @@ if (r &gt;= Q_RET_TRAN) { // any kind of tran. taken?
         }
 
         t = s; // set target to the current state
-       --limit;
-    } while ((r &gt;= Q_RET_TRAN) &amp;&amp; (limit &gt; 0));
+       --lbound;
+    } while ((r &gt;= Q_RET_TRAN) &amp;&amp; (lbound &gt; 0));
 
     QF_CRIT_ENTRY();
-    Q_ASSERT_INCRIT(320, limit &gt; 0);
+    Q_ASSERT_INCRIT(320, lbound &gt; 0);
 
     QS_MEM_SYS();
     QS_BEGIN_PRE_(QS_QEP_TRAN, qsId)
@@ -1289,8 +1294,8 @@ m_temp.uint = ~m_state.uint;
     <code>bool inState = false; // assume that this SM is not in 'state'
 
 QMState const *s = m_state.obj;
-std::int_fast8_t limit = MAX_NEST_DEPTH_; // loop hard limit
-for (; (s != nullptr) &amp;&amp; (limit &gt; 0); --limit) {
+std::int_fast8_t lbound = MAX_NEST_DEPTH_; // fixed upper loop bound
+for (; (s != nullptr) &amp;&amp; (lbound &gt; 0); --lbound) {
     if (s-&gt;stateHandler == state) { // match found?
         inState = true;
         break;
@@ -1302,7 +1307,7 @@ for (; (s != nullptr) &amp;&amp; (limit &gt; 0); --limit) {
 
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_ENSURE_INCRIT(490, limit &gt; 0);
+Q_ENSURE_INCRIT(490, lbound &gt; 0);
 QF_CRIT_EXIT();
 
 return inState;</code>
@@ -1316,8 +1321,8 @@ return inState;</code>
     <code>bool inState = false; // assume that this SM is not in 'state'
 
 QMState const *s = m_state.obj;
-std::int_fast8_t limit = MAX_NEST_DEPTH_; // loop hard limit
-for (; (s != nullptr) &amp;&amp; (limit &gt; 0); --limit) {
+std::int_fast8_t lbound = MAX_NEST_DEPTH_; // fixed upper loop bound
+for (; (s != nullptr) &amp;&amp; (lbound &gt; 0); --lbound) {
     if (s == stateObj) { // match found?
         inState = true;
         break;
@@ -1329,7 +1334,7 @@ for (; (s != nullptr) &amp;&amp; (limit &gt; 0); --limit) {
 
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_ENSURE_INCRIT(590, limit &gt; 0);
+Q_ENSURE_INCRIT(590, lbound &gt; 0);
 QF_CRIT_EXIT();
 
 return inState;</code>
@@ -1343,9 +1348,9 @@ return inState;</code>
 bool isFound = false; // start with the child not found
 QMState const *s;
 
-std::int_fast8_t limit = MAX_NEST_DEPTH_; // loop hard limit
+std::int_fast8_t lbound = MAX_NEST_DEPTH_; // fixed upper loop bound
 for (s = m_state.obj;
-     (s != nullptr) &amp;&amp; (limit &gt; 0);
+     (s != nullptr) &amp;&amp; (lbound &gt; 0);
      s = s-&gt;superstate)
 {
     if (s == parent) {
@@ -1355,17 +1360,17 @@ for (s = m_state.obj;
     else {
         child = s;
     }
-    --limit;
+    --lbound;
 }
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_ASSERT_INCRIT(610, limit &gt; 0);
+Q_ASSERT_INCRIT(610, lbound &gt; 0);
 QF_CRIT_EXIT();
 
 if (!isFound) { // still not found?
-    limit = MAX_NEST_DEPTH_; // loop hard limit
+    lbound = MAX_NEST_DEPTH_; // fixed upper loop bound
     for (s = m_temp.obj;
-         (s != nullptr) &amp;&amp; (limit &gt; 0);
+         (s != nullptr) &amp;&amp; (lbound &gt; 0);
          s = s-&gt;superstate)
     {
         if (s == parent) {
@@ -1375,12 +1380,12 @@ if (!isFound) { // still not found?
         else {
             child = s;
         }
-        --limit;
+        --lbound;
     }
 }
 
 QF_CRIT_ENTRY();
-Q_ENSURE_INCRIT(690, isFound &amp;&amp; (limit &gt; 0));
+Q_ENSURE_INCRIT(690, isFound &amp;&amp; (lbound &gt; 0));
 QF_CRIT_EXIT();
 
 return child; // return the child</code>
@@ -1403,9 +1408,9 @@ Q_REQUIRE_INCRIT(700, tatbl != nullptr);
 QF_CRIT_EXIT();
 
 QState r = Q_RET_NULL;
-std::int_fast8_t limit = MAX_TRAN_LENGTH_; // loop hard limit
+std::int_fast8_t lbound = MAX_TRAN_LENGTH_; // fixed upper loop bound
 QActionHandler const *a = &amp;tatbl-&gt;act[0];
-for (; (*a != nullptr) &amp;&amp; (limit &gt; 0); ++a) {
+for (; (*a != nullptr) &amp;&amp; (lbound &gt; 0); ++a) {
     r = (*(*a))(this); // call the action through the 'a' pointer
 #ifdef Q_SPY
     QS_CRIT_ENTRY();
@@ -1449,7 +1454,7 @@ for (; (*a != nullptr) &amp;&amp; (limit &gt; 0); ++a) {
     QS_MEM_APP();
     QS_CRIT_EXIT();
 #endif // Q_SPY
-    --limit;
+    --lbound;
 }
 QF_CRIT_ENTRY();
 Q_ENSURE_INCRIT(790, *a == nullptr);
@@ -1476,8 +1481,8 @@ QF_CRIT_STAT
 
 // exit states from the current state to the tran. source state
 QMState const *s = cs;
-std::int_fast8_t limit = MAX_NEST_DEPTH_; // loop hard limit
-for (; (s != ts) &amp;&amp; (limit &gt; 0); --limit) {
+std::int_fast8_t lbound = MAX_NEST_DEPTH_; // fixed upper loop bound
+for (; (s != ts) &amp;&amp; (lbound &gt; 0); --lbound) {
     // exit action provided in state 's'?
     if (s-&gt;exitAction != nullptr) {
         // execute the exit action
@@ -1503,7 +1508,7 @@ for (; (s != ts) &amp;&amp; (limit &gt; 0); --limit) {
     }
 }
 QF_CRIT_ENTRY();
-Q_ENSURE_INCRIT(890, limit &gt; 0);
+Q_ENSURE_INCRIT(890, lbound &gt; 0);
 QF_CRIT_EXIT();</code>
    </operation>
    <!--${QEP::QMsm::enterHistory_}-->
@@ -2161,7 +2166,7 @@ QF_MEM_SYS();
 
 #ifndef Q_UNSAFE
 std::uint8_t const pcopy = static_cast&lt;std::uint8_t&gt;(~m_prio_dis);
-Q_REQUIRE_INCRIT(102, (QEvt::verify_(e)) &amp;&amp; (m_prio == pcopy));
+Q_INVARIANT_INCRIT(102, (QEvt::verify_(e)) &amp;&amp; (m_prio == pcopy));
 #endif
 
 QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into temporary
@@ -2300,7 +2305,7 @@ QF_MEM_SYS();
 
 #ifndef Q_UNSAFE
 std::uint8_t const pcopy = static_cast&lt;std::uint8_t&gt;(~m_prio_dis);
-Q_REQUIRE_INCRIT(202, (QEvt::verify_(e)) &amp;&amp; (m_prio == pcopy));
+Q_INVARIANT_INCRIT(202, (QEvt::verify_(e)) &amp;&amp; (m_prio == pcopy));
 #endif
 
 #ifdef QXK_HPP_
@@ -2466,7 +2471,7 @@ QF_CRIT_ENTRY();
 QF_MEM_SYS();
 
 Q_REQUIRE_INCRIT(200, sig &lt; static_cast&lt;QSignal&gt;(maxPubSignal_));
-Q_REQUIRE_INCRIT(202,
+Q_INVARIANT_INCRIT(202,
     subscrList_[sig].m_set.verify_(&amp;subscrList_[sig].m_set_dis));
 
 QS_BEGIN_PRE_(QS_QF_PUBLISH, qsId)
@@ -2509,9 +2514,9 @@ if (subscrSet.notEmpty()) { // any subscribers?
 
     QF_SCHED_STAT_
     QF_SCHED_LOCK_(p); // lock the scheduler up to AO's prio
-    std::uint_fast8_t limit = QF_MAX_ACTIVE + 1U;
+    std::uint_fast8_t lbound = QF_MAX_ACTIVE + 1U;
     do { // loop over all subscribers
-        --limit;
+        --lbound;
 
         // POST() asserts internally if the queue overflows
         a-&gt;POST(e, sender);
@@ -2533,7 +2538,7 @@ if (subscrSet.notEmpty()) { // any subscribers?
         else {
             p = 0U; // no more subscribers
         }
-    } while ((p != 0U) &amp;&amp; (limit &gt; 0U));
+    } while ((p != 0U) &amp;&amp; (lbound &gt; 0U));
 
     QF_CRIT_ENTRY();
     Q_ENSURE_INCRIT(290, p == 0U);
@@ -2564,7 +2569,7 @@ Q_REQUIRE_INCRIT(300, (Q_USER_SIG &lt;= sig)
     &amp;&amp; (sig &lt; maxPubSignal_)
     &amp;&amp; (0U &lt; p) &amp;&amp; (p &lt;= QF_MAX_ACTIVE)
     &amp;&amp; (registry_[p] == this));
-Q_REQUIRE_INCRIT(302,
+Q_INVARIANT_INCRIT(302,
     subscrList_[sig].m_set.verify_(&amp;subscrList_[sig].m_set_dis));
 
 QS_BEGIN_PRE_(QS_QF_ACTIVE_SUBSCRIBE, m_prio)
@@ -2597,7 +2602,7 @@ Q_REQUIRE_INCRIT(400, (Q_USER_SIG &lt;= sig)
     &amp;&amp; (sig &lt; maxPubSignal_)
     &amp;&amp; (0U &lt; p) &amp;&amp; (p &lt;= QF_MAX_ACTIVE)
     &amp;&amp; (registry_[p] == this));
-Q_REQUIRE_INCRIT(402,
+Q_INVARIANT_INCRIT(402,
     subscrList_[sig].m_set.verify_(&amp;subscrList_[sig].m_set_dis));
 
 QS_BEGIN_PRE_(QS_QF_ACTIVE_UNSUBSCRIBE, m_prio)
@@ -2929,8 +2934,6 @@ QF_CRIT_EXIT();
 // reused to hold the tickRate as well as other information
 refCtr_ = static_cast&lt;std::uint8_t&gt;(tickRate);</code>
    </operation>
-   <!--${QF::QTimeEvt::~QTimeEvt}-->
-   <operation name="~QTimeEvt?def Q_XTOR" type="" visibility="0x00" properties="0x00"/>
    <!--${QF::QTimeEvt::armX}-->
    <operation name="armX" type="void" visibility="0x00" properties="0x00">
     <specifiers>noexcept</specifiers>
@@ -3159,8 +3162,8 @@ QS_BEGIN_PRE_(QS_QF_TICK, 0U)
 QS_END_PRE_()
 
 // scan the linked-list of time events at this rate...
-std::uint_fast8_t limit = 2U*QF_MAX_ACTIVE; // loop hard limit
-for (; limit &gt; 0U; --limit) {
+std::uint_fast8_t lbound = 2U*QF_MAX_ACTIVE; // fixed upper loop bound
+for (; lbound &gt; 0U; --lbound) {
     QTimeEvt *e = prev-&gt;m_next; // advance down the time evt. list
 
     if (e == nullptr) { // end of the list?
@@ -3180,7 +3183,7 @@ for (; limit &gt; 0U; --limit) {
     }
 
     // the time event 'e' must be valid
-    Q_ASSERT_INCRIT(112, QEvt::verify_(e));
+    Q_INVARIANT_INCRIT(112, QEvt::verify_(e));
 
     if (e-&gt;m_ctr == 0U) { // time event scheduled for removal?
         prev-&gt;m_next = e-&gt;m_next;
@@ -3269,7 +3272,7 @@ for (; limit &gt; 0U; --limit) {
     QF_MEM_SYS();
 }
 
-Q_ENSURE_INCRIT(190, limit &gt; 0U);
+Q_ENSURE_INCRIT(190, lbound &gt; 0U);
 QF_MEM_APP();
 QF_CRIT_EXIT();</code>
    </operation>
@@ -3489,8 +3492,6 @@ QF_CRIT_EXIT();</code>
     m_nFree(0U),
     m_nMin(0U)</code>
    </operation>
-   <!--${QF::QEQueue::~QEQueue}-->
-   <operation name="~QEQueue?def Q_XTOR" type="" visibility="0x00" properties="0x00"/>
    <!--${QF::QEQueue::init}-->
    <operation name="init" type="void" visibility="0x00" properties="0x00">
     <specifiers>noexcept</specifiers>
@@ -3760,8 +3761,6 @@ return e;</code>
     m_nFree(0U),
     m_nMin(0U)</code>
    </operation>
-   <!--${QF::QMPool::~QMPool}-->
-   <operation name="~QMPool?def Q_XTOR" type="" visibility="0x00" properties="0x00"/>
    <!--${QF::QMPool::init}-->
    <operation name="init" type="void" visibility="0x00" properties="0x00">
     <specifiers>noexcept</specifiers>
@@ -3850,8 +3849,8 @@ if (m_nFree &gt; static_cast&lt;QMPoolCtr&gt;(margin)) {
     QFreeBlock * const fb_next = fb-&gt;m_next;
 
     // the free block must have integrity (duplicate inverse storage)
-    Q_ASSERT_INCRIT(302, Q_UINTPTR_CAST_(fb_next)
-                          == static_cast&lt;std::uintptr_t&gt;(~fb-&gt;m_next_dis));
+    Q_INVARIANT_INCRIT(302, Q_UINTPTR_CAST_(fb_next)
+                       == static_cast&lt;std::uintptr_t&gt;(~fb-&gt;m_next_dis));
 
     m_nFree = (m_nFree - 1U); // one free block less
     if (m_nFree == 0U) { // is the pool becoming empty?
@@ -3929,7 +3928,7 @@ fb-&gt;m_next_dis = static_cast&lt;std::uintptr_t&gt;(
 #endif
 
 // set as new head of the free list
-m_free_head = static_cast&lt;QFreeBlock *&gt;(block);
+m_free_head = fb;
 
 m_nFree = m_nFree + 1U; // one more free block in this pool
 
@@ -4234,7 +4233,7 @@ return e;</code>
     <parameter name="e" type="QEvt const * const"/>
     <code>QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_REQUIRE_INCRIT(402, QEvt::verify_(e));
+Q_INVARIANT_INCRIT(402, QEvt::verify_(e));
 
 std::uint_fast8_t const poolNum = e-&gt;getPoolNum_();
 
@@ -4299,7 +4298,7 @@ Q_UNUSED_PAR(evtRef);
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
 
-Q_REQUIRE_INCRIT(502, QEvt::verify_(e));
+Q_INVARIANT_INCRIT(502, QEvt::verify_(e));
 
 std::uint_fast8_t const poolNum = e-&gt;getPoolNum_();
 
@@ -4330,7 +4329,7 @@ return e;</code>
 
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_REQUIRE_INCRIT(602, QEvt::verify_(e));
+Q_INVARIANT_INCRIT(602, QEvt::verify_(e));
 
 #ifdef Q_SPY
 std::uint_fast8_t const poolNum = e-&gt;getPoolNum_();
@@ -4632,7 +4631,7 @@ gc(evtRef); // recycle the referenced event
 QF_CRIT_ENTRY();
 QF_MEM_SYS();
 
-Q_ASSERT_INCRIT(102, priv_.schedCeil
+Q_INVARIANT_INCRIT(102, priv_.schedCeil
     == static_cast&lt;std::uint_fast8_t&gt;(~priv_.schedCeil_dis));
 
 if (ceiling &gt; priv_.schedCeil) { // raising the scheduler ceiling?
@@ -4658,7 +4657,7 @@ QF_CRIT_EXIT();</code>
 QF_CRIT_ENTRY();
 QF_MEM_SYS();
 
-Q_ASSERT_INCRIT(202, priv_.schedCeil
+Q_INVARIANT_INCRIT(202, priv_.schedCeil
     == static_cast&lt;std::uint_fast8_t&gt;(~priv_.schedCeil_dis));
 
 if (priv_.schedCeil != 0U) { // actually enabling the scheduler?
@@ -4730,10 +4729,10 @@ std::uint_fast8_t pprev = 0U; // previous prio.
 for (;;) { // QV event loop...
 
     // check internal integrity (duplicate inverse storage)
-    Q_ASSERT_INCRIT(302,
+    Q_INVARIANT_INCRIT(302,
          QV::priv_.readySet.verify_(&amp;QV::priv_.readySet_dis));
     // check internal integrity (duplicate inverse storage)
-    Q_ASSERT_INCRIT(303, QV::priv_.schedCeil
+    Q_INVARIANT_INCRIT(303, QV::priv_.schedCeil
         == static_cast&lt;std::uint_fast8_t&gt;(~QV::priv_.schedCeil_dis));
 
     // find the maximum prio. AO ready to run
@@ -4908,7 +4907,7 @@ QF_CRIT_ENTRY();
 QF_MEM_SYS();
 
 Q_REQUIRE_INCRIT(100, !QK_ISR_CONTEXT_());
-Q_REQUIRE_INCRIT(102, QK_priv_.lockCeil
+Q_INVARIANT_INCRIT(102, QK_priv_.lockCeil
     == static_cast&lt;std::uint_fast8_t&gt;(~QK_priv_.lockCeil_dis));
 
 // first store the previous lock prio
@@ -4950,7 +4949,7 @@ if (prevCeil != 0xFFU) {
     QF_CRIT_ENTRY();
     QF_MEM_SYS();
 
-    Q_REQUIRE_INCRIT(202, QK_priv_.lockCeil
+    Q_INVARIANT_INCRIT(202, QK_priv_.lockCeil
         == static_cast&lt;std::uint_fast8_t&gt;(~QK_priv_.lockCeil_dis));
     Q_REQUIRE_INCRIT(210, (!QK_ISR_CONTEXT_())
                           &amp;&amp; (QK_priv_.lockCeil &gt; prevCeil));
@@ -5134,7 +5133,7 @@ QF_CRIT_EXIT();</code>
    <specifiers>noexcept</specifiers>
    <code>// NOTE: this function is entered with interrupts DISABLED
 
-Q_REQUIRE_INCRIT(402,
+Q_INVARIANT_INCRIT(402,
     QK_priv_.readySet.verify_(&amp;QK_priv_.readySet_dis));
 
 std::uint_fast8_t p;
@@ -5145,7 +5144,7 @@ else {
     // find the highest-prio AO with non-empty event queue
     p = QK_priv_.readySet.findMax();
 
-    Q_ASSERT_INCRIT(412, QK_priv_.actThre
+    Q_INVARIANT_INCRIT(412, QK_priv_.actThre
         == static_cast&lt;std::uint_fast8_t&gt;(~QK_priv_.actThre_dis));
 
     // is the AO's prio. below the active preemption-threshold?
@@ -5153,7 +5152,7 @@ else {
         p = 0U; // no activation needed
     }
     else {
-        Q_ASSERT_INCRIT(422, QK_priv_.lockCeil
+        Q_INVARIANT_INCRIT(422, QK_priv_.lockCeil
             == static_cast&lt;std::uint_fast8_t&gt;(~QK_priv_.lockCeil_dis));
 
         // is the AO's prio. below the lock-ceiling?
@@ -5161,7 +5160,7 @@ else {
             p = 0U; // no activation needed
         }
         else {
-            Q_ASSERT_INCRIT(432, QK_priv_.nextPrio
+            Q_INVARIANT_INCRIT(432, QK_priv_.nextPrio
                 == static_cast&lt;std::uint_fast8_t&gt;(~QK_priv_.nextPrio_dis));
             QK_priv_.nextPrio = p; // next AO to run
 #ifndef Q_UNSAFE
@@ -5182,7 +5181,7 @@ return p;</code>
 std::uint_fast8_t const prio_in = QK_priv_.actPrio; // save initial prio.
 std::uint_fast8_t p = QK_priv_.nextPrio; // next prio to run
 
-Q_REQUIRE_INCRIT(502,
+Q_INVARIANT_INCRIT(502,
    (prio_in == static_cast&lt;std::uint_fast8_t&gt;(~QK_priv_.actPrio_dis))
    &amp;&amp; (p == static_cast&lt;std::uint_fast8_t&gt;(~QK_priv_.nextPrio_dis)));
 Q_REQUIRE_INCRIT(510, (prio_in &lt;= QF_MAX_ACTIVE)
@@ -5207,7 +5206,7 @@ else {
     Q_ASSERT_INCRIT(510, a != nullptr);
 
     pthre_in = static_cast&lt;std::uint_fast8_t&gt;(a-&gt;getPThre());
-    Q_ASSERT_INCRIT(511, pthre_in == static_cast&lt;std::uint_fast8_t&gt;(
+    Q_INVARIANT_INCRIT(511, pthre_in == static_cast&lt;std::uint_fast8_t&gt;(
         ~static_cast&lt;std::uint_fast8_t&gt;(a-&gt;m_pthre_dis) &amp; 0xFFU));
 }
 
@@ -5217,7 +5216,7 @@ do  {
     Q_ASSERT_INCRIT(520, a != nullptr); // the AO must be registered
     std::uint_fast8_t const pthre
         = static_cast&lt;std::uint_fast8_t&gt;(a-&gt;getPThre());
-    Q_ASSERT_INCRIT(522, pthre == static_cast&lt;std::uint_fast8_t&gt;(
+    Q_INVARIANT_INCRIT(522, pthre == static_cast&lt;std::uint_fast8_t&gt;(
         ~static_cast&lt;std::uint_fast8_t&gt;(a-&gt;m_pthre_dis) &amp; 0xFFU));
 
     // set new active prio. and preemption-threshold
@@ -5245,6 +5244,7 @@ do  {
     }
 #endif // QF_ON_CONTEXT_SW || Q_SPY
 
+    QF_MEM_APP();
     QF_INT_ENABLE(); // unconditionally enable interrupts
 
     QP::QEvt const * const e = a-&gt;get_();
@@ -5261,7 +5261,7 @@ do  {
     QF_MEM_SYS();
 
     // internal integrity check (duplicate inverse storage)
-    Q_ASSERT_INCRIT(532,
+    Q_INVARIANT_INCRIT(532,
         QK_priv_.readySet.verify_(&amp;QK_priv_.readySet_dis));
 
     if (a-&gt;getEQueue().isEmpty()) { // empty queue?
@@ -5283,7 +5283,7 @@ do  {
             p = 0U; // no activation needed
         }
         else {
-            Q_ASSERT_INCRIT(542,
+            Q_INVARIANT_INCRIT(542,
                 QK_priv_.lockCeil == ~QK_priv_.lockCeil_dis);
 
             // is the AO's prio. below the lock preemption-threshold?
@@ -6176,7 +6176,7 @@ if (m_ao.m_eQueue.m_nFree == 0U) {
 // is the mutex locked by this thread already (nested locking)?
 else if (m_ao.m_osObject == curr) {
 
-    // the nesting level beyond the arbitrary but high limit
+    // the nesting level beyond the arbitrary but high bound
     // most likely means cyclic or recursive locking of a mutex.
     Q_ASSERT_INCRIT(220, m_ao.m_eQueue.m_nFree &lt; 0xFFU);
 
@@ -6323,7 +6323,7 @@ if (m_ao.m_eQueue.m_nFree == 0U) {
 }
 // is the mutex locked by this thread already (nested locking)?
 else if (m_ao.m_osObject == curr) {
-    // the nesting level must not exceed the specified limit
+    // the nesting level must not exceed the specified bound
     Q_ASSERT_INCRIT(320, m_ao.m_eQueue.m_nFree &lt; 0xFFU);
 
     // lock one more level
@@ -6677,7 +6677,7 @@ else { // starting QXThread
   <!--${QXK-extern-C::QXK_sched_}-->
   <operation name="QXK_sched_" type="std::uint_fast8_t" visibility="0x00" properties="0x00">
    <specifiers>noexcept</specifiers>
-   <code>Q_REQUIRE_INCRIT(402,
+   <code>Q_INVARIANT_INCRIT(402,
     QXK_priv_.readySet.verify_(&amp;QXK_priv_.readySet_dis));
 
 std::uint_fast8_t p;
@@ -6756,6 +6756,7 @@ std::uint_fast8_t p = next-&gt;getPrio();
 do  {
     QXK_priv_.actPrio = p; // next active prio
 
+    QF_MEM_APP();
     QF_INT_ENABLE(); // unconditionally enable interrupts
 
     QP::QEvt const * const e = next-&gt;get_();
@@ -6771,7 +6772,7 @@ do  {
     QF_MEM_SYS();
 
     // check internal integrity (duplicate inverse storage)
-    Q_ASSERT_INCRIT(502,
+    Q_INVARIANT_INCRIT(502,
         QXK_priv_.readySet.verify_(&amp;QXK_priv_.readySet_dis));
 
     if (next-&gt;getEQueue().isEmpty()) { // empty queue?
@@ -8454,11 +8455,9 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qsId_)) { \
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION     733U
-#define QP_VERSION_STR &quot;7.3.3&quot;
-
-//! Encrypted  current QP release (7.3.3) and date (2024-03-01)
-#define QP_RELEASE     0x70C4F752U
+#define QP_VERSION_STR &quot;7.3.5-rc.1&quot;
+#define QP_VERSION     735U
+#define QP_RELEASE     0x70A1DEF0U
 
 //============================================================================
 //! @cond INTERNAL
@@ -10871,7 +10870,7 @@ void target_info_pre_(std::uint8_t const isReset) {
     QS::u8_raw_(QS_OBJ_PTR_SIZE | (QS_FUN_PTR_SIZE &lt;&lt; 4U));
     QS::u8_raw_(QS_TIME_SIZE);
 
-    // send the limits...
+    // send the bounds...
     QS::u8_raw_(QF_MAX_ACTIVE);
     QS::u8_raw_(QF_MAX_EPOOL | (QF_MAX_TICK_RATE &lt;&lt; 4U));
 

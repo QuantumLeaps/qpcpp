@@ -165,7 +165,7 @@ bool QXMutex::lock(QTimeEvtCtr const nTicks) noexcept {
     // is the mutex locked by this thread already (nested locking)?
     else if (m_ao.m_osObject == curr) {
 
-        // the nesting level beyond the arbitrary but high limit
+        // the nesting level beyond the arbitrary but high bound
         // most likely means cyclic or recursive locking of a mutex.
         Q_ASSERT_INCRIT(220, m_ao.m_eQueue.m_nFree < 0xFFU);
 
@@ -312,7 +312,7 @@ bool QXMutex::tryLock() noexcept {
     }
     // is the mutex locked by this thread already (nested locking)?
     else if (m_ao.m_osObject == curr) {
-        // the nesting level must not exceed the specified limit
+        // the nesting level must not exceed the specified bound
         Q_ASSERT_INCRIT(320, m_ao.m_eQueue.m_nFree < 0xFFU);
 
         // lock one more level

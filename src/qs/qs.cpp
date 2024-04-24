@@ -998,7 +998,7 @@ void target_info_pre_(std::uint8_t const isReset) {
     QS::u8_raw_(QS_OBJ_PTR_SIZE | (QS_FUN_PTR_SIZE << 4U));
     QS::u8_raw_(QS_TIME_SIZE);
 
-    // send the limits...
+    // send the bounds...
     QS::u8_raw_(QF_MAX_ACTIVE);
     QS::u8_raw_(QF_MAX_EPOOL | (QF_MAX_TICK_RATE << 4U));
 

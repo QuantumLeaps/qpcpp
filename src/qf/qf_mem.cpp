@@ -152,8 +152,8 @@ void * QMPool::get(
         QFreeBlock * const fb_next = fb->m_next;
 
         // the free block must have integrity (duplicate inverse storage)
-        Q_ASSERT_INCRIT(302, Q_UINTPTR_CAST_(fb_next)
-                              == static_cast<std::uintptr_t>(~fb->m_next_dis));
+        Q_INVARIANT_INCRIT(302, Q_UINTPTR_CAST_(fb_next)
+                           == static_cast<std::uintptr_t>(~fb->m_next_dis));
 
         m_nFree = (m_nFree - 1U); // one free block less
         if (m_nFree == 0U) { // is the pool becoming empty?
@@ -230,7 +230,7 @@ void QMPool::put(
     #endif
 
     // set as new head of the free list
-    m_free_head = static_cast<QFreeBlock *>(block);
+    m_free_head = fb;
 
     m_nFree = m_nFree + 1U; // one more free block in this pool
 

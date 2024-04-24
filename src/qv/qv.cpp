@@ -81,7 +81,7 @@ void schedDisable(std::uint_fast8_t const ceiling) {
     QF_CRIT_ENTRY();
     QF_MEM_SYS();
 
-    Q_ASSERT_INCRIT(102, priv_.schedCeil
+    Q_INVARIANT_INCRIT(102, priv_.schedCeil
         == static_cast<std::uint_fast8_t>(~priv_.schedCeil_dis));
 
     if (ceiling > priv_.schedCeil) { // raising the scheduler ceiling?
@@ -108,7 +108,7 @@ void schedEnable() {
     QF_CRIT_ENTRY();
     QF_MEM_SYS();
 
-    Q_ASSERT_INCRIT(202, priv_.schedCeil
+    Q_INVARIANT_INCRIT(202, priv_.schedCeil
         == static_cast<std::uint_fast8_t>(~priv_.schedCeil_dis));
 
     if (priv_.schedCeil != 0U) { // actually enabling the scheduler?
@@ -186,10 +186,10 @@ int_t run() {
     for (;;) { // QV event loop...
 
         // check internal integrity (duplicate inverse storage)
-        Q_ASSERT_INCRIT(302,
+        Q_INVARIANT_INCRIT(302,
              QV::priv_.readySet.verify_(&QV::priv_.readySet_dis));
         // check internal integrity (duplicate inverse storage)
-        Q_ASSERT_INCRIT(303, QV::priv_.schedCeil
+        Q_INVARIANT_INCRIT(303, QV::priv_.schedCeil
             == static_cast<std::uint_fast8_t>(~QV::priv_.schedCeil_dis));
 
         // find the maximum prio. AO ready to run

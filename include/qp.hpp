@@ -44,11 +44,9 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION     733U
-#define QP_VERSION_STR "7.3.3"
-
-//! Encrypted  current QP release (7.3.3) and date (2024-03-01)
-#define QP_RELEASE     0x70C4F752U
+#define QP_VERSION_STR "7.3.5-rc.1"
+#define QP_VERSION     735U
+#define QP_RELEASE     0x70A1DEF0U
 
 //============================================================================
 //! @cond INTERNAL
@@ -970,10 +968,6 @@ public:
         QActive * const act,
         QSignal const sig,
         std::uint_fast8_t const tickRate = 0U) noexcept;
-
-#ifdef Q_XTOR
-    ~QTimeEvt();
-#endif // def Q_XTOR
     void armX(
         QTimeEvtCtr const nTicks,
         QTimeEvtCtr const interval = 0U) noexcept;

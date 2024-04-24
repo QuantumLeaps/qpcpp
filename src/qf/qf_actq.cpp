@@ -91,7 +91,7 @@ bool QActive::post_(
 
     #ifndef Q_UNSAFE
     std::uint8_t const pcopy = static_cast<std::uint8_t>(~m_prio_dis);
-    Q_REQUIRE_INCRIT(102, (QEvt::verify_(e)) && (m_prio == pcopy));
+    Q_INVARIANT_INCRIT(102, (QEvt::verify_(e)) && (m_prio == pcopy));
     #endif
 
     QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into temporary
@@ -234,7 +234,7 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
 
     #ifndef Q_UNSAFE
     std::uint8_t const pcopy = static_cast<std::uint8_t>(~m_prio_dis);
-    Q_REQUIRE_INCRIT(202, (QEvt::verify_(e)) && (m_prio == pcopy));
+    Q_INVARIANT_INCRIT(202, (QEvt::verify_(e)) && (m_prio == pcopy));
     #endif
 
     #ifdef QXK_HPP_
