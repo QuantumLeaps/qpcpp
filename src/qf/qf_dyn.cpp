@@ -70,9 +70,8 @@ namespace QP {
 
 //${QEP::QEvt::ctor} .........................................................
 #ifdef QEVT_DYN_CTOR
-QEvt * QEvt::ctor(DynEvt const dummy) noexcept {
+void QEvt::ctor(DynEvt const dummy) noexcept {
     Q_UNUSED_PAR(dummy);
-    return this;
 }
 
 #endif // def QEVT_DYN_CTOR

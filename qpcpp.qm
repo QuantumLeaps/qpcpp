@@ -80,12 +80,11 @@ Contact information:
     <code>: std::uint8_t { DYNAMIC };</code>
    </attribute>
    <!--${QEP::QEvt::ctor}-->
-   <operation name="ctor?def QEVT_DYN_CTOR" type="QEvt *" visibility="0x00" properties="0x00">
+   <operation name="ctor?def QEVT_DYN_CTOR" type="void" visibility="0x00" properties="0x00">
     <specifiers>noexcept</specifiers>
     <!--${QEP::QEvt::ctor::dummy}-->
     <parameter name="dummy" type="DynEvt const"/>
-    <code>Q_UNUSED_PAR(dummy);
-return this;</code>
+    <code>Q_UNUSED_PAR(dummy);</code>
    </operation>
    <!--${QEP::QEvt::QEvt}-->
    <operation name="QEvt" type="explicit constexpr" visibility="0x00" properties="0x02">
@@ -4366,6 +4365,61 @@ gc(evtRef); // recycle the referenced event
     <!--${QF::QF-dyn::gcFromISR::e}-->
     <parameter name="e" type="QEvt const *"/>
    </operation>
+   <!--${QF::QF-dyn::q_new}-->
+   <operation name="q_new?ndef QEVT_DYN_CTOR" type="template&lt;class evtT_&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
+    <!--${QF::QF-dyn::q_new::sig}-->
+    <parameter name="sig" type="enum_t const"/>
+    <code>return static_cast&lt;evtT_*&gt;(
+    QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, sig));</code>
+   </operation>
+   <!--${QF::QF-dyn::q_new}-->
+   <operation name="q_new?def QEVT_DYN_CTOR" type="template&lt;class evtT_, typename... Args&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
+    <!--${QF::QF-dyn::q_new::sig}-->
+    <parameter name="sig" type="enum_t const"/>
+    <!--${QF::QF-dyn::q_new::args}-->
+    <parameter name="args" type="Args..."/>
+    <code>evtT_ *e = static_cast&lt;evtT_*&gt;(
+    QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, sig));
+e-&gt;ctor(args...); // e cannot be nullptr
+return e;</code>
+   </operation>
+   <!--${QF::QF-dyn::q_new_x}-->
+   <operation name="q_new_x?ndef QEVT_DYN_CTOR" type="template&lt;class evtT_&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
+    <!--${QF::QF-dyn::q_new_x::margin}-->
+    <parameter name="margin" type="std::uint_fast16_t const"/>
+    <!--${QF::QF-dyn::q_new_x::sig}-->
+    <parameter name="sig" type="enum_t const"/>
+    <code>return static_cast&lt;evtT_*&gt;(QP::QF::newX_(sizeof(evtT_), margin, sig));</code>
+   </operation>
+   <!--${QF::QF-dyn::q_new_x}-->
+   <operation name="q_new_x?def QEVT_DYN_CTOR" type="template&lt;class evtT_, typename... Args&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
+    <!--${QF::QF-dyn::q_new_x::margin}-->
+    <parameter name="margin" type="std::uint_fast16_t const"/>
+    <!--${QF::QF-dyn::q_new_x::sig}-->
+    <parameter name="sig" type="enum_t const"/>
+    <!--${QF::QF-dyn::q_new_x::args}-->
+    <parameter name="args" type="Args..."/>
+    <code>evtT_ *e = static_cast&lt;evtT_*&gt;(QP::QF::newX_(sizeof(evtT_), margin, sig));
+if (e != nullptr) {
+    e-&gt;ctor(args...);
+}
+return e;</code>
+   </operation>
+   <!--${QF::QF-dyn::q_new_ref}-->
+   <operation name="q_new_ref" type="template&lt;class evtT_&gt;&#10;void" visibility="0x00" properties="0x02">
+    <!--${QF::QF-dyn::q_new_ref::e}-->
+    <parameter name="e" type="QP::QEvt const * const"/>
+    <!--${QF::QF-dyn::q_new_ref::evtRef}-->
+    <parameter name="evtRef" type="evtT_ const *&amp;"/>
+    <code>evtRef = static_cast&lt;evtT_ const *&gt;(QP::QF::newRef_(e, evtRef));</code>
+   </operation>
+   <!--${QF::QF-dyn::q_delete_ref}-->
+   <operation name="q_delete_ref" type="template&lt;class evtT_&gt; void" visibility="0x00" properties="0x02">
+    <!--${QF::QF-dyn::q_delete_ref::evtRef}-->
+    <parameter name="evtRef" type="evtT_ const *&amp;"/>
+    <code>QP::QF::deleteRef_(evtRef);
+evtRef = nullptr;</code>
+   </operation>
   </package>
  </package>
  <!--${QF-extern-C}-->
@@ -4395,8 +4449,7 @@ gc(evtRef); // recycle the referenced event
    <parameter name="evtT_" type="&lt;event class&gt;"/>
    <!--${QF-macros::Q_NEW::sig_}-->
    <parameter name="sig_" type="QP::QSignal"/>
-   <code>(static_cast&lt;evtT_ *&gt;( \
-    QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, (sig_))))</code>
+   <code>(QP::QF::q_new&lt;evtT_&gt;((sig_)))</code>
   </operation>
   <!--${QF-macros::Q_NEW}-->
   <operation name="Q_NEW?def QEVT_DYN_CTOR" type="void" visibility="0x03" properties="0x00">
@@ -4406,8 +4459,7 @@ gc(evtRef); // recycle the referenced event
    <parameter name="sig_" type="QP::QSignal"/>
    <!--${QF-macros::Q_NEW::...}-->
    <parameter name="..." type="__VA_ARGS__"/>
-   <code>( static_cast&lt;evtT_ *&gt;( \
-    QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, (sig_)))-&gt;ctor(__VA_ARGS__))</code>
+   <code>(QP::QF::q_new&lt;evtT_&gt;((sig_), __VA_ARGS__))</code>
   </operation>
   <!--${QF-macros::Q_NEW_X}-->
   <operation name="Q_NEW_X?ndef QEVT_DYN_CTOR" type="void" visibility="0x03" properties="0x00">
@@ -4417,8 +4469,7 @@ gc(evtRef); // recycle the referenced event
    <parameter name="margin_" type="std::uint16_t"/>
    <!--${QF-macros::Q_NEW_X::sig_}-->
    <parameter name="sig_" type="QP::QSignal"/>
-   <code>(static_cast&lt;evtT_ *&gt;( \
-    QP::QF::newX_(sizeof(evtT_), (margin_), (sig_))))</code>
+   <code>(QP::QF::q_new_x&lt;evtT_&gt;((margin_), (sig_)))</code>
   </operation>
   <!--${QF-macros::Q_NEW_X}-->
   <operation name="Q_NEW_X?def QEVT_DYN_CTOR" type="void" visibility="0x03" properties="0x00">
@@ -4430,8 +4481,7 @@ gc(evtRef); // recycle the referenced event
    <parameter name="sig_" type="QP::QSignal"/>
    <!--${QF-macros::Q_NEW_X::...}-->
    <parameter name="..." type="__VA_ARGS__"/>
-   <code>( static_cast&lt;evtT_ *&gt;( \
-    QP::QF::newX_(sizeof(evtT_), (margin_), (sig_)))-&gt;ctor(__VA_ARGS__))</code>
+   <code>(QP::QF::q_new_x&lt;evtT_&gt;((margin_), (sig_), __VA_ARGS__))</code>
   </operation>
   <!--${QF-macros::Q_NEW_REF}-->
   <operation name="Q_NEW_REF" type="void" visibility="0x03" properties="0x00">
@@ -4439,8 +4489,7 @@ gc(evtRef); // recycle the referenced event
    <parameter name="evtRef_" type="&lt;event class&gt;"/>
    <!--${QF-macros::Q_NEW_REF::evtT_}-->
    <parameter name="evtT_" type="&lt;event class&gt;"/>
-   <code>\
-    ((evtRef_) = static_cast&lt;evtT_ const *&gt;(QP::QF::newRef_(e, (evtRef_))))</code>
+   <code>(QP::QF::q_new_ref&lt;evtT_&gt;(e, (evtRef_)))</code>
   </operation>
   <!--${QF-macros::Q_DELETE_REF}-->
   <operation name="Q_DELETE_REF" type="void" visibility="0x03" properties="0x00">
@@ -4448,7 +4497,7 @@ gc(evtRef); // recycle the referenced event
    <parameter name="evtRef_" type="&lt;event class&gt;"/>
    <code>do { \
     QP::QF::deleteRef_((evtRef_)); \
-    (evtRef_) = 0U; \
+    (evtRef_) = nullptr; \
 } while (false)</code>
   </operation>
   <!--${QF-macros::PUBLISH}-->
@@ -8455,7 +8504,7 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qsId_)) { \
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR &quot;7.3.5-rc.1&quot;
+#define QP_VERSION_STR &quot;7.3.5-rc.2&quot;
 #define QP_VERSION     735U
 #define QP_RELEASE     0x70A1DEF0U
 

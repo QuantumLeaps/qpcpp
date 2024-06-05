@@ -44,7 +44,7 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR "7.3.5-rc.1"
+#define QP_VERSION_STR "7.3.5-rc.2"
 #define QP_VERSION     735U
 #define QP_RELEASE     0x70A1DEF0U
 
@@ -150,7 +150,7 @@ public:
 public:
 
 #ifdef QEVT_DYN_CTOR
-    QEvt * ctor(DynEvt const dummy) noexcept;
+    void ctor(DynEvt const dummy) noexcept;
 #endif // def QEVT_DYN_CTOR
     explicit constexpr QEvt(QSignal const s) noexcept
       : sig(s),
@@ -1144,6 +1144,72 @@ QEvt * newXfromISR_(
 void gcFromISR(QEvt const * e) noexcept;
 #endif // def QF_ISR_API
 
+//${QF::QF-dyn::q_new} .......................................................
+#ifndef QEVT_DYN_CTOR
+template<class evtT_>
+inline evtT_ * q_new(enum_t const sig) {
+    return static_cast<evtT_*>(
+        QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, sig));
+}
+#endif // ndef QEVT_DYN_CTOR
+
+//${QF::QF-dyn::q_new} .......................................................
+#ifdef QEVT_DYN_CTOR
+template<class evtT_, typename... Args>
+inline evtT_ * q_new(
+    enum_t const sig,
+    Args... args)
+{
+    evtT_ *e = static_cast<evtT_*>(
+        QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, sig));
+    e->ctor(args...); // e cannot be nullptr
+    return e;
+}
+#endif // def QEVT_DYN_CTOR
+
+//${QF::QF-dyn::q_new_x} .....................................................
+#ifndef QEVT_DYN_CTOR
+template<class evtT_>
+inline evtT_ * q_new_x(
+    std::uint_fast16_t const margin,
+    enum_t const sig)
+{
+    return static_cast<evtT_*>(QP::QF::newX_(sizeof(evtT_), margin, sig));
+}
+#endif // ndef QEVT_DYN_CTOR
+
+//${QF::QF-dyn::q_new_x} .....................................................
+#ifdef QEVT_DYN_CTOR
+template<class evtT_, typename... Args>
+inline evtT_ * q_new_x(
+    std::uint_fast16_t const margin,
+    enum_t const sig,
+    Args... args)
+{
+    evtT_ *e = static_cast<evtT_*>(QP::QF::newX_(sizeof(evtT_), margin, sig));
+    if (e != nullptr) {
+        e->ctor(args...);
+    }
+    return e;
+}
+#endif // def QEVT_DYN_CTOR
+
+//${QF::QF-dyn::q_new_ref} ...................................................
+template<class evtT_>
+inline void q_new_ref(
+    QP::QEvt const * const e,
+    evtT_ const *& evtRef)
+{
+    evtRef = static_cast<evtT_ const *>(QP::QF::newRef_(e, evtRef));
+}
+
+//${QF::QF-dyn::q_delete_ref} ................................................
+template<class evtT_>
+inline void q_delete_ref(evtT_ const *& evtRef) {
+    QP::QF::deleteRef_(evtRef);
+    evtRef = nullptr;
+}
+
 } // namespace QF
 } // namespace QP
 //$enddecl${QF::QF-dyn} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1168,36 +1234,31 @@ void QF_onContextSw(
 
 //${QF-macros::Q_NEW} ........................................................
 #ifndef QEVT_DYN_CTOR
-#define Q_NEW(evtT_, sig_) (static_cast<evtT_ *>( \
-    QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, (sig_))))
+#define Q_NEW(evtT_, sig_) (QP::QF::q_new<evtT_>((sig_)))
 #endif // ndef QEVT_DYN_CTOR
 
 //${QF-macros::Q_NEW} ........................................................
 #ifdef QEVT_DYN_CTOR
-#define Q_NEW(evtT_, sig_, ...) ( static_cast<evtT_ *>( \
-    QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, (sig_)))->ctor(__VA_ARGS__))
+#define Q_NEW(evtT_, sig_, ...) (QP::QF::q_new<evtT_>((sig_), __VA_ARGS__))
 #endif // def QEVT_DYN_CTOR
 
 //${QF-macros::Q_NEW_X} ......................................................
 #ifndef QEVT_DYN_CTOR
-#define Q_NEW_X(evtT_, margin_, sig_) (static_cast<evtT_ *>( \
-    QP::QF::newX_(sizeof(evtT_), (margin_), (sig_))))
+#define Q_NEW_X(evtT_, margin_, sig_) (QP::QF::q_new_x<evtT_>((margin_), (sig_)))
 #endif // ndef QEVT_DYN_CTOR
 
 //${QF-macros::Q_NEW_X} ......................................................
 #ifdef QEVT_DYN_CTOR
-#define Q_NEW_X(evtT_, margin_, sig_, ...) ( static_cast<evtT_ *>( \
-    QP::QF::newX_(sizeof(evtT_), (margin_), (sig_)))->ctor(__VA_ARGS__))
+#define Q_NEW_X(evtT_, margin_, sig_, ...) (QP::QF::q_new_x<evtT_>((margin_), (sig_), __VA_ARGS__))
 #endif // def QEVT_DYN_CTOR
 
 //${QF-macros::Q_NEW_REF} ....................................................
-#define Q_NEW_REF(evtRef_, evtT_) \
-    ((evtRef_) = static_cast<evtT_ const *>(QP::QF::newRef_(e, (evtRef_))))
+#define Q_NEW_REF(evtRef_, evtT_) (QP::QF::q_new_ref<evtT_>(e, (evtRef_)))
 
 //${QF-macros::Q_DELETE_REF} .................................................
 #define Q_DELETE_REF(evtRef_) do { \
     QP::QF::deleteRef_((evtRef_)); \
-    (evtRef_) = 0U; \
+    (evtRef_) = nullptr; \
 } while (false)
 
 //${QF-macros::PUBLISH} ......................................................
