@@ -73,6 +73,14 @@ void QEQueue::init(
     QEvt const * qSto[],
     std::uint_fast16_t const qLen) noexcept
 {
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    QF_MEM_SYS();
+
+    #if (QF_EQUEUE_CTR_SIZE == 1U)
+    Q_REQUIRE_INCRIT(100, qLen < 0xFFU);
+    #endif
+
     m_frontEvt = nullptr; // no events in the queue
     m_ring     = &qSto[0];
     m_end      = static_cast<QEQueueCtr>(qLen);
@@ -82,6 +90,9 @@ void QEQueue::init(
     }
     m_nFree    = static_cast<QEQueueCtr>(qLen + 1U); //+1 for frontEvt
     m_nMin     = m_nFree;
+
+    QF_MEM_APP();
+    QF_CRIT_EXIT();
 }
 
 //${QF::QEQueue::post} .......................................................

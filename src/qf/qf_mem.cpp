@@ -98,7 +98,7 @@ void QMPool::init(
 
     // start at the head of the free list
     QFreeBlock *fb = m_free_head;
-    m_nTot = 1U; // the last block already in the list
+    std::uint32_t nTot = 1U; // the last block already in the list
 
     // chain all blocks together in a free-list...
     for (std::uint_fast32_t size = poolSize - m_blockSize;
@@ -110,15 +110,22 @@ void QMPool::init(
         fb->m_next_dis = ~Q_UINTPTR_CAST_(fb->m_next);
     #endif
         fb = fb->m_next; // advance to the next block
-        ++m_nTot;        // one more free block in the pool
+        ++nTot;          // one more free block in the pool
     }
+
+    // dynamic range check
+    #if (QF_MPOOL_CTR_SIZE == 1U)
+    Q_ENSURE_INCRIT(190, nTot < 0xFFU);
+    #elif (QF_MPOOL_CTR_SIZE == 2U)
+    Q_ENSURE_INCRIT(190, nTot < 0xFFFFU);
+    #endif
 
     fb->m_next  = nullptr; // the last link points to NULL
     #ifndef Q_UNSAFE
     fb->m_next_dis = ~Q_UINTPTR_CAST_(fb->m_next);
     #endif
 
-    fb->m_next = nullptr; // the last link points to NULL
+    m_nTot  = static_cast<QMPoolCtr>(nTot);
     m_nFree = m_nTot;  // all blocks are free
     m_nMin  = m_nTot;  // the minimum # free blocks
     m_start = static_cast<QFreeBlock *>(poolSto); // original start

@@ -37,10 +37,10 @@
 version-*
 JLink*.*
 
+cert/
 html/
 latex/
-cert-pack/
-cert-latex/
+doxygen/gen/
 test_priv/
 dbg/
 rel/

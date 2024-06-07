@@ -76,16 +76,9 @@ Contact information:
     <code> {0xE0U};</code>
    </attribute>
    <!--${QEP::QEvt::DynEvt}-->
-   <attribute name="DynEvt?def QEVT_DYN_CTOR" type="enum" visibility="0x04" properties="0x00">
+   <attribute name="DynEvt" type="enum" visibility="0x04" properties="0x00">
     <code>: std::uint8_t { DYNAMIC };</code>
    </attribute>
-   <!--${QEP::QEvt::ctor}-->
-   <operation name="ctor?def QEVT_DYN_CTOR" type="void" visibility="0x00" properties="0x00">
-    <specifiers>noexcept</specifiers>
-    <!--${QEP::QEvt::ctor::dummy}-->
-    <parameter name="dummy" type="DynEvt const"/>
-    <code>Q_UNUSED_PAR(dummy);</code>
-   </operation>
    <!--${QEP::QEvt::QEvt}-->
    <operation name="QEvt" type="explicit constexpr" visibility="0x00" properties="0x02">
     <specifiers>noexcept</specifiers>
@@ -98,6 +91,19 @@ Contact information:
    <!--${QEP::QEvt::QEvt}-->
    <operation name="QEvt" type="" visibility="0x00" properties="0x00">
     <specifiers>= delete</specifiers>
+   </operation>
+   <!--${QEP::QEvt::init}-->
+   <operation name="init" type="void" visibility="0x00" properties="0x02">
+    <specifiers>noexcept</specifiers>
+    <code>// no event parameters to initialize</code>
+   </operation>
+   <!--${QEP::QEvt::init}-->
+   <operation name="init" type="void" visibility="0x00" properties="0x02">
+    <specifiers>noexcept</specifiers>
+    <!--${QEP::QEvt::init::dummy}-->
+    <parameter name="dummy" type="DynEvt const"/>
+    <code>static_cast&lt;void&gt;(dummy);
+// no event parameters to initialize</code>
    </operation>
    <!--${QEP::QEvt::verify_}-->
    <operation name="verify_" type="bool" visibility="0x00" properties="0x03">
@@ -3498,7 +3504,15 @@ QF_CRIT_EXIT();</code>
     <parameter name="qSto[]" type="QEvt const *"/>
     <!--${QF::QEQueue::init::qLen}-->
     <parameter name="qLen" type="std::uint_fast16_t const"/>
-    <code>m_frontEvt = nullptr; // no events in the queue
+    <code>QF_CRIT_STAT
+QF_CRIT_ENTRY();
+QF_MEM_SYS();
+
+#if (QF_EQUEUE_CTR_SIZE == 1U)
+Q_REQUIRE_INCRIT(100, qLen &lt; 0xFFU);
+#endif
+
+m_frontEvt = nullptr; // no events in the queue
 m_ring     = &amp;qSto[0];
 m_end      = static_cast&lt;QEQueueCtr&gt;(qLen);
 if (qLen &gt; 0U) {
@@ -3506,7 +3520,10 @@ if (qLen &gt; 0U) {
     m_tail = 0U;
 }
 m_nFree    = static_cast&lt;QEQueueCtr&gt;(qLen + 1U); //+1 for frontEvt
-m_nMin     = m_nFree;</code>
+m_nMin     = m_nFree;
+
+QF_MEM_APP();
+QF_CRIT_EXIT();</code>
    </operation>
    <!--${QF::QEQueue::post}-->
    <operation name="post" type="bool" visibility="0x00" properties="0x00">
@@ -3793,7 +3810,7 @@ Q_ASSERT_INCRIT(110, poolSize &gt;= m_blockSize);
 
 // start at the head of the free list
 QFreeBlock *fb = m_free_head;
-m_nTot = 1U; // the last block already in the list
+std::uint32_t nTot = 1U; // the last block already in the list
 
 // chain all blocks together in a free-list...
 for (std::uint_fast32_t size = poolSize - m_blockSize;
@@ -3805,15 +3822,22 @@ for (std::uint_fast32_t size = poolSize - m_blockSize;
     fb-&gt;m_next_dis = ~Q_UINTPTR_CAST_(fb-&gt;m_next);
 #endif
     fb = fb-&gt;m_next; // advance to the next block
-    ++m_nTot;        // one more free block in the pool
+    ++nTot;          // one more free block in the pool
 }
+
+// dynamic range check
+#if (QF_MPOOL_CTR_SIZE == 1U)
+Q_ENSURE_INCRIT(190, nTot &lt; 0xFFU);
+#elif (QF_MPOOL_CTR_SIZE == 2U)
+Q_ENSURE_INCRIT(190, nTot &lt; 0xFFFFU);
+#endif
 
 fb-&gt;m_next  = nullptr; // the last link points to NULL
 #ifndef Q_UNSAFE
 fb-&gt;m_next_dis = ~Q_UINTPTR_CAST_(fb-&gt;m_next);
 #endif
 
-fb-&gt;m_next = nullptr; // the last link points to NULL
+m_nTot  = static_cast&lt;QMPoolCtr&gt;(nTot);
 m_nFree = m_nTot;  // all blocks are free
 m_nMin  = m_nTot;  // the minimum # free blocks
 m_start = static_cast&lt;QFreeBlock *&gt;(poolSto); // original start
@@ -4349,42 +4373,26 @@ QF_CRIT_EXIT();
 gc(evtRef); // recycle the referenced event
 #endif</code>
    </operation>
-   <!--${QF::QF-dyn::newXfromISR_}-->
-   <operation name="newXfromISR_?def QF_ISR_API" type="QEvt *" visibility="0x00" properties="0x01">
-    <specifiers>noexcept</specifiers>
-    <!--${QF::QF-dyn::newXfromISR_::evtSize}-->
-    <parameter name="evtSize" type="std::uint_fast16_t const"/>
-    <!--${QF::QF-dyn::newXfromISR_::margin}-->
-    <parameter name="margin" type="std::uint_fast16_t const"/>
-    <!--${QF::QF-dyn::newXfromISR_::sig}-->
-    <parameter name="sig" type="enum_t const"/>
-   </operation>
-   <!--${QF::QF-dyn::gcFromISR}-->
-   <operation name="gcFromISR?def QF_ISR_API" type="void" visibility="0x00" properties="0x01">
-    <specifiers>noexcept</specifiers>
-    <!--${QF::QF-dyn::gcFromISR::e}-->
-    <parameter name="e" type="QEvt const *"/>
-   </operation>
    <!--${QF::QF-dyn::q_new}-->
-   <operation name="q_new?ndef QEVT_DYN_CTOR" type="template&lt;class evtT_&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
+   <operation name="q_new?ndef QEVT_PAR_INIT" type="template&lt;class evtT_&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
     <!--${QF::QF-dyn::q_new::sig}-->
     <parameter name="sig" type="enum_t const"/>
     <code>return static_cast&lt;evtT_*&gt;(
     QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, sig));</code>
    </operation>
    <!--${QF::QF-dyn::q_new}-->
-   <operation name="q_new?def QEVT_DYN_CTOR" type="template&lt;class evtT_, typename... Args&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
+   <operation name="q_new?def QEVT_PAR_INIT" type="template&lt;class evtT_, typename... Args&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
     <!--${QF::QF-dyn::q_new::sig}-->
     <parameter name="sig" type="enum_t const"/>
     <!--${QF::QF-dyn::q_new::args}-->
     <parameter name="args" type="Args..."/>
     <code>evtT_ *e = static_cast&lt;evtT_*&gt;(
     QP::QF::newX_(sizeof(evtT_), QP::QF::NO_MARGIN, sig));
-e-&gt;ctor(args...); // e cannot be nullptr
+e-&gt;init(args...); // e cannot be nullptr
 return e;</code>
    </operation>
    <!--${QF::QF-dyn::q_new_x}-->
-   <operation name="q_new_x?ndef QEVT_DYN_CTOR" type="template&lt;class evtT_&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
+   <operation name="q_new_x?ndef QEVT_PAR_INIT" type="template&lt;class evtT_&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
     <!--${QF::QF-dyn::q_new_x::margin}-->
     <parameter name="margin" type="std::uint_fast16_t const"/>
     <!--${QF::QF-dyn::q_new_x::sig}-->
@@ -4392,7 +4400,7 @@ return e;</code>
     <code>return static_cast&lt;evtT_*&gt;(QP::QF::newX_(sizeof(evtT_), margin, sig));</code>
    </operation>
    <!--${QF::QF-dyn::q_new_x}-->
-   <operation name="q_new_x?def QEVT_DYN_CTOR" type="template&lt;class evtT_, typename... Args&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
+   <operation name="q_new_x?def QEVT_PAR_INIT" type="template&lt;class evtT_, typename... Args&gt;&#10;evtT_ *" visibility="0x00" properties="0x02">
     <!--${QF::QF-dyn::q_new_x::margin}-->
     <parameter name="margin" type="std::uint_fast16_t const"/>
     <!--${QF::QF-dyn::q_new_x::sig}-->
@@ -4401,7 +4409,7 @@ return e;</code>
     <parameter name="args" type="Args..."/>
     <code>evtT_ *e = static_cast&lt;evtT_*&gt;(QP::QF::newX_(sizeof(evtT_), margin, sig));
 if (e != nullptr) {
-    e-&gt;ctor(args...);
+    e-&gt;init(args...);
 }
 return e;</code>
    </operation>
@@ -4419,6 +4427,22 @@ return e;</code>
     <parameter name="evtRef" type="evtT_ const *&amp;"/>
     <code>QP::QF::deleteRef_(evtRef);
 evtRef = nullptr;</code>
+   </operation>
+   <!--${QF::QF-dyn::newXfromISR_}-->
+   <operation name="newXfromISR_?def QF_ISR_API" type="QEvt *" visibility="0x00" properties="0x01">
+    <specifiers>noexcept</specifiers>
+    <!--${QF::QF-dyn::newXfromISR_::evtSize}-->
+    <parameter name="evtSize" type="std::uint_fast16_t const"/>
+    <!--${QF::QF-dyn::newXfromISR_::margin}-->
+    <parameter name="margin" type="std::uint_fast16_t const"/>
+    <!--${QF::QF-dyn::newXfromISR_::sig}-->
+    <parameter name="sig" type="enum_t const"/>
+   </operation>
+   <!--${QF::QF-dyn::gcFromISR}-->
+   <operation name="gcFromISR?def QF_ISR_API" type="void" visibility="0x00" properties="0x01">
+    <specifiers>noexcept</specifiers>
+    <!--${QF::QF-dyn::gcFromISR::e}-->
+    <parameter name="e" type="QEvt const *"/>
    </operation>
   </package>
  </package>
@@ -4444,7 +4468,7 @@ evtRef = nullptr;</code>
     (static_cast&lt;QP::QPrioSpec&gt;((prio_) | (pthre_) &lt;&lt; 8U))</code>
   </operation>
   <!--${QF-macros::Q_NEW}-->
-  <operation name="Q_NEW?ndef QEVT_DYN_CTOR" type="void" visibility="0x03" properties="0x00">
+  <operation name="Q_NEW?ndef QEVT_PAR_INIT" type="void" visibility="0x03" properties="0x00">
    <!--${QF-macros::Q_NEW::evtT_}-->
    <parameter name="evtT_" type="&lt;event class&gt;"/>
    <!--${QF-macros::Q_NEW::sig_}-->
@@ -4452,7 +4476,7 @@ evtRef = nullptr;</code>
    <code>(QP::QF::q_new&lt;evtT_&gt;((sig_)))</code>
   </operation>
   <!--${QF-macros::Q_NEW}-->
-  <operation name="Q_NEW?def QEVT_DYN_CTOR" type="void" visibility="0x03" properties="0x00">
+  <operation name="Q_NEW?def QEVT_PAR_INIT" type="void" visibility="0x03" properties="0x00">
    <!--${QF-macros::Q_NEW::evtT_}-->
    <parameter name="evtT_" type="&lt;event class&gt;"/>
    <!--${QF-macros::Q_NEW::sig_}-->
@@ -4462,7 +4486,7 @@ evtRef = nullptr;</code>
    <code>(QP::QF::q_new&lt;evtT_&gt;((sig_), __VA_ARGS__))</code>
   </operation>
   <!--${QF-macros::Q_NEW_X}-->
-  <operation name="Q_NEW_X?ndef QEVT_DYN_CTOR" type="void" visibility="0x03" properties="0x00">
+  <operation name="Q_NEW_X?ndef QEVT_PAR_INIT" type="void" visibility="0x03" properties="0x00">
    <!--${QF-macros::Q_NEW_X::evtT_}-->
    <parameter name="evtT_" type="&lt;event class&gt;"/>
    <!--${QF-macros::Q_NEW_X::margin_}-->
@@ -4472,7 +4496,7 @@ evtRef = nullptr;</code>
    <code>(QP::QF::q_new_x&lt;evtT_&gt;((margin_), (sig_)))</code>
   </operation>
   <!--${QF-macros::Q_NEW_X}-->
-  <operation name="Q_NEW_X?def QEVT_DYN_CTOR" type="void" visibility="0x03" properties="0x00">
+  <operation name="Q_NEW_X?def QEVT_PAR_INIT" type="void" visibility="0x03" properties="0x00">
    <!--${QF-macros::Q_NEW_X::evtT_}-->
    <parameter name="evtT_" type="&lt;event class&gt;"/>
    <!--${QF-macros::Q_NEW_X::margin_}-->
@@ -8504,9 +8528,9 @@ if (QS_GLB_CHECK_(rec_) &amp;&amp; QS_LOC_CHECK_(qsId_)) { \
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR &quot;7.3.5-rc.2&quot;
-#define QP_VERSION     735U
-#define QP_RELEASE     0x70A1DEF0U
+#define QP_VERSION_STR &quot;7.4.0-rc.1&quot;
+#define QP_VERSION     740U
+#define QP_RELEASE     0x7092C3BBU
 
 //============================================================================
 //! @cond INTERNAL
@@ -9349,7 +9373,12 @@ extern char const BUILD_TIME[9];
 //============================================================================
 // QP/C++ API compatibility layer...
 
-#if (QP_API_VERSION &lt; 730)
+#if (QP_API_VERSION &lt; 740)
+
+#ifdef QEVT_DYN_CTOR
+//! @deprecated #QEVT_DYN_CTOR, please use #QEVT_PAR_INIT
+#define QEVT_PAR_INIT
+#endif
 
 //! @deprecated plain 'char' is no longer forbidden in MISRA/AUTOSAR-C++
 using char_t = char;
@@ -9746,7 +9775,6 @@ namespace {
 Q_DEFINE_THIS_MODULE(&quot;qf_dyn&quot;)
 } // unnamed namespace
 
-$define ${QEP::QEvt::ctor}
 $define ${QF::QF-dyn}
 
 #endif // (QF_MAX_EPOOL &gt; 0U) mutable events configured</text>

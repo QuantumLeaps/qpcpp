@@ -1,5 +1,10 @@
 //============================================================================
 // QP/C++ Real-Time Embedded Framework (RTEF)
+//
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
+//
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -22,17 +27,14 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-08-18
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2024-06-06
+//! @version Last updated for: @ref qpcpp_7_4_0
 //!
 //! @file
-//! @brief QS/C++ port to Win32
+//! @brief QS/C++ port to POSIX/Win32
 
 #ifndef QS_PORT_HPP_
 #define QS_PORT_HPP_
-
-#define QS_CTR_SIZE         4U
-#define QS_TIME_SIZE        4U
 
 #if defined(_WIN64) || defined(__LP64__) || defined(_LP64)  // 64-bit OS?
     #define QS_OBJ_PTR_SIZE 8U
@@ -48,11 +50,11 @@ void QS_rx_input(void);  // handle the QS-RX input
 }
 
 //============================================================================
-// NOTE: QS might be used with or without other QP components, in which case
-// the separate definitions of the macros QF_CRIT_STAT, QF_CRIT_ENTRY(),
-// and QF_CRIT_EXIT() are needed. In this port QS is configured to be used with
-// the other QP component, by simply including "qp_port.hpp" *before* "qs.hpp".
-//
+// NOTE: QS might be used with or without other QP components, in which
+// case the separate definitions of the macros QF_CRIT_STAT, QF_CRIT_ENTRY(),
+// and QF_CRIT_EXIT() are needed. In this port QS is configured to be used
+// with the other QP component, by simply including "qp_port.hpp"
+// *before* "qs.hpp".
 #ifndef QP_PORT_HPP_
 #include "qp_port.hpp" // use QS with QP
 #endif
@@ -60,4 +62,3 @@ void QS_rx_input(void);  // handle the QS-RX input
 #include "qs.hpp"      // QS platform-independent public interface
 
 #endif // QS_PORT_HPP_
-

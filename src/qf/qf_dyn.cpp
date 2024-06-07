@@ -65,19 +65,6 @@ Q_DEFINE_THIS_MODULE("qf_dyn")
 #endif
 //$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-//$define${QEP::QEvt::ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-namespace QP {
-
-//${QEP::QEvt::ctor} .........................................................
-#ifdef QEVT_DYN_CTOR
-void QEvt::ctor(DynEvt const dummy) noexcept {
-    Q_UNUSED_PAR(dummy);
-}
-
-#endif // def QEVT_DYN_CTOR
-
-} // namespace QP
-//$enddef${QEP::QEvt::ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //$define${QF::QF-dyn} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 namespace QP {
 namespace QF {

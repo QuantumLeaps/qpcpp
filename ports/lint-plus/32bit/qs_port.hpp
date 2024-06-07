@@ -1,5 +1,10 @@
 //============================================================================
 // QP/C++ Real-Time Embedded Framework (RTEF)
+//
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
+//
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -22,36 +27,27 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-08-17
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2024-06-06
+//! @version Last updated for: @ref qpcpp_7_4_0
 //!
 //! @file
-//! @brief QS/C++ port to a 32-bit CPU, generic C++ compiler
-//! @description
-//! This is an example QP/C++ port with the documentation for the main
-//! items, such as configuration macros, functions, and includes.
+//! @brief QS/C++ port to a 32-bit CPU, generic C++11 compiler
 
 #ifndef QS_PORT_HPP_
 #define QS_PORT_HPP_
 
-//! QS buffer counter size in bytes
-#define QS_CTR_SIZE      2U
-
-//! QS time-stamp size in bytes
-#define QS_TIME_SIZE     4U
-
-//! object pointer size in bytes
+// object pointer size in bytes
 #define QS_OBJ_PTR_SIZE  4U
 
-//! function pointer size in bytes
+// function pointer size in bytes
 #define QS_FUN_PTR_SIZE  4U
 
 //============================================================================
-// NOTE: QS might be used with or without other QP components, in which case
-// the separate definitions of the macros QF_CRIT_STAT, QF_CRIT_ENTRY(),
-// and QF_CRIT_EXIT() are needed. In this port QS is configured to be used with
-// the other QP component, by simply including "qp_port.hpp" *before* "qs.hpp".
-//
+// NOTE: QS might be used with or without other QP components, in which
+// case the separate definitions of the macros QF_CRIT_STAT, QF_CRIT_ENTRY(),
+// and QF_CRIT_EXIT() are needed. In this port QS is configured to be used
+// with the other QP component, by simply including "qp_port.hpp"
+// *before* "qs.hpp".
 #ifndef QP_PORT_HPP_
 #include "qp_port.hpp" // use QS with QP
 #endif
