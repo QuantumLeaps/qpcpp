@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-12-04
-//! @version Last updated for: @ref qpcpp_7_3_1
+//! @date Last updated on: 2024-06-11
+//! @version Last updated for: @ref qpcpp_7_4_0
 //!
 //! @file
 //! @brief QF/C++ port to ThreadX (a.k.a. Azure RTOS), generic C++11 compiler
@@ -42,7 +42,7 @@
 //============================================================================
 namespace { // anonymous namespace with local definitions
 
-Q_DEFINE_THIS_MODULE("qf_port")
+Q_THIS_MODULE("qf_port");
 
 static void thread_function(ULONG thread_input); // prototype
 static void thread_function(ULONG thread_input) { // ThreadX signature

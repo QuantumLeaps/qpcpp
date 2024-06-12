@@ -34,7 +34,7 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-Q_DEFINE_THIS_FILE
+Q_THIS_FILE();
 
 namespace {
 //============================================================================

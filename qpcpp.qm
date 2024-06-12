@@ -567,9 +567,9 @@ QStateHandler t = s;
 QF_CRIT_STAT
 
 QF_CRIT_ENTRY();
+Q_REQUIRE_INCRIT(300, QEvt::verify_(e));
 Q_INVARIANT_INCRIT(302, (s != Q_STATE_CAST(0))
     &amp;&amp; (m_state.uint == static_cast&lt;std::uintptr_t&gt;(~m_temp.uint)));
-Q_INVARIANT_INCRIT(303, QEvt::verify_(e));
 
 QS_MEM_SYS();
 QS_BEGIN_PRE_(QS_QEP_DISPATCH, qsId)
@@ -823,6 +823,8 @@ do {
 
 #ifndef Q_UNSAFE
 m_temp.uint = ~m_state.uint;
+#else
+Q_UNUSED_PAR(isFound);
 #endif
 
 QF_CRIT_STAT
@@ -1094,9 +1096,9 @@ QMState const *t = s;
 
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_INVARIANT_INCRIT(300, (s != nullptr)
+Q_REQUIRE_INCRIT(300, QEvt::verify_(e));
+Q_INVARIANT_INCRIT(302, (s != nullptr)
     &amp;&amp; (m_state.uint == static_cast&lt;std::uintptr_t&gt;(~m_temp.uint)));
-Q_INVARIANT_INCRIT(302, QEvt::verify_(e));
 
 QS_MEM_SYS();
 QS_BEGIN_PRE_(QS_QEP_DISPATCH, qsId)
@@ -2170,8 +2172,10 @@ QF_CRIT_ENTRY();
 QF_MEM_SYS();
 
 #ifndef Q_UNSAFE
+Q_REQUIRE_INCRIT(100, QEvt::verify_(e));
+
 std::uint8_t const pcopy = static_cast&lt;std::uint8_t&gt;(~m_prio_dis);
-Q_INVARIANT_INCRIT(102, (QEvt::verify_(e)) &amp;&amp; (m_prio == pcopy));
+Q_INVARIANT_INCRIT(102, m_prio == pcopy);
 #endif
 
 QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into temporary
@@ -2227,7 +2231,13 @@ if (status) { // can post the event?
     // as producing the #QS_QF_ACTIVE_POST trace record, which are:
     // the local filter for this AO ('m_prio') is set
     if (QS_LOC_CHECK_(m_prio)) {
+        QF_MEM_APP();
+        QF_CRIT_EXIT();
+
         QS::onTestPost(sender, this, e, status);
+
+        QF_CRIT_ENTRY();
+        QF_MEM_SYS();
     }
 #endif
 
@@ -2276,7 +2286,13 @@ else { // cannot post the event
     // as producing the #QS_QF_ACTIVE_POST trace record, which are:
     // the local filter for this AO ('m_prio') is set
     if (QS_LOC_CHECK_(m_prio)) {
+        QF_MEM_APP();
+        QF_CRIT_EXIT();
+
         QS::onTestPost(sender, this, e, status);
+
+        QF_CRIT_ENTRY();
+        QF_MEM_SYS();
     }
 #endif
 
@@ -2309,8 +2325,10 @@ QF_CRIT_ENTRY();
 QF_MEM_SYS();
 
 #ifndef Q_UNSAFE
+Q_REQUIRE_INCRIT(200, QEvt::verify_(e));
+
 std::uint8_t const pcopy = static_cast&lt;std::uint8_t&gt;(~m_prio_dis);
-Q_INVARIANT_INCRIT(202, (QEvt::verify_(e)) &amp;&amp; (m_prio == pcopy));
+Q_INVARIANT_INCRIT(202, m_prio == pcopy);
 #endif
 
 #ifdef QXK_HPP_
@@ -2351,7 +2369,13 @@ QS_END_PRE_()
 // as producing the #QS_QF_ACTIVE_POST trace record, which are:
 // the local filter for this AO ('m_prio') is set
 if (QS_LOC_CHECK_(m_prio)) {
+    QF_MEM_APP();
+    QF_CRIT_EXIT();
+
     QS::onTestPost(nullptr, this, e, true);
+
+    QF_CRIT_ENTRY();
+    QF_MEM_SYS();
 }
 #endif
 
@@ -2384,6 +2408,8 @@ QACTIVE_EQUEUE_WAIT_(this); // wait for event to arrive directly
 
 // always remove evt from the front
 QEvt const * const e = m_eQueue.m_frontEvt;
+Q_INVARIANT_INCRIT(312, QEvt::verify_(e));
+
 QEQueueCtr const nFree = m_eQueue.m_nFree + 1U; // get volatile into tmp
 m_eQueue.m_nFree = nFree; // update the # free
 
@@ -3542,7 +3568,7 @@ QF_CRIT_STAT
 QF_CRIT_ENTRY();
 QF_MEM_SYS();
 
-Q_REQUIRE_INCRIT(200, e != nullptr);
+Q_REQUIRE_INCRIT(200,  QEvt::verify_(e));
 
 QEQueueCtr nFree = m_nFree; // get volatile into temporary
 
@@ -3622,9 +3648,10 @@ QF_CRIT_STAT
 QF_CRIT_ENTRY();
 QF_MEM_SYS();
 
-QEQueueCtr nFree = m_nFree; // get volatile into temporary
+Q_REQUIRE_INCRIT(300,  QEvt::verify_(e));
 
-Q_REQUIRE_INCRIT(300, nFree != 0U);
+QEQueueCtr nFree = m_nFree; // get volatile into temporary
+Q_REQUIRE_INCRIT(301, nFree != 0U);
 
 if (e-&gt;getPoolNum_() != 0U) { // is it a mutable event?
     QEvt_refCtr_inc_(e); // increment the reference counter
@@ -3675,6 +3702,9 @@ QF_MEM_SYS();
 QEvt const * const e  = m_frontEvt; // always remove evt from the front
 
 if (e != nullptr) { // was the queue not empty?
+    Q_INVARIANT_INCRIT(412, QEvt::verify_(e));
+
+    // use a temporary variable to increment m_nFree
     QEQueueCtr const nFree = m_nFree + 1U;
     m_nFree = nFree;  // update the # free
 
@@ -3698,7 +3728,7 @@ if (e != nullptr) { // was the queue not empty?
         m_frontEvt = nullptr; // queue becomes empty
 
         // all entries in the queue must be free (+1 for fronEvt)
-        Q_ASSERT_INCRIT(410, nFree == (m_end + 1U));
+        Q_INVARIANT_INCRIT(420, nFree == (m_end + 1U));
 
         QS_BEGIN_PRE_(QS_QF_EQUEUE_GET_LAST, qsId)
             QS_TIME_PRE_();      // timestamp
@@ -4256,7 +4286,7 @@ return e;</code>
     <parameter name="e" type="QEvt const * const"/>
     <code>QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_INVARIANT_INCRIT(402, QEvt::verify_(e));
+Q_REQUIRE_INCRIT(400, QEvt::verify_(e));
 
 std::uint_fast8_t const poolNum = e-&gt;getPoolNum_();
 
@@ -4321,11 +4351,12 @@ Q_UNUSED_PAR(evtRef);
 QF_CRIT_STAT
 QF_CRIT_ENTRY();
 
-Q_INVARIANT_INCRIT(502, QEvt::verify_(e));
+Q_REQUIRE_INCRIT(500, QEvt::verify_(e));
 
 std::uint_fast8_t const poolNum = e-&gt;getPoolNum_();
+Q_UNUSED_PAR(poolNum); // might be unused
 
-Q_REQUIRE_INCRIT(500, (poolNum != 0U)
+Q_REQUIRE_INCRIT(501, (poolNum != 0U)
     &amp;&amp; (evtRef == nullptr));
 
 QEvt_refCtr_inc_(e); // increments the ref counter
@@ -4348,11 +4379,11 @@ return e;</code>
     <specifiers>noexcept</specifiers>
     <!--${QF::QF-dyn::deleteRef_::evtRef}-->
     <parameter name="evtRef" type="QEvt const * const"/>
-    <code>QEvt const * const e = evtRef;
-
-QF_CRIT_STAT
+    <code>QF_CRIT_STAT
 QF_CRIT_ENTRY();
-Q_INVARIANT_INCRIT(602, QEvt::verify_(e));
+
+QEvt const * const e = evtRef;
+Q_REQUIRE_INCRIT(600, QEvt::verify_(e));
 
 #ifdef Q_SPY
 std::uint_fast8_t const poolNum = e-&gt;getPoolNum_();
@@ -4370,7 +4401,7 @@ QS_MEM_APP();
 QF_CRIT_EXIT();
 
 #if (QF_MAX_EPOOL &gt; 0U)
-gc(evtRef); // recycle the referenced event
+gc(e); // recycle the referenced event
 #endif</code>
    </operation>
    <!--${QF::QF-dyn::q_new}-->
@@ -7698,14 +7729,14 @@ QS::tstPriv_.readySet.update_(&amp;QS::tstPriv_.readySet_dis);
     </operation>
     <!--${QS::QUTest-stub::QF::run}-->
     <operation name="run" type="int_t" visibility="0x00" properties="0x01">
-     <code>QS_CRIT_STAT
-QS_CRIT_ENTRY();
-QS_MEM_SYS();
-
-// function dictionaries for the standard API
+     <code>// function dictionaries for the standard API
 QS_FUN_DICTIONARY(&amp;QActive::post_);
 QS_FUN_DICTIONARY(&amp;QActive::postLIFO);
 QS_FUN_DICTIONARY(&amp;QS::processTestEvts_);
+
+QS_CRIT_STAT
+QS_CRIT_ENTRY();
+QS_MEM_SYS();
 
 // produce the QS_QF_RUN trace record
 QS_BEGIN_PRE_(QS_QF_RUN, 0U)
@@ -8016,14 +8047,15 @@ QS_BEGIN_PRE_(rec, m_prio)
     QS_EQC_PRE_(margin); // margin requested
 QS_END_PRE_()
 
+QF_MEM_APP();
+QF_CRIT_EXIT();
+
 // callback to examine the posted event under the same conditions
 // as producing the #QS_QF_ACTIVE_POST trace record, which are:
 // the local filter for this AO ('m_prio') is set
 if (QS_LOC_CHECK_(m_prio)) {
     QS::onTestPost(sender, this, e, status);
 }
-QF_MEM_APP();
-QF_CRIT_EXIT();
 
 // recycle the event immediately, because it was not really posted
 #if (QF_MAX_EPOOL &gt; 0U)
@@ -8063,15 +8095,15 @@ QS_BEGIN_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
     QS_EQC_PRE_(0U);     // min # free entries
 QS_END_PRE_()
 
+QF_MEM_APP();
+QF_CRIT_EXIT();
+
 // callback to examine the posted event under the same conditions
 // as producing the #QS_QF_ACTIVE_POST trace record, which are:
 // the local filter for this AO ('m_prio') is set
 if (QS_LOC_CHECK_(m_prio)) {
     QS::onTestPost(nullptr, this, e, true);
 }
-QF_MEM_APP();
-QF_CRIT_EXIT();
-
 // recycle the event immediately, because it was not really posted
 #if (QF_MAX_EPOOL &gt; 0U)
 QF::gc(e);
@@ -9383,6 +9415,14 @@ extern char const BUILD_TIME[9];
 //! @deprecated plain 'char' is no longer forbidden in MISRA/AUTOSAR-C++
 using char_t = char;
 
+//! @deprecated module name definition
+//! Use Q_THIS_MODULE(name_) ended with a semicolon ';'
+#define Q_DEFINE_THIS_MODULE(name_)  Q_THIS_MODULE(name_);
+
+//! @deprecated file name definition
+//! Use Q_THIS_FILE() ended with a semicolon ';'
+#define Q_DEFINE_THIS_FILE           Q_THIS_FILE();
+
 //! @deprecated assertion failure handler
 //! Use Q_onError() instead.
 #define Q_onAssert(module_, id_) Q_onError(module_, id_)
@@ -9589,7 +9629,7 @@ using char_t = char;
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qep_hsm&quot;)
+Q_THIS_MODULE(&quot;qep_hsm&quot;);
 
 // immutable events corresponding to the reserved signals.
 static QP::QEvt const l_reservedEvt_[4] {
@@ -9653,7 +9693,7 @@ $define ${QEP::QHsm}</text>
 // unnamed namespace for local definitions with internal linkage
 namespace {
 
-Q_DEFINE_THIS_MODULE(&quot;qep_msm&quot;)
+Q_THIS_MODULE(&quot;qep_msm&quot;);
 
 // maximum depth of state nesting in a QMsm (including the top level)
 static constexpr std::int_fast8_t MAX_NEST_DEPTH_ {6};
@@ -9695,7 +9735,7 @@ $define ${QEP::QMsm}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-//Q_DEFINE_THIS_MODULE(&quot;qf_act&quot;)
+//Q_THIS_MODULE(&quot;qf_act&quot;);
 } // unnamed namespace
 
 $define ${QF::QActive::registry_[QF_MAX_ACTIVE + 1U]}
@@ -9720,7 +9760,7 @@ $define ${QF::types::QF_LOG2}</text>
 //============================================================================
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qf_actq&quot;)
+Q_THIS_MODULE(&quot;qf_actq&quot;);
 } // unnamed namespace
 
 $define ${QF::QActive::post_}
@@ -9746,7 +9786,7 @@ $define ${QF::QTicker}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qf_defer&quot;)
+Q_THIS_MODULE(&quot;qf_defer&quot;);
 } // unnamed namespace
 
 $define ${QF::QActive::defer}
@@ -9772,7 +9812,7 @@ $define ${QF::QActive::flushDeferred}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qf_dyn&quot;)
+Q_THIS_MODULE(&quot;qf_dyn&quot;);
 } // unnamed namespace
 
 $define ${QF::QF-dyn}
@@ -9794,7 +9834,7 @@ $define ${QF::QF-dyn}
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qf_mem&quot;)
+Q_THIS_MODULE(&quot;qf_mem&quot;);
 } // unnamed namespace
 
 $define ${QF::QMPool}</text>
@@ -9814,7 +9854,7 @@ $define ${QF::QMPool}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qf_qact&quot;)
+Q_THIS_MODULE(&quot;qf_qact&quot;);
 } // unnamed namespace
 
 $define ${QF::QActive::QActive}
@@ -9838,7 +9878,7 @@ $define ${QF::QActive::unregister_}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-//Q_DEFINE_THIS_MODULE(&quot;qf_qmact&quot;)
+//Q_THIS_MODULE(&quot;qf_qmact&quot;);
 } // unnamed namespace
 
 $define ${QF::QMActive}</text>
@@ -9858,7 +9898,7 @@ $define ${QF::QMActive}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qf_qeq&quot;)
+Q_THIS_MODULE(&quot;qf_qeq&quot;);
 } // unnamed namespace
 
 $define ${QF::QEQueue}</text>
@@ -9878,7 +9918,7 @@ $define ${QF::QEQueue}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qf_ps&quot;)
+Q_THIS_MODULE(&quot;qf_ps&quot;);
 } // unnamed namespace
 
 $define ${QF::QActive::subscrList_}
@@ -9910,7 +9950,7 @@ $define ${QF::QActive::unsubscribeAll}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qf_time&quot;)
+Q_THIS_MODULE(&quot;qf_time&quot;);
 } // unnamed namespace
 
 $define ${QF::QTimeEvt}</text>
@@ -9938,7 +9978,7 @@ $define ${QF::QTimeEvt}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qv&quot;)
+Q_THIS_MODULE(&quot;qv&quot;);
 } // unnamed namespace
 
 $define ${QV::QV-base}
@@ -9970,7 +10010,7 @@ $define ${QV::QActive}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qk&quot;)
+Q_THIS_MODULE(&quot;qk&quot;);
 } // unnamed namespace
 
 $define ${QK::QK-base}
@@ -10006,7 +10046,7 @@ $define ${QK::QActive}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qxk&quot;)
+Q_THIS_MODULE(&quot;qxk&quot;);
 } // unnamed namespace
 
 $define ${QXK::QXK-base}
@@ -10039,7 +10079,7 @@ $define ${QXK::QActive}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qxk_mutex&quot;)
+Q_THIS_MODULE(&quot;qxk_mutex&quot;);
 } // unnamed namespace
 
 $define ${QXK::QXMutex}</text>
@@ -10064,7 +10104,7 @@ $define ${QXK::QXMutex}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qxk_sema&quot;)
+Q_THIS_MODULE(&quot;qxk_sema&quot;);
 } // unnamed namespace
 
 $define ${QXK::QXSemaphore}</text>
@@ -10089,7 +10129,7 @@ $define ${QXK::QXSemaphore}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qxk_xthr&quot;)
+Q_THIS_MODULE(&quot;qxk_xthr&quot;);
 } // unnamed namespace
 
 $define ${QXK::QXThread}</text>
@@ -10107,7 +10147,7 @@ $define ${QXK::QXThread}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qs&quot;)
+Q_THIS_MODULE(&quot;qs&quot;);
 } // unnamed namespace
 
 $define ${QS::QS-TX}
@@ -11187,7 +11227,7 @@ void f64_fmt_(
 
 namespace { // unnamed local namespace
 
-Q_DEFINE_THIS_MODULE(&quot;qs_rx&quot;)
+Q_THIS_MODULE(&quot;qs_rx&quot;);
 
 enum RxStateEnum : std::uint8_t {
     ERROR_STATE,
@@ -12355,7 +12395,7 @@ Q_NORETURN Q_onError(
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE(&quot;qutest&quot;)
+Q_THIS_MODULE(&quot;qutest&quot;);
 } // unnamed namespace
 
 namespace QP {

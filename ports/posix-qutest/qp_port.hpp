@@ -27,11 +27,11 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-07
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2024-06-10
+//! @version Last updated for: @ref qpc_7_4_0
 //!
 //! @file
-//! @brief QF/C++ port for QUTEST Windows/Linux/macOS, GNU or Visual C++
+//! @brief QP/C++ port for QUTEST Windows, generic C++11
 
 #ifndef QP_PORT_HPP_
 #define QP_PORT_HPP_
@@ -49,8 +49,8 @@
 #define QACTIVE_EQUEUE_TYPE  QEQueue
 
 // QF interrupt disable/enable
-#define QF_INT_DISABLE()     (++QP::QS::tstPriv_.intLock)
-#define QF_INT_ENABLE()      (--QP::QS::tstPriv_.intLock)
+#define QF_INT_DISABLE()     (QP::QS::onIntDisable())
+#define QF_INT_ENABLE()      (QP::QS::onIntEnable())
 
 // QF critical section
 #define QF_CRIT_STAT
@@ -64,6 +64,12 @@
 #include "qmpool.hpp"    // QUTest port uses QMPool memory-pool
 #include "qp.hpp"        // QP platform-independent public interface
 
+namespace QP {
+namespace QS {
+void onIntDisable();
+void onIntEnable();
+}
+}
 //============================================================================
 // interface used only inside QF implementation, but not in applications
 

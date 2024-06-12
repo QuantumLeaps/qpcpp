@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-01-03
-//! @version Last updated for: @ref qpc_7_3_2
+//! @date Last updated on: 2024-06-11
+//! @version Last updated for: @ref qpc_7_4_0
 //!
 //! @file
 //! @brief QF/C++ port to Zephyr RTOS kernel, all supported compilers
@@ -41,7 +41,7 @@
 
 namespace { // unnamed namespace
 
-Q_DEFINE_THIS_MODULE("qf_port")
+Q_THIS_MODULE("qf_port");
 
 //............................................................................
 static void thread_entry(void *p1, void *p2, void *p3) { // Zephyr signature

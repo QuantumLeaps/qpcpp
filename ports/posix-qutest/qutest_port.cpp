@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-02-16
-//! @version Last updated for: @ref qpcpp_7_3_3
+//! @date Last updated on: 2024-06-11
+//! @version Last updated for: @ref qpc_7_4_0
 //!
 //! @file
 //! @brief QS/C++ "port" to QUTest with POSIX
@@ -63,7 +63,7 @@
 
 namespace { // unnamed local namespace
 
-//Q_DEFINE_THIS_MODULE("qutest_port")
+Q_THIS_MODULE("qutest_port");
 
 // local variables ...........................................................
 static int l_sock = INVALID_SOCKET;
@@ -118,6 +118,8 @@ bool QS::onStartup(void const *arg) {
     if (*src == ':') {
         serviceName = src + 1;
     }
+    //printf("<TARGET> Connecting to QSPY on Host=%s:%s...\n",
+    //       hostName, serviceName);
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -208,8 +210,8 @@ void QS::onReset() {
 //............................................................................
 void QS::onFlush() {
     // NOTE:
-    // No critical section in QS_onFlush() to avoid nesting of critical sections
-    // in case QS_onFlush() is called from Q_onError().
+    // No critical section in QS::onFlush() to avoid nesting of critical sections
+    // in case QS::onFlush() is called from Q_onError().
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "<TARGET> ERROR   %s\n",
                   "invalid TCP socket");
@@ -249,18 +251,19 @@ void QS::onFlush() {
         nBytes = QS_TX_CHUNK;
     }
 }
+
 //............................................................................
 void QS::onTestLoop() {
     fd_set readSet;
     FD_ZERO(&readSet);
 
-    struct timeval timeout = {
-        (long)0, (long)(QS_TIMEOUT_MS * 1000)
-    };
-
     rxPriv_.inTestLoop = true;
     while (rxPriv_.inTestLoop) {
         FD_SET(l_sock, &readSet);
+
+        struct timeval timeout = {
+            (long)0, (long)(QS_TIMEOUT_MS * 1000)
+        };
 
         // selective, timed blocking on the TCP/IP socket...
         timeout.tv_usec = (long)(QS_TIMEOUT_MS * 1000);
@@ -286,6 +289,21 @@ void QS::onTestLoop() {
     // set inTestLoop to true in case calls to QS_onTestLoop() nest,
     // which can happen through the calls to QS_TEST_PAUSE().
     rxPriv_.inTestLoop = true;
+}
+
+//............................................................................
+void QS::onIntDisable(void) {
+    if (tstPriv_.intLock != 0U) {
+         Q_onError(&Q_this_module_[0], 998);
+    }
+    ++tstPriv_.intLock;
+}
+//............................................................................
+void QS::onIntEnable(void) {
+    --tstPriv_.intLock;
+    if (tstPriv_.intLock != 0U) {
+        Q_onError(&Q_this_module_[0], 999);
+    }
 }
 
 } // namespace QP

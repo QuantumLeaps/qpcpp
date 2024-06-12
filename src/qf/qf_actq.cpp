@@ -54,7 +54,7 @@
 //============================================================================
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE("qf_actq")
+Q_THIS_MODULE("qf_actq");
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -90,8 +90,10 @@ bool QActive::post_(
     QF_MEM_SYS();
 
     #ifndef Q_UNSAFE
+    Q_REQUIRE_INCRIT(100, QEvt::verify_(e));
+
     std::uint8_t const pcopy = static_cast<std::uint8_t>(~m_prio_dis);
-    Q_INVARIANT_INCRIT(102, (QEvt::verify_(e)) && (m_prio == pcopy));
+    Q_INVARIANT_INCRIT(102, m_prio == pcopy);
     #endif
 
     QEQueueCtr nFree = m_eQueue.m_nFree; // get volatile into temporary
@@ -147,7 +149,13 @@ bool QActive::post_(
         // as producing the #QS_QF_ACTIVE_POST trace record, which are:
         // the local filter for this AO ('m_prio') is set
         if (QS_LOC_CHECK_(m_prio)) {
+            QF_MEM_APP();
+            QF_CRIT_EXIT();
+
             QS::onTestPost(sender, this, e, status);
+
+            QF_CRIT_ENTRY();
+            QF_MEM_SYS();
         }
     #endif
 
@@ -196,7 +204,13 @@ bool QActive::post_(
         // as producing the #QS_QF_ACTIVE_POST trace record, which are:
         // the local filter for this AO ('m_prio') is set
         if (QS_LOC_CHECK_(m_prio)) {
+            QF_MEM_APP();
+            QF_CRIT_EXIT();
+
             QS::onTestPost(sender, this, e, status);
+
+            QF_CRIT_ENTRY();
+            QF_MEM_SYS();
         }
     #endif
 
@@ -233,8 +247,10 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_MEM_SYS();
 
     #ifndef Q_UNSAFE
+    Q_REQUIRE_INCRIT(200, QEvt::verify_(e));
+
     std::uint8_t const pcopy = static_cast<std::uint8_t>(~m_prio_dis);
-    Q_INVARIANT_INCRIT(202, (QEvt::verify_(e)) && (m_prio == pcopy));
+    Q_INVARIANT_INCRIT(202, m_prio == pcopy);
     #endif
 
     #ifdef QXK_HPP_
@@ -275,7 +291,13 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     // as producing the #QS_QF_ACTIVE_POST trace record, which are:
     // the local filter for this AO ('m_prio') is set
     if (QS_LOC_CHECK_(m_prio)) {
+        QF_MEM_APP();
+        QF_CRIT_EXIT();
+
         QS::onTestPost(nullptr, this, e, true);
+
+        QF_CRIT_ENTRY();
+        QF_MEM_SYS();
     }
     #endif
 
@@ -314,6 +336,8 @@ QEvt const * QActive::get_() noexcept {
 
     // always remove evt from the front
     QEvt const * const e = m_eQueue.m_frontEvt;
+    Q_INVARIANT_INCRIT(312, QEvt::verify_(e));
+
     QEQueueCtr const nFree = m_eQueue.m_nFree + 1U; // get volatile into tmp
     m_eQueue.m_nFree = nFree; // update the # free
 

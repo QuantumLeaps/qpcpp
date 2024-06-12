@@ -56,7 +56,7 @@
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE("qep_hsm")
+Q_THIS_MODULE("qep_hsm");
 
 // immutable events corresponding to the reserved signals.
 static QP::QEvt const l_reservedEvt_[4] {
@@ -254,9 +254,9 @@ void QHsm::dispatch(
     QF_CRIT_STAT
 
     QF_CRIT_ENTRY();
+    Q_REQUIRE_INCRIT(300, QEvt::verify_(e));
     Q_INVARIANT_INCRIT(302, (s != Q_STATE_CAST(0))
         && (m_state.uint == static_cast<std::uintptr_t>(~m_temp.uint)));
-    Q_INVARIANT_INCRIT(303, QEvt::verify_(e));
 
     QS_MEM_SYS();
     QS_BEGIN_PRE_(QS_QEP_DISPATCH, qsId)
@@ -506,6 +506,8 @@ QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
 
     #ifndef Q_UNSAFE
     m_temp.uint = ~m_state.uint;
+    #else
+    Q_UNUSED_PAR(isFound);
     #endif
 
     QF_CRIT_STAT
