@@ -1,7 +1,7 @@
 //============================================================================
 // Product: QUTEST port for Zephyr RTOS
-// Last updated for version 7.3.2
-// Last updated on  2023-12-13
+// Last updated for version 7.4.0
+// Last updated on  2024-06-11
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -46,7 +46,7 @@
 
 namespace {
 
-//Q_DEFINE_THIS_MODULE("qutest_port")
+//Q_THIS_MODULE("qutest_port");
 
 // select the Zephyr shell UART
 // NOTE: you can change this to other UART peripheral if desired

@@ -55,7 +55,7 @@
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE("qf_dyn")
+Q_THIS_MODULE("qf_dyn");
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -222,7 +222,7 @@ QEvt * newX_(
 void gc(QEvt const * const e) noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_INVARIANT_INCRIT(402, QEvt::verify_(e));
+    Q_REQUIRE_INCRIT(400, QEvt::verify_(e));
 
     std::uint_fast8_t const poolNum = e->getPoolNum_();
 
@@ -286,11 +286,12 @@ QEvt const * newRef_(
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    Q_INVARIANT_INCRIT(502, QEvt::verify_(e));
+    Q_REQUIRE_INCRIT(500, QEvt::verify_(e));
 
     std::uint_fast8_t const poolNum = e->getPoolNum_();
+    Q_UNUSED_PAR(poolNum); // might be unused
 
-    Q_REQUIRE_INCRIT(500, (poolNum != 0U)
+    Q_REQUIRE_INCRIT(501, (poolNum != 0U)
         && (evtRef == nullptr));
 
     QEvt_refCtr_inc_(e); // increments the ref counter
@@ -311,11 +312,11 @@ QEvt const * newRef_(
 
 //${QF::QF-dyn::deleteRef_} ..................................................
 void deleteRef_(QEvt const * const evtRef) noexcept {
-    QEvt const * const e = evtRef;
-
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_INVARIANT_INCRIT(602, QEvt::verify_(e));
+
+    QEvt const * const e = evtRef;
+    Q_REQUIRE_INCRIT(600, QEvt::verify_(e));
 
     #ifdef Q_SPY
     std::uint_fast8_t const poolNum = e->getPoolNum_();
@@ -333,7 +334,7 @@ void deleteRef_(QEvt const * const evtRef) noexcept {
     QF_CRIT_EXIT();
 
     #if (QF_MAX_EPOOL > 0U)
-    gc(evtRef); // recycle the referenced event
+    gc(e); // recycle the referenced event
     #endif
 }
 

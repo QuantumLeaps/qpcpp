@@ -154,7 +154,7 @@ Q_NORETURN Q_onError(
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE("qutest")
+Q_THIS_MODULE("qutest");
 } // unnamed namespace
 
 namespace QP {
@@ -212,14 +212,14 @@ void stop() {
 
 //${QS::QUTest-stub::QF::run} ................................................
 int_t run() {
-    QS_CRIT_STAT
-    QS_CRIT_ENTRY();
-    QS_MEM_SYS();
-
     // function dictionaries for the standard API
     QS_FUN_DICTIONARY(&QActive::post_);
     QS_FUN_DICTIONARY(&QActive::postLIFO);
     QS_FUN_DICTIONARY(&QS::processTestEvts_);
+
+    QS_CRIT_STAT
+    QS_CRIT_ENTRY();
+    QS_MEM_SYS();
 
     // produce the QS_QF_RUN trace record
     QS_BEGIN_PRE_(QS_QF_RUN, 0U)
@@ -522,14 +522,15 @@ bool QActiveDummy::fakePost(
         QS_EQC_PRE_(margin); // margin requested
     QS_END_PRE_()
 
+    QF_MEM_APP();
+    QF_CRIT_EXIT();
+
     // callback to examine the posted event under the same conditions
     // as producing the #QS_QF_ACTIVE_POST trace record, which are:
     // the local filter for this AO ('m_prio') is set
     if (QS_LOC_CHECK_(m_prio)) {
         QS::onTestPost(sender, this, e, status);
     }
-    QF_MEM_APP();
-    QF_CRIT_EXIT();
 
     // recycle the event immediately, because it was not really posted
     #if (QF_MAX_EPOOL > 0U)
@@ -567,15 +568,15 @@ void QActiveDummy::fakePostLIFO(QEvt const * const e) noexcept {
         QS_EQC_PRE_(0U);     // min # free entries
     QS_END_PRE_()
 
+    QF_MEM_APP();
+    QF_CRIT_EXIT();
+
     // callback to examine the posted event under the same conditions
     // as producing the #QS_QF_ACTIVE_POST trace record, which are:
     // the local filter for this AO ('m_prio') is set
     if (QS_LOC_CHECK_(m_prio)) {
         QS::onTestPost(nullptr, this, e, true);
     }
-    QF_MEM_APP();
-    QF_CRIT_EXIT();
-
     // recycle the event immediately, because it was not really posted
     #if (QF_MAX_EPOOL > 0U)
     QF::gc(e);

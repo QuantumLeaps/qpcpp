@@ -22,8 +22,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-02-16
-//! @version Last updated for: @ref qpcpp_7_3_3
+//! @date Last updated on: 2024-06-11
+//! @version Last updated for: @ref qpcpp_7_4_0
 //!
 //! @file
 //! @brief QF/C++ port to Win32 (multithreaded)
@@ -44,7 +44,7 @@
 
 namespace { // unnamed local namespace
 
-Q_DEFINE_THIS_MODULE("qf_port")
+Q_THIS_MODULE("qf_port");
 
 // Local objects =============================================================
 static CRITICAL_SECTION l_startupCritSect;

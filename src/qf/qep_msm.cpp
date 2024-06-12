@@ -57,7 +57,7 @@
 // unnamed namespace for local definitions with internal linkage
 namespace {
 
-Q_DEFINE_THIS_MODULE("qep_msm")
+Q_THIS_MODULE("qep_msm");
 
 // maximum depth of state nesting in a QMsm (including the top level)
 static constexpr std::int_fast8_t MAX_NEST_DEPTH_ {6};
@@ -177,9 +177,9 @@ void QMsm::dispatch(
 
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_INVARIANT_INCRIT(300, (s != nullptr)
+    Q_REQUIRE_INCRIT(300, QEvt::verify_(e));
+    Q_INVARIANT_INCRIT(302, (s != nullptr)
         && (m_state.uint == static_cast<std::uintptr_t>(~m_temp.uint)));
-    Q_INVARIANT_INCRIT(302, QEvt::verify_(e));
 
     QS_MEM_SYS();
     QS_BEGIN_PRE_(QS_QEP_DISPATCH, qsId)

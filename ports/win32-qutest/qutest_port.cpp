@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-11-30
-//! @version Last updated for: @ref qpcpp_7_3_3
+//! @date Last updated on: 2024-06-11
+//! @version Last updated for: @ref qpc_7_4_0
 //!
 //! @file
 //! @brief QUTEST port for Windows, GNU or Visual C++
@@ -57,11 +57,11 @@
 #define QS_TX_SIZE     (8*1024)
 #define QS_RX_SIZE     (2*1024)
 #define QS_TX_CHUNK    QS_TX_SIZE
-#define QS_TIMEOUT_MS  10
+#define QS_TIMEOUT_MS  10U
 
 namespace { // unnamed local namespace
 
-//Q_DEFINE_THIS_MODULE("qutest_port")
+Q_THIS_MODULE("qutest_port");
 
 // local variables ...........................................................
 static SOCKET l_sock = INVALID_SOCKET;
@@ -171,7 +171,6 @@ bool QS::onStartup(void const *arg) {
     sockopt_bool = TRUE;
     setsockopt(l_sock, SOL_SOCKET, SO_DONTLINGER,
                (const char *)&sockopt_bool, sizeof(sockopt_bool));
-
     //PRINTF_S("<TARGET> Connected to QSPY at Host=%s:%d\n",
     //       hostName, port_remote);
     onFlush();
@@ -198,10 +197,10 @@ void QS::onReset() {
     exit(0);
 }
 //............................................................................
-// NOTE:
-// No critical section in QS::onFlush() to avoid nesting of critical sections
-// in case QS::onFlush() is called from Q_onError().
 void QS::onFlush() {
+    // NOTE:
+    // No critical section in QS::onFlush() to avoid nesting of critical sections
+    // in case QS::onFlush() is called from Q_onError().
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "<TARGET> ERROR   %s\n",
                   "invalid TCP socket");
@@ -230,7 +229,6 @@ void QS::onFlush() {
             }
             else if (nSent < (int)nBytes) { // sent fewer than requested?
                 Sleep(QS_TIMEOUT_MS); // sleep for the timeout
-
                 // adjust the data and loop back to send() the rest
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
@@ -243,6 +241,7 @@ void QS::onFlush() {
         nBytes = QS_TX_CHUNK;
     }
 }
+
 //............................................................................
 void QS::onTestLoop() {
     fd_set readSet;
@@ -279,6 +278,21 @@ void QS::onTestLoop() {
     // set inTestLoop to true in case calls to QS_onTestLoop() nest,
     // which can happen through the calls to QS_TEST_PAUSE().
     rxPriv_.inTestLoop = true;
+}
+
+//............................................................................
+void QS::onIntDisable(void) {
+    if (tstPriv_.intLock != 0U) {
+         Q_onError(&Q_this_module_[0], 998);
+    }
+    ++tstPriv_.intLock;
+}
+//............................................................................
+void QS::onIntEnable(void) {
+    --tstPriv_.intLock;
+    if (tstPriv_.intLock != 0U) {
+        Q_onError(&Q_this_module_[0], 999);
+    }
 }
 
 } // namespace QP

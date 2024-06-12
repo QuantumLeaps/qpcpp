@@ -53,7 +53,7 @@
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_DEFINE_THIS_MODULE("qf_qeq")
+Q_THIS_MODULE("qf_qeq");
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -109,7 +109,7 @@ bool QEQueue::post(
     QF_CRIT_ENTRY();
     QF_MEM_SYS();
 
-    Q_REQUIRE_INCRIT(200, e != nullptr);
+    Q_REQUIRE_INCRIT(200,  QEvt::verify_(e));
 
     QEQueueCtr nFree = m_nFree; // get volatile into temporary
 
@@ -188,9 +188,10 @@ void QEQueue::postLIFO(
     QF_CRIT_ENTRY();
     QF_MEM_SYS();
 
-    QEQueueCtr nFree = m_nFree; // get volatile into temporary
+    Q_REQUIRE_INCRIT(300,  QEvt::verify_(e));
 
-    Q_REQUIRE_INCRIT(300, nFree != 0U);
+    QEQueueCtr nFree = m_nFree; // get volatile into temporary
+    Q_REQUIRE_INCRIT(301, nFree != 0U);
 
     if (e->getPoolNum_() != 0U) { // is it a mutable event?
         QEvt_refCtr_inc_(e); // increment the reference counter
@@ -239,6 +240,9 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
     QEvt const * const e  = m_frontEvt; // always remove evt from the front
 
     if (e != nullptr) { // was the queue not empty?
+        Q_INVARIANT_INCRIT(412, QEvt::verify_(e));
+
+        // use a temporary variable to increment m_nFree
         QEQueueCtr const nFree = m_nFree + 1U;
         m_nFree = nFree;  // update the # free
 
@@ -262,7 +266,7 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
             m_frontEvt = nullptr; // queue becomes empty
 
             // all entries in the queue must be free (+1 for fronEvt)
-            Q_ASSERT_INCRIT(410, nFree == (m_end + 1U));
+            Q_INVARIANT_INCRIT(420, nFree == (m_end + 1U));
 
             QS_BEGIN_PRE_(QS_QF_EQUEUE_GET_LAST, qsId)
                 QS_TIME_PRE_();      // timestamp
