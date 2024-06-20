@@ -2,7 +2,7 @@
 # see https://www.state-machine.com/qtools/qutest.html/qutest.html
 
 note('''
-This test group verifies the preemption scenarios
+This test group verifies the preemption tests
 in the QK preemptive kernel
 ''')
 
@@ -17,7 +17,7 @@ def on_reset():
 def Q_PRIO(prio, pthre):
     return prio | (pthre << 8)
 
-scenario("ao->ao->ao (NO PTS)")
+test("ao->ao->ao (NO PTS)")
 # given...
 current_obj(OBJ_AP, "pspecB")
 poke(0, 2, pack("<HHH", Q_PRIO(1,0), Q_PRIO(2,0), Q_PRIO(3,0)))
@@ -74,7 +74,7 @@ expect("@timestamp CONTEXT_SW ObjB::inst[0] NULL")
 expect("@timestamp Trg-Done QS_RX_EVENT")
 
 
-scenario("ao->ao->ao (PTS1)")
+test("ao->ao->ao (PTS1)")
 # given...
 current_obj(OBJ_AP, "pspecB")
 poke(0, 2, pack("<HHH", Q_PRIO(1,3), Q_PRIO(2,3), Q_PRIO(3,0)))
@@ -131,7 +131,7 @@ expect("@timestamp CONTEXT_SW ObjB::inst[0] NULL")
 expect("@timestamp Trg-Done QS_RX_EVENT")
 
 
-scenario("ao->ao->ao (PTS2)")
+test("ao->ao->ao (PTS2)")
 # given...
 current_obj(OBJ_AP, "pspecB")
 poke(0, 2, pack("<HHH", Q_PRIO(1,0), Q_PRIO(2,3), Q_PRIO(3,0)))

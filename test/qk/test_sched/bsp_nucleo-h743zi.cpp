@@ -41,7 +41,7 @@
 
 namespace {
 
-Q_THIS_FILE();
+Q_DEFINE_THIS_FILE
 
 #ifdef Q_SPY
 

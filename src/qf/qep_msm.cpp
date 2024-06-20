@@ -57,7 +57,7 @@
 // unnamed namespace for local definitions with internal linkage
 namespace {
 
-Q_THIS_MODULE("qep_msm");
+Q_DEFINE_THIS_MODULE("qep_msm")
 
 // maximum depth of state nesting in a QMsm (including the top level)
 static constexpr std::int_fast8_t MAX_NEST_DEPTH_ {6};

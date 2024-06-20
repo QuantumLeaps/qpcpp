@@ -72,14 +72,6 @@
 //! @deprecated plain 'char' is no longer forbidden in MISRA/AUTOSAR-C++
 using char_t = char;
 
-//! @deprecated module name definition
-//! Use Q_THIS_MODULE(name_) ended with a semicolon ';'
-#define Q_DEFINE_THIS_MODULE(name_)  Q_THIS_MODULE(name_);
-
-//! @deprecated file name definition
-//! Use Q_THIS_FILE() ended with a semicolon ';'
-#define Q_DEFINE_THIS_FILE           Q_THIS_FILE();
-
 //! @deprecated assertion failure handler
 //! Use Q_onError() instead.
 #define Q_onAssert(module_, id_) Q_onError(module_, id_)

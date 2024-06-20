@@ -61,7 +61,7 @@
 
 namespace { // unnamed local namespace
 
-Q_THIS_MODULE("qutest_port");
+Q_DEFINE_THIS_MODULE("qutest_port")
 
 // local variables ...........................................................
 static SOCKET l_sock = INVALID_SOCKET;

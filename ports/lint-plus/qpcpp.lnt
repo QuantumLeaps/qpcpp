@@ -47,8 +47,7 @@
 
 // AC++M16-3-2 function-like macro
 -esym(9026,
- Q_THIS_MODULE,
- Q_THIS_FILE,
+ Q_DEFINE_THIS_MODULE,
  Q_ASSERT_STATIC,
  Q_ASSERT,
  Q_ASSERT_ID,
@@ -78,7 +77,7 @@
 
 // MC++R10-0-6 unparenthesized macro parameter in definition of macro
 -esym(9022,
- Q_THIS_MODULE)
+ Q_DEFINE_THIS_MODULE)
 
 // definition of macro ends in semi-colon
 -esym(823,

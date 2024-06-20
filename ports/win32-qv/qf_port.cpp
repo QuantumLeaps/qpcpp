@@ -44,7 +44,7 @@
 
 namespace { // unnamed local namespace
 
-Q_THIS_MODULE("qf_port");
+Q_DEFINE_THIS_MODULE("qf_port")
 
 // Local objects =============================================================
 static DWORD l_tickMsec = 10U; // clock tick in msec (argument for Sleep())

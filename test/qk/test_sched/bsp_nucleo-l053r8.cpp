@@ -39,7 +39,7 @@
 
 namespace {
 
-Q_THIS_FILE();
+Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
 // LED pins available on the board (just one user LED LD2--Green on PA.5)

@@ -34,9 +34,10 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-Q_THIS_FILE();
-
 namespace {
+
+Q_DEFINE_THIS_FILE
+
 //============================================================================
 // AO ObjB
 enum { NUM_B = 3 };

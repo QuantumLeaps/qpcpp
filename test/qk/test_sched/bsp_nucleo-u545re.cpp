@@ -1,58 +1,70 @@
 //============================================================================
-// Product: BSP for system-testing of QXK kernel, NUCLEO-H743ZI board
-// Last updated for version 7.2.0
-// Last updated on  2022-12-25
+// Product: BSP for system-testing of QK kernel, NUCLEO-U545RE-Q board
+// Last updated for version 7.4.0
+// Last updated on  2024-06-24
 //
-//                    Q u a n t u m  L e a P s
-//                    ------------------------
-//                    Modern Embedded Software
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
 //
-// This program is open source software: you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// Alternatively, this program may be distributed and modified under the
-// terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GNU General Public License and are specifically designed for
-// licensees interested in retaining the proprietary status of their code.
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
 //
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <www.gnu.org/licenses>.
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // Contact information:
-// <www.state-machine.com/licensing>
+// <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-// STM32CubeH7 include files
-#include "stm32h7xx_hal.h"
-#include "stm32h7xx_nucleo_144.h"
+#include "stm32u545xx.h"  // CMSIS-compliant header file for the MCU used
 // add other drivers if necessary...
 
 namespace {
 
 Q_DEFINE_THIS_FILE
 
+// Local-scope defines -----------------------------------------------------
+// LED pins available on the board (just one user LED LD2--Green on PA.5)
+#define LD2_PIN  5U
+
+// Button pins available on the board (just one user Button B1 on PC.13)
+#define B1_PIN   13U
+
+// macros from STM32Cube LL:
+#define SET_BIT(REG, BIT)     ((REG) |= (BIT))
+#define CLEAR_BIT(REG, BIT)   ((REG) &= ~(BIT))
+#define READ_BIT(REG, BIT)    ((REG) & (BIT))
+#define CLEAR_REG(REG)        ((REG) = (0x0))
+#define WRITE_REG(REG, VAL)   ((REG) = (VAL))
+#define READ_REG(REG)         ((REG))
+#define MODIFY_REG(REG, CLEARMASK, SETMASK) \
+    WRITE_REG((REG), ((READ_REG(REG) & (~(CLEARMASK))) | (SETMASK)))
+
 #ifdef Q_SPY
+// QSpy source IDs
+static QP::QSpyId const l_SysTick_Handler = { 100U };
+static QP::QSpyId const l_test_ISR = { 101U };
 
-    // QSpy source IDs
-    static QP::QSpyId const l_SysTick_Handler = { 100U };
-    static QP::QSpyId const l_test_ISR = { 101U };
-
-    enum AppRecords { // application-specific trace records
-        CONTEXT_SW = QP::QS_USER1,
-        TRACE_MSG
-    };
+enum AppRecords { // application-specific trace records
+    CONTEXT_SW = QP::QS_USER1,
+    TRACE_MSG
+};
 
 #endif
 
@@ -64,102 +76,93 @@ extern "C" {
 //............................................................................
 void SysTick_Handler(void); // prototype
 void SysTick_Handler(void) {
-    QXK_ISR_ENTRY(); // inform QXK about entering an ISR
+    QK_ISR_ENTRY(); // inform QK kernel about entering an ISR
 
     QP::QTimeEvt::TICK_X(0U, &l_SysTick_Handler);
-    //the_Ticker0->TRIG(&l_SysTick_Handler);
 
-    QXK_ISR_EXIT();  // inform QXK about exiting an ISR
+    QK_ISR_EXIT();  // inform QK kernel about exiting an ISR
 }
 //............................................................................
 void EXTI0_IRQHandler(void); // prototype
 void EXTI0_IRQHandler(void) { // for testing, NOTE03
-    QXK_ISR_ENTRY(); // inform QXK about entering an ISR
+    QK_ISR_ENTRY(); // inform QXK kernel about entering an ISR
 
     // for testing...
     static QP::QEvt const t1(TEST1_SIG);
     QP::QF::PUBLISH(&t1, &l_test_ISR);
 
-    QXK_ISR_EXIT();  // inform QXK about exiting an ISR
+    QK_ISR_EXIT();  // inform QK kernel about exiting an ISR
 }
 
 } // extern "C"
 
 // BSP functions =============================================================
-// MPU setup for STM32H743ZI MCU
-static void STM32H743ZI_MPU_setup(void) {
-    // The following MPU configuration contains just a generic ROM
-    // region (with read-only access) and NULL-pointer protection region.
-    // Otherwise, the MPU will fall back on the background region (PRIVDEFENA).
-    //
-    static struct {
-        std::uint32_t rbar;
-        std::uint32_t rasr;
-    } const mpu_setup[] = {
 
-        { // region #0: Flash: base=0x0000'0000, size=512M=2^(28+1)
-          0x00000000U                       // base address
-              | MPU_RBAR_VALID_Msk          // valid region
-              | (MPU_RBAR_REGION_Msk & 0U), // region #0
-          (28U << MPU_RASR_SIZE_Pos)        // 2^(18+1) region
-              | (0x6U << MPU_RASR_AP_Pos)   // PA:ro/UA:ro
-              | (1U << MPU_RASR_C_Pos)      // C=1
-              | MPU_RASR_ENABLE_Msk         // region enable
-        },
+static void STM32U545RE_MPU_setup(void) {
+    MPU->CTRL = 0U;  // disable the MPU
 
-        { // region #7: NULL-pointer: base=0x000'0000, size=128M=2^(26+1)
-          // NOTE: this region extends to  0x080'0000, which is where
-          // the ROM is re-mapped by STM32
-          //
-          0x00000000U                       // base address
-              | MPU_RBAR_VALID_Msk          // valid region
-              | (MPU_RBAR_REGION_Msk & 7U), // region #7
-          (26U << MPU_RASR_SIZE_Pos)        // 2^(26+1)=128M region
-              | (0x0U << MPU_RASR_AP_Pos)   // PA:na/UA:na
-              | (1U << MPU_RASR_XN_Pos)     // XN=1
-              | MPU_RASR_ENABLE_Msk         // region enable
-        },
-    };
+    MPU->RNR = 0U; // region 0 (for ROM)
+    MPU->RBAR = (0x08000000U & MPU_RBAR_BASE_Msk)  | (0x3U << MPU_RBAR_AP_Pos);
+    MPU->RLAR = (0x08080000U & MPU_RLAR_LIMIT_Msk) | MPU_RLAR_EN_Msk;
 
-    // enable the MemManage_Handler for MPU exception
+    MPU->RNR  = 7U; // region 7 (for NULL pointer protection)
+    MPU->RBAR = (0x00000000U & MPU_RBAR_BASE_Msk)  | MPU_RBAR_XN_Msk;
+    MPU->RLAR = (0x00080000U & MPU_RLAR_LIMIT_Msk) | MPU_RLAR_EN_Msk;
+    __DMB();
+
+    MPU->CTRL = MPU_CTRL_ENABLE_Msk | MPU_CTRL_PRIVDEFENA_Msk;
+
     SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
 
     __DSB();
-    MPU->CTRL = 0U; // disable the MPU */
-    for (std::uint_fast8_t n = 0U; n < Q_DIM(mpu_setup); ++n) {
-        MPU->RBAR = mpu_setup[n].rbar;
-        MPU->RASR = mpu_setup[n].rasr;
-    }
-    MPU->CTRL = MPU_CTRL_ENABLE_Msk         // enable the MPU */
-                | MPU_CTRL_PRIVDEFENA_Msk;  // enable background region */
     __ISB();
-    __DSB();
 }
 //............................................................................
 void BSP::init(void) {
     // setup the MPU...
-    STM32H743ZI_MPU_setup();
+    STM32U545RE_MPU_setup();
 
-    // NOTE: SystemInit() already called from the startup code
-    //  but SystemCoreClock needs to be updated
-    //
+    // initialize I-CACHE
+    MODIFY_REG(ICACHE->CR, ICACHE_CR_WAYSEL, 0U); // 1-way
+    SET_BIT(ICACHE->CR, ICACHE_CR_EN); // enable
+
+    // flash prefetch buffer enable
+    SET_BIT(FLASH->ACR, FLASH_ACR_PRFTEN);
+
+    // enable PWR clock interface
+    SET_BIT(RCC->AHB3ENR, RCC_AHB3ENR_PWREN);
+
+    // NOTE: SystemInit() has been already called from the startup code
+    // but SystemCoreClock needs to be updated
     SystemCoreClockUpdate();
 
-    SCB_EnableICache(); // Enable I-Cache
-    SCB_EnableDCache(); // Enable D-Cache
+    // enable GPIOA clock port for the LED LD4
+    RCC->AHB2ENR1 |= RCC_AHB2ENR1_GPIOAEN;
 
-    // Configure Flash prefetch and Instr. cache through ART accelerator
-#if (ART_ACCLERATOR_ENABLE != 0)
-    __HAL_FLASH_ART_ENABLE();
-#endif // ART_ACCLERATOR_ENABLE
+    // set all used GPIOA pins as push-pull output, no pull-up, pull-down
+    MODIFY_REG(GPIOA->OSPEEDR,
+               GPIO_OSPEEDR_OSPEED0 << (LD2_PIN * GPIO_OSPEEDR_OSPEED1_Pos),
+               1U << (LD2_PIN * GPIO_OSPEEDR_OSPEED1_Pos)); // speed==1
+    MODIFY_REG(GPIOA->OTYPER,
+               1U << LD2_PIN,
+               0U << LD2_PIN); // output
+    MODIFY_REG(GPIOA->PUPDR,
+               GPIO_PUPDR_PUPD0 << (LD2_PIN * GPIO_PUPDR_PUPD1_Pos),
+               0U << (LD2_PIN * GPIO_PUPDR_PUPD1_Pos)); // PUSHPULL
+     MODIFY_REG(GPIOA->MODER,
+               GPIO_MODER_MODE0 << (LD2_PIN * GPIO_MODER_MODE1_Pos),
+               1U << (LD2_PIN * GPIO_MODER_MODE1_Pos)); // MODE_1
 
-    // Configure the LEDs
-    BSP_LED_Init(LED1);
-    BSP_LED_Init(LED2);
-    BSP_LED_Init(LED3);
+    // enable GPIOC clock port for the Button B1
+    RCC->AHB2ENR1 |=  RCC_AHB2ENR1_GPIOCEN;
 
-    // Configure the User Button in GPIO Mode
-    BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
+    // configure Button B1 pin on GPIOC as input, no pull-up, pull-down
+    MODIFY_REG(GPIOC->PUPDR,
+               GPIO_PUPDR_PUPD0 << (B1_PIN * GPIO_PUPDR_PUPD1_Pos),
+               0U << (B1_PIN * GPIO_PUPDR_PUPD1_Pos)); // NO PULL
+    MODIFY_REG(GPIOC->MODER,
+               GPIO_MODER_MODE0 << (B1_PIN * GPIO_MODER_MODE1_Pos),
+               0U << (B1_PIN * GPIO_MODER_MODE1_Pos)); // MODE_0
 
     // initialize the QS software tracing...
     if (!QS_INIT(nullptr)) { // initialize the QS software tracing
@@ -179,11 +182,11 @@ void BSP::terminate(int16_t result) {
 }
 //............................................................................
 void BSP::ledOn(void) {
-    BSP_LED_On(LED1);
+    GPIOA->BSRR = (1U << LD2_PIN);  // turn LED on
 }
 //............................................................................
 void BSP::ledOff(void) {
-    BSP_LED_Off(LED1);
+    GPIOA->BRR = (1U << LD2_PIN);  // turn LED off
 }
 //............................................................................
 void BSP::trigISR(void) {
@@ -200,14 +203,14 @@ void BSP::trace(QP::QActive const *thr, char const *msg) {
 uint32_t BSP::romRead(int32_t offset, uint32_t fromEnd) {
     int32_t const rom_base = (fromEnd == 0U)
                              ? 0x08000000
-                             : 0x08200000 - 4;
+                             : 0x08080000 - 4;
     return *(uint32_t volatile *)(rom_base + offset);
 }
 //............................................................................
 void BSP::romWrite(int32_t offset, uint32_t fromEnd, uint32_t value) {
     int32_t const rom_base = (fromEnd == 0U)
                              ? 0x08000000
-                             : 0x08200000 - 4;
+                             : 0x08080000 - 4;
     *(uint32_t volatile *)(rom_base + offset) = value;
 }
 
@@ -215,14 +218,14 @@ void BSP::romWrite(int32_t offset, uint32_t fromEnd, uint32_t value) {
 uint32_t BSP::ramRead(int32_t offset, uint32_t fromEnd) {
     int32_t const ram_base = (fromEnd == 0U)
                              ? 0x20000000
-                             : 0x20020000 - 4;
+                             : 0x20040000 - 4;
     return *(uint32_t volatile *)(ram_base + offset);
 }
 //............................................................................
 void BSP::ramWrite(int32_t offset, uint32_t fromEnd, uint32_t value) {
     int32_t const ram_base = (fromEnd == 0U)
                              ? 0x20000000
-                             : 0x20020000 - 4;
+                             : 0x20040000 - 4;
     *(uint32_t volatile *)(ram_base + offset) = value;
 }
 
@@ -231,16 +234,21 @@ namespace QP {
 
 // QF callbacks --------------------------------------------------------------
 void QF::onStartup(void) {
+    // NOTE: SystemInit() has been already called from the startup code
+    // but SystemCoreClock needs to be updated
+    SystemCoreClockUpdate();
+
     //NOTE: don't start ticking for these tests
     //SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
 
     // assign all priority bits for preemption-prio. and none to sub-prio.
+    // NOTE: this might have been changed by STM32Cube.
     NVIC_SetPriorityGrouping(0U);
 
     // set priorities of ALL ISRs used in the system
-    NVIC_SetPriority(USART2_IRQn, 0U);
     NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 0U);
-    NVIC_SetPriority(EXTI0_IRQn, QF_AWARE_ISR_CMSIS_PRI + 1U);
+    NVIC_SetPriority(EXTI0_IRQn,   QF_AWARE_ISR_CMSIS_PRI + 1U);
+    // NOTE: priority of UART IRQ used for QS-RX is set in qutest_port.c
     // ...
 
     // enable IRQs...
@@ -250,7 +258,7 @@ void QF::onStartup(void) {
 void QF::onCleanup(void) {
 }
 //............................................................................
-void QXK::onIdle(void) {
+void QK::onIdle(void) {
 #ifdef Q_SPY
     QS::rxParse();  // parse all the received bytes
     QS::doOutput();

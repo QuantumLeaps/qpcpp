@@ -58,7 +58,7 @@
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE("qxk_sema");
+Q_DEFINE_THIS_MODULE("qxk_sema")
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

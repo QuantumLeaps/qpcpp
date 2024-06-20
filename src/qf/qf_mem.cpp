@@ -53,7 +53,7 @@
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE("qf_mem");
+Q_DEFINE_THIS_MODULE("qf_mem")
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

@@ -154,7 +154,7 @@ Q_NORETURN Q_onError(
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE("qutest");
+Q_DEFINE_THIS_MODULE("qutest")
 } // unnamed namespace
 
 namespace QP {

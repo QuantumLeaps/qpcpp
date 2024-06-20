@@ -64,9 +64,9 @@ extern "C" {
 
 //$declare${QP-FuSa::enabled} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-//${QP-FuSa::enabled::Q_THIS_MODULE} .........................................
-#define Q_THIS_MODULE(name_) \
-    static char const Q_this_module_[] = name_
+//${QP-FuSa::enabled::Q_DEFINE_THIS_MODULE} ..................................
+#define Q_DEFINE_THIS_MODULE(name_) \
+    static char const Q_this_module_[] = name_;
 
 //${QP-FuSa::enabled::Q_ASSERT_INCRIT} .......................................
 #define Q_ASSERT_INCRIT(id_, expr_)  \
@@ -97,8 +97,8 @@ extern "C" {
 #else
 //$declare${QP-FuSa::disabled} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-//${QP-FuSa::disabled::Q_THIS_MODULE} ........................................
-#define Q_THIS_MODULE(name_) extern char Q_this_module_
+//${QP-FuSa::disabled::Q_DEFINE_THIS_MODULE} .................................
+#define Q_DEFINE_THIS_MODULE(name_)
 
 //${QP-FuSa::disabled::Q_ASSERT_INCRIT} ......................................
 #define Q_ASSERT_INCRIT(id_, expr_) ((void)0)
@@ -117,8 +117,8 @@ extern "C" {
 //============================================================================
 //$declare1${QP-FuSa} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-//${QP-FuSa::Q_THIS_FILE} ....................................................
-#define Q_THIS_FILE() Q_THIS_MODULE(__FILE__)
+//${QP-FuSa::Q_DEFINE_THIS_FILE} .............................................
+#define Q_DEFINE_THIS_FILE Q_DEFINE_THIS_MODULE(__FILE__)
 
 //${QP-FuSa::Q_ASSERT} .......................................................
 #define Q_ASSERT(expr_) Q_ASSERT_ID(__LINE__, (expr_))

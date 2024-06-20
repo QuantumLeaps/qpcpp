@@ -9415,14 +9415,6 @@ extern char const BUILD_TIME[9];
 //! @deprecated plain 'char' is no longer forbidden in MISRA/AUTOSAR-C++
 using char_t = char;
 
-//! @deprecated module name definition
-//! Use Q_THIS_MODULE(name_) ended with a semicolon ';'
-#define Q_DEFINE_THIS_MODULE(name_)  Q_THIS_MODULE(name_);
-
-//! @deprecated file name definition
-//! Use Q_THIS_FILE() ended with a semicolon ';'
-#define Q_DEFINE_THIS_FILE           Q_THIS_FILE();
-
 //! @deprecated assertion failure handler
 //! Use Q_onError() instead.
 #define Q_onAssert(module_, id_) Q_onError(module_, id_)
@@ -9629,7 +9621,7 @@ using char_t = char;
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qep_hsm&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qep_hsm&quot;)
 
 // immutable events corresponding to the reserved signals.
 static QP::QEvt const l_reservedEvt_[4] {
@@ -9693,7 +9685,7 @@ $define ${QEP::QHsm}</text>
 // unnamed namespace for local definitions with internal linkage
 namespace {
 
-Q_THIS_MODULE(&quot;qep_msm&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qep_msm&quot;)
 
 // maximum depth of state nesting in a QMsm (including the top level)
 static constexpr std::int_fast8_t MAX_NEST_DEPTH_ {6};
@@ -9735,7 +9727,7 @@ $define ${QEP::QMsm}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-//Q_THIS_MODULE(&quot;qf_act&quot;);
+//Q_DEFINE_THIS_MODULE(&quot;qf_act&quot;)
 } // unnamed namespace
 
 $define ${QF::QActive::registry_[QF_MAX_ACTIVE + 1U]}
@@ -9760,7 +9752,7 @@ $define ${QF::types::QF_LOG2}</text>
 //============================================================================
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qf_actq&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qf_actq&quot;)
 } // unnamed namespace
 
 $define ${QF::QActive::post_}
@@ -9786,7 +9778,7 @@ $define ${QF::QTicker}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qf_defer&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qf_defer&quot;)
 } // unnamed namespace
 
 $define ${QF::QActive::defer}
@@ -9812,7 +9804,7 @@ $define ${QF::QActive::flushDeferred}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qf_dyn&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qf_dyn&quot;)
 } // unnamed namespace
 
 $define ${QF::QF-dyn}
@@ -9834,7 +9826,7 @@ $define ${QF::QF-dyn}
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qf_mem&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qf_mem&quot;)
 } // unnamed namespace
 
 $define ${QF::QMPool}</text>
@@ -9854,7 +9846,7 @@ $define ${QF::QMPool}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qf_qact&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qf_qact&quot;)
 } // unnamed namespace
 
 $define ${QF::QActive::QActive}
@@ -9878,7 +9870,7 @@ $define ${QF::QActive::unregister_}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-//Q_THIS_MODULE(&quot;qf_qmact&quot;);
+//Q_DEFINE_THIS_MODULE(&quot;qf_qmact&quot;)
 } // unnamed namespace
 
 $define ${QF::QMActive}</text>
@@ -9898,7 +9890,7 @@ $define ${QF::QMActive}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qf_qeq&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qf_qeq&quot;)
 } // unnamed namespace
 
 $define ${QF::QEQueue}</text>
@@ -9918,7 +9910,7 @@ $define ${QF::QEQueue}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qf_ps&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qf_ps&quot;)
 } // unnamed namespace
 
 $define ${QF::QActive::subscrList_}
@@ -9950,7 +9942,7 @@ $define ${QF::QActive::unsubscribeAll}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qf_time&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qf_time&quot;)
 } // unnamed namespace
 
 $define ${QF::QTimeEvt}</text>
@@ -9978,7 +9970,7 @@ $define ${QF::QTimeEvt}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qv&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qv&quot;)
 } // unnamed namespace
 
 $define ${QV::QV-base}
@@ -10010,7 +10002,7 @@ $define ${QV::QActive}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qk&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qk&quot;)
 } // unnamed namespace
 
 $define ${QK::QK-base}
@@ -10046,7 +10038,7 @@ $define ${QK::QActive}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qxk&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qxk&quot;)
 } // unnamed namespace
 
 $define ${QXK::QXK-base}
@@ -10079,7 +10071,7 @@ $define ${QXK::QActive}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qxk_mutex&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qxk_mutex&quot;)
 } // unnamed namespace
 
 $define ${QXK::QXMutex}</text>
@@ -10104,7 +10096,7 @@ $define ${QXK::QXMutex}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qxk_sema&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qxk_sema&quot;)
 } // unnamed namespace
 
 $define ${QXK::QXSemaphore}</text>
@@ -10129,7 +10121,7 @@ $define ${QXK::QXSemaphore}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qxk_xthr&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qxk_xthr&quot;)
 } // unnamed namespace
 
 $define ${QXK::QXThread}</text>
@@ -10147,7 +10139,7 @@ $define ${QXK::QXThread}</text>
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qs&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qs&quot;)
 } // unnamed namespace
 
 $define ${QS::QS-TX}
@@ -11227,7 +11219,7 @@ void f64_fmt_(
 
 namespace { // unnamed local namespace
 
-Q_THIS_MODULE(&quot;qs_rx&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qs_rx&quot;)
 
 enum RxStateEnum : std::uint8_t {
     ERROR_STATE,
@@ -12395,7 +12387,7 @@ Q_NORETURN Q_onError(
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE(&quot;qutest&quot;);
+Q_DEFINE_THIS_MODULE(&quot;qutest&quot;)
 } // unnamed namespace
 
 namespace QP {

@@ -53,7 +53,7 @@
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-Q_THIS_MODULE("qf_defer");
+Q_DEFINE_THIS_MODULE("qf_defer")
 } // unnamed namespace
 
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

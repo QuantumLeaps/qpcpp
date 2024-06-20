@@ -41,7 +41,7 @@
 
 namespace { // unnamed namespace
 
-Q_THIS_MODULE("qf_port");
+Q_DEFINE_THIS_MODULE("qf_port")
 
 //............................................................................
 static void thread_entry(void *p1, void *p2, void *p3) { // Zephyr signature

@@ -51,7 +51,7 @@
 
 namespace { // unnamed local namespace
 
-Q_THIS_MODULE("qs_rx");
+Q_DEFINE_THIS_MODULE("qs_rx")
 
 enum RxStateEnum : std::uint8_t {
     ERROR_STATE,

@@ -56,7 +56,7 @@
 //============================================================================
 namespace { // anonymous namespace with local definitions
 
-Q_THIS_MODULE("qf_port");
+Q_DEFINE_THIS_MODULE("qf_port")
 
 //............................................................................
 static void thread_function(void *pVoid); // prototype

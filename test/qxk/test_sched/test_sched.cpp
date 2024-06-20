@@ -1,7 +1,7 @@
 //============================================================================
 // Product: System test fixture for QXK on the EFM32 target
-// Last updated for version 7.2.0
-// Last updated on  2022-12-14
+// Last updated for version 7.4.0
+// Last updated on  2024-06-21
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -34,9 +34,10 @@
 #include "qpcpp.hpp"
 #include "bsp.hpp"
 
-Q_THIS_FILE();
-
 namespace {
+
+Q_DEFINE_THIS_FILE
+
 //============================================================================
 // AO ObjB
 enum { NUM_B = 3 };

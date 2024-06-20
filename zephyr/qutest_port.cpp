@@ -46,7 +46,7 @@
 
 namespace {
 
-//Q_THIS_MODULE("qutest_port");
+//Q_DEFINE_THIS_MODULE("qutest_port")
 
 // select the Zephyr shell UART
 // NOTE: you can change this to other UART peripheral if desired

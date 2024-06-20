@@ -42,7 +42,7 @@
 
 namespace {
 
-Q_THIS_FILE();
+Q_DEFINE_THIS_FILE
 
 // Local-scope objects -------------------------------------------------------
 #define LED_PORT    gpioPortF
