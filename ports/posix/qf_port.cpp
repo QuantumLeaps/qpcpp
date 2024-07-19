@@ -22,7 +22,7 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-06-11
+//! @date Last updated on: 2024-07-18
 //! @version Last updated for: @ref qpcpp_7_4_0
 //!
 //! @file
@@ -80,6 +80,44 @@ static void *ao_thread(void *arg) { // thread routine for all AOs
     return nullptr; // return success
 }
 
+//----------------------------------------------------------------------------
+#ifdef __APPLE__
+
+constexpr int TIMER_ABSTIME {0};
+
+// emulate clock_nanosleep() for CLOCK_MONOTONIC and TIMER_ABSTIME
+static inline int clock_nanosleep(clockid_t clockid, int flags,
+    const struct timespec* t,
+    struct timespec* remain)
+{
+    Q_UNUSED_PAR(clockid);
+    Q_UNUSED_PAR(flags);
+    Q_UNUSED_PAR(remain);
+
+    struct timespec ts_delta;
+    clock_gettime(CLOCK_MONOTONIC, &ts_delta);
+
+    ts_delta.tv_sec  = t->tv_sec  - ts_delta.tv_sec;
+    ts_delta.tv_nsec = t->tv_nsec - ts_delta.tv_nsec;
+    if (ts_delta.tv_sec < 0) {
+        ts_delta.tv_sec = 0;
+        ts_delta.tv_nsec = 0;
+    }
+    else if (ts_delta.tv_nsec < 0) {
+        if (ts_delta.tv_sec == 0) {
+            ts_delta.tv_sec = 0;
+            ts_delta.tv_nsec = 0;
+        }
+        else {
+            ts_delta.tv_sec = ts_delta.tv_sec - 1;
+            ts_delta.tv_nsec = ts_delta.tv_nsec + NSEC_PER_SEC;
+        }
+    }
+
+    return nanosleep(&ts_delta, NULL);
+}
+#endif
+
 } // unnamed local namespace
 
 //============================================================================
@@ -95,12 +133,12 @@ int_t critSectNest_;
 //............................................................................
 void enterCriticalSection_() {
     pthread_mutex_lock(&critSectMutex_);
-    Q_ASSERT_INCRIT(100, critSectNest_ == 0); // NO nesting of crit.sect!
+    Q_ASSERT_INCRIT(101, critSectNest_ == 0); // NO nesting of crit.sect!
     ++critSectNest_;
 }
 //............................................................................
 void leaveCriticalSection_() {
-    Q_ASSERT_INCRIT(200, critSectNest_ == 1); // crit.sect. must ballace!
+    Q_ASSERT_INCRIT(102, critSectNest_ == 1); // crit.sect. must balance!
     if ((--critSectNest_) == 0) {
         pthread_mutex_unlock(&critSectMutex_);
     }
@@ -252,7 +290,7 @@ int consoleWaitForKey() {
 
 } // namespace QF
 
-//============================================================================
+// QActive functions =========================================================
 void QActive::evtLoop_(QActive *act) {
     // block this thread until the startup mutex is unlocked from QF::run()
     pthread_mutex_lock(&l_startupMutex);
@@ -338,7 +376,6 @@ void QActive::start(QPrioSpec const prioSpec,
 
     pthread_attr_destroy(&attr);
 }
-
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {
