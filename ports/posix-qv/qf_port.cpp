@@ -22,7 +22,7 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-06-11
+//! @date Last updated on: 2024-07-18
 //! @version Last updated for: @ref qpcpp_7_4_0
 //!
 //! @file
@@ -65,7 +65,45 @@ static int_t l_tickPrio;       // priority of the ticker thread
 constexpr long NSEC_PER_SEC {1000000000L};
 constexpr long DEFAULT_TICKS_PER_SEC {100L};
 
-//============================================================================
+//----------------------------------------------------------------------------
+#ifdef __APPLE__
+
+constexpr int TIMER_ABSTIME {0};
+
+// emulate clock_nanosleep() for CLOCK_MONOTONIC and TIMER_ABSTIME
+static inline int clock_nanosleep(clockid_t clockid, int flags,
+    const struct timespec* t,
+    struct timespec* remain)
+{
+    Q_UNUSED_PAR(clockid);
+    Q_UNUSED_PAR(flags);
+    Q_UNUSED_PAR(remain);
+
+    struct timespec ts_delta;
+    clock_gettime(CLOCK_MONOTONIC, &ts_delta);
+
+    ts_delta.tv_sec  = t->tv_sec  - ts_delta.tv_sec;
+    ts_delta.tv_nsec = t->tv_nsec - ts_delta.tv_nsec;
+    if (ts_delta.tv_sec < 0) {
+        ts_delta.tv_sec = 0;
+        ts_delta.tv_nsec = 0;
+    }
+    else if (ts_delta.tv_nsec < 0) {
+        if (ts_delta.tv_sec == 0) {
+            ts_delta.tv_sec = 0;
+            ts_delta.tv_nsec = 0;
+        }
+        else {
+            ts_delta.tv_sec = ts_delta.tv_sec - 1;
+            ts_delta.tv_nsec = ts_delta.tv_nsec + NSEC_PER_SEC;
+        }
+    }
+
+    return nanosleep(&ts_delta, NULL);
+}
+#endif
+
+//----------------------------------------------------------------------------
 static void *ticker_thread(void *arg); // prototype
 static void *ticker_thread(void *arg) { // for pthread_create()
     Q_UNUSED_PAR(arg);
@@ -130,14 +168,14 @@ static int_t l_critSectNest;   // critical section nesting up-down counter
 void enterCriticalSection_() {
     if (l_isRunning) {
         pthread_mutex_lock(&l_critSectMutex_);
-        Q_ASSERT_INCRIT(100, l_critSectNest == 0); // NO nesting of crit.sect!
+        Q_ASSERT_INCRIT(101, l_critSectNest == 0); // NO nesting of crit.sect!
         ++l_critSectNest;
     }
 }
 //............................................................................
 void leaveCriticalSection_() {
     if (l_isRunning) {
-        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect. must ballace!
+        Q_ASSERT_INCRIT(102, l_critSectNest == 1); // crit.sect. must balance!
         if ((--l_critSectNest) == 0) {
             pthread_mutex_unlock(&l_critSectMutex_);
         }
@@ -359,7 +397,6 @@ void QActive::start(QPrioSpec const prioSpec,
     this->init(par, m_prio);
     QS_FLUSH(); // flush the trace buffer to the host
 }
-
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {

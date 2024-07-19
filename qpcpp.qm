@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="6.1.1" links="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.state-machine.com/qm/qm.xsd">
+<model version="6.2.0" links="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.state-machine.com/qm/qm.xsd">
  <documentation>QP/C++ Real-Time Embedded Framework (RTEF)
 The model is used to generate the whole QP/C++ source code.
 
@@ -25,7 +25,38 @@ Contact information:
 &lt;www.state-machine.com/licensing&gt;
 &lt;info@state-machine.com&gt;</documentation>
  <!--${qpcpp}-->
- <framework name="qpcpp" license="LICENSES/LicenseRef-QL-dual.qlc"/>
+ <framework name="qpcpp">
+  <license name="LicenseRef-QL-dual">Any user of the QP/C++ real-time embedded framework
+qpcpp
+2025-12-31
+
+Copyright (C) 2005 Quantum Leaps, LLC &lt;state-machine.com&gt;.
+
+                   Q u a n t u m  L e a P s
+                   ------------------------
+                   Modern Embedded Software
+
+SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+
+This software is dual-licensed under the terms of the open source GNU
+General Public License version 3 (or any later version), or alternatively,
+under the terms of one of the closed source Quantum Leaps commercial
+licenses.
+
+The terms of the open source GNU General Public License version 3
+can be found at: &lt;www.gnu.org/licenses/gpl-3.0&gt;
+
+The terms of the closed source Quantum Leaps commercial licenses
+can be found at: &lt;www.state-machine.com/licensing&gt;
+
+Redistributions in source code must retain this top-level comment block.
+Plagiarizing this software to sidestep the license obligations is illegal.
+
+Contact information:
+&lt;www.state-machine.com/licensing&gt;
+&lt;info@state-machine.com&gt;
+#CEF384A62BD9270573AA82386A5BE6F6E36AD848</license>
+ </framework>
  <!--${glob-types}-->
  <package name="glob-types" stereotype="0x00">
   <!--${glob-types::int_t}-->
@@ -2193,7 +2224,7 @@ if (margin == QF::NO_MARGIN) {
     }
     else {
         status = false; // cannot post
-        Q_ERROR_INCRIT(190); // must be able to post the event
+        Q_ERROR_INCRIT(110); // must be able to post the event
     }
 }
 else if (nFree &gt; static_cast&lt;QEQueueCtr&gt;(margin)) {

@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-12-13
-//! @version Last updated for: @ref qpcpp_7_3_2
+//! @date Last updated on: 2024-07-18
+//! @version Last updated for: @ref qpcpp_7_4_0
 //!
 //! @file
 //! @brief QS/C++ port to POSIX
@@ -237,7 +237,7 @@ void QS::onFlush() {
 //............................................................................
 QSTimeCtr QS::onGetTime() {
     struct timespec tspec;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &tspec);
+    clock_gettime(CLOCK_MONOTONIC, &tspec);
 
     // convert to units of 0.1 microsecond
     QSTimeCtr time = (QSTimeCtr)(tspec.tv_sec * 10000000 + tspec.tv_nsec / 100);
