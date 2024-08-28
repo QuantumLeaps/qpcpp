@@ -438,9 +438,6 @@ public:
     }
 #endif // def Q_SPY
     bool isIn(QStateHandler const state) noexcept override;
-
-    //! @deprecated instead use: QMsm::isIn()
-    bool isInState(QMState const * const stateObj) const noexcept;
     QMState const * childStateObj(QMState const * const parent) const noexcept;
 
 private:
@@ -931,9 +928,6 @@ public:
         return reinterpret_cast<QMsm *>(this)->QMsm::getStateHandler();
     }
 #endif // def Q_SPY
-    bool isInState(QMState const * const st) const noexcept {
-        return reinterpret_cast<QMsm const *>(this)->QMsm::isInState(st);
-    }
     QMState const * childStateObj(QMState const * const parent) const noexcept {
         return reinterpret_cast<QMsm const *>(this)
                    ->QMsm::childStateObj(parent);

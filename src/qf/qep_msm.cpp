@@ -209,7 +209,7 @@ void QMsm::dispatch(
         else if (r == Q_RET_SUPER_SUB) {
             t = m_temp.obj; // current host state of the submachie
         }
-        else { // event unhandled due to a guard?
+        else { // event unhandled due to a guard
             QF_CRIT_ENTRY();
             // event must be unhandled due to a guard evaluating to 'false'
             Q_ASSERT_INCRIT(310, r == Q_RET_UNHANDLED);
@@ -391,30 +391,6 @@ bool QMsm::isIn(QStateHandler const state) noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
     Q_ENSURE_INCRIT(490, lbound > 0);
-    QF_CRIT_EXIT();
-
-    return inState;
-}
-
-//${QEP::QMsm::isInState} ....................................................
-bool QMsm::isInState(QMState const * const stateObj) const noexcept {
-    bool inState = false; // assume that this SM is not in 'state'
-
-    QMState const *s = m_state.obj;
-    std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_; // fixed upper loop bound
-    for (; (s != nullptr) && (lbound > 0); --lbound) {
-        if (s == stateObj) { // match found?
-            inState = true;
-            break;
-        }
-        else {
-            s = s->superstate; // advance to the superstate
-        }
-    }
-
-    QF_CRIT_STAT
-    QF_CRIT_ENTRY();
-    Q_ENSURE_INCRIT(590, lbound > 0);
     QF_CRIT_EXIT();
 
     return inState;
