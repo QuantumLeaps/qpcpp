@@ -22,8 +22,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-07-18
-//! @version Last updated for: @ref qpcpp_7_4_0
+//! @date Last updated on: 2024-09-19
+//! @version Last updated for: @ref qpcpp_8_0_0
 //!
 //! @file
 //! @brief QF/C++ port to POSIX (multithreaded with P-threads)
@@ -170,8 +170,8 @@ int run() {
     onStartup(); // application-specific startup callback
 
     // produce the QS_QF_RUN trace record
-    QS_BEGIN_PRE_(QS_QF_RUN, 0U)
-    QS_END_PRE_()
+    QS_BEGIN_PRE(QS_QF_RUN, 0U)
+    QS_END_PRE()
 
     // try to set the priority of the ticker thread, see NOTE01
     struct sched_param sparam;
@@ -314,7 +314,7 @@ void QActive::evtLoop_(QActive *act) {
 
 //============================================================================
 void QActive::start(QPrioSpec const prioSpec,
-                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {

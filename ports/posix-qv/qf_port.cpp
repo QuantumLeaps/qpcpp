@@ -22,8 +22,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-07-18
-//! @version Last updated for: @ref qpcpp_7_4_0
+//! @date Last updated on: 2024-09-19
+//! @version Last updated for: @ref qpcpp_8_0_0
 //!
 //! @file
 //! @brief QF/C++ port to POSIX-QV (single-threaded)
@@ -258,8 +258,8 @@ int run() {
     QF_CRIT_ENTRY();
 
     // produce the QS_QF_RUN trace record
-    QS_BEGIN_PRE_(QS_QF_RUN, 0U)
-    QS_END_PRE_()
+    QS_BEGIN_PRE(QS_QF_RUN, 0U)
+    QS_END_PRE()
 
     while (l_isRunning) {
         Q_ASSERT_INCRIT(300, readySet_.verify_(&readySet_dis_));
@@ -374,7 +374,7 @@ int consoleWaitForKey() {
 
 // QActive functions =========================================================
 void QActive::start(QPrioSpec const prioSpec,
-                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {

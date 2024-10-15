@@ -1,29 +1,32 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// This software is dual-licensed under the terms of the open source GNU
-// General Public License version 3 (or any later version), or alternatively,
-// under the terms of one of the closed source Quantum Leaps commercial
-// licenses.
-//
-// The terms of the open source GNU General Public License version 3
-// can be found at: <www.gnu.org/licenses/gpl-3.0>
-//
-// The terms of the closed source Quantum Leaps commercial licenses
-// can be found at: <www.state-machine.com/licensing>
+// The QP/C software is dual-licensed under the terms of the open-source GNU
+// General Public License (GPL) or under the terms of one of the closed-
+// source Quantum Leaps commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
-// Contact information:
-// <www.state-machine.com>
+// NOTE:
+// The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
+// incorporation of the QP/C software into proprietary programs. Please
+// contact Quantum Leaps for commercial licensing options, which expressly
+// supersede the GPL and are designed explicitly for licensees interested
+// in using QP/C in closed-source proprietary applications.
+//
+// Quantum Leaps contact information:
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-06-11
-//! @version Last updated for: @ref qpcpp_7_4_0
+//! @date Last updated on: 2024-10-29
+//! @version Last updated for: @ref qpcpp_8_0_0
 //!
 //! @file
 //! @brief QF/C++ port to FreeRTOS 10.x, generic C++11 compiler
@@ -84,7 +87,9 @@ namespace QP {
 
 //............................................................................
 void QF::init() {
-    // empty for FreeRTOS
+    bzero_(&QF::priv_,             sizeof(QF::priv_));
+    bzero_(&QActive::registry_[0], sizeof(QActive::registry_));
+    // nothing to do for FreeRTOS
 }
 //............................................................................
 int_t QF::run() {
@@ -94,8 +99,8 @@ int_t QF::run() {
 #ifdef Q_SPY
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    QS_BEGIN_PRE_(QS_QF_RUN, 0U)
-    QS_END_PRE_()
+    QS_BEGIN_PRE(QS_QF_RUN, 0U)
+    QS_END_PRE()
     QF_CRIT_EXIT();
 #endif
 
@@ -133,7 +138,7 @@ void QActive::evtLoop_(QActive *act) {
 //............................................................................
 void QActive::start(
     QPrioSpec const prioSpec,
-    QEvt const * * const qSto,
+    QEvtPtr * const qSto,
     std::uint_fast16_t const qLen,
     void * const stkSto,
     std::uint_fast16_t const stkSize,
@@ -146,7 +151,7 @@ void QActive::start(
     // - queue size must be provided
     // - stack storage must be provided
     // - stack size must be provided
-    Q_REQUIRE_INCRIT(200,
+    Q_REQUIRE_INCRIT(100,
         (qSto != nullptr) && (qLen > 0U)
         && (stkSto != nullptr) && (stkSize > 0U));
     QF_CRIT_EXIT();
@@ -158,7 +163,7 @@ void QActive::start(
             reinterpret_cast<std::uint8_t *>(qSto),   // queue buffer
             &m_osObject);                             // static queue buffer
     QF_CRIT_ENTRY();
-    Q_ASSERT_INCRIT(210, m_eQueue != static_cast<QueueHandle_t>(0));
+    Q_ASSERT_INCRIT(110, m_eQueue != static_cast<QueueHandle_t>(0));
     QF_CRIT_EXIT();
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
@@ -209,8 +214,12 @@ void QActive::start(
         &m_thread);     // task buffer
 
     QF_CRIT_ENTRY();
-    Q_ASSERT_INCRIT(220, task != static_cast<TaskHandle_t>(0));
+    Q_ASSERT_INCRIT(120, task != static_cast<TaskHandle_t>(0));
     QF_CRIT_EXIT();
+
+#ifdef Q_UNSAFE
+    Q_UNUSED_PAR(task);
+#endif
 }
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
@@ -225,13 +234,15 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
     QF_CRIT_ENTRY();
     // this function must be called before QACTIVE_START(),
     // which implies that m_thread.pxDummy1 must not be used yet;
-    Q_REQUIRE_INCRIT(300, m_thread.pxDummy1 == nullptr);
+    Q_REQUIRE_INCRIT(150, m_thread.pxDummy1 == nullptr);
     switch (attr1) {
         case TASK_NAME_ATTR:
             // temporarily store the name, cast 'const' away
             m_thread.pxDummy1 = const_cast<void *>(attr2);
             break;
         // ...
+        default:
+            break;
     }
     QF_CRIT_EXIT();
 }
@@ -245,9 +256,148 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    // find the number of free slots available in the queue
+    Q_REQUIRE_INCRIT(200, e != nullptr);
+#ifndef Q_UNSAFE
+    Q_INVARIANT_INCRIT(201, e->verify_());
+#endif // ndef Q_UNSAFE
+
+    // the number of free slots available in the queue
     std::uint_fast16_t nFree =
          static_cast<std::uint_fast16_t>(FREERTOS_QUEUE_GET_FREE());
+
+    bool status;
+    if (margin == QF::NO_MARGIN) {
+        if (nFree > 0U) {
+            status = true; // can post
+        }
+        else {
+            status = false; // cannot post
+            Q_ERROR_INCRIT(210); // must be able to post the event
+        }
+    }
+    else if (nFree > margin) {
+        status = true; // can post
+    }
+    else {
+        status = false; // cannot post
+    }
+
+    if (status) { // can post the event?
+
+        QS_BEGIN_PRE(QS_QF_ACTIVE_POST, m_prio)
+            QS_TIME_PRE();      // timestamp
+            QS_OBJ_PRE(sender); // the sender object
+            QS_SIG_PRE(e->sig); // the signal of the event
+            QS_OBJ_PRE(this);   // this active object (recipient)
+            QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);
+            QS_EQC_PRE(static_cast<QEQueueCtr>(nFree)); // # free entries
+            QS_EQC_PRE(0U);     // min # free entries (unknown)
+        QS_END_PRE()
+
+        if (e->getPoolNum_() != 0U) { // is it a pool event?
+            QEvt_refCtr_inc_(e); // increment the reference counter
+        }
+        QF_CRIT_EXIT();
+
+        BaseType_t err = xQueueSendToBack(
+                             m_eQueue, static_cast<void const *>(&e), 0U);
+
+        QF_CRIT_ENTRY();
+        // posting to the FreeRTOS message queue must succeed, see NOTE3
+        Q_ASSERT_INCRIT(220, err == pdPASS);
+
+#ifdef Q_UNSAFE
+        Q_UNUSED_PAR(err);
+#endif
+    }
+    else { // cannot post the event
+
+        QS_BEGIN_PRE(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
+            QS_TIME_PRE();      // timestamp
+            QS_OBJ_PRE(sender); // the sender object
+            QS_SIG_PRE(e->sig); // the signal of the event
+            QS_OBJ_PRE(this);   // this active object (recipient)
+            QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);
+            QS_EQC_PRE(static_cast<QEQueueCtr>(nFree)); // # free entries
+            QS_EQC_PRE(margin); // margin requested
+        QS_END_PRE()
+    }
+    QF_CRIT_EXIT();
+
+    return status;
+}
+//............................................................................
+void QActive::postLIFO(QEvt const * const e) noexcept {
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+
+    Q_REQUIRE_INCRIT(300, e != nullptr);
+#ifndef Q_UNSAFE
+    Q_INVARIANT_INCRIT(301, e->verify_());
+#endif // ndef Q_UNSAFE
+
+    QS_BEGIN_PRE(QS_QF_ACTIVE_POST_LIFO, m_prio)
+        QS_TIME_PRE();       // timestamp
+        QS_SIG_PRE(e->sig);  // the signal of this event
+        QS_OBJ_PRE(this);    // this active object
+        QS_2U8_PRE(e->evtTag_, e->refCtr_); // pool Id & refCtr of the evt
+        QS_EQC_PRE(static_cast<QEQueueCtr>(FREERTOS_QUEUE_GET_FREE()));
+        QS_EQC_PRE(0U);      // min # free entries (unknown)
+    QS_END_PRE()
+
+    if (e->getPoolNum_() != 0U) { // is it a pool event?
+        QEvt_refCtr_inc_(e); // increment the reference counter
+    }
+    QF_CRIT_EXIT();
+
+    BaseType_t err = xQueueSendToFront(
+                         m_eQueue, static_cast<void const *>(&e), 0U);
+
+    QF_CRIT_ENTRY();
+    // LIFO posting to the FreeRTOS queue must succeed, see NOTE3
+    Q_ASSERT_INCRIT(320, err == pdPASS);
+    QF_CRIT_EXIT();
+
+#ifdef Q_UNSAFE
+    Q_UNUSED_PAR(err);
+#endif
+}
+//............................................................................
+QEvt const *QActive::get_(void) noexcept {
+    QEvt const *e;
+    xQueueReceive(m_eQueue, (void *)&e, portMAX_DELAY);
+
+    QS_CRIT_STAT
+    QS_CRIT_ENTRY();
+    QS_BEGIN_PRE(QS_QF_ACTIVE_GET, m_prio)
+        QS_TIME_PRE();       // timestamp
+        QS_SIG_PRE(e->sig);  // the signal of this event
+        QS_OBJ_PRE(this);    // this active object
+        QS_2U8_PRE(e->getPoolNum_(), e->refCtr_); // pool Id&ref Count
+        QS_EQC_PRE(static_cast<QEQueueCtr>(FREERTOS_QUEUE_GET_FREE()));
+    QS_END_PRE()
+    QS_CRIT_EXIT();
+
+    return e;
+}
+
+//============================================================================
+// The "FromISR" QP APIs for the FreeRTOS port...
+bool QActive::postFromISR(QEvt const * const e,
+                          std::uint_fast16_t const margin,
+                          void *par,
+                          void const * const sender) noexcept
+{
+    UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+
+    Q_REQUIRE_INCRIT(500, e != nullptr);
+#ifndef Q_UNSAFE
+    Q_INVARIANT_INCRIT(501, e->verify_());
+#endif // ndef Q_UNSAFE
+
+    // find the number of free slots available in the queue
+    std::uint_fast16_t const nFree =
+        static_cast<std::uint_fast16_t>(FREERTOS_QUEUE_GET_FREE());
 
     bool status;
     if (margin == QF::NO_MARGIN) {
@@ -268,131 +418,15 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
     if (status) { // can post the event?
 
-        QS_BEGIN_PRE_(QS_QF_ACTIVE_POST, m_prio)
-            QS_TIME_PRE_();      // timestamp
-            QS_OBJ_PRE_(sender); // the sender object
-            QS_SIG_PRE_(e->sig); // the signal of the event
-            QS_OBJ_PRE_(this);   // this active object (recipient)
-            QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // pool Id&ref Count
-            QS_EQC_PRE_(static_cast<QEQueueCtr>(nFree)); // # free entries
-            QS_EQC_PRE_(0U);     // min # free entries (unknown)
-        QS_END_PRE_()
-
-        if (e->getPoolNum_() != 0U) { // is it a pool event?
-            QEvt_refCtr_inc_(e); // increment the reference counter
-        }
-        QF_CRIT_EXIT();
-
-        BaseType_t err = xQueueSendToBack(
-                             m_eQueue, static_cast<void const *>(&e), 0U);
-
-        // posting to the FreeRTOS message queue must succeed, see NOTE3
-        QF_CRIT_ENTRY();
-        Q_ASSERT_INCRIT(520, err == pdPASS);
-    }
-    else {
-
-        QS_BEGIN_PRE_(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
-            QS_TIME_PRE_();      // timestamp
-            QS_OBJ_PRE_(sender); // the sender object
-            QS_SIG_PRE_(e->sig); // the signal of the event
-            QS_OBJ_PRE_(this);   // this active object (recipient)
-            QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // pool Id&ref Count
-            QS_EQC_PRE_(static_cast<QEQueueCtr>(nFree)); // # free entries
-            QS_EQC_PRE_(margin); // margin requested
-        QS_END_PRE_()
-    }
-    QF_CRIT_EXIT();
-
-    return status;
-}
-//............................................................................
-void QActive::postLIFO(QEvt const * const e) noexcept {
-    QF_CRIT_STAT
-    QF_CRIT_ENTRY();
-
-    QS_BEGIN_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
-        QS_TIME_PRE_();       // timestamp
-        QS_SIG_PRE_(e->sig);  // the signal of this event
-        QS_OBJ_PRE_(this);    // this active object
-        QS_2U8_PRE_(e->evtTag_, e->refCtr_); // pool Id & refCtr of the evt
-        QS_EQC_PRE_(static_cast<QEQueueCtr>(FREERTOS_QUEUE_GET_FREE()));
-        QS_EQC_PRE_(0U);      // min # free entries (unknown)
-    QS_END_PRE_()
-
-    if (e->getPoolNum_() != 0U) { // is it a pool event?
-        QEvt_refCtr_inc_(e); // increment the reference counter
-    }
-    QF_CRIT_EXIT();
-
-    BaseType_t err = xQueueSendToFront(
-                         m_eQueue, static_cast<void const *>(&e), 0U);
-
-    // LIFO posting to the FreeRTOS queue must succeed, see NOTE3
-    QF_CRIT_ENTRY();
-    Q_ASSERT_INCRIT(610, err == pdPASS);
-    QF_CRIT_EXIT();
-}
-//............................................................................
-QEvt const *QActive::get_(void) noexcept {
-    QEvt const *e;
-    xQueueReceive(m_eQueue, (void *)&e, portMAX_DELAY);
-
-    QS_CRIT_STAT
-    QS_CRIT_ENTRY();
-    QS_BEGIN_PRE_(QS_QF_ACTIVE_GET, m_prio)
-        QS_TIME_PRE_();       // timestamp
-        QS_SIG_PRE_(e->sig);  // the signal of this event
-        QS_OBJ_PRE_(this);    // this active object
-        QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // pool Id&ref Count
-        QS_EQC_PRE_(static_cast<QEQueueCtr>(FREERTOS_QUEUE_GET_FREE()));
-    QS_END_PRE_()
-    QS_CRIT_EXIT();
-
-    return e;
-}
-
-//============================================================================
-// The "FromISR" QP APIs for the FreeRTOS port...
-bool QActive::postFromISR(QEvt const * const e,
-                          std::uint_fast16_t const margin,
-                          void *par,
-                          void const * const sender) noexcept
-{
-    UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
-
-    // find the number of free slots available in the queue
-    std::uint_fast16_t const nFree =
-        static_cast<std::uint_fast16_t>(FREERTOS_QUEUE_GET_FREE());
-
-    bool status;
-    if (margin == QF::NO_MARGIN) {
-        if (nFree > 0U) {
-            status = true; // can post
-        }
-        else {
-            status = false; // cannot post
-            Q_ERROR_INCRIT(810); // must be able to post the event
-        }
-    }
-    else if (nFree > margin) {
-        status = true; // can post
-    }
-    else {
-        status = false; // cannot post
-    }
-
-    if (status) { // can post the event?
-
-        QS_BEGIN_PRE_(QS_QF_ACTIVE_POST, m_prio)
-            QS_TIME_PRE_();      // timestamp
-            QS_OBJ_PRE_(sender); // the sender object
-            QS_SIG_PRE_(e->sig); // the signal of the event
-            QS_OBJ_PRE_(this);   // this active object (recipient)
-            QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // pool Id&ref Count
-            QS_EQC_PRE_(nFree);  // # free entries available
-            QS_EQC_PRE_(0U);     // min # free entries (unknown)
-        QS_END_PRE_()
+        QS_BEGIN_PRE(QS_QF_ACTIVE_POST, m_prio)
+            QS_TIME_PRE();      // timestamp
+            QS_OBJ_PRE(sender); // the sender object
+            QS_SIG_PRE(e->sig); // the signal of the event
+            QS_OBJ_PRE(this);   // this active object (recipient)
+            QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);
+            QS_EQC_PRE(nFree);  // # free entries available
+            QS_EQC_PRE(0U);     // min # free entries (unknown)
+        QS_END_PRE()
 
         if (e->getPoolNum_() != 0U) { // is it a pool event?
             QEvt_refCtr_inc_(e); // increment the reference counter
@@ -405,20 +439,24 @@ bool QActive::postFromISR(QEvt const * const e,
 
         // posting to the FreeRTOS message queue must succeed
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
-        Q_ASSERT_INCRIT(820, err == pdPASS);
+        Q_ASSERT_INCRIT(520, err == pdPASS);
         portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
+
+#ifdef Q_UNSAFE
+        Q_UNUSED_PAR(err);
+#endif
     }
     else {
 
-        QS_BEGIN_PRE_(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
-            QS_TIME_PRE_();      // timestamp
-            QS_OBJ_PRE_(sender); // the sender object
-            QS_SIG_PRE_(e->sig); // the signal of the event
-            QS_OBJ_PRE_(this);   // this active object (recipient)
-            QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // pool Id&ref Count
-            QS_EQC_PRE_(nFree);  // # free entries available
-            QS_EQC_PRE_(margin); // margin requested
-        QS_END_PRE_()
+        QS_BEGIN_PRE(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
+            QS_TIME_PRE();      // timestamp
+            QS_OBJ_PRE(sender); // the sender object
+            QS_SIG_PRE(e->sig); // the signal of the event
+            QS_OBJ_PRE(this);   // this active object (recipient)
+            QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);
+            QS_EQC_PRE(nFree);  // # free entries available
+            QS_EQC_PRE(margin); // margin requested
+        QS_END_PRE()
         portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
 
         QF::gcFromISR(e); // recycle the event to avoid a leak
@@ -431,21 +469,26 @@ void QActive::publishFromISR(QEvt const *e,
                              void *par,
                              void const * const sender) noexcept
 {
+    Q_REQUIRE_INCRIT(600, e != nullptr);
+#ifndef Q_UNSAFE
+    Q_INVARIANT_INCRIT(601, e->verify_());
+#endif // ndef Q_UNSAFE
+
     QSignal const sig = e->sig;
 
     UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
 
-    //! @pre the published signal must be within the configured range
-    Q_REQUIRE_INCRIT(500, sig < QActive::maxPubSignal_);
-    Q_REQUIRE_INCRIT(502,
+    // the published signal must be within the configured range
+    Q_REQUIRE_INCRIT(610, sig < QActive::maxPubSignal_);
+    Q_REQUIRE_INCRIT(611,
         subscrList_[sig].m_set.verify_(&subscrList_[sig].m_set_dis));
 
-    QS_BEGIN_PRE_(QS_QF_PUBLISH, 0U)
-        QS_TIME_PRE_();          // the timestamp
-        QS_OBJ_PRE_(sender);     // the sender object
-        QS_SIG_PRE_(sig);        // the signal of the event
-        QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_);// pool-Id & ref-Count
-    QS_END_PRE_()
+    QS_BEGIN_PRE(QS_QF_PUBLISH, 0U)
+        QS_TIME_PRE();          // the timestamp
+        QS_OBJ_PRE(sender);     // the sender object
+        QS_SIG_PRE(sig);        // the signal of the event
+        QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);
+    QS_END_PRE()
 
     // is it a dynamic event?
     if (e->getPoolNum_() != 0U) {
@@ -470,7 +513,7 @@ void QActive::publishFromISR(QEvt const *e,
         do { // loop over all subscribers
             // the prio of the AO must be registered with the framework
             uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
-            Q_ASSERT_INCRIT(510, registry_[p] != nullptr);
+            Q_ASSERT_INCRIT(620, registry_[p] != nullptr);
             portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
 
             // POST_FROM_ISR() asserts if the queue overflows
@@ -494,98 +537,152 @@ void QActive::publishFromISR(QEvt const *e,
 }
 //............................................................................
 void QTimeEvt::tickFromISR(std::uint_fast8_t const tickRate,
-                           void *par,
+                           void *pxHigherPriorityTaskWoken,
                            void const * const sender) noexcept
 {
+    #ifndef Q_SPY
+    Q_UNUSED_PAR(sender);
+    #endif
+
     UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+
+    Q_REQUIRE_INCRIT(700, tickRate < Q_DIM(timeEvtHead_));
 
     QTimeEvt *prev = &timeEvtHead_[tickRate];
 
-    QS_BEGIN_PRE_(QS_QF_TICK, 0U)
-        ++prev->m_ctr;
-        QS_TEC_PRE_(prev->m_ctr); // tick ctr
-        QS_U8_PRE_(tickRate);     // tick rate
-    QS_END_PRE_()
+    QS_BEGIN_PRE(QS_QF_TICK, 0U)
+        prev->m_ctr = (prev->m_ctr + 1U);
+        QS_TEC_PRE(prev->m_ctr); // tick ctr
+        QS_U8_PRE(tickRate);     // tick rate
+    QS_END_PRE()
 
     // scan the linked-list of time events at this rate...
-    for (;;) {
-        QTimeEvt *t = prev->m_next; // advance down the time evt. list
+    std::uint_fast8_t lbound = 2U*QF_MAX_ACTIVE; // fixed upper loop bound
+    for (; lbound > 0U; --lbound) {
+        Q_ASSERT_INCRIT(710, prev != nullptr); // sanity check
 
-        // end of the list?
-        if (t == nullptr) {
+        QTimeEvt *te = prev->m_next; // advance down the time evt. list
+#ifndef Q_UNSAFE
+        Q_INVARIANT_INCRIT(711,
+            Q_PTR2UINT_CAST_(te) ==
+                static_cast<std::uintptr_t>(~prev->m_next_dis));
+#endif // ndef Q_UNSAFE
 
-            // any new time events armed since the last run?
+        if (te == nullptr) { // end of the list?
+
+            // any new time events armed since the last QTimeEvt_tick_()?
             if (timeEvtHead_[tickRate].m_act != nullptr) {
-
-                // sanity check
-                Q_ASSERT_INCRIT(610, prev != nullptr);
-                prev->m_next = QTimeEvt::timeEvtHead_[tickRate].toTimeEvt();
+#ifndef Q_UNSAFE
+                Q_INVARIANT_INCRIT(712,
+                    Q_PTR2UINT_CAST_(timeEvtHead_[tickRate].m_act) ==
+                    static_cast<std::uintptr_t>(
+                        ~timeEvtHead_dis_[tickRate].m_ptr_dis));
+#endif // ndef Q_UNSAFE
+                prev->m_next = timeEvtHead_[tickRate].toTimeEvt();
                 timeEvtHead_[tickRate].m_act = nullptr;
-                t = prev->m_next;  // switch to the new list
+#ifndef Q_UNSAFE
+                prev->m_next_dis =
+                    static_cast<std::uintptr_t>(
+                        ~Q_PTR2UINT_CAST_(prev->m_next));
+                timeEvtHead_dis_[tickRate].m_ptr_dis =
+                    static_cast<std::uintptr_t>(~Q_PTR2UINT_CAST_(nullptr));
+#endif // ndef Q_UNSAFE
+
+                te = prev->m_next; // switch to the new list
             }
-            else {
-                break; // all currently armed time evts. processed
+            else { // all currently armed time events are processed
+                break; // terminate the for-loop
             }
         }
 
-        // time event scheduled for removal?
-        if (t->m_ctr == 0U) {
-            prev->m_next = t->m_next;
-            // mark time event 't' as NOT linked
-            t->refCtr_ &= static_cast<std::uint8_t>(~TE_IS_LINKED);
+        // the time event 'te' must be valid
+        Q_ASSERT_INCRIT(720, te != nullptr);
+        Q_INVARIANT_INCRIT(721, te->verify_());
+
+        QTimeEvtCtr ctr = te->m_ctr;
+#ifndef Q_UNSAFE
+        Q_INVARIANT_INCRIT(722, ctr ==
+            static_cast<QTimeEvtCtr>(~te->m_ctr_dis));
+#endif // ndef Q_UNSAFE
+
+        if (ctr == 0U) { // time event scheduled for removal?
+            prev->m_next = te->m_next;
+#ifndef Q_UNSAFE
+            prev->m_next_dis =
+                static_cast<std::uintptr_t>(~Q_PTR2UINT_CAST_(te->m_next));
+#endif // ndef Q_UNSAFE
+
+            // mark time event 'te' as NOT linked
+            te->m_flags &= static_cast<std::uint8_t>(~QTE_FLAG_IS_LINKED);
+
             // do NOT advance the prev pointer
+
             // exit crit. section to reduce latency
             portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
         }
-        else {
-            --t->m_ctr;
-
-            // is time evt about to expire?
-            if (t->m_ctr == 0U) {
-                QActive *act = t->toActive(); // temp. for volatile
-
-                // periodic time evt?
-                if (t->m_interval != 0U) {
-                    t->m_ctr = t->m_interval; // rearm the time event
-                    prev = t; // advance to this time event
-                }
-                // one-shot time event: automatically disarm
-                else {
-                    prev->m_next = t->m_next;
-                    // mark time event 't' as NOT linked
-                    t->refCtr_ &= static_cast<std::uint8_t>(~TE_IS_LINKED);
-                    // do NOT advance the prev pointer
-
-                    QS_BEGIN_PRE_(QS_QF_TIMEEVT_AUTO_DISARM, act->m_prio)
-                        QS_OBJ_PRE_(t);        // this time event object
-                        QS_OBJ_PRE_(act);      // the target AO
-                        QS_U8_PRE_(tickRate);  // tick rate
-                    QS_END_PRE_()
-                }
-
-                QS_BEGIN_PRE_(QS_QF_TIMEEVT_POST, act->m_prio)
-                    QS_TIME_PRE_();            // timestamp
-                    QS_OBJ_PRE_(t);            // the time event object
-                    QS_SIG_PRE_(t->sig);       // signal of time event
-                    QS_OBJ_PRE_(act);          // the target AO
-                    QS_U8_PRE_(tickRate);      // tick rate
-                QS_END_PRE_()
-
-                // exit critical section before posting
-                portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
-
-                // asserts if the queue overflows
-                act->POST_FROM_ISR(t, par, sender);
+        else if (ctr == 1U) { // is time event about to expire?
+            QActive * const act = te->toActive();
+            if (te->m_interval != 0U) { // periodic time evt?
+                te->m_ctr = te->m_interval; // rearm the time event
+#ifndef Q_UNSAFE
+                te->m_ctr_dis = static_cast<QTimeEvtCtr>(~te->m_interval);
+#endif // ndef Q_UNSAFE
+                prev = te; // advance to this time event
             }
-            else {
-                prev = t; // advance to this time event
-                // exit crit. section to reduce latency
-                portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
+            else { // one-shot time event: automatically disarm
+                te->m_ctr = 0U;
+                prev->m_next = te->m_next;
+#ifndef Q_UNSAFE
+                te->m_ctr_dis =
+                    static_cast<QTimeEvtCtr>(~static_cast<QTimeEvtCtr>(0U));
+                prev->m_next_dis =
+                    static_cast<std::uintptr_t>(~Q_PTR2UINT_CAST_(te->m_next));
+#endif // ndef Q_UNSAFE
+
+                // mark time event 'te' as NOT linked
+                te->m_flags &=
+                    static_cast<std::uint8_t>(~QTE_FLAG_IS_LINKED);
+                // do NOT advance the prev pointer
+
+                QS_BEGIN_PRE(QS_QF_TIMEEVT_AUTO_DISARM, act->m_prio)
+                    QS_OBJ_PRE(te);       // this time event object
+                    QS_OBJ_PRE(act);      // the target AO
+                    QS_U8_PRE(tickRate);  // tick rate
+                QS_END_PRE()
             }
+
+            QS_BEGIN_PRE(QS_QF_TIMEEVT_POST, act->m_prio)
+                QS_TIME_PRE();            // timestamp
+                QS_OBJ_PRE(te);           // the time event object
+                QS_SIG_PRE(te->sig);      // signal of this time event
+                QS_OBJ_PRE(act);          // the target AO
+                QS_U8_PRE(tickRate);      // tick rate
+            QS_END_PRE()
+
+            portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
+
+            // POST_FROM_ISR() asserts if the queue overflows
+            act->POST_FROM_ISR(te,
+                pxHigherPriorityTaskWoken,
+                sender);
         }
-        // re-enter crit. section to continue
+        else { // time event keeps timing out
+            --ctr; // decrement the tick counter
+            te->m_ctr = ctr; // update the original
+#ifndef Q_UNSAFE
+            te->m_ctr_dis = static_cast<QTimeEvtCtr>(~ctr);
+#endif // ndef Q_UNSAFE
+
+            prev = te; // advance to this time event
+
+            portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
+        }
+        // re-enter crit. section to continue the loop
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
     }
+
+    Q_ENSURE_INCRIT(890, lbound > 0U);
+
     portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
 }
 //............................................................................
@@ -593,216 +690,263 @@ QEvt *QF::newXfromISR_(std::uint_fast16_t const evtSize,
                        std::uint_fast16_t const margin,
                        enum_t const sig) noexcept
 {
-    // find the pool index that fits the requested event size ...
-    std::uint_fast8_t idx;
-    for (idx = 0U; idx < priv_.maxPool_; ++idx) {
-        if (evtSize <= QF_EPOOL_EVENT_SIZE_(priv_.ePool_[idx])) {
+    // find the pool index that fits the requested event size...
+    std::uint_fast8_t poolNum = 0U; // zero-based poolNum initially
+    for (; poolNum < priv_.maxPool_; ++poolNum) {
+        if (evtSize <= QF_EPOOL_EVENT_SIZE_(priv_.ePool_[poolNum])) {
             break;
         }
     }
-    // cannot run out of registered pools
+
     UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
-    Q_REQUIRE_INCRIT(700, idx < priv_.maxPool_);
+
+    // precondition:
+    // - cannot run out of registered pools
+    Q_REQUIRE_INCRIT(800, poolNum < priv_.maxPool_);
+
+    ++poolNum; // convert to 1-based poolNum
+
     portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
 
-    // get e -- platform-dependent
+    // get event e (port-dependent)...
 #ifdef Q_SPY
     QEvt *e = static_cast<QEvt *>(
-              priv_.ePool_[idx].getFromISR(((margin != QF::NO_MARGIN)
-                  ? margin : 0U),
-                  static_cast<std::uint_fast8_t>(QS_EP_ID) + idx + 1U));
+        priv_.ePool_[poolNum - 1U].getFromISR(((margin != QF::NO_MARGIN)
+            ? margin : 0U),
+        static_cast<std::uint_fast8_t>(QS_EP_ID) + poolNum));
 #else
     QEvt *e = static_cast<QEvt *>(
-              priv_.ePool_[idx].getFromISR(((margin != QF::NO_MARGIN)
-                  ? margin : 0U), 0U));
+        priv_.ePool_[poolNum - 1U].getFromISR(((margin != QF::NO_MARGIN)
+            ? margin : 0U), 0U));
 #endif
 
-    // was e allocated correctly?
-    if (e != nullptr) {
+    if (e != nullptr) { // was e allocated correctly?
         e->sig     = static_cast<QSignal>(sig); // set the signal
         e->refCtr_ = 0U;
-        e->evtTag_ = static_cast<std::uint8_t>(QEvt::MARKER | (idx + 1U));
+        e->evtTag_ = static_cast<std::uint8_t>((poolNum << 4U) | 0x0FU);
 
 #ifdef Q_SPY
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
-        QS_BEGIN_PRE_(QS_QF_NEW,
-                      static_cast<uint_fast8_t>(QS_EP_ID) + idx + 1U)
-            QS_TIME_PRE_();         // timestamp
-            QS_EVS_PRE_(evtSize);   // the size of the event
-            QS_SIG_PRE_(sig);       // the signal of the event
-        QS_END_PRE_()
+        QS_BEGIN_PRE(QS_QF_NEW,
+                static_cast<uint_fast8_t>(QS_EP_ID) + poolNum)
+            QS_TIME_PRE();        // timestamp
+            QS_EVS_PRE(evtSize);  // the size of the event
+            QS_SIG_PRE(sig);      // the signal of the event
+        QS_END_PRE()
         portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
-#endif // Q_SPY
+#endif // def Q_SPY
     }
-    else { // event cannot be allocated
-        // must tolerate bad alloc.
+    else { // event was not allocated
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
-        Q_ASSERT_INCRIT(720, margin != QF::NO_MARGIN);
-        portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
 
-#ifdef Q_SPY
-        uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
-        QS_BEGIN_PRE_(QS_QF_NEW_ATTEMPT,
-                             static_cast<uint_fast8_t>(QS_EP_ID) + idx + 1U)
-            QS_TIME_PRE_();         // timestamp
-            QS_EVS_PRE_(evtSize);   // the size of the event
-            QS_SIG_PRE_(sig);       // the signal of the event
-        QS_END_PRE_()
+        // This assertion means that the event allocation failed,
+        // and this failure cannot be tolerated. The most frequent
+        // reason is an event leak in the application.
+        Q_ASSERT_INCRIT(820, margin != QF::NO_MARGIN);
+
+        QS_BEGIN_PRE(QS_QF_NEW_ATTEMPT,
+                static_cast<uint_fast8_t>(QS_EP_ID) + poolNum)
+            QS_TIME_PRE();        // timestamp
+            QS_EVS_PRE(evtSize);  // the size of the event
+            QS_SIG_PRE(sig);      // the signal of the event
+        QS_END_PRE()
+
         portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
-#endif // Q_SPY
     }
-    return e; // can't be NULL if we can't tolerate bad allocation
+
+    // the returned event e is guaranteed to be valid (not NULL)
+    // if we can't tolerate failed allocation
+    return e;
 }
 //............................................................................
 void QF::gcFromISR(QEvt const * const e) noexcept {
-    // is it a dynamic event?
-    if (e->getPoolNum_() != 0U) {
-        UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+    UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
 
-        // isn't this the last ref?
-        if (e->refCtr_ > 1U) {
+    Q_REQUIRE_INCRIT(700, e != nullptr);
+#ifndef Q_UNSAFE
+    Q_INVARIANT_INCRIT(701, e->verify_());
+#endif
+
+    std::uint_fast8_t const poolNum = e->getPoolNum_();
+
+    if (poolNum != 0U) { // is it a pool event (mutable)?
+
+        if (e->refCtr_ > 1U) { // isn't this the last ref?
+
+            QS_BEGIN_PRE(QS_QF_GC_ATTEMPT,
+                    static_cast<uint_fast8_t>(QS_EP_ID) + poolNum)
+                QS_TIME_PRE();       // timestamp
+                QS_SIG_PRE(e->sig);  // the signal of the event
+                QS_2U8_PRE(poolNum, e->refCtr_);
+            QS_END_PRE()
+
             QEvt_refCtr_dec_(e); // decrement the ref counter
-
-            QS_BEGIN_PRE_(QS_QF_GC_ATTEMPT,
-                          static_cast<uint_fast8_t>(e->getPoolNum_()))
-                QS_TIME_PRE_();      // timestamp
-                QS_SIG_PRE_(e->sig); // the signal of the event
-                QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_);//poolNum & refCtr
-            QS_END_PRE_()
 
             portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
         }
-        // this is the last reference to this event, recycle it
-        else {
-            std::uint_fast8_t idx =
-                static_cast<std::uint_fast8_t>(e->getPoolNum_()) - 1U;
+        else { // this is the last reference to this event, recycle it
 
-            QS_BEGIN_PRE_(QS_QF_GC,
-                          static_cast<uint_fast8_t>(e->getPoolNum_()))
-                QS_TIME_PRE_();         // timestamp
-                QS_SIG_PRE_(e->sig);    // the signal of the event
-                QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_);//poolNum & refCtr
-            QS_END_PRE_()
+            QS_BEGIN_PRE(QS_QF_GC,
+                    static_cast<uint_fast8_t>(QS_EP_ID) + poolNum)
+                QS_TIME_PRE();         // timestamp
+                QS_SIG_PRE(e->sig);    // the signal of the event
+                QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);//poolNum & refCtr
+            QS_END_PRE()
 
-            // pool ID must be in range
-            Q_ASSERT_INCRIT(810, idx < priv_.maxPool_);
+            // pool number must be in range
+            Q_ASSERT_INCRIT(710, (poolNum <= priv_.maxPool_)
+                                     && (poolNum <= QF_MAX_EPOOL));
 
             portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
 
 #ifdef Q_SPY
-            // cast 'const' away, which is OK because it's a pool event
-            priv_.ePool_[idx].putFromISR(QF_CONST_CAST_(QEvt*, e),
+            // cast 'const' away in (QEvt *)e is OK because it's a pool event
+            priv_.ePool_[poolNum - 1U].putFromISR(QF_CONST_CAST_(QEvt*, e),
                 static_cast<uint_fast8_t>(QS_EP_ID) + e->getPoolNum_());
 #else
-            priv_.ePool_[idx].putFromISR(QF_CONST_CAST_(QEvt*, e), 0U);
+            priv_.ePool_[poolNum - 1U].putFromISR(QF_CONST_CAST_(QEvt*, e), 0U);
 #endif
         }
     }
+    else {
+        portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
+    }
+}
+//............................................................................
+void *QMPool::getFromISR(std::uint_fast16_t const margin,
+                         std::uint_fast8_t const qsId) noexcept
+{
+    #ifndef Q_SPY
+    Q_UNUSED_PAR(qsId);
+    #endif
+
+    UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+
+    // get volatile into temporaries
+    QFreeBlock *fb = m_free_head;
+    QMPoolCtr nFree = m_nFree;
+
+    #ifndef Q_UNSAFE
+    Q_INVARIANT_INCRIT(801, Q_PTR2UINT_CAST_(fb)
+        == static_cast<std::uintptr_t>(~m_free_head_dis));
+    Q_INVARIANT_INCRIT(802, nFree == static_cast<QMPoolCtr>(~m_nFree_dis));
+    #endif // ndef Q_UNSAFE
+
+    // have more free blocks than the requested margin?
+    if (nFree > static_cast<QMPoolCtr>(margin)) {
+        Q_ASSERT_INCRIT(810, fb != nullptr);
+
+        QFreeBlock * const fb_next = fb->m_next;
+
+    #ifndef Q_UNSAFE
+        // the free block must have integrity (duplicate inverse storage)
+        Q_INVARIANT_INCRIT(811, Q_PTR2UINT_CAST_(fb_next)
+            == static_cast<std::uintptr_t>(~fb->m_next_dis));
+    #endif // ndef Q_UNSAFE
+
+        --nFree; // one less free block
+        if (nFree == 0U) { // is the pool becoming empty?
+            // pool is becoming empty, so the next free block must be NULL
+            Q_ASSERT_INCRIT(820, fb_next == nullptr);
+
+            m_nFree = 0U;
+    #ifndef Q_UNSAFE
+            m_nFree_dis = static_cast<QMPoolCtr>(~m_nFree);
+            m_nMin = 0U; // remember that the pool got empty
+    #endif // ndef Q_UNSAFE
+        }
+        else {
+            m_nFree = nFree; // update the original
+    #ifndef Q_UNSAFE
+            m_nFree_dis = static_cast<QMPoolCtr>(~nFree);
+
+            // The pool is not empty, so the next free-block pointer
+            // must be in range.
+            Q_INVARIANT_INCRIT(830,
+                QF_PTR_RANGE_(fb_next, m_start, m_end));
+
+            // is the # free blocks the new minimum so far?
+            if (m_nMin > nFree) {
+                m_nMin = nFree; // remember the minimum so far
+            }
+    #endif // ndef Q_UNSAFE
+        }
+
+        m_free_head = fb_next; // set the head to the next free block
+    #ifndef Q_UNSAFE
+        m_free_head_dis =
+            static_cast<std::uintptr_t>(~Q_PTR2UINT_CAST_(fb_next));
+    #endif // ndef Q_UNSAFE
+
+        QS_BEGIN_PRE(QS_QF_MPOOL_GET, qsId)
+            QS_TIME_PRE();         // timestamp
+            QS_OBJ_PRE(this);      // this memory pool
+            QS_MPC_PRE(nFree);     // # of free blocks in the pool
+    #ifndef Q_UNSAFE
+            QS_MPC_PRE(m_nMin);    // min # free blocks ever in the pool
+    #else
+            QS_MPC_PRE(0U);        // min # free blocks (not available)
+    #endif // ndef Q_UNSAFE
+        QS_END_PRE()
+    }
+    else { // don't have enough free blocks at this point
+        fb = nullptr;
+
+        QS_BEGIN_PRE(QS_QF_MPOOL_GET_ATTEMPT, qsId)
+            QS_TIME_PRE();         // timestamp
+            QS_OBJ_PRE(this);      // this memory pool
+            QS_MPC_PRE(nFree);     // # free blocks in the pool
+            QS_MPC_PRE(margin);    // the requested margin
+        QS_END_PRE()
+    }
+
+    portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
+
+    return fb; // return the block or nullptr to the caller
 }
 //............................................................................
 void QMPool::putFromISR(void *block,
-                        std::uint_fast8_t const qs_id) noexcept
+                        std::uint_fast8_t const qsId) noexcept
 {
-#ifndef Q_SPY
-    Q_UNUSED_PAR(qs_id);
-#endif
+    #ifndef Q_SPY
+    Q_UNUSED_PAR(qsId);
+    #endif
 
     QFreeBlock * const fb = static_cast<QFreeBlock *>(block);
 
     UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
 
-    // precondition:
-    // - # free blocks cannot exceed the total # blocks and
-    // - the block pointer must be from this pool.
-    Q_REQUIRE_INCRIT(900, (m_nFree < m_nTot)
-                          && QF_PTR_RANGE_(fb, m_start, m_end));
+    // get volatile into temporaries
+    QFreeBlock * const free_head = m_free_head;
+    QMPoolCtr nFree = m_nFree;
 
-    fb->m_next = static_cast<QFreeBlock *>(m_free_head); // link into list
-#ifndef Q_UNSAFE
-    fb->m_next_dis = static_cast<uintptr_t>(~Q_UINTPTR_CAST_(fb->m_next));
-#endif
+    #ifndef Q_UNSAFE
+    Q_INVARIANT_INCRIT(901, Q_PTR2UINT_CAST_(free_head)
+        == static_cast<std::uintptr_t>(~m_free_head_dis));
+    Q_INVARIANT_INCRIT(902, nFree == static_cast<QMPoolCtr>(~m_nFree_dis));
+    #endif // ndef Q_UNSAFE
+
+    Q_REQUIRE_INCRIT(910, nFree < m_nTot);
+    Q_REQUIRE_INCRIT(911, QF_PTR_RANGE_(fb, m_start, m_end));
+
+    ++nFree; // one more free block in this pool
 
     m_free_head = fb; // set as new head of the free list
-    ++m_nFree;        // one more free block in this pool
+    m_nFree     = nFree;
+    fb->m_next  = free_head; // link into the list
+    #ifndef Q_UNSAFE
+    m_free_head_dis = static_cast<std::uintptr_t>(~Q_PTR2UINT_CAST_(fb));
+    m_nFree_dis     = static_cast<QMPoolCtr>(~nFree);
+    fb->m_next_dis  = static_cast<std::uintptr_t>(~Q_PTR2UINT_CAST_(free_head));
+    #endif
 
-    QS_BEGIN_PRE_(QS_QF_MPOOL_PUT, qs_id)
-        QS_TIME_PRE_();         // timestamp
-        QS_OBJ_PRE_(this);      // this memory pool
-        QS_MPC_PRE_(m_nFree);   // the number of free blocks in the pool
-    QS_END_PRE_()
+    QS_BEGIN_PRE(QS_QF_MPOOL_PUT, qsId)
+        QS_TIME_PRE();         // timestamp
+        QS_OBJ_PRE(this);      // this memory pool
+        QS_MPC_PRE(nFree);     // the # free blocks in the pool
+    QS_END_PRE()
 
     portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
-}
-//............................................................................
-void *QMPool::getFromISR(std::uint_fast16_t const margin,
-                         std::uint_fast8_t const qs_id) noexcept
-{
-#ifndef Q_SPY
-    Q_UNUSED_PAR(qs_id);
-#endif
-
-    UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
-
-    // have more free blocks than the requested margin?
-    QFreeBlock *fb;
-    if (m_nFree > static_cast<QMPoolCtr>(margin)) {
-        fb = static_cast<QFreeBlock *>(m_free_head); // get a free block
-
-        // the pool has some free blocks, so a free block must be available
-        Q_ASSERT_INCRIT(900, fb != nullptr);
-
-        QFreeBlock * const fb_next = fb->m_next; // fast temporary to avoid UB
-
-        // the free block must have integrity (duplicate inverse storage)
-        Q_ASSERT_INCRIT(902, Q_UINTPTR_CAST_(fb_next)
-                              == static_cast<uintptr_t>(~fb->m_next_dis));
-
-        // is the pool becoming empty?
-        --m_nFree; // one less free block
-        if (m_nFree == 0U) {
-            // pool is becoming empty, so the next free block must be NULL
-            Q_ASSERT_INCRIT(920, fb_next == nullptr);
-
-            m_nMin = 0U; // remember that the pool got empty
-        }
-        else {
-            // invariant
-            // The pool is not empty, so the next free-block pointer,
-            // so the next free block must be in range.
-            //
-            // NOTE: The next free block pointer can fall out of range
-            // when the client code writes past the memory block, thus
-            // corrupting the next block.
-            Q_ASSERT_INCRIT(930, QF_PTR_RANGE_(fb_next, m_start, m_end));
-
-            // is the number of free blocks the new minimum so far?
-            if (m_nMin > m_nFree) {
-                m_nMin = m_nFree; // remember the new minimum
-            }
-        }
-
-        m_free_head = fb_next; // set the head to the next free block
-
-        QS_BEGIN_PRE_(QS_QF_MPOOL_GET, qs_id)
-            QS_TIME_PRE_();         // timestamp
-            QS_OBJ_PRE_(this);      // this memory pool
-            QS_MPC_PRE_(m_nFree);   // # free blocks in the pool
-            QS_MPC_PRE_(m_nMin);    // min # free blocks ever in the pool
-        QS_END_PRE_()
-    }
-    else { // don't have enough free blocks at this point
-        fb = nullptr;
-
-        QS_BEGIN_PRE_(QS_QF_MPOOL_GET_ATTEMPT, qs_id)
-            QS_TIME_PRE_();         // timestamp
-            QS_OBJ_PRE_(this);      // this memory pool
-            QS_MPC_PRE_(m_nFree);   // # free blocks in the pool
-            QS_MPC_PRE_(margin);    // the requested margin
-        QS_END_PRE_()
-    }
-    portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedInterruptStatus);
-
-    return fb; // return the block or NULL pointer to the caller
 }
 
 } // namespace QP

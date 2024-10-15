@@ -38,6 +38,10 @@ set(QPCPP_PROJECT qpcPrj)
 set(QPCPP_CFG_KERNEL QV)
 set(QPCPP_CFG_GUI TRUE)
 set(QPCPP_CFG_PORT win32)
+# QP/CPP 8.0.0: to include a local 'qp_config.hpp' add the related include path
+# to the qpcpp build settings. Replace "${CMAKE_CURRENT_LIST_DIR}/include" by
+# your project specific path!
+set(QPCPP_CFG_QPCONFIG_H_INCLUDE_PATH ${CMAKE_CURRENT_LIST_DIR}/include)
 qpcpp_sdk_init()
 
 target_link_libraries(qpcppApp PRIVATE qpcpp)
@@ -78,6 +82,9 @@ This file is situated in the root directory of qpcpp. It performs a pre-initiali
 * `QPCPP-CFG-GUI` - BOOL: set this Boolean variable to ON/TRUE, if GUI support (win32) shall be compiled in. Default: OFF
 * `QPCPP_CFG_UNIT_TEST` - BOOL: set this to ON/TRUE to support qutest, if build configuration `Spy` is active. Default: OFF
 * `QPCPP_CFG_VERBOSE` - BOOL: set this to enable more verbosity in message output. Default: OFF
+* `QPCPP_CFG_QPCONFIG_H_INCLUDE_PATH`: - STRING (PATH): (`QP/CPP 8.0.0`) set this to have the build of QP/CPP use your project specific `qp_config.hpp`.
+  Default: `${QPCPP_SDK_PATH}/ports/config`
+
 
 ### General usage hints
 1. Set `QPCPP_SDK_PATH` or `QPCPP_FETCH_FROM_GIT` either in your `CMakeLists.txt` file or as an environment variable.
@@ -87,7 +94,7 @@ This file is situated in the root directory of qpcpp. It performs a pre-initiali
 5. Define the cmake target (executable or library)
 6. Include `qpcpp_sdk_init.cmake`
 7. configure the qpc SDK
-8. call `qpcpp_sdk_init`
+8. call `qpcpp_sdk_init()`
 9. Add the qpcpp library to your cmake target:
    `target_link_libraries(<target>> PRIVATE qpcpp)`
 
@@ -102,7 +109,7 @@ Generate and build your cmake project
   Refer to the [CMakePresets.json manual](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html) for further details.
   Then you generate with `cmake --preset=<preset> .` from your project directory. The build then can be started with `cmake --build --preset=<preset>`.
 
-### QPC configurations support
+### QPCPP configurations support
 Many `qpcpp` examples provide 3 build configurations:
 * `Debug` - build with debug support and debug symbols. Most optimizations are turned off
 * `Release` - build without debug support. Activate optimizations instead
@@ -110,44 +117,14 @@ Many `qpcpp` examples provide 3 build configurations:
 
 These configurations are also supported by qpcpp with cmake. Different possibilities exist to activate those.
 
-### `qp_config.h` support
-Some build configurations require the inclusion of `qp_config.h`. To achieve this, the QPC macro `QP_CONFIG` should be set, when compiling the
-`qpcpp` source files. The include search paths also needs to be set accordingly in order for the preprocessor to be able to find the correct include
-file.
+### `qp_config.hpp` support
+With the release of QP/C++ V8.0.0 the inclusion of `qp_config.hpp` is mandatory.
+The `cmake` build system of qpc addresses this by providing the configuration variable `QPCPP_CFG_QPCONFIG_H_INCLUDE_PATH`. Set this to the path of your local project's `qp_config.hpp` and this will automatically be found by the build system. Do this in your main `CMakeLists.txt` file __before__ calling `qpcpp_sdk_init()`.
 
-As `qp_config.hpp` is a project related file, which - in most cases - resides outside the `qpcpp` source code tree, the decision is to handle the
-above mentioned topic within the root project's `CMakeLists.txt` file instead of integrating this topic into a rather complicated configuration
-of `qpcpp` itself.
+You do not need to set this variable, should the qpcpp default settings be sufficient for your project. In this case the build system uses the `qp_config.hpp` file, as it can be found in the directory `${QPCPP_SDK_PATH}/src/ports/config`.
 
 An example can be found in the [cmake dpp example](https://github.com/QuantumLeaps/qpcpp-examples/tree/main/posix-win32-cmake/dpp). Have a look into
 the example's [CMakeLists.txt](https://github.com/QuantumLeaps/qpcpp-examples/blob/main/posix-win32-cmake/dpp/CMakeLists.txt).
-
-You will find the reference to the `qpc` library, followed by the project's specific setup for `qp_config.h` like this:
-```
-# set up qpcpp library
-target_link_libraries(dpp
-    PRIVATE
-        qpcpp
-)
-# should a 'qp_config.h' configuration file be used and is it available
-# edit the HINTS in the 'find_file()' call according to your project settings
-if(USE_QP_CONFIG)
-    find_file(QP_CONFIG qp_config.h HINTS ${CMAKE_CURRENT_SOURCE_DIR}) # try to identify 'qp_config.h'
-    if(QP_CONFIG) # found 'qp_config.h'
-        cmake_path(GET QP_CONFIG PARENT_PATH QP_CONFIG_DIR) # extract the path from the FQFN
-        target_compile_definitions(qpcpp # add -DQP_CONFIG to the qpcpp build
-            PUBLIC
-                QP_CONFIG
-        )
-        target_include_directories(qpcpp # add the path to 'qp_config.h' to the list of include paths for qpcpp
-            PUBLIC
-                ${QP_CONFIG_DIR}
-        )
-    else() # 'qp_config.h' requested but not find - try to configure and build anyways
-        message(WARNING "File 'qp_config.h' not found!")
-    endif()
-endif()
-```
 
 ### Multi configuration generators
 The most easy way to make use of the different configurations is to use a multi config generator like `Ninja Multi-Config` or `MS Visual Studio`.

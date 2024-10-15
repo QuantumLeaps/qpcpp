@@ -1,6 +1,6 @@
 //============================================================================
 // Product: QUTEST port for Zephyr RTOS
-// Last updated for version 7.4.0
+// Last updated for version 8.0.0
 // Last updated on  2024-06-11
 //
 //                    Q u a n t u m  L e a P s

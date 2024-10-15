@@ -22,8 +22,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-06-11
-//! @version Last updated for: @ref qpcpp_7_4_0
+//! @date Last updated on: 2024-09-19
+//! @version Last updated for: @ref qpcpp_8_0_0
 //!
 //! @file
 //! @brief QF/C++ port to Win32 (single-threaded, like the QV kernel)
@@ -135,14 +135,18 @@ int run() {
         QF_CRIT_ENTRY();
         Q_ASSERT_INCRIT(310, ticker != static_cast<HANDLE>(0));
         QF_CRIT_EXIT();
+
+#ifdef Q_UNSAFE
+        Q_UNUSED_PAR(ticker);
+#endif
     }
 
     // the combined event-loop and background-loop of the QV kernel
     QF_CRIT_ENTRY();
 
     // produce the QS_QF_RUN trace record
-    QS_BEGIN_PRE_(QS_QF_RUN, 0U)
-    QS_END_PRE_()
+    QS_BEGIN_PRE(QS_QF_RUN, 0U)
+    QS_END_PRE()
 
     while (l_isRunning) {
         Q_ASSERT_INCRIT(300, readySet_.verify_(&readySet_dis_));
@@ -235,7 +239,7 @@ int consoleWaitForKey(void) {
 // QActive functions =========================================================
 
 void QActive::start(QPrioSpec const prioSpec,
-                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
+                    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {

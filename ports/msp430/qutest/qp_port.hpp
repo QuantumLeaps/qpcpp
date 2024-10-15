@@ -1,34 +1,34 @@
 //============================================================================
 // QP/C++ Real-Time Embedded Framework (RTEF)
 //
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
 //                   Q u a n t u m  L e a P s
 //                   ------------------------
 //                   Modern Embedded Software
 //
-// Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
-//
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// This software is dual-licensed under the terms of the open source GNU
-// General Public License version 3 (or any later version), or alternatively,
-// under the terms of one of the closed source Quantum Leaps commercial
-// licenses.
-//
-// The terms of the open source GNU General Public License version 3
-// can be found at: <www.gnu.org/licenses/gpl-3.0>
-//
-// The terms of the closed source Quantum Leaps commercial licenses
-// can be found at: <www.state-machine.com/licensing>
+// The QP/C software is dual-licensed under the terms of the open-source GNU
+// General Public License (GPL) or under the terms of one of the closed-
+// source Quantum Leaps commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
-// Contact information:
-// <www.state-machine.com>
+// NOTE:
+// The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
+// incorporation of the QP/C software into proprietary programs. Please
+// contact Quantum Leaps for commercial licensing options, which expressly
+// supersede the GPL and are designed explicitly for licensees interested
+// in using QP/C in closed-source proprietary applications.
+//
+// Quantum Leaps contact information:
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-07
-//! @version Last updated for: @ref qpcpp_7_3_0
+//! @date Last updated on: 2024-09-30
+//! @version Last updated for: @ref qpcpp_8_0_0
 //!
 //! @file
 //! @brief QP/C++ to MSP40, QUTEST unit test harness, generic C++11 compiler
@@ -36,9 +36,8 @@
 #ifndef QP_PORT_HPP_
 #define QP_PORT_HPP_
 
-#include <cstdint>  // Exact-width types. C++11 Standard
-
-#include "qp_config.hpp" // external QP configuration required in this port
+#include <cstdint>        // Exact-width types. C++11 Standard
+#include "qp_config.hpp"  // QP configuration from the application
 
 // no-return function specifier (C++11 Standard)
 #define Q_NORETURN  [[ noreturn ]] void
@@ -83,8 +82,8 @@
     #define QF_SCHED_UNLOCK_()    ((void)0)
 
     // native event queue operations
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_INCRIT(110, (me_)->m_eQueue.m_frontEvt != nullptr)
+    #define QACTIVE_EQUEUE_WAIT_(me_) (static_cast<void>(0))
+
 #ifndef Q_UNSAFE
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
         QF::readySet_.insert(static_cast<std::uint_fast8_t>((me_)->m_prio));

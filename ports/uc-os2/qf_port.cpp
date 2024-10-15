@@ -1,29 +1,32 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// This software is dual-licensed under the terms of the open source GNU
-// General Public License version 3 (or any later version), or alternatively,
-// under the terms of one of the closed source Quantum Leaps commercial
-// licenses.
-//
-// The terms of the open source GNU General Public License version 3
-// can be found at: <www.gnu.org/licenses/gpl-3.0>
-//
-// The terms of the closed source Quantum Leaps commercial licenses
-// can be found at: <www.state-machine.com/licensing>
+// The QP/C software is dual-licensed under the terms of the open-source GNU
+// General Public License (GPL) or under the terms of one of the closed-
+// source Quantum Leaps commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
-// Contact information:
-// <www.state-machine.com>
+// NOTE:
+// The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
+// incorporation of the QP/C software into proprietary programs. Please
+// contact Quantum Leaps for commercial licensing options, which expressly
+// supersede the GPL and are designed explicitly for licensees interested
+// in using QP/C in closed-source proprietary applications.
+//
+// Quantum Leaps contact information:
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-06-11
-//! @version Last updated for: @ref qpcpp_7_4_0
+//! @date Last updated on: 2024-09-26
+//! @version Last updated for: @ref qpcpp_8_0_0
 //!
 //! @file
 //! @brief QF/C++ port to uC-OS2 RTOS, generic C++11 compiler
@@ -66,8 +69,8 @@ int QF::run() {
     // produce the QS_QF_RUN trace record
     QS_CRIT_STAT
     QS_CRIT_ENTRY();
-    QS_BEGIN_PRE_(QS_QF_RUN, 0U)
-    QS_END_PRE_()
+    QS_BEGIN_PRE(QS_QF_RUN, 0U)
+    QS_END_PRE()
     QS_CRIT_EXIT();
 
     OSStart(); // start uC-OS2 multitasking,  should never return
@@ -91,9 +94,9 @@ void QActive::evtLoop_(QActive *act) {
 
 //............................................................................
 void QActive::start(QPrioSpec const prioSpec,
-                    QEvt const * * const qSto, std::uint_fast16_t const qLen,
-                    void * const stkSto, std::uint_fast16_t const stkSize,
-                    void const * const par)
+    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
+    void * const stkSto, std::uint_fast16_t const stkSize,
+    void const * const par)
 {
     // task name to be passed to OSTaskCreateExt()
     void * const task_name = static_cast<void *>(m_eQueue);
@@ -104,7 +107,7 @@ void QActive::start(QPrioSpec const prioSpec,
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
     // the uC-OS2 queue must be created correctly
-    Q_ASSERT_INCRIT(210, m_eQueue != nullptr);
+    Q_ASSERT_INCRIT(110, m_eQueue != nullptr);
     QF_CRIT_EXIT();
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
@@ -168,17 +171,22 @@ void QActive::start(QPrioSpec const prioSpec,
     // uC-OS2 task must be created correctly
     Q_ASSERT_INCRIT(220, err == OS_ERR_NONE);
     QF_CRIT_EXIT();
+
+#ifdef Q_UNSAFE
+    Q_UNUSED_PAR(err);
+#endif
 }
 //............................................................................
-// NOTE: This function must be called BEFORE starting an active object
 void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
+    // NOTE: this function must be called *before* QActive_start(),
+    // which implies that me->thread.tx_thread_name must not be used yet;
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
     switch (attr1) {
         case TASK_NAME_ATTR:
-           // this function must be called before QACTIVE_START(),
+           // this function must be called before QActive_start(),
            // which implies that m_eQueue must not be used yet;
-           Q_ASSERT_INCRIT(300, m_eQueue == nullptr);
+           Q_ASSERT_INCRIT(150, m_eQueue == nullptr);
            // temporarily store the name, cast 'const' away
            m_eQueue = static_cast<OS_EVENT *>(
                            const_cast<void *>(attr2));
@@ -197,6 +205,12 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
+
+    Q_REQUIRE_INCRIT(200, e != nullptr);
+#ifndef Q_UNSAFE
+    Q_INVARIANT_INCRIT(201, e->verify_());
+#endif
+
     std::uint_fast16_t const nFree = static_cast<std::uint_fast16_t>(
         reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSQSize
          - reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSNMsgs);
@@ -204,15 +218,15 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
     bool status;
     if (margin == QF::NO_MARGIN) {
         if (nFree > 0U) {
-            status = true;   // can post
+            status = true; // can post
         }
         else {
             status = false;  // cannot post
-            Q_ERROR_INCRIT(710); // must be able to post the event
+            Q_ERROR_INCRIT(210); // must be able to post the event
         }
     }
     else if (nFree > static_cast<QEQueueCtr>(margin)) {
-        status = true;  // can post
+        status = true; // can post
     }
     else {
         status = false; // cannot post
@@ -220,40 +234,43 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
 
     if (status) { // can post the event?
 
-        QS_BEGIN_PRE_(QS_QF_ACTIVE_POST, m_prio)
-            QS_TIME_PRE_();      // timestamp
-            QS_OBJ_PRE_(sender); // the sender object
-            QS_SIG_PRE_(e->sig); // the signal of the event
-            QS_OBJ_PRE_(this);   // this active object (recipient)
-            QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_);// pool-Id & ref-Count
-            QS_EQC_PRE_(nFree);  // # free entries
-            QS_EQC_PRE_(0U);     // min # free entries (unknown)
-        QS_END_PRE_()
+        QS_BEGIN_PRE(QS_QF_ACTIVE_POST, m_prio)
+            QS_TIME_PRE();       // timestamp
+            QS_OBJ_PRE(sender);  // the sender object
+            QS_SIG_PRE(e->sig);  // the signal of the event
+            QS_OBJ_PRE(this);    // this active object (recipient)
+            QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);
+            QS_EQC_PRE(nFree);   // # free entries
+            QS_EQC_PRE(0U);      // min # free entries (unknown)
+        QS_END_PRE()
 
-        if (e->getPoolNum_() != 0U) {  // is it a pool event?
+        if (e->getPoolNum_() != 0U) { // is it a pool event?
             QEvt_refCtr_inc_(e); // increment the reference counter
         }
-
         QF_CRIT_EXIT();
 
         INT8U err = OSQPost(m_eQueue, const_cast<QEvt *>(e));
 
         QF_CRIT_ENTRY();
         // posting to uC-OS2 message queue must succeed, see NOTE3
-        Q_ASSERT_INCRIT(720, err == OS_ERR_NONE);
+        Q_ASSERT_INCRIT(220, err == OS_ERR_NONE);
         QF_CRIT_EXIT();
+
+#ifdef Q_UNSAFE
+        Q_UNUSED_PAR(err);
+#endif
     }
     else {
 
-        QS_BEGIN_PRE_(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
-            QS_TIME_PRE_();      // timestamp
-            QS_OBJ_PRE_(sender); // the sender object
-            QS_SIG_PRE_(e->sig); // the signal of the event
-            QS_OBJ_PRE_(this);   // this active object (recipient)
-            QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_);// pool-Id & ref-Count
-            QS_EQC_PRE_(nFree);  // # free entries
-            QS_EQC_PRE_(margin); // margin requested
-        QS_END_PRE_()
+        QS_BEGIN_PRE(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
+            QS_TIME_PRE();       // timestamp
+            QS_OBJ_PRE(sender);  // the sender object
+            QS_SIG_PRE(e->sig);  // the signal of the event
+            QS_OBJ_PRE(this);    // this active object (recipient)
+            QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);
+            QS_EQC_PRE(nFree);   // # free entries available
+            QS_EQC_PRE(margin);  // margin requested
+        QS_END_PRE()
 
         QF_CRIT_EXIT();
     }
@@ -265,18 +282,23 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    QS_BEGIN_PRE_(QS_QF_ACTIVE_POST_LIFO, m_prio)
-        QS_TIME_PRE_();      // timestamp
-        QS_SIG_PRE_(e->sig); // the signal of this event
-        QS_OBJ_PRE_(this);   // this active object
-        QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // pool-Id & ref-Count
-                             // # free entries
-        QS_EQC_PRE_(reinterpret_cast<OS_Q *>(m_eQueue)->OSQSize
-                    - reinterpret_cast<OS_Q *>(m_eQueue)->OSQEntries);
-        QS_EQC_PRE_(0U);     // min # free (unknown)
-    QS_END_PRE_()
+    Q_REQUIRE_INCRIT(300, e != nullptr);
+#ifndef Q_UNSAFE
+    Q_INVARIANT_INCRIT(301, e->verify_());
+#endif
 
-    if (e->getPoolNum_() != 0U) {  // is it a pool event?
+    QS_BEGIN_PRE(QS_QF_ACTIVE_POST_LIFO, m_prio)
+        QS_TIME_PRE();       // timestamp
+        QS_SIG_PRE(e->sig);  // the signal of this event
+        QS_OBJ_PRE(this);    // this active object
+        QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);
+                              // # free entries
+        QS_EQC_PRE(reinterpret_cast<OS_Q *>(m_eQueue)->OSQSize
+                    - reinterpret_cast<OS_Q *>(m_eQueue)->OSQEntries);
+        QS_EQC_PRE(0U);      // min # free entries (unknown)
+    QS_END_PRE()
+
+    if (e->getPoolNum_() != 0U) { // is it a pool event?
         QEvt_refCtr_inc_(e); // increment the reference counter
     }
     QF_CRIT_EXIT();
@@ -285,8 +307,12 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
 
     QF_CRIT_ENTRY();
     // posting to uC-OS2 message queue must succeed, see NOTE3
-    Q_ASSERT_INCRIT(810, err == OS_ERR_NONE);
+    Q_ASSERT_INCRIT(310, err == OS_ERR_NONE);
     QF_CRIT_EXIT();
+
+#ifdef Q_UNSAFE
+    Q_UNUSED_PAR(err);
+#endif
 }
 //............................................................................
 QEvt const *QActive::get_(void) noexcept {
@@ -296,19 +322,22 @@ QEvt const *QActive::get_(void) noexcept {
 
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_ASSERT_INCRIT(910, err == OS_ERR_NONE);
+    Q_ASSERT_INCRIT(410, err == OS_ERR_NONE);
 
-    QS_BEGIN_PRE_(QS_QF_ACTIVE_GET, m_prio)
-        QS_TIME_PRE_();      // timestamp
-        QS_SIG_PRE_(e->sig); // the signal of this event
-        QS_OBJ_PRE_(this);   // this active object
-        QS_2U8_PRE_(e->getPoolNum_(), e->refCtr_); // pool-Id & ref-Count
-                             // # free entries
-        QS_EQC_PRE_(reinterpret_cast<OS_Q *>(m_eQueue)->OSQSize
+    QS_BEGIN_PRE(QS_QF_ACTIVE_GET, m_prio)
+        QS_TIME_PRE();          // timestamp
+        QS_SIG_PRE(e->sig);     // the signal of this event
+        QS_OBJ_PRE(this);       // this active object
+        QS_2U8_PRE(e->getPoolNum_(), e->refCtr_);
+                                 // # free entries
+        QS_EQC_PRE(reinterpret_cast<OS_Q *>(m_eQueue)->OSQSize
                     - reinterpret_cast<OS_Q *>(m_eQueue)->OSQEntries);
-    QS_END_PRE_()
+    QS_END_PRE()
     QF_CRIT_EXIT();
 
+#ifdef Q_UNSAFE
+    Q_UNUSED_PAR(err);
+#endif
     return e;
 }
 

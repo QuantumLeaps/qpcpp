@@ -23,7 +23,7 @@
 // <info@state-machine.com>
 //============================================================================
 //! @date Last updated on: 2024-07-18
-//! @version Last updated for: @ref qpcpp_7_4_0
+//! @version Last updated for: @ref qpcpp_8_0_0
 //!
 //! @file
 //! @brief QS/C++ port to POSIX
