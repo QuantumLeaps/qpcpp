@@ -36,9 +36,9 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR "8.0.0"
-#define QP_VERSION     800U
-#define QP_RELEASE     0x7055936FU
+#define QP_VERSION_STR "8.0.1"
+#define QP_VERSION     801U
+#define QP_RELEASE     0x703931CEU
 
 //============================================================================
 //! @cond INTERNAL

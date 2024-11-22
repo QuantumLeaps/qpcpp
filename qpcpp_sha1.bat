@@ -1,18 +1,20 @@
 @setlocal
 
+set VERSION=8.0.1
+
 :: usage
 @echo Usage: qppcp_sha1 [gen]
 @echo examples:
-@echo qppcp_sha1     : check the sha1 sums in the file qpcpp.sha1
-@echo qpcpp_sha1 gen : generate the sha1 file qpcpp.sha1
+@echo qppcp_sha1     : check the sha1 sums in the file qpcpp_%VERSION%.sha1
+@echo qpcpp_sha1 gen : generate the sha1 file qpcpp_%VERSION%.sha1
 @echo.
 
 @if NOT "%1"=="gen" (
-sha1sum --check --warn qpcpp.sha1
+sha1sum --check --warn qpcpp_%VERSION%.sha1
 goto end
 )
 
-@echo generating qpcpp.sha1...
+@echo generating qpcpp_%VERSION%.sha1...
 @sha1sum qpcpp.qm ^
     include/* ^
     src/qf/* src/qk/* src/qs/* src/qv/* src/qxk/* ^
@@ -33,7 +35,7 @@ goto end
     ports/posix/* ports/posix-qv/* ports/posix-qutest/* ^
     ports/win32/* ports/win32-qv/* ports/win32-qutest/* ^
     zephyr/* ^
-    > qpcpp.sha1
+    > qpcpp_%VERSION%.sha1
 @echo done
 
 :end
