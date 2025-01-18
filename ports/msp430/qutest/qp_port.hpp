@@ -9,7 +9,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// The QP/C software is dual-licensed under the terms of the open-source GNU
+// This software is dual-licensed under the terms of the open-source GNU
 // General Public License (GPL) or under the terms of one of the closed-
 // source Quantum Leaps commercial licenses.
 //
@@ -27,12 +27,6 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-09-30
-//! @version Last updated for: @ref qpcpp_8_0_0
-//!
-//! @file
-//! @brief QP/C++ to MSP40, QUTEST unit test harness, generic C++11 compiler
-
 #ifndef QP_PORT_HPP_
 #define QP_PORT_HPP_
 
@@ -42,12 +36,8 @@
 // no-return function specifier (C++11 Standard)
 #define Q_NORETURN  [[ noreturn ]] void
 
-// QF configuration for QK -- data members of the QActive class...
-
 // QActive event queue type
 #define QACTIVE_EQUEUE_TYPE  QEQueue
-// QACTIVE_OS_OBJ_TYPE not used in this port
-// QACTIVE_THREAD_TYPE not used in this port
 
 // QF interrupt disable/enable
 #define QF_INT_DISABLE()     (++QP::QF::intLock_)
@@ -74,33 +64,28 @@
 
 //============================================================================
 // interface used only inside QF implementation, but not in applications
+
 #ifdef QP_IMPL
 
     // QUTest scheduler locking (not used)
     #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) ((void)0)
-    #define QF_SCHED_UNLOCK_()    ((void)0)
+    #define QF_SCHED_LOCK_(dummy) (static_cast<void>(0))
+    #define QF_SCHED_UNLOCK_()    (static_cast<void>(0))
 
-    // native event queue operations
+    // native QEQueue operations
     #define QACTIVE_EQUEUE_WAIT_(me_) (static_cast<void>(0))
+    #define QACTIVE_EQUEUE_SIGNAL_(me_)    \
+        (QP::QS::tstPriv_.readySet.insert( \
+            static_cast<std::uint_fast8_t>((me_)->m_prio)))
 
-#ifndef Q_UNSAFE
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        QF::readySet_.insert(static_cast<std::uint_fast8_t>((me_)->m_prio));
-        QF::readySet_.update_(&QF::readySet_dis)
-#else
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        QF::readySet_.insert(static_cast<std::uint_fast8_t>((me_)->m_prio))
-#endif
-
-    // native QF event pool operations
+    // native QMPool operations
     #define QF_EPOOL_TYPE_  QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
         (p_).init((poolSto_), (poolSize_), (evtSize_))
     #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
     #define QF_EPOOL_GET_(p_, e_, m_, qsId_) \
         ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
-    #define QF_EPOOL_PUT_(p_, e_, qsId_) ((p_).put((e_), (qsId_)))
+    #define QF_EPOOL_PUT_(p_, e_, qsId_)  ((p_).put((e_), (qsId_)))
 
 #endif // QP_IMPL
 

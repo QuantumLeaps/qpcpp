@@ -3,13 +3,13 @@
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// The QP/C software is dual-licensed under the terms of the open-source GNU
+// This software is dual-licensed under the terms of the open-source GNU
 // General Public License (GPL) or under the terms of one of the closed-
 // source Quantum Leaps commercial licenses.
 //
@@ -35,9 +35,9 @@
 // <o>QP API compatibility version (QP_API_VERSION)
 //   <0=>  0   (Maximum compatibility)
 //   <691=>691 (QP 6.9.1 or newer)
-//   <734=>7.3.4 (QP 7.3.4 or newer)
+//   <750=>750 (QP 7.5.0 or newer)
 //   <9999=>9999 (Latest only)
-// <i>QP API backwards compatibility with the QP/C API version.
+// <i>QP API backwards compatibility with the QP API version.
 // <i>Lower QP_API_VERSION values enable backwards compatibility
 // <i>with lower (older) QP API versions.
 // <i>For example, QP_API_VERSION==691 will enable the compatibility
@@ -191,7 +191,7 @@
 // </c>
 
 // <c2>Enable memory isolation (QF_MEM_ISOLATE)
-// <i>Memory isolation (requires MPU)
+// <i>Memory isolation (supported in SafeQP only, requires MPU)
 // <i>NOTE: implies QF_ON_CONTEXT_SW.
 //#define QF_MEM_ISOLATE
 // </c>
@@ -201,11 +201,13 @@
 //..........................................................................
 // <h>QV/QK/QXK built-in kernels (ARM Cortex-M)
 
+#if (__ARM_ARCH > 6)
 // <c2>Kernel uses critical section based on BASEPRI (QF_USE_BASEPRI)
 // <i>If not selected, critical section will be based on PRIMASK
 // <i>NOTE: The BASEPRI threshold can be adjusted in the "Text Editor" mode.
 //#define QF_USE_BASEPRI 0x3F
 // </c>
+#endif // (__ARM_ARCH > 6)
 
 // <c2>QK Kernel uses IRQ for return-from-preemption
 // <i>NOTE: Use "editor mode" to edit QK_USE_IRQ_NUM

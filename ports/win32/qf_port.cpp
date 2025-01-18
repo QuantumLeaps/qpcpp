@@ -22,12 +22,6 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-09-19
-//! @version Last updated for: @ref qpcpp_8_0_0
-//!
-//! @file
-//! @brief QF/C++ port to Win32 (multithreaded)
-
 #define QP_IMPL             // this is QP implementation
 #include "qp_port.hpp"      // QP port
 #include "qp_pkg.hpp"       // QP package-scope interface

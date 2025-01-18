@@ -9,7 +9,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// The QP/C software is dual-licensed under the terms of the open-source GNU
+// This software is dual-licensed under the terms of the open-source GNU
 // General Public License (GPL) or under the terms of one of the closed-
 // source Quantum Leaps commercial licenses.
 //
@@ -191,7 +191,7 @@
 // </c>
 
 // <c2>Enable memory isolation (QF_MEM_ISOLATE)
-// <i>Memory isolation (requires MPU)
+// <i>Memory isolation (supported in SafeQP only, requires MPU)
 // <i>NOTE: implies QF_ON_CONTEXT_SW.
 //#define QF_MEM_ISOLATE
 // </c>

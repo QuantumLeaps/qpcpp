@@ -22,15 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-06-11
-//! @version Last updated for: @ref qpcpp_8_0_0
-//!
-//! @file
-//! @brief QS/C++ port to Win32 API
-//!
-
 #ifndef Q_SPY
-    #error "Q_SPY must be defined to compile qs_port.cpp"
+    #error Q_SPY must be defined to compile qs_port.cpp
 #endif // Q_SPY
 
 #define QP_IMPL             // this is QP implementation

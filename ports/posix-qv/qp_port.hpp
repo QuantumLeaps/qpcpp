@@ -9,7 +9,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// The QP/C software is dual-licensed under the terms of the open-source GNU
+// This software is dual-licensed under the terms of the open-source GNU
 // General Public License (GPL) or under the terms of one of the closed-
 // source Quantum Leaps commercial licenses.
 //
@@ -27,12 +27,6 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-09-30
-//! @version Last updated for: @ref qpcpp_8_0_0
-//!
-//! @file
-//! @brief QP/C++ port to POSIX-QV (signgle threaded), generic C++11
-
 #ifndef QP_PORT_HPP_
 #define QP_PORT_HPP_
 
@@ -97,16 +91,9 @@ void onClockTick();
     // QF event queue customization for POSIX-QV...
     #define QACTIVE_EQUEUE_WAIT_(me_) (static_cast<void>(0))
 
-#ifndef Q_UNSAFE
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        QF::readySet_.insert((me_)->m_prio); \
-        QF::readySet_.update_(&QF::readySet_dis_); \
-        pthread_cond_signal(&QP::QF::condVar_)
-#else
     #define QACTIVE_EQUEUE_SIGNAL_(me_) \
         QF::readySet_.insert((me_)->m_prio); \
         pthread_cond_signal(&QP::QF::condVar_)
-#endif
 
     // native QF event pool operations
     #define QF_EPOOL_TYPE_  QMPool

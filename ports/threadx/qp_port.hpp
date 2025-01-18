@@ -1,15 +1,13 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-//
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// The QP/C software is dual-licensed under the terms of the open-source GNU
+// This software is dual-licensed under the terms of the open-source GNU
 // General Public License (GPL) or under the terms of one of the closed-
 // source Quantum Leaps commercial licenses.
 //
@@ -27,12 +25,6 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-09-30
-//! @version Last updated for: @ref qpcpp_8_0_0
-//!
-//! @file
-//! @brief QP/C++ port to ThreadX (a.k.a, Azure RTOS), generic C++11 compiler
-
 #ifndef QP_PORT_HPP_
 #define QP_PORT_HPP_
 
@@ -51,9 +43,9 @@
 #define QF_TX_PRIO_OFFSET       2U
 
 #ifndef QF_MAX_ACTIVE
-#define QF_MAX_ACTIVE    (TX_MAX_PRIORITIES - QF_TX_PRIO_OFFSET)
+    #define QF_MAX_ACTIVE    (TX_MAX_PRIORITIES - QF_TX_PRIO_OFFSET)
 #else
-#error "QF_MAX_ACTIVE shouild not be externally defined in QP-ThreadX port"
+    #error QF_MAX_ACTIVE shouild not be externally defined in QP-ThreadX port
 #endif
 
 // mapping between QF-priority and TX-priority, see NOTE1

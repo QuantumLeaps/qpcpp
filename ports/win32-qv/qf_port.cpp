@@ -22,12 +22,6 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-09-19
-//! @version Last updated for: @ref qpcpp_8_0_0
-//!
-//! @file
-//! @brief QF/C++ port to Win32 (single-threaded, like the QV kernel)
-
 #define QP_IMPL             // this is QP implementation
 #include "qp_port.hpp"      // QP port
 #include "qp_pkg.hpp"       // QP package-scope interface
@@ -114,10 +108,6 @@ void init() {
     win32Event_ = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     readySet_.setEmpty();
-#ifndef Q_UNSAFE
-    readySet_.update_(&readySet_dis_);
-#endif
-
 }
 
 //............................................................................
@@ -149,8 +139,6 @@ int run() {
     QS_END_PRE()
 
     while (l_isRunning) {
-        Q_ASSERT_INCRIT(300, readySet_.verify_(&readySet_dis_));
-
         // find the maximum priority AO ready to run
         if (readySet_.notEmpty()) {
             std::uint_fast8_t p = readySet_.findMax();
@@ -169,9 +157,6 @@ int run() {
             QF_CRIT_ENTRY();
             if (a->getEQueue().isEmpty()) { // empty queue?
                 readySet_.remove(p);
-#ifndef Q_UNSAFE
-                readySet_.update_(&readySet_dis_);
-#endif
             }
         }
         else {
@@ -200,9 +185,6 @@ void stop() {
 
     // unblock the event-loop so it can terminate
     readySet_.insert(1U);
-#ifndef Q_UNSAFE
-    readySet_.update_(&readySet_dis_);
-#endif
     SetEvent(win32Event_);
 }
 //............................................................................
@@ -272,9 +254,6 @@ void QActive::stop() {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
     QF::readySet_.remove(m_prio);
-#ifndef Q_UNSAFE
-    QF::readySet_.update_(&QF::readySet_dis_);
-#endif
     QF_CRIT_EXIT();
 
     unregister_(); // remove this AO from QF

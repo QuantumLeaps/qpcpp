@@ -1,32 +1,32 @@
 //============================================================================
 // QP/C++ Real-Time Embedded Framework (RTEF)
-// Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
+//
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// This software is dual-licensed under the terms of the open source GNU
-// General Public License version 3 (or any later version), or alternatively,
-// under the terms of one of the closed source Quantum Leaps commercial
-// licenses.
-//
-// The terms of the open source GNU General Public License version 3
-// can be found at: <www.gnu.org/licenses/gpl-3.0>
-//
-// The terms of the closed source Quantum Leaps commercial licenses
-// can be found at: <www.state-machine.com/licensing>
+// This software is dual-licensed under the terms of the open-source GNU
+// General Public License (GPL) or under the terms of one of the closed-
+// source Quantum Leaps commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
-// Contact information:
+// NOTE:
+// The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
+// incorporation of the QP/C software into proprietary programs. Please
+// contact Quantum Leaps for commercial licensing options, which expressly
+// supersede the GPL and are designed explicitly for licensees interested
+// in using QP/C in closed-source proprietary applications.
+//
+// Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-09-19
-//! @version Last updated for: @ref qpcpp_8_0_0
-//!
-//! @file
-//! @brief QF/C++ port to POSIX-QV (single-threaded)
 
 // expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008)
 #define _POSIX_C_SOURCE 200809L
@@ -188,9 +188,6 @@ void init() {
     pthread_cond_init(&condVar_, NULL);
 
     readySet_.setEmpty();
-#ifndef Q_UNSAFE
-    readySet_.update_(&readySet_dis_);
-#endif
 
     // lock memory so we're never swapped out to disk
     //mlockall(MCL_CURRENT | MCL_FUTURE); // un-comment when supported
@@ -282,9 +279,6 @@ int run() {
             QF_CRIT_ENTRY();
             if (a->getEQueue().isEmpty()) { // empty queue?
                 readySet_.remove(p);
-#ifndef Q_UNSAFE
-                readySet_.update_(&readySet_dis_);
-#endif
             }
         }
         else {
@@ -318,9 +312,6 @@ void stop() {
 
     // unblock the event-loop so it can terminate
     readySet_.insert(1U);
-#ifndef Q_UNSAFE
-    readySet_.update_(&readySet_dis_);
-#endif
     pthread_cond_signal(&condVar_);
 }
 //............................................................................
@@ -406,9 +397,6 @@ void QActive::stop() {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
     QF::readySet_.remove(m_prio);
-#ifndef Q_UNSAFE
-    QF::readySet_.update_(&QF::readySet_dis_);
-#endif
     QF_CRIT_EXIT();
 
     unregister_();

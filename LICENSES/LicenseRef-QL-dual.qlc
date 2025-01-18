@@ -9,8 +9,8 @@ Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 
 SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 
-The QP/C++ software is dual-licensed under the terms of the open-source
-GNU General Public License (GPL) or under the terms of one of the closed-
+This software is dual-licensed under the terms of the open-source GNU
+General Public License (GPL) or under the terms of one of the closed-
 source Quantum Leaps commercial licenses.
 
 Redistributions in source code must retain this top-level comment block.
@@ -25,4 +25,4 @@ closed-source distribution.
 Quantum Leaps contact information:
 <www.state-machine.com/licensing>
 <info@state-machine.com>
-#48B37CF39D4FD9DE279250B31FD388AFD0BE9B40
+#E73B85325051C864FE0E4C672EF7577CB16A80DA

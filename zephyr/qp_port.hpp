@@ -7,7 +7,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// The QP/C software is dual-licensed under the terms of the open-source GNU
+// This software is dual-licensed under the terms of the open-source GNU
 // General Public License (GPL) or under the terms of one of the closed-
 // source Quantum Leaps commercial licenses.
 //
@@ -25,12 +25,6 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2023-09-07
-//! @version Last updated for: @ref qpcpp_7_3_0
-//!
-//! @file
-//! @brief QP/C++ port to Zephyr RTOS 3.4
-
 #ifndef QP_PORT_HPP_
 #define QP_PORT_HPP_
 

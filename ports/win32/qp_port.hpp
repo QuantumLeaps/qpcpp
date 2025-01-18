@@ -9,7 +9,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// The QP/C software is dual-licensed under the terms of the open-source GNU
+// This software is dual-licensed under the terms of the open-source GNU
 // General Public License (GPL) or under the terms of one of the closed-
 // source Quantum Leaps commercial licenses.
 //
@@ -27,12 +27,6 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-09-30
-//! @version Last updated for: @ref qpcpp_8_0_0
-//!
-//! @file
-//! @brief QP/C++ port to Win32 (multithreaded), generic C++11
-
 #ifndef QP_PORT_HPP_
 #define QP_PORT_HPP_
 
@@ -104,7 +98,8 @@ void onClockTick();
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         while ((me_)->m_eQueue.m_frontEvt == nullptr) { \
             QF_CRIT_EXIT(); \
-            static_cast<void>(WaitForSingleObject((me_)->m_osObject, INFINITE)); \
+            static_cast<void>(WaitForSingleObject( \
+                (me_)->m_osObject, INFINITE)); \
             QF_CRIT_ENTRY(); \
         }
 

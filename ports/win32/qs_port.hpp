@@ -27,12 +27,6 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-06-06
-//! @version Last updated for: @ref qpcpp_8_0_0
-//!
-//! @file
-//! @brief QS/C++ port to POSIX/Win32
-
 #ifndef QS_PORT_HPP_
 #define QS_PORT_HPP_
 
