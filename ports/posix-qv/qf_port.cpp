@@ -1,11 +1,12 @@
 //============================================================================
 // QP/C++ Real-Time Embedded Framework (RTEF)
+// Version 8.0.2
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
@@ -17,11 +18,10 @@
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
-// incorporation of the QP/C software into proprietary programs. Please
-// contact Quantum Leaps for commercial licensing options, which expressly
-// supersede the GPL and are designed explicitly for licensees interested
-// in using QP/C in closed-source proprietary applications.
+// The GPL does NOT permit the incorporation of this code into proprietary
+// programs. Please contact Quantum Leaps for commercial licensing options,
+// which expressly supersede the GPL and are designed explicitly for
+// closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -166,26 +166,22 @@ static int_t l_critSectNest;   // critical section nesting up-down counter
 
 //............................................................................
 void enterCriticalSection_() {
-    if (l_isRunning) {
-        pthread_mutex_lock(&l_critSectMutex_);
-        Q_ASSERT_INCRIT(101, l_critSectNest == 0); // NO nesting of crit.sect!
-        ++l_critSectNest;
-    }
+    pthread_mutex_lock(&l_critSectMutex_);
+    Q_ASSERT_INCRIT(101, l_critSectNest == 0); // NO nesting of crit.sect!
+    ++l_critSectNest;
 }
 //............................................................................
 void leaveCriticalSection_() {
-    if (l_isRunning) {
-        Q_ASSERT_INCRIT(102, l_critSectNest == 1); // crit.sect. must balance!
-        if ((--l_critSectNest) == 0) {
-            pthread_mutex_unlock(&l_critSectMutex_);
-        }
+    Q_ASSERT_INCRIT(102, l_critSectNest == 1); // crit.sect. must balance!
+    if ((--l_critSectNest) == 0) {
+        pthread_mutex_unlock(&l_critSectMutex_);
     }
 }
 
 //............................................................................
 void init() {
     // init the global condition variable with the default initializer
-    pthread_cond_init(&condVar_, NULL);
+    pthread_cond_init(&condVar_, nullptr);
 
     readySet_.setEmpty();
 
@@ -259,8 +255,6 @@ int run() {
     QS_END_PRE()
 
     while (l_isRunning) {
-        Q_ASSERT_INCRIT(300, readySet_.verify_(&readySet_dis_));
-
         // find the maximum priority AO ready to run
         if (readySet_.notEmpty()) {
             std::uint_fast8_t p = readySet_.findMax();
@@ -298,8 +292,8 @@ int run() {
         }
     }
     QF_CRIT_EXIT();
-    onCleanup();  // cleanup callback
-    QS_EXIT();    // cleanup the QSPY connection
+    onCleanup();    // cleanup callback
+    QS_EXIT();      // cleanup the QSPY connection
 
     pthread_cond_destroy(&condVar_); // cleanup the condition variable
     pthread_mutex_destroy(&l_critSectMutex_); // cleanup the global mutex
@@ -365,9 +359,9 @@ int consoleWaitForKey() {
 
 // QActive functions =========================================================
 void QActive::start(QPrioSpec const prioSpec,
-                    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
-                    void * const stkSto, std::uint_fast16_t const stkSize,
-                    void const * const par)
+    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
+    void * const stkSto, std::uint_fast16_t const stkSize,
+    void const * const par)
 {
     Q_UNUSED_PAR(stkSto);
     Q_UNUSED_PAR(stkSize);
@@ -375,14 +369,15 @@ void QActive::start(QPrioSpec const prioSpec,
     // no per-AO stack needed for this port
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(800, stkSto == nullptr);
+    Q_REQUIRE_INCRIT(600, stkSto == nullptr);
     QF_CRIT_EXIT();
 
-    m_eQueue.init(qSto, qLen);
 
-    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority of the AO
     m_pthre = 0U; // preemption-threshold (not used in this port)
     register_(); // register this AO
+
+    m_eQueue.init(qSto, qLen);
 
     // top-most initial tran. (virtual call)
     this->init(par, m_prio);
