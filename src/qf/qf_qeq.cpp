@@ -88,7 +88,7 @@ bool QEQueue::post(
     QEQueueCtr tmp = m_nFree; // get volatile into temporary
 
     // can the queue accept the event?
-    bool status = ((margin == QF::NO_MARGIN) && (tmp > 0U))
+    bool const status = ((margin == QF::NO_MARGIN) && (tmp > 0U))
         || (tmp > static_cast<QEQueueCtr>(margin));
     if (status) {
         // is it a mutable event?
