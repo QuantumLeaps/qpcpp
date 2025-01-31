@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -76,11 +75,6 @@ private:
     QMPoolCtr volatile m_nFree;
     QMPoolCtr m_nMin;
 
-#ifndef Q_UNSAFE
-    std::uintptr_t m_freeHead_dis;
-    QMPoolCtr m_nFree_dis;
-#endif // ndef Q_UNSAFE
-
 public:
     QMPool()
       : m_start(nullptr),
@@ -90,10 +84,6 @@ public:
         m_nTot(0U),
         m_nFree(0U),
         m_nMin(0U)
-    #ifndef Q_UNSAFE
-       ,m_freeHead_dis(static_cast<std::uintptr_t>(~0U)),
-        m_nFree_dis(static_cast<QEQueueCtr>(~0U))
-    #endif
     {}
     void init(
         void * const poolSto,

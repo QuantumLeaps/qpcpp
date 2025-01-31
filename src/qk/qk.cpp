@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -304,17 +303,12 @@ void stop() {
 
 //............................................................................
 int_t run() {
+    QF_INT_DISABLE();
 #ifdef Q_SPY
     // produce the QS_QF_RUN trace record
-    QF_INT_DISABLE();
     QS::beginRec_(QS_REC_NUM_(QS_QF_RUN));
     QS::endRec_();
-    QF_INT_ENABLE();
 #endif // Q_SPY
-
-    onStartup(); // application-specific startup callback
-
-    QF_INT_DISABLE();
 
 #ifdef QK_START
     QK_START(); // port-specific startup of the QK kernel
@@ -333,6 +327,8 @@ int_t run() {
     }
 
     QF_INT_ENABLE();
+
+    onStartup(); // app. callback: configure and enable interrupts
 
     for (;;) { // QK idle loop...
         QK::onIdle(); // application-specific QK on-idle callback

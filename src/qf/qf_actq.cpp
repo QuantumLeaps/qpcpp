@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -330,6 +329,18 @@ void QActive::postFIFO_(
     }
 }
 
+//............................................................................
+std::uint_fast16_t QActive::getQueueMin(std::uint_fast8_t const prio) noexcept {
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    Q_REQUIRE_INCRIT(600, (prio <= QF_MAX_ACTIVE)
+                      && (registry_[prio] != nullptr));
+    std::uint_fast16_t const min =
+         static_cast<std::uint_fast16_t>(registry_[prio]->m_eQueue.m_nMin);
+    QF_CRIT_EXIT();
+
+    return min;
+}
 
 //============================================================================
 

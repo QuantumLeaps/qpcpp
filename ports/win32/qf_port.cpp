@@ -1,5 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
+// QP/C++ Real-Time Event Framework (RTEF)
 // Copyright (C) 2005 Quantum Leaps, LLC <state-machine.com>.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial

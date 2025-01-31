@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -183,7 +182,7 @@ void QHsm::init(
     QF_CRIT_EXIT();
 
     // execute the top-most initial tran.
-    QState r = (*m_temp.fun)(this, Q_EVT_CAST(QEvt));
+    QState const r = (*m_temp.fun)(this, Q_EVT_CAST(QEvt));
 
     QF_CRIT_ENTRY();
     // the top-most initial tran. must be taken
@@ -308,14 +307,14 @@ void QHsm::dispatch(
 }
 
 //............................................................................
-bool QHsm::isIn(QStateHandler const state) noexcept {
+bool QHsm::isIn(QStateHandler const stateHndl) noexcept {
     bool inState = false; // assume that this HSM is not in 'state'
 
     // scan the state hierarchy bottom-up
     QStateHandler s = m_state.fun;
     QState r = Q_RET_SUPER;
     while (r != Q_RET_IGNORED) {
-        if (s == state) { // do the states match?
+        if (s == stateHndl) { // do the states match?
             inState = true;  // 'true' means that match found
             break; // break out of the for-loop
         }
@@ -326,7 +325,7 @@ bool QHsm::isIn(QStateHandler const state) noexcept {
 }
 
 //............................................................................
-QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
+QStateHandler QHsm::childState(QStateHandler const parentHndl) noexcept {
 #ifndef Q_UNSAFE
     bool isFound = false; // assume the child state NOT found
 #endif
@@ -336,7 +335,7 @@ QStateHandler QHsm::childState(QStateHandler const parent) noexcept {
     QState r = Q_RET_SUPER;
     while (r != Q_RET_IGNORED) {
         // have the parent of the current child?
-        if (m_temp.fun == parent) {
+        if (m_temp.fun == parentHndl) {
 #ifndef Q_UNSAFE
             isFound = true; // indicate that child state was found
 #endif

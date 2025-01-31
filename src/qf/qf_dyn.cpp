@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -138,7 +137,7 @@ QEvt * newX_(
     QF_CRIT_EXIT();
 
     // get event `e` out of the event pool (port-dependent)...
-    QEvt *e = nullptr;
+    QEvt *e;
 #ifdef Q_SPY
     QF_EPOOL_GET_(priv_.ePool_[poolNum - 1U], e,
                   ((margin != NO_MARGIN) ? margin : 0U),

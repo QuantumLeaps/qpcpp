@@ -1,5 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 //                   Q u a n t u m  L e a P s
 //                   ------------------------

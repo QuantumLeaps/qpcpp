@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -100,13 +99,6 @@ std::uint_fast8_t QF_LOG2(QP::QPSetBits const bitmask) noexcept {
     return n + log2LUT[x];
 }
 #endif // ndef QF_LOG2
-
-//............................................................................
-#ifndef Q_UNSAFE
-QPtrDis::QPtrDis(void const * const ptr) noexcept
-  : m_ptr_dis(static_cast<std::uintptr_t>(~Q_PTR2UINT_CAST_(ptr)))
-{}
-#endif
 
 } // namespace QP
 
