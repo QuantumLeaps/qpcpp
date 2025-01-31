@@ -1,6 +1,7 @@
 public
 qpcpp
 2025-12-31
+
 Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 
                    Q u a n t u m  L e a P s
@@ -10,8 +11,8 @@ Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 
 This software is dual-licensed under the terms of the open-source GNU
-General Public License (GPL) or under the terms of one of the closed-
-source Quantum Leaps commercial licenses.
+General Public License (GPL) or, alternatively under the terms of one of
+the closed-source Quantum Leaps commercial licenses.
 
 Redistributions in source code must retain this top-level comment block.
 Plagiarizing this software to sidestep the license obligations is illegal.
@@ -25,4 +26,4 @@ closed-source distribution.
 Quantum Leaps contact information:
 <www.state-machine.com/licensing>
 <info@state-machine.com>
-#E73B85325051C864FE0E4C672EF7577CB16A80DA
+#22068EAFB0B47F43F9A380BA77EA1CA618EE0EC6

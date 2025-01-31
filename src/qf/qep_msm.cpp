@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -232,7 +231,7 @@ void QMsm::dispatch(
                 t->stateHandler, hist->stateHandler);
 
             // save the tran-action table before it gets clobbered
-            QMTranActTable const *tatbl = m_temp.tatbl;
+            QMTranActTable const * const tatbl = m_temp.tatbl;
             exitToTranSource_(s, t, qsId);
             static_cast<void>(execTatbl_(tatbl, qsId));
             r = enterHistory_(hist, qsId);
@@ -242,7 +241,7 @@ void QMsm::dispatch(
 
         while (r >= Q_RET_TRAN) {
             // save the tran-action table before it gets clobbered
-            QMTranActTable const *tatbl = m_temp.tatbl;
+            QMTranActTable const * const tatbl = m_temp.tatbl;
             m_temp.obj = nullptr; // clear
             exitToTranSource_(s, t, qsId);
             r = execTatbl_(tatbl, qsId);
@@ -271,12 +270,12 @@ void QMsm::dispatch(
 }
 
 //............................................................................
-bool QMsm::isIn(QStateHandler const state) noexcept {
+bool QMsm::isIn(QStateHandler const stateHndl) noexcept {
     bool inState = false; // assume that this SM is not in 'state'
 
     QMState const *s = m_state.obj;
     while (s != nullptr) {
-        if (s->stateHandler == state) { // match found?
+        if (s->stateHandler == stateHndl) { // match found?
             inState = true;
             break;
         }
@@ -287,7 +286,7 @@ bool QMsm::isIn(QStateHandler const state) noexcept {
 }
 
 //............................................................................
-QMState const * QMsm::childStateObj(QMState const * const parent)
+QMState const * QMsm::childStateObj(QMState const * const parentHndl)
     const noexcept
 {
     QMState const *s = m_state.obj; // start with current state
@@ -295,7 +294,7 @@ QMState const * QMsm::childStateObj(QMState const * const parent)
     bool isFound = false; // assume the child NOT found
 
     while (s != nullptr) {
-        if (s == parent) {
+        if (s == parentHndl) {
             isFound = true; // child is found
             break;
         }

@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -31,10 +30,10 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR "8.0.2"
-#define QP_VERSION     802U
-// <VER>=802 <DATE>=250120
-#define QP_RELEASE     0x6AEAB45DU
+#define QP_VERSION_STR "8.0.3"
+#define QP_VERSION     803U
+// <VER>=803 <DATE>=250331
+#define QP_RELEASE     0x6ACA822CU
 
 //============================================================================
 // default configuration settings
@@ -180,45 +179,39 @@ constexpr enum_t  Q_USER_SIG {4};
 
 //============================================================================
 class QAsm {
-protected:
+public:
     QAsmAttr m_state;
     QAsmAttr m_temp;
 
 public:
+    // All possible return values from state-handlers
+    // NOTE: The ordering is important for algorithmic correctness.
+    static constexpr QState Q_RET_SUPER     {0U};
+    static constexpr QState Q_RET_UNHANDLED {1U};
 
-    //! All possible return values from state-handlers
-    //! NOTE: The ordering is important for algorithmic correctness.
-    enum QStateRet : QState {
-        // unhandled and need to "bubble up"
-        Q_RET_SUPER,     //!< event passed to superstate to handle
-        Q_RET_UNHANDLED, //!< event unhandled due to a guard
+    // handled and do not need to "bubble up"
+    static constexpr QState Q_RET_HANDLED   {2U};
+    static constexpr QState Q_RET_IGNORED   {3U};
 
-        // handled and do not need to "bubble up"
-        Q_RET_HANDLED,   //!< event handled (internal transition)
-        Q_RET_IGNORED,   //!< event silently ignored (bubbled up to top)
+    // entry/exit
+    static constexpr QState Q_RET_ENTRY     {4U};
+    static constexpr QState Q_RET_EXIT      {5U};
 
-        // entry/exit
-        Q_RET_ENTRY,     //!< state entry action executed
-        Q_RET_EXIT,      //!< state exit  action executed
+    // no side effects
+    static constexpr QState Q_RET_NULL      {6U};
 
-        // no side effects
-        Q_RET_NULL,      //!< return value without any effect
+    // transitions need to execute transition-action table in QP::QMsm
+    static constexpr QState Q_RET_TRAN      {7U};
+    static constexpr QState Q_RET_TRAN_INIT {8U};
 
-        // transitions need to execute transition-action table in QP::QMsm
-        Q_RET_TRAN,      //!< regular transition
-        Q_RET_TRAN_INIT, //!< initial transition in a state
+    // transitions that additionally clobber QHsm.m_state
+    static constexpr QState Q_RET_TRAN_HIST {9U};
 
-        // transitions that additionally clobber QHsm.m_state
-        Q_RET_TRAN_HIST, //!< transition to history of a given state
-    };
-
-    //! Reserved signals by the QP-framework.
-    enum ReservedSig : QSignal {
-        Q_EMPTY_SIG,     //!< signal to execute the default case
-        Q_ENTRY_SIG,     //!< signal for entry actions
-        Q_EXIT_SIG,      //!< signal for exit actions
-        Q_INIT_SIG       //!< signal for nested initial transitions
-    };
+    // Reserved signals by the QP-framework
+    static constexpr QSignal Q_EMPTY_SIG    {0U};
+    static constexpr QSignal Q_ENTRY_SIG    {1U};
+    static constexpr QSignal Q_EXIT_SIG     {2U};
+    static constexpr QSignal Q_INIT_SIG     {3U};
 
 protected:
     explicit QAsm() noexcept
@@ -242,8 +235,8 @@ public:
     virtual void dispatch(
         QEvt const * const e,
         std::uint_fast8_t const qsId) = 0;
-    virtual bool isIn(QStateHandler const state) noexcept {
-        static_cast<void>(state);
+    virtual bool isIn(QStateHandler const stateHndl) noexcept {
+        Q_UNUSED_PAR(stateHndl);
         return false;
     }
     QStateHandler state() const noexcept {
@@ -342,8 +335,8 @@ public:
     void dispatch(
         QEvt const * const e,
         std::uint_fast8_t const qsId) override;
-    bool isIn(QStateHandler const state) noexcept override;
-    QStateHandler childState(QStateHandler const parent) noexcept;
+    bool isIn(QStateHandler const stateHndl) noexcept override;
+    QStateHandler childState(QStateHandler const parentHndl) noexcept;
 
 #ifdef Q_SPY
     QStateHandler getStateHandler() noexcept override {
@@ -387,8 +380,9 @@ public:
         return m_state.obj->stateHandler;
     }
 #endif // def Q_SPY
-    bool isIn(QStateHandler const state) noexcept override;
-    QMState const * childStateObj(QMState const * const parent) const noexcept;
+    bool isIn(QStateHandler const stateHndl) noexcept override;
+    QMState const * childStateObj(QMState const * const parentHndl)
+        const noexcept;
 
 private:
     QState execTatbl_(
@@ -565,24 +559,12 @@ private:
 }; // class QSubscrList
 
 //============================================================================
-class QPtrDis {
-private:
-    std::uintptr_t m_ptr_dis;
-
-    // friends...
-    friend class QTimeEvt;
-    friend class QXThread;
-
-public:
-    QPtrDis(void const * const ptr = nullptr) noexcept;
-}; // class QPtrDis
-
 class QEQueue; // forward declaration
 
 
 //============================================================================
 class QActive : public QP::QAsm {
-protected:
+private:
     std::uint8_t m_prio;
     std::uint8_t m_pthre;
 
@@ -640,11 +622,11 @@ public:
     {
         reinterpret_cast<QHsm *>(this)->QHsm::dispatch(e, qsId);
     }
-    bool isIn(QStateHandler const state) noexcept override {
-        return reinterpret_cast<QHsm *>(this)->QHsm::isIn(state);
+    bool isIn(QStateHandler const stateHndl) noexcept override {
+        return reinterpret_cast<QHsm *>(this)->QHsm::isIn(stateHndl);
     }
-    QStateHandler childState(QStateHandler const parent) noexcept {
-        return reinterpret_cast<QHsm *>(this)->QHsm::childState(parent);
+    QStateHandler childState(QStateHandler const parentHandler) noexcept {
+        return reinterpret_cast<QHsm *>(this)->QHsm::childState(parentHandler);
     }
     void setAttr(
         std::uint32_t attr1,
@@ -755,7 +737,7 @@ private:
 //============================================================================
 class QMActive : public QP::QActive {
 protected:
-    QMActive(QStateHandler const initial) noexcept;
+    explicit QMActive(QStateHandler const initial) noexcept;
 
 public:
     void init(
@@ -773,8 +755,8 @@ public:
     {
         reinterpret_cast<QMsm *>(this)->QMsm::dispatch(e, qsId);
     }
-    bool isIn(QStateHandler const state) noexcept override {
-        return reinterpret_cast<QMsm *>(this)->QMsm::isIn(state);
+    bool isIn(QStateHandler const stateHndl) noexcept override {
+        return reinterpret_cast<QMsm *>(this)->QMsm::isIn(stateHndl);
     }
 
 #ifdef Q_SPY

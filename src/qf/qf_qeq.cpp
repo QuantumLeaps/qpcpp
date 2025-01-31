@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -88,7 +87,7 @@ bool QEQueue::post(
     QEQueueCtr tmp = m_nFree; // get volatile into temporary
 
     // can the queue accept the event?
-    bool status = ((margin == QF::NO_MARGIN) && (tmp > 0U))
+    bool const status = ((margin == QF::NO_MARGIN) && (tmp > 0U))
         || (tmp > static_cast<QEQueueCtr>(margin));
     if (status) {
         // is it a mutable event?

@@ -1,6 +1,5 @@
 //============================================================================
-// QP/C++ Real-Time Embedded Framework (RTEF)
-// Version 8.0.2
+// QP/C++ Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -113,17 +112,12 @@ void stop() {
 
 //${QV::QF-cust::run} ........................................................
 int_t run() {
+    QF_INT_DISABLE();
 #ifdef Q_SPY
     // produce the QS_QF_RUN trace record
-    QF_INT_DISABLE();
     QS::beginRec_(QS_REC_NUM_(QS_QF_RUN));
     QS::endRec_();
-    QF_INT_ENABLE();
 #endif // Q_SPY
-
-    onStartup(); // application-specific startup callback
-
-    QF_INT_DISABLE();
 
 #ifdef QV_START
     QV_START(); // port-specific startup of the QV kernel
@@ -139,6 +133,11 @@ int_t run() {
 
 #endif // (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
 
+    QF_INT_ENABLE();
+
+    onStartup(); // app. callback: configure and enable interrupts
+
+    QF_INT_DISABLE();
     for (;;) { // QV event loop...
         // find the maximum prio. AO ready to run
         std::uint_fast8_t const p = (QV::priv_.readySet.notEmpty()
