@@ -32,8 +32,8 @@
 //============================================================================
 #define QP_VERSION_STR "8.0.3"
 #define QP_VERSION     803U
-// <VER>=803 <DATE>=250331
-#define QP_RELEASE     0x6ACA822CU
+// <VER>=803 <DATE>=250407
+#define QP_RELEASE     0x6ABEE96CU
 
 //============================================================================
 // default configuration settings
@@ -89,10 +89,7 @@
 // global types/utilities
 
 using int_t  = int;
-
 using enum_t  = int;
-using float32_t  = float;
-using float64_t  = double;
 
 #define Q_UNUSED_PAR(par_)  (static_cast<void>(par_))
 #define Q_DIM(array_)       (sizeof(array_) / sizeof((array_)[0U]))

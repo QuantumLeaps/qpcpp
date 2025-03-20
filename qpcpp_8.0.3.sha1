@@ -1,10 +1,10 @@
 4d5e2410a76731de093ad73209fe01106aee8890 *include/qequeue.hpp
 89c918c0053614c60c07a0b6aaa94ed2cdd33f59 *include/qk.hpp
 e7dd79c395cb75b152248c6ed0ce99dd3631cb1f *include/qmpool.hpp
-33469d8598b60270ae7c5e6cf63123ebb5b75a3a *include/qp.hpp
+1030f64620be86c8907f6f76a3620a0cc0f3a668 *include/qp.hpp
 ec705a25e70387f1f76cbca64b4eae27da21ce34 *include/qp_pkg.hpp
 db816e95cd000eee9f84c6a65d60ae3324e2c5bb *include/qpcpp.hpp
-c8051f4392be5065697c1f76ad02745ce62ac302 *include/qs.hpp
+6867134bb048700f20c255e742b1cf03e26009a3 *include/qs.hpp
 a9010a1d78bfc32bd23ec2099b4bf09cff3e509b *include/qs_dummy.hpp
 887f540b59745ad63aaa81a6aebec0fdd02aae99 *include/qs_pkg.hpp
 3510ac954ebbba52f290f0831b7ea17613a7752b *include/qsafe.h
@@ -30,7 +30,7 @@ a001d5e6a591d5d20b0a26e8f84e333f57306784 *src/qf/qf_qmact.cpp
 eb28260d471fc752ca54b2c1e2d763f28432c2c1 *src/qs/CMakeLists.txt
 a9bcc7f6bbead67d96cbf71c8423c79f0c9a1a79 *src/qs/qs.cpp
 90fdbed82c3ae22b5cfb0cec730878a08a654b0c *src/qs/qs_64bit.cpp
-8f9a7e1c532d2e753cdc7c6cd15c266d815b646e *src/qs/qs_fp.cpp
+0558a238e91ae6c75e6cbb8422fe4b82b711966c *src/qs/qs_fp.cpp
 17001543e90fdae153ee918cd6c81b2915d97f40 *src/qs/qs_rx.cpp
 c97bda54ac3be8da467c70440f983fa934eaa864 *src/qs/qstamp.cpp
 e86d8033e7e8232582256ea418d9bff4f973f102 *src/qs/qutest.cpp
@@ -150,7 +150,7 @@ f084c5b1e8f6a58679f3235a1c6f9eb0fcc02e97 *ports/win32-qv/safe_std.h
 3c23c06f425a8d8dbb18d1f191ac6cab483a8e51 *ports/win32-qutest/CMakeLists.txt
 0294baed2579c94810db0ae31d0ba203923895fa *ports/win32-qutest/qp_port.hpp
 b5086006723f687209988dd7f348c20f7d104221 *ports/win32-qutest/qs_port.hpp
-749807291537665d62c7e5a51a83baef4fdbdb62 *ports/win32-qutest/qutest_port.cpp
+12b61266fd104a43f3402654a1651789eb30a12a *ports/win32-qutest/qutest_port.cpp
 f084c5b1e8f6a58679f3235a1c6f9eb0fcc02e97 *ports/win32-qutest/safe_std.h
 76dd9078dc4311d53d3862d44177a8660258da6d *zephyr/CMakeLists.txt
 36a0252cf0bfd6be0d345c48c00b2300f8917f05 *zephyr/Kconfig
