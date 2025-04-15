@@ -18,10 +18,10 @@
 //
 // NOTE:
 // The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
-// incorporation of the QP/C software into proprietary programs. Please
+// incorporation of the QP/C++ software into proprietary programs. Please
 // contact Quantum Leaps for commercial licensing options, which expressly
 // supersede the GPL and are designed explicitly for licensees interested
-// in using QP/C in closed-source proprietary applications.
+// in using QP/C++ in closed-source proprietary applications.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -37,7 +37,7 @@
 //   <691=>691 (QP 6.9.1 or newer)
 //   <734=>7.3.4 (QP 7.3.4 or newer)
 //   <9999=>9999 (Latest only)
-// <i>QP API backwards compatibility with the QP/C API version.
+// <i>QP API backwards compatibility with the QP/C++ API version.
 // <i>Lower QP_API_VERSION values enable backwards compatibility
 // <i>with lower (older) QP API versions.
 // <i>For example, QP_API_VERSION==691 will enable the compatibility

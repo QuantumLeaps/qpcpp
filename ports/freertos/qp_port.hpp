@@ -3,9 +3,9 @@
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
@@ -18,10 +18,10 @@
 //
 // NOTE:
 // The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
-// incorporation of the QP/C software into proprietary programs. Please
+// incorporation of the QP/C++ software into proprietary programs. Please
 // contact Quantum Leaps for commercial licensing options, which expressly
 // supersede the GPL and are designed explicitly for licensees interested
-// in using QP/C in closed-source proprietary applications.
+// in using QP/C++ in closed-source proprietary applications.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -37,21 +37,22 @@
 #define Q_NORETURN  [[ noreturn ]] void
 
 // QActive customization for FreeRTOS
-#define QACTIVE_EQUEUE_TYPE  QueueHandle_t
-#define QACTIVE_OS_OBJ_TYPE  StaticQueue_t
-#define QACTIVE_THREAD_TYPE  StaticTask_t
+#define QACTIVE_EQUEUE_TYPE     QueueHandle_t
+#define QACTIVE_OS_OBJ_TYPE     StaticQueue_t
+#define QACTIVE_THREAD_TYPE     StaticTask_t
 
 // FreeRTOS requires the "FromISR" API in QP/C++
-#define QF_ISR_API           1
+#define QF_ISR_API              1
 
 // QF interrupt disabling/enabling (task level)
-#define QF_INT_DISABLE()     taskDISABLE_INTERRUPTS()
-#define QF_INT_ENABLE()      taskENABLE_INTERRUPTS()
+#define QF_INT_DISABLE()        taskDISABLE_INTERRUPTS()
+#define QF_INT_ENABLE()         taskENABLE_INTERRUPTS()
 
 // QF critical section for FreeRTOS (task level), see NOTE2
 #define QF_CRIT_STAT
-#define QF_CRIT_ENTRY()      taskENTER_CRITICAL()
-#define QF_CRIT_EXIT()       taskEXIT_CRITICAL()
+#define QF_CRIT_ENTRY()         taskENTER_CRITICAL()
+#define QF_CRIT_EXIT()          taskEXIT_CRITICAL()
+#define QF_CRIT_EST()           taskENTER_CRITICAL()
 
 // include files -------------------------------------------------------------
 #include "FreeRTOS.h"  // FreeRTOS master include file, see NOTE3

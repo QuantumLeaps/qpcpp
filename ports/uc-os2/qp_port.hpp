@@ -3,9 +3,9 @@
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
@@ -17,11 +17,10 @@
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
-// incorporation of the QP/C software into proprietary programs. Please
-// contact Quantum Leaps for commercial licensing options, which expressly
-// supersede the GPL and are designed explicitly for licensees interested
-// in using QP/C in closed-source proprietary applications.
+// The GPL does NOT permit the incorporation of this code into proprietary
+// programs. Please contact Quantum Leaps for commercial licensing options,
+// which expressly supersede the GPL and are designed explicitly for
+// closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -52,10 +51,16 @@
     #define QF_CRIT_STAT
     #define QF_CRIT_ENTRY()  OS_ENTER_CRITICAL()
     #define QF_CRIT_EXIT()   OS_EXIT_CRITICAL()
+    #define QF_CRIT_EST()    OS_ENTER_CRITICAL()
 #elif (OS_CRITICAL_METHOD == 3U)
     #define QF_CRIT_STAT     OS_CPU_SR cpu_sr;
     #define QF_CRIT_ENTRY()  OS_ENTER_CRITICAL()
     #define QF_CRIT_EXIT()   OS_EXIT_CRITICAL()
+    #define QF_CRIT_EST()    do { \
+        OS_CPU_SR cpu_sr;         \
+        OS_ENTER_CRITICAL();      \
+        static_cast<void>(cpu_sr);\
+    } while (false)
 #else
     #error Unsupported uC-OS2 critical section type
 #endif // OS_CRITICAL_METHOD

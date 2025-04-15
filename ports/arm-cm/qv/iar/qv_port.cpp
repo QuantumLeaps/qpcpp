@@ -18,10 +18,10 @@
 //
 // NOTE:
 // The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
-// incorporation of the QP/C software into proprietary programs. Please
+// incorporation of the QP/C++ software into proprietary programs. Please
 // contact Quantum Leaps for commercial licensing options, which expressly
 // supersede the GPL and are designed explicitly for licensees interested
-// in using QP/C in closed-source proprietary applications.
+// in using QP/C++ in closed-source proprietary applications.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>

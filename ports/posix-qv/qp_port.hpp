@@ -3,9 +3,9 @@
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
@@ -18,10 +18,10 @@
 //
 // NOTE:
 // The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
-// incorporation of the QP/C software into proprietary programs. Please
+// incorporation of the QP/C++ software into proprietary programs. Please
 // contact Quantum Leaps for commercial licensing options, which expressly
 // supersede the GPL and are designed explicitly for licensees interested
-// in using QP/C in closed-source proprietary applications.
+// in using QP/C++ in closed-source proprietary applications.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -45,6 +45,7 @@
 #define QF_CRIT_STAT
 #define QF_CRIT_ENTRY()      QP::QF::enterCriticalSection_()
 #define QF_CRIT_EXIT()       QP::QF::leaveCriticalSection_()
+#define QF_CRIT_EST()        QP::QF::enterCriticalSection_()
 
 // QF_LOG2 not defined -- use the internal LOG2() implementation
 
@@ -109,7 +110,6 @@ void onClockTick();
 namespace QP {
 namespace QF {
     extern QPSet readySet_;
-    extern QPSet readySet_dis_;
     extern pthread_cond_t condVar_; // Cond.var. to signal events
 } // namespace QF
 } // namespace QP

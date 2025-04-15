@@ -56,7 +56,7 @@ QTimeEvt::QTimeEvt(
     m_act(act),
     m_ctr(0U),
     m_interval(0U),
-    m_tickRate(0U),
+    m_tickRate(tickRate),
     m_flags(0U)
 {
     QF_CRIT_STAT

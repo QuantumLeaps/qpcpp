@@ -44,13 +44,14 @@
 #define QF_CRIT_STAT         k_spinlock_key_t key_;
 #define QF_CRIT_ENTRY()      ((key_) = k_spin_lock(&QP::QF::spinlock))
 #define QF_CRIT_EXIT()       k_spin_unlock(&QP::QF::spinlock, key_)
+#define QF_CRIT_EST()        static_cast<void>(k_spin_lock(&QP::QF::spinlock))
 
 // Q_PRINTK() macro to avoid conflicts with Zephyr's printk()
 // when Q_SPY configuration is used
 #ifndef Q_SPY
 #define Q_PRINTK(fmt_, ...)  printk(fmt_, ##__VA_ARGS__)
 #else
-#define Q_PRINTK(dummy, ...) (static_cast<void>(0))
+#define Q_PRINTK(dummy, ...) static_cast<void>(0)
 #endif
 
 // include files -------------------------------------------------------------

@@ -1,4 +1,6 @@
 //============================================================================
+// QP/C++ Real-Time Event Framework (RTEF)
+//
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
 //                    Q u a n t u m  L e a P s
@@ -15,11 +17,10 @@
 // Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
-// incorporation of the QP/C software into proprietary programs. Please
-// contact Quantum Leaps for commercial licensing options, which expressly
-// supersede the GPL and are designed explicitly for licensees interested
-// in using QP/C in closed-source proprietary applications.
+// The GPL does NOT permit the incorporation of this code into proprietary
+// programs. Please contact Quantum Leaps for commercial licensing options,
+// which expressly supersede the GPL and are designed explicitly for
+// closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -59,7 +60,8 @@
 // QF critical section for ThreadX, see NOTE3
 #define QF_CRIT_STAT     UINT int_ctrl_;
 #define QF_CRIT_ENTRY()  (int_ctrl_ = tx_interrupt_control(TX_INT_DISABLE))
-#define QF_CRIT_EXIT()   ((void)tx_interrupt_control(int_ctrl_))
+#define QF_CRIT_EXIT()   static_cast<void>(tx_interrupt_control(int_ctrl_))
+#define QF_CRIT_EST()    static_cast<void>(tx_interrupt_control(TX_INT_DISABLE))
 
 // include files -------------------------------------------------------------
 #include "tx_api.h"    // ThreadX API

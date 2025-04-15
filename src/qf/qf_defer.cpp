@@ -53,13 +53,24 @@ bool QActive::defer(
 
     QS_CRIT_STAT
     QS_CRIT_ENTRY();
-    QS_BEGIN_PRE(QS_QF_ACTIVE_DEFER, m_prio)
-        QS_TIME_PRE();      // time stamp
-        QS_OBJ_PRE(this);   // this active object
-        QS_OBJ_PRE(eq);     // the deferred queue
-        QS_SIG_PRE(e->sig); // the signal of the event
-        QS_2U8_PRE(e->poolNum_, e->refCtr_);
-    QS_END_PRE()
+    if (status) {
+        QS_BEGIN_PRE(QS_QF_ACTIVE_DEFER, m_prio)
+            QS_TIME_PRE();      // time stamp
+            QS_OBJ_PRE(this);   // this active object
+            QS_OBJ_PRE(eq);     // the deferred queue
+            QS_SIG_PRE(e->sig); // the signal of the event
+            QS_2U8_PRE(e->poolNum_, e->refCtr_);
+        QS_END_PRE()
+    }
+    else {
+        QS_BEGIN_PRE(QS_QF_ACTIVE_DEFER_ATTEMPT, m_prio)
+            QS_TIME_PRE();      // time stamp
+            QS_OBJ_PRE(this);   // this active object
+            QS_OBJ_PRE(eq);     // the deferred queue
+            QS_SIG_PRE(e->sig); // the signal of the event
+            QS_2U8_PRE(e->poolNum_, e->refCtr_);
+        QS_END_PRE()
+    }
     QS_CRIT_EXIT();
 
     return status;

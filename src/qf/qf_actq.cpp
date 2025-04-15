@@ -51,10 +51,6 @@ bool QActive::post_(
     std::uint_fast16_t const margin,
     void const * const sender) noexcept
 {
-#ifndef Q_SPY
-    Q_UNUSED_PAR(sender);
-#endif
-
 #ifdef Q_UTEST // test?
 #if (Q_UTEST != 0) // testing QP-stub?
     if (m_temp.fun == Q_STATE_CAST(0)) { // QActiveDummy?
@@ -98,6 +94,13 @@ bool QActive::post_(
 
     if (status) { // can post the event?
         postFIFO_(e, sender);
+#ifdef Q_UTEST
+        if (QS_LOC_CHECK_(m_prio)) {
+            QF_CRIT_EXIT();
+            QS::onTestPost(sender, this, e, true); // QUTEst callback
+            QF_CRIT_ENTRY();
+        }
+#endif // def Q_UTEST
         QF_CRIT_EXIT();
     }
     else { // event cannot be posted
@@ -293,14 +296,6 @@ void QActive::postFIFO_(
         QS_EQC_PRE(tmp);      // # free entries
         QS_EQC_PRE(m_eQueue.m_nMin); // min # free entries
     QS_END_PRE()
-
-#ifdef Q_UTEST
-    if (QS_LOC_CHECK_(m_prio)) {
-        QF_CRIT_EXIT();
-        QS::onTestPost(sender, this, e, true); // QUTEst callback
-        QF_CRIT_ENTRY();
-    }
-#endif // def Q_UTEST
 
     if (m_eQueue.m_frontEvt == nullptr) { // is the queue empty?
         m_eQueue.m_frontEvt = e; // deliver event directly

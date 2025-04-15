@@ -3,9 +3,9 @@
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
@@ -18,10 +18,10 @@
 //
 // NOTE:
 // The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
-// incorporation of the QP/C software into proprietary programs. Please
+// incorporation of the QP/C++ software into proprietary programs. Please
 // contact Quantum Leaps for commercial licensing options, which expressly
 // supersede the GPL and are designed explicitly for licensees interested
-// in using QP/C in closed-source proprietary applications.
+// in using QP/C++ in closed-source proprietary applications.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -73,7 +73,8 @@
 #define QF_CRIT_EXIT() \
     __asm volatile ("MSR cpsr_c,%0" :: "r" (cpsr_) : "cc")
 
-#define QF_CRIT_EXIT_NOP()     __asm volatile ("ISB")
+#define QF_CRIT_EST()           QF_INT_DISABLE()
+#define QF_CRIT_EXIT_NOP()      __asm volatile ("ISB")
 
 // Check if the code executes in the ISR context
 #define QK_ISR_CONTEXT_() (QK_priv_.intNest != 0U)
