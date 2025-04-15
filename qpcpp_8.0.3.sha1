@@ -44,7 +44,7 @@ c0b6bbe7edee4a26cf4e9d304cfa70750f676ff5 *src/qxk/qxk_mutex.cpp
 8da15bc71324c15730f60101c488e55094af21c0 *ports/arm-cm/qk/armclang/qk_port.cpp
 ff22ca84caa682820a10350414c8ba45197ab750 *ports/arm-cm/qk/armclang/qp_port.hpp
 aad9ffa2514131bd4078626f4e4338374960f921 *ports/arm-cm/qk/armclang/qs_port.hpp
-cf27e0fc3f6275688bb8ec3d5050ec4f50479775 *ports/arm-cm/qk/gnu/qk_port.cpp
+e2f93069d5e28e184a9f1fa0cc062c59dcf5e857 *ports/arm-cm/qk/gnu/qk_port.cpp
 ff22ca84caa682820a10350414c8ba45197ab750 *ports/arm-cm/qk/gnu/qp_port.hpp
 aad9ffa2514131bd4078626f4e4338374960f921 *ports/arm-cm/qk/gnu/qs_port.hpp
 f9f273a8223334031a538ebe0be83c798fc411a6 *ports/arm-cm/qk/iar/qk_port.cpp
@@ -55,7 +55,7 @@ aad9ffa2514131bd4078626f4e4338374960f921 *ports/arm-cm/qv/armclang/qs_port.hpp
 61bfb6a2fe5f5a46ac579ff0d810a523e137fad7 *ports/arm-cm/qv/armclang/qv_port.cpp
 906ddb82f7a65f6d3f2a20ebc9bfb2928aaaab3a *ports/arm-cm/qv/gnu/qp_port.hpp
 aad9ffa2514131bd4078626f4e4338374960f921 *ports/arm-cm/qv/gnu/qs_port.hpp
-05a6606b79592e159972b82e13f8d87c4776de3d *ports/arm-cm/qv/gnu/qv_port.cpp
+742f36951d4a836baecfa157d25b86e288e4c74b *ports/arm-cm/qv/gnu/qv_port.cpp
 e70e9e4562b8f3c5d4677997b7354db330c04ab2 *ports/arm-cm/qv/iar/qp_port.hpp
 aad9ffa2514131bd4078626f4e4338374960f921 *ports/arm-cm/qv/iar/qs_port.hpp
 862340a493050af382b82dc6b58084009bf6b5be *ports/arm-cm/qv/iar/qv_port.cpp
@@ -64,7 +64,7 @@ aad9ffa2514131bd4078626f4e4338374960f921 *ports/arm-cm/qxk/armclang/qs_port.hpp
 a480dda4919a2a0f79e7c62b0f5f4970969d55fa *ports/arm-cm/qxk/armclang/qxk_port.cpp
 58e229c064217104aff453bdb8c17efba7409f4f *ports/arm-cm/qxk/gnu/qp_port.hpp
 aad9ffa2514131bd4078626f4e4338374960f921 *ports/arm-cm/qxk/gnu/qs_port.hpp
-1333d39387cd9545e737eea9f8c262ea53fec963 *ports/arm-cm/qxk/gnu/qxk_port.cpp
+2ee798f91cbb8d04c722850cab1996d779550b28 *ports/arm-cm/qxk/gnu/qxk_port.cpp
 448fbd66bc00f1bcded84b91648fd5c2bdb38717 *ports/arm-cm/qxk/iar/qp_port.hpp
 aad9ffa2514131bd4078626f4e4338374960f921 *ports/arm-cm/qxk/iar/qs_port.hpp
 1e753e8be9ddae2e09b5c41a7ae504477f2f68fe *ports/arm-cm/qxk/iar/qxk_port.cpp
