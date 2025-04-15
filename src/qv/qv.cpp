@@ -148,19 +148,22 @@ int_t run() {
             QActive * const a = QActive::registry_[p];
 
 #if (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
-            QS_BEGIN_PRE(QS_SCHED_NEXT, p)
-                QS_TIME_PRE();        // timestamp
-                QS_2U8_PRE(static_cast<std::uint8_t>(p),
-                            static_cast<std::uint8_t>(pprev));
-            QS_END_PRE()
+            if (p != pprev) { // changing threads?
+
+                QS_BEGIN_PRE(QS_SCHED_NEXT, p)
+                    QS_TIME_PRE();        // timestamp
+                    QS_2U8_PRE(static_cast<std::uint8_t>(p),
+                               static_cast<std::uint8_t>(pprev));
+                QS_END_PRE()
 
 #ifdef QF_ON_CONTEXT_SW
-            QF_onContextSw(((pprev != 0U)
-                            ? QActive::registry_[pprev]
-                            : nullptr), a);
+                QF_onContextSw(((pprev != 0U)
+                               ? QActive::registry_[pprev]
+                               : nullptr), a);
 #endif // QF_ON_CONTEXT_SW
 
-            pprev = p; // update previous prio.
+                pprev = p; // update previous prio.
+            }
 #endif // (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
 
             QF_INT_ENABLE();

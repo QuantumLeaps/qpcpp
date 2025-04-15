@@ -30,10 +30,10 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR "8.0.3"
-#define QP_VERSION     803U
-// <VER>=803 <DATE>=250407
-#define QP_RELEASE     0x6ABEE96CU
+#define QP_VERSION_STR "8.0.4"
+#define QP_VERSION     804U
+// <VER>=804 <DATE>=250531
+#define QP_RELEASE     0x6AABFDABU
 
 //============================================================================
 // default configuration settings
@@ -118,10 +118,8 @@ public:
     std::uint8_t poolNum_;
     std::uint8_t volatile refCtr_;
 
-public:
     enum DynEvt: std::uint8_t { DYNAMIC };
 
-public:
     explicit constexpr QEvt(QSignal const s) noexcept
       : sig(s),
         poolNum_(0x00U),
@@ -129,10 +127,10 @@ public:
     {}
 
     QEvt() = delete;
-    void init() noexcept {
+    void init() const noexcept {
         // no event parameters to initialize
     }
-    void init(DynEvt const dummy) noexcept {
+    void init(DynEvt const dummy) const noexcept {
         Q_UNUSED_PAR(dummy);
         // no event parameters to initialize
     }
@@ -180,7 +178,6 @@ public:
     QAsmAttr m_state;
     QAsmAttr m_temp;
 
-public:
     // All possible return values from state-handlers
     // NOTE: The ordering is important for algorithmic correctness.
     static constexpr QState Q_RET_SUPER     {0U};
@@ -209,14 +206,6 @@ public:
     static constexpr QSignal Q_ENTRY_SIG    {1U};
     static constexpr QSignal Q_EXIT_SIG     {2U};
     static constexpr QSignal Q_INIT_SIG     {3U};
-
-protected:
-    explicit QAsm() noexcept
-      : m_state(),
-        m_temp ()
-    {}
-
-public:
 
 #ifdef Q_XTOR
     virtual ~QAsm() noexcept {
@@ -259,6 +248,11 @@ public:
     }
 
 protected:
+    explicit QAsm() noexcept
+      : m_state(),
+        m_temp ()
+    {}
+
     QState tran(QStateHandler const target) noexcept {
         m_temp.fun = target;
         return Q_RET_TRAN;

@@ -3,25 +3,23 @@
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+// SPDX-License-Identifier: LicenseRef-QL-commercial
 //
-// This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// This software is licensed under the terms of the Quantum Leaps commercial
+// licenses. Please contact Quantum Leaps for more information about the
+// available licensing options.
 //
-// Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
-//
-// NOTE:
-// The GPL (see <www.gnu.org/licenses/gpl-3.0>) does NOT permit the
-// incorporation of the QP/C software into proprietary programs. Please
-// contact Quantum Leaps for commercial licensing options, which expressly
-// supersede the GPL and are designed explicitly for licensees interested
-// in using QP/C in closed-source proprietary applications.
+// RESTRICTIONS
+// You may NOT :
+// (a) redistribute, encumber, sell, rent, lease, sublicense, or otherwise
+//     transfer rights in this software,
+// (b) remove or alter any trademark, logo, copyright or other proprietary
+//     notices, legends, symbols or labels present in this software,
+// (c) plagiarize this software to sidestep the licensing obligations.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -38,15 +36,13 @@
 
 // QActive event queue type
 #define QACTIVE_EQUEUE_TYPE  QEQueue
-
-// QF interrupt disable/enable
-#define QF_INT_DISABLE()     (++QP::QF::intLock_)
-#define QF_INT_ENABLE()      (--QP::QF::intLock_)
+// QACTIVE_OS_OBJ_TYPE  not used in this port
+// QACTIVE_THREAD_TYPE  not used in this port
 
 // QF critical section
-#define QF_CRIT_STAT
-#define QF_CRIT_ENTRY()      QF_INT_DISABLE()
-#define QF_CRIT_EXIT()       QF_INT_ENABLE()
+#define QF_CRIT_STAT         QP::QF::QCritStatus critStat_;
+#define QF_CRIT_ENTRY()      (critStat_ = QP::QF::critEntry())
+#define QF_CRIT_EXIT()       (QP::QF::critExit(critStat_))
 
 // QF_LOG2 not defined -- use the internal LOG2() implementation
 
@@ -67,10 +63,10 @@
 
 #ifdef QP_IMPL
 
-    // QUTest scheduler locking (not used)
-    #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) (static_cast<void>(0))
-    #define QF_SCHED_UNLOCK_()    (static_cast<void>(0))
+    // QUTest scheduler locking
+    #define QF_SCHED_STAT_ QP::QF::QSchedStatus lockStat_;
+    #define QF_SCHED_LOCK_(ceil_) (lockStat_ = QP::QF::schedLock((ceil_)))
+    #define QF_SCHED_UNLOCK_()    (QP::QF::schedUnlock(lockStat_))
 
     // native QEQueue operations
     #define QACTIVE_EQUEUE_WAIT_(me_) (static_cast<void>(0))

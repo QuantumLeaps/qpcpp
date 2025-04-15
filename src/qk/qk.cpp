@@ -216,8 +216,8 @@ void QK_activate_() noexcept {
 
             QS_BEGIN_PRE(QP::QS_SCHED_NEXT, p)
                 QS_TIME_PRE();     // timestamp
-                QS_2U8_PRE(p,      // prio. of the scheduled AO
-                            pprev); // previous prio.
+                QS_2U8_PRE(static_cast<std::uint8_t>(p),
+                           static_cast<std::uint8_t>(pprev));
             QS_END_PRE()
 
 #ifdef QF_ON_CONTEXT_SW

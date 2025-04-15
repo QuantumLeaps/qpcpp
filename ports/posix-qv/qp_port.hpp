@@ -109,7 +109,6 @@ void onClockTick();
 namespace QP {
 namespace QF {
     extern QPSet readySet_;
-    extern QPSet readySet_dis_;
     extern pthread_cond_t condVar_; // Cond.var. to signal events
 } // namespace QF
 } // namespace QP
