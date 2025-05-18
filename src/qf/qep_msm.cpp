@@ -151,6 +151,7 @@ void QMsm::init(
 
     // the top-most initial tran. must be taken
     Q_ASSERT_LOCAL(240, r == Q_RET_TRAN_INIT);
+    Q_ASSERT_LOCAL(250, m_temp.tatbl != nullptr);
 
     QS_CRIT_STAT
     QS_TRAN_SEG_(QS_QEP_STATE_INIT,
@@ -170,7 +171,8 @@ void QMsm::init(
     QS_TOP_INIT_(QS_QEP_INIT_TRAN, m_state.obj->stateHandler);
 
 #ifndef Q_UNSAFE
-    m_temp.uint = ~m_state.uint;
+    // establish stable state configuration
+    m_temp.uint = static_cast<std::uintptr_t>(~m_state.uint);
 #endif
 }
 
@@ -183,12 +185,13 @@ void QMsm::dispatch(
     Q_UNUSED_PAR(qsId);
 #endif
 
-    Q_REQUIRE_LOCAL(300, e != (QEvt *)0);
-    Q_INVARIANT_LOCAL(320, m_state.uint
-        == static_cast<std::uintptr_t>(~m_temp.uint));
+    Q_INVARIANT_LOCAL(300,
+        m_state.uint == static_cast<std::uintptr_t>(~m_temp.uint));
+
+    Q_REQUIRE_LOCAL(310, e != nullptr);
 
     QMState const *s = m_state.obj; // the current state
-    QMState const *t = s; // store the current state for later
+    QMState const * const t = s; // store the current state for later
     QS_CRIT_STAT
     QS_TRAN0_(QS_QEP_DISPATCH, s->stateHandler);
 
@@ -227,7 +230,15 @@ void QMsm::dispatch(
         QMState const * const ts = s; // tran. source for QS tracing
 #endif // Q_SPY
 
-        if (r == Q_RET_TRAN_HIST) { // was it tran. to history?
+        if (r == Q_RET_TRAN) {
+            struct QMTranActTable const * const tatbl = m_temp.tatbl;
+            exitToTranSource_(t, s, qsId);
+            r = execTatbl_(tatbl, qsId);
+#ifdef Q_SPY
+            s = m_state.obj;
+#endif // Q_SPY
+        }
+        else if (r == Q_RET_TRAN_HIST) { // was it tran. to history?
             QMState const * const hist = m_state.obj; // save history
             m_state.obj = t; // restore the original state
 
@@ -235,33 +246,31 @@ void QMsm::dispatch(
                 s->stateHandler, hist->stateHandler);
 
             // save the tran-action table before it gets clobbered
-            QMTranActTable const * const tatbl = m_temp.tatbl;
-            if (t != s) { // current state different from tran. source?
-                exitToTranSource_(t, s, qsId);
-            }
+            struct QMTranActTable const * const tatbl = m_temp.tatbl;
+            exitToTranSource_(t, s, qsId);
             static_cast<void>(execTatbl_(tatbl, qsId));
             r = enterHistory_(hist, qsId);
-            t = m_state.obj;
-            s = t; // set target to the current state
+#ifdef Q_SPY
+            s = m_state.obj;
+#endif // Q_SPY
+        }
+        else {
+            // empty
         }
 
         lbound = QMSM_MAX_NEST_DEPTH_;
-        while (r >= Q_RET_TRAN) {
-            // save the tran-action table before it gets clobbered
-            QMTranActTable const * const tatbl = m_temp.tatbl;
-            m_temp.obj = nullptr; // clear
-            if (t != s) { // current state different from tran. source?
-                exitToTranSource_(t, s, qsId);
-            }
-            r = execTatbl_(tatbl, qsId);
-            t = m_state.obj;
-            s = t; // set target to the current state
+        while (r == Q_RET_TRAN_INIT) { // initial tran. in the target?
+
+            r = execTatbl_(m_temp.tatbl, qsId);
+#ifdef Q_SPY
+            s = m_state.obj;
+#endif // Q_SPY
 
              --lbound; // fixed loop bound
             Q_INVARIANT_LOCAL(360, lbound >= 0);
         }
 
-        QS_TRAN_END_(QS_QEP_TRAN, ts->stateHandler, t->stateHandler);
+        QS_TRAN_END_(QS_QEP_TRAN, ts->stateHandler, s->stateHandler);
     }
 #ifdef Q_SPY
     else if (r == Q_RET_HANDLED) { // was the event handled?
@@ -273,7 +282,8 @@ void QMsm::dispatch(
     }
 
 #ifndef Q_UNSAFE
-    m_temp.uint = ~m_state.uint;
+    // establish stable state configuration
+    m_temp.uint = static_cast<std::uintptr_t>(~m_state.uint);
 #endif
 }
 
@@ -338,8 +348,7 @@ void QMsm::exitToTranSource_(
     QMState const *s = curr_state;
     std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
     while (s != tran_source) {
-        // exit action provided in state 's'?
-        if (s->exitAction != nullptr) {
+        if (s->exitAction != nullptr) { // exit action provided?
             static_cast<void>((*s->exitAction)(this));
             QS_STATE_ACT_(QS_QEP_STATE_EXIT, m_temp.obj->stateHandler);
         }
@@ -364,7 +373,7 @@ QState QMsm::enterHistory_(
     QMState const *s = hist;
     std::int_fast8_t i = -1; // entry path index (one below [0])
     std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
-    do {
+    while (s != m_state.obj) {
         if (s->entryAction != nullptr) {
             ++i;
             Q_INVARIANT_LOCAL(610, i < QMSM_MAX_NEST_DEPTH_);
@@ -374,7 +383,7 @@ QState QMsm::enterHistory_(
 
         --lbound; // fixed loop bound
         Q_INVARIANT_LOCAL(620, lbound >= 0);
-    } while (s != m_state.obj);
+    }
 
     QS_CRIT_STAT
     // retrace the entry path in reverse (desired) order...
@@ -407,7 +416,7 @@ bool QMsm::isIn(QStateHandler const stateHndl) noexcept {
     bool inState = false; // assume that this SM is not in 'state'
     QMState const *s = m_state.obj;
     std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
-    do {
+    while (s != nullptr) {
         if (s->stateHandler == stateHndl) { // match found?
             inState = true;
             break;
@@ -416,7 +425,7 @@ bool QMsm::isIn(QStateHandler const stateHndl) noexcept {
 
          --lbound; // fixed loop bound
          Q_INVARIANT_LOCAL(740, lbound >= 0);
-    } while (s != (QMState *)0);
+    }
 
     return inState;
 }
@@ -429,7 +438,7 @@ QMState const * QMsm::childStateObj(QMState const * const parentHndl)
     QMState const *child = s;
     bool isFound = false; // assume the child NOT found
     std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
-    do {
+    while (s != nullptr) {
         if (s == parentHndl) {
             isFound = true; // child is found
             break;
@@ -439,7 +448,7 @@ QMState const * QMsm::childStateObj(QMState const * const parentHndl)
 
          --lbound; // fixed loop bound
          Q_INVARIANT_LOCAL(840, lbound >= 0);
-    } while (s != nullptr);
+    }
     Q_ENSURE_LOCAL(890, isFound);
 
 #ifdef Q_UNSAFE

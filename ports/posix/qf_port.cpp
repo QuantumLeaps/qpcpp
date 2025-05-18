@@ -132,12 +132,12 @@ int_t critSectNest_;
 //............................................................................
 void enterCriticalSection_() {
     pthread_mutex_lock(&critSectMutex_);
-    Q_ASSERT_INCRIT(101, critSectNest_ == 0); // NO nesting of crit.sect!
+    Q_ASSERT_INCRIT(100, critSectNest_ == 0); // NO nesting of crit.sect!
     ++critSectNest_;
 }
 //............................................................................
 void leaveCriticalSection_() {
-    Q_ASSERT_INCRIT(102, critSectNest_ == 1); // crit.sect. must balance!
+    Q_ASSERT_INCRIT(200, critSectNest_ == 1); // crit.sect. must balance!
     if ((--critSectNest_) == 0) {
         pthread_mutex_unlock(&critSectMutex_);
     }
@@ -313,9 +313,9 @@ void QActive::evtLoop_(QActive *act) {
 
 //============================================================================
 void QActive::start(QPrioSpec const prioSpec,
-                    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
-                    void * const stkSto, std::uint_fast16_t const stkSize,
-                    void const * const par)
+    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
+    void * const stkSto, std::uint_fast16_t const stkSize,
+    void const * const par)
 {
     Q_UNUSED_PAR(stkSto);
     Q_UNUSED_PAR(stkSize);
@@ -368,7 +368,9 @@ void QActive::start(QPrioSpec const prioSpec,
         pthread_attr_setschedparam(&attr, &param);
         err = pthread_create(&thread, &attr, &ao_thread, this);
     }
-    Q_ASSERT_ID(810, err == 0); // AO thread must be created
+    QF_CRIT_ENTRY();
+    Q_ASSERT_INCRIT(810, err == 0); // AO thread must be created
+    QF_CRIT_EXIT();
 
     //pthread_attr_getschedparam(&attr, &param);
     //printf("param.sched_priority==%d\n", param.sched_priority);
@@ -378,7 +380,9 @@ void QActive::start(QPrioSpec const prioSpec,
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {
-    unsubscribeAll(); // unsubscribe this AO from all events
+    if (subscrList_ != nullptr) {
+        unsubscribeAll(); // unsubscribe from all events
+    }
     m_thread = false; // stop the thread loop (see QF::thread_)
 }
 #endif

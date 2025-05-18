@@ -219,7 +219,9 @@ void QActive::start(
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {
-    unsubscribeAll(); // unsubscribe from all events
+    if (subscrList_ != nullptr) {
+        unsubscribeAll(); // unsubscribe from all events
+    }
     m_eQueue = static_cast<QueueHandle_t>(0); // stop thread (see QF::thread_)
 }
 #endif

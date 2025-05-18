@@ -109,7 +109,6 @@ using char_t = char;
 //! Use Q_ASSERT_STATIC() or better yet `static_assert()` instead.
 #define Q_ASSERT_COMPILE(expr_) Q_ASSERT_STATIC(expr_)
 
-
 #endif // QP_API_VERSION < 800
 
 #endif // QPCPP_HPP_

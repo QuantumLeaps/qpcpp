@@ -56,13 +56,13 @@ QTimeEvt::QTimeEvt(
     m_act(act),
     m_ctr(0U),
     m_interval(0U),
-    m_tickRate(tickRate),
+    m_tickRate(static_cast<std::uint8_t>(tickRate)),
     m_flags(0U)
 {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(300, (sig != 0U)
-        && (tickRate < QF_MAX_TICK_RATE));
+    Q_REQUIRE_INCRIT(300, sig != 0U);
+    Q_REQUIRE_INCRIT(310, tickRate < QF_MAX_TICK_RATE);
     QF_CRIT_EXIT();
 
     refCtr_ = 0U; // adjust from the QEvt(sig) ctor
@@ -78,27 +78,23 @@ void QTimeEvt::armX(
 
     // dynamic range checks
 #if (QF_TIMEEVT_CTR_SIZE == 1U)
-    Q_REQUIRE_INCRIT(400, (nTicks < 0xFFU) && (interval < 0xFFU));
+    Q_REQUIRE_INCRIT(400, nTicks   < 0xFFU);
+    Q_REQUIRE_INCRIT(410, interval < 0xFFU);
 #elif (QF_TIMEEVT_CTR_SIZE == 2U)
-    Q_REQUIRE_INCRIT(400, (nTicks < 0xFFFFU) && (interval < 0xFFFFU));
+    Q_REQUIRE_INCRIT(400, nTicks   < 0xFFFFU);
+    Q_REQUIRE_INCRIT(410, interval < 0xFFFFU);
 #endif
 
+#ifndef Q_UNSAFE
     QTimeEvtCtr const ctr = m_ctr;
+#endif
+
     std::uint8_t const tickRate = m_tickRate;
-#ifdef Q_SPY
-    std::uint_fast8_t const qsId =
-         static_cast<QActive const *>(m_act)->m_prio;
-#endif // def Q_SPY
 
-    Q_REQUIRE_INCRIT(410,
-        (nTicks != 0U)
-        && (ctr == 0U)
-        && (m_act != nullptr)
-        && (tickRate < QF_MAX_TICK_RATE));
-
-#ifdef Q_UNSAFE
-    Q_UNUSED_PAR(ctr);
-#endif // ndef Q_UNSAFE
+    Q_REQUIRE_INCRIT(440, nTicks != 0U);
+    Q_REQUIRE_INCRIT(450, ctr == 0U);
+    Q_REQUIRE_INCRIT(460, m_act != nullptr);
+    Q_REQUIRE_INCRIT(470, tickRate < QF_MAX_TICK_RATE);
 
     m_ctr = static_cast<QTimeEvtCtr>(nTicks);
     m_interval = static_cast<QTimeEvtCtr>(interval);
@@ -120,7 +116,8 @@ void QTimeEvt::armX(
         timeEvtHead_[tickRate].m_act = this;
     }
 
-    QS_BEGIN_PRE(QS_QF_TIMEEVT_ARM, qsId)
+    QS_BEGIN_PRE(QS_QF_TIMEEVT_ARM,
+            static_cast<QActive const *>(m_act)->m_prio)
         QS_TIME_PRE();        // timestamp
         QS_OBJ_PRE(this);     // this time event object
         QS_OBJ_PRE(m_act);    // the active object
@@ -190,10 +187,9 @@ bool QTimeEvt::rearm(std::uint32_t const nTicks) noexcept {
     std::uint8_t const tickRate = m_tickRate;
     QTimeEvtCtr const ctr = m_ctr;
 
-    Q_REQUIRE_INCRIT(610,
-        (nTicks != 0U)
-        && (m_act != nullptr)
-        && (tickRate < QF_MAX_TICK_RATE));
+    Q_REQUIRE_INCRIT(610, nTicks != 0U);
+    Q_REQUIRE_INCRIT(620, m_act != nullptr);
+    Q_REQUIRE_INCRIT(630, tickRate < QF_MAX_TICK_RATE);
 
 #ifdef Q_SPY
     std::uint_fast8_t const qsId = static_cast<QActive *>(m_act)->m_prio;
@@ -247,7 +243,7 @@ bool QTimeEvt::wasDisarmed() noexcept {
     QF_CRIT_ENTRY();
 
     bool const wasDisarmed = (m_flags & QTE_FLAG_WAS_DISARMED) != 0U;
-    m_flags |= QTE_FLAG_WAS_DISARMED;
+    m_flags |= QTE_FLAG_WAS_DISARMED; // mark as disarmed
 
     QF_CRIT_EXIT();
 
@@ -276,28 +272,23 @@ void QTimeEvt::tick(
         QS_TEC_PRE(prev->m_ctr); // tick ctr
         QS_U8_PRE(tickRate);     // tick rate
     QS_END_PRE()
-#endif // def Q_SPY
+#endif
 
     // scan the linked-list of time events at this rate...
-    while (true) {
-        Q_ASSERT_INCRIT(810, prev != nullptr); // sanity check
-
+    std::uint_fast8_t lbound = (2U * QF_MAX_ACTIVE); // fixed loop bound
+    for (;;) {
         QTimeEvt *te = prev->m_next; // advance down the time evt. list
 
         if (te == nullptr) { // end of the list?
-            // NO any new time events armed since the last QTimeEvt_tick_()?
-            if (timeEvtHead_[tickRate].m_act == nullptr) {
-                break; // terminate the while-loop
+            // set 'te' to the the newly-armed linked list
+            te = timeEvtHead_[tickRate].toTimeEvt();
+            if (te == nullptr) { // no newly-armed time events?
+                break; // terminate the loop
             }
 
-            prev->m_next = timeEvtHead_[tickRate].toTimeEvt();
+            prev->m_next = te;
             timeEvtHead_[tickRate].m_act = nullptr;
-
-            te = prev->m_next; // switch to the new list
         }
-
-        // the time event 'te' must be valid
-        Q_ASSERT_INCRIT(840, te != nullptr);
 
         QTimeEvtCtr ctr = te->m_ctr;
 
@@ -339,6 +330,9 @@ void QTimeEvt::tick(
             QF_CRIT_EXIT(); // exit crit. section to reduce latency
         }
         QF_CRIT_ENTRY(); // re-enter crit. section to continue the loop
+
+        --lbound; // fixed loop bound
+        Q_INVARIANT_INCRIT(890, lbound > 0U);
     }
     QF_CRIT_EXIT();
 }
@@ -396,8 +390,7 @@ QTimeEvt *QTimeEvt::expire_(
         prev->m_next = m_next;
 
         // mark this time event as NOT linked
-        m_flags &=
-            static_cast<std::uint8_t>(~QTE_FLAG_IS_LINKED);
+        m_flags &= static_cast<std::uint8_t>(~QTE_FLAG_IS_LINKED);
         // do NOT advance the prev pointer
 
         QS_BEGIN_PRE(QS_QF_TIMEEVT_AUTO_DISARM, act->m_prio)

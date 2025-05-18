@@ -108,7 +108,10 @@ static void *ticker_thread(void *arg) { // for pthread_create()
     Q_UNUSED_PAR(arg);
 
     // system clock tick must be configured
-    Q_REQUIRE_ID(100, l_tick.tv_nsec != 0);
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    Q_REQUIRE_INCRIT(100, l_tick.tv_nsec != 0);
+    QF_CRIT_EXIT();
 
     // get the absolute monotonic time for no-drift sleeping
     static struct timespec next_tick;
@@ -166,14 +169,14 @@ static int_t l_critSectNest;   // critical section nesting up-down counter
 void enterCriticalSection_() {
     if (l_isRunning) {
         pthread_mutex_lock(&l_critSectMutex_);
-        Q_ASSERT_INCRIT(101, l_critSectNest == 0); // NO nesting of crit.sect!
+        Q_ASSERT_INCRIT(100, l_critSectNest == 0); // NO nesting of crit.sect!
         ++l_critSectNest;
     }
 }
 //............................................................................
 void leaveCriticalSection_() {
     if (l_isRunning) {
-        Q_ASSERT_INCRIT(102, l_critSectNest == 1); // crit.sect. must balance!
+        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect. must balance!
         if ((--l_critSectNest) == 0) {
             pthread_mutex_unlock(&l_critSectMutex_);
         }
@@ -273,7 +276,7 @@ int run() {
             QF::gc(e);
 
             QF_CRIT_ENTRY();
-            if (a->getEQueue().isEmpty()) { // empty queue?
+            if (a->m_eQueue.isEmpty()) { // empty queue?
                 readySet_.remove(p);
             }
         }
@@ -294,8 +297,8 @@ int run() {
         }
     }
     QF_CRIT_EXIT();
-    onCleanup();  // cleanup callback
-    QS_EXIT();    // cleanup the QSPY connection
+    onCleanup(); // cleanup callback
+    QS_EXIT();   // cleanup the QSPY connection
 
     pthread_cond_destroy(&condVar_); // cleanup the condition variable
     pthread_mutex_destroy(&l_critSectMutex_); // cleanup the global mutex
@@ -361,6 +364,7 @@ int consoleWaitForKey() {
 } // namespace QF
 
 // QActive functions =========================================================
+
 void QActive::start(QPrioSpec const prioSpec,
     QEvtPtr * const qSto, std::uint_fast16_t const qLen,
     void * const stkSto, std::uint_fast16_t const stkSize,
@@ -379,16 +383,19 @@ void QActive::start(QPrioSpec const prioSpec,
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
     m_pthre = 0U; // preemption-threshold (not used in this port)
-    register_(); // register this AO
+    register_();  // register this AO
 
     // top-most initial tran. (virtual call)
     this->init(par, m_prio);
-    QS_FLUSH(); // flush the trace buffer to the host
+    QS_FLUSH(); // flush the QS trace buffer to the host
 }
+
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {
-    unsubscribeAll(); // unsubscribe from all events
+    if (subscrList_ != nullptr) {
+        unsubscribeAll(); // unsubscribe from all events
+    }
 
     // make sure the AO is no longer in "ready set"
     QF_CRIT_STAT
@@ -396,7 +403,7 @@ void QActive::stop() {
     QF::readySet_.remove(m_prio);
     QF_CRIT_EXIT();
 
-    unregister_();
+    unregister_(); // remove this AO from QF
 }
 #endif
 

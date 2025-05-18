@@ -63,15 +63,15 @@ QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept {
         QS_BEGIN_PRE(QS_SCHED_LOCK, QK_priv_.actPrio)
             QS_TIME_PRE();   // timestamp
             // the previous lock ceiling & new lock ceiling
-            QS_2U8_PRE(static_cast<std::uint8_t>(QK_priv_.lockCeil),
-                        static_cast<std::uint8_t>(ceiling));
+            QS_2U8_PRE(QK_priv_.lockCeil,
+                       static_cast<std::uint8_t>(ceiling));
         QS_END_PRE()
 
         // previous status of the lock
         stat = static_cast<QSchedStatus>(QK_priv_.lockCeil);
 
         // new status of the lock
-        QK_priv_.lockCeil = ceiling;
+        QK_priv_.lockCeil = static_cast<std::uint8_t>(ceiling);
     }
     QF_CRIT_EXIT();
 
@@ -85,13 +85,14 @@ void schedUnlock(QSchedStatus const prevCeil) noexcept {
         QF_CRIT_STAT
         QF_CRIT_ENTRY();
 
-        Q_REQUIRE_INCRIT(200, (!QK_ISR_CONTEXT_())
-                              && (QK_priv_.lockCeil > prevCeil));
+        Q_REQUIRE_INCRIT(200, !QK_ISR_CONTEXT_());
+        Q_REQUIRE_INCRIT(210, QK_priv_.lockCeil > prevCeil);
+
         QS_BEGIN_PRE(QS_SCHED_UNLOCK, QK_priv_.actPrio)
             QS_TIME_PRE(); // timestamp
             // current lock ceiling (old), previous lock ceiling (new)
-            QS_2U8_PRE(static_cast<std::uint8_t>(QK_priv_.lockCeil),
-                        static_cast<std::uint8_t>(prevCeil));
+            QS_2U8_PRE(QK_priv_.lockCeil,
+                       static_cast<std::uint8_t>(prevCeil));
         QS_END_PRE()
 
         // restore the previous lock ceiling
@@ -107,7 +108,6 @@ void schedUnlock(QSchedStatus const prevCeil) noexcept {
 }
 
 } // namespace QK
-} // namespace QP
 
 //============================================================================
 extern "C" {
@@ -118,10 +118,10 @@ QK_Attr QK_priv_;
 std::uint_fast8_t QK_sched_() noexcept {
     // NOTE: this function is entered with interrupts DISABLED
 
-    std::uint_fast8_t p = 0U; // assume NO activation needed
+    std::uint8_t p = 0U; // assume NO activation needed
     if (QK_priv_.readySet.notEmpty()) {
         // find the highest-prio AO with non-empty event queue
-        p = QK_priv_.readySet.findMax();
+        p = static_cast<std::uint8_t>(QK_priv_.readySet.findMax());
 
         // is the AO's prio. below the active preemption-threshold?
         if (p <= QK_priv_.actThre) {
@@ -148,8 +148,8 @@ std::uint_fast8_t QK_sched_act_(
 {
     // NOTE: this function is entered with interrupts DISABLED
 
-    std::uint_fast8_t p = act->getPrio();
-    if (act->getEQueue().isEmpty()) { // empty queue?
+    std::uint8_t p = act->m_prio;
+    if (act->m_eQueue.isEmpty()) { // empty queue?
         QK_priv_.readySet.remove(p);
     }
 
@@ -158,7 +158,7 @@ std::uint_fast8_t QK_sched_act_(
     }
     else {
         // find new highest-prio AO ready to run...
-        p = QK_priv_.readySet.findMax();
+        p = static_cast<std::uint8_t>(QK_priv_.readySet.findMax());
         // NOTE: p is guaranteed to be <= QF_MAX_ACTIVE
 
         // is the new prio. below the initial preemption-threshold?
@@ -177,35 +177,34 @@ std::uint_fast8_t QK_sched_act_(
 }
 
 //............................................................................
-void QK_activate_() noexcept {
+void QK_activate_() {
     // NOTE: this function is entered with interrupts DISABLED
 
-    std::uint_fast8_t const prio_in = QK_priv_.actPrio; // save initial prio.
-    std::uint_fast8_t p = QK_priv_.nextPrio; // next prio to run
+    std::uint8_t const prio_in = QK_priv_.actPrio; // save initial prio.
+    std::uint8_t p = QK_priv_.nextPrio; // next prio to run
 
-    Q_REQUIRE_INCRIT(500, (prio_in <= QF_MAX_ACTIVE)
-       && (0U < p) && (p <= QF_MAX_ACTIVE));
+    Q_REQUIRE_INCRIT(520, prio_in <= QF_MAX_ACTIVE);
+    Q_REQUIRE_INCRIT(530, (0U < p) && (p <= QF_MAX_ACTIVE));
 
 #if (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
-    std::uint_fast8_t pprev = prio_in;
+    std::uint8_t pprev = prio_in;
 #endif // QF_ON_CONTEXT_SW || Q_SPY
 
     QK_priv_.nextPrio = 0U; // clear for the next time
 
-    std::uint_fast8_t pthre_in = 0U; // assume preempting the idle thread
+    std::uint8_t pthre_in = 0U; // assume preempting the idle thread
     if (prio_in != 0U) { // preempting NOT the idle thread
         QP::QActive const * const a = QP::QActive::registry_[prio_in];
-        Q_ASSERT_INCRIT(510, a != nullptr);
+        Q_ASSERT_INCRIT(540, a != nullptr);
 
-        pthre_in = static_cast<std::uint_fast8_t>(a->getPThre());
+        pthre_in = a->m_pthre;
     }
 
     // loop until no more ready-to-run AOs of higher pthre than the initial
     do  {
         QP::QActive * const a = QP::QActive::registry_[p];
-        Q_ASSERT_INCRIT(520, a != nullptr); // the AO must be registered
-        std::uint_fast8_t const pthre
-            = static_cast<std::uint_fast8_t>(a->getPThre());
+        Q_ASSERT_INCRIT(570, a != nullptr); // the AO must be registered
+        std::uint8_t const pthre = a->m_pthre;
 
         // set new active prio. and preemption-threshold
         QK_priv_.actPrio = p;
@@ -216,8 +215,7 @@ void QK_activate_() noexcept {
 
             QS_BEGIN_PRE(QP::QS_SCHED_NEXT, p)
                 QS_TIME_PRE();     // timestamp
-                QS_2U8_PRE(static_cast<std::uint8_t>(p),
-                           static_cast<std::uint8_t>(pprev));
+                QS_2U8_PRE(p, pprev);
             QS_END_PRE()
 
 #ifdef QF_ON_CONTEXT_SW
@@ -233,7 +231,7 @@ void QK_activate_() noexcept {
         QP::QEvt const * const e = a->get_();
 
         // dispatch event (virtual call)
-        a->dispatch(e, a->getPrio());
+        a->dispatch(e, a->m_prio);
 #if (QF_MAX_EPOOL > 0U)
         QP::QF::gc(e);
 #endif
@@ -272,13 +270,11 @@ void QK_activate_() noexcept {
 #endif // QF_ON_CONTEXT_SW
     }
 
-
 #endif // QF_ON_CONTEXT_SW || Q_SPY
 }
 } // extern "C"
 
 //............................................................................
-namespace QP {
 namespace QF {
 
 //............................................................................
@@ -356,8 +352,7 @@ void QActive::start(
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    Q_REQUIRE_INCRIT(300,
-        (stkSto == nullptr));
+    Q_REQUIRE_INCRIT(300, stkSto == nullptr);
     QF_CRIT_EXIT();
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-prio.

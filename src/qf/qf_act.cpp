@@ -49,6 +49,11 @@ char const versionStr[] = "QP/C++ " QP_VERSION_STR;
 
 QActive * QActive::registry_[QF_MAX_ACTIVE + 1U];
 
+QActive *QActive::fromRegistry(std::uint_fast8_t const prio) {
+    return registry_[prio];
+}
+
+//----------------------------------------------------------------------------
 namespace QF {
 
 QF::Attr priv_;
@@ -66,7 +71,7 @@ void bzero_(
 
 } // namespace QF
 
-//............................................................................
+//----------------------------------------------------------------------------
 #ifndef QF_LOG2
 std::uint_fast8_t QF_LOG2(QP::QPSetBits const bitmask) noexcept {
     static constexpr std::uint8_t log2LUT[16] = {

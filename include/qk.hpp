@@ -41,22 +41,16 @@ extern "C" {
 class QK_Attr {
 public:
     QP::QPSet readySet;
-    std::uint_fast8_t actPrio;
-    std::uint_fast8_t nextPrio;
-    std::uint_fast8_t actThre;
-    std::uint_fast8_t lockCeil;
-    std::uint_fast8_t intNest;
+    std::uint8_t actPrio;
+    std::uint8_t nextPrio;
+    std::uint8_t actThre;
+    std::uint8_t lockCeil;
+    std::uint8_t intNest;
 }; // class QK_Attr
 
 extern QK_Attr QK_priv_;
 
-std::uint_fast8_t QK_sched_() noexcept;
-
-std::uint_fast8_t QK_sched_act_(
-    QP::QActive const * const act,
-    std::uint_fast8_t const pthre_in) noexcept;
-
-void QK_activate_() noexcept;
+// NOTE: the extern "C" QK functions already declared in qp.hpp
 
 } // extern "C"
 

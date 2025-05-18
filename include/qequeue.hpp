@@ -51,31 +51,8 @@ class QEvt; // forward declaration
 namespace QP {
 
 class QEQueue {
-private:
-    QEvt const * volatile m_frontEvt;
-    QEvt const * * m_ring;
-    QEQueueCtr m_end;
-    QEQueueCtr volatile m_head;
-    QEQueueCtr volatile m_tail;
-    QEQueueCtr volatile m_nFree;
-    QEQueueCtr m_nMin;
-
-    // friends...
-    friend class QActive;
-    friend class QTicker;
-    friend class QXMutex;
-    friend class QXThread;
-
 public:
-    QEQueue() noexcept
-      : m_frontEvt(nullptr),
-        m_ring(nullptr),
-        m_end(0U),
-        m_head(0U),
-        m_tail(0U),
-        m_nFree(0U),
-        m_nMin(0U)
-    {}
+    QEQueue() noexcept;
     void init(
         QEvt const * * const qSto,
         std::uint_fast16_t const qLen) noexcept;
@@ -96,13 +73,31 @@ public:
     bool isEmpty() const noexcept {
         return m_frontEvt == nullptr;
     }
+    QEvt const *peekFront() const noexcept {
+        return m_frontEvt;
+    }
 
 private:
+    QEvt const * volatile m_frontEvt;
+    QEvt const * * m_ring;
+    QEQueueCtr m_end;
+    QEQueueCtr volatile m_head;
+    QEQueueCtr volatile m_tail;
+    QEQueueCtr volatile m_nFree;
+    QEQueueCtr m_nMin;
+
     QEQueue(QEQueue const & other) = delete;
     QEQueue & operator=(QEQueue const & other) = delete;
     void postFIFO_(
         QEvt const * const e,
         void const * const sender);
+
+    // friends...
+    friend class QActive;
+    friend class QTicker;
+    friend class QXMutex;
+    friend class QXThread;
+    friend class QS;
 }; // class QEQueue
 
 } // namespace QP

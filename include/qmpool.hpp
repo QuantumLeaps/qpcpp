@@ -76,15 +76,7 @@ private:
     QMPoolCtr m_nMin;
 
 public:
-    QMPool()
-      : m_start(nullptr),
-        m_end(nullptr),
-        m_freeHead(nullptr),
-        m_blockSize(0U),
-        m_nTot(0U),
-        m_nFree(0U),
-        m_nMin(0U)
-    {}
+    QMPool() noexcept;
     void init(
         void * const poolSto,
         std::uint_fast32_t const poolSize,
@@ -113,13 +105,16 @@ private:
     QMPool(QEQueue const & other) = delete;
     QMPool & operator=(QMPool const & other) = delete;
 
+    // friends...
+    friend class QS;
+
 public:
 
 #ifdef QF_ISR_API
     void * getFromISR(
         std::uint_fast16_t const margin,
         std::uint_fast8_t const qsId) noexcept;
-#endif // def QF_ISR_API
+#endif
 
 #ifdef QF_ISR_API
     void putFromISR(

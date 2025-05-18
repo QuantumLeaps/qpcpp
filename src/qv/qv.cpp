@@ -62,8 +62,8 @@ void schedDisable(std::uint_fast8_t const ceiling) {
         QS_BEGIN_PRE(QS_SCHED_LOCK, 0U)
             QS_TIME_PRE();   // timestamp
             // the previous sched ceiling & new sched ceiling
-            QS_2U8_PRE(static_cast<std::uint8_t>(priv_.schedCeil),
-                        static_cast<std::uint8_t>(ceiling));
+            QS_2U8_PRE(priv_.schedCeil,
+                       static_cast<std::uint8_t>(ceiling));
         QS_END_PRE()
 
         priv_.schedCeil = ceiling;
@@ -81,7 +81,7 @@ void schedEnable() {
         QS_BEGIN_PRE(QS_SCHED_UNLOCK, 0U)
             QS_TIME_PRE(); // timestamp
             // current sched ceiling (old), previous sched ceiling (new)
-            QS_2U8_PRE(static_cast<std::uint8_t>(priv_.schedCeil), 0U);
+            QS_2U8_PRE(priv_.schedCeil, 0U);
         QS_END_PRE()
 
         priv_.schedCeil = 0U;
@@ -151,7 +151,7 @@ int_t run() {
             if (p != pprev) { // changing threads?
 
                 QS_BEGIN_PRE(QS_SCHED_NEXT, p)
-                    QS_TIME_PRE();        // timestamp
+                    QS_TIME_PRE(); // timestamp
                     QS_2U8_PRE(static_cast<std::uint8_t>(p),
                                static_cast<std::uint8_t>(pprev));
                 QS_END_PRE()
@@ -169,15 +169,16 @@ int_t run() {
             QF_INT_ENABLE();
 
             QEvt const * const e = a->get_();
+            // NOTE QActive::get_() performs QF_MEM_APP() before return
 
             // dispatch event (virtual call)
-            a->dispatch(e, a->getPrio());
+            a->dispatch(e, p);
 #if (QF_MAX_EPOOL > 0U)
             gc(e);
 #endif
             QF_INT_DISABLE();
 
-            if (a->getEQueue().isEmpty()) { // empty queue?
+            if (a->m_eQueue.isEmpty()) { // empty queue?
                 QV::priv_.readySet.remove(p);
             }
         }
@@ -229,17 +230,17 @@ void QActive::start(
 
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(300,
-        stkSto == nullptr);
+    Q_REQUIRE_INCRIT(310, stkSto == nullptr);
     QF_CRIT_EXIT();
 
-    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); //  QF-prio.
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-prio.
     m_pthre = 0U; // not used
     register_(); // make QF aware of this AO
 
-    m_eQueue.init(qSto, qLen); // initialize QEQueue of this AO
+    m_eQueue.init(qSto, qLen);
 
-    this->init(par, m_prio); // take the top-most initial tran. (virtual)
+    // top-most initial tran. (virtual call)
+    this->init(par, m_prio);
     QS_FLUSH(); // flush the trace buffer to the host
 }
 

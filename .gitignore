@@ -49,6 +49,7 @@ src/qxk/qxk.cpp
 src/qxk/qxk_mutex.cpp
 src/qxk/qxk_sema.cpp
 src/qxk/qxk_xthr.cpp
+zephyr/qutest_port.cpp
 
 ports/arm-cm/qxk/
 ports/arm-cm/qutest/

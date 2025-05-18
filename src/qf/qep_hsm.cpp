@@ -173,15 +173,16 @@ void QHsm::init(
     Q_UNUSED_PAR(qsId);
 #endif // def Q_SPY
 
-    QStateHandler s = m_state.fun; // current state
-    Q_REQUIRE_LOCAL(200, m_temp.fun != nullptr);
-    Q_REQUIRE_LOCAL(210, s == Q_STATE_CAST(&top));
+    QStateHandler const s = m_state.fun; // current state
+    Q_REQUIRE_LOCAL(200, s == Q_STATE_CAST(&top));
+    Q_REQUIRE_LOCAL(210, m_temp.fun != nullptr);
 
     // execute the top-most initial tran.
     QState const r = (*m_temp.fun)(this, Q_EVT_CAST(QEvt));
 
     // the top-most initial tran. must be taken
     Q_ASSERT_LOCAL(240, r == Q_RET_TRAN);
+    Q_ASSERT_LOCAL(250, m_temp.fun != nullptr);
 
     QS_TRAN_SEG_(QS_QEP_STATE_INIT, s, m_temp.fun);
 
@@ -192,18 +193,19 @@ void QHsm::init(
         ++ip; // fixed loop bound
         Q_INVARIANT_LOCAL(260, ip < QHSM_MAX_NEST_DEPTH_);
 
+        Q_ASSERT_LOCAL(270, m_temp.fun != nullptr);
         path[ip] = m_temp.fun; // store the entry path
         static_cast<void>(QHSM_RESERVED_EVT_(m_temp.fun, Q_EMPTY_SIG));
     } while (m_temp.fun != s);
 
     enter_target_(&path[0], ip, qsId);
-    s = path[0];
 
-    QS_TOP_INIT_(QS_QEP_INIT_TRAN, s);
+    QS_TOP_INIT_(QS_QEP_INIT_TRAN, path[0]);
 
-    m_state.fun = s; // change the current active state
+    m_state.fun = path[0]; // change the current active state
 #ifndef Q_UNSAFE
-    m_temp.uint = ~m_state.uint; // mark stable state configuration
+    // establish stable state configuration
+    m_temp.uint = static_cast<std::uintptr_t>(~m_state.uint);
 #else
     Q_UNUSED_PAR(r);
 #endif
@@ -218,9 +220,10 @@ void QHsm::dispatch(
     Q_UNUSED_PAR(qsId);
 #endif
 
-    Q_REQUIRE_LOCAL(300, e != nullptr);
-    Q_INVARIANT_INCRIT(320,
+    Q_INVARIANT_INCRIT(300,
         m_state.uint == static_cast<std::uintptr_t>(~m_temp.uint));
+
+    Q_REQUIRE_LOCAL(310, e != nullptr);
 
     QStateHandler s = m_state.fun; // current state
     QS_CRIT_STAT
@@ -248,6 +251,8 @@ void QHsm::dispatch(
     } while (r == Q_RET_SUPER);
 
     if (r >= Q_RET_TRAN) { // tran. (regular or history) taken?
+        Q_ASSERT_LOCAL(350, m_temp.fun != nullptr);
+
 #ifdef Q_SPY
         if (r == Q_RET_TRAN_HIST) { // tran. to history?
             QS_TRAN_SEG_(QS_QEP_TRAN_HIST, s, m_temp.fun);
@@ -285,7 +290,8 @@ void QHsm::dispatch(
 
     m_state.fun = path[0]; // change the current active state
 #ifndef Q_UNSAFE
-    m_temp.uint = ~m_state.uint;
+    // establish stable state configuration
+    m_temp.uint = static_cast<std::uintptr_t>(~m_state.uint);
 #endif
 }
 
@@ -315,6 +321,7 @@ std::int_fast8_t QHsm::tran_simple_(
         // find superstate of target
         QState const r = QHSM_RESERVED_EVT_(t, Q_EMPTY_SIG);
         Q_ASSERT_LOCAL(440, r == Q_RET_SUPER);
+        Q_ASSERT_LOCAL(450, m_temp.fun != nullptr);
 #ifdef Q_UNSAFE
         Q_UNUSED_PAR(r);
 #endif
@@ -398,7 +405,8 @@ std::int_fast8_t QHsm::tran_complex_(
         // source->super... == target->super->super...
         s = ss; // source->super
         r = Q_RET_IGNORED; // assume that the LCA NOT found
-        for (iq = ip; iq >= 0; --iq) {
+        iq = ip; // outside for(;;) to comply with MC:2023 R14.2
+        for (; iq >= 0; --iq) {
             if (s == path[iq]) { // is this the LCA?
                 r = Q_RET_HANDLED; // indicate the LCA found
                 ip = iq - 1; // do not enter the LCA
@@ -415,11 +423,12 @@ std::int_fast8_t QHsm::tran_complex_(
                 if (QHSM_RESERVED_EVT_(s, Q_EXIT_SIG) == Q_RET_HANDLED) {
                     QS_STATE_ACT_(QS_QEP_STATE_EXIT, s);
                     // find superstate of s
-                    (void)QHSM_RESERVED_EVT_(s, Q_EMPTY_SIG);
+                    static_cast<void>(QHSM_RESERVED_EVT_(s, Q_EMPTY_SIG));
                 }
                 s = m_temp.fun; // set to super of s
                 // NOTE: loop bounded per invariant:540
-                for (iq = ip; iq >= 0; --iq) {
+                iq = ip; // outside for(;;) to comply with MC:2023 R14.2
+                for (; iq >= 0; --iq) {
                     if (s == path[iq]) { // is this the LCA?
                         ip = iq - 1; // indicate not to enter the LCA
                         r = Q_RET_HANDLED; // cause break from outer loop
@@ -463,6 +472,7 @@ void QHsm::enter_target_(
         --lbound; // fixed loop bound
         Q_INVARIANT_LOCAL(640, lbound >= 0);
 
+        Q_ASSERT_LOCAL(650, m_temp.fun != nullptr);
         QS_TRAN_SEG_(QS_QEP_STATE_INIT, t, m_temp.fun);
 
         // find superstate of initial tran. target...
@@ -492,8 +502,8 @@ void QHsm::enter_target_(
 
 //............................................................................
 bool QHsm::isIn(QStateHandler const stateHndl) noexcept {
-    Q_INVARIANT_LOCAL(700, m_state.uint
-        == static_cast<std::uintptr_t>(~m_temp.uint));
+    Q_INVARIANT_LOCAL(700,
+        m_state.uint == static_cast<std::uintptr_t>(~m_temp.uint));
 
     bool inState = false; // assume that this HSM is NOT in 'stateHndl'
 
@@ -513,7 +523,8 @@ bool QHsm::isIn(QStateHandler const stateHndl) noexcept {
         Q_INVARIANT_LOCAL(740, lbound >= 0);
     } while (r == Q_RET_SUPER);
 
-    m_temp.uint = ~m_state.uint; // restore the invariant
+    // restore the invariant (stable state configuration)
+    m_temp.uint = static_cast<std::uintptr_t>(~m_state.uint);
 
     return inState; // return the status
 }
@@ -544,7 +555,8 @@ QStateHandler QHsm::childState(QStateHandler const parentHndl) noexcept {
     } while (r == Q_RET_SUPER);
     Q_ENSURE_LOCAL(890, isFound);
 
-    m_temp.uint = ~m_state.uint; // restore the invariant
+    // restore the invariant (stable state configuration)
+    m_temp.uint = static_cast<std::uintptr_t>(~m_state.uint);
 
     return child;
 }

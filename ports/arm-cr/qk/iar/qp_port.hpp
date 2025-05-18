@@ -98,8 +98,8 @@
 #define QK_IRQ_END()                  \
     } --QK_priv_.intNest;             \
     if (QK_priv_.intNest == 0U) {     \
-        if (QK_sched_() != 0U) {      \
-            QK_activate_();           \
+        if (QP::QK_sched_() != 0U) {  \
+            QP::QK_activate_();       \
         }                             \
     }                                 \
     __asm(" POP {R3, LR}\n"           \
@@ -116,8 +116,8 @@
 #define QK_IRQ_END()                  \
     } --QK_priv_.intNest;             \
     if (QK_priv_.intNest == 0U) {     \
-        if (QK_sched_() != 0U) {      \
-            QK_activate_();           \
+        if (QP::QK_sched_() != 0U) {  \
+            QP::QK_activate_();       \
         }                             \
     }                                 \
     __asm(" POP {R3, LR}\n"           \

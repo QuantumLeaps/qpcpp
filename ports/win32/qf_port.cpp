@@ -38,7 +38,6 @@
 #endif // Q_SPY
 
 #include <climits>          // limits of dynamic range for integers
-#include <conio.h>          // console input/output
 
 namespace { // unnamed local namespace
 
@@ -138,12 +137,20 @@ void stop() {
 }
 //............................................................................
 void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
-    Q_REQUIRE_ID(600, ticksPerSec != 0U);
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    Q_REQUIRE_INCRIT(600, ticksPerSec != 0U);
+    QF_CRIT_EXIT();
+
     l_tickMsec = 1000UL / ticksPerSec;
     l_tickPrio = tickPrio;
 }
 
-//............................................................................
+// console access ============================================================
+#ifdef QF_CONSOLE
+
+#include <conio.h>          // console input/output
+
 void consoleSetup() {
 }
 //............................................................................
@@ -161,20 +168,25 @@ int consoleWaitForKey(void) {
     return static_cast<int>(_getwch());
 }
 
+#endif // #ifdef QF_CONSOLE
+
 } // namespace QF
 
 // QActive functions =========================================================
 
 void QActive::start(QPrioSpec const prioSpec,
-                    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
-                    void * const stkSto, std::uint_fast16_t const stkSize,
-                    void const * const par)
+    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
+    void * const stkSto, std::uint_fast16_t const stkSize,
+    void const * const par)
 {
     Q_UNUSED_PAR(stkSto);
     Q_UNUSED_PAR(stkSize);
 
     // no external AO-stack storage needed for this port
-    Q_REQUIRE_ID(800, stkSto == nullptr);
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    Q_REQUIRE_INCRIT(800, stkSto == nullptr);
+    QF_CRIT_EXIT();
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
     m_pthre = 0U; // preemption-threshold (not used in QF, but in Win32)
@@ -197,7 +209,9 @@ void QActive::start(QPrioSpec const prioSpec,
         this,
         0,
         NULL);
-    Q_ENSURE_ID(830, m_thread != nullptr); // must succeed
+    QF_CRIT_ENTRY();
+    Q_ENSURE_INCRIT(830, m_thread != nullptr); // must succeed
+    QF_CRIT_EXIT();
 
     // set the priority of the Win32 thread based on the
     // "prio-threshold" field provided in the `prioSpec` parameter
@@ -222,7 +236,9 @@ void QActive::start(QPrioSpec const prioSpec,
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {
-    unsubscribeAll(); // unsubscribe this AO from all events
+    if (subscrList_ != nullptr) {
+        unsubscribeAll(); // unsubscribe this AO from all events
+    }
     m_thread = nullptr; // stop the thread loop (see QF::thread_)
 }
 #endif

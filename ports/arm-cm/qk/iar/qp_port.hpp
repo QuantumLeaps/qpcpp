@@ -106,7 +106,7 @@
     #define QK_ISR_EXIT()  do {                                   \
         QF_INT_DISABLE();                                         \
         QF_MEM_SYS();                                             \
-        if (QK_sched_() != 0U) {                                  \
+        if (QP::QK_sched_() != 0U) {                              \
             *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (1U << 28U);\
         }                                                         \
         QF_MEM_APP();                                             \
@@ -116,7 +116,7 @@
 #else
     #define QK_ISR_EXIT()  do {                                   \
         QF_INT_DISABLE();                                         \
-        if (QK_sched_() != 0U) {                                  \
+        if (QP::QK_sched_() != 0U) {                              \
             *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (1U << 28U);\
         }                                                         \
         QF_INT_ENABLE();                                          \

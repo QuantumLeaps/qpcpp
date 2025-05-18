@@ -45,6 +45,16 @@ Q_DEFINE_THIS_MODULE("qf_mem")
 namespace QP {
 
 //............................................................................
+QMPool::QMPool() noexcept
+  : m_start(nullptr),
+    m_end(nullptr),
+    m_freeHead(nullptr),
+    m_blockSize(0U),
+    m_nTot(0U),
+    m_nFree(0U),
+    m_nMin(0U)
+{}
+//............................................................................
 void QMPool::init(
     void * const poolSto,
     std::uint_fast32_t const poolSize,
@@ -55,11 +65,12 @@ void QMPool::init(
 
     Q_REQUIRE_INCRIT(100, poolSto != nullptr);
 
-    m_freeHead = static_cast<void * *>(poolSto);
+    m_start    = static_cast<void * *>(poolSto);
+    m_freeHead = m_start;
 
     // find # free links in a memory block, see NOTE1
     m_blockSize = static_cast<QMPoolSize>(2U * sizeof(void *));
-    std::uint_fast16_t inext = 2U;
+    std::uint_fast16_t inext = 2U; // index of the next block
     while (m_blockSize < static_cast<QMPoolSize>(blockSize)) {
         m_blockSize += static_cast<QMPoolSize>(sizeof(void *));
         ++inext;
@@ -78,23 +89,31 @@ void QMPool::init(
          size -= static_cast<std::uint_fast32_t>(m_blockSize))
     {
         pfb[0] = &pfb[inext]; // set the next link to next free block
+#ifndef Q_UNSAFE
+        pfb[1] = QP_DIS_PTR_UPDATE_(void*,
+            reinterpret_cast<std::uintptr_t>(pfb[0]));
+#endif
         pfb = static_cast<void * *>(pfb[0]); // advance to the next block
-        ++nTot;       // one more free block in the pool
+        ++nTot; // one more free block in the pool
     }
     pfb[0] = nullptr; // the last link points to NULL
 
     // dynamic range check
 #if (QF_MPOOL_CTR_SIZE == 1U)
-    Q_ASSERT_INCRIT(190, nTot < 0xFFU);
+    Q_ASSERT_INCRIT(160, nTot < 0xFFU);
 #elif (QF_MPOOL_CTR_SIZE == 2U)
-    Q_ASSERT_INCRIT(190, nTot < 0xFFFFU);
+    Q_ASSERT_INCRIT(160, nTot < 0xFFFFU);
 #endif
 
     m_nTot  = static_cast<QMPoolCtr>(nTot);
     m_nFree = m_nTot; // all blocks are free
-    m_start = static_cast<void * *>(poolSto); // original start
     m_end   = pfb;    // the last block in this pool
     m_nMin  = m_nTot; // the minimum # free blocks
+
+#ifndef Q_UNSAFE
+    pfb[1] = QP_DIS_PTR_UPDATE_(void*,
+        reinterpret_cast<std::uintptr_t>(pfb[0]));
+#endif
 
     QF_CRIT_EXIT();
 }
@@ -112,20 +131,23 @@ void * QMPool::get(
     QF_CRIT_ENTRY();
 
     // get volatile into temporaries
-    void * *pfb = m_freeHead; // pointer to free block
-    QMPoolCtr nFree = m_nFree;
+    void * *pfb     = m_freeHead; // pointer to free block
+    QMPoolCtr nFree = m_nFree;    // volatile into temporary
 
     // have more free blocks than the requested margin?
     if (nFree > static_cast<QMPoolCtr>(margin)) {
-        Q_ASSERT_INCRIT(310, pfb != nullptr);
+        Q_ASSERT_INCRIT(330, pfb != nullptr);
 
         // fast temporary
         void * * const pfb_next = static_cast<void * *>(pfb[0]);
+        // the free block must have integrity (duplicate storage)
+        Q_INVARIANT_INCRIT(342, QP_DIS_VERIFY_(std::uintptr_t,
+            pfb_next, reinterpret_cast<std::uintptr_t>(pfb[1])));
 
         --nFree; // one less free block
         if (nFree == 0U) { // is the pool becoming empty?
             // pool is becoming empty, so the next free block must be NULL
-            Q_ASSERT_INCRIT(320, pfb_next == nullptr);
+            Q_ASSERT_INCRIT(350, pfb_next == nullptr);
 
             m_nFree = 0U; // no more free blocks
             m_nMin  = 0U; // remember that the pool got empty
@@ -133,7 +155,7 @@ void * QMPool::get(
         else { // the pool is NOT empty
 
             // the next free-block pointer must be in range
-            Q_ASSERT_INCRIT(330, QF_PTR_RANGE_(pfb_next, m_start, m_end));
+            Q_ASSERT_INCRIT(360, QF_PTR_RANGE_(pfb_next, m_start, m_end));
 
             m_nFree = nFree; // update the original
             if (m_nMin > nFree) { // is this the new minimum?
@@ -146,6 +168,9 @@ void * QMPool::get(
         // change the allocated block contents so that it is different
         // than a free block inside the pool.
         pfb[0] = &m_end[1]; // invalid location beyond the end
+#ifndef Q_UNSAFE
+        pfb[1] = nullptr; // invalidate the duplicate storage
+#endif
 
         QS_BEGIN_PRE(QS_QF_MPOOL_GET, qsId)
             QS_TIME_PRE();         // timestamp
@@ -167,7 +192,7 @@ void * QMPool::get(
 
     QF_CRIT_EXIT();
 
-    return pfb; // return the block or nullptr to the caller
+    return static_cast<void *>(pfb); // return the block or nullptr
 }
 
 //............................................................................
@@ -184,18 +209,29 @@ void QMPool::put(
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
+    Q_REQUIRE_INCRIT(400, pfb != nullptr);
+
+    // the block must be in range of this pool (block from a different pool?)
+    Q_REQUIRE_INCRIT(410, QF_PTR_RANGE_(pfb, m_start, m_end));
+    // the block must NOT be in the pool already (double free)
+    Q_INVARIANT_INCRIT(422, !QP_DIS_VERIFY_(std::uintptr_t,
+        pfb[0], reinterpret_cast<std::uintptr_t>(pfb[1])));
+
     // get volatile into temporaries
     void * * const freeHead = m_freeHead;
     QMPoolCtr nFree = m_nFree;
 
-    Q_REQUIRE_INCRIT(400, nFree < m_nTot);
-    Q_REQUIRE_INCRIT(410, QF_PTR_RANGE_(pfb, m_start, m_end));
+    Q_REQUIRE_INCRIT(450, nFree < m_nTot);
 
     ++nFree; // one more free block in this pool
 
     m_freeHead = pfb; // set as new head of the free list
     m_nFree    = nFree;
     pfb[0]     = freeHead; // link into the list
+#ifndef Q_UNSAFE
+    pfb[1] = QP_DIS_PTR_UPDATE_(void*,
+        reinterpret_cast<std::uintptr_t>(freeHead));
+#endif
 
     QS_BEGIN_PRE(QS_QF_MPOOL_PUT, qsId)
         QS_TIME_PRE();         // timestamp
@@ -214,7 +250,5 @@ void QMPool::put(
 // (see void * data type). These pointers are used to form a linked-list
 // of free blocks in the pool. The first location pfb[0] is the actual link.
 // The second location pfb[1] is used in SafeQP as the redundant "duplicate
-// storage" for the link at pfb[0]. Even though the "duplicate storage" is NOT
-// used in this QP edition, the minimum number of number of void* pointers
-// (void * data type) inside a memory block is still kept at 2 to maintain
-// the same policy for sizing the memory blocks.
+// storage" for the link at pfb[0]. Therefore, the minimum number of void*
+// pointers (void * data type) inside a memory block is 2.

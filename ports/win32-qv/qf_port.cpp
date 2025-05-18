@@ -38,7 +38,6 @@
 #endif // Q_SPY
 
 #include <climits>          // limits of dynamic range for integers
-#include <conio.h>          // console input/output
 
 namespace { // unnamed local namespace
 
@@ -98,7 +97,7 @@ void enterCriticalSection_() {
 //............................................................................
 void leaveCriticalSection_() {
     if (l_isRunning) {
-        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect. must ballace!
+        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect. must balance!
         if ((--l_critSectNest) == 0) {
             LeaveCriticalSection(&l_win32CritSect);
         }
@@ -119,8 +118,6 @@ int run() {
 
     onStartup(); // application-specific startup callback
 
-    QF_CRIT_STAT
-
     if (l_tickMsec != 0U) { // system clock tick configured?
         // create the ticker thread...
         HANDLE ticker = CreateThread(NULL, 1024, &ticker_thread,
@@ -128,7 +125,6 @@ int run() {
         QF_CRIT_ENTRY();
         Q_ASSERT_INCRIT(310, ticker != static_cast<HANDLE>(0));
         QF_CRIT_EXIT();
-
 #ifdef Q_UNSAFE
         Q_UNUSED_PAR(ticker);
 #endif
@@ -158,7 +154,7 @@ int run() {
             QF::gc(e);
 
             QF_CRIT_ENTRY();
-            if (a->getEQueue().isEmpty()) { // empty queue?
+            if (a->m_eQueue.isEmpty()) { // empty queue?
                 readySet_.remove(p);
             }
         }
@@ -175,8 +171,8 @@ int run() {
         }
     }
     QF_CRIT_EXIT();
-    onCleanup(); // cleanup callback
-    QS_EXIT();   // cleanup the QSPY connection
+    onCleanup();    // cleanup callback
+    QS_EXIT();      // cleanup the QSPY connection
 
     //CloseHandle(win32Event_);
     //DeleteCriticalSection(&l_win32CritSect);
@@ -184,7 +180,7 @@ int run() {
 }
 //............................................................................
 void stop() {
-    l_isRunning = false; // this will exit the main event-loop
+    l_isRunning = false; // terminate the main event-loop
 
     // unblock the event-loop so it can terminate
     readySet_.insert(1U);
@@ -202,6 +198,10 @@ void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
 }
 
 // console access ============================================================
+#ifdef QF_CONSOLE
+
+#include <conio.h>        // console input/output
+
 void consoleSetup() {
 }
 //............................................................................
@@ -212,21 +212,23 @@ int consoleGetKey() {
     if (_kbhit()) { // any key pressed?
         return static_cast<int>(_getwch());
     }
-    return 0;
+    return 0; // no input at this time
 }
 //............................................................................
 int consoleWaitForKey(void) {
     return static_cast<int>(_getwch());
 }
 
+#endif // QF_CONSOLE
+
 } // namespace QF
 
 // QActive functions =========================================================
 
 void QActive::start(QPrioSpec const prioSpec,
-                    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
-                    void * const stkSto, std::uint_fast16_t const stkSize,
-                    void const * const par)
+    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
+    void * const stkSto, std::uint_fast16_t const stkSize,
+    void const * const par)
 {
     Q_UNUSED_PAR(stkSto);
     Q_UNUSED_PAR(stkSize);
@@ -234,14 +236,14 @@ void QActive::start(QPrioSpec const prioSpec,
     // no per-AO stack needed for this port
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(600, stkSto == nullptr);
+    Q_REQUIRE_INCRIT(800, stkSto == nullptr);
     QF_CRIT_EXIT();
+
+    m_eQueue.init(qSto, qLen);
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
     m_pthre = 0U; // preemption-threshold (not used in this port)
     register_();  // register this AO
-
-    m_eQueue.init(qSto, qLen);
 
     // top-most initial tran. (virtual call)
     this->init(par, m_prio);
@@ -251,7 +253,9 @@ void QActive::start(QPrioSpec const prioSpec,
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {
-    unsubscribeAll();
+    if (subscrList_ != nullptr) {
+        unsubscribeAll();
+    }
 
     // make sure the AO is no longer in "ready set"
     QF_CRIT_STAT
@@ -261,7 +265,7 @@ void QActive::stop() {
 
     unregister_(); // remove this AO from QF
 }
-#endif
+#endif // QACTIVE_CAN_STOP
 
 } // namespace QP
 

@@ -30,11 +30,11 @@
 #define QS_DUMMY_HPP_
 
 #ifdef Q_SPY
-    error Q_SPY must NOT be defined to include qs_dummy.hpp
+    #error Q_SPY must NOT be defined to include qs_dummy.hpp
 #endif
 
 #ifdef Q_UTEST
-    error Q_UTEST must NOT be defined to include qs_dummy.hpp
+    #error Q_UTEST must NOT be defined to include qs_dummy.hpp
 #endif
 
 #define QS_INIT(arg_)                   (true)
@@ -82,64 +82,6 @@
 #define QS_OUTPUT()                     static_cast<void>(0)
 #define QS_RX_INPUT()                   static_cast<void>(0)
 #define QS_ONLY(code_)                  static_cast<void>(0)
-
-//============================================================================
-namespace QP {
-namespace QS {
-
-// QS API used inside applications
-#ifndef QS_TIME_SIZE
-    using QSTimeCtr = std::uint32_t;
-#elif (QS_TIME_SIZE == 2U)
-    using QSTimeCtr = std::uint16_t;
-#else
-    using QSTimeCtr = std::uint32_t;
-#endif
-
-void initBuf(std::uint8_t * const sto,
-             std::uint_fast32_t const stoSize) noexcept;
-std::uint16_t getByte() noexcept;
-std::uint8_t const *getBlock(std::uint16_t * const pNbytes) noexcept;
-void doOutput();
-bool onStartup(void const * arg);
-void onCleanup();
-void onFlush();
-QSTimeCtr onGetTime();
-
-void rxInitBuf(std::uint8_t * const sto,
-               std::uint16_t const stoSize) noexcept;
-bool rxPut(std::uint8_t const b) noexcept;
-void rxParse();
-
-} // namespace QP
-} // namespace QS
-
-//============================================================================
-// QS API used inside test fixtures
-#ifdef Q_UTEST
-
-#if (QS_FUN_PTR_SIZE == 2U)
-    typedef uint16_t QSFun;
-#elif (QS_FUN_PTR_SIZE == 4U)
-    typedef uint32_t QSFun;
-#elif (QS_FUN_PTR_SIZE == 8U)
-    typedef uint64_t QSFun;
-#endif
-
-struct QS_TProbe {
-    QSFun    addr;
-    uint32_t data;
-    uint8_t  idx;
-};
-
-void QS_onTestSetup(void);
-void QS_onTestTeardown(void);
-void QS_onTestEvt(QEvt *e);
-void QS_onTestPost(void const *sender, QActive *recipient,
-                   QEvt const *e, bool status);
-void QS_onTestLoop(void);
-
-#endif // def Q_UTEST
 
 //============================================================================
 // interface used only for internal implementation, but not in applications

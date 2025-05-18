@@ -32,8 +32,8 @@
 //============================================================================
 #define QP_VERSION_STR "8.0.4"
 #define QP_VERSION     804U
-// <VER>=804 <DATE>=250531
-#define QP_RELEASE     0x6AABFDABU
+// <VER>=804 <DATE>=250611
+#define QP_RELEASE     0x6A9FC8ABU
 
 //============================================================================
 // default configuration settings
@@ -89,14 +89,13 @@
 // global types/utilities
 
 using int_t  = int;
-using enum_t  = int;
+using enum_t = int;
 
 #define Q_UNUSED_PAR(par_)  (static_cast<void>(par_))
 #define Q_DIM(array_)       (sizeof(array_) / sizeof((array_)[0U]))
 #define Q_UINT2PTR_CAST(type_, uint_) (reinterpret_cast<type_ *>(uint_))
 
 //============================================================================
-
 namespace QP {
 
 extern char const versionStr[24];
@@ -121,9 +120,9 @@ public:
     enum DynEvt: std::uint8_t { DYNAMIC };
 
     explicit constexpr QEvt(QSignal const s) noexcept
-      : sig(s),
-        poolNum_(0x00U),
-        refCtr_(0xE0U)
+      : sig(s)
+        ,poolNum_(0x00U)
+        ,refCtr_(0xE0U)
     {}
 
     QEvt() = delete;
@@ -302,14 +301,12 @@ protected:
         m_temp.obj = s;
         return Q_RET_EXIT;
     }
-#endif // def Q_SPY
-
-#ifndef Q_SPY
+#else
     QState qm_exit(QMState const * const s) noexcept {
         static_cast<void>(s); // unused parameter
         return Q_RET_EXIT;
     }
-#endif // ndef Q_SPY
+#endif // Q_SPY
 }; // class QAsm
 
 //============================================================================
@@ -349,6 +346,9 @@ private:
         QStateHandler * const path,
         std::int_fast8_t const depth,
         std::uint_fast8_t const qsId);
+
+    // friends...
+    friend class QS;
 }; // class QHsm
 
 //============================================================================
@@ -372,6 +372,7 @@ public:
         return m_state.obj->stateHandler;
     }
 #endif // def Q_SPY
+    QMState const * topQMState() const noexcept;
     bool isIn(QStateHandler const stateHndl) noexcept override;
     QMState const * childStateObj(QMState const * const parentHndl)
         const noexcept;
@@ -388,8 +389,8 @@ private:
         QMState const * const hist,
         std::uint_fast8_t const qsId);
 
-public:
-    QMState const * topQMState() const noexcept;
+    // friends...
+    friend class QS;
 }; // class QMsm
 
 } // namespace QP
@@ -473,8 +474,8 @@ using QPrioSpec = std::uint16_t;
 //============================================================================
 class QPSet {
 private:
-    QPSetBits m_bits[((QF_MAX_ACTIVE + (8U*sizeof(QPSetBits))) - 1U)/(8U*sizeof(QPSetBits))];
-
+    QPSetBits m_bits[((QF_MAX_ACTIVE + (8U * sizeof(QPSetBits))) - 1U)
+                     / (8U * sizeof(QPSetBits))];
 public:
     void setEmpty() noexcept {
         m_bits[0] = 0U;
@@ -539,6 +540,8 @@ public:
 #endif
     }
 
+    // friends...
+    friend class QS;
 }; // class QPSet
 
 //============================================================================
@@ -548,11 +551,42 @@ private:
 
     // friends...
     friend class QActive;
+    friend class QS;
 }; // class QSubscrList
 
 //============================================================================
-class QEQueue; // forward declaration
 
+class QEQueue; // forward declaration
+class QActive; // forward declaration
+
+//----------------------------------------------------------------------------
+// declarations for friendship with the QActive class
+
+extern "C" {
+    std::uint_fast8_t QK_sched_() noexcept;
+    std::uint_fast8_t QK_sched_act_(
+        QP::QActive const * const act,
+        std::uint_fast8_t const pthre_in) noexcept;
+    void QK_activate_();
+
+    std::uint_fast8_t QXK_sched_() noexcept;
+    void QXK_contextSw_(QP::QActive * const next) noexcept;
+    void QXK_threadExit_() noexcept;
+    void QXK_activate_();
+} // extern "C"
+
+namespace QF {
+    void init();
+    void stop();
+    int_t run();
+
+    void onStartup();
+    void onCleanup();
+} // namespace QF
+
+namespace QXK {
+    QP::QActive *current() noexcept;
+} // namespace QXK
 
 //============================================================================
 class QActive : public QP::QAsm {
@@ -562,41 +596,18 @@ private:
 
 #ifdef QACTIVE_THREAD_TYPE
     QACTIVE_THREAD_TYPE m_thread;
-#endif // def QACTIVE_THREAD_TYPE
+#endif
 
 #ifdef QACTIVE_OS_OBJ_TYPE
     QACTIVE_OS_OBJ_TYPE m_osObject;
-#endif // def QACTIVE_OS_OBJ_TYPE
+#endif
 
 #ifdef QACTIVE_EQUEUE_TYPE
     QACTIVE_EQUEUE_TYPE m_eQueue;
-#endif // def QACTIVE_EQUEUE_TYPE
-
-public:
-    static QActive * registry_[QF_MAX_ACTIVE + 1U];
-    static QSubscrList * subscrList_;
-    static enum_t maxPubSignal_;
-
-    // friends...
-    friend class QTimeEvt;
-    friend class QTicker;
-    friend class QXThread;
-    friend class QXMutex;
-    friend class QXSemaphore;
-    friend class QActiveDummy;
-    friend class GuiQActive;
-    friend class GuiQMActive;
-    friend void schedLock();
+#endif
 
 protected:
-    explicit QActive(QStateHandler const initial) noexcept
-      : QAsm(),
-        m_prio(0U),
-        m_pthre(0U)
-    {
-        m_state.fun = Q_STATE_CAST(&top);
-        m_temp.fun  = initial;
-    }
+    explicit QActive(QStateHandler const initial) noexcept;
 
 public:
     void init(
@@ -651,7 +662,8 @@ public:
         void const * const sender) noexcept;
     void postLIFO(QEvt const * const e) noexcept;
     QEvt const * get_() noexcept;
-    static std::uint_fast16_t getQueueMin(std::uint_fast8_t const prio) noexcept;
+    static std::uint_fast16_t getQueueMin(
+        std::uint_fast8_t const prio) noexcept;
     static void psInit(
         QSubscrList * const subscrSto,
         enum_t const maxSignal) noexcept;
@@ -669,22 +681,20 @@ public:
     std::uint_fast16_t flushDeferred(
         QEQueue * const eq,
         std::uint_fast16_t const num = 0xFFFFU) const noexcept;
-    std::uint_fast8_t getPrio() const noexcept {
-        return static_cast<std::uint_fast8_t>(m_prio);
+    std::uint8_t getPrio() const noexcept {
+        return m_prio;
     }
-    void setPrio(QPrioSpec const prio) noexcept {
-        m_prio  = static_cast<std::uint8_t>(prio & 0xFFU);
-        m_pthre = static_cast<std::uint8_t>(prio >> 8U);
-    }
-    std::uint_fast8_t getPThre() const noexcept {
-        return static_cast<std::uint_fast8_t>(m_pthre);
-    }
+    static void evtLoop_(QActive *act);
+    static QActive *fromRegistry(std::uint_fast8_t const prio);
 
-#ifdef QACTIVE_EQUEUE_TYPE
-    QACTIVE_EQUEUE_TYPE const & getEQueue() const noexcept {
-        return m_eQueue;
+#ifdef QACTIVE_THREAD_TYPE
+    QACTIVE_THREAD_TYPE const & getThread() const noexcept {
+        return m_thread;
     }
-#endif // def QACTIVE_EQUEUE_TYPE
+    void setThread(QACTIVE_THREAD_TYPE const & thr) {
+        m_thread = thr;
+    }
+#endif // def QACTIVE_THREAD_TYPE
 
 #ifdef QACTIVE_OS_OBJ_TYPE
     QACTIVE_OS_OBJ_TYPE const & getOsObject() const noexcept {
@@ -692,38 +702,57 @@ public:
     }
 #endif // def QACTIVE_OS_OBJ_TYPE
 
-#ifdef QACTIVE_THREAD_TYPE
-    QACTIVE_THREAD_TYPE const & getThread() const noexcept {
-        return m_thread;
-    }
-#endif // def QACTIVE_THREAD_TYPE
-
-#ifdef QACTIVE_THREAD_TYPE
-    void setThread(QACTIVE_THREAD_TYPE const & thr) {
-        m_thread = thr;
-    }
-#endif // def QACTIVE_THREAD_TYPE
-    static void evtLoop_(QActive * act);
-
 #ifdef QF_ISR_API
     virtual bool postFromISR(
         QEvt const * const e,
         std::uint_fast16_t const margin,
         void * par,
         void const * const sender) noexcept;
-#endif // def QF_ISR_API
 
-#ifdef QF_ISR_API
     static void publishFromISR(
         QEvt const * e,
         void * par,
         void const * sender) noexcept;
-#endif // def QF_ISR_API
+#endif // QF_ISR_API
 
 private:
     void postFIFO_(
         QEvt const * const e,
         void const * const sender);
+
+    static QActive * registry_[QF_MAX_ACTIVE + 1U];
+
+    static QSubscrList *subscrList_;
+    static QSignal maxPubSignal_;
+
+    // friends...
+    friend class QTimeEvt;
+    friend class QTicker;
+    friend class QXThread;
+    friend class QXMutex;
+    friend class QXSemaphore;
+    friend class QMActive;
+    friend class QActiveDummy;
+    friend class QS;
+
+    friend void QF::init();
+    friend void QF::stop();
+    friend int_t QF::run();
+    friend void QF::onStartup();
+    friend void QF::onCleanup();
+
+    friend std::uint_fast8_t QK_sched_() noexcept;
+    friend std::uint_fast8_t QK_sched_act_(
+        QP::QActive const * const act,
+        std::uint_fast8_t const pthre_in) noexcept;
+    friend void QK_activate_();
+
+    friend std::uint_fast8_t QXK_sched_() noexcept;
+    friend void QXK_contextSw_(QP::QActive * const next) noexcept;
+    friend void QXK_threadExit_() noexcept;
+    friend void QXK_activate_();
+    friend QP::QActive *QXK::current() noexcept;
+
 }; // class QActive
 
 //============================================================================
@@ -762,7 +791,6 @@ public:
     }
 }; // class QMActive
 
-
 //============================================================================
 class QTimeEvt : public QP::QEvt {
 private:
@@ -776,10 +804,6 @@ private:
 public:
     static QTimeEvt timeEvtHead_[QF_MAX_TICK_RATE];
 
-private:
-    friend class QXThread;
-
-public:
     QTimeEvt(
         QActive * const act,
         QSignal const sig,
@@ -834,6 +858,10 @@ private:
         QTimeEvt * const prev_link,
         QActive const * const act,
         std::uint_fast8_t const tickRate) noexcept;
+
+    // fiends...
+    friend class QXThread;
+    friend class QS;
 }; // class QTimeEvt
 
 //============================================================================
@@ -854,14 +882,6 @@ public:
 
 //============================================================================
 namespace QF {
-
-void init();
-void stop();
-
-int_t run();
-
-void onStartup();
-void onCleanup();
 
 //! @deprecated
 inline void psInit(
