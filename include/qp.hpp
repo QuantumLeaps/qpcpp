@@ -349,6 +349,9 @@ private:
         QStateHandler * const path,
         std::int_fast8_t const depth,
         std::uint_fast8_t const qsId);
+
+    // friends...
+    friend class QUTest;
 }; // class QHsm
 
 //============================================================================
@@ -372,6 +375,7 @@ public:
         return m_state.obj->stateHandler;
     }
 #endif // def Q_SPY
+    QMState const * topQMState() const noexcept;
     bool isIn(QStateHandler const stateHndl) noexcept override;
     QMState const * childStateObj(QMState const * const parentHndl)
         const noexcept;
@@ -388,8 +392,8 @@ private:
         QMState const * const hist,
         std::uint_fast8_t const qsId);
 
-public:
-    QMState const * topQMState() const noexcept;
+    // friends...
+    friend class QUTest;
 }; // class QMsm
 
 } // namespace QP
@@ -539,6 +543,8 @@ public:
 #endif
     }
 
+    // friends...
+    friend class QUTest;
 }; // class QPSet
 
 //============================================================================
@@ -548,11 +554,11 @@ private:
 
     // friends...
     friend class QActive;
+    friend class QUTest;
 }; // class QSubscrList
 
 //============================================================================
 class QEQueue; // forward declaration
-
 
 //============================================================================
 class QActive : public QP::QAsm {
@@ -576,17 +582,6 @@ public:
     static QActive * registry_[QF_MAX_ACTIVE + 1U];
     static QSubscrList * subscrList_;
     static enum_t maxPubSignal_;
-
-    // friends...
-    friend class QTimeEvt;
-    friend class QTicker;
-    friend class QXThread;
-    friend class QXMutex;
-    friend class QXSemaphore;
-    friend class QActiveDummy;
-    friend class GuiQActive;
-    friend class GuiQMActive;
-    friend void schedLock();
 
 protected:
     explicit QActive(QStateHandler const initial) noexcept
@@ -724,6 +719,18 @@ private:
     void postFIFO_(
         QEvt const * const e,
         void const * const sender);
+
+    // friends...
+    friend class QTimeEvt;
+    friend class QTicker;
+    friend class QXThread;
+    friend class QXMutex;
+    friend class QXSemaphore;
+    friend class QActiveDummy;
+    friend class GuiQActive;
+    friend class GuiQMActive;
+    friend class QUTest;
+    friend void schedLock();
 }; // class QActive
 
 //============================================================================
@@ -776,10 +783,6 @@ private:
 public:
     static QTimeEvt timeEvtHead_[QF_MAX_TICK_RATE];
 
-private:
-    friend class QXThread;
-
-public:
     QTimeEvt(
         QActive * const act,
         QSignal const sig,
@@ -834,6 +837,10 @@ private:
         QTimeEvt * const prev_link,
         QActive const * const act,
         std::uint_fast8_t const tickRate) noexcept;
+
+    // fiends...
+    friend class QXThread;
+    friend class QUTest;
 }; // class QTimeEvt
 
 //============================================================================
