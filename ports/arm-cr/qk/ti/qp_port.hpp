@@ -111,13 +111,13 @@
     ++QK_priv_.intNest; {
 
 // QK-specific Interrupt Request handler END
-#define QK_IRQ_END()              \
-    } --QK_priv_.intNest;         \
-    if (QK_priv_.intNest == 0U) { \
-        if (QK_sched_() != 0U) {  \
-            QK_activate_();       \
-        }                         \
-    }                             \
+#define QK_IRQ_END()                     \
+    } --QK_priv_.intNest;                \
+    if (QK_priv_.intNest == 0U) {        \
+        if (QP::QK_sched_() != 0U) {     \
+            QP::QK_activate_();          \
+        }                                \
+    }                                    \
 }
 
 // include files -------------------------------------------------------------

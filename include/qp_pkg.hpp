@@ -30,9 +30,13 @@
 #define QP_PKG_HPP_
 
 //============================================================================
+// helper macros...
 #define QF_CONST_CAST_(type_, ptr_)    const_cast<type_>(ptr_)
-#define Q_PTR2UINT_CAST_(ptr_)         (reinterpret_cast<std::uintptr_t>(ptr_))
 #define QF_PTR_RANGE_(x_, min_, max_)  (((min_) <= (x_)) && ((x_) <= (max_)))
+#define QP_DIS_UPDATE_(T_, org_)       (static_cast<T_>(~(org_)))
+#define QP_DIS_PTR_UPDATE_(T_, org_)   (reinterpret_cast<T_>(~(org_)))
+#define QP_DIS_VERIFY_(T_, org_, dis_) \
+    (reinterpret_cast<T_>(org_) == static_cast<T_>(~(dis_)))
 
 //============================================================================
 namespace QP {

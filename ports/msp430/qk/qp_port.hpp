@@ -63,13 +63,13 @@
 // QK interrupt entry and exit...
 #define QK_ISR_ENTRY()    (++QK_priv_.intNest)
 
-#define QK_ISR_EXIT()     do {    \
-    --QK_priv_.intNest;           \
-    if (QK_priv_.intNest == 0U) { \
-        if (QK_sched_() != 0U) {  \
-            QK_activate_();       \
-        }                         \
-    }                             \
+#define QK_ISR_EXIT()     do {       \
+    --QK_priv_.intNest;              \
+    if (QK_priv_.intNest == 0U) {    \
+        if (QP::QK_sched_() != 0U) { \
+            QP::QK_activate_();      \
+        }                            \
+    }                                \
 } while (false)
 
 // include files -------------------------------------------------------------

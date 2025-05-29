@@ -87,7 +87,7 @@ void QTimeEvt::armX(
 
 #ifndef Q_UNSAFE
     QTimeEvtCtr const ctr = m_ctr;
-#endif // ndef Q_UNSAFE
+#endif
 
     std::uint8_t const tickRate = m_tickRate;
 
@@ -116,7 +116,8 @@ void QTimeEvt::armX(
         timeEvtHead_[tickRate].m_act = this;
     }
 
-    QS_BEGIN_PRE(QS_QF_TIMEEVT_ARM, static_cast<QActive const *>(m_act)->m_prio)
+    QS_BEGIN_PRE(QS_QF_TIMEEVT_ARM,
+            static_cast<QActive const *>(m_act)->m_prio)
         QS_TIME_PRE();        // timestamp
         QS_OBJ_PRE(this);     // this time event object
         QS_OBJ_PRE(m_act);    // the active object
@@ -242,7 +243,7 @@ bool QTimeEvt::wasDisarmed() noexcept {
     QF_CRIT_ENTRY();
 
     bool const wasDisarmed = (m_flags & QTE_FLAG_WAS_DISARMED) != 0U;
-    m_flags |= QTE_FLAG_WAS_DISARMED;
+    m_flags |= QTE_FLAG_WAS_DISARMED; // mark as disarmed
 
     QF_CRIT_EXIT();
 
@@ -271,7 +272,7 @@ void QTimeEvt::tick(
         QS_TEC_PRE(prev->m_ctr); // tick ctr
         QS_U8_PRE(tickRate);     // tick rate
     QS_END_PRE()
-#endif // def Q_SPY
+#endif
 
     // scan the linked-list of time events at this rate...
     std::uint_fast8_t lbound = (2U * QF_MAX_ACTIVE); // fixed loop bound

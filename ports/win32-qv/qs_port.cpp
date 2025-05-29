@@ -1,27 +1,31 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
+//
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
-// This software is dual-licensed under the terms of the open source GNU
-// General Public License version 3 (or any later version), or alternatively,
-// under the terms of one of the closed source Quantum Leaps commercial
-// licenses.
+// SPDX-License-Identifier: LicenseRef-QL-commercial
 //
-// The terms of the open source GNU General Public License version 3
-// can be found at: <www.gnu.org/licenses/gpl-3.0>
+// This software is licensed under the terms of the Quantum Leaps commercial
+// licenses. Please contact Quantum Leaps for more information about the
+// available licensing options.
 //
-// The terms of the closed source Quantum Leaps commercial licenses
-// can be found at: <www.state-machine.com/licensing>
+// RESTRICTIONS
+// You may NOT :
+// (a) redistribute, encumber, sell, rent, lease, sublicense, or otherwise
+//     transfer rights in this software,
+// (b) remove or alter any trademark, logo, copyright or other proprietary
+//     notices, legends, symbols or labels present in this software,
+// (c) plagiarize this software to sidestep the licensing obligations.
 //
-// Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
-//
-// Contact information:
-// <www.state-machine.com>
+// Quantum Leaps contact information:
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
+
 #ifndef Q_SPY
     #error Q_SPY must be defined to compile qs_port.cpp
 #endif // Q_SPY
@@ -61,6 +65,9 @@ namespace { // unnamed local namespace
 // local variables ...........................................................
 static SOCKET l_sock = INVALID_SOCKET;
 
+static char *l_rxBuf;
+static int   l_rxBufLen;
+
 } // unnamed local namespace
 
 //============================================================================
@@ -68,8 +75,6 @@ namespace QP {
 
 //............................................................................
 bool QS::onStartup(void const *arg) {
-    static uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
-    static uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
     char hostName[128];
     char const *serviceName = "6601";  // default QSPY server port
     char const *src;
@@ -84,8 +89,13 @@ bool QS::onStartup(void const *arg) {
     WSADATA wsaData;
 
     // initialize the QS transmit and receive buffers
+    static std::uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
     initBuf(qsBuf, sizeof(qsBuf));
+
+    static std::uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+    l_rxBuf    = (char *)qsRxBuf;
+    l_rxBufLen = (int)sizeof(qsRxBuf);
 
     // initialize Windows sockets version 2.2
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR) {
@@ -167,10 +177,10 @@ bool QS::onStartup(void const *arg) {
                (const char *)&sockopt_bool, sizeof(sockopt_bool));
 
     //PRINTF_S("<TARGET> Connected to QSPY at Host=%s:%d\n",
-    //         hostName, port_remote);
+    //       hostName, port_remote);
     onFlush();
 
-    return true;  // success
+    return true; // success
 
 error:
     return false; // failure
@@ -190,10 +200,10 @@ void QS::onReset(void) {
     exit(0);
 }
 //............................................................................
-// NOTE:
-// No critical section in QS::onFlush() to avoid nesting of critical sections
-// in case QS::onFlush() is called from Q_onError().
 void QS::onFlush(void) {
+    // NOTE:
+    // No critical section in QS::onFlush() to avoid nesting of critical
+    // sections in case QS::onFlush() is called from Q_onError().
 
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
@@ -202,7 +212,7 @@ void QS::onFlush(void) {
 
     std::uint16_t nBytes = QS_TX_CHUNK;
     std::uint8_t const *data;
-    while ((data = getBlock(&nBytes)) != (uint8_t *)0) {
+    while ((data = getBlock(&nBytes)) != nullptr) {
         for (;;) { // for-ever until break or return
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { // sending failed?
@@ -210,7 +220,6 @@ void QS::onFlush(void) {
                 if (err == WSAEWOULDBLOCK) {
                     // sleep for the timeout and then loop back
                     // to send() the SAME data again
-                    //
                     Sleep(QS_TIMEOUT_MS);
                 }
                 else { // some other socket error...
@@ -289,12 +298,9 @@ void QS::doOutput(void) {
 }
 //............................................................................
 void QS::doInput(void) {
-    int status = recv(l_sock,
-                      (char *)QS::rxPriv_.buf, (int)QS::rxPriv_.end, 0);
-    if (status > 0) { // any data received?
-        QS::rxPriv_.tail = 0U;
-        QS::rxPriv_.head = status; // # bytes received
-        QS::rxParse(); // parse all received bytes
+    int len = recv(l_sock, l_rxBuf, l_rxBufLen, 0);
+    if (len > 0) { // any data received?
+        QS::rxParseBuf(static_cast<std::uint16_t>(len));
     }
 }
 

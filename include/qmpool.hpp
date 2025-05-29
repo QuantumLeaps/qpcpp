@@ -113,13 +113,16 @@ private:
     QMPool(QEQueue const & other) = delete;
     QMPool & operator=(QMPool const & other) = delete;
 
+    // friends...
+    friend class QS;
+
 public:
 
 #ifdef QF_ISR_API
     void * getFromISR(
         std::uint_fast16_t const margin,
         std::uint_fast8_t const qsId) noexcept;
-#endif // def QF_ISR_API
+#endif
 
 #ifdef QF_ISR_API
     void putFromISR(

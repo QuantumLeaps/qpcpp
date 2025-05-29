@@ -43,9 +43,9 @@ Q_DEFINE_THIS_MODULE("qf_ps")
 } // unnamed namespace
 
 namespace QP {
-QSubscrList * QActive::subscrList_;
 
-enum_t QActive::maxPubSignal_;
+QSubscrList * QActive::subscrList_;
+QSignal QActive::maxPubSignal_;
 
 //............................................................................
 void QActive::psInit(
@@ -72,17 +72,19 @@ void QActive::publish_(
     Q_UNUSED_PAR(qsId);
 #endif
 
-    QSignal const sig = e->sig;
-
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    Q_REQUIRE_INCRIT(200, sig < static_cast<QSignal>(maxPubSignal_));
+    Q_REQUIRE_INCRIT(200, e != nullptr);
+
+    QSignal const sig = e->sig;
+
+    Q_REQUIRE_INCRIT(230, sig < maxPubSignal_);
 
     QS_BEGIN_PRE(QS_QF_PUBLISH, qsId)
         QS_TIME_PRE();          // the timestamp
         QS_OBJ_PRE(sender);     // the sender object
-        QS_SIG_PRE(e->sig);     // the signal of the event
+        QS_SIG_PRE(sig);        // the signal of the event
         QS_2U8_PRE(e->poolNum_, e->refCtr_);
     QS_END_PRE()
 
@@ -94,7 +96,7 @@ void QActive::publish_(
         // collector step (QF::gc()) decrements the reference counter and
         // recycles the event if the counter drops to zero. This covers the
         // case when the event was published without any subscribers.
-        Q_ASSERT_INCRIT(205, e->refCtr_ < (2U * QF_MAX_ACTIVE));
+        Q_ASSERT_INCRIT(240, e->refCtr_ < (2U * QF_MAX_ACTIVE));
         QEvt_refCtr_inc_(e);
     }
 
@@ -111,36 +113,37 @@ void QActive::publish_(
 
         QActive *a = registry_[p];
         // the AO must be registered with the framework
-        Q_ASSERT_INCRIT(210, a != nullptr);
+        Q_ASSERT_INCRIT(250, a != nullptr);
 
         QF_CRIT_EXIT();
 
         QF_SCHED_STAT_
         QF_SCHED_LOCK_(p); // lock the scheduler up to AO's prio
-        do { // loop over all subscribers
+
+        std::uint_fast8_t lbound = QF_MAX_ACTIVE + 1U; // fixed loop bound
+        for (;;) { // loop over all subscribers
+
             // POST() asserts internally if the queue overflows
             a->POST(e, sender);
 
             subscrSet.remove(p); // remove the handled subscriber
-            if (subscrSet.notEmpty()) {  // still more subscribers?
-                p = subscrSet.findMax(); // highest-prio subscriber
-
-                QF_CRIT_ENTRY();
-
-                a = registry_[p];
-                // the AO must be registered with the framework
-                Q_ASSERT_INCRIT(220, a != nullptr);
-
-                QF_CRIT_EXIT();
+            if (subscrSet.isEmpty()) {  // no more subscribers?
+                break;
             }
-            else {
-                p = 0U; // no more subscribers
-            }
-        } while (p != 0U);
 
-        QF_CRIT_ENTRY();
-        Q_ASSERT_INCRIT(290, p == 0U); // all subscribers processed
-        QF_CRIT_EXIT();
+            p = subscrSet.findMax(); // highest-prio subscriber
+
+            QF_CRIT_ENTRY();
+
+            a = registry_[p];
+            // the AO must be registered with the framework
+            Q_ASSERT_INCRIT(260, a != nullptr);
+
+            --lbound; // fixed loop bound
+            Q_INVARIANT_INCRIT(270, lbound > 0U);
+
+            QF_CRIT_EXIT();
+        }
 
         QF_SCHED_UNLOCK_(); // unlock the scheduler
     }
@@ -155,17 +158,16 @@ void QActive::publish_(
 
 //............................................................................
 void QActive::subscribe(enum_t const sig) const noexcept {
-    std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
-
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    Q_REQUIRE_INCRIT(300, (Q_USER_SIG <= sig)
-        && (sig < maxPubSignal_)
-        && (0U < p) && (p <= QF_MAX_ACTIVE)
-        && (registry_[p] == this));
+    Q_REQUIRE_INCRIT(300, sig >= Q_USER_SIG);
+    Q_REQUIRE_INCRIT(310, static_cast<QSignal>(sig) < maxPubSignal_);
 
-    QS_BEGIN_PRE(QS_QF_ACTIVE_SUBSCRIBE, m_prio)
+    std::uint8_t const p = static_cast<std::uint_fast8_t>(m_prio);
+    Q_REQUIRE_INCRIT(330, (0U < p) && (p <= QF_MAX_ACTIVE));
+
+    QS_BEGIN_PRE(QS_QF_ACTIVE_SUBSCRIBE, p)
         QS_TIME_PRE();    // timestamp
         QS_SIG_PRE(sig);  // the signal of this event
         QS_OBJ_PRE(this); // this active object
@@ -179,15 +181,14 @@ void QActive::subscribe(enum_t const sig) const noexcept {
 
 //............................................................................
 void QActive::unsubscribe(enum_t const sig) const noexcept {
-    std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
-
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    Q_REQUIRE_INCRIT(400, (Q_USER_SIG <= sig)
-        && (sig < maxPubSignal_)
-        && (0U < p) && (p <= QF_MAX_ACTIVE)
-        && (registry_[p] == this));
+    Q_REQUIRE_INCRIT(400, sig >= Q_USER_SIG);
+    Q_REQUIRE_INCRIT(410, static_cast<QSignal>(sig) < maxPubSignal_);
+
+    std::uint8_t const p = static_cast<std::uint_fast8_t>(m_prio);
+    Q_REQUIRE_INCRIT(430, (0U < p) && (p <= QF_MAX_ACTIVE));
 
     QS_BEGIN_PRE(QS_QF_ACTIVE_UNSUBSCRIBE, p)
         QS_TIME_PRE();    // timestamp
@@ -205,16 +206,14 @@ void QActive::unsubscribe(enum_t const sig) const noexcept {
 void QActive::unsubscribeAll() const noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
+    QSignal const maxPubSig = maxPubSignal_;
 
-    std::uint_fast8_t const p = static_cast<std::uint_fast8_t>(m_prio);
-
-    Q_REQUIRE_INCRIT(500, (0U < p) && (p <= QF_MAX_ACTIVE)
-                           && (registry_[p] == this));
-    enum_t const maxPubSig = maxPubSignal_;
+    std::uint8_t const p = static_cast<std::uint_fast8_t>(m_prio);
+    Q_REQUIRE_INCRIT(520, (0U < p) && (p <= QF_MAX_ACTIVE));
 
     QF_CRIT_EXIT();
 
-    for (enum_t sig = Q_USER_SIG; sig < maxPubSig; ++sig) {
+    for (QSignal sig = Q_USER_SIG; sig < maxPubSig; ++sig) {
         QF_CRIT_ENTRY();
 
         if (subscrList_[sig].m_set.hasElement(p)) {

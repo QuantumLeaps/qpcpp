@@ -89,14 +89,13 @@
 // global types/utilities
 
 using int_t  = int;
-using enum_t  = int;
+using enum_t = int;
 
 #define Q_UNUSED_PAR(par_)  (static_cast<void>(par_))
 #define Q_DIM(array_)       (sizeof(array_) / sizeof((array_)[0U]))
 #define Q_UINT2PTR_CAST(type_, uint_) (reinterpret_cast<type_ *>(uint_))
 
 //============================================================================
-
 namespace QP {
 
 extern char const versionStr[24];
@@ -121,9 +120,9 @@ public:
     enum DynEvt: std::uint8_t { DYNAMIC };
 
     explicit constexpr QEvt(QSignal const s) noexcept
-      : sig(s),
-        poolNum_(0x00U),
-        refCtr_(0xE0U)
+      : sig(s)
+        ,poolNum_(0x00U)
+        ,refCtr_(0xE0U)
     {}
 
     QEvt() = delete;
@@ -302,14 +301,12 @@ protected:
         m_temp.obj = s;
         return Q_RET_EXIT;
     }
-#endif // def Q_SPY
-
-#ifndef Q_SPY
+#else
     QState qm_exit(QMState const * const s) noexcept {
         static_cast<void>(s); // unused parameter
         return Q_RET_EXIT;
     }
-#endif // ndef Q_SPY
+#endif // Q_SPY
 }; // class QAsm
 
 //============================================================================
@@ -351,7 +348,7 @@ private:
         std::uint_fast8_t const qsId);
 
     // friends...
-    friend class QUTest;
+    friend class QS;
 }; // class QHsm
 
 //============================================================================
@@ -393,7 +390,7 @@ private:
         std::uint_fast8_t const qsId);
 
     // friends...
-    friend class QUTest;
+    friend class QS;
 }; // class QMsm
 
 } // namespace QP
@@ -477,8 +474,8 @@ using QPrioSpec = std::uint16_t;
 //============================================================================
 class QPSet {
 private:
-    QPSetBits m_bits[((QF_MAX_ACTIVE + (8U*sizeof(QPSetBits))) - 1U)/(8U*sizeof(QPSetBits))];
-
+    QPSetBits m_bits[((QF_MAX_ACTIVE + (8U * sizeof(QPSetBits))) - 1U)
+                     / (8U * sizeof(QPSetBits))];
 public:
     void setEmpty() noexcept {
         m_bits[0] = 0U;
@@ -544,7 +541,7 @@ public:
     }
 
     // friends...
-    friend class QUTest;
+    friend class QS;
 }; // class QPSet
 
 //============================================================================
@@ -554,11 +551,27 @@ private:
 
     // friends...
     friend class QActive;
-    friend class QUTest;
+    friend class QS;
 }; // class QSubscrList
 
 //============================================================================
+
 class QEQueue; // forward declaration
+class QActive; // forward declaration
+
+// declarations in global namespace for friendships
+extern "C" {
+    std::uint_fast8_t QK_sched_() noexcept;
+    std::uint_fast8_t QK_sched_act_(
+        QP::QActive const * const act,
+        std::uint_fast8_t const pthre_in) noexcept;
+    void QK_activate_();
+
+    std::uint_fast8_t QXK_sched_() noexcept;
+    void QXK_contextSw_(QP::QActive * const next) noexcept;
+    void QXK_threadExit_() noexcept;
+    void QXK_activate_();
+}
 
 //============================================================================
 class QActive : public QP::QAsm {
@@ -568,30 +581,18 @@ private:
 
 #ifdef QACTIVE_THREAD_TYPE
     QACTIVE_THREAD_TYPE m_thread;
-#endif // def QACTIVE_THREAD_TYPE
+#endif
 
 #ifdef QACTIVE_OS_OBJ_TYPE
     QACTIVE_OS_OBJ_TYPE m_osObject;
-#endif // def QACTIVE_OS_OBJ_TYPE
+#endif
 
 #ifdef QACTIVE_EQUEUE_TYPE
     QACTIVE_EQUEUE_TYPE m_eQueue;
-#endif // def QACTIVE_EQUEUE_TYPE
-
-public:
-    static QActive * registry_[QF_MAX_ACTIVE + 1U];
-    static QSubscrList * subscrList_;
-    static enum_t maxPubSignal_;
+#endif
 
 protected:
-    explicit QActive(QStateHandler const initial) noexcept
-      : QAsm(),
-        m_prio(0U),
-        m_pthre(0U)
-    {
-        m_state.fun = Q_STATE_CAST(&top);
-        m_temp.fun  = initial;
-    }
+    explicit QActive(QStateHandler const initial) noexcept;
 
 public:
     void init(
@@ -664,15 +665,15 @@ public:
     std::uint_fast16_t flushDeferred(
         QEQueue * const eq,
         std::uint_fast16_t const num = 0xFFFFU) const noexcept;
-    std::uint_fast8_t getPrio() const noexcept {
-        return static_cast<std::uint_fast8_t>(m_prio);
+    std::uint8_t getPrio() const noexcept {
+        return m_prio;
     }
-    void setPrio(QPrioSpec const prio) noexcept {
-        m_prio  = static_cast<std::uint8_t>(prio & 0xFFU);
-        m_pthre = static_cast<std::uint8_t>(prio >> 8U);
+    void setPrio(QPrioSpec const prioSpec) noexcept {
+        m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU);
+        m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U);
     }
-    std::uint_fast8_t getPThre() const noexcept {
-        return static_cast<std::uint_fast8_t>(m_pthre);
+    std::uint8_t getPThre() const noexcept {
+        return m_pthre;
     }
 
 #ifdef QACTIVE_EQUEUE_TYPE
@@ -706,19 +707,22 @@ public:
         std::uint_fast16_t const margin,
         void * par,
         void const * const sender) noexcept;
-#endif // def QF_ISR_API
 
-#ifdef QF_ISR_API
     static void publishFromISR(
         QEvt const * e,
         void * par,
         void const * sender) noexcept;
-#endif // def QF_ISR_API
+#endif // QF_ISR_API
+
+    static QActive * registry_[QF_MAX_ACTIVE + 1U];
 
 private:
     void postFIFO_(
         QEvt const * const e,
         void const * const sender);
+
+    static QSubscrList *subscrList_;
+    static QSignal maxPubSignal_;
 
     // friends...
     friend class QTimeEvt;
@@ -729,8 +733,19 @@ private:
     friend class QActiveDummy;
     friend class GuiQActive;
     friend class GuiQMActive;
-    friend class QUTest;
+    friend class QS;
     friend void schedLock();
+
+    friend std::uint_fast8_t QK_sched_() noexcept;
+    friend std::uint_fast8_t QK_sched_act_(
+        QP::QActive const * const act,
+        std::uint_fast8_t const pthre_in) noexcept;
+    friend void QK_activate_();
+
+    friend std::uint_fast8_t QXK_sched_() noexcept;
+    friend void QXK_contextSw_(QP::QActive * const next) noexcept;
+    friend void QXK_threadExit_() noexcept;
+    friend void QXK_activate_();
 }; // class QActive
 
 //============================================================================
@@ -840,7 +855,7 @@ private:
 
     // fiends...
     friend class QXThread;
-    friend class QUTest;
+    friend class QS;
 }; // class QTimeEvt
 
 //============================================================================

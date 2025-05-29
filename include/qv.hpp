@@ -36,7 +36,7 @@ namespace QV {
 class Attr {
 public:
     QPSet readySet;
-    std::uint_fast8_t schedCeil;
+    std::uint8_t schedCeil;
 }; // class Attr
 
 extern QV::Attr priv_;

@@ -35,12 +35,12 @@
     #error Q_SPY must be defined to compile qs_port.cpp
 #endif // Q_SPY
 
-#define QP_IMPL             // this is QP implementation
-#include "qp_port.hpp"      // QP port
-#include "qsafe.h"          // QP Functional Safety (FuSa) Subsystem
-#include "qs_port.hpp"      // QS port
+#define QP_IMPL        // this is QP implementation
+#include "qp_port.hpp" // QP port
+#include "qsafe.h"     // QP Functional Safety (FuSa) Subsystem
+#include "qs_port.hpp" // QS port
 
-#include "safe_std.h"       // portable "safe" <stdio.h>/<string.h> facilities
+#include "safe_std.h"  // portable "safe" <stdio.h>/<string.h> facilities
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -67,6 +67,8 @@ namespace { // unnamed local namespace
 static int l_sock = INVALID_SOCKET;
 static struct timespec const c_timeout = { 0, QS_TIMEOUT_MS*1000000L };
 
+static char *l_rxBuf;
+static int   l_rxBufLen;
 
 } // unnamed local namespace
 
@@ -75,15 +77,8 @@ namespace QP {
 
 //............................................................................
 bool QS::onStartup(void const *arg) {
-
-    static uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
-    initBuf(qsBuf, sizeof(qsBuf));
-
-    static uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
-    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
-
     char hostName[128];
-    char const *serviceName = "6601";   // default QSPY server port
+    char const *serviceName = "6601";  // default QSPY server port
     char const *src;
     char *dst;
     int status;
@@ -92,6 +87,15 @@ bool QS::onStartup(void const *arg) {
     struct addrinfo *rp = NULL;
     struct addrinfo hints;
     int sockopt_bool;
+
+    // initialize the QS transmit and receive buffers
+    static std::uint8_t qsBuf[QS_TX_SIZE];   // buffer for QS-TX channel
+    initBuf(qsBuf, sizeof(qsBuf));
+
+    static std::uint8_t qsRxBuf[QS_RX_SIZE]; // buffer for QS-RX channel
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+    l_rxBuf    = (char *)qsRxBuf;
+    l_rxBufLen = (int)sizeof(qsRxBuf);
 
     // extract hostName from 'arg' (hostName:port_remote)...
     src = (arg != nullptr)
@@ -191,10 +195,11 @@ void QS::onReset() {
     exit(0);
 }
 //............................................................................
-// NOTE:
-// No critical section in QS::onFlush() to avoid nesting of critical sections
-// in case QS::onFlush() is called from Q_onError().
 void QS::onFlush() {
+    // NOTE:
+    // No critical section in QS::onFlush() to avoid nesting of critical
+    // sections in case QS::onFlush() is called from Q_onError().
+
     if (l_sock == INVALID_SOCKET) { // socket NOT initialized?
         FPRINTF_S(stderr, "<TARGET> ERROR   %s\n",
                   "invalid TCP socket");
@@ -227,7 +232,7 @@ void QS::onFlush() {
                 nBytes -= (uint16_t)nSent;
             }
             else {
-                break; // break out of the for-ever loop
+                break;
             }
         }
         // set nBytes for the next call to QS::getBlock()
@@ -290,14 +295,10 @@ void QS::doOutput() {
 }
 //............................................................................
 void QS::doInput(void) {
-    int status = recv(l_sock,
-                      (char *)QS::rxPriv_.buf, (int)QS::rxPriv_.end, 0);
-    if (status > 0) { // any data received?
-        QS::rxPriv_.tail = 0U;
-        QS::rxPriv_.head = status; // # bytes received
-        QS::rxParse(); // parse all received bytes
+    int len = recv(l_sock, l_rxBuf, l_rxBufLen, 0);
+    if (len > 0) { // any data received?
+        QS::rxParseBuf(static_cast<std::uint16_t>(len));
     }
 }
 
 } // namespace QP
-
