@@ -19,7 +19,7 @@ a70891b7b65fef362c318bd2e0ffc396d4b63f23 *src/qf/qep_msm.cpp
 bd21539d1962e9a00db653f10e8c241abee97119 *src/qf/qf_actq.cpp
 084e050639c4ccf28f5b93f57082ae00294f3a92 *src/qf/qf_defer.cpp
 94841287f4d771be7c891604a594208e4415a6c3 *src/qf/qf_dyn.cpp
-94a7a263b32f704f593a4782cbff2e422b2898c7 *src/qf/qf_mem.cpp
+5e30caa815031dfc8c648faefb0faff720e21cae *src/qf/qf_mem.cpp
 0ec1869e8115d0b20e9b49b531f62adefde74d63 *src/qf/qf_ps.cpp
 f01358c88e2a45f04a1c8852d0efec19fce4fcc8 *src/qf/qf_qact.cpp
 4028fdfef72fca72fa232c77817b9e2b65f2ec39 *src/qf/qf_qeq.cpp
@@ -99,8 +99,8 @@ d20e40d3c828d1d9681c314528ca5e2f18cd772d *ports/embos/qp_port.hpp
 35fbee9e7492cf897f26b6686b3b650c6b8fabb8 *ports/embos/qs_port.hpp
 4e86718c62fd78bc866ffdf855aa1e5a186916b2 *ports/embos/syscalls.c
 e4f00894f86806af6d88d38e831a8fc0ad36059e *ports/freertos/CMakeLists.txt
-da5abb9a583d785cfe70ff4861e7469d3d8e8591 *ports/freertos/qf_port.cpp
-6498bc99657223bcc9e69a2bdd28863555609402 *ports/freertos/qp_port.hpp
+a16a6f1e499bc7fb91cdcdd73c7058eaa32e7d53 *ports/freertos/qf_port.cpp
+9f4ca9fff8327bc18348358a71d57c913649f740 *ports/freertos/qp_port.hpp
 35fbee9e7492cf897f26b6686b3b650c6b8fabb8 *ports/freertos/qs_port.hpp
 4e86718c62fd78bc866ffdf855aa1e5a186916b2 *ports/freertos/syscalls.c
 18df978f665338c757f1a2a284c2acc779bd59d3 *ports/threadx/CMakeLists.txt
@@ -162,8 +162,9 @@ f084c5b1e8f6a58679f3235a1c6f9eb0fcc02e97 *ports/win32-qutest/safe_std.h
 76dd9078dc4311d53d3862d44177a8660258da6d *zephyr/CMakeLists.txt
 36a0252cf0bfd6be0d345c48c00b2300f8917f05 *zephyr/Kconfig
 2eb2a922e18b4760a68151ebee1b6282d20b4692 *zephyr/module.yml
-3427e1e065cd1bbc7ce9c46749a8ecdefbf8143c *zephyr/qf_port.cpp
+9a9e5f0a8e48600f64ae98016b709da12beadeb2 *zephyr/qf_port.cpp
 109c291df50110f185adc17bcdf8becc0a79346c *zephyr/qp-zephyr.jpg
 12fda4da868f4b3d6be1120a220d0bf72fe51a65 *zephyr/qp_port.hpp
 0ddae999ce63eb39de7758fa7574d06188a89fbe *zephyr/qs_port.hpp
+680911bb9e5cd87a9954407d3c18fce7dbca4df8 *zephyr/qutest_port.cpp
 791248d57ce8dfa6497728c7c2d0734c2c581625 *zephyr/README.md
