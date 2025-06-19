@@ -121,8 +121,12 @@ void QActive::evtLoop_(QActive *act) {
 // - attr2 - will be used for thread name in k_thread_name_set()
 //
 void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
-    m_thread.base.order_key = attr1;
+    m_eQueue.used_msgs = attr1; // will be used for thread options
+#ifdef CONFIG_THREAD_NAME
     m_thread.init_data = const_cast<void *>(attr2);
+#else
+    Q_UNUSED_PAR(attr2);
+#endif
 }
 //............................................................................
 void QActive::start(QPrioSpec const prioSpec,
@@ -130,6 +134,12 @@ void QActive::start(QPrioSpec const prioSpec,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
+    // extract data temporarily saved in QActive::setAttr()
+    std::uint32_t opt = m_eQueue.used_msgs;
+#ifdef CONFIG_THREAD_NAME
+    char const *name = static_cast<char const *>(m_thread.init_data);
+#endif
+
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
     m_pthre = 0U;   // preemption-threshold (not used for AO registration)
     register_(); // make QF aware of this active object
@@ -144,7 +154,7 @@ void QActive::start(QPrioSpec const prioSpec,
 
     // The Zephyr priority of the AO thread can be specified in two ways:
     //
-    // 1. Implictily based on the AO's priority (Zephyr uses the reverse
+    // 1. Implicitly based on the AO's priority (Zephyr uses the reverse
     //    priority numbering scheme than QP). This option is chosen, when
     //    the higher-byte of the prioSpec parameter is set to zero.
     //
@@ -157,19 +167,13 @@ void QActive::start(QPrioSpec const prioSpec,
     //    so it is the responsibility of the application to ensure that
     //    it is consistent with the AO's priority. An example of
     //    inconsistent setting would be assigning Zephyr priorities that
-    //    would result in a different relative priritization of AO's threads
-    //    than indicated by the AO priorities assigned.
+    //    would result in a different relative prioritization of AO's
+    //    threads than indicated by the AO priorities assigned.
     //
     int zephyr_prio = (int)((int16_t)prioSpec >> 8);
     if (zephyr_prio == 0) {
         zephyr_prio = (int)QF_MAX_ACTIVE - (int)m_prio;
     }
-
-    // extract data temporarily saved in m_thread by QActive::setAttr()
-    std::uint32_t opt = m_thread.base.order_key;
-#ifdef CONFIG_THREAD_NAME
-    char const *name = static_cast<char const *>(m_thread.init_data);
-#endif
 
     // clear the Zephyr thread structure before creating the thread
     m_thread = (struct k_thread){};

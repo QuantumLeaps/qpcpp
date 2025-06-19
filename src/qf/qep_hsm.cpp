@@ -279,14 +279,15 @@ void QHsm::dispatch(
         enter_target_(&path[0], ip, qsId);
         QS_TRAN_END_(QS_QEP_TRAN, s, path[0]);
     }
-#ifdef Q_SPY
     else if (r == Q_RET_HANDLED) {
         QS_TRAN0_(QS_QEP_INTERN_TRAN, s);
     }
-    else {
+    else if (r == Q_RET_IGNORED) {
         QS_TRAN0_(QS_QEP_IGNORED, m_state.fun);
     }
-#endif // Q_SPY
+    else {
+        Q_ERROR_LOCAL(360);
+    }
 
     m_state.fun = path[0]; // change the current active state
 #ifndef Q_UNSAFE

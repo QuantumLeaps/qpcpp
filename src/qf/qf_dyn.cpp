@@ -87,8 +87,8 @@ void poolInit(
 std::uint_fast16_t poolGetMaxBlockSize() noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
-    std::uint_fast8_t const maxPool = priv_.maxPool_;
-    Q_REQUIRE_INCRIT(200, (0U < maxPool) && (maxPool <= QF_MAX_EPOOL));
+    std::uint8_t const maxPool = priv_.maxPool_;
+    Q_REQUIRE_INCRIT(210, (0U < maxPool) && (maxPool <= QF_MAX_EPOOL));
 
     std::uint_fast16_t const maxSize =
         QF_EPOOL_EVENT_SIZE_(priv_.ePool_[maxPool - 1U]);
@@ -103,9 +103,9 @@ std::uint_fast16_t getPoolMin(std::uint_fast8_t const poolNum) noexcept {
     QF_CRIT_ENTRY();
 
 #ifndef Q_UNSAFE
-    std::uint_fast8_t const maxPool = priv_.maxPool_;
-    Q_REQUIRE_INCRIT(300, maxPool <= QF_MAX_EPOOL);
-    Q_REQUIRE_INCRIT(310, (0U < poolNum) && (poolNum <= maxPool));
+    std::uint8_t const maxPool = priv_.maxPool_;
+    Q_REQUIRE_INCRIT(310, maxPool <= QF_MAX_EPOOL);
+    Q_REQUIRE_INCRIT(320, (0U < poolNum) && (poolNum <= maxPool));
 #endif
     std::uint_fast16_t const min = static_cast<std::uint_fast16_t>(
         priv_.ePool_[poolNum - 1U].getNMin());
@@ -124,8 +124,8 @@ QEvt * newX_(
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    std::uint_fast8_t const maxPool = priv_.maxPool_;
-    Q_REQUIRE_INCRIT(400, maxPool <= QF_MAX_EPOOL);
+    std::uint8_t const maxPool = priv_.maxPool_;
+    Q_REQUIRE_INCRIT(410, maxPool <= QF_MAX_EPOOL);
 
     // find the pool id that fits the requested event size...
     std::uint8_t poolNum = 0U; // zero-based poolNum initially
@@ -136,7 +136,7 @@ QEvt * newX_(
     }
 
     // - cannot run out of registered pools
-    Q_ASSERT_INCRIT(410, poolNum < maxPool);
+    Q_ASSERT_INCRIT(420, poolNum < maxPool);
 
     ++poolNum; // convert to 1-based poolNum
 
@@ -173,7 +173,7 @@ QEvt * newX_(
         // This assertion means that the event allocation failed,
         // and this failure cannot be tolerated. The most frequent
         // reason is an event leak in the application.
-        Q_ASSERT_INCRIT(420, margin != NO_MARGIN);
+        Q_ASSERT_INCRIT(430, margin != NO_MARGIN);
 
         QS_BEGIN_PRE(QS_QF_NEW_ATTEMPT,
                 static_cast<std::uint_fast8_t>(QS_EP_ID) + poolNum)
@@ -197,7 +197,7 @@ void gc(QEvt const * const e) noexcept {
 
     Q_REQUIRE_INCRIT(500, e != nullptr);
 
-    std::uint_fast8_t const poolNum = e->poolNum_;
+    std::uint8_t const poolNum = e->poolNum_;
     if (poolNum != 0U) { // is it a pool event (mutable)?
 
         if (e->refCtr_ > 1U) { // isn't this the last reference?
@@ -215,9 +215,9 @@ void gc(QEvt const * const e) noexcept {
         }
         else { // this is the last reference to this event, recycle it
 #ifndef Q_UNSAFE
-            std::uint_fast8_t const maxPool = priv_.maxPool_;
-            Q_ASSERT_INCRIT(530, maxPool <= QF_MAX_EPOOL);
-            Q_ASSERT_INCRIT(540, poolNum <= maxPool);
+            std::uint8_t const maxPool = priv_.maxPool_;
+            Q_ASSERT_INCRIT(540, maxPool <= QF_MAX_EPOOL);
+            Q_ASSERT_INCRIT(550, poolNum <= maxPool);
 #endif
             QS_BEGIN_PRE(QS_QF_GC,
                     static_cast<std::uint_fast8_t>(QS_EP_ID) + poolNum)

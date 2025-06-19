@@ -38,8 +38,8 @@
 
 // QActive customization for FreeRTOS
 #define QACTIVE_EQUEUE_TYPE     QueueHandle_t
-#define QACTIVE_OS_OBJ_TYPE     StaticQueue_t
-#define QACTIVE_THREAD_TYPE     StaticTask_t
+#define QACTIVE_OS_OBJ_TYPE     OsObject
+#define QACTIVE_THREAD_TYPE     TaskHandle_t
 
 // FreeRTOS requires the "FromISR" API in QP/C++
 #define QF_ISR_API              1
@@ -59,10 +59,14 @@
 #include "task.h"      // FreeRTOS task management
 #include "queue.h"     // FreeRTOS queue management
 
+struct OsObject {
+    StaticQueue_t m_queue;
+    StaticTask_t  m_task;
+};
+
 #include "qequeue.hpp" // QP event queue (for deferring events)
 #include "qmpool.hpp"  // QP memory pool (for event pools)
 #include "qp.hpp"      // QP platform-independent public interface
-
 
 // the "FromISR" versions of the QF APIs, see NOTE3
 #ifdef Q_SPY

@@ -47,7 +47,7 @@ public:
 
 #if (QF_MAX_EPOOL > 0U)
     QF_EPOOL_TYPE_ ePool_[QF_MAX_EPOOL];
-    std::uint_fast8_t maxPool_;
+    std::uint8_t maxPool_;
 #else
     std::uint8_t dummy;
 #endif //  (QF_MAX_EPOOL == 0U)

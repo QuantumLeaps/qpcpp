@@ -102,7 +102,7 @@ public:
     }
 
 private:
-    QMPool(QEQueue const & other) = delete;
+    QMPool(QMPool const & other) = delete;
     QMPool & operator=(QMPool const & other) = delete;
 
     // friends...

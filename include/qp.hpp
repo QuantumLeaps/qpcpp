@@ -30,10 +30,10 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR "8.0.4"
-#define QP_VERSION     804U
-// <VER>=804 <DATE>=250611
-#define QP_RELEASE     0x6A9FC8ABU
+#define QP_VERSION_STR "8.0.5"
+#define QP_VERSION     805U
+// <VER>=805 <DATE>=250811
+#define QP_RELEASE     0x6A81442A
 
 //============================================================================
 // default configuration settings
@@ -178,28 +178,25 @@ public:
     QAsmAttr m_state;
     QAsmAttr m_temp;
 
-    // All possible return values from state-handlers
+    // All possible values returned from state/action handlers...
     // NOTE: The ordering is important for algorithmic correctness.
+
+    // unhandled and needs to "bubble up"
     static constexpr QState Q_RET_SUPER     {0U};
     static constexpr QState Q_RET_UNHANDLED {1U};
 
-    // handled and do not need to "bubble up"
+// handled and does not need to "bubble up"
     static constexpr QState Q_RET_HANDLED   {2U};
     static constexpr QState Q_RET_IGNORED   {3U};
 
-    // entry/exit
+// entry/exit/initial
     static constexpr QState Q_RET_ENTRY     {4U};
     static constexpr QState Q_RET_EXIT      {5U};
+    static constexpr QState Q_RET_TRAN_INIT {6U};
 
-    // no side effects
-    static constexpr QState Q_RET_NULL      {6U};
-
-    // transitions need to execute transition-action table in QP::QMsm
+// regular tran./tran.-to-history
     static constexpr QState Q_RET_TRAN      {7U};
-    static constexpr QState Q_RET_TRAN_INIT {8U};
-
-    // transitions that additionally clobber QHsm.m_state
-    static constexpr QState Q_RET_TRAN_HIST {9U};
+    static constexpr QState Q_RET_TRAN_HIST {8U};
 
     // Reserved signals by the QP-framework
     static constexpr QSignal Q_EMPTY_SIG    {0U};
@@ -451,6 +448,9 @@ namespace QP {
 
 using QPrioSpec = std::uint16_t;
 
+class QEQueue; // forward declaration
+class QActive; // forward declaration
+
 #if (QF_TIMEEVT_CTR_SIZE == 1U)
     using QTimeEvtCtr = std::uint8_t;
 #elif (QF_TIMEEVT_CTR_SIZE == 2U)
@@ -555,9 +555,6 @@ private:
 }; // class QSubscrList
 
 //============================================================================
-
-class QEQueue; // forward declaration
-class QActive; // forward declaration
 
 //----------------------------------------------------------------------------
 // declarations for friendship with the QActive class
