@@ -19,7 +19,7 @@ a70891b7b65fef362c318bd2e0ffc396d4b63f23 *src/qf/qep_msm.cpp
 bd21539d1962e9a00db653f10e8c241abee97119 *src/qf/qf_actq.cpp
 084e050639c4ccf28f5b93f57082ae00294f3a92 *src/qf/qf_defer.cpp
 94841287f4d771be7c891604a594208e4415a6c3 *src/qf/qf_dyn.cpp
-94a7a263b32f704f593a4782cbff2e422b2898c7 *src/qf/qf_mem.cpp
+5e30caa815031dfc8c648faefb0faff720e21cae *src/qf/qf_mem.cpp
 0ec1869e8115d0b20e9b49b531f62adefde74d63 *src/qf/qf_ps.cpp
 f01358c88e2a45f04a1c8852d0efec19fce4fcc8 *src/qf/qf_qact.cpp
 4028fdfef72fca72fa232c77817b9e2b65f2ec39 *src/qf/qf_qeq.cpp
@@ -166,4 +166,5 @@ f084c5b1e8f6a58679f3235a1c6f9eb0fcc02e97 *ports/win32-qutest/safe_std.h
 109c291df50110f185adc17bcdf8becc0a79346c *zephyr/qp-zephyr.jpg
 12fda4da868f4b3d6be1120a220d0bf72fe51a65 *zephyr/qp_port.hpp
 0ddae999ce63eb39de7758fa7574d06188a89fbe *zephyr/qs_port.hpp
+680911bb9e5cd87a9954407d3c18fce7dbca4df8 *zephyr/qutest_port.cpp
 791248d57ce8dfa6497728c7c2d0734c2c581625 *zephyr/README.md
