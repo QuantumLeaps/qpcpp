@@ -236,7 +236,7 @@ void QActive::start(QPrioSpec const prioSpec,
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {
-    if (subscrList_ != nullptr) {
+    if (QActive_subscrList_ != nullptr) {
         unsubscribeAll(); // unsubscribe this AO from all events
     }
     m_thread = nullptr; // stop the thread loop (see QF::thread_)

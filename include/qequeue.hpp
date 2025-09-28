@@ -64,30 +64,24 @@ public:
         QEvt const * const e,
         std::uint_fast8_t const qsId) noexcept;
     QEvt const * get(std::uint_fast8_t const qsId) noexcept;
-    QEQueueCtr getNFree() const noexcept {
-        return m_nFree;
-    }
-    QEQueueCtr getNMin() const noexcept {
-        return m_nMin;
-    }
-    bool isEmpty() const noexcept {
-        return m_frontEvt == nullptr;
-    }
-    QEvt const *peekFront() const noexcept {
-        return m_frontEvt;
-    }
+    std::uint16_t getFree() const noexcept;
+    std::uint16_t getUse() const noexcept;
+    std::uint16_t getMin() const noexcept;
+    bool isEmpty() const noexcept;
+    QEvt const *peekFront() const &;
+    QEvt const *peekFront() &&
+        // ref-qualified reference (MISRA-C++:2023 Rule 6.8.4)
+        = delete;
 
 private:
-    QEvt const * volatile m_frontEvt;
+    QEvt const * m_frontEvt;
     QEvt const * * m_ring;
     QEQueueCtr m_end;
-    QEQueueCtr volatile m_head;
-    QEQueueCtr volatile m_tail;
-    QEQueueCtr volatile m_nFree;
+    QEQueueCtr m_head;
+    QEQueueCtr m_tail;
+    QEQueueCtr m_nFree;
     QEQueueCtr m_nMin;
 
-    QEQueue(QEQueue const & other) = delete;
-    QEQueue & operator=(QEQueue const & other) = delete;
     void postFIFO_(
         QEvt const * const e,
         void const * const sender);

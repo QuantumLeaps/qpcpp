@@ -194,8 +194,8 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
 }
 
 //............................................................................
-bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
-                    void const * const sender) noexcept
+bool QActive::postx_(QEvt const * const e, std::uint_fast16_t const margin,
+                     void const * const sender) noexcept
 {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
@@ -236,7 +236,6 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
         QS_END_PRE()
 
         if (e->poolNum_ != 0U) { // is it a pool event?
-            Q_ASSERT_INCRIT(205, e->refCtr_ < (2U * QF_MAX_ACTIVE));
             QEvt_refCtr_inc_(e); // increment the reference counter
         }
         QF_CRIT_EXIT();
@@ -288,7 +287,6 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     QS_END_PRE()
 
     if (e->poolNum_ != 0U) { // is it a pool event?
-        Q_ASSERT_INCRIT(305, e->refCtr_ < (2U * QF_MAX_ACTIVE));
         QEvt_refCtr_inc_(e); // increment the reference counter
     }
     QF_CRIT_EXIT();
@@ -329,6 +327,20 @@ QEvt const *QActive::get_(void) noexcept {
     Q_UNUSED_PAR(err);
 #endif
     return e;
+}
+//............................................................................
+std::uint16_t QActive::getQueueUse(
+    std::uint_fast8_t const prio) noexcept
+{
+    return 0U; // queue use not supported in this RTOS
+}
+//............................................................................
+std::uint16_t QActive::getQueueFree(std::uint_fast8_t const prio) noexcept {
+    return 0U; // queue free elements not supported in this RTOS
+}
+//............................................................................
+std::uint16_t QActive::getQueueMin(std::uint_fast8_t const prio) noexcept {
+    return 0U; // queue minimum not supported in this RTOS
 }
 
 } // namespace QP

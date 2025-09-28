@@ -29,56 +29,48 @@
 #ifndef QP_PKG_HPP_
 #define QP_PKG_HPP_
 
-//============================================================================
-// helper macros...
-#define QF_CONST_CAST_(type_, ptr_)    const_cast<type_>(ptr_)
-#define QF_PTR_RANGE_(x_, min_, max_)  (((min_) <= (x_)) && ((x_) <= (max_)))
-#define QP_DIS_UPDATE_(T_, org_)       (static_cast<T_>(~(org_)))
-#define QP_DIS_PTR_UPDATE_(T_, org_)   (reinterpret_cast<T_>(~(org_)))
-#define QP_DIS_VERIFY_(T_, org_, dis_) \
-    (reinterpret_cast<T_>(org_) == static_cast<T_>(~(dis_)))
+#include <array>    // for std::array
+
+#ifdef QP_IMPL
+
+namespace QP {
+
+extern std::array<QActive*, QF_MAX_ACTIVE + 1U> QActive_registry_;
+extern QSubscrList *QActive_subscrList_;
+extern QSignal QActive_maxPubSignal_;
+
+#if (QF_MAX_TICK_RATE > 0U)
+extern std::array<QTimeEvt, QF_MAX_TICK_RATE> QTimeEvt_head_;
+
+// Bitmasks are for the QTimeEvt::flags attribute
+constexpr std::uint8_t QTE_FLAG_IS_LINKED    {1U << 7U};
+constexpr std::uint8_t QTE_FLAG_WAS_DISARMED {1U << 6U};
+
+#endif // (QF_MAX_TICK_RATE > 0U)
 
 //============================================================================
-namespace QP {
+void QEvt_refCtr_inc_(QEvt const * const me) noexcept;
+void QEvt_refCtr_dec_(QEvt const * const me) noexcept;
+
+//============================================================================
 namespace QF {
 
 class Attr {
 public:
 
 #if (QF_MAX_EPOOL > 0U)
-    QF_EPOOL_TYPE_ ePool_[QF_MAX_EPOOL];
+    std::array<QF_EPOOL_TYPE_, QF_MAX_EPOOL> ePool_;
     std::uint8_t maxPool_;
 #else
     std::uint8_t dummy;
-#endif //  (QF_MAX_EPOOL == 0U)
+#endif // (QF_MAX_EPOOL == 0U)
 }; // class Attr
 
 extern QF::Attr priv_;
 
-void bzero_(
-    void * const start,
-    std::uint_fast16_t const len) noexcept;
-
 } // namespace QF
-
-//============================================================================
-// Bitmasks are for the QTimeEvt::flags attribute
-constexpr std::uint8_t QTE_FLAG_IS_LINKED    {1U << 7U};
-constexpr std::uint8_t QTE_FLAG_WAS_DISARMED {1U << 6U};
-
-//============================================================================
-inline void QEvt_refCtr_inc_(QEvt const * const e) noexcept {
-    // NOTE: this function must be called inside a critical section
-    std::uint8_t const rc = e->refCtr_ + 1U;
-    (QF_CONST_CAST_(QEvt*, e))->refCtr_ = rc; // cast away 'const'
-}
-
-inline void QEvt_refCtr_dec_(QEvt const * const e) noexcept {
-    // NOTE: this function must be called inside a critical section
-    std::uint8_t const rc = e->refCtr_ - 1U;
-    (QF_CONST_CAST_(QEvt*, e))->refCtr_ = rc; // cast away 'const'
-}
-
 } // namespace QP
+
+#endif // QP_IMPL
 
 #endif // QP_PKG_HPP_

@@ -39,71 +39,53 @@
 
 // unnamed namespace for local definitions with internal linkage
 namespace {
-//Q_DEFINE_THIS_MODULE("qf_act")
+Q_DEFINE_THIS_MODULE("qf_act")
 } // unnamed namespace
 
+//----------------------------------------------------------------------------
 namespace QP {
 
 // QP version string embedded in the binary image
-char const versionStr[] = "QP/C++ " QP_VERSION_STR;
+static constexpr char versionStr[24] = "QP/C++ " QP_VERSION_STR;
 
-QActive * QActive::registry_[QF_MAX_ACTIVE + 1U];
+//............................................................................
+char const *version() noexcept {
+    // public access to versionStr[] so that it won't be eliminated as unused
+    return &versionStr[0];
+}
+//............................................................................
+void QEvt_refCtr_inc_(QEvt const * const me) noexcept {
+    // NOTE: this function must be called *inside* a critical section
 
-QActive *QActive::fromRegistry(std::uint_fast8_t const prio) {
-    return registry_[prio];
+    // the event reference count must not exceed the number of AOs
+    // in the system plus each AO possibly holding one event reference
+    Q_REQUIRE_INCRIT(200, me->refCtr_ < (QF_MAX_ACTIVE + QF_MAX_ACTIVE));
+
+    QEvt * const mut_me = const_cast<QEvt *>(me); // cast 'const' away
+    ++mut_me->refCtr_;
+}
+//............................................................................
+void QEvt_refCtr_dec_(QEvt const * const me) noexcept {
+    // NOTE: this function must be called inside a critical section
+    QEvt * const mut_me = const_cast<QEvt *>(me); // cast 'const' away
+    --mut_me->refCtr_;
 }
 
 //----------------------------------------------------------------------------
-namespace QF {
-
-QF::Attr priv_;
-
-void bzero_(
-    void * const start,
-    std::uint_fast16_t const len) noexcept
-{
-    std::uint8_t *ptr = static_cast<std::uint8_t *>(start);
-    for (std::uint_fast16_t n = len; n > 0U; --n) {
-        *ptr = 0U;
-        ++ptr;
-    }
+QAsm::QAsm() noexcept // default QAsm ctor
+  : m_state(),
+    m_temp ()
+{}
+//............................................................................
+QState QAsm::top(void * const me, QEvt const * const e) noexcept {
+    Q_UNUSED_PAR(me);
+    Q_UNUSED_PAR(e);
+    return Q_RET_IGNORED; // the top state ignores all events
 }
-
-} // namespace QF
-
-//----------------------------------------------------------------------------
-#ifndef QF_LOG2
-std::uint_fast8_t QF_LOG2(QP::QPSetBits const bitmask) noexcept {
-    static constexpr std::uint8_t log2LUT[16] = {
-        0U, 1U, 2U, 2U, 3U, 3U, 3U, 3U,
-        4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U
-    };
-    std::uint_fast8_t n = 0U;
-    QP::QPSetBits x = bitmask;
-    QP::QPSetBits tmp;
-
-#if (QF_MAX_ACTIVE > 16U)
-    tmp = static_cast<QP::QPSetBits>(x >> 16U);
-    if (tmp != 0U) {
-        n += 16U;
-        x = tmp;
-    }
-#endif
-#if (QF_MAX_ACTIVE > 8U)
-    tmp = (x >> 8U);
-    if (tmp != 0U) {
-        n += 8U;
-        x = tmp;
-    }
-#endif
-    tmp = (x >> 4U);
-    if (tmp != 0U) {
-        n += 4U;
-        x = tmp;
-    }
-    return n + log2LUT[x];
+//............................................................................
+void QAsm::init(std::uint_fast8_t const qsId) {
+    // this init() overload delegates to the init() without margin parameter
+    this->init(nullptr, qsId);
 }
-#endif // ndef QF_LOG2
 
 } // namespace QP
-
