@@ -35,10 +35,13 @@
 // no-return function specifier (C++11 Standard)
 #define Q_NORETURN  [[ noreturn ]] void
 
+// static assertion (C++11 Standard)
+#define Q_ASSERT_STATIC(expr_)  static_assert((expr_), "QP static assert")
+
 // QActive event queue type
-#define QACTIVE_EQUEUE_TYPE  QEQueue
-// QACTIVE_OS_OBJ_TYPE  not used in this port
-// QACTIVE_THREAD_TYPE  not used in this port
+#define QACTIVE_EQUEUE_TYPE     QEQueue
+#define QACTIVE_OS_OBJ_TYPE     void *
+#define QACTIVE_THREAD_TYPE     void const *
 
 // QF critical section
 #define QF_CRIT_STAT         QP::QF::QCritStatus critStat_;
@@ -49,15 +52,8 @@
 // QF_LOG2 not defined -- use the internal LOG2() implementation
 
 // include files -------------------------------------------------------------
-#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
-    #include <intrinsics.h>
-#elif defined(__GNUC__)
-    #include <msp430.h>
-    #include "in430.h"
-#endif
-
-#include "qequeue.hpp"   // QUTest port uses QEQueue event-queue
-#include "qmpool.hpp"    // QUTest port uses QMPool memory-pool
+#include "qequeue.hpp"   // Qube port uses QEQueue event-queue
+#include "qmpool.hpp"    // Qube port uses QMPool memory-pool
 #include "qp.hpp"        // QP platform-independent public interface
 
 //============================================================================
@@ -79,10 +75,10 @@
     // QMPool operations
     #define QF_EPOOL_TYPE_ QMPool
     #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-            (p_).init((poolSto_), (poolSize_), (evtSize_))
+        (p_).init((poolSto_), (poolSize_), (evtSize_))
     #define QF_EPOOL_EVENT_SIZE_(p_) ((p_).getBlockSize())
     #define QF_EPOOL_GET_(p_, e_, m_, qsId_) \
-            ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
     #define QF_EPOOL_PUT_(p_, e_, qsId_) ((p_).put((e_), (qsId_)))
     #define QF_EPOOL_USE_(ePool_)   ((ePool_)->getUse())
     #define QF_EPOOL_FREE_(ePool_)  ((ePool_)->getFree())

@@ -26,51 +26,30 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#ifndef QP_PKG_HPP_
-#define QP_PKG_HPP_
+#ifndef QS_PORT_HPP_
+#define QS_PORT_HPP_
 
-#include <array>    // for std::array
+#if defined(__LP64__) || defined(_LP64) || defined(_WIN64) // 64-bit?
+    #define QS_OBJ_PTR_SIZE 8U
+    #define QS_FUN_PTR_SIZE 8U
+#else                                   // 32-bit architecture
+    #define QS_OBJ_PTR_SIZE 4U
+    #define QS_FUN_PTR_SIZE 4U
+#endif
 
-#ifdef QP_IMPL
-
-namespace QP {
-
-extern std::array<QActive*, QF_MAX_ACTIVE + 1U> QActive_registry_;
-extern QSubscrList *QActive_subscrList_;
-extern QSignal QActive_maxPubSignal_;
-
-#if (QF_MAX_TICK_RATE > 0U)
-extern std::array<QTimeEvt, QF_MAX_TICK_RATE> QTimeEvt_head_;
-
-// Bitmasks are for the QTimeEvt::flags attribute
-constexpr std::uint8_t QTE_FLAG_IS_LINKED    {1U << 7U};
-constexpr std::uint8_t QTE_FLAG_WAS_DISARMED {1U << 6U};
-
-#endif // (QF_MAX_TICK_RATE > 0U)
+// flush the QS output buffer after each QS record
+#define QS_REC_DONE()  QS::onFlush()
 
 //============================================================================
-void QEvt_refCtr_inc_(QEvt const * const me) noexcept;
-void QEvt_refCtr_dec_(QEvt const * const me) noexcept;
+// NOTE: QS might be used with or without other QP components, in which
+// case the separate definitions of the macros QF_CRIT_STAT, QF_CRIT_ENTRY(),
+// and QF_CRIT_EXIT() are needed. In this port QS is configured to be used
+// with the other QP component, by simply including "qp_port.hpp"
+// *before* "qs.hpp".
+#ifndef QP_PORT_HPP_
+#include "qp_port.hpp" // use QS with QP
+#endif
 
-//============================================================================
-namespace QF {
+#include "qs.hpp"      // QS platform-independent public interface
 
-class Attr {
-public:
-
-#if (QF_MAX_EPOOL > 0U)
-    std::array<QF_EPOOL_TYPE_, QF_MAX_EPOOL> ePool_;
-    std::uint8_t maxPool_;
-#else
-    std::uint8_t dummy;
-#endif // (QF_MAX_EPOOL == 0U)
-}; // class Attr
-
-extern QF::Attr priv_;
-
-} // namespace QF
-} // namespace QP
-
-#endif // QP_IMPL
-
-#endif // QP_PKG_HPP_
+#endif // QS_PORT_HPP_

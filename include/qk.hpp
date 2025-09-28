@@ -31,7 +31,7 @@
 
 namespace QP {
 
-using QSchedStatus = std::uint_fast8_t;
+using QSchedStatus = std::uint8_t;
 
 } // namespace QP
 
@@ -58,7 +58,7 @@ extern QK_Attr QK_priv_;
 namespace QP {
 namespace QK {
 
-QSchedStatus schedLock(std::uint_fast8_t const ceiling) noexcept;
+QSchedStatus schedLock(std::uint8_t const ceiling) noexcept;
 void schedUnlock(QSchedStatus const prevCeil) noexcept;
 void onIdle();
 
@@ -97,14 +97,17 @@ void onIdle();
     } \
 } while (false)
 
-// QF event pool customization for QK...
-#define QF_EPOOL_TYPE_ QMPool
+// QMPool operations
+#define QF_EPOOL_TYPE_  QMPool
 #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
     (p_).init((poolSto_), (poolSize_), (evtSize_))
-#define QF_EPOOL_EVENT_SIZE_(p_) ((p_).getBlockSize())
+#define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
 #define QF_EPOOL_GET_(p_, e_, m_, qsId_) \
     ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
 #define QF_EPOOL_PUT_(p_, e_, qsId_) ((p_).put((e_), (qsId_)))
+#define QF_EPOOL_USE_(ePool_)   ((ePool_)->getUse())
+#define QF_EPOOL_FREE_(ePool_)  ((ePool_)->getFree())
+#define QF_EPOOL_MIN_(ePool_)   ((ePool_)->getMin())
 
 #endif // QP_IMPL
 
