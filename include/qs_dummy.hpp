@@ -43,9 +43,9 @@
 #define QS_GLB_FILTER(rec_)             static_cast<void>(0)
 #define QS_LOC_FILTER(qsId_)            static_cast<void>(0)
 
-#define QS_BEGIN_ID(rec_, qsId_)        if (false) {
+#define QS_BEGIN_ID(rec_, qsId_)        {
 #define QS_END()                        }
-#define QS_BEGIN_INCRIT(rec_, qsId_)    if (false) {
+#define QS_BEGIN_INCRIT(rec_, qsId_)    {
 #define QS_END_INCRIT()                 }
 
 #define QS_I8(width_, data_)            static_cast<void>(0)
@@ -83,6 +83,10 @@
 #define QS_RX_INPUT()                   static_cast<void>(0)
 #define QS_ONLY(code_)                  static_cast<void>(0)
 
+#define QS_CRIT_STAT
+#define QS_CRIT_ENTRY()                 static_cast<void>(0)
+#define QS_CRIT_EXIT()                  static_cast<void>(0)
+
 //============================================================================
 // interface used only for internal implementation, but not in applications
 #ifdef QP_IMPL
@@ -102,10 +106,6 @@
     #define QS_MPC_PRE(ctr_)            static_cast<void>(0)
     #define QS_MPS_PRE(size_)           static_cast<void>(0)
     #define QS_TEC_PRE(ctr_)            static_cast<void>(0)
-
-    #define QS_CRIT_STAT
-    #define QS_CRIT_ENTRY()             static_cast<void>(0)
-    #define QS_CRIT_EXIT()              static_cast<void>(0)
 
     #define QS_TR_CRIT_ENTRY()          static_cast<void>(0)
     #define QS_TR_CRIT_EXIT()           static_cast<void>(0)

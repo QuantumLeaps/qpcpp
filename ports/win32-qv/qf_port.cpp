@@ -141,7 +141,7 @@ int run() {
         // find the maximum priority AO ready to run
         if (readySet_.notEmpty()) {
             std::uint_fast8_t p = readySet_.findMax();
-            QActive *a = QActive::registry_[p];
+            QActive *a = QActive_registry_[p];
 
             // the active object 'a' must still be registered in QF
             // (e.g., it must not be stopped)
@@ -253,7 +253,7 @@ void QActive::start(QPrioSpec const prioSpec,
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {
-    if (subscrList_ != nullptr) {
+    if (QActive_subscrList_ != nullptr) {
         unsubscribeAll();
     }
 

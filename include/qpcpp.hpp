@@ -38,13 +38,53 @@
     #include "qs_dummy.hpp" // QS/C++ dummy (inactive) interface
 #endif
 
-//============================================================================
 #ifndef QP_API_VERSION
     #define QP_API_VERSION 0
-#endif // QP_API_VERSION
+#endif
 
 // QP API compatibility layer...
-//============================================================================
+
+#ifdef Q_SIGNAL_SIZE
+_Static_assert(Q_SIGNAL_SIZE == 2U,
+    "Q_SIGNAL_SIZE must be 2 bytes (16-bit signal space)");
+#endif
+
+// version 8.1.0 -------------------------------------------------------------
+#if (QP_API_VERSION < 810)
+
+using enum_t = int;
+
+#ifdef Q_SPY
+
+namespace QP {
+
+//! @deprecated instead use: QS_Groups
+enum QS_Groups_old : std::int16_t {
+    QS_ALL_RECORDS = QS_GRP_ALL,
+    QS_SM_RECORDS  = QS_GRP_SM,
+    QS_AO_RECORDS  = QS_GRP_AO,
+    QS_EQ_RECORDS  = QS_GRP_EQ,
+    QS_MP_RECORDS  = QS_GRP_MP,
+    QS_TE_RECORDS  = QS_GRP_TE,
+    QS_QF_RECORDS  = QS_GRP_QF,
+    QS_SC_RECORDS  = QS_GRP_SC,
+    QS_SEM_RECORDS = QS_GRP_SEM,
+    QS_MTX_RECORDS = QS_GRP_MTX,
+    QS_U0_RECORDS  = QS_GRP_U0,
+    QS_U1_RECORDS  = QS_GRP_U1,
+    QS_U2_RECORDS  = QS_GRP_U2,
+    QS_U3_RECORDS  = QS_GRP_U3,
+    QS_U4_RECORDS  = QS_GRP_U4,
+    QS_UA_RECORDS  = QS_GRP_UA,
+};
+
+// NOTE: deprecated QS::ObjKind_old provided in the QS class in qs.hpp
+
+} // namespace QP
+
+#endif // Q_SPY
+
+// version 8.0.0 -------------------------------------------------------------
 #if (QP_API_VERSION < 800)
 
 #define QM_SM_STATE_DECL(subm_, state_) error "submachines no longer supported"
@@ -110,5 +150,6 @@ using char_t = char;
 #define Q_ASSERT_COMPILE(expr_) Q_ASSERT_STATIC(expr_)
 
 #endif // QP_API_VERSION < 800
+#endif // QP_API_VERSION < 810
 
 #endif // QPCPP_HPP_

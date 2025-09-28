@@ -41,7 +41,7 @@ public:
 
 extern QV::Attr priv_;
 
-void schedDisable(std::uint_fast8_t const ceiling);
+void schedDisable(std::uint8_t const ceiling);
 
 void schedEnable();
 
@@ -64,14 +64,17 @@ void onIdle();
 #define QACTIVE_EQUEUE_SIGNAL_(me_) \
     (QV::priv_.readySet.insert((me_)->m_prio))
 
-// QF event pool customization for QV...
-#define QF_EPOOL_TYPE_ QMPool
+// QMPool operations
+#define QF_EPOOL_TYPE_  QMPool
 #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
     (p_).init((poolSto_), (poolSize_), (evtSize_))
-#define QF_EPOOL_EVENT_SIZE_(p_) ((p_).getBlockSize())
+#define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
 #define QF_EPOOL_GET_(p_, e_, m_, qsId_) \
     ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
 #define QF_EPOOL_PUT_(p_, e_, qsId_) ((p_).put((e_), (qsId_)))
+#define QF_EPOOL_USE_(ePool_)   ((ePool_)->getUse())
+#define QF_EPOOL_FREE_(ePool_)  ((ePool_)->getFree())
+#define QF_EPOOL_MIN_(ePool_)   ((ePool_)->getMin())
 
 #endif // QP_IMPL
 

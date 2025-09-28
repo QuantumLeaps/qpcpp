@@ -49,11 +49,12 @@ bool QActive::defer(
     QEQueue * const eq,
     QEvt const * const e) const noexcept
 {
+    // post with margin==0U to use all available entries in the queue
     bool const status = eq->post(e, 0U, m_prio);
 
     QS_CRIT_STAT
     QS_CRIT_ENTRY();
-    if (status) {
+    if (status) { // deferring successful?
         QS_BEGIN_PRE(QS_QF_ACTIVE_DEFER, m_prio)
             QS_TIME_PRE();      // time stamp
             QS_OBJ_PRE(this);   // this active object
@@ -62,7 +63,7 @@ bool QActive::defer(
             QS_2U8_PRE(e->poolNum_, e->refCtr_);
         QS_END_PRE()
     }
-    else {
+    else { // deferring failed
         QS_BEGIN_PRE(QS_QF_ACTIVE_DEFER_ATTEMPT, m_prio)
             QS_TIME_PRE();      // time stamp
             QS_OBJ_PRE(this);   // this active object
@@ -83,14 +84,16 @@ bool QActive::recall(QEQueue * const eq) noexcept {
     bool recalled = false;
     if (e != nullptr) { // event available?
 
-        postLIFO(e); // post it to the front of the AO's queue
+        // post it to the front of the AO's queue.
+        // NOTE: asserts internally if the posting fails.
+        postLIFO(e);
 
         QF_CRIT_STAT
         QF_CRIT_ENTRY();
 
         if (e->poolNum_ != 0U) { // mutable event?
 
-            // after posting to the AO's queue the event must be referenced
+            // after posting to the AO's queue, the event must be referenced
             // at least twice: once in the deferred event queue (eq->get()
             // did NOT decrement the reference counter) and once in the
             // AO's event queue.
@@ -111,7 +114,7 @@ bool QActive::recall(QEQueue * const eq) noexcept {
 
         QF_CRIT_EXIT();
 
-        recalled = true;
+        recalled = true; // success
     }
     else {
         QS_CRIT_STAT
@@ -129,21 +132,21 @@ bool QActive::recall(QEQueue * const eq) noexcept {
 }
 
 //............................................................................
-std::uint_fast16_t QActive::flushDeferred(
+std::uint16_t QActive::flushDeferred(
     QEQueue * const eq,
     std::uint_fast16_t const num) const noexcept
 {
-    std::uint_fast16_t n = 0U;
-    while (n < num) {
+    std::uint16_t n = 0U; // the flushed event counter
+    while (n < num) { // below the requested number?
         QEvt const * const e = eq->get(m_prio);
-        if (e != nullptr) {
+        if (e != nullptr) { // event obtained from the queue?
             ++n; // count one more flushed event
 #if (QF_MAX_EPOOL > 0U)
             QF::gc(e); // garbage collect
 #endif
         }
-        else {
-            break;
+        else { // queue ran out of events
+            break; // done flushing
         }
     }
 

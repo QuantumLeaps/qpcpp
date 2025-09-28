@@ -38,8 +38,7 @@
 
 #define QF_MPOOL_EL(evType_) struct { \
     void * sto_[((sizeof(evType_) - 1U) / sizeof(void *)) + \
-                    (sizeof(evType_) < (2U * sizeof(void *)) ? 2U : 1U)]; \
-}
+                    (sizeof(evType_) < (2U * sizeof(void *)) ? 2U : 1U)]; }
 
 //============================================================================
 namespace QP {
@@ -67,12 +66,12 @@ namespace QP {
 //============================================================================
 class QMPool {
 private:
-    void * * m_start;
-    void * * m_end;
-    void * * volatile m_freeHead;
+    void * *m_start;
+    void * *m_end;
+    void * *m_freeHead;
     QMPoolSize m_blockSize;
     QMPoolCtr m_nTot;
-    QMPoolCtr volatile m_nFree;
+    QMPoolCtr m_nFree;
     QMPoolCtr m_nMin;
 
 public:
@@ -87,40 +86,23 @@ public:
     void put(
         void * const block,
         std::uint_fast8_t const qsId) noexcept;
-    QMPoolSize getBlockSize() const noexcept {
-        return m_blockSize;
-    }
-    QMPoolCtr getNMin() const noexcept {
-        #ifndef Q_UNSAFE
-        return m_nMin;
-        #else
-        return 0U;
-        #endif
-    }
-    QMPoolCtr getNFree() const noexcept {
-        return m_nFree;
-    }
-
-private:
-    QMPool(QMPool const & other) = delete;
-    QMPool & operator=(QMPool const & other) = delete;
-
-    // friends...
-    friend class QS;
-
-public:
+    QMPoolSize getBlockSize() const noexcept;
+    std::uint16_t getUse() const noexcept;
+    std::uint16_t getFree() const noexcept;
+    std::uint16_t getMin() const noexcept;
 
 #ifdef QF_ISR_API
     void * getFromISR(
         std::uint_fast16_t const margin,
         std::uint_fast8_t const qsId) noexcept;
-#endif
-
-#ifdef QF_ISR_API
     void putFromISR(
         void * const b,
         std::uint_fast8_t const qsId) noexcept;
 #endif // def QF_ISR_API
+
+private:
+    // friends...
+    friend class QS;
 }; // class QMPool
 
 } // namespace QP

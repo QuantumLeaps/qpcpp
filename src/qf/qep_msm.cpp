@@ -26,8 +26,8 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-#define QP_IMPL             // this is QP implementation
 #include "qp_port.hpp"      // QP port
+#include "qp_pkg.hpp"       // QP package-scope interface
 #include "qsafe.h"          // QP Functional Safety (FuSa) Subsystem
 #ifdef Q_SPY                // QS software tracing enabled?
     #include "qs_port.hpp"  // QS port
@@ -43,9 +43,6 @@ Q_DEFINE_THIS_MODULE("qep_msm")
 
 // maximum depth of state nesting in a QMsm (including the top level)
 static constexpr std::int_fast8_t QMSM_MAX_NEST_DEPTH_ {6};
-
-// maximum length of transition-action array
-static constexpr std::int_fast8_t QMSM_MAX_TRAN_LENGTH_ {2*QMSM_MAX_NEST_DEPTH_};
 
 //! @cond INTERNAL
 
@@ -143,14 +140,19 @@ void QMsm::init(
     Q_UNUSED_PAR(qsId);
 #endif
 
-    Q_REQUIRE_LOCAL(200, m_temp.fun != nullptr);
-    Q_REQUIRE_LOCAL(210, m_state.obj == &l_msm_top_s);
+    // current state must be initialized to &l_msm_top_s in QMsm_ctor()
+    Q_REQUIRE_LOCAL(200, m_state.obj == &l_msm_top_s);
+
+    // temp contains the top-most initial tran. handler, which must be valid
+    Q_REQUIRE_LOCAL(210, m_temp.fun != nullptr);
 
     // execute the top-most initial tran.
     QState r = (*m_temp.fun)(this, Q_EVT_CAST(QEvt));
 
     // the top-most initial tran. must be taken
     Q_ASSERT_LOCAL(240, r == Q_RET_TRAN_INIT);
+
+    // the top-most initial tran. must set the tran-action table in temp
     Q_ASSERT_LOCAL(250, m_temp.tatbl != nullptr);
 
     QS_CRIT_STAT
@@ -161,18 +163,15 @@ void QMsm::init(
     m_state.obj = m_temp.tatbl->target;
 
     // drill down into the state hierarchy with initial transitions...
-    std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
     do {
-        --lbound; // fixed loop bound
-        Q_INVARIANT_LOCAL(280, lbound >= 0);
         r = execTatbl_(m_temp.tatbl, qsId);
-    } while (r >= Q_RET_TRAN_INIT);
+    } while (r == Q_RET_TRAN_INIT);
 
     QS_TOP_INIT_(QS_QEP_INIT_TRAN, m_state.obj->stateHandler);
 
 #ifndef Q_UNSAFE
-    // establish stable state configuration
-    m_temp.uint = static_cast<std::uintptr_t>(~m_state.uint);
+    // establish stable state configuration at the end of RTC step
+    m_temp.uint = dis_update<std::uintptr_t>(m_state.uint);
 #endif
 }
 
@@ -185,9 +184,12 @@ void QMsm::dispatch(
     Q_UNUSED_PAR(qsId);
 #endif
 
+    // this state machine must be in a stable state configuration
+    // NOTE: stable state configuration is established after every RTC step.
     Q_INVARIANT_LOCAL(300,
-        m_state.uint == static_cast<std::uintptr_t>(~m_temp.uint));
+        dis_verify<std::uintptr_t>(m_state.uint, m_temp.uint));
 
+    // the event to be dispatched must be valid
     Q_REQUIRE_LOCAL(310, e != nullptr);
 
     QMState const *s = m_state.obj; // the current state
@@ -196,12 +198,8 @@ void QMsm::dispatch(
     QS_TRAN0_(QS_QEP_DISPATCH, s->stateHandler);
 
     // scan the state hierarchy up to the top state...
-    QState r = Q_RET_SUPER;
-    std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
+    QState r;
     do {
-         --lbound; // fixed loop bound
-        Q_INVARIANT_LOCAL(340, lbound >= 0);
-
         r = (*s->stateHandler)(this, e); // call state handler function
         if (r >= Q_RET_HANDLED) { // event handled? (the most frequent case)
             break; // done scanning the state hierarchy
@@ -223,22 +221,22 @@ void QMsm::dispatch(
     if (s == nullptr) { // event bubbled to the 'top' state?
 #ifdef Q_SPY
         QS_TRAN0_(QS_QEP_IGNORED, t->stateHandler);
-#endif // Q_SPY
+#endif
     }
-    else if (r >= Q_RET_TRAN) { // any kind of tran. taken?
+    else if (r == Q_RET_HANDLED) { // was the event e handled?
+        QS_TRAN0_(QS_QEP_INTERN_TRAN, s->stateHandler); // output QS record
+    }
+    else if ((r == Q_RET_TRAN) || (r == Q_RET_TRAN_HIST)) { //any tran. taken?
 #ifdef Q_SPY
         QMState const * const ts = s; // tran. source for QS tracing
 #endif // Q_SPY
 
-        if (r == Q_RET_TRAN) {
+        if (r == Q_RET_TRAN) { // tran. taken?
             struct QMTranActTable const * const tatbl = m_temp.tatbl;
             exitToTranSource_(t, s, qsId);
             r = execTatbl_(tatbl, qsId);
-#ifdef Q_SPY
-            s = m_state.obj;
-#endif // Q_SPY
         }
-        else if (r == Q_RET_TRAN_HIST) { // was it tran. to history?
+        else { // must be tran. to history
             QMState const * const hist = m_state.obj; // save history
             m_state.obj = t; // restore the original state
 
@@ -250,38 +248,28 @@ void QMsm::dispatch(
             exitToTranSource_(t, s, qsId);
             static_cast<void>(execTatbl_(tatbl, qsId));
             r = enterHistory_(hist, qsId);
+        }
 #ifdef Q_SPY
-            s = m_state.obj;
-#endif // Q_SPY
-        }
-        else {
-            // empty
-        }
+        s = m_state.obj;
+#endif
 
-        lbound = QMSM_MAX_NEST_DEPTH_;
         while (r == Q_RET_TRAN_INIT) { // initial tran. in the target?
 
             r = execTatbl_(m_temp.tatbl, qsId);
 #ifdef Q_SPY
             s = m_state.obj;
-#endif // Q_SPY
-
-             --lbound; // fixed loop bound
-            Q_INVARIANT_LOCAL(350, lbound >= 0);
+#endif
         }
 
         QS_TRAN_END_(QS_QEP_TRAN, ts->stateHandler, s->stateHandler);
     }
-    else if (r == Q_RET_HANDLED) { // was the event handled?
-        QS_TRAN0_(QS_QEP_INTERN_TRAN, s->stateHandler);
-    }
     else {
-        Q_ERROR_LOCAL(360);
+        Q_ERROR_LOCAL(360); // last action handler returned impossible value
     }
 
 #ifndef Q_UNSAFE
-    // establish stable state configuration
-    m_temp.uint = static_cast<std::uintptr_t>(~m_state.uint);
+    // establish stable state configuration at the end of RTC step
+    m_temp.uint = dis_update<std::uintptr_t>(m_state.uint);
 #endif
 }
 
@@ -294,40 +282,34 @@ QState QMsm::execTatbl_(
     Q_UNUSED_PAR(qsId);
 #endif
 
+    // the tran-action table parameter must be valid
     Q_REQUIRE_LOCAL(400, tatbl != nullptr);
 
     QS_CRIT_STAT
     QState r = Q_RET_SUPER;
     QActionHandler const *a = &tatbl->act[0];
-    std::int_fast8_t lbound = QMSM_MAX_TRAN_LENGTH_;
-    while (*a != nullptr) {
+    while (*a != nullptr) { // not the end of the tran-action table?
         r = (*(*a))(this); // call the action through the 'a' pointer
-        ++a;
+        ++a; // advance to the next entry in the tran-action table
 
-#ifdef Q_SPY
-        if (r == Q_RET_ENTRY) {
+        if (r == Q_RET_ENTRY) { // was the action a state entry?
             QS_STATE_ACT_(QS_QEP_STATE_ENTRY, m_temp.obj->stateHandler);
         }
-        else if (r == Q_RET_EXIT) {
+        else if (r == Q_RET_EXIT) { // was the action a state exit?
             QS_STATE_ACT_(QS_QEP_STATE_EXIT, m_temp.obj->stateHandler);
         }
-        else if (r == Q_RET_TRAN_INIT) {
+        else if (r == Q_RET_TRAN_INIT) { // was the action a state init?
             QS_TRAN_SEG_(QS_QEP_STATE_INIT,
                 tatbl->target->stateHandler,
                 m_temp.tatbl->target->stateHandler);
         }
         else {
-            // empty
+            // the action returned unexptected status (corrupt SM?)
+            Q_ERROR_LOCAL(460);
         }
-#endif // Q_SPY
-
-        --lbound; // fixed loop bound
-        Q_INVARIANT_LOCAL(480, lbound >= 0);
     }
 
-    m_state.obj = (r >= Q_RET_TRAN)
-        ? m_temp.tatbl->target
-        : tatbl->target;
+    m_state.obj = tatbl->target; // set new current state
     return r;
 }
 
@@ -343,17 +325,17 @@ void QMsm::exitToTranSource_(
     QS_CRIT_STAT
 
     // exit states from the current state to the tran. source state
+    // NOTE: the following loop does not need the fixed loop bound check
+    // because the path from the current state to the tran.source has
+    // been already checked in the invariant 340.
     QMState const *s = curr_state;
-    std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
     while (s != tran_source) {
         if (s->exitAction != nullptr) { // exit action provided?
+            // execute the exit action, ignore the result
             static_cast<void>((*s->exitAction)(this));
             QS_STATE_ACT_(QS_QEP_STATE_EXIT, m_temp.obj->stateHandler);
         }
         s = s->superstate; // advance to the superstate
-
-        --lbound; // fixed loop bound
-        Q_INVARIANT_LOCAL(580, lbound >= 0);
     }
 }
 
@@ -367,62 +349,54 @@ QState QMsm::enterHistory_(
 #endif
 
     // record the entry path from current state to history
-    QMState const *epath[QMSM_MAX_NEST_DEPTH_];
+    std::array<QMState const *, QMSM_MAX_NEST_DEPTH_> path;
     QMState const *s = hist;
     std::int_fast8_t i = -1; // entry path index (one below [0])
-    std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
     while (s != m_state.obj) {
-        if (s->entryAction != nullptr) {
+        if (s->entryAction != nullptr) { // does s have an entry action?
             ++i;
             Q_INVARIANT_LOCAL(610, i < QMSM_MAX_NEST_DEPTH_);
-            epath[i] = s;
+            path[i] = s;
         }
         s = s->superstate;
-
-        --lbound; // fixed loop bound
-        Q_INVARIANT_LOCAL(620, lbound >= 0);
     }
 
     QS_CRIT_STAT
     // retrace the entry path in reverse (desired) order...
-    // NOTE: i the fixed loop bound
+    // NOTE: i is the fixed loop bound already checked in invariant 610
     for (; i >= 0; --i) {
-        static_cast<void>((*epath[i]->entryAction)(this));
-        QS_STATE_ACT_(QS_QEP_STATE_ENTRY, epath[i]->stateHandler);
+        // enter the state in path[i], ignore the result
+        static_cast<void>((*path[i]->entryAction)(this));
+        QS_STATE_ACT_(QS_QEP_STATE_ENTRY, path[i]->stateHandler);
     }
 
     m_state.obj = hist; // set current state to the tran. target
 
     // initial tran. present?
     QState r = Q_RET_SUPER;
-    if (hist->initAction != nullptr) {
-        r = (*hist->initAction)(this); // execute the tran. action
-
+    if (hist->initAction != nullptr) { // init. action provided?
+        r = (*hist->initAction)(this); // execute the init. action
         QS_TRAN_SEG_(QS_QEP_STATE_INIT,
             hist->stateHandler, m_temp.tatbl->target->stateHandler);
     }
-    return r;
+    return r; // inform the caller if the init action was taken
 }
 
 //............................................................................
-QMState const * QMsm::topQMState() const noexcept {
+QMState const * QMsm::topQMState() noexcept {
+    // return the top state (object pointer)
     return &l_msm_top_s;
 }
-
 //............................................................................
 bool QMsm::isIn(QStateHandler const stateHndl) noexcept {
     bool inState = false; // assume that this SM is not in 'state'
     QMState const *s = m_state.obj;
-    std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
     while (s != nullptr) {
         if (s->stateHandler == stateHndl) { // match found?
             inState = true;
             break;
         }
         s = s->superstate; // advance to the superstate
-
-         --lbound; // fixed loop bound
-         Q_INVARIANT_LOCAL(740, lbound >= 0);
     }
 
     return inState;
@@ -435,18 +409,15 @@ QMState const * QMsm::childStateObj(QMState const * const parentHndl)
     QMState const *s = m_state.obj; // start with current state
     QMState const *child = s;
     bool isFound = false; // assume the child NOT found
-    std::int_fast8_t lbound = QMSM_MAX_NEST_DEPTH_;
-    while (s != nullptr) {
+    while (s != nullptr) { // top of state hierarchy not reached yet?
         if (s == parentHndl) {
             isFound = true; // child is found
             break;
         }
         child = s;
         s = s->superstate;
-
-         --lbound; // fixed loop bound
-         Q_INVARIANT_LOCAL(840, lbound >= 0);
     }
+    // the child state must be found, or the state machine is corrupt
     Q_ENSURE_LOCAL(890, isFound);
 
 #ifdef Q_UNSAFE
@@ -455,5 +426,12 @@ QMState const * QMsm::childStateObj(QMState const * const parentHndl)
 
     return child;
 }
+//............................................................................
+#ifdef Q_SPY
+QStateHandler QMsm::getStateHandler() const noexcept {
+    // return the current state handler (function pointer)
+    return m_state.obj->stateHandler;
+}
+#endif
 
 } // namespace QP

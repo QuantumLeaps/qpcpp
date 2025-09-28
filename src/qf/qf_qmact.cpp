@@ -48,8 +48,45 @@ namespace QP {
 QMActive::QMActive(QStateHandler const initial) noexcept
   : QActive(initial)
 {
-    m_state.obj = reinterpret_cast<QMsm *>(this)->topQMState();
+    // NOTE: QMActive indirectly inherits the abstract QAsm base class,
+    // but it will delegate the state machine behavior to the QMsm class,
+    // so the following initialization is identical as in QMsm ctor:
+    m_state.obj = QMsm::topQMState();
     m_temp.fun  = initial;
 }
+//............................................................................
+void QMActive::init(
+    void const * const e,
+    std::uint_fast8_t const qsId)
+{
+    // delegate to the QMsm class
+    reinterpret_cast<QMsm *>(this)->QMsm::init(e, qsId);
+}
+//............................................................................
+void QMActive::dispatch(
+    QEvt const * const e,
+    std::uint_fast8_t const qsId)
+{
+    // delegate to the QMsm class
+    reinterpret_cast<QMsm *>(this)->QMsm::dispatch(e, qsId);
+}
+//............................................................................
+bool QMActive::isIn(QStateHandler const stateHndl) noexcept {
+    // delegate to the QMsm class
+    return reinterpret_cast<QMsm *>(this)->QMsm::isIn(stateHndl);
+}
+//............................................................................
+QMState const * QMActive::childStateObj(QMState const * const parent) const noexcept {
+    // delegate to the QMsm class
+    return reinterpret_cast<QMsm const *>(this)
+               ->QMsm::childStateObj(parent);
+}
+//............................................................................
+#ifdef Q_SPY
+QStateHandler QMActive::getStateHandler() const noexcept {
+    // delegate to the QMsm class
+    return reinterpret_cast<QMsm const *>(this)->QMsm::getStateHandler();
+}
+#endif // def Q_SPY
 
 } // namespace QP

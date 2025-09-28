@@ -37,9 +37,12 @@
 // no-return function specifier (C++11 Standard)
 #define Q_NORETURN  [[ noreturn ]] void
 
+// static assertion (C++11 Standard)
+#define Q_ASSERT_STATIC(expr_)  static_assert((expr_), "QP static assert")
+
 // QF configuration for QV -- data members of the QActive class...
 
-// QV event-queue used for AOs
+// QActive event-queue type used for AOs
 #define QACTIVE_EQUEUE_TYPE     QEQueue
 
 // QActive "thread" type used to store the MPU settings in the AO

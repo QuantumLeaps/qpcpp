@@ -66,6 +66,7 @@ void init() {
 //............................................................................
 int_t run() {
     onStartup();
+
 #ifdef Q_SPY
 
 #if (CONFIG_NUM_PREEMPT_PRIORITIES > 0)
@@ -130,9 +131,9 @@ void QActive::setAttr(std::uint32_t attr1, void const *attr2) {
 }
 //............................................................................
 void QActive::start(QPrioSpec const prioSpec,
-                    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
-                    void * const stkSto, std::uint_fast16_t const stkSize,
-                    void const * const par)
+    QEvtPtr * const qSto, std::uint_fast16_t const qLen,
+    void * const stkSto, std::uint_fast16_t const stkSize,
+    void const * const par)
 {
     // extract data temporarily saved in QActive::setAttr()
     std::uint32_t opt = m_eQueue.used_msgs;
@@ -170,9 +171,9 @@ void QActive::start(QPrioSpec const prioSpec,
     //    would result in a different relative prioritization of AO's
     //    threads than indicated by the AO priorities assigned.
     //
-    int zephyr_prio = (int)((int16_t)prioSpec >> 8);
+    int zephyr_prio = (static_cast<int>(prioSpec) >> 8);
     if (zephyr_prio == 0) {
-        zephyr_prio = (int)QF_MAX_ACTIVE - (int)m_prio;
+        zephyr_prio = static_cast<int>(QF_MAX_ACTIVE) - static_cast<int>(m_prio);
     }
 
     // clear the Zephyr thread structure before creating the thread
@@ -196,8 +197,8 @@ void QActive::start(QPrioSpec const prioSpec,
 #endif
 }
 //............................................................................
-bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
-                    void const * const sender) noexcept
+bool QActive::postx_(QEvt const * const e, std::uint_fast16_t const margin,
+                     void const * const sender) noexcept
 {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
@@ -238,7 +239,6 @@ bool QActive::post_(QEvt const * const e, std::uint_fast16_t const margin,
         QS_END_PRE()
 
         if (e->poolNum_ != 0U) { // is it a pool event?
-            Q_ASSERT_INCRIT(205, e->refCtr_ < (2U * QF_MAX_ACTIVE));
             QEvt_refCtr_inc_(e); // increment the reference counter
         }
 
@@ -285,7 +285,6 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     QS_END_PRE()
 
     if (e->poolNum_ != 0U) { // is it a pool event?
-        Q_ASSERT_INCRIT(305, e->refCtr_ < (2U * QF_MAX_ACTIVE));
         QEvt_refCtr_inc_(e); // increment the reference counter
     }
 
@@ -304,7 +303,6 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
 }
 //............................................................................
 QEvt const *QActive::get_(void) noexcept {
-
     // wait for an event (forever)
     QEvtPtr e;
     int err = k_msgq_get(&m_eQueue, static_cast<void *>(&e), K_FOREVER);
@@ -328,6 +326,20 @@ QEvt const *QActive::get_(void) noexcept {
     QF_CRIT_EXIT();
 
     return e;
+}
+//............................................................................
+std::uint16_t QActive::getQueueUse(
+    std::uint_fast8_t const prio) noexcept
+{
+    return 0U; // queue use not supported in this RTOS
+}
+//............................................................................
+std::uint16_t QActive::getQueueFree(std::uint_fast8_t const prio) noexcept {
+    return 0U; // queue free elements not supported in this RTOS
+}
+//............................................................................
+std::uint16_t QActive::getQueueMin(std::uint_fast8_t const prio) noexcept {
+    return 0U; // queue minimum not supported in this RTOS
 }
 
 } // namespace QP

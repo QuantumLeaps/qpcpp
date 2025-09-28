@@ -28,7 +28,7 @@
 //============================================================================
 #define QP_IMPL             // this is QP implementation
 #include "qp_port.hpp"      // QP port
-#include "qp_pkg.hpp"       // QP package-scope interface
+#include "qp_pkg.hpp"       // QP package-scope internal interface
 #include "qsafe.h"          // QP Functional Safety (FuSa) Subsystem
 #ifdef Q_SPY                // QS software tracing enabled?
     #include "qs_port.hpp"  // QS port
@@ -53,7 +53,7 @@ namespace QV {
 QV::Attr priv_;
 
 //............................................................................
-void schedDisable(std::uint_fast8_t const ceiling) {
+void schedDisable(std::uint8_t const ceiling) {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
@@ -95,10 +95,6 @@ namespace QF {
 
 //............................................................................
 void init() {
-    bzero_(&QF::priv_,                 sizeof(QF::priv_));
-    bzero_(&QV::priv_,                 sizeof(QV::priv_));
-    bzero_(&QActive::registry_[0],     sizeof(QActive::registry_));
-
 #ifdef QV_INIT
     QV_INIT(); // port-specific initialization of the QV kernel
 #endif
@@ -115,7 +111,7 @@ int_t run() {
     QF_INT_DISABLE();
 #ifdef Q_SPY
     // produce the QS_QF_RUN trace record
-    QS::beginRec_(QS_REC_NUM_(QS_QF_RUN));
+    QS::beginRec_(QS_QF_RUN);
     QS::endRec_();
 #endif // Q_SPY
 
@@ -145,7 +141,7 @@ int_t run() {
                                : 0U);
 
         if (p > QV::priv_.schedCeil) { // is it above the sched ceiling?
-            QActive * const a = QActive::registry_[p];
+            QActive * const a = QActive_registry_[p];
 
 #if (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
             if (p != pprev) { // changing threads?
@@ -158,7 +154,7 @@ int_t run() {
 
 #ifdef QF_ON_CONTEXT_SW
                 QF_onContextSw(((pprev != 0U)
-                               ? QActive::registry_[pprev]
+                               ? QActive_registry_[pprev]
                                : nullptr), a);
 #endif // QF_ON_CONTEXT_SW
 
@@ -191,10 +187,10 @@ int_t run() {
                 QS_END_PRE()
 
 #ifdef QF_ON_CONTEXT_SW
-                QF_onContextSw(QActive::registry_[pprev], nullptr);
+                QF_onContextSw(QActive_registry_[pprev], nullptr);
 #endif // QF_ON_CONTEXT_SW
 
-                pprev = 0U; // update previous prio
+                pprev = 0U; // update previous prio.
             }
 #endif // (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
 
@@ -206,17 +202,14 @@ int_t run() {
             // atomically with putting the CPU into a power-saving mode.
             QV::onIdle();
 
-            QF_INT_DISABLE();
+            QF_INT_DISABLE(); // disable interrupts before looping back
         }
     }
-#ifdef __GNUC__ // GNU compiler?
-    return 0;
-#endif
 }
 
 } // namespace QF
 
-//............................................................................
+//----------------------------------------------------------------------------
 void QActive::start(
     QPrioSpec const prioSpec,
     QEvtPtr * const qSto,
@@ -230,6 +223,8 @@ void QActive::start(
 
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
+
+    // stack storage must NOT be provided for the AO (QV does not need it)
     Q_REQUIRE_INCRIT(310, stkSto == nullptr);
     QF_CRIT_EXIT();
 
