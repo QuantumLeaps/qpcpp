@@ -30,10 +30,10 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR  "8.1.0"
-#define QP_VERSION      810U
-// <VER>=810 <DATE>=250930
-#define QP_RELEASE      0x6A6F1BB5U
+#define QP_VERSION_STR  "8.1.1"
+#define QP_VERSION      811U
+// <VER>=810 <DATE>=251008
+#define QP_RELEASE      0x6A6334D4U
 
 //----------------------------------------------------------------------------
 // default configuration settings
@@ -218,9 +218,7 @@ public:
         QEvt const * const e,
         std::uint_fast8_t const qsId) = 0;
     virtual bool isIn(QStateHandler const stateHndl) = 0;
-#ifdef Q_SPY
     virtual QStateHandler getStateHandler() const noexcept = 0;
-#endif
 
     QStateHandler state() const noexcept {
         return m_state.fun; // public "getter" for the state handler
@@ -310,11 +308,9 @@ public:
     void dispatch(
         QEvt const * const e,
         std::uint_fast8_t const qsId) override;
-#ifdef Q_SPY
-    QStateHandler getStateHandler() const noexcept override;
-#endif
-
     bool isIn(QStateHandler const stateHndl) noexcept override;
+    QStateHandler getStateHandler() const noexcept override;
+
     QStateHandler childState(QStateHandler const parentHndl) noexcept;
 
 private:
@@ -348,14 +344,12 @@ public:
     void dispatch(
         QEvt const * const e,
         std::uint_fast8_t const qsId) override;
-#ifdef Q_SPY
-    QStateHandler getStateHandler() const noexcept override;
-#endif
-
-    static QMState const * topQMState() noexcept;
     bool isIn(QStateHandler const stateHndl) noexcept override;
+    QStateHandler getStateHandler() const noexcept override;
+
     QMState const * childStateObj(QMState const * const parentHndl)
         const noexcept;
+    static QMState const * topQMState() noexcept;
 
 private:
     QState execTatbl_(
@@ -536,10 +530,9 @@ public:
     void dispatch(
         QEvt const * const e,
         std::uint_fast8_t const qsId) override;
-#ifdef Q_SPY
-    QStateHandler getStateHandler() const noexcept override;
-#endif
     bool isIn(QStateHandler const stateHndl) noexcept override;
+    QStateHandler getStateHandler() const noexcept override;
+
     QStateHandler childState(QStateHandler const parentHandler) noexcept;
     void setAttr(
         std::uint32_t attr1,
@@ -683,11 +676,9 @@ public:
         QEvt const * const e,
         std::uint_fast8_t const qsId) override;
     bool isIn(QStateHandler const stateHndl) noexcept override;
-    QMState const *childStateObj(QMState const * const parent) const noexcept;
-
-#ifdef Q_SPY
     QStateHandler getStateHandler() const noexcept override;
-#endif // def Q_SPY
+
+    QMState const *childStateObj(QMState const * const parent) const noexcept;
 }; // class QMActive
 
 //----------------------------------------------------------------------------

@@ -162,7 +162,7 @@ void QHsm::init(
     QS_CRIT_ENTRY();
     bool toDo = false; // assume that dictionary not produced
     if ((QS::priv_.flags & 0x01U) == 0U) { // dictionary not produced yet?
-        QS::priv_.flags |= 0x01U; // mark the QHsm_top dictionary as produced
+        QS::priv_.flags |= 0x01U; // mark the QHsm::top dictionary as produced
         toDo = true;
     }
     QS_CRIT_EXIT();
@@ -248,7 +248,6 @@ void QHsm::dispatch(
 
     // process the event hierarchically...
     std::array <QStateHandler, QHSM_MAX_NEST_DEPTH_> path; // entry path array
-    path[0] = s; // save current state
     m_temp.fun = s;
     QState r; // state handler return value
     std::int_fast8_t ip = QHSM_MAX_NEST_DEPTH_;//path index & fixed loop bound
@@ -271,7 +270,10 @@ void QHsm::dispatch(
         }
     } while (r == Q_RET_SUPER); // loop as long as superstate returned
 
-    if (r == Q_RET_HANDLED) { // did the last handler handle event e?
+    if (r == Q_RET_IGNORED) { // was event e ignored?
+        QS_TRAN0_(QS_QEP_IGNORED, m_state.fun); // output QS record
+    }
+    else if (r == Q_RET_HANDLED) { // did the last handler handle event e?
         QS_TRAN0_(QS_QEP_INTERN_TRAN, s); // output QS record
     }
     else if ((r == Q_RET_TRAN) || (r == Q_RET_TRAN_HIST)) { // tran. taken?
@@ -304,15 +306,13 @@ void QHsm::dispatch(
         // enter the target (possibly recursively) by initial trans.
         enter_target_(&path[0], ip, qsId);
         QS_TRAN_END_(QS_QEP_TRAN, s, path[0]); // output QS record
-    }
-    else if (r == Q_RET_IGNORED) { // was event e ignored?
-        QS_TRAN0_(QS_QEP_IGNORED, m_state.fun); // output QS record
+
+        m_state.fun = path[0]; // change the current active state
     }
     else {
         Q_ERROR_LOCAL(360); // last state handler returned impossible value
     }
 
-    m_state.fun = path[0]; // change the current active state
 #ifndef Q_UNSAFE
     // establish stable state configuration
     m_temp.uint = dis_update<std::uintptr_t>(m_state.uint);
@@ -593,12 +593,10 @@ QStateHandler QHsm::childState(QStateHandler const parentHndl) noexcept {
 }
 
 //............................................................................
-#ifdef Q_SPY
 QStateHandler QHsm::getStateHandler() const noexcept {
     // NOTE: this function does NOT apply critical section, so it can
     // be safely called from an already established critical section.
     return m_state.fun; // public "getter" to the state handler (function)
 }
-#endif
 
 } // namespace QP

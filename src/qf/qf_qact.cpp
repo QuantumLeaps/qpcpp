@@ -162,12 +162,10 @@ QActive* QActive::fromRegistry(std::uint_fast8_t const prio) {
     return QActive_registry_[prio];
 }
 //............................................................................
-#ifdef Q_SPY
 QStateHandler QActive::getStateHandler() const noexcept {
     // delegate to the QHsm class
     return reinterpret_cast<QHsm const *>(this)->QHsm::getStateHandler();
 }
-#endif // def Q_SPY
 
 //----------------------------------------------------------------------------
 #ifndef QF_LOG2

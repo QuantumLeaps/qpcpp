@@ -82,11 +82,9 @@ QMState const * QMActive::childStateObj(QMState const * const parent) const noex
                ->QMsm::childStateObj(parent);
 }
 //............................................................................
-#ifdef Q_SPY
 QStateHandler QMActive::getStateHandler() const noexcept {
     // delegate to the QMsm class
     return reinterpret_cast<QMsm const *>(this)->QMsm::getStateHandler();
 }
-#endif // def Q_SPY
 
 } // namespace QP

@@ -427,11 +427,9 @@ QMState const * QMsm::childStateObj(QMState const * const parentHndl)
     return child;
 }
 //............................................................................
-#ifdef Q_SPY
 QStateHandler QMsm::getStateHandler() const noexcept {
     // return the current state handler (function pointer)
     return m_state.obj->stateHandler;
 }
-#endif
 
 } // namespace QP
