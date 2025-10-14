@@ -243,6 +243,8 @@ void QHsm::dispatch(
     Q_REQUIRE_LOCAL(310, e != nullptr);
 
     QStateHandler s = m_state.fun; // current state
+    m_temp.fun = nullptr; // invalidate
+
     QS_CRIT_STAT
     QS_TRAN0_(QS_QEP_DISPATCH, s); // output QS record
 
@@ -288,14 +290,14 @@ void QHsm::dispatch(
 
         path[0] = m_temp.fun; // save tran. target in path[0]
 
-        // exit current state to tran. source...
+        // exit current state to tran. source (path[0] not used)...
         for (std::int_fast8_t iq = QHSM_MAX_NEST_DEPTH_ - 1; iq > ip; --iq) {
             // exit from 'path[iq]'
             if ((*path[iq])(this, &l_resEvt_[Q_EXIT_SIG]) == Q_RET_HANDLED) {
                 QS_STATE_ACT_(QS_QEP_STATE_EXIT, path[iq]); //output QS record
             }
         }
-        path[2] = s; // save tran. source
+        path[2] = s; // save tran. source in path[2]
 
         // take the tran...
         ip = tran_simple_(&path[0], qsId); // try simple tran. first
@@ -550,7 +552,7 @@ bool QHsm::isIn(QStateHandler const stateHndl) noexcept {
     do {
         if (s == stateHndl) { // do the states match?
             inState = true;  // 'true' means that match found
-            break; // break out of the for-loop
+            break; // break out of the do-loop
         }
 
         // find superstate of 's'
@@ -567,12 +569,16 @@ bool QHsm::isIn(QStateHandler const stateHndl) noexcept {
 
 //............................................................................
 QStateHandler QHsm::childState(QStateHandler const parentHndl) noexcept {
+    // NOTE: this function is designed to be called during an RTC step,
+    // so it does NOT assume to be called in a stable state configuration
+    // and also does NOT establish stable state configuration upon exit.
+
 #ifndef Q_UNSAFE
     bool isFound = false; // assume the child state NOT found
 #endif
 
-    QStateHandler child = m_state.fun; // start with current state
-    m_temp.fun = child; // establish stable state configuration
+    QStateHandler child = m_state.fun; // child state to find
+    m_temp.fun = child; // start from the current state
     QState r = Q_RET_SUPER;
     do {
         // have the parent of the current child?
@@ -584,7 +590,7 @@ QStateHandler QHsm::childState(QStateHandler const parentHndl) noexcept {
         }
         child = m_temp.fun;
 
-        // find superstate of 'child'
+        // find superstate of 'child' (placed in m_temp)
         r = (*child)(this, &l_resEvt_[Q_EMPTY_SIG]);
     } while (r == Q_RET_SUPER);
     Q_ENSURE_LOCAL(890, isFound);
