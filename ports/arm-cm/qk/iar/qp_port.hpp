@@ -31,6 +31,7 @@
 #define QP_PORT_HPP_
 
 #include <cstdint>        // Exact-width types. C++11 Standard
+#include <array>          // std::array<> template. C++11 Standard
 #include <intrinsics.h>   // IAR intrinsic functions
 #include "qp_config.hpp"  // QP configuration from the application
 
@@ -42,7 +43,7 @@
 
 // QF configuration for QK -- data members of the QActive class...
 
-// QActive event-queue type used for AOs
+// QActive event queue type
 #define QACTIVE_EQUEUE_TYPE     QEQueue
 
 // QActive "thread" type used to store the MPU settings in the AO
@@ -109,7 +110,7 @@
     #define QK_ISR_EXIT()  do {                                   \
         QF_INT_DISABLE();                                         \
         QF_MEM_SYS();                                             \
-        if (QP::QK_sched_() != 0U) {                              \
+        if (QP::QK::sched_() != 0U) {                             \
             *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (1U << 28U);\
         }                                                         \
         QF_MEM_APP();                                             \
@@ -119,7 +120,7 @@
 #else
     #define QK_ISR_EXIT()  do {                                   \
         QF_INT_DISABLE();                                         \
-        if (QP::QK_sched_() != 0U) {                              \
+        if (QP::QK::sched_() != 0U) {                             \
             *Q_UINT2PTR_CAST(uint32_t, 0xE000ED04U) = (1U << 28U);\
         }                                                         \
         QF_INT_ENABLE();                                          \
@@ -140,8 +141,6 @@
 
 // initialization of the QK kernel
 #define QK_INIT()     QK_init()
-extern "C" void QK_init(void);
-extern "C" void QK_thread_ret(void);
 
 #ifdef __ARM_FP         //--------- if VFP available...
 // When the FPU is configured, clear the FPCA bit in the CONTROL register
@@ -162,6 +161,12 @@ void QF_int_disable_(void);
 void QF_int_enable_(void);
 void QF_crit_entry_(void);
 void QF_crit_exit_(void);
+
+void QK_init(void);
+void QK_thread_ret(void);
+
+typedef void (*QK_activator)(void);
+extern QK_activator const QK_actAddr_; // address of QK::activate_()
 
 } // extern "C"
 

@@ -31,10 +31,14 @@
 #define QP_PORT_HPP_
 
 #include <cstdint>        // Exact-width types. C++11 Standard
+#include <array>          // std::array<> template. C++11 Standard
 #include "qp_config.hpp"  // QP configuration from the application
 
 // no-return function specifier (C++11 Standard)
 #define Q_NORETURN  [[ noreturn ]] void
+
+// static assertion (C++11 Standard)
+#define Q_ASSERT_STATIC(expr_)  static_assert((expr_), "QP static assert")
 
 // QF configuration for QK -- data members of the QActive class...
 
@@ -58,18 +62,18 @@
 #define QF_CRIT_EXIT()          __set_interrupt_state(int_state_)
 
 // Check if the code executes in the ISR context
-#define QK_ISR_CONTEXT_() (QK_priv_.intNest != 0U)
+#define QK_ISR_CONTEXT_() (QP::QK::priv_.intNest != 0U)
 
 // QK interrupt entry and exit...
-#define QK_ISR_ENTRY()    (++QK_priv_.intNest)
+#define QK_ISR_ENTRY()    (++QP::QK::priv_.intNest)
 
 #define QK_ISR_EXIT()     do {       \
-    --QK_priv_.intNest;              \
-    if (QK_priv_.intNest == 0U) {    \
-        if (QP::QK_sched_() != 0U) { \
-            QP::QK_activate_();      \
-        }                            \
-    }                                \
+    --QP::QK::priv_.intNest;           \
+    if (QP::QK::priv_.intNest == 0U) { \
+        if (QP::QK::sched_() != 0U) {  \
+            QP::QK::activate_();       \
+        }                              \
+    }                                  \
 } while (false)
 
 // include files -------------------------------------------------------------

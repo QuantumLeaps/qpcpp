@@ -29,30 +29,31 @@
 #ifndef QV_HPP_
 #define QV_HPP_
 
-namespace QP {
-namespace QV {
-
 //============================================================================
-class Attr {
+namespace QP {
+
+//----------------------------------------------------------------------------
+class QV {
 public:
     QPSet readySet;
     std::uint8_t schedCeil;
-}; // class Attr
 
-extern QV::Attr priv_;
 
-void schedDisable(std::uint8_t const ceiling);
+    static void schedDisable(std::uint8_t const ceiling) noexcept;
+    static void schedEnable() noexcept;
+    static void onIdle();
 
-void schedEnable();
+    static QV priv_;
 
-void onIdle();
+}; // class QV
 
-} // namespace QV
 } // namespace QP
 
 //============================================================================
 // interface used only for internal implementation, but not in applications
+
 #ifdef QP_IMPL
+//! @cond INTERNAL
 
 // scheduler locking for QV (not needed)...
 #define QF_SCHED_STAT_
@@ -76,6 +77,7 @@ void onIdle();
 #define QF_EPOOL_FREE_(ePool_)  ((ePool_)->getFree())
 #define QF_EPOOL_MIN_(ePool_)   ((ePool_)->getMin())
 
+//! @endcond
 #endif // QP_IMPL
 
 #endif // QV_HPP_

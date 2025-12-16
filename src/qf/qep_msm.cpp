@@ -26,6 +26,7 @@
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
+#define QP_IMPL             // this is QP implementation
 #include "qp_port.hpp"      // QP port
 #include "qp_pkg.hpp"       // QP package-scope interface
 #include "qsafe.h"          // QP Functional Safety (FuSa) Subsystem
@@ -42,7 +43,7 @@ namespace {
 Q_DEFINE_THIS_MODULE("qep_msm")
 
 // maximum depth of state nesting in a QMsm (including the top level)
-static constexpr std::int_fast8_t QMSM_MAX_NEST_DEPTH_ {6};
+static constexpr std::size_t QMSM_MAX_NEST_DEPTH_ {6U};
 
 //! @cond INTERNAL
 
@@ -304,7 +305,7 @@ QState QMsm::execTatbl_(
                 m_temp.tatbl->target->stateHandler);
         }
         else {
-            // the action returned unexptected status (corrupt SM?)
+            // the last action handler returned impossible value (corrupt SM?)
             Q_ERROR_LOCAL(460);
         }
     }
@@ -331,7 +332,7 @@ void QMsm::exitToTranSource_(
     QMState const *s = curr_state;
     while (s != tran_source) {
         if (s->exitAction != nullptr) { // exit action provided?
-            // execute the exit action, ignore the result
+            // exit state s, ignore the result
             static_cast<void>((*s->exitAction)(this));
             QS_STATE_ACT_(QS_QEP_STATE_EXIT, m_temp.obj->stateHandler);
         }
@@ -351,12 +352,12 @@ QState QMsm::enterHistory_(
     // record the entry path from current state to history
     std::array<QMState const *, QMSM_MAX_NEST_DEPTH_> path;
     QMState const *s = hist;
-    std::int_fast8_t i = -1; // entry path index (one below [0])
+    std::size_t ip = 0U; // entry path index
     while (s != m_state.obj) {
         if (s->entryAction != nullptr) { // does s have an entry action?
-            ++i;
-            Q_INVARIANT_LOCAL(610, i < QMSM_MAX_NEST_DEPTH_);
-            path[i] = s;
+            Q_INVARIANT_LOCAL(610, ip < QMSM_MAX_NEST_DEPTH_);
+            path[ip] = s;
+            ++ip;
         }
         s = s->superstate;
     }
@@ -364,10 +365,11 @@ QState QMsm::enterHistory_(
     QS_CRIT_STAT
     // retrace the entry path in reverse (desired) order...
     // NOTE: i is the fixed loop bound already checked in invariant 610
-    for (; i >= 0; --i) {
-        // enter the state in path[i], ignore the result
-        static_cast<void>((*path[i]->entryAction)(this));
-        QS_STATE_ACT_(QS_QEP_STATE_ENTRY, path[i]->stateHandler);
+    while (ip > 0U) {
+        --ip;
+        // enter the state in path[ip], ignore the result
+        static_cast<void>((*path[ip]->entryAction)(this));
+        QS_STATE_ACT_(QS_QEP_STATE_ENTRY, path[ip]->stateHandler);
     }
 
     m_state.obj = hist; // set current state to the tran. target

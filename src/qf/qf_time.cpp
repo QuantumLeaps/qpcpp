@@ -361,7 +361,9 @@ bool QTimeEvt::noActive(std::uint_fast8_t const tickRate) noexcept {
     // NOTE: this function must be called *inside* critical section
     Q_REQUIRE_INCRIT(900, tickRate < QF_MAX_TICK_RATE);
 
-    bool const noActive = (QTimeEvt_head_[tickRate].m_next == nullptr);
+    QTimeEvt const &head = QTimeEvt_head_[tickRate];
+    bool const noActive =
+        (head.m_next == nullptr) && (head.m_act == nullptr);
 
     return noActive;
 }

@@ -47,13 +47,13 @@ namespace {
 Q_DEFINE_THIS_MODULE("qv")
 } // unnamed namespace
 
+//============================================================================
 namespace QP {
-namespace QV {
 
-QV::Attr priv_;
+QV QV::priv_;
 
 //............................................................................
-void schedDisable(std::uint8_t const ceiling) {
+void QV::schedDisable(std::uint8_t const ceiling) noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
@@ -72,7 +72,7 @@ void schedDisable(std::uint8_t const ceiling) {
 }
 
 //............................................................................
-void schedEnable() {
+void QV::schedEnable() noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
@@ -89,8 +89,7 @@ void schedEnable() {
     QF_CRIT_EXIT();
 }
 
-} // namespace QV
-
+//----------------------------------------------------------------------------
 namespace QF {
 
 //............................................................................
@@ -106,7 +105,7 @@ void stop() {
     // nothing else to do for the QV kernel
 }
 
-//${QV::QF-cust::run} ........................................................
+//............................................................................
 int_t run() {
     QF_INT_DISABLE();
 #ifdef Q_SPY
@@ -137,8 +136,8 @@ int_t run() {
     for (;;) { // QV event loop...
         // find the maximum prio. AO ready to run
         std::uint_fast8_t const p = (QV::priv_.readySet.notEmpty()
-                               ? QV::priv_.readySet.findMax()
-                               : 0U);
+                                    ? QV::priv_.readySet.findMax()
+                                    : 0U);
 
         if (p > QV::priv_.schedCeil) { // is it above the sched ceiling?
             QActive * const a = QActive_registry_[p];

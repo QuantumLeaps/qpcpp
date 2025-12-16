@@ -171,7 +171,7 @@ QStateHandler QActive::getStateHandler() const noexcept {
 #ifndef QF_LOG2
 std::uint_fast8_t QF_LOG2(QP::QPSetBits const bitmask) noexcept {
     // look-up table for log2(0..15)
-    static constexpr std::array<std::uint8_t, 16> log2LUT = {
+    static constexpr std::array<std::uint8_t, 16U> log2LUT = {
         0U, 1U, 2U, 2U, 3U, 3U, 3U, 3U,
         4U, 4U, 4U, 4U, 4U, 4U, 4U, 4U
     };

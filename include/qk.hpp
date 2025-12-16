@@ -29,16 +29,13 @@
 #ifndef QK_HPP_
 #define QK_HPP_
 
+//============================================================================
 namespace QP {
 
 using QSchedStatus = std::uint8_t;
 
-} // namespace QP
-
-//============================================================================
-extern "C" {
-
-class QK_Attr {
+//----------------------------------------------------------------------------
+class QK {
 public:
     QP::QPSet readySet;
     std::uint8_t actPrio;
@@ -46,28 +43,29 @@ public:
     std::uint8_t actThre;
     std::uint8_t lockCeil;
     std::uint8_t intNest;
-}; // class QK_Attr
 
-extern QK_Attr QK_priv_;
 
-// NOTE: the extern "C" QK functions already declared in qp.hpp
+    static QSchedStatus schedLock(std::uint8_t const ceiling) noexcept;
+    static void schedUnlock(QSchedStatus const prevCeil) noexcept;
+    static void onIdle();
 
-} // extern "C"
+    static std::uint_fast8_t sched_() noexcept;
+    static std::uint_fast8_t sched_act_(
+                QActive const* const act,
+                std::uint_fast8_t const pthre_in) noexcept;
+    static void activate_();
 
-//============================================================================
-namespace QP {
-namespace QK {
+    static QK priv_;
 
-QSchedStatus schedLock(std::uint8_t const ceiling) noexcept;
-void schedUnlock(QSchedStatus const prevCeil) noexcept;
-void onIdle();
+}; // class QK
 
-} // namespace QK
 } // namespace QP
 
 //============================================================================
 // interface used only for internal implementation, but not in applications
+
 #ifdef QP_IMPL
+//! @cond INTERNAL
 
 // scheduler locking for QK...
 #define QF_SCHED_STAT_ QSchedStatus lockStat_;
@@ -88,11 +86,11 @@ void onIdle();
 // QActive event queue customization for QK...
 #define QACTIVE_EQUEUE_WAIT_(me_) (static_cast<void>(0))
 #define QACTIVE_EQUEUE_SIGNAL_(me_) do { \
-    QK_priv_.readySet.insert( \
+    QK::priv_.readySet.insert( \
         static_cast<std::uint_fast8_t>((me_)->m_prio)); \
     if (!QK_ISR_CONTEXT_()) { \
-        if (QK_sched_() != 0U) { \
-            QK_activate_(); \
+        if (QK::sched_() != 0U) { \
+            QK::activate_(); \
         } \
     } \
 } while (false)
@@ -109,6 +107,7 @@ void onIdle();
 #define QF_EPOOL_FREE_(ePool_)  ((ePool_)->getFree())
 #define QF_EPOOL_MIN_(ePool_)   ((ePool_)->getMin())
 
+//! @endcond
 #endif // QP_IMPL
 
 #endif // QK_HPP_

@@ -31,6 +31,7 @@
 #define QP_PORT_HPP_
 
 #include <cstdint>        // Exact-width types. C++11 Standard
+#include <array>          // std::array<> template. C++11 Standard
 #include "qp_config.hpp"  // QP configuration from the application
 
 // no-return function specifier (C++11 Standard)

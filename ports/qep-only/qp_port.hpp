@@ -38,6 +38,7 @@
 
 // include files -------------------------------------------------------------
 #include <cstdint>        // Exact-width types. C++11 Standard
+#include <array>          // std::array<> template. C++11 Standard
 #include "qp_config.hpp"  // QP configuration from the application
 #include "qp.hpp"         // QP platform-independent public interface
 

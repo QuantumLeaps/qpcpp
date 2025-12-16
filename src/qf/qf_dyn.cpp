@@ -80,7 +80,7 @@ void poolInit(
 #ifdef Q_SPY
     // generate the QS object-dictionary entry for the initialized pool
     {
-        std::array<std::uint8_t, 9> obj_name = // initial event pool name
+        std::array<std::uint8_t, 9U> obj_name = // initial event pool name
             { 'E', 'v', 't', 'P', 'o', 'o', 'l', '?', '\0' };
         // replace the "?" with the one-digit pool number (1-based)
         obj_name[7] = static_cast<std::uint8_t>(

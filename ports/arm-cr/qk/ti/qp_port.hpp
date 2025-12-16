@@ -31,6 +31,7 @@
 #define QP_PORT_HPP_
 
 #include <cstdint>        // Exact-width types. C++11 Standard
+#include <array>          // std::array<> template. C++11 Standard
 #include "qp_config.hpp"  // QP configuration from the application
 
 // no-return function specifier (C++11 Standard)
@@ -41,10 +42,10 @@
 
 // QF configuration for QK -- data members of the QActive class...
 
-// QActive event-queue type used for AOs
+// QActive event queue type
 #define QACTIVE_EQUEUE_TYPE     QEQueue
 
-// QF interrupt disable/enable, see NOTE2
+// interrupt disabling policy, see NOTE2
 #ifdef __16bis__
     #define QF_INT_DISABLE()    __asm(" CPSID i")
     #define QF_INT_ENABLE()     __asm(" CPSIE i")
@@ -74,7 +75,7 @@
 #define QF_CRIT_EXIT_NOP()     __asm(" ISB")
 
 // Check if the code executes in the ISR context
-#define QK_ISR_CONTEXT_() (QK_priv_.intNest != 0U)
+#define QK_ISR_CONTEXT_() (QP::QK::priv_.intNest != 0U)
 
 // QK-specific Interrupt Request handler BEGIN
 #define QK_IRQ_BEGIN(name_)              \
@@ -111,16 +112,16 @@
     " POP {R0-R3, R12}\n"                \
     " RFEIA SP!\n");                     \
     void name_ ## _isr(void) {           \
-    ++QK_priv_.intNest; {
+    ++QP::QK::priv_.intNest; {
 
 // QK-specific Interrupt Request handler END
-#define QK_IRQ_END()                     \
-    } --QK_priv_.intNest;                \
-    if (QK_priv_.intNest == 0U) {        \
-        if (QP::QK_sched_() != 0U) {     \
-            QP::QK_activate_();          \
-        }                                \
-    }                                    \
+#define QK_IRQ_END()                   \
+    } --QP::QK::priv_.intNest;         \
+    if (QP::QK::priv_.intNest == 0U) { \
+        if (QP::QK::sched_() != 0U) {  \
+            QP::QK::activate_();       \
+        }                              \
+    }                                  \
 }
 
 // include files -------------------------------------------------------------

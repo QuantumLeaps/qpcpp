@@ -30,10 +30,10 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR  "8.1.1"
-#define QP_VERSION      811U
-// <VER>=810 <DATE>=251008
-#define QP_RELEASE      0x6A6334D4U
+#define QP_VERSION_STR  "8.1.2"
+#define QP_VERSION      812U
+// <VER>=812 <DATE>=260105
+#define QP_RELEASE      0x64F71D43U
 
 //----------------------------------------------------------------------------
 // default configuration settings
@@ -314,17 +314,21 @@ public:
     QStateHandler childState(QStateHandler const parentHndl) noexcept;
 
 private:
-    std::int_fast8_t tran_simple_(
-        QStateHandler * const path,
+    // maximum depth of state nesting in a QHsm (including the top level)
+    // must be >= 3
+    static constexpr std::size_t MAX_NEST_DEPTH_ {6U};
+
+    std::size_t tran_simple_(
+        std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
         std::uint_fast8_t const qsId);
 
-    std::int_fast8_t tran_complex_(
-        QStateHandler * const path,
+    std::size_t tran_complex_(
+        std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
         std::uint_fast8_t const qsId);
 
     void enter_target_(
-        QStateHandler * const path,
-        std::int_fast8_t const depth,
+        std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+        std::size_t const depth,
         std::uint_fast8_t const qsId);
 
     // friends...
@@ -473,19 +477,6 @@ private:
 //----------------------------------------------------------------------------
 // declarations for friendship with the QActive class
 
-extern "C" {
-    std::uint_fast8_t QK_sched_() noexcept;
-    std::uint_fast8_t QK_sched_act_(
-        QP::QActive const * const act,
-        std::uint_fast8_t const pthre_in) noexcept;
-    void QK_activate_();
-
-    std::uint_fast8_t QXK_sched_() noexcept;
-    void QXK_contextSw_(QP::QActive * const next) noexcept;
-    void QXK_threadExit_() noexcept;
-    void QXK_activate_();
-} // extern "C"
-
 namespace QF {
     void init();
     void stop();
@@ -497,12 +488,8 @@ namespace QF {
     constexpr std::uint_fast16_t NO_MARGIN {0xFFFFU};
 } // namespace QF
 
-namespace QXK {
-    QP::QActive *current() noexcept;
-} // namespace QXK
-
 //----------------------------------------------------------------------------
-class QActive : public QP::QAsm {
+class QActive : public QAsm {
 private:
     std::uint8_t m_prio;
     std::uint8_t m_pthre;
@@ -640,6 +627,8 @@ private:
     friend class QXSemaphore;
     friend class QMActive;
     friend class QActiveDummy;
+    friend class QK;
+    friend class QXK;
     friend class QS;
 
     friend void QF::init();
@@ -648,22 +637,10 @@ private:
     friend void QF::onStartup();
     friend void QF::onCleanup();
 
-    friend std::uint_fast8_t QK_sched_() noexcept;
-    friend std::uint_fast8_t QK_sched_act_(
-        QP::QActive const * const act,
-        std::uint_fast8_t const pthre_in) noexcept;
-    friend void QK_activate_();
-
-    friend std::uint_fast8_t QXK_sched_() noexcept;
-    friend void QXK_contextSw_(QP::QActive * const next) noexcept;
-    friend void QXK_threadExit_() noexcept;
-    friend void QXK_activate_();
-    friend QP::QActive *QXK::current() noexcept;
-
 }; // class QActive
 
 //----------------------------------------------------------------------------
-class QMActive : public QP::QActive {
+class QMActive : public QActive {
 protected:
     explicit QMActive(QStateHandler const initial) noexcept;
 
@@ -684,7 +661,7 @@ public:
 //----------------------------------------------------------------------------
 #if (QF_MAX_TICK_RATE > 0U)
 
-class QTimeEvt : public QP::QEvt {
+class QTimeEvt : public QEvt {
 private:
     QTimeEvt *m_next;
     void * m_act;
@@ -760,7 +737,7 @@ private:
 }; // class QTimeEvt
 
 //----------------------------------------------------------------------------
-class QTicker : public QP::QActive {
+class QTicker : public QActive {
 public:
     explicit QTicker(std::uint8_t const tickRate) noexcept;
     using QActive::init;
@@ -912,6 +889,7 @@ void QF_onContextSw(
     QP::QActive * prev,
     QP::QActive * next);
 #endif // def QF_ON_CONTEXT_SW
+
 } // extern "C"
 
 //----------------------------------------------------------------------------
@@ -958,12 +936,5 @@ void QF_onContextSw(
 #ifndef QF_CRIT_EXIT_NOP
     #define QF_CRIT_EXIT_NOP() (static_cast<void>(0))
 #endif // ndef QF_CRIT_EXIT_NOP
-
-//----------------------------------------------------------------------------
-// memory protection facilities
-
-#ifdef QF_MEM_ISOLATE
-    #error Memory isolation not supported in this QP edition, need SafeQP
-#endif // def QF_MEM_ISOLATE
 
 #endif // QP_HPP_

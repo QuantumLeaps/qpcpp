@@ -29,8 +29,6 @@
 #ifndef QP_PKG_HPP_
 #define QP_PKG_HPP_
 
-#include <array>    // for std::array
-
 #ifdef QP_IMPL
 
 namespace QP {
@@ -51,6 +49,27 @@ constexpr std::uint8_t QTE_FLAG_WAS_DISARMED {1U << 6U};
 //============================================================================
 void QEvt_refCtr_inc_(QEvt const * const me) noexcept;
 void QEvt_refCtr_dec_(QEvt const * const me) noexcept;
+
+//----------------------------------------------------------------------------
+// Duplicate Inverse Storage (DIS) facilities
+
+#ifndef Q_UNSAFE
+
+template<typename T_>
+static T_ dis_update(T_ const org) {
+    // calculate the Duplicate Inverse Storage (DIS) for the original
+    // variable org
+    return static_cast<T_>(~org);
+}
+//........................................................................
+template<typename T_>
+static bool dis_verify(T_ const org, T_ const dis) {
+    // verify that the Duplicate Inverse Storage (DIS) dis matches
+    // the original variable org
+    return dis == static_cast<T_>(~org);
+}
+
+#endif // Q_UNSAFE
 
 //============================================================================
 namespace QF {

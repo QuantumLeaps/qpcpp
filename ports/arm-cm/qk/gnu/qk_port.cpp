@@ -3,9 +3,9 @@
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
@@ -31,16 +31,6 @@
 #include "qp_port.hpp"
 #include "qsafe.h"        // QP Functional Safety (FuSa) Subsystem
 
-extern "C" {
-
-// prototypes ----------------------------------------------------------------
-void PendSV_Handler(void);
-#ifdef QK_USE_IRQ_HANDLER           // if use IRQ...
-void QK_USE_IRQ_HANDLER(void);
-#else                               // use default (NMI)
-void NMI_Handler(void);
-#endif
-
 #define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED18U)
 #define NVIC_EN      ((uint32_t volatile *)0xE000E100U)
 #define NVIC_IP      ((uint32_t volatile *)0xE000E400U)
@@ -52,6 +42,19 @@ void NMI_Handler(void);
 // helper macros to "stringify" values
 #define VAL(x) #x
 #define STRINGIFY(x) VAL(x)
+
+//============================================================================
+extern "C" {
+
+// prototypes ----------------------------------------------------------------
+void PendSV_Handler(void);
+#ifdef QK_USE_IRQ_HANDLER           // if use IRQ...
+void QK_USE_IRQ_HANDLER(void);
+#else                               // use default (NMI)
+void NMI_Handler(void);
+#endif
+
+QK_activator const QK_actAddr_ = &QP::QK::activate_;
 
 //============================================================================
 // interrupts and critical section...
@@ -301,14 +304,15 @@ __asm volatile (
     // executes in the Handler mode of the PendSV exception. The switch
     // to the Thread mode is accomplished by returning from PendSV using
     // a fabricated exception stack frame, where the return address is
-    // QK_activate_().
+    // QK::activate_().
     //
     // NOTE: the QK activator is called with interrupts DISABLED and also
     // returns with interrupts DISABLED.
     "  LSR     r3,r1,#3         \n" // r3 := (r1 >> 3), set T bit (new xpsr)
-    "  LDR     r2,=QK_activate_ \n" // address of QK_activate_
+    "  LDR     r2,=QK_actAddr_  \n" // address of QK_actAddr_
+    "  LDR     r2,[r2]          \n" // address of QK::activate_
     "  SUB     r2,r2,#1         \n" // align Thumb-address at halfword (new pc)
-    "  LDR     r1,=QK_thread_ret \n" // return address after the call  (new lr)
+    "  LDR     r1,=QK_thread_ret\n" // return address after the call  (new lr)
 
     "  SUB     sp,sp,#8*4       \n" // reserve space for exception stack frame
     "  ADD     r0,sp,#5*4       \n" // r0 := 5 registers below the SP
@@ -324,7 +328,7 @@ __asm volatile (
 }
 
 //============================================================================
-// QK_thread_ret is a helper function executed when the QXK activator returns.
+// QK_thread_ret is a helper function executed when the QK activator returns.
 //
 // After the QK activator returns, we need to resume the preempted
 // thread. However, this must be accomplished by a return-from-exception,
@@ -510,4 +514,3 @@ __asm volatile (
 #endif // ARMv6-M
 
 } // extern "C"
-

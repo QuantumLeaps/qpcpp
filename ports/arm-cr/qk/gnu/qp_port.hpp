@@ -31,6 +31,7 @@
 #define QP_PORT_HPP_
 
 #include <cstdint>        // Exact-width types. C++11 Standard
+#include <array>          // std::array<> template. C++11 Standard
 #include "qp_config.hpp"  // QP configuration from the application
 
 // no-return function specifier (C++11 Standard)
@@ -80,7 +81,7 @@
 #define QF_CRIT_EXIT_NOP()      __asm volatile ("ISB")
 
 // Check if the code executes in the ISR context
-#define QK_ISR_CONTEXT_() (QK_priv_.intNest != 0U)
+#define QK_ISR_CONTEXT_() (QP::QK::priv_.intNest != 0U)
 
 // QK-specific Interrupt Request handler BEGIN
 #ifdef __ARM_FP
@@ -100,7 +101,7 @@
     __asm(" AND R3, SP, #4\n"                  \
     " SUB SP, SP, R3\n"                        \
     " PUSH {R3, LR}\n");                       \
-    ++QK_priv_.intNest; {
+    ++QP::QK::priv_.intNest; {
 #else
 #define QK_IRQ_BEGIN(name_)                    \
     void name_(void)                           \
@@ -113,40 +114,40 @@
     __asm(" AND R3, SP, #4\n"                  \
     " SUB SP, SP, R3\n"                        \
     " PUSH {R3, LR}\n");                       \
-    ++QK_priv_.intNest; {
+    ++QP::QK::priv_.intNest; {
 #endif
 
 // QK-specific Interrupt Request handler END
 #ifdef __ARM_FP
-#define QK_IRQ_END()                  \
-    } --QK_priv_.intNest;             \
-    if (QK_priv_.intNest == 0U) {     \
-        if (QP::QK_sched_() != 0U) {  \
-            QP::QK_activate_();       \
-        }                             \
-    }                                 \
-    __asm volatile (" POP {R3, LR}\n" \
-    " ADD SP, SP, R3");               \
-    __asm(" FLDMIAD SP!, {D0-D7}\n"   \
-    " LDMFD SP!, {R12}\n"             \
-    " FMXR FPEXC, R12 \n"             \
-    " LDMFD SP!, {R12} \n"            \
-    " FMXR FPSCR, R12");              \
-    __asm(" POP {R0-R3, R12}\n"       \
-    " RFEIA SP!");                    \
+#define QK_IRQ_END()                   \
+    } --QP::QK::priv_.intNest;         \
+    if (QP::QK::priv_.intNest == 0U) { \
+        if (QP::QK::sched_() != 0U) {  \
+            QP::QK::activate_();       \
+        }                              \
+    }                                  \
+    __asm volatile (" POP {R3, LR}\n"  \
+    " ADD SP, SP, R3");                \
+    __asm(" FLDMIAD SP!, {D0-D7}\n"    \
+    " LDMFD SP!, {R12}\n"              \
+    " FMXR FPEXC, R12 \n"              \
+    " LDMFD SP!, {R12} \n"             \
+    " FMXR FPSCR, R12");               \
+    __asm(" POP {R0-R3, R12}\n"        \
+    " RFEIA SP!");                     \
 }
 #else
-#define QK_IRQ_END()                  \
-    } --QK_priv_.intNest;             \
-    if (QK_priv_.intNest == 0U) {     \
-        if (QP::QK_sched_() != 0U) {  \
-            QP::QK_activate_();       \
-        }                             \
-    }                                 \
-    __asm volatile (" POP {R3, LR}\n" \
-    " ADD SP, SP, R3");               \
+#define QK_IRQ_END()                   \
+    } --QP::QK::priv_.intNest;         \
+    if (QP::QK::priv_.intNest == 0U) { \
+        if (QP::QK::sched_() != 0U) {  \
+            QP::QK::activate_();       \
+        }                              \
+    }                                  \
+    __asm volatile (" POP {R3, LR}\n"  \
+    " ADD SP, SP, R3");                \
     __asm volatile (" POP {R0-R3, R12}\n" \
-    " RFEIA SP!");                    \
+    " RFEIA SP!");                     \
 }
 #endif
 

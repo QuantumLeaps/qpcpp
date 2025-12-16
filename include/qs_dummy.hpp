@@ -39,7 +39,6 @@
 
 #define QS_INIT(arg_)                   (true)
 #define QS_EXIT()                       static_cast<void>(0)
-#define QS_DUMP()                       static_cast<void>(0)
 #define QS_GLB_FILTER(rec_)             static_cast<void>(0)
 #define QS_LOC_FILTER(qsId_)            static_cast<void>(0)
 
