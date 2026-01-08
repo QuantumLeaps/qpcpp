@@ -39,8 +39,8 @@
 #endif
 
 namespace QP {
-void QS_output(void);    // handle the QS output
-void QS_rx_input(void);  // handle the QS-RX input
+void QS_output();    // handle the QS output
+void QS_rx_input();  // handle the QS-RX input
 }
 
 //============================================================================

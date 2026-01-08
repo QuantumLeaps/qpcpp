@@ -31,8 +31,8 @@
 
 #include <cstdint>         // Exact-width types. C++11 Standard
 #include <array>           // std::array<> template. C++11 Standard
-#include <zephyr/kernel.h> // Zephyr kernel API
 #include "qp_config.hpp"   // QP configuration from the application
+#include <zephyr/kernel.h> // Zephyr kernel API
 
 // no-return function specifier (C++11 Standard)
 #define Q_NORETURN  [[ noreturn ]] void

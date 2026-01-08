@@ -148,10 +148,6 @@ void init() {
     // lock memory so we're never swapped out to disk
     //mlockall(MCL_CURRENT | MCL_FUTURE); // un-comment when supported
 
-    // lock the startup mutex to block any active objects started before
-    // calling QF::run()
-    pthread_mutex_lock(&l_startupMutex);
-
     l_tick.tv_sec = 0;
     l_tick.tv_nsec = NSEC_PER_SEC / DEFAULT_TICKS_PER_SEC; // default rate
     l_tickPrio = sched_get_priority_min(SCHED_FIFO); // default ticker prio
@@ -161,6 +157,10 @@ void init() {
     memset(&sig_act, 0, sizeof(sig_act));
     sig_act.sa_handler = &sigIntHandler;
     sigaction(SIGINT, &sig_act, NULL);
+
+    // lock the startup mutex to block any active objects started before
+    // calling QF::run()
+    pthread_mutex_lock(&l_startupMutex);
 }
 
 //............................................................................
@@ -182,9 +182,10 @@ int run() {
         // setting priority failed, probably due to insufficient privileges
     }
 
-    // exit the startup critical section to unblock any active objects
+    // unlock the startup mutex to unblock any active objects
     // started before calling QF_run()
     pthread_mutex_unlock(&l_startupMutex);
+
     l_isRunning = true;
 
     // The provided clock tick service configured?
@@ -242,6 +243,11 @@ void stop() {
 }
 //............................................................................
 void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    Q_REQUIRE_INCRIT(600, ticksPerSec != 0U);
+    QF_CRIT_EXIT();
+
     if (ticksPerSec != 0U) {
         l_tick.tv_nsec = NSEC_PER_SEC / ticksPerSec;
     }
@@ -263,7 +269,8 @@ void consoleSetup() {
 
     tcgetattr(0, &l_tsav); // save the current terminal attributes
     tcgetattr(0, &tio);    // obtain the current terminal attributes
-    tio.c_lflag &= ~(ICANON | ECHO); // disable the canonical mode & echo
+    // disable the canonical mode & echo
+    tio.c_lflag &= static_cast<tcflag_t>(~(ICANON | ECHO));
     tcsetattr(0, TCSANOW, &tio);     // set the new attributes
 }
 //............................................................................
@@ -277,7 +284,7 @@ int consoleGetKey() {
     if (byteswaiting > 0) {
         char ch;
         byteswaiting = read(0, &ch, 1);
-        return (int)ch;
+        return static_cast<int>(ch);
     }
     return 0; // no input at this time
 }
@@ -285,7 +292,8 @@ int consoleGetKey() {
 int consoleWaitForKey() {
     return static_cast<int>(getchar());
 }
-#endif
+
+#endif // #ifdef QF_CONSOLE
 
 } // namespace QF
 
@@ -311,7 +319,7 @@ void QActive::evtLoop_(QActive *act) {
 #endif
 }
 
-//============================================================================
+//............................................................................
 void QActive::start(QPrioSpec const prioSpec,
     QEvtPtr * const qSto, std::uint_fast16_t const qLen,
     void * const stkSto, std::uint_fast16_t const stkSize,
@@ -326,6 +334,7 @@ void QActive::start(QPrioSpec const prioSpec,
     Q_REQUIRE_INCRIT(800, stkSto == nullptr);
     QF_CRIT_EXIT();
 
+    // create the condition variable to throttle the AO's event queue
     pthread_cond_init(&m_osObject, 0);
     m_eQueue.init(qSto, qLen);
 
@@ -333,7 +342,7 @@ void QActive::start(QPrioSpec const prioSpec,
     m_pthre = 0U; // preemption-threshold (not used in this port)
     register_(); // register this AO
 
-    // top-most initial tran. (virtual call)
+    // the top-most initial tran. (virtual)
     this->init(par, m_prio);
     QS_FLUSH(); // flush the trace buffer to the host
 
@@ -348,14 +357,14 @@ void QActive::start(QPrioSpec const prioSpec,
 
     // priority of the p-thread, see NOTE04
     struct sched_param param;
-    param.sched_priority = m_prio
+    param.sched_priority = static_cast<int>(m_prio)
                            + (sched_get_priority_max(SCHED_FIFO)
-                              - QF_MAX_ACTIVE - 3U);
+                              - static_cast<int>(QF_MAX_ACTIVE) - 3);
     pthread_attr_setschedparam(&attr, &param);
 
     pthread_attr_setstacksize(&attr,
         (stkSize < static_cast<std::uint_fast16_t>(PTHREAD_STACK_MIN)
-        ? PTHREAD_STACK_MIN
+        ? static_cast<std::size_t>(PTHREAD_STACK_MIN)
         : stkSize));
     pthread_t thread;
     int err = pthread_create(&thread, &attr, &ao_thread, this);
@@ -377,6 +386,7 @@ void QActive::start(QPrioSpec const prioSpec,
 
     pthread_attr_destroy(&attr);
 }
+
 //............................................................................
 #ifdef QACTIVE_CAN_STOP
 void QActive::stop() {
