@@ -307,7 +307,7 @@ int run() {
 }
 //............................................................................
 void stop() {
-    l_isRunning = false; // terminate the main event-loop thread
+    l_isRunning = false; // terminate the main event-loop
 
     // unblock the event-loop so it can terminate
     readySet_.insert(1U);
@@ -315,6 +315,11 @@ void stop() {
 }
 //............................................................................
 void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+    Q_REQUIRE_INCRIT(600, ticksPerSec != 0U);
+    QF_CRIT_EXIT();
+
     if (ticksPerSec != 0U) {
         l_tick.tv_nsec = NSEC_PER_SEC / ticksPerSec;
     }
@@ -336,7 +341,8 @@ void consoleSetup() {
 
     tcgetattr(0, &l_tsav); // save the current terminal attributes
     tcgetattr(0, &tio);    // obtain the current terminal attributes
-    tio.c_lflag &= ~(ICANON | ECHO); // disable the canonical mode & echo
+    // disable the canonical mode & echo
+    tio.c_lflag &= static_cast<tcflag_t>(~(ICANON | ECHO));
     tcsetattr(0, TCSANOW, &tio);     // set the new attributes
 }
 //............................................................................
@@ -350,7 +356,7 @@ int consoleGetKey() {
     if (byteswaiting > 0) {
         char ch;
         byteswaiting = read(0, &ch, 1);
-        return (int)ch;
+        return static_cast<int>(ch);
     }
     return 0; // no input at this time
 }

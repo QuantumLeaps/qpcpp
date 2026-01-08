@@ -120,8 +120,8 @@ int run() {
 
     if (l_tickMsec != 0U) { // system clock tick configured?
         // create the ticker thread...
-        HANDLE ticker = CreateThread(NULL, 1024, &ticker_thread,
-                                     nullptr, 0U, NULL);
+        HANDLE ticker = CreateThread(nullptr, 1024, &ticker_thread,
+                                     nullptr, 0U, nullptr);
         QF_CRIT_ENTRY();
         Q_ASSERT_INCRIT(310, ticker != static_cast<HANDLE>(0));
         QF_CRIT_EXIT();
@@ -233,7 +233,7 @@ void QActive::start(QPrioSpec const prioSpec,
     Q_UNUSED_PAR(stkSto);
     Q_UNUSED_PAR(stkSize);
 
-    // no per-AO stack needed for this port
+    // no external AO-stack storage needed for this port
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
     Q_REQUIRE_INCRIT(800, stkSto == nullptr);

@@ -76,7 +76,7 @@ void enterCriticalSection_() {
 //............................................................................
 void leaveCriticalSection_() {
     if (l_isRunning) {
-        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect. must ballace!
+        Q_ASSERT_INCRIT(200, l_critSectNest == 1); // crit.sect. must balance!
         if ((--l_critSectNest) == 0) {
             LeaveCriticalSection(&l_win32CritSect);
         }
@@ -257,7 +257,7 @@ void QActive::evtLoop_(QActive *act) {
 #endif
     {
         QEvt const *e = act->get_(); // wait for event
-        act->dispatch(e, act->m_prio); // dispatch to the AO's state machine
+        act->dispatch(e, act->m_prio); // dispatch to the SM
         QF::gc(e); // check if the event is garbage, and collect it if so
     }
 #ifdef QACTIVE_CAN_STOP
