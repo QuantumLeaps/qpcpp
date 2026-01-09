@@ -135,7 +135,7 @@ e2e295c371bc14f0089a888b07d98c657dea07bf *ports/posix-qv/README.md
 c9969a454b540a3b1abd3dd5cc46fb211663310e *ports/posix-qutest/CMakeLists.txt
 11f60e501d3ecd6c7b867a044bda43a5c6882786 *ports/posix-qutest/qp_port.hpp
 aee4b3f1391d0570f565c849f2ff3995404e6c78 *ports/posix-qutest/qs_port.hpp
-8bf0194dea682a3641cc7b5528a7b1d0a322b775 *ports/posix-qutest/qutest_port.cpp
+71ff925a2e4d301346f7704a2e6a714299f8f2a7 *ports/posix-qutest/qutest_port.cpp
 7749a8204624bcee42f98607587f0232875bd8ad *ports/posix-qutest/safe_std.h
 06b76c6c30ea880876b47ee27115178ff62ea66b *ports/win32/CMakeLists.txt
 bcee54c0d8996434d2241ade28e7806f758b1daa *ports/win32/qf_port.cpp
