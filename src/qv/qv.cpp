@@ -163,13 +163,11 @@ int_t run() {
 
             QF_INT_ENABLE();
 
-            QEvt const * const e = a->get_();
-            // NOTE QActive::get_() performs QF_MEM_APP() before return
+            QEvt const * const e = a->get_(); // queue not empty
 
-            // dispatch event (virtual call)
-            a->dispatch(e, p);
+            a->dispatch(e, p); // dispatch event (virtual call)
 #if (QF_MAX_EPOOL > 0U)
-            gc(e);
+            QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
             QF_INT_DISABLE();
 

@@ -65,11 +65,10 @@
 #define QF_CRIT_EST()    static_cast<void>(tx_interrupt_control(TX_INT_DISABLE))
 
 // include files -------------------------------------------------------------
-#include "tx_api.h"    // ThreadX API
-
-#include "qequeue.hpp" // QP event queue (for deferring events)
-#include "qmpool.hpp"  // QP memory pool (for event pools)
-#include "qp.hpp"      // QP platform-independent public interface
+#include "tx_api.h"        // ThreadX API
+#include "qequeue.hpp"     // QP event queue (for deferring events)
+#include "qmpool.hpp"      // QP memory pool (for event pools)
+#include "qp.hpp"          // QP platform-independent public interface
 
 namespace QP {
 
@@ -83,49 +82,49 @@ enum ThreadX_ThreadAttrs {
 // interface used only inside QF implementation, but not in applications
 #ifdef QP_IMPL
 
-    // ThreadX-specific scheduler locking (implemented in qf_port.cpp)
-    #define QF_SCHED_STAT_ QFSchedLock lockStat_;
-    #define QF_SCHED_LOCK_(prio_) do {            \
-        if (TX_THREAD_GET_SYSTEM_STATE() != 0U) { \
-            lockStat_.m_lockPrio = 0U;            \
-        } else {                                  \
-            lockStat_.lock((prio_));              \
-        }                                         \
-    } while (false)
-    #define QF_SCHED_UNLOCK_() do {       \
-        if (lockStat_.m_lockPrio != 0U) { \
-            lockStat_.unlock();           \
-        }                                 \
-    } while (false)
+// ThreadX-specific scheduler locking
+#define QF_SCHED_STAT_ QFSchedLock lockStat_;
+#define QF_SCHED_LOCK_(prio_) do {            \
+    if (TX_THREAD_GET_SYSTEM_STATE() != 0U) { \
+        lockStat_.m_lockPrio = 0U;            \
+    } else {                                  \
+        lockStat_.lock((prio_));              \
+    }                                         \
+} while (false)
+#define QF_SCHED_UNLOCK_() do {       \
+    if (lockStat_.m_lockPrio != 0U) { \
+        lockStat_.unlock();           \
+    }                                 \
+} while (false)
 
-    namespace QP {
-        struct QFSchedLock {
-            uint_fast8_t m_lockPrio; // lock prio [QF numbering scheme]
-            UINT m_prevThre;         // previoius preemption threshold
-            TX_THREAD *m_lockHolder; // the thread holding the lock
+namespace QP {
+    struct QFSchedLock {
+        std::uint_fast8_t m_lockPrio; // lock prio [QF numbering scheme]
+        UINT m_prevThre;         // previoius preemption threshold
+        TX_THREAD *m_lockHolder; // the thread holding the lock
 
-            void lock(uint_fast8_t prio);
-            void unlock(void) const;
-        };
-    } // namespace QP
-    extern "C" {
-        // internal TX interrupt counter for TX_THREAD_GET_SYSTEM_STATE()
-        extern ULONG volatile _tx_thread_system_state;
-    }
+        void lock(uint_fast8_t prio);
+        void unlock(void) const;
+    };
+} // namespace QP
+extern "C" {
+    // internal TX interrupt counter for TX_THREAD_GET_SYSTEM_STATE()
+    extern ULONG volatile _tx_thread_system_state;
+}
 
-    // QMPool operations
-    #define QF_EPOOL_TYPE_ QMPool
-    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-            (p_).init((poolSto_), (poolSize_), (evtSize_))
-    #define QF_EPOOL_EVENT_SIZE_(p_) ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_, qsId_) \
-            ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
-    #define QF_EPOOL_PUT_(p_, e_, qsId_) ((p_).put((e_), (qsId_)))
-    #define QF_EPOOL_USE_(ePool_)   ((ePool_)->getUse())
-    #define QF_EPOOL_FREE_(ePool_)  ((ePool_)->getFree())
-    #define QF_EPOOL_MIN_(ePool_)   ((ePool_)->getMin())
+// QMPool operations
+#define QF_EPOOL_TYPE_  QMPool
+#define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+        (p_).init((poolSto_), (poolSize_), (evtSize_))
+#define QF_EPOOL_EVENT_SIZE_(p_) ((p_).getBlockSize())
+#define QF_EPOOL_GET_(p_, e_, m_, qsId_) \
+        ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
+#define QF_EPOOL_PUT_(p_, e_, qsId_) ((p_).put((e_), (qsId_)))
+#define QF_EPOOL_USE_(ePool_)   ((ePool_)->getUse())
+#define QF_EPOOL_FREE_(ePool_)  ((ePool_)->getFree())
+#define QF_EPOOL_MIN_(ePool_)   ((ePool_)->getMin())
 
-#endif // ifdef QP_IMPL
+#endif // QP_IMPL
 
 //============================================================================
 // NOTE1:

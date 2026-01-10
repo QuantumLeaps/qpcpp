@@ -195,7 +195,7 @@ void QK::activate_() {
 
     std::uint8_t pthre_in = 0U; // assume preempting the idle thread
     if (prio_in > 0U) { // preempting a regular thread (NOT the idle thread)?
-        QP::QActive const * const a = QP::QActive_registry_[prio_in];
+        QActive const * const a = QActive_registry_[prio_in];
 
         // the AO must be registered at prio. prio_in
         Q_ASSERT_INCRIT(540, a != nullptr);
@@ -205,7 +205,7 @@ void QK::activate_() {
 
     // loop until no more ready-to-run AOs of higher pthre than the initial
     do  {
-        QP::QActive * const a = QP::QActive_registry_[p];
+        QActive * const a = QActive_registry_[p];
 
         // the AO must be registered at prio. p
         Q_ASSERT_INCRIT(570, a != nullptr);
@@ -218,13 +218,13 @@ void QK::activate_() {
 #if (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
         if (p != pprev) { // changing threads?
 
-            QS_BEGIN_PRE(QP::QS_SCHED_NEXT, p)
+            QS_BEGIN_PRE(QS_SCHED_NEXT, p)
                 QS_TIME_PRE();     // timestamp
                 QS_2U8_PRE(p, pprev);
             QS_END_PRE()
 
 #ifdef QF_ON_CONTEXT_SW
-            QF_onContextSw(QP::QActive_registry_[pprev], a);
+            QF_onContextSw(QActive_registry_[pprev], a);
 #endif // QF_ON_CONTEXT_SW
 
             pprev = p; // update previous prio.
@@ -233,12 +233,10 @@ void QK::activate_() {
 
         QF_INT_ENABLE(); // unconditionally enable interrupts
 
-        QP::QEvt const * const e = a->get_();
-
-        // dispatch event (virtual call)
-        a->dispatch(e, p);
+        QEvt const * const e = a->get_(); // queue not empty
+        a->dispatch(e, p); // dispatch event (virtual call)
 #if (QF_MAX_EPOOL > 0U)
-        QP::QF::gc(e);
+        QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
 
         // determine the next highest-prio. AO ready to run...
@@ -255,25 +253,25 @@ void QK::activate_() {
 
 #if (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
     if (prio_in != 0U) { // resuming an active object?
-        QS_BEGIN_PRE(QP::QS_SCHED_NEXT, prio_in)
+        QS_BEGIN_PRE(QS_SCHED_NEXT, prio_in)
             QS_TIME_PRE();     // timestamp
             // prio. of the resumed AO, previous prio.
             QS_2U8_PRE(prio_in, pprev);
         QS_END_PRE()
 
 #ifdef QF_ON_CONTEXT_SW
-        QF_onContextSw(QP::QActive_registry_[pprev],
-                       QP::QActive_registry_[prio_in]);
+        QF_onContextSw(QActive_registry_[pprev],
+                       QActive_registry_[prio_in]);
 #endif // QF_ON_CONTEXT_SW
     }
     else {  // resuming prio.==0 --> idle
-        QS_BEGIN_PRE(QP::QS_SCHED_IDLE, pprev)
+        QS_BEGIN_PRE(QS_SCHED_IDLE, pprev)
             QS_TIME_PRE();     // timestamp
             QS_U8_PRE(pprev);  // previous prio.
         QS_END_PRE()
 
 #ifdef QF_ON_CONTEXT_SW
-        QF_onContextSw(QP::QActive_registry_[pprev], nullptr);
+        QF_onContextSw(QActive_registry_[pprev], nullptr);
 #endif // QF_ON_CONTEXT_SW
     }
 

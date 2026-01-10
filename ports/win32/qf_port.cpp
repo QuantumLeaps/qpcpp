@@ -250,15 +250,17 @@ void QActive::evtLoop_(QActive *act) {
     EnterCriticalSection(&l_startupCritSect);
     LeaveCriticalSection(&l_startupCritSect);
 
+    // the event-loop...
 #ifdef QACTIVE_CAN_STOP
-    while (act->m_thread)
+    while (act->m_thread) {
 #else
-    for (;;) // for-ever
+    for (;;) { // for-ever
 #endif
-    {
-        QEvt const *e = act->get_(); // wait for event
-        act->dispatch(e, act->m_prio); // dispatch to the SM
+        QEvt const *e = act->get_(); // BLOCK for event
+        act->dispatch(e, act->m_prio); // dispatch event (virtual call)
+#if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
+#endif
     }
 #ifdef QACTIVE_CAN_STOP
     act->unregister_(); // remove this object from QF

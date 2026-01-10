@@ -270,10 +270,11 @@ int run() {
             Q_ASSERT_INCRIT(320, a != nullptr);
             QF_CRIT_EXIT();
 
-            QEvt const *e = a->get_();
-            // dispatch event (virtual call)
-            a->dispatch(e, a->getPrio());
-            QF::gc(e);
+            QEvt const *e = a->get_(); // queue not empty
+            a->dispatch(e, a->getPrio()); // dispatch event (virtual call)
+#if (QF_MAX_EPOOL > 0U)
+            QF::gc(e); // check if the event is garbage, and collect it if so
+#endif
 
             QF_CRIT_ENTRY();
             if (a->m_eQueue.isEmpty()) { // empty queue?

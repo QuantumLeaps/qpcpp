@@ -198,18 +198,12 @@ static void handle_evts(void) {
         uint_fast8_t const p = QPSet_findMax(&QF_readySet_);
         QActive* const a = QActive_registry_[p];
 
-        // perform the run-to-completion (RTC) step...
-        // 1. retrieve the event from the AO's event queue, which by this
-        //   time must be non-empty and The QV kernel asserts it.
-        // 2. dispatch the event to the AO's state machine.
-        // 3. determine if event is garbage and collect it if so
-        //
-        QEvt const* const e = QActive_get_(a);
+        QEvt const* const e = QActive_get_(a); // queue not empty
         QS_FLUSH();
-        QASM_DISPATCH(&a->super, e, a->prio);
+        a->dispatch(e, a->prio); // dispatch event (virtual call)
         QS_FLUSH();
 #if (QF_MAX_EPOOL > 0U)
-        QF_gc(e);
+        QF::gc(e); // check if the event is garbage, and collect it if so
         QS_FLUSH();
 #endif
         if (a->eQueue.frontEvt == (QEvt*)0) { // empty queue?
