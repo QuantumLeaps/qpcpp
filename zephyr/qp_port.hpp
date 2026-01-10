@@ -41,7 +41,7 @@
 #define QACTIVE_EQUEUE_TYPE  struct k_msgq
 #define QACTIVE_THREAD_TYPE  struct k_thread
 
-// QF critical section entry/exit for Zephyr, see NOTE1/
+// QF critical section entry/exit for Zephyr, see NOTE1
 #define QF_CRIT_STAT         k_spinlock_key_t key_;
 #define QF_CRIT_ENTRY()      ((key_) = k_spin_lock(&QP::QF::spinlock))
 #define QF_CRIT_EXIT()       k_spin_unlock(&QP::QF::spinlock, key_)
@@ -66,6 +66,10 @@ namespace QF {
 // Zephyr spinlock for QF critical section
 extern struct k_spinlock spinlock;
 
+#if defined(QF_IDLE) || defined(Q_SPY)
+void onIdle();
+#endif
+
 } // namespace QF
 } // namespace QP
 
@@ -73,31 +77,31 @@ extern struct k_spinlock spinlock;
 // interface used only inside QF implementation, but not in applications
 #ifdef QP_IMPL
 
-    // scheduler locking, see NOTE2
-    #define QF_SCHED_STAT_
-    #define QF_SCHED_LOCK_(dummy) do { \
-        if (!k_is_in_isr()) {       \
-            k_sched_lock();         \
-        }                           \
-    } while (false)
+// scheduler locking, see NOTE2
+#define QF_SCHED_STAT_
+#define QF_SCHED_LOCK_(dummy) do { \
+    if (!k_is_in_isr()) {       \
+        k_sched_lock();         \
+    }                           \
+} while (false)
 
-    #define QF_SCHED_UNLOCK_() do { \
-        if (!k_is_in_isr()) {       \
-            k_sched_unlock();       \
-        } \
-    } while (false)
+#define QF_SCHED_UNLOCK_() do { \
+    if (!k_is_in_isr()) {       \
+        k_sched_unlock();       \
+    } \
+} while (false)
 
-    // QMPool operations
-    #define QF_EPOOL_TYPE_ QMPool
-    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
-        (p_).init((poolSto_), (poolSize_), (evtSize_))
-    #define QF_EPOOL_EVENT_SIZE_(p_) ((p_).getBlockSize())
-    #define QF_EPOOL_GET_(p_, e_, m_, qsId_) \
-        ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
-    #define QF_EPOOL_PUT_(p_, e_, qsId_) ((p_).put((e_), (qsId_)))
-    #define QF_EPOOL_USE_(ePool_)   ((ePool_)->getUse())
-    #define QF_EPOOL_FREE_(ePool_)  ((ePool_)->getFree())
-    #define QF_EPOOL_MIN_(ePool_)   ((ePool_)->getMin())
+// QMPool operations
+#define QF_EPOOL_TYPE_  QMPool
+#define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+    (p_).init((poolSto_), (poolSize_), (evtSize_))
+#define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).getBlockSize())
+#define QF_EPOOL_GET_(p_, e_, m_, qsId_) \
+    ((e_) = static_cast<QEvt *>((p_).get((m_), (qsId_))))
+#define QF_EPOOL_PUT_(p_, e_, qsId_) ((p_).put((e_), (qsId_)))
+#define QF_EPOOL_USE_(ePool_)     ((ePool_)->getUse())
+#define QF_EPOOL_FREE_(ePool_)    ((ePool_)->getFree())
+#define QF_EPOOL_MIN_(ePool_)     ((ePool_)->getMin())
 
 #endif // QP_IMPL
 
@@ -115,4 +119,3 @@ extern struct k_spinlock spinlock;
 //
 
 #endif // QP_PORT_HPP_
-
