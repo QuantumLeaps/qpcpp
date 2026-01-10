@@ -98,16 +98,12 @@ bool QEQueue::post(
 
     QEQueueCtr nFree = m_nFree; // get member into temporary
 
-    bool status = (nFree > 0U);
-    if (margin == QF::NO_MARGIN) { // no margin requested?
-        // queue must not overflow
-        Q_ASSERT_INCRIT(130, status);
-    }
-    else {
-        status = (nFree > static_cast<QEQueueCtr>(margin));
-    }
-
+    bool status = ((margin == QF::NO_MARGIN)
+        || (nFree > static_cast<QEQueueCtr>(margin)));
     if (status) { // can post the event?
+
+        // the queue must have a free slot
+        Q_ASSERT_INCRIT(130, nFree != 0U);
 
 #if (QF_MAX_EPOOL > 0U)
         if (e->poolNum_ != 0U) { // is it a mutable event?
@@ -190,6 +186,7 @@ void QEQueue::postLIFO(
 
     --nFree; // one free entry just used up
     m_nFree = nFree; // update the member original
+
     if (m_nMin > nFree) { // is this the new minimum?
         m_nMin = nFree; // update minimum so far
     }
@@ -230,7 +227,7 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
 
     QEvt const * const e = m_frontEvt; // always remove evt from the front
 
-    if (e != nullptr) { // was the queue not empty?
+    if (e != nullptr) { // is the queue NOT empty?
         QEQueueCtr nFree = m_nFree; // get member into temporary
 
         ++nFree; // one more free event in the queue
@@ -297,19 +294,19 @@ std::uint16_t QEQueue::getUse() const noexcept {
 std::uint16_t QEQueue::getFree() const noexcept {
     // NOTE: this function does NOT apply critical section, so it can
     // be safely called from an already established critical section.
-    return m_nFree;
+    return static_cast<std::uint16_t>(m_nFree);
 }
 //............................................................................
 std::uint16_t QEQueue::getMin() const noexcept {
     // NOTE: this function does NOT apply critical section, so it can
     // be safely called from an already established critical section.
-    return m_nMin;
+    return static_cast<std::uint16_t>(m_nMin);
 }
 //............................................................................
 bool QEQueue::isEmpty() const noexcept {
     // NOTE: this function does NOT apply critical section, so it can
     // be safely called from an already established critical section.
-    return m_frontEvt == nullptr;
+    return (m_frontEvt == nullptr);
 }
 //............................................................................
 QEvt const *QEQueue::peekFront() const & {

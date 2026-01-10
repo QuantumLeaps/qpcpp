@@ -67,33 +67,29 @@ bool QActive::postx_(
 
     QEQueueCtr const nFree = m_eQueue.m_nFree; // get member into temporary
 
-    bool status = (nFree > 0U);
-    if (margin == QF::NO_MARGIN) { // no margin requested?
-        // queue must not overflow
-        Q_ASSERT_INCRIT(130, status);
-    }
-    else {
-        status = (nFree > static_cast<QEQueueCtr>(margin));
-    }
+    bool status = ((margin == QF::NO_MARGIN)
+        || (nFree > static_cast<QEQueueCtr>(margin)));
+    if (status) { // should try to post the event?
+
+        // the queue must have a free slot
+        Q_ASSERT_INCRIT(130, nFree != 0U);
 
 #if (QF_MAX_EPOOL > 0U)
-    if (e->poolNum_ != 0U) { // is it a mutable event?
-        QEvt_refCtr_inc_(e); // increment the reference counter
-    }
+        if (e->poolNum_ != 0U) { // is it a mutable event?
+            QEvt_refCtr_inc_(e); // increment the reference counter
+        }
 #endif // (QF_MAX_EPOOL > 0U)
 
-    if (status) { // can post the event?
         postFIFO_(e, sender);
+
+        QF_CRIT_EXIT();
 #ifdef Q_UTEST
         if (QS_LOC_CHECK_(m_prio)) {
-            QF_CRIT_EXIT();
             QS::onTestPost(sender, this, e, true); // QUTest callback
-            QF_CRIT_ENTRY();
         }
 #endif // def Q_UTEST
-        QF_CRIT_EXIT();
     }
-    else { // event cannot be posted
+    else { // event cannot be posted, but it is OK
         QS_BEGIN_PRE(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
             QS_TIME_PRE();       // timestamp
             QS_OBJ_PRE(sender);  // the sender object
@@ -104,15 +100,13 @@ bool QActive::postx_(
             QS_EQC_PRE(margin);  // margin requested
         QS_END_PRE()
 
+        QF_CRIT_EXIT();
+
 #ifdef Q_UTEST
         if (QS_LOC_CHECK_(m_prio)) {
-            QF_CRIT_EXIT();
-            QS::onTestPost(sender, this, e, status);
-            QF_CRIT_ENTRY();
+            QS::onTestPost(sender, this, e, status); // QUTEst callback
         }
 #endif // def Q_USTEST
-
-        QF_CRIT_EXIT();
 
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // recycle the event to avoid a leak
