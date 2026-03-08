@@ -43,7 +43,9 @@ namespace QP {
     #error QF_EQUEUE_CTR_SIZE defined incorrectly, expected 1U or 2U
 #endif
 
-class QEvt; // forward declaration
+// forward declarations (NOTE must be consistent with "qp.hpp")
+class QEvt;
+using QEvtPtr = QEvt const *;
 
 } // namespace QP
 
@@ -54,7 +56,7 @@ class QEQueue {
 public:
     QEQueue() noexcept;
     void init(
-        QEvt const * * const qSto,
+        QEvtPtr * const qSto,
         std::uint_fast16_t const qLen) noexcept;
     bool post(
         QEvt const * const e,
@@ -74,8 +76,8 @@ public:
         = delete;
 
 private:
-    QEvt const * m_frontEvt;
-    QEvt const * * m_ring;
+    QEvtPtr m_frontEvt;
+    QEvtPtr * m_ring;
     QEQueueCtr m_end;
     QEQueueCtr m_head;
     QEQueueCtr m_tail;

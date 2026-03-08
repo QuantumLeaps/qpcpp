@@ -53,6 +53,15 @@ namespace QP {
 QK QK::priv_;
 
 //............................................................................
+QK::QK() noexcept
+ :  readySet(),
+    actPrio(0U),
+    nextPrio(0U),
+    actThre(0U),
+    lockCeil(0U),
+    intNest(0U)
+{}
+//............................................................................
 QSchedStatus QK::schedLock(std::uint8_t const ceiling) noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();

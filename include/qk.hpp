@@ -45,6 +45,7 @@ public:
     std::uint8_t intNest;
 
 
+    QK() noexcept;
     static QSchedStatus schedLock(std::uint8_t const ceiling) noexcept;
     static void schedUnlock(QSchedStatus const prevCeil) noexcept;
     static void onIdle();

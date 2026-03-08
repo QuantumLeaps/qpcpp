@@ -30,10 +30,10 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR  "8.1.2"
-#define QP_VERSION      812U
-// <VER>=812 <DATE>=260105
-#define QP_RELEASE      0x64F71D43U
+#define QP_VERSION_STR  "8.1.3"
+#define QP_VERSION      813U
+// <VER>=813 <DATE>=260309
+#define QP_RELEASE      0x64D7FC82U
 
 //----------------------------------------------------------------------------
 // default configuration settings
@@ -126,7 +126,10 @@ public:
     }
 }; // class QEvt
 
+#ifndef QEQUEUE_HPP_
+// NOTE must be consistent with "qequeue.hpp"
 using QEvtPtr = QEvt const *;
+#endif
 
 //----------------------------------------------------------------------------
 // QEP (hierarchical event processor) types
@@ -149,7 +152,7 @@ struct QMState {
 
 struct QMTranActTable {
     QMState const *target;
-    QActionHandler const act[1];
+    std::array<QActionHandler, 1> act;
 };
 
 union QAsmAttr {
@@ -185,7 +188,6 @@ public:
     static constexpr QState Q_RET_EXIT      {7U};
     static constexpr QState Q_RET_TRAN_INIT {8U};
 
-
     // Reserved signals by the QP-framework (used in QHsm only)
     static constexpr QSignal Q_EMPTY_SIG    {0U};
     static constexpr QSignal Q_ENTRY_SIG    {1U};
@@ -206,9 +208,7 @@ public:
     static constexpr QActionHandler const Q_ACTION_NULL { nullptr };
 
 #ifdef Q_XTOR
-    virtual ~QAsm() noexcept {
-        // empty
-    }
+    virtual ~QAsm() = default;
 #endif // def Q_XTOR
     virtual void init(
         void const * const e,
@@ -452,6 +452,13 @@ private:
 #endif
 
 public:
+    constexpr QPSet()
+      : m_bits0(0U)
+#if (QF_MAX_ACTIVE > 32U)
+       ,m_bits1(0U)
+#endif
+    {}
+
     void setEmpty() noexcept;
     bool isEmpty() const noexcept;
     bool notEmpty() const noexcept;
@@ -772,7 +779,7 @@ inline void publish_(QEvt const * const e,
 }
 
 //! @deprecated
-static inline std::uint_fast16_t getQueueMin(
+inline std::uint_fast16_t getQueueMin(
     std::uint_fast8_t const prio) noexcept
 {
     // use QActive::getQueueMin() instead of the deprecated QF::getQueueMin()

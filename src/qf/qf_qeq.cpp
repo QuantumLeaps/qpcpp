@@ -56,7 +56,7 @@ QEQueue::QEQueue() noexcept
 {}
 //............................................................................
 void QEQueue::init(
-    QEvt const * * const qSto,
+    QEvtPtr * const qSto,
     std::uint_fast16_t const qLen) noexcept
 {
     QF_CRIT_STAT

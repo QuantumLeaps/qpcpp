@@ -53,6 +53,12 @@ namespace QP {
 QV QV::priv_;
 
 //............................................................................
+QV::QV() noexcept
+ :  readySet(),
+    schedCeil(0U)
+{}
+
+//............................................................................
 void QV::schedDisable(std::uint8_t const ceiling) noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();

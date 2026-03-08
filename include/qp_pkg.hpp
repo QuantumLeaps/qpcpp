@@ -56,14 +56,14 @@ void QEvt_refCtr_dec_(QEvt const * const me) noexcept;
 #ifndef Q_UNSAFE
 
 template<typename T_>
-static T_ dis_update(T_ const org) {
+T_ dis_update(T_ const org) {
     // calculate the Duplicate Inverse Storage (DIS) for the original
     // variable org
     return static_cast<T_>(~org);
 }
 //........................................................................
 template<typename T_>
-static bool dis_verify(T_ const org, T_ const dis) {
+bool dis_verify(T_ const org, T_ const dis) {
     // verify that the Duplicate Inverse Storage (DIS) dis matches
     // the original variable org
     return dis == static_cast<T_>(~org);

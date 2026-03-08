@@ -2,7 +2,7 @@
 
 # About the QPCPP Zephyr Module
 This directory defines the
-[QP/C++ Real-Time Embedded Framework](https://github.com/QuantumLeaps/qpcpp)
+[QP/C++ real-time event framework](https://github.com/QuantumLeaps/qpcpp)
 as a [Zephyr module](https://docs.zephyrproject.org/latest/develop/modules.html).
 
 # How to use

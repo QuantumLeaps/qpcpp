@@ -50,7 +50,7 @@ endif()
 
 project(
     qpcpp
-    VERSION "1.0.0"
+    VERSION "8.1.3"
     DESCRIPTION "QPCPP library"
     LANGUAGES C ASM
 )
