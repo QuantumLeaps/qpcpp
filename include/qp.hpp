@@ -171,6 +171,7 @@ class QAsm {
 public:
     QAsmAttr m_state;
     QAsmAttr m_temp;
+    std::size_t m_nestDepth; 
 
     // All possible values returned from state/action handlers...
     // NOTE: The numerical order is important for algorithmic correctness.
