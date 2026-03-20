@@ -144,7 +144,6 @@ QHsm::QHsm(QStateHandler const initial) noexcept
 {
     m_state.fun = &top; // the current state (top)
     m_temp.fun  = initial; // the initial tran. handler
-    m_nestDepth = 0U; // no nested states
 }
 
 //............................................................................
@@ -191,12 +190,12 @@ void QHsm::init(
     QS_TRAN_SEG_(QS_QEP_STATE_INIT, s, m_temp.fun); // output QS record
 
     // drill down into the state hierarchy with initial transitions...
-    std::array <QStateHandler, MAX_NEST_DEPTH_> path; // entry path array
+    std::array <QStateHandler, MAX_TESTED_NEST_DEPTH_> path; // entry path array
 
     std::size_t ip = 0U; // path index & fixed loop bound
     do {
         // the entry path index must not overflow the allocated array
-        Q_INVARIANT_LOCAL(260, ip < MAX_NEST_DEPTH_);
+        Q_INVARIANT_LOCAL(260, ip < MAX_TESTED_NEST_DEPTH_);
 
         // the initial tran. must set target in temp
         Q_ASSERT_LOCAL(270, m_temp.fun != nullptr);
@@ -249,10 +248,10 @@ void QHsm::dispatch(
     QS_TRAN0_(QS_QEP_DISPATCH, s); // output QS record
 
     // process the event hierarchically...
-    std::array <QStateHandler, MAX_NEST_DEPTH_> path; // entry path array
+    std::array <QStateHandler, MAX_TESTED_NEST_DEPTH_> path; // entry path array
     m_temp.fun = s;
     QState r; // state handler return value
-    std::size_t ip = MAX_NEST_DEPTH_; // path index & fixed loop bound
+    std::size_t ip = MAX_TESTED_NEST_DEPTH_; // path index & fixed loop bound
     do {
         // the entry path index must stay in range of the path[] array
         Q_INVARIANT_LOCAL(340, ip != 0U);
@@ -294,15 +293,11 @@ void QHsm::dispatch(
         path[0U] = m_temp.fun; // save tran. target in path[0]
 
         // exit current state to tran. source (path[0] not used)...
-        for (std::size_t iq = MAX_NEST_DEPTH_ - 1U; iq > ip; --iq) {
+        for (std::size_t iq = MAX_TESTED_NEST_DEPTH_ - 1U; iq > ip; --iq) {
             // exit from 'path[iq]'
             if ((*path[iq])(this, &l_resEvt_[Q_EXIT_SIG]) == Q_RET_HANDLED) {
                 QS_STATE_ACT_(QS_QEP_STATE_EXIT, path[iq]); //output QS record
             }
-
-            Q_ASSERT_LOCAL(370, m_nestDepth > 0);
-            --m_nestDepth;
-
         }
         path[2U] = s; // save tran. source in path[2]
 
@@ -331,7 +326,7 @@ void QHsm::dispatch(
 //............................................................................
 //! @private @memberof QHsm
 std::size_t QHsm::tran_simple_(
-    std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+    std::array<QStateHandler, MAX_TESTED_NEST_DEPTH_> &path,
     std::uint_fast8_t const qsId)
 {
 #ifndef Q_SPY
@@ -349,8 +344,6 @@ std::size_t QHsm::tran_simple_(
         if ((*s)(this, &l_resEvt_[Q_EXIT_SIG]) == Q_RET_HANDLED) {
             QS_STATE_ACT_(QS_QEP_STATE_EXIT, s); // output QS record
         }
-        Q_ASSERT_LOCAL(430, m_nestDepth > 0);
-        --m_nestDepth;
     }
     else { // not a tran. to self
         // find superstate of target in 't'
@@ -377,8 +370,6 @@ std::size_t QHsm::tran_simple_(
                 if ((*s)(this, &l_resEvt_[Q_EXIT_SIG]) == Q_RET_HANDLED) {
                     QS_STATE_ACT_(QS_QEP_STATE_EXIT, s); // output QS record
                 }
-                Q_ASSERT_LOCAL(460, m_nestDepth > 0);
-                --m_nestDepth;
             }
             // (d) check source->super==target...
             else if (m_temp.fun == path[0U]) {
@@ -387,8 +378,6 @@ std::size_t QHsm::tran_simple_(
                     QS_STATE_ACT_(QS_QEP_STATE_EXIT, s); // output QS record
                 }
                 ip = 0U; // set entry path index NOT to enter the target
-                Q_ASSERT_LOCAL(470, m_nestDepth > 0);
-                --m_nestDepth;
             }
             else { // tran. more complex
                 path[1U] = t; // save the superstate of target
@@ -404,7 +393,7 @@ std::size_t QHsm::tran_simple_(
 //............................................................................
 //! @private @memberof QHsm
 std::size_t QHsm::tran_complex_(
-    std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+    std::array<QStateHandler, MAX_TESTED_NEST_DEPTH_> &path,
     std::uint_fast8_t const qsId)
 {
 #ifndef Q_SPY
@@ -422,7 +411,7 @@ std::size_t QHsm::tran_complex_(
     std::size_t iq = 0U; // assume that LCA is NOT found
     do {
         // the entry path index must stay in range of the path[] array
-        Q_INVARIANT_LOCAL(540, ip < MAX_NEST_DEPTH_);
+        Q_INVARIANT_LOCAL(540, ip < MAX_TESTED_NEST_DEPTH_);
 
         path[ip] = m_temp.fun; // store temp in the entry path array
         ++ip;
@@ -447,8 +436,6 @@ std::size_t QHsm::tran_complex_(
             QS_STATE_ACT_(QS_QEP_STATE_EXIT, s); // output QS record
         }
 #endif // def Q_SPY
-        Q_ASSERT_LOCAL(460, m_nestDepth > 0);
-        --m_nestDepth;
 
         // (f) check the rest of
         // source->super... == target->super->super...
@@ -474,10 +461,6 @@ std::size_t QHsm::tran_complex_(
                     // find superstate of 's', ignore the result
                     static_cast<void>((*s)(this, &l_resEvt_[Q_EMPTY_SIG]));
                 }
-
-                Q_ASSERT_LOCAL(460, m_nestDepth > 0);
-                --m_nestDepth;
-
                 s = m_temp.fun; // set to super of s
                 // NOTE: loop bounded per invariant:540
                 iq = ip;
@@ -499,7 +482,7 @@ std::size_t QHsm::tran_complex_(
 //............................................................................
 //! @private @memberof QHsm
 void QHsm::enter_target_(
-    std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+    std::array<QStateHandler, MAX_TESTED_NEST_DEPTH_> &path,
     std::size_t const depth,
     std::uint_fast8_t const qsId)
 {
@@ -509,8 +492,8 @@ void QHsm::enter_target_(
 
     QS_CRIT_STAT
     std::size_t ip = depth;
-    m_nestDepth = m_nestDepth + ip;
-    Q_REQUIRE_LOCAL(600, m_nestDepth < MAX_NEST_DEPTH_);
+
+    Q_REQUIRE_LOCAL(600, ip <= MAX_TESTED_NEST_DEPTH_);
 
     // execute entry actions from LCA to tran target...
     while (ip > 0U) {
@@ -535,7 +518,7 @@ void QHsm::enter_target_(
         ip = 0U; // entry path index and fixed loop bound
         do {
             // the entry path index must stay in range of the path[] array
-            Q_INVARIANT_LOCAL(660, ip < MAX_NEST_DEPTH_);
+            Q_INVARIANT_LOCAL(660, ip < MAX_TESTED_NEST_DEPTH_);
 
             path[ip] = m_temp.fun; // store the entry path
             ++ip;
@@ -551,9 +534,6 @@ void QHsm::enter_target_(
         } while (m_temp.fun != t); // loop as long as tran.target not reached
 
         // retrace the entry path in reverse (correct) order...
-        m_nestDepth = m_nestDepth + ip;
-        Q_ASSERT_LOCAL(670, m_nestDepth < MAX_NEST_DEPTH_);
-
         while (ip > 0U) {
             --ip;
             // enter 'path[ip]'

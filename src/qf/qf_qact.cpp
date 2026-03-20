@@ -62,7 +62,6 @@ QActive::QActive(QStateHandler const initial) noexcept
     // so the following initiaization is identical as in QHsm ctor:
     m_state.fun = Q_STATE_CAST(&top);
     m_temp.fun  = initial;
-    m_nestDepth = 0U; // no nested states
 }
 
 //............................................................................
