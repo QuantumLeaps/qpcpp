@@ -72,13 +72,12 @@ bool QActive::postx_(
     Q_REQUIRE_INCRIT(100, e != nullptr);
 
     // the number of free slots available in the uC-OS2 queue
-    std::uint_fast16_t const nFree = static_cast<std::uint_fast16_t>(
+    QEQueueCtr const nFree = static_cast<QEQueueCtr>(
         reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSQSize
          - reinterpret_cast<OS_Q_DATA *>(m_eQueue)->OSNMsgs);
 
     bool status = ((margin == QF::NO_MARGIN)
         || (nFree > static_cast<QEQueueCtr>(margin)));
-
     if (status) { // should try to post the event?
 #if (QF_MAX_EPOOL > 0U)
         if (e->poolNum_ != 0U) { // is it a mutable event?
@@ -86,6 +85,7 @@ bool QActive::postx_(
         }
 #endif // (QF_MAX_EPOOL > 0U)
 
+        // assume that event posting will be successful, see NOTE3
         QS_BEGIN_PRE(QS_QF_ACTIVE_POST, m_prio)
             QS_TIME_PRE();      // timestamp
             QS_OBJ_PRE(sender); // the sender object
@@ -100,11 +100,11 @@ bool QActive::postx_(
 
         // post the event to the uC-OS2 event queue, see NOTE3
         status = (OSQPost(m_eQueue, const_cast<QEvt *>(e)) == OS_ERR_NONE);
+
+        QF_CRIT_ENTRY(); // re-enter crit.sec.
     }
 
     if (!status) { // event NOT posted?
-        QF_CRIT_ENTRY();
-
         // posting is allowed to fail only when margin != QF_NO_MARGIN
         Q_ASSERT_INCRIT(130, margin != QF::NO_MARGIN);
 
@@ -114,7 +114,7 @@ bool QActive::postx_(
             QS_SIG_PRE(e->sig); // the signal of the event
             QS_OBJ_PRE(this);   // this active object (recipient)
             QS_2U8_PRE(e->poolNum_, e->refCtr_); // pool-Num & ref-Count
-            QS_EQC_PRE(nFree);  // # free entries available
+            QS_EQC_PRE(nFree);  // # free entries
             QS_EQC_PRE(margin); // margin requested
         QS_END_PRE()
 
@@ -123,6 +123,9 @@ bool QActive::postx_(
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // recycle the event to avoid a leak
 #endif
+    }
+    else {
+        QF_CRIT_EXIT();
     }
 
     return status;
@@ -146,7 +149,7 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
         QS_SIG_PRE(e->sig);  // the signal of this event
         QS_OBJ_PRE(this);    // this active object
         QS_2U8_PRE(e->poolNum_, e->refCtr_); // pool-Num & ref-Count
-                              // # free entries
+                             // # free entries
         QS_EQC_PRE(reinterpret_cast<OS_Q *>(m_eQueue)->OSQSize
                     - reinterpret_cast<OS_Q *>(m_eQueue)->OSQEntries);
         QS_EQC_PRE(0U);      // min # free entries (unknown)
@@ -186,7 +189,7 @@ QEvt const *QActive::get_() noexcept {
         QS_SIG_PRE(e->sig);  // the signal of this event
         QS_OBJ_PRE(this);    // this active object
         QS_2U8_PRE(e->poolNum_, e->refCtr_); // pool-Num & ref-Count
-                                 // # free entries
+                             // # free entries
         QS_EQC_PRE(reinterpret_cast<OS_Q *>(m_eQueue)->OSQSize
                     - reinterpret_cast<OS_Q *>(m_eQueue)->OSQEntries);
     QS_END_PRE()
@@ -316,7 +319,7 @@ void init() {
 }
 //............................................................................
 int run() {
-    onStartup(); // the startup callback, see NOTE4
+    onStartup(); // QF callback, see NOTE4
 
     // produce the QS_QF_RUN trace record
 #ifdef Q_SPY

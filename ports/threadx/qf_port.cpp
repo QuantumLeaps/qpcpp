@@ -71,9 +71,9 @@ bool QActive::postx_(
     // the event to post must not be NULL
     Q_REQUIRE_INCRIT(100, e != nullptr);
 
-    // the number of free slots available in the embOS queue
-    std::uint_fast16_t nFree =
-        static_cast<std::uint_fast16_t>(m_eQueue.tx_queue_available_storage);
+    // the number of free slots available in the ThreadX queue
+    QEQueueCtr const nFree =
+        static_cast<QEQueueCtr>(m_eQueue.tx_queue_available_storage);
 
     bool status = ((margin == QF::NO_MARGIN)
         || (nFree > static_cast<QEQueueCtr>(margin)));
@@ -84,6 +84,7 @@ bool QActive::postx_(
         }
 #endif // (QF_MAX_EPOOL > 0U)
 
+        // assume that event posting will be successful, see NOTE3
         QS_BEGIN_PRE(QS_QF_ACTIVE_POST, m_prio)
             QS_TIME_PRE();      // timestamp
             QS_OBJ_PRE(sender); // the sender object
@@ -94,16 +95,19 @@ bool QActive::postx_(
             QS_EQC_PRE(0U);     // min # free entries (unknown)
         QS_END_PRE()
 
-        QF_CRIT_EXIT(); // exit crit.sect. before calling Zephyr API
+        QF_CRIT_EXIT(); // exit crit.sect. before calling RTOS API
 
-        // post the event to the ThreadX event queue, see NOTE3
-        status = (tx_queue_send(&m_eQueue, const_cast<QEvt**>(&e), TX_NO_WAIT)
-                  == TX_SUCCESS);
+        // post the following evtPtr to the RTOS queue, see NOTE3
+        QEvtPtr const evtPtr = {
+            e
+        };
+        status = (tx_queue_send(&m_eQueue,
+            const_cast<QEvtPtr *>(&evtPtr), TX_NO_WAIT) == TX_SUCCESS);
+
+        QF_CRIT_ENTRY(); // re-enter crit.sec.
     }
 
     if (!status) { // event NOT posted?
-        QF_CRIT_ENTRY();
-
         // posting is allowed to fail only when margin != QF_NO_MARGIN
         Q_ASSERT_INCRIT(130, margin != QF::NO_MARGIN);
 
@@ -113,7 +117,7 @@ bool QActive::postx_(
             QS_SIG_PRE(e->sig); // the signal of the event
             QS_OBJ_PRE(this);   // this active object (recipient)
             QS_2U8_PRE(e->poolNum_, e->refCtr_); // pool-Num & ref-Count
-            QS_EQC_PRE(nFree);  // # free entries available
+            QS_EQC_PRE(nFree);  // # free entries
             QS_EQC_PRE(margin); // margin requested
         QS_END_PRE()
 
@@ -122,6 +126,9 @@ bool QActive::postx_(
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // recycle the event to avoid a leak
 #endif
+    }
+    else {
+        QF_CRIT_EXIT();
     }
 
     return status;
@@ -145,18 +152,22 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
         QS_SIG_PRE(e->sig);  // the signal of this event
         QS_OBJ_PRE(this);    // this active object
         QS_2U8_PRE(e->poolNum_, e->refCtr_); // pool-Num & ref-Count
-        QS_EQC_PRE(m_eQueue.tx_queue_available_storage); // # free
+        QS_EQC_PRE(m_eQueue.tx_queue_available_storage); // # free entries
         QS_EQC_PRE(0U);      // min # free entries (unknown)
     QS_END_PRE()
 
     QF_CRIT_EXIT(); // exit crit.sect. before calling RTOS API
 
+    // post the following evtPtr to the RTOS queue, see NOTE3
+    QEvtPtr const evtPtr = {
+        e
+    };
     UINT const err = tx_queue_front_send(&m_eQueue,
-        const_cast<QEvt**>(&e), TX_NO_WAIT);
+        const_cast<QEvtPtr *>(&evtPtr), TX_NO_WAIT);
 
 #ifndef Q_UNSAFE
     QF_CRIT_ENTRY();
-    // LIFO posting to ThreadX mailbox must succeed, see NOTE3
+    // LIFO posting to the RTOS queue must succeed, see NOTE3
     Q_ASSERT_INCRIT(230, err == TX_SUCCESS);
     QF_CRIT_EXIT();
 #else
@@ -166,9 +177,9 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
 //............................................................................
 QEvt const *QActive::get_() noexcept {
     // wait for an event (forever)
-    QEvtPtr e;
+    QEvtPtr evtPtr;
     UINT const err = tx_queue_receive(&m_eQueue,
-                     static_cast<VOID *>(&e), TX_WAIT_FOREVER);
+        static_cast<QEvtPtr *>(&evtPtr), TX_WAIT_FOREVER);
 
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
@@ -181,15 +192,15 @@ QEvt const *QActive::get_() noexcept {
 
     QS_BEGIN_PRE(QS_QF_ACTIVE_GET, m_prio)
         QS_TIME_PRE();       // timestamp
-        QS_SIG_PRE(e->sig);  // the signal of this event
+        QS_SIG_PRE(evtPtr.e->sig); // the signal of this event
         QS_OBJ_PRE(this);    // this active object
-        QS_2U8_PRE(e->poolNum_, e->refCtr_); // pool-Num & ref-Count
+        QS_2U8_PRE(evtPtr.e->poolNum_, evtPtr.e->refCtr_);
         QS_EQC_PRE(m_eQueue.tx_queue_available_storage); // # free entries
     QS_END_PRE()
 
     QF_CRIT_EXIT();
 
-    return e;
+    return evtPtr.e;
 }
 //............................................................................
 std::uint16_t QActive::getQueueUse(std::uint_fast8_t const prio) noexcept {
@@ -284,15 +295,15 @@ void QActive::setAttr(std::uint32_t const attr1, void const *attr2) {
 void QActive::evtLoop_(QActive *act) {
     // the event-loop...
     for (;;) { // for-ever
-        QEvt const *e = act->get_(); // BLOCK for event
-        act->dispatch(e, act->m_prio); // dispatch event (virtual call)
+        QEvt const * const e = act->get_(); // BLOCK for event
+        act->dispatch(e, act->m_prio); // dispatch to the AO's SM (virtual)
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
     }
 }
 
-//----------------------------------------------------------------------------
+//============================================================================
 namespace QF {
 
 //............................................................................
@@ -301,7 +312,7 @@ void init() {
 }
 //............................................................................
 int_t run() {
-    onStartup();    // QF callback to configure and start interrupts
+    onStartup(); // QF callback
 
     // produce the QS_QF_RUN trace record
 #ifdef Q_SPY

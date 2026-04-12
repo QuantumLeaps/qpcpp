@@ -46,7 +46,7 @@ namespace QP {
 
 //............................................................................
 QEQueue::QEQueue() noexcept
-  : m_frontEvt(nullptr),  // queue empty initially
+  : m_frontEvt(),         // queue empty initially
     m_ring(nullptr),      // no queue buffer initially
     m_end(0U),            // end index 0 initially
     m_head(0U),           // head index 0 initially
@@ -67,7 +67,7 @@ void QEQueue::init(
     Q_REQUIRE_INCRIT(10, qLen < 0xFFU);
 #endif
 
-    m_frontEvt = nullptr; // no events in the queue
+    m_frontEvt.e = nullptr; // no events in the queue
     m_ring     = qSto;    // the beginning of the ring buffer
     m_end      = static_cast<QEQueueCtr>(qLen); // index of the last element
     if (qLen > 0U) { // queue buffer storage provided?
@@ -128,12 +128,12 @@ bool QEQueue::post(
         QS_END_PRE()
 #endif // def Q_SPY
 
-        if (m_frontEvt == nullptr) { // is the queue empty?
-            m_frontEvt = e; // deliver event directly
+        if (m_frontEvt.e == nullptr) { // is the queue empty?
+            m_frontEvt.e = e; // deliver event directly
         }
         else { // queue was not empty, insert event into the ring-buffer
             QEQueueCtr head = m_head; // get member into temporary
-            m_ring[head] = e; // insert e into buffer
+            m_ring[head].e = e; // insert e into buffer
 
             if (head == 0U) { // need to wrap the head?
                 head = m_end;
@@ -200,8 +200,8 @@ void QEQueue::postLIFO(
         QS_EQC_PRE(m_nMin);   // min # free entries
     QS_END_PRE()
 
-    QEvt const * const frontEvt = m_frontEvt; // get member into temporary
-    m_frontEvt = e; // deliver the event directly to the front
+    QEvt const * const frontEvt = m_frontEvt.e; // get member into temporary
+    m_frontEvt.e = e; // deliver the event directly to the front
 
     if (frontEvt != nullptr) { // was the queue NOT empty?
         QEQueueCtr tail = m_tail; // get member into temporary
@@ -210,7 +210,7 @@ void QEQueue::postLIFO(
             tail = 0U; // wrap around
         }
         m_tail = tail; // update the member original
-        m_ring[tail] = frontEvt;
+        m_ring[tail].e = frontEvt;
     }
 
     QF_CRIT_EXIT();
@@ -225,7 +225,7 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    QEvt const * const e = m_frontEvt; // always remove evt from the front
+    QEvt const * const e = m_frontEvt.e; // always remove evt from the front
 
     if (e != nullptr) { // is the queue NOT empty?
         QEQueueCtr nFree = m_nFree; // get member into temporary
@@ -237,7 +237,7 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
             // remove event from the tail
             QEQueueCtr tail = m_tail; // get member into temporary
 
-            QEvt const * const frontEvt = m_ring[tail];
+            QEvt const * const frontEvt = m_ring[tail].e;
 
             // the queue must have at least one event (at the front)
             Q_ASSERT_INCRIT(350, frontEvt != nullptr);
@@ -250,7 +250,7 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
                 QS_EQC_PRE(nFree);  // # free entries
             QS_END_PRE()
 
-            m_frontEvt = frontEvt; // update the member original
+            m_frontEvt.e = frontEvt; // update the member original
 
             if (tail == 0U) { // need to wrap the tail?
                 tail = m_end; // wrap around
@@ -259,10 +259,10 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
             m_tail = tail; // update the member original
         }
         else {
-            m_frontEvt = nullptr; // queue becomes empty
+            m_frontEvt.e = nullptr; // queue becomes empty
 
             // all entries in the queue must be free (+1 for frontEvt)
-            Q_INVARIANT_INCRIT(360, nFree == (m_end + 1U));
+            Q_INVARIANT_INCRIT(370, nFree == (m_end + 1U));
 
             QS_BEGIN_PRE(QS_QF_EQUEUE_GET_LAST, qsId)
                 QS_TIME_PRE();      // timestamp
@@ -283,7 +283,7 @@ std::uint16_t QEQueue::getUse() const noexcept {
     // NOTE: this function does NOT apply critical section, so it can
     // be safely called from an already established critical section.
     std::uint16_t nUse = 0U;
-    if (m_frontEvt != nullptr) { // queue not empty?
+    if (m_frontEvt.e != nullptr) { // queue not empty?
         nUse = static_cast<std::uint16_t>(
             static_cast<std::uint16_t>(m_end) + 1U
             - static_cast<std::uint16_t>(m_nFree));
@@ -306,13 +306,13 @@ std::uint16_t QEQueue::getMin() const noexcept {
 bool QEQueue::isEmpty() const noexcept {
     // NOTE: this function does NOT apply critical section, so it can
     // be safely called from an already established critical section.
-    return (m_frontEvt == nullptr);
+    return (m_frontEvt.e == nullptr);
 }
 //............................................................................
 QEvt const *QEQueue::peekFront() const & {
     // NOTE: this function does NOT apply critical section, so it can
     // be safely called from an already established critical section.
-    return m_frontEvt;
+    return m_frontEvt.e;
 }
 
 } // namespace QP

@@ -45,13 +45,14 @@ namespace QP {
 
 // forward declarations (NOTE must be consistent with "qp.hpp")
 class QEvt;
-using QEvtPtr = QEvt const *;
 
-} // namespace QP
+//----------------------------------------------------------------------------
+// NOTE must be consistent with "qp.hpp"
+struct QEvtPtr {
+    QEvt const *e;
+};
 
-//============================================================================
-namespace QP {
-
+//----------------------------------------------------------------------------
 class QEQueue {
 public:
     QEQueue() noexcept;
