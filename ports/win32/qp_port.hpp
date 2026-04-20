@@ -100,7 +100,7 @@ void onClockTick();
 
     // QF event queue customization for Win32...
     #define QACTIVE_EQUEUE_WAIT_(me_) \
-        while ((me_)->m_eQueue.m_frontEvt == nullptr) { \
+        while ((me_)->m_eQueue.m_frontEvt.e == nullptr) { \
             QF_CRIT_EXIT(); \
             static_cast<void>(WaitForSingleObject( \
                 (me_)->m_osObject, INFINITE)); \

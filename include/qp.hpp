@@ -30,10 +30,10 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR  "8.1.3"
-#define QP_VERSION      813U
-// <VER>=813 <DATE>=260309
-#define QP_RELEASE      0x64D7FC82U
+#define QP_VERSION_STR  "8.1.4"
+#define QP_VERSION      814U
+// <VER>=814 <DATE>=260413
+#define QP_RELEASE      0x64C81E01U
 
 //----------------------------------------------------------------------------
 // default configuration settings
@@ -128,8 +128,10 @@ public:
 
 #ifndef QEQUEUE_HPP_
 // NOTE must be consistent with "qequeue.hpp"
-using QEvtPtr = QEvt const *;
-#endif
+struct QEvtPtr {
+    QEvt const *e;
+};
+#endif // QEQUEUE_HPP_
 
 //----------------------------------------------------------------------------
 // QEP (hierarchical event processor) types
@@ -612,13 +614,13 @@ public:
     virtual bool postFromISR(
         QEvt const * const e,
         std::uint_fast16_t const margin,
-        void * par,
+        void * const par,
         void const * const sender) noexcept;
 
     static void publishFromISR(
-        QEvt const * e,
-        void * par,
-        void const * sender) noexcept;
+        QEvt const * const e,
+        void * const par,
+        void const * const sender) noexcept;
 #endif // QF_ISR_API
 
 private:
@@ -721,7 +723,7 @@ public:
 #ifdef QF_ISR_API
     static void tickFromISR(
         std::uint_fast8_t const tickRate,
-        void * par,
+        void * const par,
         void const * sender) noexcept;
 #endif // def QF_ISR_API
     static bool noActive(std::uint_fast8_t const tickRate) noexcept;

@@ -94,7 +94,7 @@ void onClockTick();
 
     // QF event queue customization for POSIX...
     #define QACTIVE_EQUEUE_WAIT_(me_) do { \
-        while ((me_)->m_eQueue.m_frontEvt == nullptr) { \
+        while ((me_)->m_eQueue.m_frontEvt.e == nullptr) { \
             Q_ASSERT_INCRIT(400, QF::critSectNest_ == 1); \
             --QF::critSectNest_; \
             pthread_cond_wait(&(me_)->m_osObject, &QF::critSectMutex_); \
