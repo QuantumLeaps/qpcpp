@@ -109,7 +109,7 @@ void QK::schedUnlock(QSchedStatus const prevCeil) noexcept {
         QS_END_PRE()
 
         // restore the previous lock ceiling
-        priv_.lockCeil = prevCeil;
+        priv_.lockCeil = static_cast<std::uint8_t>(prevCeil);
 
         // find if any AOs should be run after unlocking the scheduler
         if (sched_() != 0U) { // preemption needed?

@@ -1,9 +1,9 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
 //
-//                   Q u a n t u m  L e a P s
-//                   ------------------------
-//                   Modern Embedded Software
+//                    Q u a n t u m  L e a P s
+//                    ------------------------
+//                    Modern Embedded Software
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
