@@ -316,20 +316,24 @@ public:
     QStateHandler childState(QStateHandler const parentHndl) noexcept;
 
 private:
-    // maximum depth of state nesting in a QHsm (including the top level)
+    // Maximum nesting depth (including the top level) that has been fully  
+    // tested (including MC/DC coverage)
+    // The QHsm implementation is verified only up to this level
+    // Application designers must ensure state nesting does not exceed this 
+    // value.
     // must be >= 3
-    static constexpr std::size_t MAX_NEST_DEPTH_ {6U};
+    static constexpr std::size_t MAX_TESTED_NEST_DEPTH_ {6U};
 
     std::size_t tran_simple_(
-        std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+        std::array<QStateHandler, MAX_TESTED_NEST_DEPTH_> &path,
         std::uint_fast8_t const qsId);
 
     std::size_t tran_complex_(
-        std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+        std::array<QStateHandler, MAX_TESTED_NEST_DEPTH_> &path,
         std::uint_fast8_t const qsId);
 
     void enter_target_(
-        std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+        std::array<QStateHandler, MAX_TESTED_NEST_DEPTH_> &path,
         std::size_t const depth,
         std::uint_fast8_t const qsId);
 
