@@ -890,16 +890,10 @@ void gcFromISR(QEvt const * e) noexcept;
 } // namespace QP
 
 //============================================================================
-extern "C" {
 
-//${QF-extern-C::QF_onContextSw} .............................................
 #ifdef QF_ON_CONTEXT_SW
-void QF_onContextSw(
-    QP::QActive * prev,
-    QP::QActive * next);
-#endif // def QF_ON_CONTEXT_SW
-
-} // extern "C"
+extern "C" void QF_onContextSw(QP::QActive * prev, QP::QActive * next);
+#endif // QF_ON_CONTEXT_SW
 
 //----------------------------------------------------------------------------
 // QF base facilities

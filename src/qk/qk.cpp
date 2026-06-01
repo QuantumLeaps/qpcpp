@@ -28,7 +28,7 @@
 //============================================================================
 #define QP_IMPL             // this is QP implementation
 #include "qp_port.hpp"      // QP port
-#include "qp_pkg.hpp"       // QP package-scope interface
+#include "qp_pkg.hpp"       // QP package-scope internal interface
 #include "qsafe.h"          // QP Functional Safety (FuSa) Subsystem
 #ifdef Q_SPY                // QS software tracing enabled?
     #include "qs_port.hpp"  // QS port
@@ -299,6 +299,7 @@ void init() {
     QK_INIT(); // port-specific initialization of the QK kernel
 #endif
 }
+
 //............................................................................
 void stop() {
     onCleanup(); // application-specific cleanup callback
@@ -329,10 +330,12 @@ int_t run() {
         QK::activate_();
     }
 
+    // Application callback: configure and enable individual interrupts.
+    // NOTE: called with interrupts disabled and returns also with
+    // interrupts disabled
+    onStartup();
+
     QF_INT_ENABLE();
-
-    onStartup(); // app. callback: configure and enable interrupts
-
     for (;;) { // QK idle loop...
         QK::onIdle(); // application-specific QK idle callback
     }

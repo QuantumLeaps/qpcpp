@@ -134,12 +134,13 @@ int_t run() {
 
 #endif // (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
 
-    QF_INT_ENABLE();
+    // Application callback: configure and enable individual interrupts.
+    // NOTE: called with interrupts disabled and returns also
+    // with interrupts disabled
+    onStartup();
 
-    onStartup(); // app. callback: configure and enable interrupts
 
-    QF_INT_DISABLE();
-    for (;;) { // QV event loop...
+    for (;;) { // QV event-loop...
         // find the maximum prio. AO ready to run
         std::uint_fast8_t const p = (QV::priv_.readySet.notEmpty()
                                     ? QV::priv_.readySet.findMax()

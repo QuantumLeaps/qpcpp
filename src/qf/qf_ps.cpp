@@ -52,11 +52,16 @@ void QActive::psInit(
     QSubscrList * const subscrSto,
     QSignal const maxSignal) noexcept
 {
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+
     // provided subscSto must be valid
     Q_REQUIRE_INCRIT(100, subscrSto != nullptr);
 
     // provided maximum of subscribed signals must be >= Q_USER_SIG
     Q_REQUIRE_INCRIT(110, maxSignal >= Q_USER_SIG);
+
+    QF_CRIT_EXIT();
 
     QActive_subscrList_   = subscrSto;
     QActive_maxPubSignal_ = static_cast<QSignal>(maxSignal);

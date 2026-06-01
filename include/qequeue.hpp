@@ -94,6 +94,8 @@ private:
     friend class QTicker;
     friend class QXMutex;
     friend class QXThread;
+    friend class QV;
+    friend class QK;
     friend class QS;
 }; // class QEQueue
 
