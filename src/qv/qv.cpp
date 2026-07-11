@@ -54,46 +54,8 @@ QV QV::priv_;
 
 //............................................................................
 QV::QV() noexcept
- :  readySet(),
-    schedCeil(0U)
+ :  readySet()
 {}
-
-//............................................................................
-void QV::schedDisable(std::uint8_t const ceiling) noexcept {
-    QF_CRIT_STAT
-    QF_CRIT_ENTRY();
-
-    if (ceiling > priv_.schedCeil) { // raising the scheduler ceiling?
-
-        QS_BEGIN_PRE(QS_SCHED_LOCK, 0U)
-            QS_TIME_PRE();   // timestamp
-            // the previous sched ceiling & new sched ceiling
-            QS_2U8_PRE(priv_.schedCeil,
-                       static_cast<std::uint8_t>(ceiling));
-        QS_END_PRE()
-
-        priv_.schedCeil = ceiling;
-    }
-    QF_CRIT_EXIT();
-}
-
-//............................................................................
-void QV::schedEnable() noexcept {
-    QF_CRIT_STAT
-    QF_CRIT_ENTRY();
-
-    if (priv_.schedCeil != 0U) { // actually enabling the scheduler?
-
-        QS_BEGIN_PRE(QS_SCHED_UNLOCK, 0U)
-            QS_TIME_PRE(); // timestamp
-            // current sched ceiling (old), previous sched ceiling (new)
-            QS_2U8_PRE(priv_.schedCeil, 0U);
-        QS_END_PRE()
-
-        priv_.schedCeil = 0U;
-    }
-    QF_CRIT_EXIT();
-}
 
 //----------------------------------------------------------------------------
 namespace QF {
@@ -139,14 +101,10 @@ int_t run() {
     // with interrupts disabled
     onStartup();
 
-
     for (;;) { // QV event-loop...
-        // find the maximum prio. AO ready to run
-        std::uint_fast8_t const p = (QV::priv_.readySet.notEmpty()
-                                    ? QV::priv_.readySet.findMax()
-                                    : 0U);
-
-        if (p > QV::priv_.schedCeil) { // is it above the sched ceiling?
+        if (QV::priv_.readySet.notEmpty()) { // any AOs ready to run?
+            // find the maximum prio. AO ready to run
+            std::uint_fast8_t const p = QV::priv_.readySet.findMax();
             QActive * const a = QActive_registry_[p];
 
 #if (defined QF_ON_CONTEXT_SW) || (defined Q_SPY)
@@ -171,8 +129,7 @@ int_t run() {
             QF_INT_ENABLE();
 
             QEvt const * const e = a->get_(); // queue not empty
-
-            a->dispatch(e, p); // dispatch event (virtual call)
+            a->dispatch(e, p); // virtual call
 #if (QF_MAX_EPOOL > 0U)
             QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
@@ -238,8 +195,7 @@ void QActive::start(
 
     m_eQueue.init(qSto, qLen);
 
-    // top-most initial tran. (virtual call)
-    this->init(par, m_prio);
+    this->init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 }
 

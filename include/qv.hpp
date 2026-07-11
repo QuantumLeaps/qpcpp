@@ -36,12 +36,9 @@ namespace QP {
 class QV {
 public:
     QPSet readySet;
-    std::uint8_t schedCeil;
 
 
     QV() noexcept;
-    static void schedDisable(std::uint8_t const ceiling) noexcept;
-    static void schedEnable() noexcept;
     static void onIdle();
 
     static QV priv_;

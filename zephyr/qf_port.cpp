@@ -244,8 +244,7 @@ void QActive::start(
     m_pthre = 0U; // preemption-threshold (not used for AO registration)
     register_(); // make QF aware of this AO
 
-    // top-most initial tran. (virtual call)
-    init(par, m_prio);
+    init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 
     // Zehyr priority, see NOTE1
@@ -286,7 +285,7 @@ void QActive::evtLoop_(QActive *act) {
     // the event-loop
     for (;;) { // for-ever
         QEvt const * const e = act->get_(); // BLOCK for event
-        act->dispatch(e, act->m_prio); // dispatch event (virtual call)
+        act->dispatch(e, act->m_prio); // virtual call
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
 #endif

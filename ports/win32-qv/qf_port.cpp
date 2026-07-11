@@ -116,27 +116,35 @@ void init() {
 int run() {
     l_isRunning = true; // QF is running
 
-    onStartup(); // application-specific startup callback
-
-    if (l_tickMsec != 0U) { // system clock tick configured?
-        // create the ticker thread...
-        HANDLE ticker = CreateThread(nullptr, 1024, &ticker_thread,
-                                     nullptr, 0U, nullptr);
-        QF_CRIT_ENTRY();
-        Q_ASSERT_INCRIT(310, ticker != static_cast<HANDLE>(0));
-        QF_CRIT_EXIT();
-#ifdef Q_UNSAFE
-        Q_UNUSED_PAR(ticker);
-#endif
-    }
-
-    // the combined event-loop and background-loop of the QV kernel
+    QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
     // produce the QS_QF_RUN trace record
     QS_BEGIN_PRE(QS_QF_RUN, 0U)
     QS_END_PRE()
 
+    // Application callback: configure and enable individual interrupts.
+    // NOTE: called within critical section and returns also in
+    // critical section.
+    onStartup();
+    QF_CRIT_EXIT();
+
+    // system clock tick configured?
+    if (l_tickMsec != 0U) {
+        // create the ticker thread...
+        HANDLE ticker = CreateThread(nullptr, 1024, &ticker_thread,
+                                     nullptr, 0U, nullptr);
+#ifndef Q_UNSAFE
+        QF_CRIT_ENTRY();
+        Q_ASSERT_INCRIT(310, ticker != static_cast<HANDLE>(0));
+        QF_CRIT_EXIT();
+#else
+        Q_UNUSED_PAR(ticker);
+#endif
+    }
+
+    // the combined event-loop and background-loop of the QV kernel
+    QF_CRIT_ENTRY();
     while (l_isRunning) {
         // find the maximum priority AO ready to run
         if (readySet_.notEmpty()) {
@@ -148,8 +156,8 @@ int run() {
             Q_ASSERT_INCRIT(320, a != nullptr);
             QF_CRIT_EXIT();
 
-            QEvt const *e = a->get_(); // queue not empty
-            a->dispatch(e, a->getPrio()); // dispatch event (virtual call)
+            QEvt const * const e = a->get_(); // NO blocking (not empty)
+            a->dispatch(e, a->getPrio()); // virtual call
 #if (QF_MAX_EPOOL > 0U)
             QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
@@ -172,11 +180,12 @@ int run() {
         }
     }
     QF_CRIT_EXIT();
-    onCleanup();    // cleanup callback
-    QS_EXIT();      // cleanup the QSPY connection
+    onCleanup(); // cleanup callback
+    QS_EXIT();   // cleanup the QSPY connection
 
     //CloseHandle(win32Event_);
     //DeleteCriticalSection(&l_win32CritSect);
+
     return 0; // return success
 }
 //............................................................................
@@ -189,6 +198,7 @@ void stop() {
 }
 //............................................................................
 void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
+    // NOTE: called inside crit.section
     if (ticksPerSec != 0U) {
         l_tickMsec = 1000UL / ticksPerSec;
     }
@@ -216,7 +226,7 @@ int consoleGetKey() {
     return 0; // no input at this time
 }
 //............................................................................
-int consoleWaitForKey(void) {
+int consoleWaitForKey() {
     return static_cast<int>(_getwch());
 }
 
@@ -234,7 +244,7 @@ void QActive::start(QPrioSpec const prioSpec,
     Q_UNUSED_PAR(stkSto);
     Q_UNUSED_PAR(stkSize);
 
-    // no external AO-stack storage needed for this port
+    // no per-AO stack needed for this port
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
     Q_REQUIRE_INCRIT(800, stkSto == nullptr);
@@ -246,8 +256,7 @@ void QActive::start(QPrioSpec const prioSpec,
     m_pthre = 0U; // preemption-threshold (not used in this port)
     register_();  // register this AO
 
-    // top-most initial tran. (virtual call)
-    this->init(par, m_prio);
+    this->init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
 }
 

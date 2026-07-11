@@ -95,12 +95,14 @@ void init() {
 
 //............................................................................
 int run() {
-
-    onStartup(); // application-specific startup callback
-
     // produce the QS_QF_RUN trace record
     QS_BEGIN_PRE(QS_QF_RUN, 0U)
     QS_END_PRE()
+
+    // Application callback: configure and enable individual interrupts.
+    // NOTE: called within critical section and returns also in
+    // critical section.
+    onStartup();
 
     // leave the startup critical section to unblock any active objects
     // started before calling QF::run()
@@ -129,6 +131,7 @@ int run() {
 
     //DeleteCriticalSection(&l_startupCritSect);
     //DeleteCriticalSection(&l_win32CritSect);
+
     return 0; // return success
 }
 //............................................................................
@@ -137,11 +140,7 @@ void stop() {
 }
 //............................................................................
 void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
-    QF_CRIT_STAT
-    QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(600, ticksPerSec != 0U);
-    QF_CRIT_EXIT();
-
+    // NOTE: called inside crit.section
     l_tickMsec = 1000UL / ticksPerSec;
     l_tickPrio = tickPrio;
 }
@@ -168,7 +167,7 @@ int consoleWaitForKey(void) {
     return static_cast<int>(_getwch());
 }
 
-#endif // #ifdef QF_CONSOLE
+#endif // QF_CONSOLE
 
 } // namespace QF
 
@@ -188,16 +187,15 @@ void QActive::start(QPrioSpec const prioSpec,
     Q_REQUIRE_INCRIT(800, stkSto == nullptr);
     QF_CRIT_EXIT();
 
-    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
-    m_pthre = 0U; // preemption-threshold (not used in QF, but in Win32)
-    register_();  // register this AO
-
     // create the Win32 "event" to throttle the AO's event queue
     m_osObject = CreateEvent(NULL, FALSE, FALSE, NULL);
     m_eQueue.init(qSto, qLen);
 
-    // top-most initial tran. (virtual call)
-    this->init(par, m_prio);
+    m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // QF-priority
+    m_pthre = 0U; // preemption-threshold (not used in QF, but in Win32)
+    register_();  // register this AO
+
+    this->init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
 
     // create a Win32 thread for the AO;
@@ -256,8 +254,8 @@ void QActive::evtLoop_(QActive *act) {
 #else
     for (;;) { // for-ever
 #endif
-        QEvt const *e = act->get_(); // BLOCK for event
-        act->dispatch(e, act->m_prio); // dispatch event (virtual call)
+        QEvt const * const e = act->get_(); // BLOCK for event
+        act->dispatch(e, act->m_prio); // virtual call
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
