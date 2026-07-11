@@ -240,7 +240,7 @@ void QActive::start(
     void * const stkSto, std::uint_fast16_t const stkSize,
     void const * const par)
 {
-    // create the embOS message box for the AO
+    // create embOS message box for the AO
     OS_MAILBOX_Create(&m_eQueue,
                 static_cast<OS_U16>(sizeof(QEvtPtr)),
                 static_cast<OS_UINT>(qLen),
@@ -250,8 +250,7 @@ void QActive::start(
     m_pthre = 0U; // preemption-threshold (not used)
     register_(); // make QF aware of this AO
 
-    // top-most initial tran. (virtual call)
-    init(par, m_prio);
+    init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 
     // embOS priority, see NOTE1
@@ -299,10 +298,10 @@ void QActive::setAttr(std::uint32_t const attr1, void const *attr2) {
 }
 //............................................................................
 void QActive::evtLoop_(QActive *act) {
-    // the event-loop
+    // the event-loop...
     for (;;) { // for-ever
         QEvt const * const e = act->get_(); // BLOCK for event
-        act->dispatch(e, act->m_prio); // dispatch to the AO's SM (virtual)
+        act->dispatch(e, act->m_prio); // virtual call
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
 #endif

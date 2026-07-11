@@ -200,7 +200,7 @@ static void handle_evts(void) {
 
         QEvt const* const e = QActive_get_(a); // queue not empty
         QS_FLUSH();
-        a->dispatch(e, a->prio); // dispatch event (virtual call)
+        a->dispatch(e, a->prio); // virtual call
         QS_FLUSH();
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
