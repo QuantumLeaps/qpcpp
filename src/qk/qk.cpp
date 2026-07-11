@@ -243,7 +243,7 @@ void QK::activate_() {
         QF_INT_ENABLE(); // unconditionally enable interrupts
 
         QEvt const * const e = a->get_(); // queue not empty
-        a->dispatch(e, p); // dispatch event (virtual call)
+        a->dispatch(e, p); // virtual call
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
@@ -369,8 +369,7 @@ void QActive::start(
 
     m_eQueue.init(qSto, qLen); // init the built-in queue
 
-    // top-most initial tran. (virtual call)
-    this->init(par, m_prio);
+    this->init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 
     // see if this AO needs to be scheduled if QK is already running

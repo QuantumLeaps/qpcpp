@@ -55,6 +55,7 @@ extern "C" {
 // but they can be implemented in C as well.
 
 extern char const QF_port_module_[];
+__attribute__((used)) // prevent removal with link-time optimization
 char const QF_port_module_[] = "qv_port";
 
 //............................................................................
@@ -67,7 +68,7 @@ char const QF_port_module_[] = "qv_port";
 // Additionally, the function also asserts that the interrupts are
 // NOT disabled upon the entry to the function, which means that
 // this interrupt management policy CANNOT nest.
-__attribute__ ((naked, weak))
+__attribute__ ((used, naked))
 void QF_int_disable_(void) {
 __asm volatile (
 #ifdef QF_USE_BASEPRI   //--------- use BASEPRI for interrupt disabling?
@@ -82,10 +83,17 @@ __asm volatile (
     "  BNE     QF_int_disable_error\n"
     "  BX      lr               \n"
     "QF_int_disable_error:      \n"
-    "  LDR     r0,=QF_port_module_ \n"
+    "  LDR     r0,QF_int_disable_module \n"
     "  MOVS    r1,#100          \n"
-    "  LDR     r2,=Q_onError    \n"
+    "  LDR     r2,QF_int_disable_onError \n"
     "  BX      r2               \n"
+
+    // Literal pool ---------------
+    "  .ALIGN  2                \n"
+    "QF_int_disable_module:     \n"
+    "  .WORD QF_port_module_    \n"
+    "QF_int_disable_onError:    \n"
+    "  .WORD Q_onError          \n"
     );
 }
 //............................................................................
@@ -98,7 +106,7 @@ __asm volatile (
 // Additionally, the function also asserts that the interrupts ARE
 // disabled upon the entry to the function, which means that
 // this interrupt management policy CANNOT nest.
-__attribute__ ((naked, weak))
+__attribute__ ((used, naked))
 void QF_int_enable_(void) {
 __asm volatile (
 #ifdef QF_USE_BASEPRI   //--------- use BASEPRI for enabling interrupts?
@@ -117,10 +125,17 @@ __asm volatile (
 #endif                  //--------- use PRIMASK for enabling interrupts
     "  BX      lr               \n"
     "QF_int_enable_error:       \n"
-    "  LDR     r0,=QF_port_module_ \n"
+    "  LDR     r0,QF_int_enable_module \n"
     "  MOVS    r1,#101          \n"
-    "  LDR     r2,=Q_onError    \n"
+    "  LDR     r2,QF_int_enable_onError \n"
     "  BX      r2               \n"
+
+    // Literal pool ---------------
+    "  .ALIGN  2                \n"
+    "QF_int_enable_module:      \n"
+    "  .WORD QF_port_module_    \n"
+    "QF_int_enable_onError:     \n"
+    "  .WORD Q_onError          \n"
     );
 }
 //............................................................................
@@ -133,7 +148,7 @@ __asm volatile (
 // Additionally, the function also asserts that the interrupts are
 // NOT disabled upon the entry to the function, which means that
 // this critical section CANNOT nest.
-__attribute__ ((naked, weak))
+__attribute__ ((used, naked))
 void QF_crit_entry_(void) {
 __asm volatile (
 #ifdef QF_USE_BASEPRI   //--------- use BASEPRI for critical section?
@@ -148,10 +163,17 @@ __asm volatile (
     "  BNE     QF_crit_entry_error\n"
     "  BX      lr               \n"
     "QF_crit_entry_error:       \n"
-    "  LDR     r0,=QF_port_module_ \n"
+    "  LDR     r0,QF_crit_entry_module \n"
     "  MOVS    r1,#110          \n"
-    "  LDR     r2,=Q_onError    \n"
+    "  LDR     r2,QF_crit_entry_onError \n"
     "  BX      r2               \n"
+
+    // Literal pool ---------------
+    "  .ALIGN  2                \n"
+    "QF_crit_entry_module:      \n"
+    "  .WORD QF_port_module_    \n"
+    "QF_crit_entry_onError:     \n"
+    "  .WORD Q_onError          \n"
     );
 }
 //............................................................................
@@ -164,7 +186,7 @@ __asm volatile (
 // Additionally, the function also asserts that the interrupts ARE
 // disabled upon the entry to the function, which means that
 // this critical section CANNOT nest.
-__attribute__ ((naked, weak))
+__attribute__ ((used, naked))
 void QF_crit_exit_(void) {
 __asm volatile (
 #ifdef QF_USE_BASEPRI   //--------- use BASEPRI for critical section?
@@ -182,10 +204,17 @@ __asm volatile (
 #endif                  //--------- use PRIMASK
     "  BX      lr               \n"
     "QF_crit_exit_error:        \n"
-    "  LDR     r0,=QF_port_module_ \n"
+    "  LDR     r0,QF_crit_exit_module \n"
     "  MOVS    r1,#111          \n"
-    "  LDR     r2,=Q_onError    \n"
+    "  LDR     r2,QF_crit_exit_onError \n"
     "  BX      r2               \n"
+
+    // Literal pool ---------------
+    "  .ALIGN  2                \n"
+    "QF_crit_exit_module:       \n"
+    "  .WORD QF_port_module_    \n"
+    "QF_crit_exit_onError:      \n"
+    "  .WORD Q_onError          \n"
     );
 }
 
@@ -232,8 +261,8 @@ void QV_init(void) {
 #if (__ARM_ARCH == 6) // if ARMv6-M...
 
 // hand-optimized quick LOG2 in assembly (no CLZ instruction in ARMv6-M)
-__attribute__ ((naked))
-uint_fast8_t QF_qlog2(uint32_t x) {
+__attribute__ ((used, naked))
+std::uint_fast8_t QF_qlog2(std::uint32_t x) {
 __asm volatile (
     "  MOVS    r1,#0            \n"
 #if (QF_MAX_ACTIVE > 16U)
@@ -255,13 +284,17 @@ __asm volatile (
     "  ADDS    r1,r1,#4         \n"
     "  MOV     r0,r2            \n"
     "QF_qlog2_3:                \n"
-    "  LDR     r2,=QF_qlog2_LUT \n"
+    "  LDR     r2,QF_qlog2_LUT_addr \n"
     "  LDRB    r0,[r2,r0]       \n"
     "  ADDS    r0,r1,r0         \n"
     "  BX      lr               \n"
-    "  .align                   \n"
+
+    // Literal pool ---------------
+    "  .ALIGN  2                \n"
+    "QF_qlog2_LUT_addr:         \n"
+    "  .WORD  QF_qlog2_LUT      \n"
     "QF_qlog2_LUT:              \n"
-    "  .byte 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4"
+    "  .BYTE 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4"
     );
 }
 

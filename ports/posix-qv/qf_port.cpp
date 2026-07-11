@@ -208,9 +208,19 @@ void init() {
 int run() {
     l_isRunning = true; // QF is running
 
-    onStartup(); // application-specific startup callback
-
     QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+
+    // produce the QS_QF_RUN trace record
+    QS_BEGIN_PRE(QS_QF_RUN, 0U)
+    QS_END_PRE()
+
+    // Application callback: configure and enable individual interrupts.
+    // NOTE: called within critical section and returns also in
+    // critical section.
+    onStartup();
+    QF_CRIT_EXIT();
+
     // system clock tick configured?
     if ((l_tick.tv_sec != 0) || (l_tick.tv_nsec != 0)) {
 
@@ -252,13 +262,9 @@ int run() {
         pthread_attr_destroy(&attr);
     }
 
+
     // the combined event-loop and background-loop of the QV kernel
     QF_CRIT_ENTRY();
-
-    // produce the QS_QF_RUN trace record
-    QS_BEGIN_PRE(QS_QF_RUN, 0U)
-    QS_END_PRE()
-
     while (l_isRunning) {
         // find the maximum priority AO ready to run
         if (readySet_.notEmpty()) {
@@ -270,8 +276,8 @@ int run() {
             Q_ASSERT_INCRIT(320, a != nullptr);
             QF_CRIT_EXIT();
 
-            QEvt const *e = a->get_(); // queue not empty
-            a->dispatch(e, a->getPrio()); // dispatch event (virtual call)
+            QEvt const * const e = a->get_(); // NO blocking (not empty)
+            a->dispatch(e, a->getPrio()); // virtual call
 #if (QF_MAX_EPOOL > 0U)
             QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
@@ -316,11 +322,7 @@ void stop() {
 }
 //............................................................................
 void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
-    QF_CRIT_STAT
-    QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(600, ticksPerSec != 0U);
-    QF_CRIT_EXIT();
-
+    // NOTE: called inside crit.section
     if (ticksPerSec != 0U) {
         l_tick.tv_nsec = NSEC_PER_SEC / ticksPerSec;
     }
@@ -366,7 +368,7 @@ int consoleWaitForKey() {
     return static_cast<int>(getchar());
 }
 
-#endif // #ifdef QF_CONSOLE
+#endif // QF_CONSOLE
 
 } // namespace QF
 
@@ -392,8 +394,7 @@ void QActive::start(QPrioSpec const prioSpec,
     m_pthre = 0U; // preemption-threshold (not used in this port)
     register_();  // register this AO
 
-    // top-most initial tran. (virtual call)
-    this->init(par, m_prio);
+    this->init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the QS trace buffer to the host
 }
 

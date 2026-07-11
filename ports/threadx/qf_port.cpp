@@ -243,8 +243,7 @@ void QActive::start(
     m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U); // QF preemption-thre.
     register_(); // make QF aware of this AO
 
-    // top-most initial tran. (virtual call)
-    init(par, m_prio);
+    init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 
     // ThreadX priority, see NOTE1

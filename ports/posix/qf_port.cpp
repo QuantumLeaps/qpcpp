@@ -165,12 +165,14 @@ void init() {
 
 //............................................................................
 int run() {
-
-    onStartup(); // application-specific startup callback
-
     // produce the QS_QF_RUN trace record
     QS_BEGIN_PRE(QS_QF_RUN, 0U)
     QS_END_PRE()
+
+    // Application callback: configure and enable individual interrupts.
+    // NOTE: called within critical section and returns also in
+    // critical section.
+    onStartup();
 
     // try to set the priority of the ticker thread, see NOTE01
     struct sched_param sparam;
@@ -243,11 +245,7 @@ void stop() {
 }
 //............................................................................
 void setTickRate(std::uint32_t ticksPerSec, int tickPrio) {
-    QF_CRIT_STAT
-    QF_CRIT_ENTRY();
-    Q_REQUIRE_INCRIT(600, ticksPerSec != 0U);
-    QF_CRIT_EXIT();
-
+    // NOTE: called inside crit.section
     if (ticksPerSec != 0U) {
         l_tick.tv_nsec = NSEC_PER_SEC / ticksPerSec;
     }
@@ -303,15 +301,14 @@ void QActive::evtLoop_(QActive *act) {
     pthread_mutex_lock(&l_startupMutex);
     pthread_mutex_unlock(&l_startupMutex);
 
-    // the event-loop...
 #ifdef QACTIVE_CAN_STOP
     act->m_thread = true;
     while (act->m_thread) {
 #else
     for (;;) { // for-ever
 #endif
-        QEvt const *e = act->get_(); // BLOCK for event
-        act->dispatch(e, act->m_prio); // dispatch event (virtual call)
+        QEvt const * const e = act->get_(); // BLOCK for event
+        act->dispatch(e, act->m_prio); // virtual call
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
@@ -346,7 +343,7 @@ void QActive::start(QPrioSpec const prioSpec,
 
     // the top-most initial tran. (virtual)
     this->init(par, m_prio);
-    QS_FLUSH(); // flush the trace buffer to the host
+    QS_FLUSH(); // flush the QS trace buffer to the host
 
     pthread_attr_t attr;
     pthread_attr_init(&attr);

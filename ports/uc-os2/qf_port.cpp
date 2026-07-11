@@ -237,8 +237,7 @@ void QActive::start(
     m_pthre = 0U; // preemption-threshold (not used for AO registration)
     register_(); // make QF aware of this AO
 
-    // top-most initial tran. (virtual call)
-    init(par, m_prio);
+    init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 
     // uC-OS2 priority, see NOTE1

@@ -5,7 +5,7 @@ This branch adds comprehensive cmake support to QP/C++
 ## Quick Start
 
 create your project with a root `CMakeLists.txt` file, following this blueprint.
-1. copy [qpcpp_sdk_import.cmake](https://github.com/QuantumLeaps/3rd_party/cmake/qpcpp_sdk_import.cmake) into your project. Make sure, it can be found by `cmake` as an included script
+1. copy [qpcpp_sdk_import.cmake](https://github.com/QuantumLeaps/3rd_party/blob/main/cmake/qpc_sdk_import.cmake) into your project. Make sure, it can be found by `cmake` as an included script
 2. Setup your 1<sup>st</sup> `CMakeLists.txt`:
 ```
 # use a recent CMake version
@@ -38,6 +38,7 @@ set(QPCPP_PROJECT qpcPrj)
 set(QPCPP_CFG_KERNEL QV)
 set(QPCPP_CFG_GUI TRUE)
 set(QPCPP_CFG_PORT win32)
+set(QPCPP_CFG_LIB_TYPE static)
 # QP/CPP 8.0.0: to include a local 'qp_config.hpp' add the related include path
 # to the qpcpp build settings. Replace "${CMAKE_CURRENT_LIST_DIR}/include" by
 # your project specific path!
@@ -72,7 +73,10 @@ To configure the integration of qpcpp you can provide information either with cm
 This file is situated in the root directory of qpcpp. It performs a pre-initialization of the qpcpp package and provides the function `qpcpp_sdk_init`. Call this function from your project's `CMakeLists.txt` file to perform the final integration of qpcpp into your project. To configure qpcpp to your projects requirements set these variables before calling `qpcpp_sdk_init()`
 
 * `QPCPP_CFG_KERNEL` - STRING: set this variable to the QPCPP kernel for your project. Valid values are QV, QK or QXK. Default: QV
-* `QPCPP_CFG_PORT` - STRING: set this variable to reflect the target platform of your project. Default: host system. Valid values are:
+* `QPCPP_CFG_PORT` - STRING: set this variable to reflect the target platform of your project. Default: host system.
+  If not set, the `CMake`subsystem tries to evaluate the desired target platform. For this it uses information found from the sytem and settings provided by a `TOOLCHAIN`file, if such a file is in use. In most cases, the port evaluation yields the expected result.
+  Default: value evaluated automatically.
+  Valid values are:
   + `arm-cm`, `arm-cr` - Arm CortexM or CortexR micro controllers. Tested with GNU cross compiler environments.
   + `freertos`, `esp-idf`, `emb-os`, `threadx`, `uc-os2` - real time OS
   + `msp430`, `pic32` - TI MSP430 or PIC32 micro controllers
@@ -84,6 +88,10 @@ This file is situated in the root directory of qpcpp. It performs a pre-initiali
 * `QPCPP_CFG_VERBOSE` - BOOL: set this to enable more verbosity in message output. Default: OFF
 * `QPCPP_CFG_QPCONFIG_H_INCLUDE_PATH`: - STRING (PATH): (`QP/CPP 8.0.0`) set this to have the build of QP/CPP use your project specific `qp_config.hpp`.
   Default: `${QPCPP_SDK_PATH}/ports/config`
+* `QPCPP_CFG_LIB_TYPE` - STRING: set this to the type of library you want to use in your project. Default: `static`.
+  Valid values are:
+  + `static` - builds `qpcpp` as a static library, which will be linked with your application
+  + `object` - builds `qpcpp` as a so called `OBJECT` library. `CMake` manages this like a library object. However in the final linking step, the object files forming the library will be added to the application one by one.
 
 
 ### General usage hints
@@ -117,14 +125,20 @@ Many `qpcpp` examples provide 3 build configurations:
 
 These configurations are also supported by qpcpp with cmake. Different possibilities exist to activate those.
 
+#### QPCPP configurations and Dual-Licensing
+The CMake sub-system checks the existence of `qs.cpp` in the `src/qs` folder. If this file does not exist, the system is configured and subsequently built with the support for the `Spy`configuration disabled.
+
+When configuring the system, a warning message will be displayed to the user. When trying to build the `Spy` configuration
+(`cmake --build <build directory> --config=Spy`) an error message will be displayed, telling that this configuration does not exist.
+
 ### `qp_config.hpp` support
 With the release of QP/C++ V8.0.0 the inclusion of `qp_config.hpp` is mandatory.
 The `cmake` build system of qpc addresses this by providing the configuration variable `QPCPP_CFG_QPCONFIG_H_INCLUDE_PATH`. Set this to the path of your local project's `qp_config.hpp` and this will automatically be found by the build system. Do this in your main `CMakeLists.txt` file __before__ calling `qpcpp_sdk_init()`.
 
 You do not need to set this variable, should the qpcpp default settings be sufficient for your project. In this case the build system uses the `qp_config.hpp` file, as it can be found in the directory `${QPCPP_SDK_PATH}/src/ports/config`.
 
-An example can be found in the [cmake dpp example](https://github.com/QuantumLeaps/qpcpp-examples/tree/main/posix-win32-cmake/dpp). Have a look into
-the example's [CMakeLists.txt](https://github.com/QuantumLeaps/qpcpp-examples/blob/main/posix-win32-cmake/dpp/CMakeLists.txt).
+An example can be found in the [cmake dpp example](https://github.com/QuantumLeaps/qpcpp-examples/tree/main/posix-win32/dpp). Have a look into
+the example's [CMakeLists.txt](https://github.com/QuantumLeaps/qpcpp-examples/blob/main/posix-win32/dpp/CMakeLists.txt).
 
 ### Multi configuration generators
 The most easy way to make use of the different configurations is to use a multi config generator like `Ninja Multi-Config` or `MS Visual Studio`.
@@ -137,7 +151,7 @@ To support this, the `cmake` variables
 * `CMAKE_ASM_FLAGS_<CONFIGURATION>`
 * `CMAKE_EXE_LINKER_FLAGS_<CONFIGURATION>`
 
-have to be set for all configurations. The desired place to hold these settings is the `toolchain` file of the compilation toolchain in use.
+have to be set for all configurations. The desired place to hold these settings is the `toolchain` file of the compilation toolchain in use. Example toolchains can be found in the [toolchains folder](https://github.com/QuantumLeaps/3rd_party/tree/main/cmake/toolchain).
 If no `toolchain` file is used, the `cmake` default configuration provides settings for the `Debug` and `Release` configuration fot the host
 compiler setup. The `Spy` configuration will be added by the qpcpp `CMakeLists.txt` file.
 

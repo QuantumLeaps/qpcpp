@@ -110,7 +110,7 @@ bool QActive::postx_(
 
         QF_CRIT_EXIT(); // exit crit.sect. before calling RTOS API
 
-        // post the following evtPtr to the RTOS event queue, see NOTE3
+        // post the following evtPtr to the RTOS queue, see NOTE3
         QEvtPtr const evtPtr = {
             e
         };
@@ -255,8 +255,7 @@ void QActive::start(
     m_pthre = 0U; // preemption-threshold (not used for AO registration)
     register_(); // make QF aware of this AO
 
-    // top-most initial tran. (virtual call)
-    init(par, m_prio);
+    init(par, m_prio); // top-most initial tran. (virtual call)
     QS_FLUSH(); // flush the trace buffer to the host
 
     // task name provided by the user in QActive::setAttr() or default name
@@ -321,8 +320,8 @@ void QActive::evtLoop_(QActive *act) {
 #else
     for (;;) { // for-ever
 #endif
-        QEvt const *e = act->get_();   // BLOCK for event
-        act->dispatch(e, act->m_prio); // dispatch event (virtual call)
+        QEvt const * const e = act->get_(); // BLOCK for event
+        act->dispatch(e, act->m_prio); // virtual call
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
