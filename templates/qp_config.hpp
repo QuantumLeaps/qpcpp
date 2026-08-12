@@ -1,5 +1,5 @@
 //============================================================================
-// SafeQP/QP configuration file (QV/QK/QXK on ARM Cortex-M)
+// QP configuration template (QV/QK/QXK on ARM Cortex-M)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
