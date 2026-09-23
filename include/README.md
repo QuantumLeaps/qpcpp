@@ -84,7 +84,7 @@ qpcpp/             // qpcpp installation directory
 |   |
 |   \---pclp
 |       |   au-ds.lnt        // Dan Saks' recommendations for placing 'const' and 'volatile'
-|       |   au-misra-cpp2.lnt // PCLP MISRA-C++:2023 (MP2) confiuration for rules checking
+|       |   au-misra-cpp2.lnt // PCLP MISRA-C++:2023 (MP2) configuration for rules checking
 |       |   co-gnu_arm.bat   // script to generate configuration for GNU-ARM toolset
 |       |   co-gnu_arm.h     // generated PCLP header file for GNU-ARM (14.3 at this time)
 |       |   co-gnu_arm.lnt   // generated PCLP configuration file for GNU-ARM (14.3 at this time)

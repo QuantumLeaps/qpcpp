@@ -1,7 +1,7 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -10,17 +10,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
 // This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// General Public License, version 3 or later (GPL-3.0-or-later), or,
+// alternatively, under the terms of one of the closed-source Quantum Leaps
+// commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL does NOT permit the incorporation of this code into proprietary
-// programs. Please contact Quantum Leaps for commercial licensing options,
-// which expressly supersede the GPL and are designed explicitly for
-// closed-source distribution.
+// The GPL does NOT permit distributing this code as part of proprietary
+// (closed-source) programs. For such use, please contact Quantum Leaps for
+// a commercial license, which is an alternative to the GPL designed
+// explicitly for closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -98,18 +98,21 @@
     #define QS_U32_PRE(data_)           static_cast<void>(0)
     #define QS_TIME_PRE()               static_cast<void>(0)
     #define QS_SIG_PRE(sig_)            static_cast<void>(0)
-    #define QS_EVS_PRE(size_)           static_cast<void>(0)
     #define QS_OBJ_PRE(obj_)            static_cast<void>(0)
     #define QS_FUN_PRE(fun_)            static_cast<void>(0)
     #define QS_EQC_PRE(ctr_)            static_cast<void>(0)
     #define QS_MPC_PRE(ctr_)            static_cast<void>(0)
-    #define QS_MPS_PRE(size_)           static_cast<void>(0)
     #define QS_TEC_PRE(ctr_)            static_cast<void>(0)
 
     #define QS_TR_CRIT_ENTRY()          static_cast<void>(0)
     #define QS_TR_CRIT_EXIT()           static_cast<void>(0)
     #define QS_TR_ISR_ENTRY(isrnest_, prio_) static_cast<void>(0)
     #define QS_TR_ISR_EXIT(isrnest_, prio_)  static_cast<void>(0)
+
+namespace QP {
+    constexpr std::int_fast16_t QS_ID_EP     { 64 };
+} // namespace QP
+
 #endif // QP_IMPL
 
 #endif // QS_DUMMY_HPP_

@@ -1,7 +1,7 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -10,17 +10,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
 // This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// General Public License, version 3 or later (GPL-3.0-or-later), or,
+// alternatively, under the terms of one of the closed-source Quantum Leaps
+// commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL does NOT permit the incorporation of this code into proprietary
-// programs. Please contact Quantum Leaps for commercial licensing options,
-// which expressly supersede the GPL and are designed explicitly for
-// closed-source distribution.
+// The GPL does NOT permit distributing this code as part of proprietary
+// (closed-source) programs. For such use, please contact Quantum Leaps for
+// a commercial license, which is an alternative to the GPL designed
+// explicitly for closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -158,8 +158,8 @@ void QHsm::init(
     QS_CRIT_STAT
     QS_CRIT_ENTRY();
     bool toDo = false; // assume that dictionary not produced
-    if ((QS::priv_.flags & 0x01U) == 0U) { // dictionary not produced yet?
-        QS::priv_.flags |= 0x01U; // mark the QHsm::top dictionary as produced
+    if (!QS::isFlagSet(0U)) { // dictionary not produced yet?
+        QS::flagSet(0U); // mark the QHsm::top dictionary as produced
         toDo = true;
     }
     QS_CRIT_EXIT();
@@ -190,7 +190,7 @@ void QHsm::init(
     QS_TRAN_SEG_(QS_QEP_STATE_INIT, s, m_temp.fun); // output QS record
 
     // drill down into the state hierarchy with initial transitions...
-    std::array <QStateHandler, MAX_NEST_DEPTH_> path; // entry path array
+    std::array <QStateHandler, MAX_PATH_LEN_> path; // entry path array
 
     std::size_t ip = 0U; // path index & fixed loop bound
     do {
@@ -248,10 +248,10 @@ void QHsm::dispatch(
     QS_TRAN0_(QS_QEP_DISPATCH, s); // output QS record
 
     // process the event hierarchically...
-    std::array <QStateHandler, MAX_NEST_DEPTH_> path; // entry path array
+    std::array <QStateHandler, MAX_PATH_LEN_> path; // entry path array
     m_temp.fun = s;
     QState r; // state handler return value
-    std::size_t ip = MAX_NEST_DEPTH_; // path index & fixed loop bound
+    std::size_t ip = MAX_PATH_LEN_; // path index & fixed loop bound
     do {
         // the entry path index must stay in range of the path[] array
         Q_INVARIANT_LOCAL(340, ip != 0U);
@@ -293,7 +293,7 @@ void QHsm::dispatch(
         path[0U] = m_temp.fun; // save tran. target in path[0]
 
         // exit current state to tran. source (path[0] not used)...
-        for (std::size_t iq = MAX_NEST_DEPTH_ - 1U; iq > ip; --iq) {
+        for (std::size_t iq = MAX_PATH_LEN_ - 1U; iq > ip; --iq) {
             // exit from 'path[iq]'
             if ((*path[iq])(this, &l_resEvt_[Q_EXIT_SIG]) == Q_RET_HANDLED) {
                 QS_STATE_ACT_(QS_QEP_STATE_EXIT, path[iq]); //output QS record
@@ -326,7 +326,7 @@ void QHsm::dispatch(
 //............................................................................
 //! @private @memberof QHsm
 std::size_t QHsm::tran_simple_(
-    std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+    std::array<QStateHandler, MAX_PATH_LEN_> &path,
     std::uint_fast8_t const qsId)
 {
 #ifndef Q_SPY
@@ -393,7 +393,7 @@ std::size_t QHsm::tran_simple_(
 //............................................................................
 //! @private @memberof QHsm
 std::size_t QHsm::tran_complex_(
-    std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+    std::array<QStateHandler, MAX_PATH_LEN_> &path,
     std::uint_fast8_t const qsId)
 {
 #ifndef Q_SPY
@@ -411,7 +411,7 @@ std::size_t QHsm::tran_complex_(
     std::size_t iq = 0U; // assume that LCA is NOT found
     do {
         // the entry path index must stay in range of the path[] array
-        Q_INVARIANT_LOCAL(540, ip < MAX_NEST_DEPTH_);
+        Q_INVARIANT_LOCAL(540, ip < MAX_PATH_LEN_);
 
         path[ip] = m_temp.fun; // store temp in the entry path array
         ++ip;
@@ -427,15 +427,10 @@ std::size_t QHsm::tran_complex_(
     if (iq == 0U) { // the LCA not found yet?
         QS_CRIT_STAT
 
-#ifndef Q_SPY
-        // exit the source 's', ignore the result
-        static_cast<void>((*s)(this, &l_resEvt_[Q_EXIT_SIG]));
-#else
         // exit the source 's'
         if ((*s)(this, &l_resEvt_[Q_EXIT_SIG]) == Q_RET_HANDLED) {
             QS_STATE_ACT_(QS_QEP_STATE_EXIT, s); // output QS record
         }
-#endif // def Q_SPY
 
         // (f) check the rest of
         // source->super... == target->super->super...
@@ -482,7 +477,7 @@ std::size_t QHsm::tran_complex_(
 //............................................................................
 //! @private @memberof QHsm
 void QHsm::enter_target_(
-    std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+    std::array<QStateHandler, MAX_PATH_LEN_> &path,
     std::size_t const depth,
     std::uint_fast8_t const qsId)
 {
@@ -517,8 +512,8 @@ void QHsm::enter_target_(
         // find superstate of initial tran. target...
         ip = 0U; // entry path index and fixed loop bound
         do {
-            // the entry path index must stay in range of the path[] array
-            Q_INVARIANT_LOCAL(660, ip < MAX_NEST_DEPTH_);
+            // the entry path index must stay in range (see code.dox)
+            Q_INVARIANT_LOCAL(660, ip < (MAX_NEST_DEPTH_ - 1U));
 
             path[ip] = m_temp.fun; // store the entry path
             ++ip;

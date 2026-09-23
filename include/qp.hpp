@@ -1,7 +1,7 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -10,17 +10,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
 // This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// General Public License, version 3 or later (GPL-3.0-or-later), or,
+// alternatively, under the terms of one of the closed-source Quantum Leaps
+// commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL does NOT permit the incorporation of this code into proprietary
-// programs. Please contact Quantum Leaps for commercial licensing options,
-// which expressly supersede the GPL and are designed explicitly for
-// closed-source distribution.
+// The GPL does NOT permit distributing this code as part of proprietary
+// (closed-source) programs. For such use, please contact Quantum Leaps for
+// a commercial license, which is an alternative to the GPL designed
+// explicitly for closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -30,10 +30,10 @@
 #define QP_HPP_
 
 //============================================================================
-#define QP_VERSION_STR  "8.1.5"
-#define QP_VERSION      815U
-// <VER>=815 <DATE>=260805
-#define QP_RELEASE      0x648C4D80U
+#define QP_VERSION_STR  "8.1.6"
+#define QP_VERSION      816U
+// <VER>=816 <DATE>=261102
+#define QP_RELEASE      0x645EFBEFU
 
 //----------------------------------------------------------------------------
 // default configuration settings
@@ -67,16 +67,8 @@
 #define QF_TIMEEVT_CTR_SIZE 4U
 #endif
 
-#if (QF_TIMEEVT_CTR_SIZE > 4U)
-#error QF_TIMEEVT_CTR_SIZE defined incorrectly, expected 1U, 2U, or 4U;
-#endif
-
-#ifndef QF_EVENT_SIZ_SIZE
-#define QF_EVENT_SIZ_SIZE 2U
-#endif
-
-#if (QF_EVENT_SIZ_SIZE > 4U)
-#error QF_EVENT_SIZ_SIZE defined incorrectly, expected 1U, 2U, or 4U;
+#if (QF_TIMEEVT_CTR_SIZE != 2U) && (QF_TIMEEVT_CTR_SIZE != 4U)
+#error QF_TIMEEVT_CTR_SIZE defined incorrectly, expected 2U or 4U;
 #endif
 
 //! @endcond
@@ -117,9 +109,7 @@ public:
 
     QEvt() // disallow the default ctor
         = delete;
-    void init() const noexcept {
-        // no event parameters to initialize
-    }
+    void init() const = delete; // derived event classes must declare init()
     void init(DynEvt const dummy) const noexcept {
         Q_UNUSED_PAR(dummy);
         // no event parameters to initialize
@@ -209,6 +199,10 @@ public:
     static constexpr QMState const *QM_STATE_NULL       { nullptr };
     static constexpr QActionHandler const Q_ACTION_NULL { nullptr };
 
+    // maximum supported nesting depth of a state machine (see code.dox)
+    static constexpr std::size_t MAX_NEST_DEPTH_ {5U};
+    static_assert(MAX_NEST_DEPTH_ >= 3U, "MAX_NEST_DEPTH_ must be >= 3");
+
 #ifdef Q_XTOR
     virtual ~QAsm() = default;
 #endif // def Q_XTOR
@@ -268,33 +262,17 @@ protected:
         return Q_RET_TRAN_HIST;
     }
 
-#ifdef Q_SPY
     QState qm_entry(QMState const * const s) noexcept {
         // for coding QMsm state machines
         m_temp.obj = s;
         return Q_RET_ENTRY;
     }
-#else
-    QState qm_entry(QMState const * const s) const noexcept {
-        // for coding QMsm state machines
-        static_cast<void>(s); // unused parameter
-        return Q_RET_ENTRY;
-    }
-#endif // Q_SPY
 
-#ifdef Q_SPY
     QState qm_exit(QMState const * const s) noexcept {
         // for coding QMsm state machines
         m_temp.obj = s;
         return Q_RET_EXIT;
     }
-#else
-    QState qm_exit(QMState const * const s) const noexcept {
-        // for coding QMsm state machines
-        static_cast<void>(s); // unused parameter
-        return Q_RET_EXIT;
-    }
-#endif // Q_SPY
 }; // class QAsm
 
 //----------------------------------------------------------------------------
@@ -316,20 +294,19 @@ public:
     QStateHandler childState(QStateHandler const parentHndl) noexcept;
 
 private:
-    // maximum depth of state nesting in a QHsm (including the top level)
-    // must be >= 3
-    static constexpr std::size_t MAX_NEST_DEPTH_ {6U};
+    // length of the path[] arrays (all nesting levels and the top state)
+    static constexpr std::size_t MAX_PATH_LEN_ {MAX_NEST_DEPTH_ + 1U};
 
     std::size_t tran_simple_(
-        std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+        std::array<QStateHandler, MAX_PATH_LEN_> &path,
         std::uint_fast8_t const qsId);
 
     std::size_t tran_complex_(
-        std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+        std::array<QStateHandler, MAX_PATH_LEN_> &path,
         std::uint_fast8_t const qsId);
 
     void enter_target_(
-        std::array<QStateHandler, MAX_NEST_DEPTH_> &path,
+        std::array<QStateHandler, MAX_PATH_LEN_> &path,
         std::size_t const depth,
         std::uint_fast8_t const qsId);
 
@@ -425,9 +402,7 @@ using QPrioSpec = std::uint16_t;
 class QEQueue; // forward declaration
 class QActive; // forward declaration
 
-#if (QF_TIMEEVT_CTR_SIZE == 1U)
-    using QTimeEvtCtr = std::uint8_t;
-#elif (QF_TIMEEVT_CTR_SIZE == 2U)
+#if (QF_TIMEEVT_CTR_SIZE == 2U)
     using QTimeEvtCtr = std::uint16_t;
 #elif (QF_TIMEEVT_CTR_SIZE == 4U)
     using QTimeEvtCtr = std::uint32_t;
@@ -581,7 +556,6 @@ public:
         return m_prio; // public "getter" for the AO's prio
     }
     static void evtLoop_(QActive *act);
-    static QActive *fromRegistry(std::uint_fast8_t const prio);
 
 #ifdef QACTIVE_THREAD_TYPE
     QACTIVE_THREAD_TYPE const & getThread() const & {
@@ -627,6 +601,7 @@ private:
         QPSet * const subscrSet,
         QEvt const * const e,
         void const * const sender);
+    static QActive* fromRegistry_(std::uint_fast8_t const prio);
 
     // friends...
     friend class QTimeEvt;
@@ -740,7 +715,7 @@ private:
         QActive const * const act,
         std::uint_fast8_t const tickRate) noexcept;
 
-    // fiends...
+    // friends...
     friend class QXThread;
     friend class QS;
 }; // class QTimeEvt
@@ -776,7 +751,7 @@ inline void psInit(    QSubscrList * const subscrSto,
 inline void publish_(QEvt const * const e,
     void const * const sender, std::uint_fast8_t const qsId) noexcept
 {
-    // use  QTimeEvt::tick() instead of the deprecated QF::tick()
+    // use QActive::publish_() instead of the deprecated QF::publish_()
     QActive::publish_(e, sender, qsId);
 }
 
@@ -794,7 +769,7 @@ inline void tick(
     std::uint_fast8_t const tickRate,
     void const * const sender) noexcept
 {
-    // use  QTimeEvt::tick() instead of the deprecated QF::tick()
+    // use QTimeEvt::tick() instead of the deprecated QF::tick()
     QTimeEvt::tick(tickRate, sender);
 }
 #endif // (QF_MAX_TICK_RATE > 0U)
@@ -834,12 +809,31 @@ void deleteRef_(QEvt const * const evtRef) noexcept;
         QSignal const sig)
     {
         // allocate a dynamic (mutable) event with a provided margin
-        // NOTE: the returned event ptr is MIGHT be nullptr
+        // NOTE: the returned event ptr might be nullptr
         return static_cast<evtT_*>(QP::QF::newX_(sizeof(evtT_), margin, sig));
     }
 #else
+    //! @cond INTERNAL
+    // compile-time helpers for q_new()/q_new_x()
+    template<class evtT_> struct isQEvt_ {
+        static constexpr bool value = false;
+    };
+    template<> struct isQEvt_<QEvt> {
+        static constexpr bool value = true;
+    };
+    template<typename... Args> struct isDynTag_ {
+        static constexpr bool value = false;
+    };
+    template<> struct isDynTag_<QEvt::DynEvt> {
+        static constexpr bool value = true;
+    };
+    //! @endcond
+
     template<class evtT_, typename... Args>
     inline evtT_ * q_new(QSignal const sig, Args... args) {
+        static_assert(isQEvt_<evtT_>::value || !isDynTag_<Args...>::value,
+            "QEvt::DYNAMIC is only for QP::QEvt; an event class with "
+            "parameters must declare its own init()");
         // allocate a dynamic (mutable) event with NO_MARGIN
         // NOTE: the returned event ptr is guaranteed NOT to be nullptr
         evtT_ *e = static_cast<evtT_*>(
@@ -851,14 +845,17 @@ void deleteRef_(QEvt const * const evtRef) noexcept;
     inline evtT_ * q_new_x(std::uint_fast16_t const margin,
         QSignal const sig, Args... args)
     {
+        static_assert(isQEvt_<evtT_>::value || !isDynTag_<Args...>::value,
+            "QEvt::DYNAMIC is only for QP::QEvt; an event class with "
+            "parameters must declare its own init()");
         // allocate a dynamic (mutable) event with a provided margin
-        // NOTE: the event allocation is MIGHT fail
+        // NOTE: the event allocation might fail
         evtT_ *e =
             static_cast<evtT_*>(QP::QF::newX_(sizeof(evtT_), margin, sig));
-        if (e != nullptr) { // was the allocation successfull?
+        if (e != nullptr) { // was the allocation successful?
             e->init(args...); // immediately initialize the event (RAII)
         }
-        // NOTE: the returned event ptr is MIGHT be nullptr
+        // NOTE: the returned event ptr might be nullptr
         return e;
     }
 #endif // QEVT_PAR_INIT

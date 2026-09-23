@@ -1,7 +1,7 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -10,17 +10,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
 // This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// General Public License, version 3 or later (GPL-3.0-or-later), or,
+// alternatively, under the terms of one of the closed-source Quantum Leaps
+// commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL does NOT permit the incorporation of this code into proprietary
-// programs. Please contact Quantum Leaps for commercial licensing options,
-// which expressly supersede the GPL and are designed explicitly for
-// closed-source distribution.
+// The GPL does NOT permit distributing this code as part of proprietary
+// (closed-source) programs. For such use, please contact Quantum Leaps for
+// a commercial license, which is an alternative to the GPL designed
+// explicitly for closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -51,24 +51,23 @@ bool QActive::postx_(
     std::uint_fast16_t const margin,
     void const * const sender) noexcept
 {
-#ifdef Q_UTEST // test?
-#if (Q_UTEST != 0) // testing QP-stub?
-    if (m_temp.fun == Q_STATE_CAST(0)) { // QActiveDummy?
-        return static_cast<QActiveDummy *>(this)->fakePost(e, margin, sender);
-    }
-#endif // (Q_UTEST != 0)
-#endif // def Q_UTEST
-
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
     // the event to post must not be NULL
     Q_REQUIRE_INCRIT(100, e != nullptr);
 
+#ifdef Q_UTEST // test?
+    if (m_state.fun == &QHsmDummy::dummyHandler) { // QActiveDummy?
+        QF_CRIT_EXIT();
+        return static_cast<QActiveDummy *>(this)->fakePost(e, margin, sender);
+    }
+#endif // def Q_UTEST
+
     QEQueueCtr const nFree = m_eQueue.m_nFree; // get member into temporary
 
     bool status = ((margin == QF::NO_MARGIN)
-        || (nFree > static_cast<QEQueueCtr>(margin)));
+        || (static_cast<std::uint_fast16_t>(nFree) > margin));
     if (status) { // should try to post the event?
 
         // the queue must have a free slot
@@ -80,7 +79,7 @@ bool QActive::postx_(
         }
 #endif // (QF_MAX_EPOOL > 0U)
 
-        postFIFO_(e, sender);
+        postFIFO_(e, sender); // called in crit.sect.
 
         QF_CRIT_EXIT();
 #ifdef Q_UTEST
@@ -106,7 +105,7 @@ bool QActive::postx_(
         if (QS_LOC_CHECK_(m_prio)) {
             QS::onTestPost(sender, this, e, status); // QUTEst callback
         }
-#endif // def Q_USTEST
+#endif // def Q_UTEST
 
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // recycle the event to avoid a leak
@@ -118,20 +117,19 @@ bool QActive::postx_(
 
 //............................................................................
 void QActive::postLIFO(QEvt const * const e) noexcept {
-#ifdef Q_UTEST // test?
-#if (Q_UTEST != 0) // testing QP-stub?
-    if (m_temp.fun == Q_STATE_CAST(0)) { // QActiveDummy?
-        static_cast<QActiveDummy *>(this)->QActiveDummy::fakePostLIFO(e);
-        return;
-    }
-#endif // (Q_UTEST != 0)
-#endif // def Q_UTEST
-
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    // the event to post must be be valid (which includes not NULL)
+    // the event to post must be valid (which includes not NULL)
     Q_REQUIRE_INCRIT(200, e != nullptr);
+
+#ifdef Q_UTEST // test?
+    if (m_state.fun == &QHsmDummy::dummyHandler) { // QActiveDummy?
+        QF_CRIT_EXIT();
+        static_cast<QActiveDummy *>(this)->QActiveDummy::fakePostLIFO(e);
+        return;
+    }
+#endif // def Q_UTEST
 
     QEQueueCtr nFree = m_eQueue.m_nFree; // get member into temporary
 
@@ -157,17 +155,6 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
         QS_EQC_PRE(m_eQueue.m_nMin); // min # free entries
     QS_END_PRE()
 
-#ifdef Q_UTEST
-    // callback to examine the posted event under the same conditions
-    // as producing the #QS_QF_ACTIVE_POST trace record, which are:
-    // the local filter for this AO ('m_prio') is set
-    if (QS_LOC_CHECK_(m_prio)) {
-        QF_CRIT_EXIT();
-        QS::onTestPost(nullptr, this, e, true);
-        QF_CRIT_ENTRY();
-    }
-#endif // def Q_UTEST
-
     QEvt const * const frontEvt = m_eQueue.m_frontEvt.e;
     m_eQueue.m_frontEvt.e = e; // deliver the event directly to the front
 
@@ -177,7 +164,7 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
         if (tail == m_eQueue.m_end) { // need to wrap the tail?
             tail = 0U; // wrap around
         }
-        m_eQueue.m_tail = tail;
+        m_eQueue.m_tail = tail; // update the original
         m_eQueue.m_ring[tail].e = frontEvt;
     }
     else { // queue was empty
@@ -185,6 +172,15 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
     }
 
     QF_CRIT_EXIT();
+
+#ifdef Q_UTEST
+    // callback to examine the posted event under the same conditions
+    // as producing the #QS_QF_ACTIVE_POST_LIFO trace record, which are:
+    // the local filter for this AO ('m_prio') is set
+    if (QS_LOC_CHECK_(m_prio)) {
+        QS::onTestPost(nullptr, this, e, true);
+    }
+#endif // def Q_UTEST
 }
 
 //............................................................................
@@ -200,7 +196,7 @@ QEvt const * QActive::get_() noexcept {
     QEvt const * const e = m_eQueue.m_frontEvt.e;
 
     // the queue must NOT be empty
-    Q_REQUIRE_INCRIT(310, e != nullptr); // queue must NOT be empty
+    Q_REQUIRE_INCRIT(310, e != nullptr);
 
     QEQueueCtr nFree = m_eQueue.m_nFree; // get member into temporary
 
@@ -235,8 +231,8 @@ QEvt const * QActive::get_() noexcept {
     else {
         m_eQueue.m_frontEvt.e = nullptr; // queue becomes empty
 
-        // all entries in the queue must be free (+1 for fronEvt)
-        Q_ASSERT_INCRIT(370, nFree == (m_eQueue.m_end + 1U));
+        // all entries in the queue must be free (+1 for frontEvt)
+        Q_INVARIANT_INCRIT(370, nFree == (m_eQueue.m_end + 1U));
 
         QS_BEGIN_PRE(QS_QF_ACTIVE_GET_LAST, m_prio)
             QS_TIME_PRE();       // timestamp
@@ -452,16 +448,14 @@ void QTicker::trig_(void const * const sender) noexcept {
     QEQueueCtr nTicks = m_eQueue.m_tail; // get member into temporary
 
     if (nTicks == 0U) { // no ticks accumulated yet?
-        // when no ticks accumuilated, m_eQueue.m_fronEvt must be NULL
+        // when no ticks accumulated, m_eQueue.m_frontEvt must be NULL
         Q_REQUIRE_INCRIT(930, m_eQueue.m_frontEvt.e == nullptr);
 
         m_eQueue.m_frontEvt.e = &tickEvt; // deliver event directly
         m_eQueue.m_nFree = 0U;
-
-        QACTIVE_EQUEUE_SIGNAL_(this); // signal the event queue
     }
     else { // some tick have accumulated (and were not processed yet)
-        // when some ticks accumulated, eQueue.fronEvt must be &tickEvt
+        // when some ticks accumulated, eQueue.frontEvt must be &tickEvt
         Q_REQUIRE_INCRIT(940,m_eQueue.m_frontEvt.e == &tickEvt);
 
         // the nTicks counter must accept one more count without overflowing
@@ -480,6 +474,12 @@ void QTicker::trig_(void const * const sender) noexcept {
         QS_EQC_PRE(0U);     // # free entries
         QS_EQC_PRE(0U);     // min # free entries
     QS_END_PRE()
+
+    // signal the event queue last, after all bookkeeping is done, because
+    // signaling may activate (and run) the QTicker synchronously
+    if (nTicks == 1U) { // was the queue empty before this tick?
+        QACTIVE_EQUEUE_SIGNAL_(this);
+    }
 
     QF_CRIT_EXIT();
 }

@@ -1,7 +1,7 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -10,17 +10,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
 // This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// General Public License, version 3 or later (GPL-3.0-or-later), or,
+// alternatively, under the terms of one of the closed-source Quantum Leaps
+// commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL does NOT permit the incorporation of this code into proprietary
-// programs. Please contact Quantum Leaps for commercial licensing options,
-// which expressly supersede the GPL and are designed explicitly for
-// closed-source distribution.
+// The GPL does NOT permit distributing this code as part of proprietary
+// (closed-source) programs. For such use, please contact Quantum Leaps for
+// a commercial license, which is an alternative to the GPL designed
+// explicitly for closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -55,21 +55,21 @@ void QActive::psInit(
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    // provided subscSto must be valid
+    // provided subscrSto must be valid
     Q_REQUIRE_INCRIT(100, subscrSto != nullptr);
 
     // provided maximum of subscribed signals must be >= Q_USER_SIG
     Q_REQUIRE_INCRIT(110, maxSignal >= Q_USER_SIG);
 
-    QF_CRIT_EXIT();
-
     QActive_subscrList_   = subscrSto;
-    QActive_maxPubSignal_ = static_cast<QSignal>(maxSignal);
+    QActive_maxPubSignal_ = maxSignal;
 
     // initialize all signals in the subscriber list...
     for (QSignal sig = 0U; sig < maxSignal; ++sig) {
-        subscrSto[sig].m_set.setEmpty();
+        subscrSto[sig].m_set.setEmpty(); // no subscribers to this signal
     }
+
+    QF_CRIT_EXIT();
 }
 
 //............................................................................
@@ -107,7 +107,7 @@ void QActive::publish_(
     if (e->poolNum_ != 0U) { // is it a mutable event?
         // NOTE: The reference counter of a mutable event is incremented to
         // prevent premature recycling of the event while multicasting is
-        // still in progress. The garbage collector step (QF_gc()) at the
+        // still in progress. The garbage collector step (QF::gc()) at the
         // end of the function decrements the reference counter and recycles
         // the event if the counter drops to zero. This covers the case when
         // event was published without any subscribers.
@@ -144,7 +144,7 @@ void QActive::multicast_(
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    // p != 0 is guaranteed as the result of QPSet_findMax()
+    // p != 0 is guaranteed as the result of QPSet::findMax()
     Q_ASSERT_INCRIT(300, p <= QF_MAX_ACTIVE);
     QActive *a = QActive_registry_[p];
 
@@ -162,8 +162,8 @@ void QActive::multicast_(
     // removed one by one at every pass.
     for (;;) { // loop over all subscribers
 
-        // POST() asserts internally if the queue overflows
-        a->POST(e, sender);
+        // a->post_() asserts internally if the queue overflows
+        a->post_(e, sender);
 
         subscrSet->remove(p); // remove the handled subscriber
         if (subscrSet->isEmpty()) {  // no more subscribers?
@@ -203,7 +203,7 @@ void QActive::subscribe(QSignal const sig) const noexcept {
     Q_REQUIRE_INCRIT(460, sig >= Q_USER_SIG);
 
     // the subscribed signal must be below the maximum of published signals
-    Q_REQUIRE_INCRIT(480, static_cast<QSignal>(sig) < QActive_maxPubSignal_);
+    Q_REQUIRE_INCRIT(480, sig < QActive_maxPubSignal_);
 
     QS_BEGIN_PRE(QS_QF_ACTIVE_SUBSCRIBE, p)
         QS_TIME_PRE();    // timestamp
@@ -232,7 +232,9 @@ void QActive::unsubscribe(QSignal const sig) const noexcept {
 
     // the sig parameter must not overlap reserved signals
     Q_REQUIRE_INCRIT(560, sig >= Q_USER_SIG);
-    Q_REQUIRE_INCRIT(580, static_cast<QSignal>(sig) < QActive_maxPubSignal_);
+
+    // the unsubscribed signal must be below the maximum of published signals
+    Q_REQUIRE_INCRIT(580, sig < QActive_maxPubSignal_);
 
     QS_BEGIN_PRE(QS_QF_ACTIVE_UNSUBSCRIBE, p)
         QS_TIME_PRE();    // timestamp
@@ -262,15 +264,12 @@ void QActive::unsubscribeAll() const noexcept {
     QSignal const maxPubSig = QActive_maxPubSignal_;
 
     // the maximum of published signals must not overlap the reserved signals
-    Q_REQUIRE_INCRIT(670, maxPubSig >= static_cast<QSignal>(Q_USER_SIG));
+    Q_REQUIRE_INCRIT(670, maxPubSig >= Q_USER_SIG);
 
     QF_CRIT_EXIT();
 
     // remove this AO's prio. from subscriber lists of all published signals
-    for (QSignal sig = static_cast<QSignal>(Q_USER_SIG);
-         sig < maxPubSig;
-         ++sig)
-    {
+    for (QSignal sig = Q_USER_SIG; sig < maxPubSig; ++sig) {
         QF_CRIT_ENTRY();
 
         if (QActive_subscrList_[sig].m_set.hasElement(p)) {

@@ -1,7 +1,7 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -10,17 +10,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
 // This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// General Public License, version 3 or later (GPL-3.0-or-later), or,
+// alternatively, under the terms of one of the closed-source Quantum Leaps
+// commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL does NOT permit the incorporation of this code into proprietary
-// programs. Please contact Quantum Leaps for commercial licensing options,
-// which expressly supersede the GPL and are designed explicitly for
-// closed-source distribution.
+// The GPL does NOT permit distributing this code as part of proprietary
+// (closed-source) programs. For such use, please contact Quantum Leaps for
+// a commercial license, which is an alternative to the GPL designed
+// explicitly for closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -153,6 +153,7 @@ std::uint_fast8_t QK::sched_act_(
     std::uint_fast8_t const pthre_in) noexcept
 {
     // NOTE: this function is entered with interrupts DISABLED
+    // and must also return with interrupts DISABLED.
 
     std::uint8_t p = act->m_prio;
     if (act->m_eQueue.isEmpty()) { // empty queue?
@@ -185,6 +186,7 @@ std::uint_fast8_t QK::sched_act_(
 //............................................................................
 void QK::activate_() {
     // NOTE: this function is entered with interrupts DISABLED
+    // and must also return with interrupts DISABLED.
 
     std::uint8_t const prio_in = priv_.actPrio; // save initial prio.
     std::uint8_t p = priv_.nextPrio; // next prio to run
@@ -243,7 +245,8 @@ void QK::activate_() {
         QF_INT_ENABLE(); // unconditionally enable interrupts
 
         QEvt const * const e = a->get_(); // queue not empty
-        a->dispatch(e, p); // virtual call
+        // dispatch e to the AO's state machine (virtual call)
+        a->dispatch(e, p);
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // check if the event is garbage, and collect it if so
 #endif
@@ -299,15 +302,12 @@ void init() {
     QK_INIT(); // port-specific initialization of the QK kernel
 #endif
 }
-
-//............................................................................
-void stop() {
-    onCleanup(); // application-specific cleanup callback
-    // nothing else to do for the preemptive QK kernel
-}
 //............................................................................
 int_t run() {
     QF_INT_DISABLE();
+    // no AO may be scheduled before QF::run()
+    Q_REQUIRE_INCRIT(610, QK::priv_.nextPrio == 0U);
+
 #ifdef Q_SPY
     // produce the QS_QF_RUN trace record
     QS::beginRec_(static_cast<std::uint_fast8_t>(QS_QF_RUN));
@@ -322,7 +322,7 @@ int_t run() {
 
 #ifdef QF_ON_CONTEXT_SW
     // officially switch to the idle context
-    QF_onContextSw(nullptr, QActive_registry_[QK::priv_.nextPrio]);
+    QF_onContextSw(nullptr, nullptr);
 #endif
 
     // activate AOs to process events posted so far
@@ -369,7 +369,8 @@ void QActive::start(
 
     m_eQueue.init(qSto, qLen); // init the built-in queue
 
-    this->init(par, m_prio); // top-most initial tran. (virtual call)
+    // top-most initial tran. (virtual call)
+    this->init(par, m_prio);
     QS_FLUSH(); // flush the trace buffer to the host
 
     // see if this AO needs to be scheduled if QK is already running

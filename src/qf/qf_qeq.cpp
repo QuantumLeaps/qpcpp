@@ -1,7 +1,7 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -10,17 +10,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
 // This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// General Public License, version 3 or later (GPL-3.0-or-later), or,
+// alternatively, under the terms of one of the closed-source Quantum Leaps
+// commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL does NOT permit the incorporation of this code into proprietary
-// programs. Please contact Quantum Leaps for commercial licensing options,
-// which expressly supersede the GPL and are designed explicitly for
-// closed-source distribution.
+// The GPL does NOT permit distributing this code as part of proprietary
+// (closed-source) programs. For such use, please contact Quantum Leaps for
+// a commercial license, which is an alternative to the GPL designed
+// explicitly for closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -55,32 +55,6 @@ QEQueue::QEQueue() noexcept
     m_nMin(0U)            // all time minimum of free entries so far
 {}
 //............................................................................
-void QEQueue::init(
-    QEvtPtr * const qSto,
-    std::uint_fast16_t const qLen) noexcept
-{
-    QF_CRIT_STAT
-    QF_CRIT_ENTRY();
-
-#if (QF_EQUEUE_CTR_SIZE == 1U)
-    // the qLen paramter must not exceed the dynamic range of uint8_t
-    Q_REQUIRE_INCRIT(10, qLen < 0xFFU);
-#endif
-
-    m_frontEvt.e = nullptr; // no events in the queue
-    m_ring     = qSto;    // the beginning of the ring buffer
-    m_end      = static_cast<QEQueueCtr>(qLen); // index of the last element
-    if (qLen > 0U) { // queue buffer storage provided?
-        m_head = 0U; // head index: for removing events
-        m_tail = 0U; // tail index: for inserting events
-    }
-    m_nFree = static_cast<QEQueueCtr>(qLen + 1U); // +1 for frontEvt
-    m_nMin  = m_nFree; // minimum so far
-
-    QF_CRIT_EXIT();
-}
-
-//............................................................................
 bool QEQueue::post(
     QEvt const * const e,
     std::uint_fast16_t const margin,
@@ -93,14 +67,14 @@ bool QEQueue::post(
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    // the posted event must be valid
+    // the event to post must not be NULL
     Q_REQUIRE_INCRIT(100, e != nullptr);
 
     QEQueueCtr nFree = m_nFree; // get member into temporary
 
     bool status = ((margin == QF::NO_MARGIN)
-        || (nFree > static_cast<QEQueueCtr>(margin)));
-    if (status) { // can post the event?
+        || (static_cast<std::uint_fast16_t>(nFree) > margin));
+    if (status) { // should try to post the event?
 
         // the queue must have a free slot
         Q_ASSERT_INCRIT(130, nFree != 0U);
@@ -117,7 +91,6 @@ bool QEQueue::post(
             m_nMin = nFree; // update minimum so far
         }
 
-#ifdef Q_SPY
         QS_BEGIN_PRE(QS_QF_EQUEUE_POST, qsId)
             QS_TIME_PRE();        // timestamp
             QS_SIG_PRE(e->sig);   // the signal of the event
@@ -126,7 +99,6 @@ bool QEQueue::post(
             QS_EQC_PRE(nFree);    // # free entries
             QS_EQC_PRE(m_nMin);   // min # free entries
         QS_END_PRE()
-#endif // def Q_SPY
 
         if (m_frontEvt.e == nullptr) { // is the queue empty?
             m_frontEvt.e = e; // deliver event directly
@@ -139,11 +111,10 @@ bool QEQueue::post(
                 head = m_end;
             }
             --head; // advance head (counter-clockwise)
-            m_head = head; // update the member original
+            m_head = head; // update the original
         }
     }
     else { // event cannot be posted
-#ifdef Q_SPY
         QS_BEGIN_PRE(QS_QF_EQUEUE_POST_ATTEMPT, qsId)
             QS_TIME_PRE();       // timestamp
             QS_SIG_PRE(e->sig);  // the signal of this event
@@ -152,7 +123,6 @@ bool QEQueue::post(
             QS_EQC_PRE(nFree);   // # free entries
             QS_EQC_PRE(margin);  // margin requested
         QS_END_PRE()
-#endif // def Q_SPY
     }
 
     QF_CRIT_EXIT();
@@ -180,12 +150,14 @@ void QEQueue::postLIFO(
     // must be able to LIFO-post the event
     Q_REQUIRE_INCRIT(230, nFree != 0U);
 
+#if (QF_MAX_EPOOL > 0U)
     if (e->poolNum_ != 0U) { // is it a mutable event?
         QEvt_refCtr_inc_(e); // increment the reference counter
     }
+#endif // (QF_MAX_EPOOL > 0U)
 
     --nFree; // one free entry just used up
-    m_nFree = nFree; // update the member original
+    m_nFree = nFree; // update the original
 
     if (m_nMin > nFree) { // is this the new minimum?
         m_nMin = nFree; // update minimum so far
@@ -209,7 +181,7 @@ void QEQueue::postLIFO(
         if (tail == m_end) { // need to wrap the tail?
             tail = 0U; // wrap around
         }
-        m_tail = tail; // update the member original
+        m_tail = tail; // update the original
         m_ring[tail].e = frontEvt;
     }
 
@@ -225,7 +197,7 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    QEvt const * const e = m_frontEvt.e; // always remove evt from the front
+    QEvt const * const e = m_frontEvt.e; // always remove event from the front
 
     if (e != nullptr) { // is the queue NOT empty?
         QEQueueCtr nFree = m_nFree; // get member into temporary
@@ -250,13 +222,13 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
                 QS_EQC_PRE(nFree);  // # free entries
             QS_END_PRE()
 
-            m_frontEvt.e = frontEvt; // update the member original
+            m_frontEvt.e = frontEvt; // update the original
 
             if (tail == 0U) { // need to wrap the tail?
                 tail = m_end; // wrap around
             }
             --tail; // advance the tail (counter-clockwise)
-            m_tail = tail; // update the member original
+            m_tail = tail; // update the original
         }
         else {
             m_frontEvt.e = nullptr; // queue becomes empty
@@ -276,6 +248,39 @@ QEvt const * QEQueue::get(std::uint_fast8_t const qsId) noexcept {
     QF_CRIT_EXIT();
 
     return e;
+}
+//............................................................................
+void QEQueue::init(
+    QEvtPtr * const qSto,
+    std::uint_fast16_t const qLen) noexcept
+{
+    QF_CRIT_STAT
+    QF_CRIT_ENTRY();
+
+    // the qLen parameter must fit in the dynamic range of QEQueueCtr
+    // (including the +1 for the front event)
+#if (QF_EQUEUE_CTR_SIZE == 1U)
+    Q_REQUIRE_INCRIT(400, qLen < 0xFFU);
+#elif (QF_EQUEUE_CTR_SIZE == 2U)
+    Q_REQUIRE_INCRIT(400, qLen < 0xFFFFU);
+#endif
+
+    // the queue storage must be provided, unless qLen is zero
+    Q_REQUIRE_INCRIT(410, (qSto != nullptr) || (qLen == 0U));
+
+    m_frontEvt.e = nullptr; // no events in the queue
+    m_ring = qSto;    // the beginning of the ring buffer
+    m_end  = static_cast<QEQueueCtr>(qLen); // index of the last element
+    // NOTE: with qLen == 0 the head/tail members are NOT initialized,
+    // because QTicker reuses them (see QTicker::QTicker()/QTicker::init())
+    if (qLen > 0U) { // queue buffer storage provided?
+        m_head = 0U; // head index: for removing events
+        m_tail = 0U; // tail index: for inserting events
+    }
+    m_nFree = static_cast<QEQueueCtr>(qLen + 1U); // +1 for frontEvt
+    m_nMin  = m_nFree; // minimum so far
+
+    QF_CRIT_EXIT();
 }
 
 //............................................................................

@@ -1,7 +1,7 @@
 //============================================================================
 // QP/C++ Real-Time Event Framework (RTEF)
 //
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 //
 //                    Q u a n t u m  L e a P s
 //                    ------------------------
@@ -10,17 +10,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
 // This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// General Public License, version 3 or later (GPL-3.0-or-later), or,
+// alternatively, under the terms of one of the closed-source Quantum Leaps
+// commercial licenses.
 //
 // Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
 //
 // NOTE:
-// The GPL does NOT permit the incorporation of this code into proprietary
-// programs. Please contact Quantum Leaps for commercial licensing options,
-// which expressly supersede the GPL and are designed explicitly for
-// closed-source distribution.
+// The GPL does NOT permit distributing this code as part of proprietary
+// (closed-source) programs. For such use, please contact Quantum Leaps for
+// a commercial license, which is an alternative to the GPL designed
+// explicitly for closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -59,7 +59,7 @@ QActive::QActive(QStateHandler const initial) noexcept
 {
     // NOTE: QActive indirectly inherits the abstract QAsm base class,
     // but it will delegate the state machine behavior to the QHsm class,
-    // so the following initiaization is identical as in QHsm ctor:
+    // so the following initialization is identical as in QHsm ctor:
     m_state.fun = Q_STATE_CAST(&top);
     m_temp.fun  = initial;
 }
@@ -81,6 +81,9 @@ void QActive::register_() noexcept {
 
     // the AO's prio. must not exceed the preemption threshold
     Q_REQUIRE_INCRIT(130, m_prio <= m_pthre);
+
+    // the AO's preemption threshold must be in range
+    Q_REQUIRE_INCRIT(140, m_pthre <= QF_MAX_ACTIVE);
 
 #ifndef Q_UNSAFE
     std::uint8_t prev_thre = m_pthre;
@@ -157,7 +160,7 @@ QStateHandler QActive::childState(QStateHandler const parentHandler) noexcept {
     return reinterpret_cast<QHsm *>(this)->QHsm::childState(parentHandler);
 }
 //............................................................................
-QActive* QActive::fromRegistry(std::uint_fast8_t const prio) {
+QActive* QActive::fromRegistry_(std::uint_fast8_t const prio) {
     // return the hidden (package scope) registry entry
     return QActive_registry_[prio];
 }
@@ -187,13 +190,13 @@ std::uint_fast8_t QF_LOG2(QP::QPSetBits const bitmask) noexcept {
     }
 #endif
 #if (QF_MAX_ACTIVE > 8U)
-    tmp = (x >> 8U);
+    tmp = static_cast<QP::QPSetBits>(x >> 8U);
     if (tmp != 0U) { // x > 2^8?
         n += 8U;
         x = tmp;
     }
 #endif
-    tmp = (x >> 4U);
+    tmp = static_cast<QP::QPSetBits>(x >> 4U);
     if (tmp != 0U) {  // x > 2^4?
         n += 4U;
         x = tmp;
@@ -216,7 +219,7 @@ bool QPSet::isEmpty() const noexcept {
     return (m_bits0 == 0U);    // check only bitmask for elements 1..32
 #else
     return (m_bits0 == 0U)     // bitmask for elements 1..32 empty?
-           ? (m_bits1 == 0U)   // check bitmask for for elements 33..64
+           ? (m_bits1 == 0U)   // check bitmask for elements 33..64
            : false;             // the set is NOT empty
 #endif
 }
@@ -225,9 +228,9 @@ bool QPSet::notEmpty() const noexcept {
 #if (QF_MAX_ACTIVE <= 32U)
     return (m_bits0 != 0U);     // check only bitmask for elements 1..32
 #else
-    return (m_bits0 != 0U)      // bitmask for elements 1..32 empty?
+    return (m_bits0 != 0U)      // bitmask for elements 1..32 not empty?
            ? true                // the set is NOT empty
-           : (m_bits1 != 0U);   // check bitmask for for elements 33..64
+           : (m_bits1 != 0U);   // check bitmask for elements 33..64
 #endif
 }
 //............................................................................
@@ -250,7 +253,7 @@ void QPSet::insert(std::uint_fast8_t const n) noexcept {
     if (n <= 32U) { // set the bit in the bitmask for elements 1..32?
         m_bits0 = (m_bits0 | (static_cast<QPSetBits>(1U) << (n - 1U)));
     }
-    else { // set the bit in the bitmask for for elements 33..64
+    else { // set the bit in the bitmask for elements 33..64
         m_bits1 = (m_bits1 | (static_cast<QPSetBits>(1U) << (n - 33U)));
     }
 #endif
@@ -259,12 +262,13 @@ void QPSet::insert(std::uint_fast8_t const n) noexcept {
 void QPSet::remove(std::uint_fast8_t const n) noexcept {
 #if (QF_MAX_ACTIVE <= 32U)
     // clear the bit only in bitmask for elements 1..32
-    m_bits0 = (m_bits0 & static_cast<QPSetBits>(~(1U << (n - 1U))));
+    m_bits0 = (m_bits0
+        & static_cast<QPSetBits>(~(static_cast<QPSetBits>(1U) << (n - 1U))));
 #else
     if (n <= 32U) { // clear the bit in the bitmask for elements 1..32?
         (m_bits0 = (m_bits0 & ~(static_cast<QPSetBits>(1U) << (n - 1U))));
     }
-    else { // clear the bit in the bitmask for for elements 33..64
+    else { // clear the bit in the bitmask for elements 33..64
         (m_bits1 = (m_bits1 & ~(static_cast<QPSetBits>(1U) << (n - 33U))));
     }
 #endif
@@ -275,7 +279,7 @@ std::uint_fast8_t QPSet::findMax() const noexcept {
     // check only the bitmask for elements 1..32
     return QF_LOG2(m_bits0);
 #else
-    return (m_bits1 != 0U) // bitmask for elements 32..64 not empty?
+    return (m_bits1 != 0U) // bitmask for elements 33..64 not empty?
         ? (32U + QF_LOG2(m_bits1)) // 32 + log2(bits 33..64)
         : (QF_LOG2(m_bits0));      // log2(bits 1..32)
 #endif
