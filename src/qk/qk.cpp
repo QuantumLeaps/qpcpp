@@ -299,12 +299,6 @@ void init() {
     QK_INIT(); // port-specific initialization of the QK kernel
 #endif
 }
-
-//............................................................................
-void stop() {
-    onCleanup(); // application-specific cleanup callback
-    // nothing else to do for the preemptive QK kernel
-}
 //............................................................................
 int_t run() {
     QF_INT_DISABLE();

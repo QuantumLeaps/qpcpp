@@ -59,7 +59,7 @@ QActive::QActive(QStateHandler const initial) noexcept
 {
     // NOTE: QActive indirectly inherits the abstract QAsm base class,
     // but it will delegate the state machine behavior to the QHsm class,
-    // so the following initiaization is identical as in QHsm ctor:
+    // so the following initialization is identical as in QHsm ctor:
     m_state.fun = Q_STATE_CAST(&top);
     m_temp.fun  = initial;
 }

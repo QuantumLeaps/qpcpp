@@ -66,13 +66,6 @@ void init() {
     QV_INIT(); // port-specific initialization of the QV kernel
 #endif
 }
-
-//............................................................................
-void stop() {
-    onCleanup(); // cleanup callback
-    // nothing else to do for the QV kernel
-}
-
 //............................................................................
 int_t run() {
     QF_INT_DISABLE();

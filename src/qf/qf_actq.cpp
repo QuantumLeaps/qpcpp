@@ -52,11 +52,9 @@ bool QActive::postx_(
     void const * const sender) noexcept
 {
 #ifdef Q_UTEST // test?
-#if (Q_UTEST != 0) // testing QP-stub?
-    if (m_temp.fun == Q_STATE_CAST(0)) { // QActiveDummy?
+    if (m_state.fun == &QHsmDummy::dummyHandler) { // QActiveDummy?
         return static_cast<QActiveDummy *>(this)->fakePost(e, margin, sender);
     }
-#endif // (Q_UTEST != 0)
 #endif // def Q_UTEST
 
     QF_CRIT_STAT
@@ -119,12 +117,10 @@ bool QActive::postx_(
 //............................................................................
 void QActive::postLIFO(QEvt const * const e) noexcept {
 #ifdef Q_UTEST // test?
-#if (Q_UTEST != 0) // testing QP-stub?
-    if (m_temp.fun == Q_STATE_CAST(0)) { // QActiveDummy?
+    if (m_state.fun == &QHsmDummy::dummyHandler) { // QActiveDummy?
         static_cast<QActiveDummy *>(this)->QActiveDummy::fakePostLIFO(e);
         return;
     }
-#endif // (Q_UTEST != 0)
 #endif // def Q_UTEST
 
     QF_CRIT_STAT
