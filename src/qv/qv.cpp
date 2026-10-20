@@ -68,6 +68,8 @@ void init() {
 }
 //............................................................................
 int_t run() {
+    QS_FLUSH(); // flush the trace buffer produced during the startup
+
     QF_INT_DISABLE();
 #ifdef Q_SPY
     // produce the QS_QF_RUN trace record
@@ -193,7 +195,6 @@ void QActive::start(
     m_eQueue.init(qSto, qLen);
 
     this->init(par, m_prio); // top-most initial tran. (virtual call)
-    QS_FLUSH(); // flush the trace buffer to the host
 }
 
 } // namespace QP

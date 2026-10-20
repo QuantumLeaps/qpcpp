@@ -601,7 +601,6 @@ private:
         QPSet * const subscrSet,
         QEvt const * const e,
         void const * const sender);
-    static QActive* fromRegistry_(std::uint_fast8_t const prio);
 
     // friends...
     friend class QTimeEvt;
@@ -680,6 +679,9 @@ public:
     }
     std::uint8_t getTickRate() const noexcept {
         return m_tickRate;  // public "getter" for the time-evt tick rate
+    }
+    std::uint8_t getFlags() const noexcept {
+        return m_flags;     // public "getter" for the time-evt flags
     }
     static void tick(
         std::uint_fast8_t const tickRate,

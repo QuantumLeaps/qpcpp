@@ -160,11 +160,6 @@ QStateHandler QActive::childState(QStateHandler const parentHandler) noexcept {
     return reinterpret_cast<QHsm *>(this)->QHsm::childState(parentHandler);
 }
 //............................................................................
-QActive* QActive::fromRegistry_(std::uint_fast8_t const prio) {
-    // return the hidden (package scope) registry entry
-    return QActive_registry_[prio];
-}
-//............................................................................
 QStateHandler QActive::getStateHandler() const noexcept {
     // delegate to the QHsm class
     return reinterpret_cast<QHsm const *>(this)->QHsm::getStateHandler();

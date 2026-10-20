@@ -82,11 +82,8 @@ bool QActive::postx_(
         postFIFO_(e, sender); // called in crit.sect.
 
         QF_CRIT_EXIT();
-#ifdef Q_UTEST
-        if (QS_LOC_CHECK_(m_prio)) {
-            QS::onTestPost(sender, this, e, true); // QUTest callback
-        }
-#endif // def Q_UTEST
+
+        QS_TEST_POST(sender, this, e, true); // QUTest callback
     }
     else { // event cannot be posted, but it is OK
         QS_BEGIN_PRE(QS_QF_ACTIVE_POST_ATTEMPT, m_prio)
@@ -101,11 +98,7 @@ bool QActive::postx_(
 
         QF_CRIT_EXIT();
 
-#ifdef Q_UTEST
-        if (QS_LOC_CHECK_(m_prio)) {
-            QS::onTestPost(sender, this, e, status); // QUTEst callback
-        }
-#endif // def Q_UTEST
+        QS_TEST_POST(sender, this, e, status); // QUTest callback
 
 #if (QF_MAX_EPOOL > 0U)
         QF::gc(e); // recycle the event to avoid a leak
@@ -173,14 +166,10 @@ void QActive::postLIFO(QEvt const * const e) noexcept {
 
     QF_CRIT_EXIT();
 
-#ifdef Q_UTEST
-    // callback to examine the posted event under the same conditions
+    // QUTest callback to examine the posted event under the same conditions
     // as producing the #QS_QF_ACTIVE_POST_LIFO trace record, which are:
     // the local filter for this AO ('m_prio') is set
-    if (QS_LOC_CHECK_(m_prio)) {
-        QS::onTestPost(nullptr, this, e, true);
-    }
-#endif // def Q_UTEST
+    QS_TEST_POST(nullptr, this, e, true);
 }
 
 //............................................................................
