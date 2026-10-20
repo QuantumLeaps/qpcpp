@@ -57,6 +57,14 @@
     Q_ASSERT_STATIC(QF_MPOOL_SIZ_SIZE == 2U);
 #endif
 
+// version 8.1.6 -------------------------------------------------------------
+#if (QP_API_VERSION < 816)
+
+//! @deprecated instead use: QP::QF::prioSpec()
+#define Q_PRIO(prio_, pthre_) \
+    (QP::QF::prioSpec(static_cast<std::uint8_t>(prio_), \
+                      static_cast<std::uint8_t>(pthre_)))
+
 // version 8.1.0 -------------------------------------------------------------
 #if (QP_API_VERSION < 810)
 
@@ -164,5 +172,6 @@ using char_t = char;
 
 #endif // QP_API_VERSION < 800
 #endif // QP_API_VERSION < 810
+#endif // QP_API_VERSION < 816
 
 #endif // QPCPP_HPP_

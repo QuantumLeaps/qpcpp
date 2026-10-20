@@ -860,8 +860,8 @@ void stop() {
 //
 // B. Explicitly as the higher-byte of the prioSpec parameter.
 //    This option is chosen when the prioSpec parameter is not-zero.
-//    For example, Q_PRIO(10U, 5U) will explicitly specify AO priority
-//    as 10 and FreeRTOS priority as 5.
+//    For example, QP::QF::prioSpec((10U, 5U) will explicitly specify
+//    AO priority as 10 and FreeRTOS priority as 5.
 //
 // CAUTION: The explicit FreeRTOS priority is NOT sanity-checked, so it is the
 // responsibility of the application to ensure that it is consistent with the

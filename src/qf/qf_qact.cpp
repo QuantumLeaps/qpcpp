@@ -49,6 +49,16 @@ std::array<QActive*, QF_MAX_ACTIVE + 1U> QActive_registry_;
 //----------------------------------------------------------------------------
 namespace QF {
 Attr priv_;
+
+//............................................................................
+QPrioSpec prioSpec(
+    std::uint8_t const prio,
+    std::uint8_t const pthre) noexcept
+{
+    // combine the QF prio. preemption-threshold pthre in the upper byte
+    return static_cast<QPrioSpec>(static_cast<std::uint32_t>(prio)
+        | (static_cast<std::uint32_t>(pthre) << 8U));
+}
 } // namespace QF
 
 //----------------------------------------------------------------------------
@@ -158,11 +168,6 @@ bool QActive::isIn(QStateHandler const stateHndl) noexcept {
 QStateHandler QActive::childState(QStateHandler const parentHandler) noexcept {
     // delegate to the QHsm class
     return reinterpret_cast<QHsm *>(this)->QHsm::childState(parentHandler);
-}
-//............................................................................
-QActive* QActive::fromRegistry_(std::uint_fast8_t const prio) {
-    // return the hidden (package scope) registry entry
-    return QActive_registry_[prio];
 }
 //............................................................................
 QStateHandler QActive::getStateHandler() const noexcept {

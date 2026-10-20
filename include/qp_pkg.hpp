@@ -41,8 +41,9 @@ extern QSignal QActive_maxPubSignal_;
 extern std::array<QTimeEvt, QF_MAX_TICK_RATE> QTimeEvt_head_;
 
 // Bitmasks are for the QTimeEvt::flags attribute
-constexpr std::uint8_t QTE_FLAG_IS_LINKED    {1U << 7U};
-constexpr std::uint8_t QTE_FLAG_WAS_DISARMED {1U << 6U};
+constexpr std::uint8_t QTE_FLAG_IS_LINKED    {1U << 7U}; // linked in its tick-rate list
+constexpr std::uint8_t QTE_FLAG_WAS_DISARMED {1U << 6U}; // the next timeout is valid
+constexpr std::uint8_t QTE_FLAG_POSTED       {1U << 5U}; // timeout posted, not acknowledged
 
 // maximum number of time events linked at one tick rate (see code.dox)
 constexpr std::uint_fast8_t QTE_MAX_LINKED {

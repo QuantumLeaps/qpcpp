@@ -61,7 +61,7 @@ QTimeEvt::QTimeEvt(
     m_ctr(0U),        // time event disarmed
     m_interval(0U),   // not periodic
     m_tickRate(static_cast<std::uint8_t>(tickRate)), // associated tickRate
-    m_flags(0U)       // not armed
+    m_flags(QTE_FLAG_WAS_DISARMED) // the first timeout is valid
 {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
@@ -110,7 +110,11 @@ void QTimeEvt::armX(
 
     m_ctr = static_cast<QTimeEvtCtr>(nTicks);
     m_interval = static_cast<QTimeEvtCtr>(interval);
-    m_flags &= static_cast<std::uint8_t>(~QTE_FLAG_WAS_DISARMED); // armed again
+
+    // a timeout posted earlier and not acknowledged yet becomes stale
+    if ((m_flags & QTE_FLAG_POSTED) != 0U) {
+        m_flags &= static_cast<std::uint8_t>(~QTE_FLAG_WAS_DISARMED);
+    }
 
     // is the time event unlinked?
     // NOTE: For the duration of a single clock tick of the specified tick
@@ -157,7 +161,6 @@ bool QTimeEvt::disarm() noexcept {
     bool wasArmed = false;
     if (ctr != 0U) {
         wasArmed = true;
-        m_flags |= QTE_FLAG_WAS_DISARMED;
         m_ctr = 0U; // schedule removal from the list
 
         QS_BEGIN_PRE(QS_QF_TIMEEVT_DISARM, qsId)
@@ -170,14 +173,17 @@ bool QTimeEvt::disarm() noexcept {
         QS_END_PRE()
     }
     else { // the time event was already disarmed automatically
-        m_flags &= static_cast<std::uint8_t>(~QTE_FLAG_WAS_DISARMED);
-
         QS_BEGIN_PRE(QS_QF_TIMEEVT_DISARM_ATTEMPT, qsId)
             QS_TIME_PRE();            // timestamp
             QS_OBJ_PRE(this);         // this time event object
             QS_OBJ_PRE(m_act);        // the target AO
             QS_U8_PRE(m_tickRate);    // tick rate
         QS_END_PRE()
+    }
+
+    // a timeout posted earlier and not acknowledged yet becomes stale
+    if ((m_flags & QTE_FLAG_POSTED) != 0U) {
+        m_flags &= static_cast<std::uint8_t>(~QTE_FLAG_WAS_DISARMED);
     }
 
     QF_CRIT_EXIT();
@@ -212,7 +218,11 @@ bool QTimeEvt::rearm(std::uint32_t const nTicks) noexcept {
 #endif
 
     m_ctr = static_cast<QTimeEvtCtr>(nTicks);
-    m_flags &= static_cast<std::uint8_t>(~QTE_FLAG_WAS_DISARMED); // armed again
+
+    // a timeout posted earlier and not acknowledged yet becomes stale
+    if ((m_flags & QTE_FLAG_POSTED) != 0U) {
+        m_flags &= static_cast<std::uint8_t>(~QTE_FLAG_WAS_DISARMED);
+    }
 
     // was the time evt not running?
     bool wasArmed = false;
@@ -259,10 +269,13 @@ bool QTimeEvt::wasDisarmed() noexcept {
     QF_CRIT_STAT
     QF_CRIT_ENTRY();
 
-    // was this time-event truly disarmed (since it was last armed)?
+    // is the timeout being processed valid (not stale)?
     bool const wasDisarmed = (m_flags & QTE_FLAG_WAS_DISARMED) != 0U;
 
-    m_flags |= QTE_FLAG_WAS_DISARMED; // mark as disarmed (SIDE EFFECT!)
+    // acknowledge the timeout (SIDE EFFECT!): the next timeout is valid,
+    // unless the time event is armed, rearmed, or disarmed before it arrives
+    m_flags |= QTE_FLAG_WAS_DISARMED;
+    m_flags &= static_cast<std::uint8_t>(~QTE_FLAG_POSTED);
 
     QF_CRIT_EXIT();
 
@@ -372,7 +385,7 @@ QTimeEvt::QTimeEvt() noexcept
     m_ctr(0U),         // time event disarmed
     m_interval(0U),    // no periodic operation
     m_tickRate(0U),    // default tick rate
-    m_flags(0U)        // not armed
+    m_flags(QTE_FLAG_WAS_DISARMED) // the first timeout is valid
 {}
 
 //............................................................................
@@ -406,6 +419,9 @@ QTimeEvt *QTimeEvt::expire_(
             QS_U8_PRE(tickRate);  // tick rate
         QS_END_PRE()
     }
+
+    // the timeout is posted (by the caller), but not acknowledged yet
+    m_flags |= QTE_FLAG_POSTED;
 
     QS_BEGIN_PRE(QS_QF_TIMEEVT_POST, act->m_prio)
         QS_TIME_PRE();            // timestamp

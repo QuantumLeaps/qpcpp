@@ -132,12 +132,12 @@ int_t critSectNest_;
 //............................................................................
 void enterCriticalSection_() {
     pthread_mutex_lock(&critSectMutex_);
-    Q_ASSERT_INCRIT(100, critSectNest_ == 0); // NO nesting of crit.sect!
+    Q_ASSERT_INCRIT(110, critSectNest_ == 0); // NO nesting of crit.sect!
     ++critSectNest_;
 }
 //............................................................................
 void leaveCriticalSection_() {
-    Q_ASSERT_INCRIT(200, critSectNest_ == 1); // crit.sect. must balance!
+    Q_ASSERT_INCRIT(111, critSectNest_ == 1); // crit.sect. must balance!
     if ((--critSectNest_) == 0) {
         pthread_mutex_unlock(&critSectMutex_);
     }

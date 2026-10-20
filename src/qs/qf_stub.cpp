@@ -75,10 +75,36 @@ void stop() {
     QS::onReset();
 }
 //............................................................................
-QCritStatus critEntry() {
+// NOTE: The interrupt disabling/enabling and the critical section are
+// emulated with one lock counter (QS::tstPriv_.intLock), which plays the role
+// of PRIMASK/BASEPRI in the ARM Cortex-M ports. The checks and the error
+// identifiers are the same as in the ARM Cortex-M ports:
+// 100 interrupts disabled while already disabled,
+// 101 interrupts enabled while not disabled,
+// 110 critical section entered while already inside,
+// 111 critical section exited while not inside.
+void intDisable() {
 #ifndef Q_UNSAFE
     if (QS::tstPriv_.intLock != 0U) {
         Q_onError(&Q_this_module_[0], 100);
+    }
+#endif
+    ++QS::tstPriv_.intLock;
+}
+//............................................................................
+void intEnable() {
+#ifndef Q_UNSAFE
+    if (QS::tstPriv_.intLock == 0U) {
+        Q_onError(&Q_this_module_[0], 101);
+    }
+#endif
+    --QS::tstPriv_.intLock;
+}
+//............................................................................
+QCritStatus critEntry() {
+#ifndef Q_UNSAFE
+    if (QS::tstPriv_.intLock != 0U) {
+        Q_onError(&Q_this_module_[0], 110);
     }
 #endif
     QCritStatus const critStat = QS::tstPriv_.intLock;
@@ -87,13 +113,13 @@ QCritStatus critEntry() {
 }
 //............................................................................
 void critExit(QCritStatus critStat) {
-    Q_UNUSED_PAR(critStat);
-    --QS::tstPriv_.intLock;
 #ifndef Q_UNSAFE
-    if (QS::tstPriv_.intLock != static_cast<std::uint8_t>(critStat)) {
-        Q_onError(&Q_this_module_[0], 101);
+    if (QS::tstPriv_.intLock == 0U) {
+        Q_onError(&Q_this_module_[0], 111);
     }
 #endif
+    // restore the saved status
+    QS::tstPriv_.intLock = static_cast<std::uint8_t>(critStat);
 }
 //............................................................................
 QSchedStatus schedLock(uint_fast8_t const ceiling) {
