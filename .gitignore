@@ -68,6 +68,7 @@ src/qs/qs_64bit.cpp
 src/qs/qs_fp.cpp
 src/qs/qs_rx.cpp
 src/qs/qutest.cpp
+src/qs/qf_stub.cpp
 src/qxk/qxk.cpp
 src/qxk/qxk_mutex.cpp
 src/qxk/qxk_sema.cpp

@@ -306,7 +306,7 @@ void QActive::evtLoop_(QActive *act) {
 namespace QF {
 
 //............................................................................
-void init() {
+void QF_INIT_CFGCHK_() {
     // nothing to do for ThreadX
 }
 //............................................................................

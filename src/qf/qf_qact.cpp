@@ -49,6 +49,16 @@ std::array<QActive*, QF_MAX_ACTIVE + 1U> QActive_registry_;
 //----------------------------------------------------------------------------
 namespace QF {
 Attr priv_;
+
+//............................................................................
+QPrioSpec prioSpec(
+    std::uint8_t const prio,
+    std::uint8_t const pthre) noexcept
+{
+    // combine the QF prio. preemption-threshold pthre in the upper byte
+    return static_cast<QPrioSpec>(static_cast<std::uint32_t>(prio)
+        | (static_cast<std::uint32_t>(pthre) << 8U));
+}
 } // namespace QF
 
 //----------------------------------------------------------------------------
@@ -160,11 +170,6 @@ QStateHandler QActive::childState(QStateHandler const parentHandler) noexcept {
     return reinterpret_cast<QHsm *>(this)->QHsm::childState(parentHandler);
 }
 //............................................................................
-QActive* QActive::fromRegistry_(std::uint_fast8_t const prio) {
-    // return the hidden (package scope) registry entry
-    return QActive_registry_[prio];
-}
-//............................................................................
 QStateHandler QActive::getStateHandler() const noexcept {
     // delegate to the QHsm class
     return reinterpret_cast<QHsm const *>(this)->QHsm::getStateHandler();
@@ -237,10 +242,12 @@ bool QPSet::notEmpty() const noexcept {
 bool QPSet::hasElement(std::uint_fast8_t const n) const noexcept {
 #if (QF_MAX_ACTIVE <= 32U)
     // check the bit only in bitmask for elements 1..32
-    return (m_bits0 & (static_cast<QPSetBits>(1U) << (n - 1U))) != 0U;
+    return (static_cast<std::uint_fast32_t>(m_bits0)
+            & (static_cast<std::uint_fast32_t>(1U) << (n - 1U))) != 0U;
 #else
     return (n <= 32U) // which group of elements (1..32 or 33..64)?
-        ? ((m_bits0 & (static_cast<QPSetBits>(1U) << (n - 1U)))  != 0U)
+        ? ((static_cast<std::uint_fast32_t>(m_bits0)
+            & (static_cast<std::uint_fast32_t>(1U) << (n - 1U))) != 0U)
         : ((m_bits1 & (static_cast<QPSetBits>(1U) << (n - 33U))) != 0U);
 #endif
 }
@@ -248,10 +255,13 @@ bool QPSet::hasElement(std::uint_fast8_t const n) const noexcept {
 void QPSet::insert(std::uint_fast8_t const n) noexcept {
 #if (QF_MAX_ACTIVE <= 32U)
     // set the bit only in bitmask for elements 1..32
-    m_bits0 = (m_bits0 | (static_cast<QPSetBits>(1U) << (n - 1U)));
+    m_bits0 = static_cast<QPSetBits>(static_cast<std::uint_fast32_t>(m_bits0)
+                  | (static_cast<std::uint_fast32_t>(1U) << (n - 1U)));
 #else
     if (n <= 32U) { // set the bit in the bitmask for elements 1..32?
-        m_bits0 = (m_bits0 | (static_cast<QPSetBits>(1U) << (n - 1U)));
+        m_bits0 = static_cast<QPSetBits>(
+            static_cast<std::uint_fast32_t>(m_bits0)
+            | (static_cast<std::uint_fast32_t>(1U) << (n - 1U)));
     }
     else { // set the bit in the bitmask for elements 33..64
         m_bits1 = (m_bits1 | (static_cast<QPSetBits>(1U) << (n - 33U)));
@@ -262,11 +272,13 @@ void QPSet::insert(std::uint_fast8_t const n) noexcept {
 void QPSet::remove(std::uint_fast8_t const n) noexcept {
 #if (QF_MAX_ACTIVE <= 32U)
     // clear the bit only in bitmask for elements 1..32
-    m_bits0 = (m_bits0
-        & static_cast<QPSetBits>(~(static_cast<QPSetBits>(1U) << (n - 1U))));
+    m_bits0 = static_cast<QPSetBits>(static_cast<std::uint_fast32_t>(m_bits0)
+        & ~(static_cast<std::uint_fast32_t>(1U) << (n - 1U)));
 #else
     if (n <= 32U) { // clear the bit in the bitmask for elements 1..32?
-        (m_bits0 = (m_bits0 & ~(static_cast<QPSetBits>(1U) << (n - 1U))));
+        m_bits0 = static_cast<QPSetBits>(
+            static_cast<std::uint_fast32_t>(m_bits0)
+            & ~(static_cast<std::uint_fast32_t>(1U) << (n - 1U)));
     }
     else { // clear the bit in the bitmask for elements 33..64
         (m_bits1 = (m_bits1 & ~(static_cast<QPSetBits>(1U) << (n - 33U))));

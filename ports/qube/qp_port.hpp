@@ -25,7 +25,6 @@
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
-//============================================================================
 #ifndef QP_PORT_HPP_
 #define QP_PORT_HPP_
 
@@ -44,11 +43,11 @@
 #define QACTIVE_OS_OBJ_TYPE     void *
 #define QACTIVE_THREAD_TYPE     void const *
 
-// QF critical section
-#define QF_CRIT_STAT         QP::QF::QCritStatus critStat_;
-#define QF_CRIT_ENTRY()      (critStat_ = QP::QF::critEntry())
-#define QF_CRIT_EXIT()       (QP::QF::critExit(critStat_))
-#define QF_CRIT_EST()        static_cast<void>(QP::QF::critEntry())
+// Qube critical section (single-threaded, only nesting is counted)
+#define QF_CRIT_STAT     std::uint_fast8_t critStat_;
+#define QF_CRIT_ENTRY()  (critStat_ = QP::QF_intLock_++)
+#define QF_CRIT_EXIT()   (QP::QF_intLock_ = critStat_)
+#define QF_CRIT_EST()    (++QP::QF_intLock_)
 
 // QF_LOG2 not defined -- use the internal LOG2() implementation
 
@@ -57,20 +56,40 @@
 #include "qmpool.hpp"    // Qube port uses QMPool memory-pool
 #include "qp.hpp"        // QP platform-independent public interface
 
+namespace QP {
+
+extern std::uint_fast8_t QF_intLock_; // critical-section nesting
+
+namespace Qube {
+
+// set the current AO (the target of the events entered by the user)
+void setAO(QActive * const ao) noexcept;
+
+// application callback to generate an event from the signal
+// and the optional parameters entered by the user
+QEvt const * onGenEvt(QSignal const sig, char const * const params);
+
+} // namespace Qube
+} // namespace QP
+
 //============================================================================
 // interface used only inside QF implementation, but not in applications
 
 #ifdef QP_IMPL
 
-    // QUTest scheduler locking
-    #define QF_SCHED_STAT_ QP::QF::QSchedStatus lockStat_;
-    #define QF_SCHED_LOCK_(ceil_) (lockStat_ = QP::QF::schedLock((ceil_)))
-    #define QF_SCHED_UNLOCK_()    (QP::QF::schedUnlock(lockStat_))
+namespace QP {
+extern QPSet QF_readySet_; // set of AOs with non-empty event queues
+} // namespace QP
+
+    // Qube scheduler locking (not used)
+    #define QF_SCHED_STAT_
+    #define QF_SCHED_LOCK_(dummy) (static_cast<void>(0))
+    #define QF_SCHED_UNLOCK_()    (static_cast<void>(0))
 
     // native QEQueue operations
     #define QACTIVE_EQUEUE_WAIT_(me_) (static_cast<void>(0))
-    #define QACTIVE_EQUEUE_SIGNAL_(me_)    \
-        (QP::QS::tstPriv_.readySet.insert( \
+    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
+        (QP::QF_readySet_.insert( \
             static_cast<std::uint_fast8_t>((me_)->m_prio)))
 
     // QMPool operations
@@ -88,4 +107,3 @@
 #endif // QP_IMPL
 
 #endif // QP_PORT_HPP_
-

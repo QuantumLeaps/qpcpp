@@ -1,231 +1,301 @@
-# use a recent CMake version
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-cmake_policy(VERSION 3.13)
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
-    cmake_policy(SET CMP0083 NEW)
-endif()
+#============================================================================
+# QP/C++ Real-Time Event Framework (RTEF) -- CMake support
+#
+# QP/C++ is built in-tree, as part of the application, so that the library
+# is always compiled with the application's own qp_config.hpp.
+#
+# Usage in the application's CMakeLists.txt:
+#
+#   # where is qp_config.hpp (and, for embedded targets, the CPU flags)
+#   add_library(qpcpp_config INTERFACE)
+#   target_include_directories(qpcpp_config INTERFACE
+#       ${CMAKE_CURRENT_SOURCE_DIR})
+#
+#   set(QPCPP_PORT win32)        # required, see the list below
+#   set(QPCPP_KERNEL qv)         # arm-cm only: qv (default), qk, qxk
+#   add_subdirectory(<path-to-qpcpp> qpcpp)
+#
+#   target_link_libraries(<app> PRIVATE qpcpp::qpcpp)
+#
+#   link_image(<app> <linker-script>)   # bare-metal: .elf, .map, .bin
+#                                       # (3rd_party/cmake, via the board)
+#
+# Supported ports: win32, win32-qv, posix, posix-qv, arm-cm, freertos
+#
+# Configurations: in the "Spy" configuration, QP/Spy software tracing is
+# built into qpcpp and Q_SPY is defined for qpcpp and for the application.
+#
+# CMake package (optional, OFF by default, host ports only):
+# qpcpp can be built and installed as a CMake package for one qp_config.hpp,
+# which is installed with the package. For example:
+#
+#   cmake -S <path-to-qpcpp> -B build -G "Ninja Multi-Config"
+#         -DCMAKE_CONFIGURATION_TYPES="Debug;Release;Spy"
+#         -DQPCPP_PORT=posix -DQPCPP_CONFIG_DIR=<dir-of-qp_config.hpp>
+#         -DQPCPP_INSTALL=ON                   (all in one command line)
+#   cmake --build build --config Release
+#   cmake --install build --config Release --prefix <install-dir>
+#
+# The application then uses:
+#
+#   find_package(qpcpp 8.1.6 REQUIRED)  # CMAKE_PREFIX_PATH=<install-dir>
+#   target_link_libraries(<app> PRIVATE qpcpp::qpcpp)
+#
+# An application compiled with a different QP configuration than the
+# installed qpcpp library fails to link (QP configuration check, see
+# include/qp_cfgchk.hpp).
+#============================================================================
+cmake_minimum_required(VERSION 3.25)
+project(qpcpp LANGUAGES CXX)
 
-# QPC SDK project root CMakeLists.txt
-set(QPCPP_HOST_PORTS posix win32)
-set(QPCPP_RTOS_PORTS embos freertos threadx uc-os2)
-set(QPCPP_BAREMETAL_PORTS arm-cm arm-cr msp430 pic32)
-set(QPCPP_MISC_PORTS qep-only)
-foreach(p in HOST RTOS BAREMETAL MISC)
-    list(APPEND QPCPP_ALL_PORTS ${QPCPP_${p}_PORTS})
-endforeach()
+set(QPCPP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-# project configuration
-# Kernel
-if(DEFINED ENV{QPCPP_CFG_KERNEL} AND (NOT QPCPP_CFG_KERNEL))
-    set(QPCPP_CFG_KERNEL $ENV{QPCPP_CFG_KERNEL})
-    message("Using QPCPP_CFG_KERNEL from environment ('${QPCPP_CFG_KERNEL}')")
-elseif(NOT QPCPP_CFG_KERNEL)
-    set(QPCPP_CFG_KERNEL qv)
-    message("Set QPCPP_CFG_KERNEL to ('${QPCPP_CFG_KERNEL}') since not specified")
-endif()
+option(QPCPP_INSTALL
+    "qpcpp: install qpcpp as a CMake package (host ports only)" OFF)
 
-# lib type
-if(DEFINED ENV{QPCPP_CFG_LIB_TYPE} AND (NOT QPCPP_CFG_LIB_TYPE))
-    set(QPCPP_CFG_LIB_TYPE $ENV{QPCPP_CFG_LIB_TYPE})
-    message("Using QPCPP_CFG_LIB_TYPE from environment ('${QPCPP_CFG_LIB_TYPE}')")
-elseif(NOT QPCPP_CFG_LIB_TYPE)
-    set(QPCPP_CFG_LIB_TYPE static)
-    message("Set QPCPP_CFG_LIB_TYPE to ('${QPCPP_CFG_LIB_TYPE}') since not specified")
-endif()
-
-if(DEFINED ENV{QPCPP_CFG_PORT} AND (NOT QPCPP_CFG_PORT))
-    set(QPCPP_CFG_PORT $ENV{QPCPP_CFG_PORT})
-    message("Using QPCPP_CFG_PORT from environment ('${QPCPP_CFG_PORT}')")
-endif()
-
-if(NOT QPCPP_CFG_GUI)
-    set(QPCPP_CFG_GUI OFF CACHE BOOL "enable GUI support for matching ports (e.g. win32 or posix & GTK)")
-    message("Set QPCPP_CFG_GUI to ('${QPCPP_CFG_GUI}') since not specified")
-endif()
-
-if(NOT QPCPP_CFG_UNIT_TEST)
-    set(QPCPP_CFG_UNIT_TEST OFF CACHE BOOL "enable detailled unit testing support")
-    message("Set QPCPP_CFG_UNIT_TEST to ('${QPCPP_CFG_UNIT_TEST}') since not specified")
-endif()
-
-if(NOT QPCPP_CFG_DEBUG)
-    set(QPCPP_CFG_DEBUG ON CACHE BOOL "enable debug sessions")
-    message("Set QPCPP_CFG_DEBUG to ('${QPCPP_CFG_DEBUG}') since not specified")
-endif()
-
-if(NOT QPCPP_CFG_VERBOSE)
-    set(QPCPP_CFG_VERBOSE OFF CACHE BOOL "enable verbose build output")
-    message("Set QPCPP_CFG_VERBOSE to ('${QPCPP_CFG_VERBOSE}') since not specified")
-endif()
-
-project(
-    qpcpp
-    VERSION "8.1.4"
-    DESCRIPTION "QPCPP library"
-    LANGUAGES C ASM
-)
-
-# add support for SPY configuration if not set via CMAKE_TOOLCHAIN_FILE
-if(NOT CMAKE_C_FLAGS_SPY)
-    foreach(LANG IN ITEMS C CXX ASM)
-        set(CMAKE_${LANG}_FLAGS_SPY "${CMAKE_${LANG}_FLAGS_DEBUG} -DQ_SPY")
-    endforeach()
-endif()
-
-# check target port plausibility
-if(NOT QPCPP_CFG_PORT)
-    message(WARNING "No PORT is configured! Falling back to target system '${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}'.")
-    if(CMAKE_SYSTEM_NAME)
-        string(TOLOWER ${CMAKE_SYSTEM_NAME} sysName)
-    else()
-        set(sysName generic)
+# check what the application must provide ...................................
+if(NOT TARGET qpcpp_config AND QPCPP_CONFIG_DIR) # qp_config.hpp directory
+    cmake_path(ABSOLUTE_PATH QPCPP_CONFIG_DIR
+        BASE_DIRECTORY ${CMAKE_SOURCE_DIR}
+        NORMALIZE OUTPUT_VARIABLE _cfg_dir)
+    if(NOT EXISTS ${_cfg_dir}/qp_config.hpp)
+        message(FATAL_ERROR "qpcpp: qp_config.hpp not found in "
+            "QPCPP_CONFIG_DIR (${_cfg_dir})")
     endif()
-    if(CMAKE_SYSTEM_PROCESSOR)
-        string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} sysProc)
-    else()
-        set(sysproc none)
-    endif()
-    if((sysName STREQUAL generic) AND (sysProc STREQUAL arm))
-        set(PORT arm-cm)
-    elseif(WIN32)
-        set(PORT win32)
-    elseif(UNIX)
-        set(PORT posix)
-    else()
-        message(FATAL_ERROR No valid target port could be found. Aborting!)
-    endif()
-else()
-    string(TOLOWER ${QPCPP_CFG_PORT} PORT)
+    add_library(qpcpp_config INTERFACE)
+    target_include_directories(qpcpp_config INTERFACE ${_cfg_dir})
+endif()
+if(NOT TARGET qpcpp_config)
+    message(FATAL_ERROR "qpcpp: the application must define the INTERFACE "
+        "target 'qpcpp_config' (with the include directory of its "
+        "qp_config.hpp) "
+        "before add_subdirectory(qpcpp), or set QPCPP_CONFIG_DIR")
+endif()
+if(NOT QPCPP_PORT)
+    message(FATAL_ERROR "qpcpp: set QPCPP_PORT before "
+        "add_subdirectory(qpcpp) "
+        "(win32, win32-qv, posix, posix-qv, arm-cm, freertos)")
+endif()
+string(TOLOWER "${QPCPP_PORT}" _port)
+if(QPCPP_INSTALL AND NOT _port MATCHES "^(win32|win32-qv|posix|posix-qv)$")
+    message(FATAL_ERROR "qpcpp: QPCPP_INSTALL is supported only for the "
+        "host ports (win32, win32-qv, posix, posix-qv), not for "
+        "'${QPCPP_PORT}'")
+endif()
+if(PROJECT_IS_TOP_LEVEL AND NOT DEFINED CMAKE_CXX_FLAGS_SPY)
+    # qpcpp built on its own (e.g., the package): Spy flags as in Debug
+    set(CMAKE_CXX_FLAGS_SPY "${CMAKE_CXX_FLAGS_DEBUG}" CACHE STRING
+        "Flags used by the C++ compiler during Spy builds")
 endif()
 
-if(NOT (${PORT} IN_LIST QPCPP_ALL_PORTS))
-    if(DEFINED PORT)
-        message(FATAL_ERROR "Target port '${PORT}' not found!")
-    else()
-        message(FATAL_ERROR "Target port not defined!")
-    endif()
-endif()
+# the qpcpp library .........................................................
+add_library(qpcpp STATIC)
+add_library(qpcpp::qpcpp ALIAS qpcpp)
 
-set(QPCPP_CFG_PORT ${PORT} CACHE STRING "The QPC target port for the system platform")
-message(STATUS "Set QPCPP_CFG_PORT to ('${QPCPP_CFG_PORT}')")
-
-# check/set Qx real time kernel
-string(TOLOWER ${QPCPP_CFG_KERNEL} KERNEL)
-list (APPEND kernList qv qk qxk)
-if(NOT (${KERNEL} IN_LIST kernList))
-    if(QPCPP_CFG_KERNEL)
-        message(WARNING "Unknown kernel '${QPCPP_CFG_KERNEL}' specified!
-    Falling back to QV kernel")
-    endif()
-    set(QPCPP_CFG_KERNEL QV CACHE STRING "set the desired micro kernel for your project. (default: QV)" FORCE)
-    set(KERNEL qv)
-endif()
-unset(kernList)
-
-# check/set lib type
-string(TOUPPER ${QPCPP_CFG_LIB_TYPE} LIB_TYPE)
-list (APPEND libTypeList OBJECT STATIC)
-if(NOT (${LIB_TYPE} IN_LIST libTypeList))
-    if(QPCPP_CFG_LIB_TYPE)
-        message(WARNING "Unknown library type '${QPCPP_CFG_LIB_TYPE}' specified!
-    Falling back to 'STATIC' library")
-    endif()
-    set(LIB_TYPE STATIC)
-    set(QPCPP_CFG_LIB_TYPE ${LIB_TYPE} CACHE STRING "set to the desired library type (STATIC or OBJECT)" FORCE)
-endif()
-unset(libTypeList)
-
-add_library(qpcpp ${LIB_TYPE} "")
-
-
-# set position independent code compile/link parameters
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
-    include(CheckPIESupported)
-    check_pie_supported()
-endif()
-set_property(TARGET qpcpp PROPERTY POSITION_INDEPENDENT_CODE FALSE)
-
-# set up the include directory search path
+# NOTE: BUILD_INTERFACE/INSTALL_INTERFACE matter only for the package
+target_link_libraries(qpcpp PUBLIC $<BUILD_INTERFACE:qpcpp_config>)
 target_include_directories(qpcpp PUBLIC
-    src
-    include
+    $<BUILD_INTERFACE:${QPCPP_DIR}/include>
+    $<INSTALL_INTERFACE:include/qpcpp>
+    $<INSTALL_INTERFACE:include/qpcpp/config>)
+target_compile_definitions(qpcpp PUBLIC $<$<CONFIG:Spy>:Q_SPY>)
+
+set(_qf_srcs
+    src/qf/qep_hsm.cpp
+    src/qf/qep_msm.cpp
+    src/qf/qf_act.cpp
+    src/qf/qf_actq.cpp
+    src/qf/qf_defer.cpp
+    src/qf/qf_dyn.cpp
+    src/qf/qf_mem.cpp
+    src/qf/qf_ps.cpp
+    src/qf/qf_qact.cpp
+    src/qf/qf_qeq.cpp
+    src/qf/qf_qmact.cpp
+    src/qf/qf_time.cpp
 )
-
-# add subdirectories with source/header files
-add_subdirectory(src)
-add_subdirectory(ports)
-
-# set general defines
-target_compile_definitions(qpcpp PRIVATE
-    $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
-    $<$<BOOL:${QPCPP_CFG_GUI}>:QWIN_GUI>
-    # $<$<CONFIG:Spy>:Q_SPY> # set via toolchain file
-    $<$<AND:$<CONFIG:Spy>,$<BOOL:${QPCPP_CFG_UNIT_TEST}>>:Q_UTEST>
+set(_qs_srcs
+    src/qs/qs.cpp
+    src/qs/qs_rx.cpp
+    src/qs/qs_fp.cpp
+    src/qs/qs_64bit.cpp
 )
+# QP/Spy is not part of every QP/C++ distribution (e.g., not on GitHub):
+# then all other configurations build, and only Spy stops with an error
+if(NOT EXISTS ${QPCPP_DIR}/src/qs/qs.cpp
+        OR NOT EXISTS ${QPCPP_DIR}/include/qs.hpp)
+    message(WARNING "qpcpp: QP/Spy sources (src/qs/qs.cpp, include/qs.hpp) "
+        "not found. The Spy configuration will not build.")
+    set(_qs_srcs "")
+    set(_msg "qpcpp: QP/Spy sources (qs.cpp, qs.hpp) not found")
+    add_custom_target(qpcpp_qs_missing
+        COMMAND "$<$<CONFIG:Spy>:${CMAKE_COMMAND};-E;echo;${_msg}>"
+        COMMAND "$<$<CONFIG:Spy>:${CMAKE_COMMAND};-E;false>"
+        COMMAND_EXPAND_LISTS VERBATIM)
+    add_dependencies(qpcpp qpcpp_qs_missing)
+endif()
+target_sources(qpcpp PRIVATE src/qs/qstamp.cpp) # build date/time
 
-target_compile_options(qpcpp PRIVATE
-    $<$<BOOL:${QPCPP_CFG_VERBOSE}>:-v>
-)
-
-target_link_options(qpcpp PRIVATE
-    $<$<BOOL:${QPCPP_CFG_VERBOSE}>:-v>
-)
-
-target_link_libraries(qpcpp PUBLIC
-    $<$<AND:$<CONFIG:Spy>,$<STREQUAL:win32,${PORT}>>:ws2_32>
-)
-
-# print configuration
-message(STATUS
-"========================================================
-  Configured project ${PROJECT_NAME} for ${PORT}
-    PROJECT_NAME                = ${PROJECT_NAME}
-    TARGET                      = ${TARGET}
-    IMAGE                       = ${IMAGE}
-    SW_VERSION                  = ${SW_VERSION}
-    PORT                        = ${PORT}
-
-    QPCPP_CFG_GUI               = ${QPCPP_CFG_GUI}
-    QPCPP_CFG_UNIT_TEST         = ${QPCPP_CFG_UNIT_TEST}
-    QPCPP_CFG_KERNEL            = ${QPCPP_CFG_KERNEL}
-    QPCPP_CFG_DEBUG             = ${QPCPP_CFG_DEBUG}
-    CMAKE_C_CPPCHECK            = ${CMAKE_C_CPPCHECK}
--- ========================================================
-"
-)
-
-if(QPCPP_CFG_VERBOSE)
-    message(STATUS
-"========================================================
-  System information:
-    CMAKE_VERSION               = ${CMAKE_VERSION}
-    CMAKE_CROSSCOMPILING        = ${CMAKE_CROSSCOMPILING}
-    CMAKE_HOST_SYSTEM           = ${CMAKE_HOST_SYSTEM}
-    CMAKE_HOST_SYSTEM_NAME      = ${CMAKE_HOST_SYSTEM_NAME}
-    CMAKE_HOST_LINUX            = ${CMAKE_HOST_LINUX}
-    CMAKE_HOST_UNIX             = ${CMAKE_HOST_UNIX}
-    CMAKE_HOST_WIN32            = ${CMAKE_HOST_WIN32}
-    CMAKE_SYSTEM                = ${CMAKE_SYSTEM}
-    CMAKE_SYSTEM_NAME           = ${CMAKE_SYSTEM_NAME}
-    CMAKE_SYSTEM_PROCESSOR      = ${CMAKE_SYSTEM_PROCESSOR}
-    WIN32                       = ${WIN32}
-    MSYS                        = ${MSYS}
-    MINGW                       = ${MINGW}
-    UNIX                        = ${UNIX}
-    LINUX                       = ${LINUX}
-
-    CMAKE_BUILD_TYPE            = ${CMAKE_BUILD_TYPE}
-    CMAKE_C_COMPILER            = ${CMAKE_C_COMPILER}
-    CMAKE_C_COMPILER_ID         = ${CMAKE_C_COMPILER_ID}
-    CMAKE_C_COMPILER_VERSION    = ${CMAKE_C_COMPILER_VERSION}
-    CMAKE_C_FLAGS               = ${CMAKE_C_FLAGS}
-
-    CMAKE_CXX_COMPILER          = ${CMAKE_CXX_COMPILER}
-    CMAKE_CXX_FLAGS             = ${CMAKE_CXX_FLAGS}
-
-    CMAKE_ASM_COMPILER          = ${CMAKE_ASM_COMPILER}
-    CMAKE_ASM_FLAGS             = ${CMAKE_ASM_FLAGS}
--- ========================================================
-"
+# the port ..................................................................
+if(_port MATCHES "^(win32|win32-qv|posix|posix-qv)$") #-------- host ports
+    set(_port_dir ${QPCPP_DIR}/ports/${_port})
+    target_sources(qpcpp PRIVATE
+        ${_qf_srcs}
+        ${_port_dir}/qf_port.cpp
+        "$<$<CONFIG:Spy>:${_qs_srcs};${_port_dir}/qs_port.cpp>"
     )
+    if(_port MATCHES "^win32")
+        target_link_libraries(qpcpp PUBLIC $<$<CONFIG:Spy>:ws2_32>) # QS socket
+    else()
+        find_package(Threads REQUIRED)
+        target_link_libraries(qpcpp PUBLIC Threads::Threads)
+    endif()
+
+elseif(_port STREQUAL "arm-cm") #------------------- ARM Cortex-M, bare-metal
+    if(NOT QPCPP_KERNEL)
+        set(QPCPP_KERNEL qv)
+    endif()
+    string(TOLOWER "${QPCPP_KERNEL}" _kernel)
+    if(_kernel STREQUAL "qv")
+        set(_kernel_srcs src/qv/qv.cpp)
+    elseif(_kernel STREQUAL "qk")
+        set(_kernel_srcs src/qk/qk.cpp)
+    elseif(_kernel STREQUAL "qxk")
+        if(NOT EXISTS ${QPCPP_DIR}/src/qxk/qxk.cpp
+                OR NOT EXISTS ${QPCPP_DIR}/include/qxk.hpp)
+            message(FATAL_ERROR "qpcpp: QXK kernel sources (src/qxk/qxk.cpp, "
+                "include/qxk.hpp) not found. QXK is not part of every QP/C++ "
+                "distribution (e.g., not on GitHub). Use QV or QK.")
+        endif()
+        set(_kernel_srcs
+            src/qxk/qxk.cpp
+            src/qxk/qxk_xthr.cpp
+            src/qxk/qxk_sema.cpp
+            src/qxk/qxk_mutex.cpp
+        )
+    else()
+        message(FATAL_ERROR "qpcpp: unknown QPCPP_KERNEL '${QPCPP_KERNEL}' "
+            "(qv, qk, qxk)")
+    endif()
+
+    # the port subdirectory for the compiler
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(_comp gnu)
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "ARMClang")
+        set(_comp armclang)
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "IAR")
+        set(_comp iar)
+    else()
+        message(FATAL_ERROR "qpcpp: arm-cm port: unsupported compiler "
+            "'${CMAKE_CXX_COMPILER_ID}' (GNU, ARMClang, IAR)")
+    endif()
+
+    set(_port_dir ${QPCPP_DIR}/ports/arm-cm/${_kernel}/${_comp})
+    target_sources(qpcpp PRIVATE
+        ${_qf_srcs}
+        ${_kernel_srcs}
+        ${_port_dir}/${_kernel}_port.cpp
+        "$<$<CONFIG:Spy>:${_qs_srcs}>"
+    )
+    if(_comp STREQUAL "gnu")
+        # INTERFACE: compiled into the application, so that the linker
+        # always uses it (from a library it would not be pulled in)
+        target_sources(qpcpp INTERFACE ${_port_dir}/syscalls.c)
+    endif()
+
+elseif(_port STREQUAL "freertos") #----------------------------------- FreeRTOS
+    if(NOT TARGET freertos_kernel)
+        message(FATAL_ERROR "qpcpp: freertos port: add FreeRTOS (target "
+            "'freertos_kernel') before add_subdirectory(qpcpp)")
+    endif()
+    set(_port_dir ${QPCPP_DIR}/ports/freertos)
+    list(REMOVE_ITEM _qf_srcs src/qf/qf_actq.cpp) # FreeRTOS provides the queues
+    target_sources(qpcpp PRIVATE
+        ${_qf_srcs}
+        ${_port_dir}/qf_port.cpp
+        "$<$<CONFIG:Spy>:${_qs_srcs}>"
+    )
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_sources(qpcpp INTERFACE ${_port_dir}/syscalls.c)
+    endif()
+    target_link_libraries(qpcpp PUBLIC freertos_kernel)
+
+else()
+    message(FATAL_ERROR "qpcpp: unknown QPCPP_PORT '${QPCPP_PORT}' "
+        "(win32, win32-qv, posix, posix-qv, arm-cm, freertos)")
+endif()
+
+if(NOT EXISTS ${_port_dir})
+    message(FATAL_ERROR "qpcpp: port directory not found: ${_port_dir}")
+endif()
+target_include_directories(qpcpp PUBLIC $<BUILD_INTERFACE:${_port_dir}>)
+
+message(STATUS "qpcpp: port ${_port_dir}")
+
+# CMake package (QPCPP_INSTALL=ON) ..........................................
+if(QPCPP_INSTALL)
+    # the qp_config.hpp the library is built with (installed with it)
+    get_target_property(_cfg_dirs qpcpp_config INTERFACE_INCLUDE_DIRECTORIES)
+    set(_cfg_file "")
+    foreach(_d IN LISTS _cfg_dirs)
+        string(REGEX REPLACE "^\\$<BUILD_INTERFACE:(.*)>$" "\\1" _d "${_d}")
+        if(EXISTS "${_d}/qp_config.hpp")
+            set(_cfg_file "${_d}/qp_config.hpp")
+            break()
+        endif()
+    endforeach()
+    if(NOT _cfg_file)
+        message(FATAL_ERROR "qpcpp: QPCPP_INSTALL: qp_config.hpp not found "
+            "in the include directories of 'qpcpp_config' (${_cfg_dirs})")
+    endif()
+
+    # the package version from the file version-<x.y.z> in the qpcpp dir.
+    file(GLOB _ver_file RELATIVE ${QPCPP_DIR} ${QPCPP_DIR}/version-*)
+    string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" _ver "${_ver_file}")
+    if(NOT _ver)
+        message(FATAL_ERROR "qpcpp: QPCPP_INSTALL: version file "
+            "${QPCPP_DIR}/version-<x.y.z> not found")
+    endif()
+
+    # the library of each configuration has its own name
+    set_target_properties(qpcpp PROPERTIES
+        DEBUG_POSTFIX _dbg
+        SPY_POSTFIX _spy)
+
+    install(TARGETS qpcpp EXPORT qpcppTargets ARCHIVE DESTINATION lib)
+    install(DIRECTORY ${QPCPP_DIR}/include/ DESTINATION include/qpcpp
+        FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+    install(DIRECTORY ${_port_dir}/ DESTINATION include/qpcpp
+        FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+    # NOTE: qp_config.hpp in its own directory, so that an application's own
+    # qp_config.hpp takes precedence (and is checked by the QP configuration
+    # check), while the installed qp_config.hpp is the default
+    install(FILES ${_cfg_file} DESTINATION include/qpcpp/config)
+    install(EXPORT qpcppTargets NAMESPACE qpcpp:: DESTINATION lib/cmake/qpcpp)
+
+    if(_port MATCHES "^posix")
+        set(_deps "find_dependency(Threads)")
+    else()
+        set(_deps "")
+    endif()
+    file(CONFIGURE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/qpcppConfig.cmake
+        CONTENT [=[
+# qpcpp CMake package: QP/C++ @_ver@ built for the port '@_port@' and for
+# the qp_config.hpp installed with this package
+# (include/qpcpp/config/qp_config.hpp)
+include(CMakeFindDependencyMacro)
+@_deps@
+include("${CMAKE_CURRENT_LIST_DIR}/qpcppTargets.cmake")
+set(qpcpp_PORT "@_port@")
+]=] @ONLY)
+    include(CMakePackageConfigHelpers)
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/qpcppConfigVersion.cmake
+        VERSION ${_ver} COMPATIBILITY ExactVersion)
+    install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/qpcppConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/qpcppConfigVersion.cmake
+        DESTINATION lib/cmake/qpcpp)
+
+    message(STATUS "qpcpp: package ${_ver} with ${_cfg_file}")
 endif()
