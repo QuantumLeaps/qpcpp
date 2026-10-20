@@ -127,7 +127,10 @@ std::uint16_t getPoolUse(std::uint_fast8_t const poolNum) noexcept {
         // calculate the sum of used entries in all event pools
         for (std::uint_fast8_t pool = priv_.maxPool_; pool > 0U; --pool) {
             // add the event pool use from the port-dependent operation
-            nUse += QF_EPOOL_USE_(&priv_.ePool_[pool - 1U]);
+            nUse = static_cast<std::uint16_t>(
+                static_cast<std::uint32_t>(nUse)
+                + static_cast<std::uint32_t>(
+                    QF_EPOOL_USE_(&priv_.ePool_[pool - 1U])));
         }
     }
 

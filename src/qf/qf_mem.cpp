@@ -79,7 +79,9 @@ void QMPool::init(
     m_blockSize = static_cast<QMPoolSize>(2U * sizeof(void *));
     std::uint_fast16_t index = 2U; // index of the next block
     while (m_blockSize < static_cast<QMPoolSize>(blockSize)) {
-        m_blockSize += static_cast<QMPoolSize>(sizeof(void *));
+        m_blockSize = static_cast<QMPoolSize>(
+            static_cast<std::uint32_t>(m_blockSize)
+            + static_cast<std::uint32_t>(sizeof(void *)));
         ++index;
     }
 
@@ -264,7 +266,8 @@ void QMPool::put(
 std::uint16_t QMPool::getUse() const noexcept {
     // NOTE: this function does NOT apply critical section, so it can
     // be safely called from an already established critical section.
-    return static_cast<std::uint16_t>(m_nTot - m_nFree);
+    return static_cast<std::uint16_t>(static_cast<std::uint32_t>(m_nTot)
+                                      - static_cast<std::uint32_t>(m_nFree));
 }
 //............................................................................
 std::uint16_t QMPool::getFree() const noexcept {

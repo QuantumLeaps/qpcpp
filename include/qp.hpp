@@ -32,8 +32,8 @@
 //============================================================================
 #define QP_VERSION_STR  "8.1.6"
 #define QP_VERSION      816U
-// <VER>=816 <DATE>=261102
-#define QP_RELEASE      0x645EFBEFU
+// <VER>=816 <DATE>=261117
+#define QP_RELEASE      0x645CB1FFU
 
 //----------------------------------------------------------------------------
 // default configuration settings
@@ -72,6 +72,9 @@
 #endif
 
 //! @endcond
+
+//----------------------------------------------------------------------------
+#include "qp_cfgchk.hpp" // QP configuration check (link-time)
 
 //----------------------------------------------------------------------------
 // global types/utilities
@@ -462,7 +465,10 @@ private:
 // declarations for friendship with the QActive class
 
 namespace QF {
-    void init();
+    void QF_INIT_CFGCHK_(); // config.-specific name, see "qp_cfgchk.hpp"
+    inline void init() {
+        QF_INIT_CFGCHK_();
+    }
     void stop();
     int_t run();
 
@@ -601,7 +607,6 @@ private:
         QPSet * const subscrSet,
         QEvt const * const e,
         void const * const sender);
-    static QActive* fromRegistry_(std::uint_fast8_t const prio);
 
     // friends...
     friend class QTimeEvt;
@@ -615,7 +620,7 @@ private:
     friend class QXK;
     friend class QS;
 
-    friend void QF::init();
+    friend void QF::QF_INIT_CFGCHK_();
     friend void QF::stop();
     friend int_t QF::run();
     friend void QF::onStartup();
@@ -680,6 +685,9 @@ public:
     }
     std::uint8_t getTickRate() const noexcept {
         return m_tickRate;  // public "getter" for the time-evt tick rate
+    }
+    std::uint8_t getFlags() const noexcept {
+        return m_flags;     // public "getter" for the time-evt flags
     }
     static void tick(
         std::uint_fast8_t const tickRate,
@@ -773,6 +781,12 @@ inline void tick(
     QTimeEvt::tick(tickRate, sender);
 }
 #endif // (QF_MAX_TICK_RATE > 0U)
+
+//----------------------------------------------------------------------------
+// QF base facilities
+QPrioSpec prioSpec(
+    std::uint8_t const prio,
+    std::uint8_t const pthre) noexcept;
 
 //----------------------------------------------------------------------------
 // QF dynamic memory facilities
@@ -894,9 +908,6 @@ extern "C" void QF_onContextSw(QP::QActive * prev, QP::QActive * next);
 
 //----------------------------------------------------------------------------
 // QF base facilities
-
-#define Q_PRIO(prio_, pthre_) \
-    (static_cast<QP::QPrioSpec>((prio_) | (pthre_) << 8U))
 
 #ifndef QEVT_PAR_INIT
     #define Q_NEW(evtT_, sig_)    (QP::QF::q_new<evtT_>((sig_)))

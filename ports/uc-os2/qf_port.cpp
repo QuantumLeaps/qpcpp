@@ -313,7 +313,7 @@ void QActive::evtLoop_(QActive *act) {
 namespace QF {
 
 //............................................................................
-void init() {
+void QF_INIT_CFGCHK_() {
     OSInit();  // initialize uC-OS2
 }
 //............................................................................
@@ -351,8 +351,8 @@ void stop() {
 //
 // B. Explicitly as the higher-byte of the prioSpec parameter.
 //    This option is chosen when the prioSpec parameter is not-zero.
-//    For example, Q_PRIO(10U, 5U) will explicitly specify AO priority
-//    as 10 and uC-OS2 priority as 5.
+//    For example, QP::QF::prioSpec((10U, 5U) will explicitly specify
+//    AO priority as 10 and uC-OS2 priority as 5.
 //
 // CAUTION: The explicit uC-OS2 priority is NOT sanity-checked, so it is the
 // responsibility of the application to ensure that it is consistent with the

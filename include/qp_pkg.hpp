@@ -41,8 +41,31 @@ extern QSignal QActive_maxPubSignal_;
 extern std::array<QTimeEvt, QF_MAX_TICK_RATE> QTimeEvt_head_;
 
 // Bitmasks are for the QTimeEvt::flags attribute
-constexpr std::uint8_t QTE_FLAG_IS_LINKED    {1U << 7U};
-constexpr std::uint8_t QTE_FLAG_WAS_DISARMED {1U << 6U};
+constexpr std::uint8_t QTE_FLAG_IS_LINKED    {1U << 7U}; // linked in its tick-rate list
+constexpr std::uint8_t QTE_FLAG_WAS_DISARMED {1U << 6U}; // the next timeout is valid
+constexpr std::uint8_t QTE_FLAG_POSTED       {1U << 5U}; // timeout posted, not acknowledged
+
+// operations on the QTimeEvt::flags attribute, performed in std::uint32_t,
+// so that the 8-bit operands are NOT promoted to (signed) int
+// (MISRA-C++:2023 Rule 7.0.5)
+inline bool QTE_flagIsSet(std::uint8_t const flags,
+                          std::uint8_t const mask) noexcept
+{
+    return (static_cast<std::uint32_t>(flags)
+            & static_cast<std::uint32_t>(mask)) != 0U;
+}
+inline std::uint8_t QTE_flagSet(std::uint8_t const flags,
+                                std::uint8_t const mask) noexcept
+{
+    return static_cast<std::uint8_t>(static_cast<std::uint32_t>(flags)
+                                     | static_cast<std::uint32_t>(mask));
+}
+inline std::uint8_t QTE_flagClr(std::uint8_t const flags,
+                                std::uint8_t const mask) noexcept
+{
+    return static_cast<std::uint8_t>(static_cast<std::uint32_t>(flags)
+                                     & ~static_cast<std::uint32_t>(mask));
+}
 
 // maximum number of time events linked at one tick rate (see code.dox)
 constexpr std::uint_fast8_t QTE_MAX_LINKED {
@@ -67,15 +90,17 @@ void QEvt_refCtr_dec_(QEvt const * const me) noexcept;
 template<typename T_>
 T_ dis_update(T_ const org) {
     // calculate the Duplicate Inverse Storage (DIS) for the original
-    // variable org
-    return static_cast<T_>(~org);
+    // variable org; the inversion is performed in std::uintmax_t, so that
+    // narrow operands are NOT promoted to (signed) int (MISRA-C++:2023
+    // Rule 7.0.5). The cast back to T_ keeps only the bits of T_.
+    return static_cast<T_>(~static_cast<std::uintmax_t>(org));
 }
 //........................................................................
 template<typename T_>
 bool dis_verify(T_ const org, T_ const dis) {
     // verify that the Duplicate Inverse Storage (DIS) dis matches
-    // the original variable org
-    return dis == static_cast<T_>(~org);
+    // the original variable org (see also dis_update())
+    return dis == static_cast<T_>(~static_cast<std::uintmax_t>(org));
 }
 
 #endif // Q_UNSAFE

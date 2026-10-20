@@ -398,6 +398,11 @@ static inline std::uint32_t QXK_get_IPSR() {
 
 #endif // ARMv6-M
 
+// prevent removal of the QXK objects that are referenced only from
+// the assembly code (e.g., with link-time optimization). Compiler-specific:
+// __attribute__((used)) for GNU-ARM/ARMCLANG, __root for IAR.
+#define QXK_USED  __attribute__((used))
+
 // initialization of the QXK kernel
 #define QXK_INIT()      QXK_init()
 

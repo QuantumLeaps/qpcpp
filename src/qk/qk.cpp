@@ -294,7 +294,7 @@ void QK::activate_() {
 namespace QF {
 
 //............................................................................
-void init() {
+void QF_INIT_CFGCHK_() {
     // setup the QK scheduler as initially locked and not running
     QK::priv_.lockCeil = (QF_MAX_ACTIVE + 1U); // scheduler locked
 
@@ -304,6 +304,8 @@ void init() {
 }
 //............................................................................
 int_t run() {
+    QS_FLUSH(); // flush the trace buffer produced during the startup
+
     QF_INT_DISABLE();
     // no AO may be scheduled before QF::run()
     Q_REQUIRE_INCRIT(610, QK::priv_.nextPrio == 0U);
@@ -364,21 +366,22 @@ void QActive::start(
     QF_CRIT_EXIT();
 
     m_prio  = static_cast<std::uint8_t>(prioSpec & 0xFFU); // prio. of the AO
-    m_pthre = static_cast<std::uint8_t>(prioSpec >> 8U);   // preemption-thre.
+    m_pthre = static_cast<std::uint8_t>( // preemption-thre.
+                  static_cast<std::uint32_t>(prioSpec) >> 8U);
     register_(); // register this AO with the framework
 
     m_eQueue.init(qSto, qLen); // init the built-in queue
 
+    // lock the scheduler up to the priority of this AO, so that this AO
+    // cannot be activated before its top-most initial tran. completes
+    // (e.g., by an event it posts to itself) if QK is already running
+    QSchedStatus const lockStat = QK::schedLock(m_prio);
+
     // top-most initial tran. (virtual call)
     this->init(par, m_prio);
-    QS_FLUSH(); // flush the trace buffer to the host
 
-    // see if this AO needs to be scheduled if QK is already running
-    QF_CRIT_ENTRY();
-    if (QK::sched_() != 0U) { // activation needed?
-        QK::activate_();
-    }
-    QF_CRIT_EXIT();
+    // unlock the scheduler, which activates this AO if it is ready
+    QK::schedUnlock(lockStat);
 }
 
 } // namespace QP
