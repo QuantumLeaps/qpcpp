@@ -48,6 +48,9 @@
 #include "qp_port.hpp" // use QS with QF
 #endif
 
+#define QS_MEM_SYS() QF_MEM_SYS()
+#define QS_MEM_APP() QF_MEM_APP()
+
 #include "qs.hpp"      // QS platform-independent public interface
 
 #endif // QS_PORT_HPP_
